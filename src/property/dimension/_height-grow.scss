@@ -1,0 +1,9 @@
+.jumi-height-grow {
+  --effect: jumi-height-grow;
+}
+
+@keyframes jumi-height-grow {
+  to {
+    height: 100%;
+  }
+}

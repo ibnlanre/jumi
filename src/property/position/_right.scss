@@ -1,0 +1,12 @@
+@for $sequence from 0 through 10 {
+  .jumi-position-r-#{$sequence} {
+    @include function-generator("pr");
+    --pr: jumi-position-r-#{$sequence};
+  }
+
+  @keyframes jumi-position-r-#{$sequence} {
+    to {
+      right: calc(#{$sequence} * 10%);
+    }
+  }
+}

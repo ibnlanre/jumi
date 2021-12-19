@@ -1,0 +1,12 @@
+@for $sequence from 0 through 10 {
+  .jumi-position-l-#{$sequence} {
+    @include function-generator("pl");
+    --pl: jumi-position-l-#{$sequence};
+  }
+
+  @keyframes jumi-position-l-#{$sequence} {
+    to {
+      left: calc(#{$sequence} * 10%);
+    }
+  }
+}

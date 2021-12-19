@@ -1,0 +1,4 @@
+// jumi-rotate-tl-1 ... jumi-rotate-tl-20
+@for $sequence from 1 through 20 {
+  @include rotate-generator(1, -1, 0, "d", "tl", $sequence);
+}

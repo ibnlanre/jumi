@@ -1,0 +1,8 @@
+:root {
+  @include animation-generator("position");
+}
+
+@import "bottom";
+@import "left";
+@import "right";
+@import "top";

@@ -1,0 +1,10 @@
+.jumi-flip-from-bottom {
+  @include function-generator("effect");
+  animation-name: jumi-flip-from-bottom;
+}
+
+@keyframes jumi-flip-from-bottom {
+  from {
+    transform: translateY(--y-distance) perspective(--perspective) rotateX(-180deg);
+  }
+}

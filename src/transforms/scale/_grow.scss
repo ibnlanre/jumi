@@ -1,0 +1,17 @@
+@for $sequence from 1 through 20 {
+  .jumi-grow-#{$sequence},
+  .hover\:jumi-grow-#{$sequence}:hover {
+    @include function-generator("scale");
+    --scale: jumi-grow-#{$sequence};
+  }
+  
+  @keyframes jumi-grow-#{$sequence} {
+    to {
+      transform: scale(calc(#{$sequence * 5%}));
+    }
+  }
+
+  .base\:jumi-grow-#{$sequence} {
+    transform: scale(calc(#{$sequence * 5%}));
+  }
+}

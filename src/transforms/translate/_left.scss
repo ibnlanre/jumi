@@ -1,0 +1,4 @@
+@for $sequence from 1 through 20 {
+  @include translate-generator(-1, 0, 0, "x", "l", $sequence);
+}
+

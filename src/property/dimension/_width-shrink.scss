@@ -1,0 +1,9 @@
+.jumi-width-shrink {
+  --effect: jumi-width-shrink;
+}
+
+@keyframes jumi-width-shrink {
+  to {
+    width: 0%;
+  }
+}

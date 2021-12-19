@@ -1,0 +1,10 @@
+.jumi-flip-from-top {
+  @include function-generator("effect");
+  animation-name: jumi-flip-from-top;
+}
+
+@keyframes jumi-flip-from-top {
+  from {
+    transform: translateY(--y-distance) perspective(--perspective) rotateX(180deg);
+  }
+}

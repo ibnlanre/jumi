@@ -1,0 +1,10 @@
+.jumi-speed-out {
+  @include function-generator("effect");
+  --effect: jumi-speed-out;
+}
+
+@keyframes jumi-speed-out {
+  100% {
+    transform: translate3d(100%, 0, 0) skewX(30deg);
+  }
+}

@@ -1,0 +1,8 @@
+:root {
+  @include animation-generator("perspective");
+}
+
+// jumi-perspective-1 ... jumi-perspective-20
+@for $sequence from 1 through 20 {
+  @include brew("perspective", "perspective-#{$sequence}", calc($sequence * 100px));
+}

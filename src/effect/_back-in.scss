@@ -1,0 +1,18 @@
+.jumi-back-in {
+  @include function-generator("effect");
+  animation-name: jumi-back-in;
+}
+
+@keyframes jumi-back-in {
+  0% {
+    scale: 0.7;
+  }
+
+  80% {
+    scale: 0.7;
+  }
+
+  100% {
+    scale: 1;
+  }
+}

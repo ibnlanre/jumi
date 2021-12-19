@@ -1,0 +1,16 @@
+@for $sequence from 1 through 20 {
+  .jumi-fade-out {
+    @include function-generator("opacity");
+    --opacity: jumi-fade-out;
+  }
+  
+  @keyframes jumi-fade-out {
+    to {
+      opacity: 1;
+    }
+  }
+
+  .base\:jumi-fade-out-#{$sequence} {
+    opacity: calc($sequence * 5%);
+  }
+}

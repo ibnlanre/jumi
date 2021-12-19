@@ -1,0 +1,10 @@
+.jumi-height-shrink {
+  
+  --dimension: jumi-height-shrink;
+}
+
+@keyframes jumi-height-shrink {
+  to {
+    height: 0%;
+  }
+}

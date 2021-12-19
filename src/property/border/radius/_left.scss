@@ -1,0 +1,10 @@
+.jumi-left-in {
+  --border-radius: jumi-left-in;
+}
+
+@keyframes jumi-left-in {
+  to {
+    border-top-left-radius: 50%;
+    border-bottom-left-radius: 50%;
+  }
+}

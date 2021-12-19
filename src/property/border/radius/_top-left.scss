@@ -1,0 +1,9 @@
+.jumi-top-left-in {
+  --border-radius: jumi-top-left-in;
+}
+
+@keyframes jumi-top-left-in {
+  to {
+    border-top-left-radius: 50%;
+  }
+}

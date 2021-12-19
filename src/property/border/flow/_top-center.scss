@@ -1,0 +1,44 @@
+@mixin jumi-border-tc {
+	position: relative;
+	overflow-x: hidden;
+
+	&:before {
+		content: "";
+		position: absolute;
+		background: currentColor;
+		height: 3px;
+		z-index: -1;
+		top: 0;
+		left: 51%;
+		right: 51%;
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+
+		&:before {
+			left: 0;
+			right: 0;
+		}
+	}
+}
+
+@for $sequence from 1 through 20 {
+  .jumi-border-tc-#{$sequence},
+  .hover\:jumi-translate-r-#{$sequence}:hover {
+    @include function-generator(border);
+    --translate-x: calc(#{$sequence} * 5vh);
+    --tx: jumi-translate-r-#{$sequence};
+  }
+  
+  @keyframes jumi-translate-r-#{$sequence} {
+    to {
+      transform: translateY(var(--translate-x));
+    }
+  }
+
+  .base\:jumi-translate-r-#{$sequence} {
+    transform: translateY(var(--translate-x));
+  }
+}

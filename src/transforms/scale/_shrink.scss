@@ -1,0 +1,17 @@
+@for $sequence from 1 through 20 {
+  .jumi-shrink-#{$sequence},
+  .hover\:jumi-shrink-#{$sequence}:hover {
+    @include function-generator("scale");
+    --scale: jumi-shrink-#{$sequence};
+  }
+  
+  @keyframes jumi-shrink-#{$sequence} {
+    to {
+      transform: scale(calc(#{$sequence * -5%}));
+    }
+  }
+
+  .base\:jumi-shrink-#{$sequence} {
+    transform: scale(calc(#{$sequence * -5%}));
+  }
+}

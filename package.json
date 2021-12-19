@@ -1,0 +1,21 @@
+{
+  "name": "jumi",
+  "version": "1.0.0",
+  "description": "composable animation classes",
+  "main": "jumi.css",
+  "scripts": {
+    "develop": "sass src/jumi.scss tests/jumi.css"
+  },
+  "keywords": [
+    "gsap",
+    "tailwindcss",
+    "animation",
+    "composable"
+  ],
+  "author": "Ridwan Olanrewaju",
+  "license": "MIT",
+  "dependencies": {
+    "purgecss": "^4.1.3",
+    "sass": "^1.43.5"
+  }
+}

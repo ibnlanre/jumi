@@ -1,0 +1,13 @@
+.jumi-blur {
+  @include function-generator("effect");
+  --effect: jumi-blur;
+}
+
+@keyframes jumi-blur {
+  from {
+    filter: blur(32px);
+  }
+  to {
+    filter: blur(0);
+  }
+}

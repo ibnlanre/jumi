@@ -1,0 +1,9 @@
+:root {
+  @include animation-generator("height");
+  @include animation-generator("width");
+}
+
+@import "height-grow";
+@import "height-shrink";
+@import "width-grow";
+@import "width-shrink";

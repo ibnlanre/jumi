@@ -1,0 +1,69 @@
+:root {
+  --rotation-d: 0;
+  @include animation-generator("rd");
+
+  --x-angle: 0;
+  --rotation-x: 0;
+  @include animation-generator("rx");
+
+  --y-angle: 0;
+  --rotation-y: 0;
+  @include animation-generator("ry");
+
+  --z-angle: 0;
+  --rotation-z: 0;
+  @include animation-generator("rz");
+}
+
+@mixin checker($x, $y, $z) {
+  @if ($x != 0) {
+    --x-angle: #{$x};
+  }
+  @if ($y != 0) {
+    --y-angle: #{$y};
+  }
+  @if ($z != 0) {
+    --z-angle: #{$z};
+  }
+}
+
+@mixin rotate-generator($x, $y, $z, $axis, $position, $level) {
+  .jumi-rotate-#{$position}-#{$level},
+  .hover\:jumi-rotate-#{$position}-#{$level}:hover {
+    @include checker($x, $y, $z);
+    --rotation-#{$axis}: #{$level * 0.05};
+
+    @include function-generator(r#{$axis});
+    --r#{$axis}: jumi-rotate-#{$position}-#{$level};
+  }
+
+  $transformation: rotate3d(
+    #{var(--x-angle)},
+    #{var(--y-angle)},
+    #{var(--z-angle)},
+    calc(var(--rotation-#{$axis}) * 360deg)
+  );
+
+  @keyframes jumi-rotate-#{$position}-#{$level} {
+    to {
+      transform: #{$transformation};
+    }
+  }
+
+  .base\:jumi-rotate-#{$position}-#{$level} {
+    @include checker($x, $y, $z);
+    --rotation-#{$axis}: #{$level * 0.05};
+    transform: #{$transformation};
+  }
+}
+
+@import "anticlockwise";
+@import "bottom-left";
+@import "bottom-right";
+@import "bottom";
+@import "clockwise";
+@import "left";
+@import "right";
+@import "top-left";
+@import "top-right";
+@import "top";

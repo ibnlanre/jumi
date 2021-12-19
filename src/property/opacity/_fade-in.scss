@@ -1,0 +1,10 @@
+.jumi-fade-in {
+  @include function-generator("opacity");
+  --opacity: jumi-fade-in;
+}
+
+@keyframes jumi-fade-in {
+  to {
+    opacity: 1;
+  }
+}

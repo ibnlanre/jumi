@@ -1,0 +1,24 @@
+@mixin jumi-border-bc {
+	position: relative;
+	overflow-x: hidden;
+
+	&:before {
+		content: "";
+		position: absolute;
+		background: currentColor;
+		height: 3px;
+		z-index: -1;
+		top: 0;
+		left: 0;
+		right: 100%;
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+
+		&:before {
+			right: 0;
+		}
+	}
+}

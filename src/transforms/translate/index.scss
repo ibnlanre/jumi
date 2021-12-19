@@ -1,0 +1,68 @@
+:root {
+  --translate-d: 0;
+  @include animation-generator(td);
+
+  --translate-x: 0;
+  @include animation-generator(tx);
+
+  --translate-y: 0;
+  @include animation-generator(ty);
+
+  --translate-z: 0;
+  @include animation-generator(tz);
+}
+
+@function distance($level, $form) {
+  @return calc($level * 5% * $form);
+}
+
+@mixin checker($x, $y, $z, $level) {
+  @if ($x != 0) {
+    --translate-x: #{distance($level, $x)};
+  }
+  @if ($y != 0) {
+    --translate-y: #{distance($level, $y)};
+  }
+  @if ($z != 0) {
+    --translate-z: #{distance($level, $z)};
+  }
+}
+
+@mixin translate-generator($x, $y, $z, $axis, $position, $level) {
+  $form: if($axis == "x", $x, if($axis == "y", $y, $z));
+
+  .jumi-translate-#{$position}-#{$level},
+  .hover\:jumi-translate-#{$position}-#{$level}:hover {
+    @include checker($x, $y, $z, $level);
+    @include function-generator(t#{$axis});
+    --t#{$axis}: jumi-translate-#{$position}-#{$level};
+  }
+
+  $transformation: translate3d(
+    #{var(--translate-x)},
+    #{var(--translate-y)},
+    #{var(--translate-z)}
+  );
+
+  @keyframes jumi-translate-#{$position}-#{$level} {
+    to {
+      transform: #{$transformation};
+    }
+  }
+
+  .base\:jumi-translate-#{$position}-#{$level} {
+    @include checker($x, $y, $z, $level);
+    transform: #{$transformation};
+  }
+}
+
+@import "bottom-left";
+@import "bottom-right";
+@import "bottom";
+
+@import "left";
+@import "right";
+
+@import "top-left";
+@import "top-right";
+@import "top";
