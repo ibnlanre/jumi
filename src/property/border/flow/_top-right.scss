@@ -1,24 +1,23 @@
-@mixin jumi-border-bc {
-	position: relative;
-	overflow-x: hidden;
+@mixin jumi-border-tr {
+  visibility: hidden;
+  position: absolute;
+	width: 0;
+  top: 0;
+  right: 0;
+}
 
-	&:before {
-		content: "";
-		position: absolute;
-		background: currentColor;
-		height: 3px;
-		z-index: -1;
-		top: 0;
-		left: 100%;
-		right: 0;
-	}
+@for $sequence from 1 through 20 {
+  .jumi-border-tr-#{$sequence},
+  .hover\:jumi-border-tr-#{$sequence}:hover {
+    @include jumi-border-tr;
+    @include function-generator(border);
+    --border: jumi-border-tr-#{$sequence};
+  }
 
-	&:hover,
-	&:focus,
-	&:active {
-
-		&:before {
-			left: 0;
-		}
-	}
+  @keyframes jumi-border-tr-#{$sequence} {
+    to {
+      visibility: visible;
+      width: #{$sequence * 5%};
+    }
+  }
 }

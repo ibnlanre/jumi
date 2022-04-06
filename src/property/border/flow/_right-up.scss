@@ -1,20 +1,20 @@
-@mixin jumi-border-rd {
+@mixin jumi-border-ru {
   visibility: hidden;
   position: absolute;
 	height: 0;
   right: 0;
-  top: 0;
+  bottom: 0;
 }
 
 @for $sequence from 1 through 20 {
-  .jumi-border-rd-#{$sequence},
-  .hover\:jumi-border-rd-#{$sequence}:hover {
-    @include jumi-border-rd;
+  .jumi-border-ru-#{$sequence},
+  .hover\:jumi-border-ru-#{$sequence}:hover {
+    @include jumi-border-ru;
     @include function-generator(border);
-    --border: jumi-border-rd-#{$sequence};
+    --border: jumi-border-ru-#{$sequence};
   }
 
-  @keyframes jumi-border-rd-#{$sequence} {
+  @keyframes jumi-border-ru-#{$sequence} {
     to {
       visibility: visible;
       height: #{$sequence * 5%};

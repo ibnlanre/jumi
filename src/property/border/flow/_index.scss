@@ -1,0 +1,16 @@
+:root {
+  @include animation-generator("border");
+}
+
+@import "bottom-center";
+@import "bottom-left";
+@import "bottom-right";
+@import "left-center";
+@import "left-down";
+@import "left-up";
+@import "right-center";
+@import "right-down";
+@import "right-up";
+@import "top-center";
+@import "top-left";
+@import "top-right";

@@ -1,26 +1,26 @@
-@mixin jumi-border-bc {
-	position: relative;
-	overflow-x: hidden;
+@mixin jumi-border-lc {
+  visibility: hidden;
+  position: absolute;
+	height: 0;
+  left: 0;
+  top: 50%;
+  bottom: 50%;
+  margin-top: auto;
+  margin-bottom: auto;
+}
 
-	&:before {
-		content: "";
-		position: absolute;
-		background: currentColor;
-		width: 3px;
-    height: 100%;
-		z-index: -1;
-		left: 0;
-		top: 51%;
-		bottom: 51%;
-	}
+@for $sequence from 1 through 20 {
+  .jumi-border-lc-#{$sequence},
+  .hover\:jumi-border-lc-#{$sequence}:hover {
+    @include jumi-border-lc;
+    @include function-generator(border);
+    --border: jumi-border-lc-#{$sequence};
+  }
 
-	&:hover,
-	&:focus,
-	&:active {
-
-		&:before {
-			top: 0;
-			bottom: 0;
-		}
-	}
+  @keyframes jumi-border-lc-#{$sequence} {
+    to {
+      visibility: visible;
+      height: #{$sequence * 5%};
+    }
+  }
 }

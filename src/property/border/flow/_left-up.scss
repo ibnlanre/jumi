@@ -1,0 +1,23 @@
+@mixin jumi-border-lu {
+  visibility: hidden;
+  position: absolute;
+	height: 0;
+  left: 0;
+  bottom: 0;
+}
+
+@for $sequence from 1 through 20 {
+  .jumi-border-lu-#{$sequence},
+  .hover\:jumi-border-lu-#{$sequence}:hover {
+    @include jumi-border-lu;
+    @include function-generator(border);
+    --border: jumi-border-lu-#{$sequence};
+  }
+
+  @keyframes jumi-border-lu-#{$sequence} {
+    to {
+      visibility: visible;
+      height: #{$sequence * 5%};
+    }
+  }
+}
