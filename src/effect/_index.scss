@@ -1,4 +1,5 @@
-:root {
+:root,
+.jumi-reset {
   @include animation-generator("effect");
 }
 

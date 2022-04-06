@@ -5,6 +5,6 @@
 
 @keyframes jumi-flip-from-top {
   from {
-    transform: translateY(--y-distance) perspective(--perspective) rotateX(180deg);
+    transform: translateY(--translate-y) perspective(--perspective) rotateX(180deg);
   }
 }

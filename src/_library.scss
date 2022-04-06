@@ -82,11 +82,11 @@
     .jumi#{$property}-#{$prefix} {
       -#{$property}-timing-function: #{$prefix};
     }
-  
+
     @if (str-index($prefix, "ease")) {
       @each $easing in $easings {
         $ease: map-get($easing-types, #{$prefix}-#{$easing});
-  
+
         .jumi-#{$prefix}-#{$easing} {
           -#{$property}-timing-function: #{$ease};
         }
@@ -142,7 +142,7 @@
   @include fill-mode-generator($property);
 
   // TIMING-FUNCTION
-  @include easing-generator(-#{$property})
+  @include easing-generator(-#{$property});
 }
 
 //////////////////////////////////////////////////
@@ -155,6 +155,6 @@
     $value: $value + ", " + var(--#{$property}-fn);
   }
 
-  // animation: $value;
-  animation: var(--rz-fn);
+  animation: $value;
+  backface-visibility: visible;
 }

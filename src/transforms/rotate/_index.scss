@@ -1,4 +1,5 @@
-:root {
+:root,
+.jumi-reset {
   --rotation-d: 0;
   @include animation-generator("rd");
 
@@ -30,9 +31,6 @@
 @mixin rotate-generator($x, $y, $z, $axis, $position, $level) {
   .jumi-rotate-#{$position}-#{$level},
   .hover\:jumi-rotate-#{$position}-#{$level}:hover {
-    @include checker($x, $y, $z);
-    --rotation-#{$axis}: #{$level * 0.05};
-
     @include function-generator(r#{$axis});
     --r#{$axis}: jumi-rotate-#{$position}-#{$level};
   }
@@ -46,6 +44,8 @@
 
   @keyframes jumi-rotate-#{$position}-#{$level} {
     to {
+      @include checker($x, $y, $z);
+      --rotation-#{$axis}: #{$level * 0.05};
       transform: #{$transformation};
     }
   }

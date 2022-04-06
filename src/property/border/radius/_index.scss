@@ -1,3 +1,8 @@
+:root,
+.jumi-reset {
+  @include animation-generator("border-radius");
+}
+
 @import "bottom-left";
 @import "bottom-right";
 @import "left";

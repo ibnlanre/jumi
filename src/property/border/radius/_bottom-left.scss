@@ -5,7 +5,7 @@
 
   @keyframes jumi-radius-bl-#{$sequence} {
     to {
-      border-bottom-left-radius: calc(#{$sequence} * 5%);
+      border-bottom-left-radius: #{$sequence * 5%};
     }
   }
 }
