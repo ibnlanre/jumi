@@ -1,17 +1,6 @@
-.jumi-bottom-right-in {
-  --border-radius: jumi-bottom-right-in;
-}
-
-@keyframes jumi-bottom-right-in {
-  to {
-    border-bottom-right-radius: 50%;
-  }
-}
-
-
 @for $sequence from 0 through 20 {
   .jumi-radius-br-#{$sequence} {
-    --: jumi-radius-bl-#{$sequence};
+    --radius: jumi-radius-bl-#{$sequence};
   }
 
   @keyframes jumi-radius-bl-#{$sequence} {

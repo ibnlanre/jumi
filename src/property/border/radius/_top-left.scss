@@ -1,9 +1,11 @@
-.jumi-top-left-in {
-  --border-radius: jumi-top-left-in;
-}
+@for $sequence from 0 through 20 {
+  .jumi-radius-tl-#{$sequence} {
+    --pb: jumi-radius-tl-#{$sequence};
+  }
 
-@keyframes jumi-top-left-in {
-  to {
-    border-top-left-radius: 50%;
+  @keyframes jumi-radius-tl-#{$sequence} {
+    to {
+      border-top-left-radius: #{$sequence * 5%};
+    }
   }
 }

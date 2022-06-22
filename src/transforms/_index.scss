@@ -1,3 +1,27 @@
+:root,
+.jumi-reset {
+  @include animation-generator("transform");
+  @each $property in $transformations {
+    --#{$property}-transform: !important;
+  }
+}
+
+.jumi-transform {
+  @include function-generator("transform");
+  --transform: jumi-transform;
+
+  $transforms: "";
+  @each $property in $transformations {
+    $transforms: $transforms + " " + var(--#{$property}-transform);
+  }
+
+  @keyframes jumi-transform {
+    to {
+      transform: #{$transforms};
+    }
+  }
+}
+
 @import "perspective";
 @import "perspective-origin";
 @import "rotate";

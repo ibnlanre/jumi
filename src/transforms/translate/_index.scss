@@ -32,28 +32,22 @@
 @mixin translate-generator($x, $y, $z, $axis, $position, $level) {
   $form: if($axis == "x", $x, if($axis == "y", $y, $z));
 
-  .jumi-translate-#{$position}-#{$level},
-  .hover\:jumi-translate-#{$position}-#{$level}:hover {
-    @include checker($x, $y, $z, $level);
-    @include function-generator(t#{$axis});
-    --t#{$axis}: jumi-translate-#{$position}-#{$level};
-  }
-
   $transformation: translate3d(
     #{var(--translate-x)},
     #{var(--translate-y)},
     #{var(--translate-z)}
   );
 
-  @keyframes jumi-translate-#{$position}-#{$level} {
-    to {
-      transform: #{$transformation};
-    }
+  .jumi-translate-#{$position}-#{$level},
+  .hover\:jumi-translate-#{$position}-#{$level}:hover {
+    @include checker($x, $y, $z, $level);
+    --t#{$axis}-transform: #{$transformation};
   }
 
   .base\:jumi-translate-#{$position}-#{$level} {
     @include checker($x, $y, $z, $level);
-    transform: #{$transformation};
+    --t#{$axis}-transform: #{$transformation};
+    transform: var(--translate-transform);
   }
 }
 

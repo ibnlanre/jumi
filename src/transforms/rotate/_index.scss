@@ -29,12 +29,6 @@
 }
 
 @mixin rotate-generator($x, $y, $z, $axis, $position, $level) {
-  .jumi-rotate-#{$position}-#{$level},
-  .hover\:jumi-rotate-#{$position}-#{$level}:hover {
-    @include function-generator(r#{$axis});
-    --r#{$axis}: jumi-rotate-#{$position}-#{$level};
-  }
-
   $transformation: rotate3d(
     #{var(--x-angle)},
     #{var(--y-angle)},
@@ -42,18 +36,18 @@
     calc(var(--rotation-#{$axis}) * 360deg)
   );
 
-  @keyframes jumi-rotate-#{$position}-#{$level} {
-    to {
-      @include checker($x, $y, $z);
-      --rotation-#{$axis}: #{$level * 0.05};
-      transform: #{$transformation};
-    }
+  .jumi-rotate-#{$position}-#{$level},
+  .hover\:jumi-rotate-#{$position}-#{$level}:hover {
+    @include checker($x, $y, $z);
+    --rotation-#{$axis}: #{$level * 0.05};
+    --r#{$axis}-transform: #{$transformation};
   }
 
   .base\:jumi-rotate-#{$position}-#{$level} {
     @include checker($x, $y, $z);
     --rotation-#{$axis}: #{$level * 0.05};
-    transform: #{$transformation};
+    --r#{$position}-transform: #{$transformation};
+    transform: var(--rz-transform);
   }
 }
 

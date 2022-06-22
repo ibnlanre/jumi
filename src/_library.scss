@@ -150,7 +150,7 @@
 //////////////////////////////////////////////////
 
 @mixin jumi {
-  $value: var(--effect-fn);
+  $value: var(--transform-fn);
   @each $property in $properties {
     $value: $value + ", " + var(--#{$property}-fn);
   }
