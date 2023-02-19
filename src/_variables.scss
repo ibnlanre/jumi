@@ -1,12 +1,11 @@
 $untimed-members: "style", "perspective-origin", "origin";
-$timed-members: "effect", "height", "width", "rd", "rx", "ry", "rz",
-  "position", "dimension", "perspective", "td", "tx", "ty", "tz", "rotate",
-  "scale";
+$timed-members: "effect", "height", "width", "rd", "rx", "ry", "rz", "position",
+  "dimension", "perspective", "td", "tx", "ty", "tz", "rotate", "scale";
 
-$properties: "border", "border-radius", "height", "width", "rd", "rx", "ry", "rz", "td", "tx", "ty", "tz",
-  "origin", "perspective", "perspective-origin";
+$properties: "effect", "border", "border-radius", "height", "width", "origin",
+  "perspective", "perspective-origin";
 
-$transforms: "perspective", "perspective-origin", "origin", "rotate", "rotate3d", "scale", "scale3d", "skew", "skewX", "skewY";
+$transformations: "rd", "rx", "ry", "rz", "td", "tx", "ty", "tz";
 
 $timing-in-ms: 25, 50, 75, 100, 200, 300, 400, 500, 600, 700, 800, 900;
 $timing-in-s: 1, 2, 3, 4, 5, 6, 7, 8, 9;
