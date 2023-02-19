@@ -1,16 +1,9 @@
 :root,
 .jumi-reset {
   --translate-d: 0;
-  @include animation-generator(td);
-
   --translate-x: 0;
-  @include animation-generator(tx);
-
   --translate-y: 0;
-  @include animation-generator(ty);
-
   --translate-z: 0;
-  @include animation-generator(tz);
 }
 
 @function distance($level, $form) {

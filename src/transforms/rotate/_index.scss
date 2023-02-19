@@ -1,19 +1,15 @@
 :root,
 .jumi-reset {
   --rotation-d: 0;
-  @include animation-generator("rd");
-
+  
   --x-angle: 0;
   --rotation-x: 0;
-  @include animation-generator("rx");
 
   --y-angle: 0;
   --rotation-y: 0;
-  @include animation-generator("ry");
 
   --z-angle: 0;
   --rotation-z: 0;
-  @include animation-generator("rz");
 }
 
 @mixin checker($x, $y, $z) {

@@ -1,11 +1,11 @@
 @for $sequence from 0 through 20 {
   .jumi-radius-br-#{$sequence} {
-    --radius: jumi-radius-bl-#{$sequence};
+    --radius: jumi-radius-br-#{$sequence};
   }
 
-  @keyframes jumi-radius-bl-#{$sequence} {
+  @keyframes jumi-radius-br-#{$sequence} {
     to {
-      border-bottom-left-radius: calc(#{$sequence} * 5%);
+      border-bottom-right-radius: calc(#{$sequence} * 5%);
     }
   }
 }

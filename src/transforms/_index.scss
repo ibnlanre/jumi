@@ -1,8 +1,12 @@
 :root,
 .jumi-reset {
   @include animation-generator("transform");
+}
+
+:root,
+.jumi-reset {
   @each $property in $transformations {
-    --#{$property}-transform: !important;
+    --#{$property}-transform: ;
   }
 }
 
