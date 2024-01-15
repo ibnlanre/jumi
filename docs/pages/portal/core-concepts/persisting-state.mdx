@@ -1,0 +1,89 @@
+---
+
+title: Persisting State
+description: Learn how to persist state using Portal's built-in hooks
+
+---
+
+# Persisting state
+
+Rather than using the configuration object to manually persist state, `portal` provides utility hooks to do so. Internally, each of these hooks use the `set` and `get` properties to modify the state, before it is used. The `get` function is called on the retrieved value before it is set as the next state. While, the `set` function is called on the current state before it is passed to the browser storage.
+
+The following code snippet demonstrates how the mechanism is implemented **internally**:
+
+```typescript copy filename="portal.ts"
+const {
+  set = (value: State) => JSON.stringify(value),
+  get = (value: string) => JSON.parse(value),
+} = { ...config };
+```
+
+## Using the hooks
+
+Although the hooks are not prefixed with `use`, they are still React hooks. This is because they are internally referencing functions that are named with the `use` prefix. Thus, they should be used within a React component. The following are the available hooks:
+
+### `.local()`
+
+#### Using the `local` hook
+
+The `local` hook is used to persist the state in `localStorage`. The following code snippet demonstrates how to use the `local` hook:
+
+```typescript copy filename="portal-local.tsx"
+const [name, setName] = portal.local("client");
+```
+
+#### Modifying the `local` hook
+
+The `local` hook uses the `localStorage` API to persist the state. The `localStorage` API accepts a `key` and a `value` as arguments. The `value` is converted to a string using the `JSON.stringify` function before it is persisted. The following code snippet demonstrates how to override the `set` and `get` properties of the `local` hook:
+
+```typescript copy filename="portal-local-modified.tsx"
+const [name, setName] = portal.local("client", {
+  set: (value) => encrypt(value),
+  get: (value) => decrypt(value),
+});
+```
+
+### `.session()`
+
+#### Using the `session` hook
+
+The `session` hook is used to persist the state in `sessionStorage`. The following code snippet demonstrates how to use the `session` hook:
+
+```typescript copy filename="portal-session.tsx"
+const [name, setName] = portal.session("client");
+```
+
+#### Modifying the `session` hook
+
+The `session` hook uses the `sessionStorage` API to persist the state. The `sessionStorage` API accepts a `key` and a `value` as arguments. The `value` is converted to a string using the `JSON.stringify` function before it is persisted. The following code snippet demonstrates how to override the `set` and `get` properties of the `session` hook:
+
+```typescript copy filename="portal-session-modified.tsx"
+const [name, setName] = portal.session("client", {
+  set: (value) => encrypt(value),
+  get: (value) => decrypt(value),
+});
+```
+
+### `.cookie()`
+
+#### Using the `cookie` hook
+
+The `cookie` hook is used to persist the state in `document.cookie`. The following code snippet demonstrates how to use the `cookie` hook:
+
+```typescript copy filename="portal-cookie.tsx"
+const [name, setName] = portal.cookie("client", {
+  path: "/"
+});
+```
+
+#### Modifying the `cookie` hook
+
+The `cookie` hook uses the `cookieStorage` API exposed by this library, to persist the state. The `cookieStorage` API accepts a `key`, `value` and an optional configuration object as arguments. The `value` is converted to a string using the `JSON.stringify` function before it is persisted. The following code snippet demonstrates how to override the `set` and `get` properties of the `cookie` hook:
+
+```typescript copy filename="portal-cookie-modified.tsx"
+const [name, setName] = portal.cookie("client", {
+  path: "/",
+  set: (value) => encrypt(value),
+  get: (value) => decrypt(value),
+});
+```

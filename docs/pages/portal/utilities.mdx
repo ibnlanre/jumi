@@ -1,0 +1,58 @@
+---
+
+title: Portal Utilities
+description: Learn how to use the portal utilities.
+
+---
+
+# Portal utilities
+
+The `portal` object ships with a couple of utility functions that can be used to manipulate the state of a portal. The following code snippet demonstrates how to use the `portal` utilities:
+
+## `.entries`
+
+The `entries` getter is used to retrieve the entries of a portal. It returns a record of `key` and `value` pairs. The following code snippet demonstrates how to use the `entries` getter:
+
+```typescript
+const entries = portal.entries;
+```
+
+## `.hasItem`
+
+The `hasItem` utility function is used to check if a portal has a state. It accepts a `key` as its argument and returns a boolean. The following code snippet demonstrates how to use the `hasItem` utility function:
+
+```typescript
+const hasName = portal.hasItem("client");
+```
+
+## `.getItem`
+
+The `getItem` utility function is used to retrieve the state of a portal. It accepts a `key` as its argument and returns the state of the portal. The following code snippet demonstrates how to use the `getItem` utility function:
+
+```typescript
+const name = portal.getItem("client");
+```
+
+## `.setItem`
+
+The `setItem` utility function is used to update the state of a portal, outside of React Components. It accepts a `key` and a `value` as its arguments. The following code snippet demonstrates how to use the `setItem` utility function:
+
+```typescript
+portal.setItem("client", "Jane Doe");
+```
+
+## `.removeItem`
+
+The `removeItem` utility function is used to remove the state of a portal. It accepts a `key` as its argument. The following code snippet demonstrates how to use the `removeItem` utility function:
+
+```typescript
+portal.removeItem("client");
+```
+
+## `.clear`
+
+The `clear` utility function is used to remove all the states of a portal. The following code snippet demonstrates how to use the `clear` utility function:
+
+```typescript
+portal.clear();
+```

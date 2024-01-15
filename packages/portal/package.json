@@ -1,0 +1,91 @@
+{
+  "name": "@ibnlanre/portal",
+  "version": "3.24.0-beta",
+  "description": "React state management library",
+  "main": "cjs/index.js",
+  "module": "esm/index.js",
+  "files": [
+    "dist/*"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json",
+    "./components": {
+      "import": "./dist/components/index.js",
+      "types": "./dist/components/index.d.mts"
+    },
+    "./hooks": {
+      "import": "./dist/hooks/index.js",
+      "types": "./dist/hooks/index.d.mts"
+    },
+    "./*": {
+      "import": "./dist/*.mjs",
+      "types": "./dist/*.d.mts"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "hooks": [
+        "./dist/hooks/index.d.mts"
+      ]
+    }
+  },
+  "scripts": {
+    "lint": "tsc --pretty --noEmit --project tsconfig.json",
+    "test": "vitest -- --typecheck",
+    "esm-bundle": "tsup --config tsup.esm.ts",
+    "cjs-bundle": "tsup --config tsup.cjs.ts",
+    "build": "yarn esm-bundle & yarn cjs-bundle",
+    "package": "yarn publish --access public"
+  },
+  "keywords": [
+    "redux",
+    "state",
+    "manager",
+    "management",
+    "context",
+    "store",
+    "query",
+    "react",
+    "hooks",
+    "typescript",
+    "front-end",
+    "portal",
+    "web"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ibnlanre/portal.git"
+  },
+  "author": "Ridwan Olanrewaju <olaitanlanre28@gmail.com>",
+  "bugs": {
+    "url": "https://github.com/ibnlanre/portal/issues"
+  },
+  "homepage": "https://github.com/ibnlanre/portal#readme",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": ">16.7",
+    "react-dom": ">16.7"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.2.0",
+    "@testing-library/react": "^14.1.0",
+    "@types/node": "^20.2.3",
+    "@types/react": "^18.2.14",
+    "@types/react-dom": "^18.2.6",
+    "jsdom": "^22.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "ts-node": "^10.9.1",
+    "tsup": "^6.7.0",
+    "typescript": "^5.0.4",
+    "vitest": "^0.34.6"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^4.2.1"
+  }
+}

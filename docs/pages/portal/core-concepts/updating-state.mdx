@@ -1,0 +1,47 @@
+---
+
+title: Updating state
+description: Learn how to update the state of a portal.
+
+---
+
+import { Callout } from "@/components";
+
+# Updating state
+
+The state of a portal can be updated using the `setState` function returned by the `use` hook. It can also be updated using the `setItem` utility function, that is exported by the `portal` object. The following code snippet demonstrates how to update the state of a portal:
+
+```typescript copy filename="update-state.tsx"
+const [name, setName] = portal.use("client");
+setName("Jane Doe");
+```
+
+## Using the `setState` function
+
+It is advised that you do not use the `setState` function within the top level of a React Component. This is because the `setState` function would trigger a rerender of the component, which may lead to an infinite loop. Instead, use it within a `useEffect` hook.
+
+<Callout type="warning">The `setState` function should not be used within the top level of a React Component.</Callout>
+
+The following code snippet demonstrates how to properly use the `setState` function:
+
+```typescript copy filename="update-state-with-use-effect.tsx"
+const [name, setName] = portal.use("client");
+
+useEffect(() => {
+  setName("Jane Doe");
+}, []);
+```
+
+## Callbacks as arguments to `setState`
+
+The `setState` function also accepts a callback as its argument. The callback accepts the current state as its argument and returns a value. The returned value becomes the new state of the portal. This is useful when the current state of the portal is required to update the state.
+
+The following code snippet demonstrates how to use a callback as an argument to `setState`:
+
+```typescript copy filename="update-state-with-callback.tsx"
+const [name, setName] = portal.use("client");
+
+useEffect(() => {
+  setName((prev) => prev.toUpperCase());
+}, []);
+```

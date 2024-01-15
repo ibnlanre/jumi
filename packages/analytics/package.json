@@ -1,0 +1,35 @@
+{
+  "name": "@ibnlanre/analytics",
+  "version": "0.0.1",
+  "description": "Analytics library for browser clients",
+  "main": "cjs/index.js",
+  "module": "esm/index.js",
+  "types": "cjs/index.d.ts",
+  "files": [
+    "esm",
+    "cjs"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ibnlanre/analytics.git"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/ibnlanre/analytics/issues"
+  },
+  "scripts": {
+    "esm-bundle": "tsup --config tsup.esm.ts",
+    "cjs-bundle": "tsup --config tsup.cjs.ts",
+    "build": "yarn esm-bundle & yarn cjs-bundle",
+    "package": "yarn publish --access public"
+  },
+  "homepage": "https://github.com/ibnlanre/analytics",
+  "dependencies": {
+    "html2canvas": "^1.4.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "tsup": "^7.2.0"
+  }
+}

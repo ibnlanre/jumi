@@ -1,0 +1,13 @@
+{
+  "name": "jumi",
+  "version": "0.0.1",
+  "description": "repository of all packages",
+  "main": "index.js",
+  "repository": "https://github.com/ibnlanre/jumi.git",
+  "author": "Ridwan Olanrewaju",
+  "license": "MIT",
+  "private": false,
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

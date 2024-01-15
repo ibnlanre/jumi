@@ -1,0 +1,100 @@
+---
+
+title: Basic Usage
+description: Learn how to use the portal utility to create a portal.
+
+---
+
+import { Callout } from "@/components";
+
+# Basic Usage
+
+While `portal` itself is an object containing a couple of utility functions, creating states requires the `use` hook. The `use` hook accepts a key and an optional configuration object as its arguments.
+
+<Callout type="info">Because `use` is a hook, it should be called from within a React component or another hook.</Callout>
+
+The configuration object defines the initial state of the portal, and how the state is treated. If a configuration object is not passed to the `portal` function, the initial state is set to `undefined`. The following code snippet demonstrates how to create a `portal` without a configuration object:
+
+```typescript copy filename="portal-without-configuration.tsx"
+const [name, setName] = portal.use("client")
+```
+
+## Configuration object
+
+The configuration object can have the following properties:
+
+### `state`
+
+The `state` property is used to define the initial state of the portal. It has the same signature as the argument passed to a `useState` hook. Unless the `state` property is defined, the type of the state is inferred as `undefined`. The following code snippet demonstrates how to use the `state` property:
+
+```typescript copy filename="portal-with-state.tsx"
+const [name, setName] = portal.use("client", {
+  state: "John Doe"
+});
+```
+
+The `state` property can also be a function that returns the initial state. The function should, however, not have any side effects. The following code snippet demonstrates how to use the `state` property:
+
+```typescript copy filename="portal-with-state-function.tsx"
+const [name, setName] = portal.use("client", {
+  state: () => "Jane Doe"
+});
+```
+
+### `get`
+
+The `get` property can be used to retrieve the initial state from a persistent storage. The `get` function accepts the current state as an argument and sets the returned value as the next state of the portal. The following code snippet demonstrates how to use the `get` property:
+
+```typescript copy filename="portal-with-get.tsx"
+const [name, setName] = portal.use("client", {
+  get: (state) => {
+    const value = localStorage.getItem("client");
+    if (value) return JSON.parse(value) as string
+    return state;
+  }
+});
+```
+
+### `set`
+
+The `set` property is a side effect that can be used to update the browser store when the state changes. It is also called when the portal is instantiated. The `set` function accepts the current state as an argument. The following code snippet demonstrates how to use the `set` property:
+
+```typescript copy filename="portal-with-set.tsx"
+const [name, setName] = portal.use("client", {
+  set: (state) => {
+    const value = JSON.stringify(state);
+    localStorage.setItem("client", value);
+  }
+});
+```
+
+### `select`
+
+The `select` property is used to transform the current state into a different value. The `select` function accepts the current state as an argument and returns a value. The following code snippet demonstrates how to use the `select` property:
+
+```typescript copy filename="portal-with-select.tsx"
+const [name, setName] = portal.use("client", {
+  select: (state) => state.toUpperCase()
+});
+```
+
+## Combining properties
+
+The `state`, `get`, and `set` properties can be used together to define the initial state, how the initial state is retrieved, and how the state is persisted. If the `state` property is not defined, a good practice is to define the `get` function before the `set` function, because of type inference. The following code snippet demonstrates how to use the `state`, `get`, and `set` properties:
+
+```typescript copy filename="portal-with-state-get-set.tsx"
+import { get, set } from 'idb-keyval';
+
+const [name, setName] = portal.use("client", {
+  state: "John Doe",
+  get: async (state) => {
+    const value = await get('client');
+    if (value) return JSON.parse(value);
+    return state;
+  },
+  set: async (state) => {
+    const value = JSON.stringify(state);
+    await set('client', value);
+  }
+});
+```

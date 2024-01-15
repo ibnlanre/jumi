@@ -1,0 +1,112 @@
+---
+
+title: Portal Register
+description: The register serves as a store for possible portal keys and values.
+
+---
+
+import { Table, Td, Th, Tr } from 'nextra/components'
+
+# Typed Portals
+
+Apart from the state of a portal, by default, the keys can clash with each other. This means that if two portals have the same key, it could lead to an unexpected behavior. For example, if two portals have the same key, and one of the portals is updated, the other portal will also be updated. This is because the keys of the portals are the same. 
+
+To solve this problem, `portal` ships with a `make` function that can be used to create a typed portal. A typed portal is a portal that has a unique set of types. This means that the keys of a typed portal cannot clash with each other, because for every possible value, there can only be one key. To achieve this, we need to create a register.
+
+## Portal register
+
+A register is a record of `key` and `value` pairs. The `key` is a string and the `value` can be any value. The register serves as a store for possible portal keys and values. The following code snippet shows what a register looks like:
+
+```typescript copy filename="register.ts"
+const register = {
+  foo: {
+    bar: {
+      baz: "qux"
+    },
+    rim: "raf"
+  },
+  sem: "per"
+};
+```
+
+### Register keys and values
+
+The nested keys of a register are the possible keys of a portal. And the values of each corresponding key in the register are the possible values of the portal. The pairs generated from the register above include the following properties:
+
+<Table className="nextra-scrollbar nx-mt-6">
+  <thead>
+    <Tr>
+      <Th className="nx-text-left">Key</Th>
+      <Th>Value</Th>
+    </Tr>
+  </thead>
+  <tbody>
+    <Tr>
+      <Td>foo</Td>
+      <Td>`{ bar: { baz : "qux" }, rim: "raf" }`</Td>
+    </Tr>
+    <Tr>
+      <Td>foo.bar</Td>
+      <Td>`{ baz: "qux" }`</Td>
+    </Tr>
+    <Tr>
+      <Td>foo.bar.baz</Td>
+      <Td>`"qux"`</Td>
+    </Tr>
+    <Tr>
+      <Td>foo.rim</Td>
+      <Td>`"raf"`</Td>
+    </Tr>
+    <Tr>
+      <Td>sem</Td>
+      <Td>`"per"`</Td>
+    </Tr>
+  </tbody>
+</Table>
+
+## `.make`
+
+Every `portal` is created using the `make` function. The `make` function accepts a register as an argument and returns a portal with the specified type. `portal` itself is a typed portal of `any` type. This is why its `key` and `value` can be anything.
+
+Using the register above, we can create a different portal, one with types of our own choosing. The `make` function accepts a register as an argument and returns a new portal, setting the value of the corresponding key as its state. Because the portal is expected to be shared across components, the `make` function should be called outside of a component. 
+
+The following code snippet demonstrates how to create a typed portal using a register:
+
+```typescript copy filename="store.ts"
+export const store = portal.make(register);
+```
+
+### Keys with no values
+
+If a key in the register has no default value, the type should still be specified using the `as` keyword. The following code snippet not only demonstrates how to create a typed portal with a key that has no default value, but also resolves to same nested keys structured found in the above [example](#register-keys-and-values):
+
+```typescript copy filename="register.ts"
+const register = {
+  foo: {} as { bar: { baz: string }, rim: string },
+  sem: "per"
+};
+```
+
+### Accessing the state
+
+The register `keys` are used as the keys of the typed portal, and register `values` are used as the initial state of the typed portal. The following code snippet demonstrates how to use a typed portal:
+
+```typescript copy filename="typed-portal.tsx"
+const [foo, setFoo] = store.use("foo.rim"); // "raf"
+const [bar, setBar] = store.use("sem"); // "per"
+```
+
+### Changing the state
+
+To modify the initial state of a typed portal, you need to provide a state property in the configuration object. This will override the default initial state. The state you provide must match the type of the register value. Here's an example showing how to alter the state of a typed portal:
+
+```typescript copy filename="typed-portal-state.tsx"
+const [foo, setFoo] = store.use("foo", {
+  state: {
+    bar: {
+      baz: "nim"
+    },
+    rim: "fur"
+  }
+});
+```

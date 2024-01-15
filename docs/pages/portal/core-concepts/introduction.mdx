@@ -1,0 +1,31 @@
+---
+
+title: Introduction
+description: Introduction to the documentation
+
+---
+
+# Introduction
+
+`Portal` is a utility that facilitates sharing and accessing state across components. It eliminates the need for [prop drilling](https://kentcdodds.com/blog/prop-drilling), and the [context](https://reactjs.org/docs/context.html) API. Furthermore, it does not require a provider, or a consumer. It is a simple function that returns a tuple containing the state and a function to update the state. 
+
+## Importing `Portal`
+
+To import the `portal` module into your project, use the following snippet:
+
+```typescript copy
+import { portal } from "@ibnlanre/portal";
+```
+
+## Creating a `Portal`
+
+`Portal` accepts a key and an optional configuration object. The configuration object can have the following properties:
+
+- `state`: The initial state of the portal. It can be a primitive value, an object, or an array. Technically, it can be any value.
+- `get`: A function that accepts the current state as an argument and returns a value. The value is used to override the initial state.
+- `set`: A side effect that accepts the current state as its argument. It is invoked when the state changes.
+- `select`: A function that transforms the current state into a different value. It is invoked when the state changes.
+
+## Difference between `state` and `get` properties
+
+The difference between the `state` and `get` properties is that the `state` property is expected to be a pure value that doesn't involve any side effects. it is passed to a `useState` hook as the initial state of the `portal`. The `get` property, on the other hand, can be used to retrieve the initial state from a persistent storage, or network request. It is called within a `useEffect` hook, and is therefore invoked after the `state` is set, and overrides the `state` if present.
