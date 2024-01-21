@@ -1,9 +1,9 @@
 import html2canvas from "html2canvas";
 
-import { UserAgentData } from "types";
-import { CAMPAIGN_KEYWORDS, CRAWLERS, CLICK_IDENTIFIERS } from "constants";
+import { UserAgentData } from "@/types";
+import { CAMPAIGN_KEYWORDS, CRAWLERS, CLICK_IDENTIFIERS } from "@/constants";
+import { HeatmapTracker } from "@/trackers/heatmap-tracker";
 import { object } from "./object";
-import { HeatmapTracker } from "trackers/heatmap-tracker";
 
 const getQueryParam = (url: string, param: string) => {
   const searchParams = new URLSearchParams(new URL(url).search);
@@ -60,20 +60,20 @@ const getSearchEngine = (referrer: string) => {
 };
 
 const getSearchInfo = (referrer: string) => {
-  const search = getSearchEngine(referrer);
-  const param = search === "yahoo" ? "p" : "q";
-  const ret = {};
+  const searchEngine = getSearchEngine(referrer);
+  const searchParam = searchEngine === "yahoo" ? "p" : "q";
+  const searchInfo = {};
 
-  if (search !== null) {
-    ret["$search_engine"] = search;
-    const keyword = getQueryParam(referrer, param);
+  if (searchEngine !== null) {
+    searchInfo["$search_engine"] = searchEngine;
+    const keyword = getQueryParam(referrer, searchParam);
 
     if (keyword.length) {
-      ret["mp_keyword"] = keyword;
+      searchInfo["mp_keyword"] = keyword;
     }
   }
 
-  return ret;
+  return searchInfo;
 };
 
 const getBrowserName = () => {

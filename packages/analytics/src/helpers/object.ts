@@ -7,18 +7,21 @@ type Value<T> = string | number | T;
 type PartialRecord<K extends keyof any, T> = {
   [P in K]?: T;
 };
-const stripEmptyProperties = <T extends PartialRecord<keyof T, any>>(obj: T) => {
-  const ret: T = {} as T;
 
-  for (const [key, value] of Object.entries<Value<T>>(obj)) {
+const stripEmptyProperties = <T extends PartialRecord<keyof T, any>>(
+  inputObj: T
+) => {
+  const strippedObj: T = {} as T;
+
+  for (const [key, value] of Object.entries<Value<T>>(inputObj)) {
     if (typeof value !== "undefined") {
-      ret[key] = isObject(value)
+      strippedObj[key] = isObject(value)
         ? stripEmptyProperties<typeof value>(value)
         : value;
     }
   }
 
-  return ret;
+  return strippedObj;
 };
 
 function utf8Encode(string) {
@@ -55,15 +58,13 @@ function base64Encode(input) {
 
 const generateUUID = () => {
   const generateTimeComponent = () => {
-    const time = new Date().getTime();
+    const time = Date.now();
     let ticks = 0;
+
     if (performance && performance.now) {
       ticks = performance.now();
-    } else {
-      while (time === new Date().getTime()) {
-        ticks++;
-      }
-    }
+    } else while (time === Date.now()) ticks++;
+
     return time.toString(16) + Math.floor(ticks).toString(16);
   };
 
@@ -72,32 +73,32 @@ const generateUUID = () => {
   };
 
   const generateUAComponent = () => {
-    const ua = window.navigator.userAgent;
-    let buffer: number[] = [];
-    let ret = 0;
+    const userAgent = window.navigator.userAgent;
+    let byteBuffer: number[] = [];
+    let result = 0;
 
-    function xor(result, byte_array) {
-      let tmp = 0;
-      for (let j = 0; j < byte_array.length; j++) {
-        tmp |= buffer[j] << (j * 8);
+    function xor(currentResult, byteArray) {
+      let temp = 0;
+      for (let j = 0; j < byteArray.length; j++) {
+        temp |= byteBuffer[j] << (j * 8);
       }
-      return result ^ tmp;
+      return currentResult ^ temp;
     }
 
-    for (let i = 0; i < ua.length; i++) {
-      const ch = ua.charCodeAt(i);
-      buffer.unshift(ch & 255);
-      if (buffer.length >= 4) {
-        ret = xor(ret, buffer);
-        buffer = [];
+    for (let i = 0; i < userAgent.length; i++) {
+      const charCode = userAgent.charCodeAt(i);
+      byteBuffer.unshift(charCode & 255);
+      if (byteBuffer.length >= 4) {
+        result = xor(result, byteBuffer);
+        byteBuffer = [];
       }
     }
 
-    if (buffer.length > 0) {
-      ret = xor(ret, buffer);
+    if (byteBuffer.length > 0) {
+      result = xor(result, byteBuffer);
     }
 
-    return ret.toString(16);
+    return result.toString(16);
   };
 
   const screenArea = (screen.height * screen.width).toString(16);
