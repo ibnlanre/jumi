@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 
 const uuid = self.crypto.randomUUID();
 const signalEvent = new Event(uuid);
@@ -20,7 +20,7 @@ class Sample<T> {
    * @protected
    * @type {boolean}
    */
-  protected blame: boolean = false;
+  protected guilty: boolean = false;
 
   /**
    * The set of subscribers to the signal.
@@ -66,9 +66,12 @@ class Sample<T> {
    * Subscribes to changes in the signal.
    *
    * @param {Function} callback The callback function to execute when the signal changes.
+   * @param {boolean} [immediate=true] Whether to run the callback immediately with the current state. Defaults to `true`.
+   *
+   * @returns {void}
    */
-  effect = (callback: (value: T) => void) => {
-    useEffect(this.subscribe(callback), []);
+  effect = (callback: (value: T) => void, immediate = true) => {
+    useEffect(this.subscribe(callback, immediate), []);
   };
 }
 
@@ -87,17 +90,22 @@ class Signal<T> extends Sample<T> {
    * @returns {void}
    */
   set value(newValue: T) {
+    this.guilty = true;
     this.state = newValue;
-    this.blame = true;
     self.dispatchEvent(signalEvent);
   }
 
+  /**
+   * Creates a new signal with an optional initial value.
+   * @param {T} [initialValue] The initial value of the signal.
+   * @returns {Signal<T>} The new signal.
+   */
   constructor(initialValue: T) {
     super(initialValue);
     self.addEventListener(uuid, () => {
-      if (this.blame) {
+      if (this.guilty) {
         this.subscribers.forEach((fn) => fn(this.state));
-        this.blame = false;
+        this.guilty = false;
       }
     });
   }
@@ -106,15 +114,20 @@ class Signal<T> extends Sample<T> {
    * Retrieves the current value of the signal and a setter function to update the value.
    * @returns {[T, Dispatch<SetStateAction<T>>]} The current value and a setter function.
    */
-  use = () => {
+  use = <Select>(
+    selector: (state: T) => Select = (state) => state as unknown as Select
+  ) => {
+    const [state, setState] = useState(this.state);
+    useEffect(this.subscribe(setState), []);
+
     const setter: Dispatch<SetStateAction<T>> = (value) => {
-      this.value =
-        typeof value === "function"
-          ? (value as (value: T) => T)(this.state)
-          : (value as T);
+      if (typeof value === "function") {
+        this.value = (value as (value: T) => T)(this.state);
+      } else this.value = value as T;
     };
 
-    return [this.state, setter] as [T, Dispatch<SetStateAction<T>>];
+    const selectedState = selector(state);
+    return [selectedState, setter] as [Select, Dispatch<SetStateAction<T>>];
   };
 }
 
@@ -129,7 +142,7 @@ class Computed<T> extends Sample<T> {
 
   /**
    * Creates a new signal with an optional initial value.
-   * @param {T} [initialValue=undefined] The initial value of the signal.
+   * @param {T} [initialValue] The initial value of the signal.
    * @returns {Signal<T>} The new signal.
    */
   constructor(initialValue: () => T) {
@@ -147,8 +160,13 @@ class Computed<T> extends Sample<T> {
    * Retrieves the current value of the signal
    * @returns {T} The current value.
    */
-  use = () => {
-    return [this.state];
+  use = <Select>(
+    selector: (state: T) => Select = (state) => state as unknown as Select
+  ) => {
+    const [state, setState] = useState(this.state);
+    useEffect(this.subscribe(setState), []);
+
+    return [selector(state)];
   };
 }
 
@@ -169,15 +187,5 @@ export function signal<T>(initialValue: T | (() => T)) {
     : new Signal(initialValue as T);
 }
 
-signal.use = function useForceUpdate() {
-  const [, setRender] = useState(0);
-
-  useEffect(() => {
-    const rerender = () => setRender((render) => ++render);
-    self.addEventListener(uuid, rerender, { passive: true });
-
-    return () => {
-      self.removeEventListener(uuid, rerender);
-    };
-  }, []);
-};
+const userSignal = signal({ name: "John Doe", age: 42 });
+const [user] = userSignal.use((state) => state.age);
