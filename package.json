@@ -6,8 +6,11 @@
   "repository": "https://github.com/ibnlanre/jumi.git",
   "author": "Ridwan Olanrewaju",
   "license": "MIT",
-  "private": false,
+  "private": true,
   "devDependencies": {
     "typescript": "^5.3.3"
-  }
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }
