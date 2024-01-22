@@ -1,7 +1,7 @@
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 
-const uuid = self.crypto.randomUUID();
-const signalEvent = new Event(uuid);
+const eventUUID = self.crypto.randomUUID();
+const signalEvent = new Event(eventUUID);
 
 /**
  * Represents a signal that maintains a current value and emits it to subscribers.
@@ -75,7 +75,7 @@ class Sample<T> {
   };
 }
 
-class Signal<T> extends Sample<T> {
+export class Signal<T> extends Sample<T> {
   /**
    * Returns the current value of the signal.
    * @returns {T} The current value.
@@ -102,7 +102,7 @@ class Signal<T> extends Sample<T> {
    */
   constructor(initialValue: T) {
     super(initialValue);
-    self.addEventListener(uuid, () => {
+    self.addEventListener(eventUUID, () => {
       if (this.guilty) {
         this.subscribers.forEach((fn) => fn(this.state));
         this.guilty = false;
@@ -131,7 +131,7 @@ class Signal<T> extends Sample<T> {
   };
 }
 
-class Computed<T> extends Sample<T> {
+export class Computed<T> extends Sample<T> {
   /**
    * Returns the current value of the signal.
    * @returns {T} The current value.
@@ -147,7 +147,7 @@ class Computed<T> extends Sample<T> {
    */
   constructor(initialValue: () => T) {
     super(initialValue());
-    self.addEventListener(uuid, () => {
+    self.addEventListener(eventUUID, () => {
       const value = initialValue();
       if (Object.is(value, this.state)) return;
 
@@ -186,6 +186,3 @@ export function signal<T>(initialValue: T | (() => T)) {
     ? new Computed(initialValue as () => T)
     : new Signal(initialValue as T);
 }
-
-const userSignal = signal({ name: "John Doe", age: 42 });
-const [user] = userSignal.use((state) => state.age);

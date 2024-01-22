@@ -7,6 +7,11 @@
   "author": "Ridwan Olanrewaju",
   "license": "MIT",
   "private": true,
+  "scripts": {
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "changeset publish"
+  },
   "devDependencies": {
     "typescript": "^5.3.3"
   },
