@@ -1,5 +1,5 @@
 import { Paths, GetValueByPath, UseSession } from "@/definition";
-import { usePortal } from "./use-portal";
+import { usePortal } from "./use-portal/usePortal";
 
 /**
  * A hook for managing the portal states with session storage.

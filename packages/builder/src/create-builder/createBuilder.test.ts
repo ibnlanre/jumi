@@ -1,6 +1,6 @@
-import { describe, expect, it, expectTypeOf } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { createBuilder } from "@/builder";
+import { createBuilder } from "../create-builder/createBuilder";
 
 describe("createBuilder", () => {
   const obj = {

@@ -1,7 +1,7 @@
 import type { SetStateAction, Dispatch } from "react";
 
 import { CookieOptions } from "./cookie";
-import { Dimension, Portal } from "@/portal";
+import { Dimension, Portal } from "@/portal/portal";
 
 /**
  * Represents the method to get the portal's initial value.

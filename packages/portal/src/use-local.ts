@@ -1,5 +1,5 @@
 import { GetValueByPath, Paths, UseLocal } from "@/definition";
-import { usePortal } from "./use-portal";
+import { usePortal } from "./use-portal/usePortal";
 
 /**
  * A hook for managing the portal states with local storage.

@@ -1,7 +1,7 @@
 import { Paths, GetValueByPath, UseCookie } from "@/definition";
 import { cookieStorage } from "@/cookies";
 
-import { usePortal } from "./use-portal";
+import { usePortal } from "../use-portal/usePortal";
 
 /**
  * A hook for managing the portal states with cookie storage.

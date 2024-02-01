@@ -7,7 +7,7 @@ import {
   StorageType,
 } from "@/definition";
 
-import { Dimension } from "./dimension";
+import { Dimension } from "../dimension";
 
 export class Portal {
   private portalMap: PortalMap<any, any> = new Map();

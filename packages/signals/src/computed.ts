@@ -6,13 +6,6 @@ import { Signal } from "./signal";
 export type Composite = Signal<any> | Computed<any, any>;
 export type CompositeArray = Array<Composite>;
 
-export function computed<Value, const DependencyList extends CompositeArray>(
-  dependencyList: DependencyList,
-  initialValue: (...args: DependencyList) => Value
-): Computed<Value, DependencyList> {
-  return new Computed(dependencyList, initialValue);
-}
-
 export class Computed<
   Value,
   const DependencyList extends CompositeArray
@@ -38,6 +31,7 @@ export class Computed<
     dependencyList.forEach((dependency) => {
       dependency.subscribe(() => {
         this.state = initialValue(...dependencyList);
+        this.subscribers.forEach((subscriber) => subscriber(this.state));
       });
     });
   }
@@ -53,4 +47,11 @@ export class Computed<
     useEffect(this.subscribe(setState), []);
     return [selector(state)];
   };
+}
+
+export function computed<Value, const DependencyList extends CompositeArray>(
+  dependencyList: DependencyList,
+  initialValue: (...args: DependencyList) => Value
+): Computed<Value, DependencyList> {
+  return new Computed(dependencyList, initialValue);
 }

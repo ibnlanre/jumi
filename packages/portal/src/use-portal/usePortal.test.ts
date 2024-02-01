@@ -1,7 +1,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { expect, describe, afterEach, it } from "vitest";
 
-import { usePortal, Portal } from "@/portal";
+import { usePortal, Portal } from "@/portal/portal";
 
 const store = new Portal();
 
