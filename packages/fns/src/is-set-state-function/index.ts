@@ -1,0 +1,1 @@
+export { isSetStateFunction } from "./isSetStateFunction";

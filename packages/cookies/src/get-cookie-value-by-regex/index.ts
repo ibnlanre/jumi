@@ -1,0 +1,1 @@
+export { getCookieValueByRegex } from "./getCookieValueByRegex";

@@ -1,6 +1,6 @@
-import { atom } from "./atom";
+import { atom } from "./atom/src";
 import { createBuilder } from "./builder/src/create-builder";
-import { cookieStorage } from "./cookies";
+import { cookieStorage } from "./cookies/src";
 import { portal } from "./portal";
 import { signal } from "./signal";
 import { debounceEffect } from "./utilities";

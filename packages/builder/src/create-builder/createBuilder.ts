@@ -30,10 +30,7 @@ export type KeyBuilder<
  * @template T The type of the store.
  * @template P The type of the path.
  */
-export type Builder<
-  T extends Record<string, any>,
-  P extends readonly string[] = []
-> = {
+export type Builder<T extends Record<string, any>, P extends string[] = []> = {
   use: () => T;
   get: () => P;
   is: T;
@@ -54,8 +51,8 @@ export type Builder<
  */
 export function createBuilder<
   T extends Record<string, any>,
-  P extends readonly string[] = []
->(register: T, ...prefix: P): Builder<T, P> {
+  const P extends string[] = []
+>(register: T, prefix?: P): Builder<T, P> {
   const keys = Object.keys(register) as Array<keyof T>;
 
   const builder = keys.reduce((acc, key) => {
@@ -80,7 +77,7 @@ export function createBuilder<
             use: () => newPath,
             get: (...args: any[]) => [...newPath, ...args],
           },
-          createBuilder(value, ...newPath)
+          createBuilder(value, newPath)
         ),
       };
     }
@@ -102,3 +99,5 @@ export function createBuilder<
     builder
   ) as Builder<T, P>;
 }
+
+createBuilder({ a: { b: { c: 1 } } }, ["hi", "low"]).get();

@@ -1,0 +1,1 @@
+export { getCookieByIndex } from "./getCookieByIndex";
