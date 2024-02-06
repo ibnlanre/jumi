@@ -1,0 +1,25 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@/*": [
+        "src/*",
+        "./*"
+      ],
+    },
+    "allowJs": true,
+    "checkJs": false,
+    "declaration": true,
+    "declarationMap": false,
+    "emitDeclarationOnly": false,
+    "outDir": "./dist",
+    "noImplicitAny": true
+  },
+  "files": [
+    "types/browserify-aes.d.ts"
+  ],
+  "include": [
+    "./src/**/*"
+  ]
+}

@@ -5,7 +5,7 @@ const esm: Options = {
   dts: true,
   sourcemap: true,
   clean: true,
-  entryPoints: ["src/index.ts"],
+  entry: ["src/index.ts"],
   outDir: "dist/esm",
   external: ["react"],
 };
@@ -15,7 +15,7 @@ const cjs: Options = {
   dts: true,
   sourcemap: true,
   clean: true,
-  entryPoints: ["src/index.ts"],
+  entry: ["src/index.ts"],
   outDir: "dist/cjs",
   external: ["react"],
 };

@@ -1,4 +1,4 @@
-import { removeCookieValue } from "../remove-cookie-value/removeCookieValue";
+import { removeCookieValue } from "../remove-cookie-value";
 
 /**
  * Clears all cookies from cookieStorage.

@@ -1,4 +1,4 @@
-import { CookieStorage } from "../../types";
+import type { CookieStorage } from "../../types";
 
 import { clearCookieStorage } from "../clear-cookie-storage";
 import { getCookieByIndex } from "../get-cookie-by-index";
