@@ -1,4 +1,4 @@
-import { isFunction } from "./isFunction";
+import { isFunction } from "../packages/fns/src/is-function/isFunction";
 
 /**
  * Gets the actual state value from the provided initial state.

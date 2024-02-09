@@ -1,40 +1,5 @@
-/**
- * Represents a store key.
- */
-export type Key<K, P extends readonly string[] = []> = {
-  get: <Y extends any[]>(...args: Y) => [...P, K, ...Y];
-  use: () => [...P, K];
-};
-
-/**
- * Represents a builder for a store key.
- * @template T The type of the store.
- * @template P The type of the path.
- */
-export type KeyBuilder<
-  T extends Record<string, any>,
-  P extends readonly string[] = []
-> = {
-  [K in keyof T]: T[K] extends (...args: infer R) => any
-    ? {
-        get: <Y extends any[]>(...args: Y) => [...P, Extract<K, string>, ...Y];
-        use: (...args: Parameters<T[K]>) => [...P, Extract<K, string>, ...R];
-      }
-    : T[K] extends Record<string, any>
-    ? Key<K, P> & KeyBuilder<T[K], [...P, Extract<K, string>]>
-    : Key<K, P>;
-};
-
-/**
- * Represents a builder for a store.
- * @template T The type of the store.
- * @template P The type of the path.
- */
-export type Builder<T extends Record<string, any>, P extends string[] = []> = {
-  use: () => T;
-  get: () => P;
-  is: T;
-} & KeyBuilder<T, P>;
+import type { KeyBuilder, Builder } from "@ibnlanre/builder";
+import { withTypes } from "../with-types";
 
 /**
  * Returns a builder object that represents the nested keys of the provided object.
@@ -100,4 +65,16 @@ export function createBuilder<
   ) as Builder<T, P>;
 }
 
-createBuilder({ a: { b: { c: 1 } } }, ["hi", "low"]).get();
+const bType = withTypes<{
+  d: string;
+}>();
+
+const hi = createBuilder(
+  {
+    a: {
+      b: bType({ c: 1 }),
+    },
+  },
+  ["hi", "low"]
+);
+hi.a.b.with.d.use();

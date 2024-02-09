@@ -1,4 +1,4 @@
-import { arraySort } from "@/array-sort";
+import { arraySort } from "@ibnlanre/fns";
 
 /**
  * Deeply sorts an object.

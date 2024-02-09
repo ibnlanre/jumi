@@ -1,0 +1,46 @@
+{
+    "name": "@ibnlanre/atom",
+    "version": "0.0.1",
+    "description": "Charts components built with recharts and Mantine",
+    "homepage": "https://dev.root.i.ng/",
+    "license": "MIT",
+    "author": "Ridwan Olanrewaju <olaitanlanre28@gmail.com>",
+    "keywords": [
+      "react",
+      "ui"
+    ],
+    "main": "./cjs/index.cjs",
+    "module": "./esm/index.mjs",
+    "types": "./lib/index.d.ts",
+    "exports": {
+      ".": {
+        "import": {
+          "types": "./lib/index.d.mts",
+          "default": "./esm/index.mjs"
+        },
+        "require": {
+          "types": "./lib/index.d.ts",
+          "default": "./cjs/index.cjs"
+        }
+      },
+      "./styles.css": "./styles.css",
+      "./styles.layer.css": "./styles.layer.css"
+    },
+    "repository": {
+      "url": "https://github.com/ibnlanre/ibnlanre.git",
+      "type": "git",
+      "directory": "packages/atom"
+    },
+    "peerDependencies": {
+      "@mantine/core": "7.5.2",
+      "@mantine/hooks": "7.5.2",
+      "react": "^18.2.0",
+      "react-dom": "^18.2.0",
+      "recharts": "^2.10.3"
+    },
+    "devDependencies": {
+      "@mantine-tests/core": "workspace:*",
+      "@mantine/core": "workspace:*",
+      "@mantine/hooks": "workspace:*"
+    }
+}

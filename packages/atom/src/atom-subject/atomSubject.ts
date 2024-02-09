@@ -1,4 +1,4 @@
-import type { Subscription } from "@/types";
+import type { Subscription } from "@ibnlanre/atom";
 
 /**
  * Represents a subject that maintains a current value and emits it to subscribers.

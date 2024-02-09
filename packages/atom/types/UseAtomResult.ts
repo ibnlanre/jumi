@@ -1,5 +1,5 @@
 import type { SetStateAction } from "react";
-import type { Prettify } from "./Prettify";
+import type { Prettify } from "@/types";
 
 /**
  * Represents the state and dispatch of an `atom`.

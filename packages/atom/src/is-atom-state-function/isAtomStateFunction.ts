@@ -1,4 +1,4 @@
-import type { AtomState } from "@/types";
+import type { AtomState } from "@ibnlanre/atom";
 
 /**
  * Type guard that checks if a value is a function taking a properties parameter and returning a State.

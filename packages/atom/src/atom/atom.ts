@@ -1,6 +1,6 @@
 import { SetStateAction, useEffect, useState } from "react";
 
-import {
+import type {
   Atom,
   AtomConfig,
   AtomOptions,
@@ -8,13 +8,15 @@ import {
   Fields,
   Params,
   UseAtomResult,
-} from "@/types";
+} from "@ibnlanre/atom";
 
-import { debounceEffect } from "@/debounce-effect";
-import { getComputedState } from "@/get-computed-state";
-import { isAtomStateFunction } from "@/is-atom-state-function";
-import { AtomSubject } from "../atom-subject";
-import { makeUseEffect } from "../make-use-effect";
+import { AtomSubject, isAtomStateFunction } from "@ibnlanre/atom";
+import {
+  debounceEffect,
+  getComputedState,
+  isFunction,
+  makeUseEffect,
+} from "@ibnlanre/fns";
 
 /**
  * @description Creates an `atom` instance for managing and updating state.

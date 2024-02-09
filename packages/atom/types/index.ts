@@ -9,7 +9,6 @@ export { Emit } from "./Emit";
 export { Fields } from "./Fields";
 export { Garbage } from "./Garbage";
 export { Params } from "./Params";
-export { Prettify } from "./Prettify";
 export { SetAtom } from "./SetAtom";
 export { Subscription } from "./Subscription";
 export { Timeline } from "./Timeline";

@@ -94,6 +94,6 @@ describe("createBuilder", () => {
   });
 
   it("should return the correct type of the builder", () => {
-    expectTypeOf(builder.is).toEqualTypeOf(obj);
+    expectTypeOf(builder.typeof).toEqualTypeOf(obj);
   });
 });
