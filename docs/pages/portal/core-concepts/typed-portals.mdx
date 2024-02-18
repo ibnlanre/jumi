@@ -9,7 +9,7 @@ import { Table, Td, Th, Tr } from 'nextra/components'
 
 # Typed Portals
 
-Apart from the state of a portal, by default, the keys can clash with each other. This means that if two portals have the same key, it could lead to an unexpected behavior. For example, if two portals have the same key, and one of the portals is updated, the other portal will also be updated. This is because the keys of the portals are the same. 
+Apart from the state of a portal, by default, the keys can clash with each other. This means that if two portals have the same key, it could lead to an unexpected behavior. For example, if two portals have the same key, and one of the portals is updated, the other portal will also be updated. This is because the keys of the portals are the same.
 
 To solve this problem, `portal` ships with a `make` function that can be used to create a typed portal. A typed portal is a portal that has a unique set of types. This means that the keys of a typed portal cannot clash with each other, because for every possible value, there can only be one key. To achieve this, we need to create a register.
 
@@ -68,7 +68,7 @@ The nested keys of a register are the possible keys of a portal. And the values 
 
 Every `portal` is created using the `make` function. The `make` function accepts a register as an argument and returns a portal with the specified type. `portal` itself is a typed portal of `any` type. This is why its `key` and `value` can be anything.
 
-Using the register above, we can create a different portal, one with types of our own choosing. The `make` function accepts a register as an argument and returns a new portal, setting the value of the corresponding key as its state. Because the portal is expected to be shared across components, the `make` function should be called outside of a component. 
+Using the register above, we can create a different portal, one with types of our own choosing. The `make` function accepts a register as an argument and returns a new portal, setting the value of the corresponding key as its state. Because the portal is expected to be shared across components, the `make` function should be called outside of a component.
 
 The following code snippet demonstrates how to create a typed portal using a register:
 
@@ -81,8 +81,15 @@ export const store = portal.make(register);
 If a key in the register has no default value, the type should still be specified using the `as` keyword. The following code snippet not only demonstrates how to create a typed portal with a key that has no default value, but also resolves to same nested keys structured found in the above [example](#register-keys-and-values):
 
 ```typescript copy filename="register.ts"
+type Foo = {
+  bar: {
+    baz: string;
+  };
+  rim: string;
+};
+
 const register = {
-  foo: {} as { bar: { baz: string }, rim: string },
+  foo: {} as Foo,
   sem: "per"
 };
 ```

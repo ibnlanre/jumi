@@ -2,7 +2,7 @@ import { renderHook, act } from "@testing-library/react";
 import { describe, test, expect, vi, expectTypeOf } from "vitest";
 import { StrictMode } from "react";
 
-import { atom } from "@/atom";
+import { atom } from "@ibnlanre/atom";
 
 describe("atom", () => {
   const initialState = 0;

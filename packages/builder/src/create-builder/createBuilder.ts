@@ -64,17 +64,3 @@ export function createBuilder<
     builder
   ) as Builder<T, P>;
 }
-
-const bType = withTypes<{
-  d: string;
-}>();
-
-const hi = createBuilder(
-  {
-    a: {
-      b: bType({ c: 1 }),
-    },
-  },
-  ["hi", "low"]
-);
-hi.a.b.with.d.use();

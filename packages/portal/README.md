@@ -892,11 +892,11 @@ To get the type of object passed to the builder
 ```typescript
 const builder = createBuilder(store);
 
-// Note that the actual value of builder.is is undefined.
-type StoreType = typeof builder.is;
+// Note that the actual value of builder.typeof is undefined.
+type StoreType = typeof builder.typeof;
 
 // Ease of use accessing the type of nested properties.
-type BarType = typeof builder.is.foo.bar;
+type BarType = typeof builder.typeof.foo.bar;
 ```
 
 ## Author
@@ -951,7 +951,7 @@ const { user, setUser, isLoading } = userAtom.use({
 
 ## Signals
 
-Signals are objects with a 
+Signals are objects with a
 
 
 
@@ -959,7 +959,7 @@ Signals are objects with a
 A signal is an object that has a value and can be observed for changes. It is similar to a state, but it is not bound to a component. It can be used to share data between components. It updates the components when the signal changes and updates the UI without re-rendering the whole component.
 
 
-```typescript
+```tsx
 import { signal } from "@ibnlanre/portal";
 
 // this could equally be defined inside the component
@@ -985,11 +985,11 @@ function Counter() {
  return (
     <div>
       <p>No change: value + 2 = {peek.value}</p>
-    <button onClick={() => count.value++}>
-     Value: {count.value}, value x 3 = {double.value}
-    </button>
+      <button onClick={() => count.value++}>
+        Value: {count.value}, value x 3 = {double.value}
+      </button>
     </div>
- );
+  );
 }
 
 ```

@@ -5,7 +5,6 @@ export type {
   AtomOptions,
   AtomState,
   Collector,
-  DebounceOptions,
   Emit,
   Fields,
   Garbage,

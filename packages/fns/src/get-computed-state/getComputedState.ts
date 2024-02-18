@@ -1,5 +1,6 @@
-import { isSetStateFunction } from "@/is-set-state-function";
+
 import { SetStateAction } from "react";
+import { isSetStateFunction } from "../is-set-state-function";
 
 /**
  * Gets the actual state value from the provided initial state.

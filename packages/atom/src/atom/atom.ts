@@ -15,7 +15,7 @@ import {
   debounceEffect,
   getComputedState,
   isFunction,
-  makeUseEffect,
+  makeUseSyncEffect,
 } from "@ibnlanre/fns";
 
 /**
@@ -262,7 +262,7 @@ export function atom<
    * A hook to synchronize the execution of the `use` function.
    * @type {Function}
    */
-  const useSyncEffect = makeUseEffect();
+  const useSyncEffect = makeUseSyncEffect();
 
   /**
    * A hook to use the `atom` instance.

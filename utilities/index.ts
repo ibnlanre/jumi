@@ -1,4 +1,3 @@
-export * from "../packages/fns/src/is-function/isFunction";
 export * from "./getResolvedState";
 export * from "./getValue";
 export * from "./handleSSRError";

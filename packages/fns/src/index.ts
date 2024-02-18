@@ -4,4 +4,4 @@ export { deepSort } from "./deep-sort";
 export { getComputedState } from "./get-computed-state";
 export { isFunction } from "./is-function";
 export { isSetStateFunction } from "./is-set-state-function";
-export { makeUseEffect } from "./make-use-effect";
+export { makeUseSyncEffect } from "./make-use-sync-effect";

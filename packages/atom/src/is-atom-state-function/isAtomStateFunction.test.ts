@@ -1,5 +1,6 @@
-import { isAtomStateFunction } from "@/utilities/isAtomStateFunction";
+
 import { describe, expect, test } from "vitest";
+import { isAtomStateFunction } from "./isAtomStateFunction";
 
 describe("isAtomStateFunction", () => {
   test("isAtomStateFunction should return true for a valid AtomState function", () => {

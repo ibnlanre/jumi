@@ -1,0 +1,1 @@
+export { makeUseSyncEffect } from "./makeUseSyncEffect";

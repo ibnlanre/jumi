@@ -1,6 +1,6 @@
+import type { DebounceOptions } from "@/types";
 import type { AtomEvents } from "./AtomEvents";
 import type { AtomState } from "./AtomState";
-import type { DebounceOptions } from "./DebounceOptions";
 
 /**
  * Configuration options for creating an `atom`.

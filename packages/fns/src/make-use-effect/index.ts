@@ -1,1 +1,0 @@
-export { makeUseEffect } from "./makeUseEffect";

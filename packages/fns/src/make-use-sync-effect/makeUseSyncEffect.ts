@@ -1,7 +1,7 @@
 import { DependencyList, EffectCallback, useEffect } from "react";
 import { deepSort } from "../deep-sort";
 
-export function makeUseEffect() {
+export function makeUseSyncEffect() {
   /**
    * A set defining whether a `useArgs` has been executed by the `use` function.
    * @type {Map<string, boolean>}

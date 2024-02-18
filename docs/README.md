@@ -895,11 +895,11 @@ To get the type of object passed to the builder
 ```typescript
 const builder = createBuilder(store);
 
-// Note that the actual value of builder.is is undefined.
-type StoreType = typeof builder.is;
+// Note that the actual value of builder.typeof is undefined.
+type StoreType = typeof builder.typeof;
 
 // Ease of use accessing the type of nested properties.
-type BarType = typeof builder.is.foo.bar;
+type BarType = typeof builder.typeof.foo.bar;
 ```
 
 ## Author
