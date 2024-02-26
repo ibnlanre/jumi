@@ -1,7 +1,11 @@
 import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useState } from "react";
+
 import { Sample } from "./sample";
 
+/**
+ * A signal that emits a value and notifies subscribers.
+ */
 export class Signal<Value> extends Sample<Value> {
   /**
    * Returns the current value of the signal.

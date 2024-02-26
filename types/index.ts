@@ -1,2 +1,2 @@
 export { DebounceOptions } from "./DebounceOptions";
-export { Prettify } from "./Prettify";
+export { Intersect } from "./Intersect";

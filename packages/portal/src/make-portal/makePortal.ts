@@ -7,12 +7,12 @@ import {
 } from "@/definition";
 import { getResolvedState, getValue } from "@/utilities";
 
-import { Portal } from "./portal/portal";
-import { usePortal } from "./use-portal/usePortal";
+import { Portal } from "../portal/Portal";
+import { usePortal } from "../use-portal/usePortal";
 
-import { useLocal } from "./use-local";
-import { useSession } from "./use-session";
-import { useCookie } from "./use-cookie/use-cookie";
+import { useLocal } from "../use-local/useLocal";
+import { useSession } from "../use-session/useSession";
+import { useCookie } from "../use-cookie/useCookie";
 
 function makePortal<Store extends Record<string, any>>(register: Store) {
   /**

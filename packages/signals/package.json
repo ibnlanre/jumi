@@ -1,13 +1,48 @@
 {
   "name": "@ibnlanre/signals",
   "version": "0.0.1",
+  "description": "A simple state management library built with signals",
+  "homepage": "https://github.com/ibnlanre/portal#readme",
   "type": "module",
-  "main": "./cjs/index.cjs",
-  "module": "./esm/index.js",
-  "types": "./cjs/index.d.ts",
+  "scripts": {
+    "bundle": "tsup",
+    "lint": "eslint --fix --ext .ts,.tsx .",
+    "test": "vitest -- --typecheck",
+    "package": "yarn publish --access public"
+  },
+  "main": "cjs/index.js",
+  "module": "esm/index.js",
+  "types": "cjs/index.d.ts",
   "files": [
-    "./dist/*"
+    "dist/*"
   ],
+  "exports": {
+    ".": {
+      "require": "./cjs/index.js",
+      "import": "./esm/index.js",
+      "types": "./cjs/index.d.ts"
+    }
+  },
+  "peerDependencies": {
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "author": "Ridwan Olanrewaju <olaitanlanre28@gmail.com>",
+  "repository": {
+    "url": "https://github.com/ibnlanre/ibnlanre.git",
+    "type": "git",
+    "directory": "packages/signals",
+    "publishConfig": {
+      "access": "public"
+    }
+  },
+  "bugs": {
+    "url": "https://github.com/ibnlanre/portal/issues"
+  },
+  "license": "MIT",
   "keywords": [
     "signal",
     "solid-js",
@@ -19,38 +54,5 @@
     "svelte",
     "vue",
     "state"
-  ],
-  "license": "MIT",
-  "exports": {
-    ".": {
-      "require": "./cjs/index.cjs",
-      "import": "./esm/index.js"
-    }
-  },
-  "scripts": {
-    "bundle": "tsup",
-    "lint": "eslint --fix --ext .ts,.tsx .",
-    "test": "vitest -- --typecheck",
-    "package": "yarn publish --access public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/FrigadeHQ/remote-storage.git"
-  },
-  "author": "Ridwan Olanrewaju <olaitanlanre28@gmail.com>",
-  "bugs": {
-    "url": "https://github.com/ibnlanre/portal/issues"
-  },
-  "homepage": "https://github.com/ibnlanre/portal#readme",
-  "engines": {
-    "node": ">=14"
-  },
-  "peerDependencies": {
-    "react": ">16.7",
-    "react-dom": ">16.7"
-  },
-  "devDependencies": {
-    "tsup": "^8.0.1",
-    "vitest": "^1.2.1"
-  }
+  ]
 }

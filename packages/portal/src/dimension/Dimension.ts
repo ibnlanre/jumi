@@ -1,6 +1,6 @@
 import { SetStateAction } from "react";
 
-import { isSetStateFunction } from "";
+import { isSetStateFunction } from "@ibnlanre/"
 import { Subscription } from "@/types";
 
 abstract class Subject<State> {

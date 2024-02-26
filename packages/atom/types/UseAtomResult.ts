@@ -1,5 +1,5 @@
+import type { Intersect } from "@/types";
 import type { SetStateAction } from "react";
-import type { Prettify } from "@/types";
 
 /**
  * Represents the state and dispatch of an `atom`.
@@ -15,7 +15,7 @@ export type UseAtomResult<Key extends string, State, Context, Select> = [
   Select,
   ((value: SetStateAction<State>) => void) & Context
 ] &
-  Prettify<
+  Intersect<
     Context & {
       [K in Key]: Select;
     } & {

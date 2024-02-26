@@ -1,146 +1,17 @@
-import type { SetStateAction, Dispatch } from "react";
 
-import { CookieOptions } from "./cookie";
-import { Dimension, Portal } from "@/portal/portal";
+import { Dimension, Portal } from "@/portal/Portal";
 
-/**
- * Represents the method to get the portal's initial value.
- * @template State The type of the state.
- */
-export type GetState<State> = (state: State) => State;
 
-/**
- * Represents the method to set the value of the store.
- * @template State The type of the state.
- */
-export type SetStore<State> = (value: State) => void;
 
-/**
- * Represents the options for the portal.
- */
-export type PortalOptions<State, Data> = {
-  /**
-   * The initial value of the portal.
-   *
-   * @description
-   * - This value is only used when the `path` is not defined within the portal.
-   * - This value will be overidden if the `get` method is defined.
-   * - It uses the `useState` hook internally.
-   */
-  state?: State | (() => State);
 
-  /**
-   * Select the required data from the state.
-   *
-   * @default (value: State) => Data
-   * @param value The state value.
-   *
-   * @returns The selected data.
-   */
-  select?: (value: State) => Data;
 
-  /**
-   * Callback to run after the state is initialized or updated.
-   *
-   * @summary
-   * - when the state is initialized or updated.
-   * - if the state is updated by the `get` method.
-   */
-  set?: SetStore<State>;
 
-  /**
-   * Method to get the initial value.
-   *
-   * @description
-   * - This method is only called when the `path` is not defined within the portal.
-   * - It uses the `useEffect` hook internally.
-   */
-  get?: GetState<State>;
-};
 
-/**
- * Represents the config for the portal.
- *
- * @template State The type of the state.
- * @template Data The type of the data.
- */
-export interface Config<State, Data>
-  extends Omit<PortalOptions<State, Data>, "set" | "get"> {
-  /**
-   * The key to use in the storage.
-   * @default path
-   */
-  key?: string;
 
-  /**
-   * Set the value in the storage.
-   *
-   * @default (value: State) => JSON.stringify(value)
-   *
-   * @param value The value from the portal.
-   * @returns The value to be stored.
-   */
-  set?: (value: State) => string;
 
-  /**
-   * Get the value from the storage.
-   *
-   * @default (value: string) => JSON.parse(value)
-   *
-   * @param value The value from the portal.
-   * @returns The value to set the portal to.
-   */
-  get?: (value: string) => State;
-}
 
-/**
- * Represents the config for the cookie portal.
- *
- * @template State The type of the state.
- * @template Data The type of the data.
- */
-export interface CookieConfig<State, Data> extends Config<State, Data> {
-  /**
-   * The options for the cookie.
-   */
-  cookieOptions?: CookieOptions;
-}
 
-/**
- * Represents the value of a portal entry.
- *
- * @template State The type of the state.
- */
-export type PortalValue<State> = {
-  /**
-   * The BehaviorSubject that contains the current value of the store.
-   */
-  observable: Dimension<State>;
-  /**
-   * The method to set the value of the store.
-   */
-  set?: SetStore<State>;
-  /**
-   * The method to get the value of the store.
-   */
-  get?: GetState<State>;
-};
 
-/**
- * Represents a map of keys and values in the portal entries.
- * @template State The type of the state.
- * @template Path The type of the path.
- */
-export type PortalMap<State, Path> = Map<Path, PortalValue<State>>;
-
-/**
- * Represents the result of the usePortal hook.
- * @template State The type of the state.
- */
-export type PortalState<State, Data = State> = [
-  Data,
-  Dispatch<SetStateAction<State>>
-];
 
 /**
  * Represents the path to a value in a store.

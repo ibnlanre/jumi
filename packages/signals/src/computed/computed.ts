@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 
-import { Sample } from "./sample";
-import { Signal } from "./signal";
+import { Sample } from "../sample";
+import { Signal } from "../signal";
 
 export type Composite = Signal<any> | Computed<any, any>;
 export type CompositeArray = Array<Composite>;
 
+/**
+ * A signal that is derived from other signals.
+ */
 export class Computed<
   Value,
   const DependencyList extends CompositeArray
@@ -25,7 +28,7 @@ export class Computed<
    */
   constructor(
     dependencyList: DependencyList,
-    initialValue: (...args: DependencyList) => Value
+    initialValue: (...args: NoInfer<DependencyList>) => Value
   ) {
     super(initialValue(...dependencyList));
     dependencyList.forEach((dependency) => {
@@ -49,6 +52,14 @@ export class Computed<
   };
 }
 
+/**
+ * Creates a new signal with an optional initial value.
+ *
+ * @param dependencyList The list of signals that this signal depends on.
+ * @param initialValue The initial value of the signal.
+ *
+ * @returns The new signal.
+ */
 export function computed<Value, const DependencyList extends CompositeArray>(
   dependencyList: DependencyList,
   initialValue: (...args: DependencyList) => Value

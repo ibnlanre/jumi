@@ -1,9 +1,2 @@
-export * from "./clear-cookie-storage";
-export * from "./cookie-storage";
-export * from "./format-cookie-options";
-export * from "./get-cookie-by-index";
-export * from "./get-cookie-storage-length";
-export * from "./get-cookie-value";
-export * from "./get-cookie-value-by-regex";
-export * from "./remove-cookie-value";
-export * from "./set-cookie-value";
+export type { CookieEntry, CookieOptions, CookieStorage } from "../types";
+export { cookieStorage } from "./cookie-storage";
