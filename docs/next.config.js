@@ -8,16 +8,16 @@ module.exports = {
   ...withNextra(),
   async redirects() {
     return [
-      {
-        source: "/",
-        destination: "/portal",
-        permanent: true,
-      },
-      {
-        source: "/portal",
-        destination: "/portal/getting-started",
-        permanent: true,
-      },
+      // {
+      //   source: "/",
+      //   destination: "/portal",
+      //   permanent: true,
+      // },
+      // {
+      //   source: "/portal",
+      //   destination: "/portal/getting-started",
+      //   permanent: true,
+      // },
       {
         source: "/atom",
         destination: "/atom/introduction",

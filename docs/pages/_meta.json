@@ -1,5 +1,6 @@
 {
-  "portal": "Portal",
   "atom": "Atom",
-  "create-builder": "createBuilder"
+  "builder": "Builder",
+  "portal": "Portal",
+  "signals": "Signals"
 }
