@@ -1,4 +1,5 @@
 import type { Break } from "./Break";
+import type { Separator } from "./Separator";
 
 export type Split<
   In extends string,

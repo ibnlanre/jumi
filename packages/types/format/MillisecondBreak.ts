@@ -1,3 +1,4 @@
+import type { Add } from "../add";
 import type { TimezoneBreak } from "./TimezoneBreak";
 
 export type MillisecondBreak<

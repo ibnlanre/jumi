@@ -1,16 +1,3 @@
-type Prettify<T> = {
-  [K in keyof T]: T[K];
-} & {};
-
-
-
-
-
-
-
-
-
-
 
 // type Test5 = DeepPartial<Options>;
 
@@ -34,8 +21,4 @@ type Options = {
 // type Test3 = SelectiveDeepPartial<Options, "useIframe">;
 //   ^?
 
-type Abs<T extends number> = `${T}` extends `-${infer U extends number}`
-  ? U
-  : T;
-
-type Test4 = Abs<-1>;
+// type Test4 = Abs<-1>;

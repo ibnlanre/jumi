@@ -1,3 +1,4 @@
+import type { Add } from "../add";
 import type { DayBreak } from "./DayBreak";
 import type { Split } from "./Split";
 import type { TimeBreak } from "./TimeBreak";

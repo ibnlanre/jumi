@@ -1,3 +1,5 @@
+import { Split } from "./Split";
+
 type DayJSFormat =
   | "LLL"
   | "LL"
@@ -61,29 +63,97 @@ type Merge<
     : never;
 };
 
-type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
-  k: infer I extends Record<string, any>
-) => void
-  ? Prettify<I>
+type Z = Split<"2022-01-01T00:00:00.000Z">;
+//   ^?
+type Y = Split<"1997-07-16T19:20:30+01:00">;
+//   ^?
+type X = Split<"2024-01-01T23:35:56.000-00:00">;
+//   ^?
+type W = Split<"2022-05-02">;
+//   ^?
+
+type Space =
+  | " "
+  | ","
+  | "."
+  | "-"
+  | ":"
+  | "T"
+  | "Z"
+  | "+"
+  | "0"
+  | "1"
+  | "2"
+  | "3"
+  | "4"
+  | "5"
+  | "6"
+  | "7"
+  | "8"
+  | "9";
+
+type FormatDate<
+  In extends string,
+  Format extends string,
+  Stream extends string = ""
+> = Format extends `${infer Part}${infer Format}`
+  ? Part extends Space
+    ? FormatDate<In, Format, `${Stream}${Part}`>
+    : FormatDate<In, Format, `${Stream}${Part}`>
+  : Format extends `${infer Part}`
+  ? Part extends Sign
+    ? Split<In, {}, Stream>
+    : never
   : never;
 
-// type Prettify<T extends Record<string, string>> = {
-//   [K in keyof T]: T[K];
-// } & {};
+type A = FormatDate<"2022-01-01T00:00:00.000Z", "YYYY-MM-DDThh:mm:ss.sTZD">;
+//   ^?
 
-type Separator = "-" | "T" | ":" | "." | "Z" | "+" | "";
-
-type Add<T extends Record<string, any>, K extends string, V> = {
-  [P in keyof T | K]: P extends keyof T ? T[P] : V;
+type DateFormat = {
+  year?: string;
+  month?: string;
+  day?: string;
+  hour?: string;
+  minute?: string;
+  second?: string;
+  millisecond?: string;
+  timezone?: string;
 };
 
-const isoDate = "2022-01-01T00:00:00.000Z";
-const isoDate2 = "2022-05-02";
-const isoDate3 = "2024-01-01T23:35:56.000-00:00";
+type Checkmate<In extends string, Out extends DateFormat> = In extends "YYYY"
+  ? "year" extends keyof Out
+    ? Out["year"]
+    : ""
+  : In extends "MM"
+  ? "month" extends keyof Out
+    ? Out["month"]
+    : ""
+  : In extends "DD"
+  ? "day" extends keyof Out
+    ? Out["day"]
+    : ""
+  : In extends "hh"
+  ? "hour" extends keyof Out
+    ? Out["hour"]
+    : ""
+  : In extends "mm"
+  ? "minute" extends keyof Out
+    ? Out["minute"]
+    : ""
+  : In extends "ss"
+  ? "second" extends keyof Out
+    ? Out["second"]
+    : ""
+  : In extends "s"
+  ? "millisecond" extends keyof Out
+    ? Out["millisecond"]
+    : ""
+  : In extends "TZD"
+  ? "timezone" extends keyof Out
+    ? Out["timezone"]
+    : ""
+  : never;
 
-// type Z = Split<typeof isoDate>;
-//   ^?
-// type Y = Split<typeof isoDate2>;
-//   ^?
-// type X = Split<typeof isoDate3>;
-//   ^?
+type V = Checkmate<"YYYY", { month: "2022" }>;
+
+

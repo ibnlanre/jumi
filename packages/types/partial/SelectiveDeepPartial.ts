@@ -1,3 +1,4 @@
+import type { Prettify } from "../prettify";
 import type { Paths } from "./Paths";
 import type { Value } from "./Value";
 

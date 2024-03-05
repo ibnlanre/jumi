@@ -1,3 +1,4 @@
+import type { Prettify } from "../prettify";
 import type { Derivatives } from "./Derivatives";
 import type { Indexable } from "./Indexable";
 import type { Structures } from "./Structures";

@@ -1,3 +1,4 @@
+import type { Add } from "../add";
 import type { Split } from "./Split";
 
 export type TimeBreak<

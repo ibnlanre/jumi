@@ -1,3 +1,5 @@
+import type { Add } from "../add";
+
 export type TimezoneBreak<
   In extends string,
   Out extends Record<string, string> = {},
