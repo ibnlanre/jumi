@@ -1,1 +1,0 @@
-export { UnionToIntersection } from "./UnionToIntersection";

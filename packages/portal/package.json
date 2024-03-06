@@ -77,15 +77,14 @@
     "@types/node": "^20.2.3",
     "@types/react": "^18.2.14",
     "@types/react-dom": "^18.2.6",
+    "@vitejs/plugin-react": "^4.2.1",
     "jsdom": "^22.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "ts-node": "^10.9.1",
     "tsup": "^6.7.0",
     "typescript": "^5.0.4",
-    "vitest": "^0.34.6"
-  },
-  "dependencies": {
-    "@vitejs/plugin-react": "^4.2.1"
+    "vitest": "^0.34.6",
+    "vite": "^5.1.5"
   }
 }

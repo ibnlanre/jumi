@@ -1,0 +1,47 @@
+{
+  "name": "@ibnlanre/typings",
+  "version": "0.0.1",
+  "description": "A collection of typescript types",
+  "homepage": "https://github.com/ibnlanre/portal#readme",
+  "type": "module",
+  "scripts": {
+    "bundle": "tsup",
+    "lint": "eslint --fix --ext .ts,.tsx .",
+    "test": "vitest -- --typecheck",
+    "package": "yarn publish --access public"
+  },
+  "main": "cjs/index.js",
+  "module": "esm/index.js",
+  "types": "cjs/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "exports": {
+    ".": {
+      "require": "./cjs/index.js",
+      "import": "./esm/index.js",
+      "types": "./cjs/index.d.ts"
+    }
+  },
+  "devDependencies": {
+    "ts-arithmetic": "^0.1.1"
+  },
+  "author": "Ridwan Olanrewaju <olaitanlanre28@gmail.com>",
+  "repository": {
+    "url": "https://github.com/ibnlanre/ibnlanre.git",
+    "type": "git",
+    "directory": "packages/typings",
+    "publishConfig": {
+      "access": "public"
+    }
+  },
+  "bugs": {
+    "url": "https://github.com/ibnlanre/portal/issues"
+  },
+  "license": "MIT",
+  "keywords": [
+    "types",
+    "typescript",
+    "type-fest"
+  ]
+}

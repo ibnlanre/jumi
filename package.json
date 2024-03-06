@@ -8,6 +8,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "yarn-version": "yarn version --no-git-tag-version",
+    "yarn-policy": "yarn policies set-version '^1.22.21'",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "changeset publish"
@@ -19,7 +21,17 @@
     "typescript": "^5.3.3",
     "vitest": "^1.3.1"
   },
-  "workspaces": [
-    "packages/*"
-  ]
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ],
+    "nohoist": [
+      "**/react",
+      "**/react-dom",
+      "**/vitest"
+    ]
+  },
+  "dependencies": {
+    "ts-arithmetic": "^0.1.1"
+  }
 }
