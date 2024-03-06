@@ -1,4 +1,6 @@
 import { Number, Object, String } from "@ibnlanre/typings";
+
+import { AmPm } from "./AmPm";
 import { DateFormat } from "./DateFormat";
 import { DayOfTheWeek } from "./DayOfTheWeek";
 import { HourClock } from "./HourClock";
@@ -54,6 +56,14 @@ export type SimpleFormat<
   ? Number.StripZero<Object.Retrieve<Out, "second">, 1>
   : In extends "ss"
   ? Object.Retrieve<Out, "second">
-  : In extends "TZD"
+  : In extends "SSS"
+  ? Object.Retrieve<Out, "millisecond">
+  : In extends "Z"
   ? Object.Retrieve<Out, "timezone">
+  : In extends "ZZ"
+  ? String.Replace<Object.Retrieve<Out, "timezone">, ":", "">
+  : In extends "A"
+  ? AmPm<Object.Retrieve<Out, "hour">>
+  : In extends "a"
+  ? Lowercase<AmPm<Object.Retrieve<Out, "hour">>>
   : never;

@@ -1,4 +1,14 @@
 import { Array, Set } from "@ibnlanre/typings";
+import {
+  Abs,
+  And,
+  IsNegative,
+  IsPositive,
+  Lt,
+  LtOrEq,
+  Mod,
+  Subtract,
+} from "ts-arithmetic";
 
 type Slice<
   T extends string,
@@ -24,13 +34,11 @@ type Split<S extends string, Delimiter extends string = ""> = S extends ""
 //   ? [T, ...Split<U, Delimiter>]
 //   : [S];
 
-type Stringable =
-  | string
-  | number
-  | boolean
-  | any[]
-  | Record<string, any>
-  | null;
+export type Replace<
+  S extends string,
+  Find extends string,
+  Replace extends string
+> = S extends `${infer T}${Find}${infer U}` ? `${T}${Replace}${U}` : S;
 
 type ToObjectString<T extends Record<string, any>> = Array.Join<
   Set.UnionToTuple<
@@ -55,10 +63,36 @@ type ToString<T> = T extends string
   ? "null"
   : never;
 
-type Length<T extends string> = Split<T>["length"];
+type Length<T extends string | string[]> = T extends string
+  ? Split<T>["length"]
+  : T["length"];
 
-type XI = Length<"fjhbvfilughlafisudbkhofuiagukbuguoiglhdfsauglafd">;
+type Concat<T, U extends string> = T extends string
+  ? `${T}${U}`
+  : T extends never
+  ? U
+  : Concat<String.ToString<T>, U>;
+
+type ValueAt<T extends object, U extends number> = U extends keyof T
+  ? T[U]
+  : never;
+
+type OrdinalHelper = ["th", "st", "nd", "rd"];
+
+type Ordinal<
+  T extends number,
+  U extends number = Mod<Abs<T>, 100>,
+  V extends number = Mod<Subtract<U, 20>, 10>,
+  UWithinRange = Lt<U, Length<OrdinalHelper>>,
+  VWithinRange = Lt<V, Length<OrdinalHelper>>
+> = And<VWithinRange, IsPositive<V>> extends 1
+  ? V //Concat<T, ValueAt<OrdinalHelper, V>>
+  : UWithinRange extends 1
+  ? Concat<T, ValueAt<OrdinalHelper, U>>
+  : Concat<T, ValueAt<OrdinalHelper, 0>>;
+
+type XI = Ordinal<11>;
 
 export declare namespace String {
-  export { Slice, Split, Stringable, ToObjectString, ToString };
+  export { Slice, Split, ToString, Length, Replace };
 }
