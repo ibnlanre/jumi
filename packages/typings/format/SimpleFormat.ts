@@ -5,6 +5,7 @@ import { DateFormat } from "./DateFormat";
 import { DayOfTheWeek } from "./DayOfTheWeek";
 import { HourClock } from "./HourClock";
 import { Month } from "./Month";
+import { Split } from "./Split";
 
 export type SimpleFormat<
   In extends string,

@@ -1,4 +1,5 @@
 import type { Add } from "../add";
+import type { BaseDateFormat } from "./DateFormat";
 import type { DayBreak } from "./DayBreak";
 import type { Split } from "./Split";
 import type { TimeBreak } from "./TimeBreak";
@@ -6,7 +7,7 @@ import type { TimeBreak } from "./TimeBreak";
 export type PeriodBreak<
   Part extends string,
   In extends string,
-  Out extends Record<string, string> = {},
+  Out extends Record<string, any> = BaseDateFormat,
   Stream extends string = ""
 > = Part extends `-${infer M}-`
   ? Split<In, Add<Out, "month", M>, Stream>

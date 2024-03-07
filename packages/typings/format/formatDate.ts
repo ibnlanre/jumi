@@ -78,7 +78,7 @@ type FormatDate<
     : never
   : never;
 
-type A = FormatDate<"2022-01-01T00:00:00.000Z", "YYYY-MM-DDThh:mm:ss.sTZD">;
+type A = FormatDate<"2022-01-01", "YYYY-MM-DDThh:mm:ss.sTZD">;
 //   ^?
 
 

@@ -1,14 +1,14 @@
-import type { Break } from "./Break";
 import type { Separator } from "./Separator";
+import type { SplitHelper } from "./SplitHelper";
 
 export type Split<
   In extends string,
-  Out extends Record<string, string> = {},
+  Out extends Record<string, any> = {},
   Stream extends string = ""
 > = In extends `${infer Part}${infer In}`
   ? Part extends Separator
-    ? Break<`${Stream}${Part}`, In, Out, Part>
+    ? SplitHelper<`${Stream}${Part}`, In, Out, Part>
     : Split<In, Out, `${Stream}${Part}`>
   : In extends ""
-  ? Break<Stream, In, Out, In>
+  ? SplitHelper<Stream, In, Out, In>
   : never;
