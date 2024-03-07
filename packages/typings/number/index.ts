@@ -29,10 +29,6 @@ type ParseIntHelper<
     : R
   : never;
 
-type Test5 = ParseIntHelper<"0.3">;
-//   ^?
-
-
 type ToNumberHelper<
   T extends string,
   U extends string = "",
@@ -46,21 +42,6 @@ type ToNumberHelper<
     ? ToNumberHelper<N, U, String.Length<U>>
     : ToNumberHelper<N, U, Pos>
   : ParseIntHelper<U, Pos>;
-
-type Test3 = ToNumber<"0">;
-//   ^?
-
-type Test2 = ToNumber<"01">;
-//   ^?
-
-type Test1 = ToNumber<"01">;
-//   ^?
-
-type Test = ToNumber<"01.9.">;
-//   ^?
-
-type Test0 = ToNumber<"01.09">;
-//   ^?
 
 type ToNumber<T extends any> = T extends string
   ? ToNumberHelper<T>
