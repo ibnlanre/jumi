@@ -1,11 +1,37 @@
-import { Number, Object, String } from "@ibnlanre/typings";
+import type { Object, String } from "@ibnlanre/typings";
 
-import { AmPm } from "./AmPm";
-import { DateFormat } from "./DateFormat";
-import { DayOfTheWeek } from "./DayOfTheWeek";
-import { HourClock } from "./HourClock";
-import { Month } from "./Month";
-import { Split } from "./Split";
+import type { AmPm } from "./AmPm";
+import type { DateFormat } from "./DateFormat";
+import type { DayOfTheWeek } from "./DayOfTheWeek";
+import type { HourClock } from "./HourClock";
+import type { Month } from "./Month";
+
+export type SimpleFormatSymbols =
+  | "YY"
+  | "YYYY"
+  | "M"
+  | "MM"
+  | "MMM"
+  | "MMMM"
+  | "D"
+  | "DD"
+  | "d"
+  | "dd"
+  | "ddd"
+  | "dddd"
+  | "H"
+  | "HH"
+  | "h"
+  | "hh"
+  | "m"
+  | "mm"
+  | "s"
+  | "ss"
+  | "SSS"
+  | "Z"
+  | "ZZ"
+  | "A"
+  | "a";
 
 export type SimpleFormat<
   In extends string,

@@ -25,6 +25,5 @@ export type Sign =
   | "A"
   | "o"
   | "O"
-  | "T"
   | "Z"
   | "L";

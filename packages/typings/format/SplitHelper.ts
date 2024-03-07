@@ -1,5 +1,6 @@
 import type { Object } from "@ibnlanre/typings";
 
+import { Intersect } from "@/types";
 import type { Break } from "./Break";
 import type { BaseDateFormat } from "./DateFormat";
 import type { UnixTimestamp } from "./UnixTimestamp";

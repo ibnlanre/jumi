@@ -1,4 +1,6 @@
+import { DateFormat } from "./DateFormat";
 import { Sign } from "./Sign";
+import { SimpleFormat, SimpleFormatSymbols } from "./SimpleFormat";
 import { Split } from "./Split";
 
 type DayJSFormat =
@@ -44,47 +46,72 @@ type ExplicitFormat<T extends string> = T extends "LLL"
   ? "MMMM DD, YYYY h:mm A"
   : never;
 
-// export type FormatDate = {
-//   <T extends DayJSFormat>(In: ConfigType, format: T): string | null;
-//   (In: ConfigType): string | null;
-// };
+import { Array, Number } from "@ibnlanre/typings";
 
-// YYYY-MM-DDThh:mm:ss.sTZD
-
-
-type Z = Split<"2022-01-01T00:00:00.000Z">;
-//   ^?
-type Y = Split<"1997-07-16T19:20:30+01:00">;
-//   ^?
-type X = Split<"2024-01-01T23:35:56.000-00:00">;
-//   ^?
-type W = Split<"2022-05-02">;
-//   ^?
-
-type Numbers = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
-type Symbol = " " | "," | "." | "-" | ":" | "T" | "Z" | "+";
-
-type FormatDate<
-  In extends string,
+type FormatDateHelper<
+  Date extends DateFormat,
   Format extends string,
-  Stream extends string = ""
+  Formatters extends Array<FormatterType>,
+  Value extends string = "",
+  Stream extends string = "",
+  Simple extends number = Number.And<
+    Array.Includes<Formatters, "simple">,
+    Stream extends SimpleFormatSymbols ? 1 : 0
+  >,
+  Advanced extends number = Number.And<
+    Array.Includes<Formatters, "advanced">,
+    Stream extends SimpleFormatSymbols ? 1 : 0
+  >,
+  Localized extends number = Number.And<
+    Array.Includes<Formatters, "localized">,
+    Stream extends SimpleFormatSymbols ? 1 : 0
+  >
 > = Format extends `${infer Part}${infer Format}`
-  ? Part extends Symbol | Numbers
-    ? FormatDate<In, Format, `${Stream}${Part}`>
-    : FormatDate<In, Format, `${Stream}${Part}`>
-  : Format extends `${infer Part}`
   ? Part extends Sign
-    ? Split<In, {}, Stream>
-    : never
+    ? FormatDateHelper<Date, Format, Formatters, Value, `${Stream}${Part}`>
+    : Simple extends 1
+    ? FormatDateHelper<
+        Date,
+        Format,
+        Formatters,
+        `${Value}${SimpleFormat<Stream, Date>}${Part}`
+      >
+    : Advanced extends 1
+    ? FormatDateHelper<
+        Date,
+        Format,
+        Formatters,
+        `${Value}${AdvancedFormat<Stream, Date>}${Part}`
+      >
+    : Localized extends 1
+    ? FormatDateHelper<
+        Date,
+        Format,
+        Formatters,
+        `${Value}${LocalizedFormat<Stream, Date>}${Part}`
+      >
+    : FormatDateHelper<Date, Format, Formatters, `${Value}${Part}`>
+  : Format extends ""
+  ? Simple extends 1
+    ? `${Value}${SimpleFormat<Stream, Date>}`
+    : Advanced extends 1
+    ? `${Value}${AdvancedFormat<Stream, Date>}`
+    : Localized extends 1
+    ? `${Value}${LocalizedFormat<Stream, Date>}`
+    : Value
   : never;
 
-type A = FormatDate<"2022-01-01", "YYYY-MM-DDThh:mm:ss.sTZD">;
+type AdvancedFormat<Stream extends string, Date extends DateFormat> = never;
+
+type LocalizedFormat<Stream extends string, Date extends DateFormat> = never;
+
+type FormatterType = "simple" | "advanced" | "localized";
+
+type FormatDate<
+  Date extends string,
+  Format extends string = "",
+  Formatters extends Array<FormatterType> = ["simple"]
+> = FormatDateHelper<Split<Date>, Format, Formatters>;
+
+type A = FormatDate<"2022-01-01", "YYYY-MM-[DD]Thh:mm:ss.sTZZ">;
 //   ^?
-
-
-
-
-// type V = Checkmate<"YYYY", { year: "2022" }>;
-// //   ^?
-// type U = Checkmate<"MMMM", { month: "04" }>;
-// //   ^?

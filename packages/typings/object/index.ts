@@ -1,10 +1,15 @@
-type Merge<T extends Record<string, any>, U extends Record<string, any>> = {
+import { Intersect } from "@/types";
+
+type Merge<
+  T extends Record<string, any>,
+  U extends Record<string, any>
+> = Intersect<{
   [K in keyof T | keyof U]: K extends keyof T
     ? T[K]
     : K extends keyof U
     ? U[K]
     : never;
-};
+}>;
 
 type Retrieve<
   Out extends Record<string, any>,

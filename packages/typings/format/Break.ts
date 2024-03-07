@@ -2,8 +2,6 @@ import type { BaseDateFormat } from "./DateFormat";
 import type { MillisecondBreak } from "./MillisecondBreak";
 import type { PeriodBreak } from "./PeriodBreak";
 
-import { Object } from "@ibnlanre/typings";
-
 export type Break<
   Part extends string,
   In extends string,
