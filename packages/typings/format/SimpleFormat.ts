@@ -18,7 +18,7 @@ export type SimpleFormat<
   : In extends "YYYY"
   ? IYear
   : In extends "M"
-  ? Number.StripZero<IMonth>
+  ? String.TrimStart<IMonth>
   : In extends "MM"
   ? IMonth
   : In extends "MMM"
@@ -26,7 +26,7 @@ export type SimpleFormat<
   : In extends "MMMM"
   ? Object.Retrieve<Month, IMonth>
   : In extends "D"
-  ? Number.StripZero<IDay>
+  ? String.TrimStart<IDay>
   : In extends "DD"
   ? IDay
   : In extends "d"
@@ -38,22 +38,22 @@ export type SimpleFormat<
   : In extends "dddd"
   ? Object.Retrieve<Month, WeekDay>
   : In extends "H"
-  ? Number.StripZero<Object.Retrieve<Out, "hour">, 1>
+  ? String.TrimStart<Object.Retrieve<Out, "hour">, 1>
   : In extends "HH"
   ? Object.Retrieve<Out, "hour">
   : In extends "h"
-  ? Number.StripZero<
+  ? String.TrimStart<
       Object.Retrieve<HourClock, Object.Retrieve<Out, "hour">>,
       1
     >
   : In extends "hh"
   ? Object.Retrieve<HourClock, Object.Retrieve<Out, "hour">>
   : In extends "m"
-  ? Number.StripZero<Object.Retrieve<Out, "minute">, 1>
+  ? String.TrimStart<Object.Retrieve<Out, "minute">, 1>
   : In extends "mm"
   ? Object.Retrieve<Out, "minute">
   : In extends "s"
-  ? Number.StripZero<Object.Retrieve<Out, "second">, 1>
+  ? String.TrimStart<Object.Retrieve<Out, "second">, 1>
   : In extends "ss"
   ? Object.Retrieve<Out, "second">
   : In extends "SSS"

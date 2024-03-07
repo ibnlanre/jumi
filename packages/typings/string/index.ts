@@ -1,14 +1,5 @@
 import { Array, Set } from "@ibnlanre/typings";
-import {
-  Abs,
-  And,
-  IsNegative,
-  IsPositive,
-  Lt,
-  LtOrEq,
-  Mod,
-  Subtract,
-} from "ts-arithmetic";
+import { Subtract } from "ts-arithmetic";
 
 type Slice<
   T extends string,
@@ -22,17 +13,11 @@ type SplitHelper<
   Result extends string[] = []
 > = S extends `${infer T}${Delimiter}${infer U}`
   ? SplitHelper<U, Delimiter, Array.Push<Result, T>>
-  : Array.Push<Result, S>;
+  : Result;
 
 type Split<S extends string, Delimiter extends string = ""> = S extends ""
   ? []
   : SplitHelper<S, Delimiter>;
-
-// type Split<S extends string, Delimiter extends string = ""> = S extends ""
-//   ? []
-//   : S extends `${infer T}${Delimiter}${infer U}`
-//   ? [T, ...Split<U, Delimiter>]
-//   : [S];
 
 export type Replace<
   S extends string,
@@ -63,36 +48,95 @@ type ToString<T> = T extends string
   ? "null"
   : never;
 
-type Length<T extends string | string[]> = T extends string
-  ? Split<T>["length"]
-  : T["length"];
-
 type Concat<T, U extends string> = T extends string
   ? `${T}${U}`
   : T extends never
   ? U
   : Concat<String.ToString<T>, U>;
 
-type ValueAt<T extends object, U extends number> = U extends keyof T
-  ? T[U]
-  : never;
+type Length<T extends string | string[]> = T extends string
+  ? Split<T>["length"]
+  : T["length"];
 
-type OrdinalHelper = ["th", "st", "nd", "rd"];
+type Contains<
+  T extends string,
+  U extends string
+> = T extends `${string}${U}${string}` ? 1 : 0;
 
-type Ordinal<
-  T extends number,
-  U extends number = Mod<Abs<T>, 100>,
-  V extends number = Mod<Subtract<U, 20>, 10>,
-  UWithinRange = Lt<U, Length<OrdinalHelper>>,
-  VWithinRange = Lt<V, Length<OrdinalHelper>>
-> = And<VWithinRange, IsPositive<V>> extends 1
-  ? V //Concat<T, ValueAt<OrdinalHelper, V>>
-  : UWithinRange extends 1
-  ? Concat<T, ValueAt<OrdinalHelper, U>>
-  : Concat<T, ValueAt<OrdinalHelper, 0>>;
+type InsertAt<
+  T extends string,
+  U extends string,
+  Index extends number
+> = `${Slice<T, 0, Index>}${U}${Slice<T, Index, Length<T>>}`;
 
-type XI = Ordinal<11>;
+type StartsWith<T extends string, U extends string> = T extends `${U}${string}`
+  ? 1
+  : 0;
+
+type TrimStartHelper<
+  T extends string,
+  Count extends number,
+  Letter extends string = "0"
+> = T extends `${Letter}${infer U}`
+  ? TrimStart<U, Subtract<Count, 1>, Letter>
+  : T;
+
+type TrimStart<
+  T extends string,
+  Count extends number = -1,
+  Letter extends string = "0"
+> = Count extends -1
+  ? T extends `${Letter}${infer U}`
+    ? TrimStartHelper<U, Count, Letter>
+    : T
+  : Count extends 0
+  ? T
+  : TrimStartHelper<T, Count, Letter>;
+
+type TrimEndHelper<
+  T extends string,
+  Count extends number,
+  Letter extends string = "0"
+> = T extends `${infer U}${Letter}`
+  ? TrimEnd<U, Subtract<Count, 1>, Letter>
+  : T;
+
+type TrimEnd<
+  T extends string,
+  Count extends number = -1,
+  Letter extends string = "0"
+> = Count extends -1
+  ? T extends `${infer U}${Letter}`
+    ? TrimEndHelper<U, Count, Letter>
+    : T
+  : Count extends 0
+  ? T
+  : TrimEndHelper<T, Count, Letter>;
+
+type Trim<
+  T extends string,
+  Count extends number = -1,
+  Letter extends string = "0"
+> = TrimStart<TrimEnd<T, Count, Letter>, Count, Letter>;
+
+type EndsWith<T extends string, U extends string> = T extends `${string}${U}`
+  ? 1
+  : 0;
 
 export declare namespace String {
-  export { Slice, Split, ToString, Length, Replace };
+  export {
+    Slice,
+    Split,
+    ToString,
+    Length,
+    Replace,
+    Concat,
+    Contains,
+    StartsWith,
+    EndsWith,
+    InsertAt,
+    TrimStart,
+    TrimEnd,
+    Trim,
+  };
 }

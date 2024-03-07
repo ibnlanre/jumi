@@ -1,42 +1,113 @@
-import { Array } from "@ibnlanre/typings";
-import { Subtract } from "ts-arithmetic";
+import { Array, Object, String } from "@ibnlanre/typings";
+import {
+  Abs,
+  Divide,
+  Gt,
+  IsPositive,
+  Lt,
+  Mod,
+  Pow,
+  Subtract,
+} from "ts-arithmetic";
+
+type Integers = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
+
+type Diff<T extends number, U extends number, Len extends number> = Pow<
+  10,
+  Subtract<Len, U>
+> extends infer R extends number
+  ? Divide<T, R>
+  : never;
+
+type ParseIntHelper<
+  T extends string,
+  Pos extends number = 0,
+  Length extends number = String.Length<T>
+> = T extends `${infer R extends number}`
+  ? And<Gt<Pos, 0>, Lt<Pos, Length>> extends 1
+    ? Diff<R, Pos, Length>
+    : R
+  : never;
+
+type Test5 = ParseIntHelper<"0.3">;
+//   ^?
+
+
+type ToNumberHelper<
+  T extends string,
+  U extends string = "",
+  Pos extends number = 0
+> = T extends `${infer R}${infer N}`
+  ? R extends Integers
+    ? U extends "0"
+      ? ToNumberHelper<N, R, Pos>
+      : ToNumberHelper<N, `${U}${R}`, Pos>
+    : R extends "."
+    ? ToNumberHelper<N, U, String.Length<U>>
+    : ToNumberHelper<N, U, Pos>
+  : ParseIntHelper<U, Pos>;
+
+type Test3 = ToNumber<"0">;
+//   ^?
+
+type Test2 = ToNumber<"01">;
+//   ^?
+
+type Test1 = ToNumber<"01">;
+//   ^?
+
+type Test = ToNumber<"01.9.">;
+//   ^?
+
+type Test0 = ToNumber<"01.09">;
+//   ^?
 
 type ToNumber<T extends any> = T extends string
-  ? ParseInt<T>
+  ? ToNumberHelper<T>
   : T extends true
   ? 1
   : T extends false
   ? 0
   : T extends any[]
-  ? Number.ToNumber<Array.Join<T, "">>
+  ? ToNumber<Array.Join<T, "">>
   : T extends number
   ? T
   : never;
 
 type ParseInt<
-  T extends string,
-  U extends string = ""
-> = T extends `${infer R}${infer N}`
-  ? R extends "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
-    ? ParseInt<N, `${U}${R}`>
-    : ParseInt<N, U>
-  : U extends `${infer R extends number}`
-  ? R
+  T extends string | number,
+  N extends string = T extends string ? T : `${T}`,
+  U extends number = ToNumber<String.TrimStart<N>>
+> = `${U}` extends `${infer R extends number}.${string}` ? R : U;
+
+type And<T extends number, U extends number> = T extends 1
+  ? U extends 1
+    ? 1
+    : 0
+  : 0;
+
+type Suffixes = ["th", "st", "nd", "rd"];
+
+type OrdinalHelper<
+  V extends number,
+  WithinRange extends number = Lt<V, String.Length<Suffixes>>,
+  NotNegative extends number = IsPositive<V>
+> = And<WithinRange, NotNegative> extends 1
+  ? Object.ValueAt<Suffixes, V>
   : never;
 
-type StripZeroHelper<
-  T extends string,
-  Count extends number
-> = T extends `0${infer U}` ? StripZero<U, Subtract<Count, 1>> : T;
+type Ordinal<
+  T extends number,
+  U extends number = Mod<Abs<T>, 100>,
+  V extends number = Mod<Subtract<U, 20>, 10>
+> = Array.Includes<Suffixes, OrdinalHelper<V>> extends 1
+  ? String.Concat<T, OrdinalHelper<V>>
+  : Array.Includes<Suffixes, OrdinalHelper<U>> extends 1
+  ? String.Concat<T, OrdinalHelper<U>>
+  : String.Concat<T, Object.ValueAt<Suffixes, 0>>;
 
-type StripZero<T extends string, Count extends number = -1> = Count extends -1
-  ? T extends `0${infer U}`
-    ? StripZeroHelper<U, Count>
-    : T
-  : Count extends 0
-  ? T
-  : StripZeroHelper<T, Count>;
+type IsEqual<T, U> = T extends U ? (U extends T ? 1 : 0) : 0;
 
 export declare namespace Number {
-  export { ToNumber, ParseInt, StripZero };
+  export { ToNumber, ParseInt, And, Ordinal, IsEqual };
 }

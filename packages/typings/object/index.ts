@@ -12,6 +12,10 @@ type Retrieve<
   FallBack = ""
 > = In extends keyof Out ? NonNullable<Out[In]> : FallBack;
 
+type ValueAt<T extends object, U extends number> = U extends keyof T
+  ? T[U]
+  : never;
+
 export declare namespace Object {
-  export { Merge, Retrieve };
+  export { Merge, Retrieve, ValueAt };
 }
