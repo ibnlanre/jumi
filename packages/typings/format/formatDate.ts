@@ -1,3 +1,4 @@
+import type { AdvancedFormat, AdvancedFormatSymbols } from "./AdvancedFormat";
 import type { DateFormat } from "./DateFormat";
 import type {
   LocalizedFormat,
@@ -6,11 +7,6 @@ import type {
 import type { Sign } from "./Sign";
 import type { SimpleFormat, SimpleFormatSymbols } from "./SimpleFormat";
 import type { Split } from "./Split";
-
-import { Array, Number } from "@ibnlanre/typings";
-
-
-
 
 type FormatDateHelper<
   Date extends DateFormat,
@@ -22,6 +18,12 @@ type FormatDateHelper<
   : Format extends `${infer Part}${infer Format}`
   ? Part extends Sign
     ? FormatDateHelper<Date, Format, Value, `${Stream}${Part}`>
+    : Stream extends AdvancedFormatSymbols
+    ? FormatDateHelper<
+        Date,
+        Format,
+        `${Value}${AdvancedFormat<Stream, Date>}${Part}`
+      >
     : Stream extends SimpleFormatSymbols
     ? FormatDateHelper<
         Date,
@@ -30,24 +32,14 @@ type FormatDateHelper<
       >
     : FormatDateHelper<Date, Format, `${Value}${Part}`>
   : Format extends ""
-  ? Stream extends SimpleFormatSymbols
+  ? Stream extends AdvancedFormatSymbols
+    ? `${Value}${AdvancedFormat<Stream, Date>}`
+    : Stream extends SimpleFormatSymbols
     ? `${Value}${SimpleFormat<Stream, Date>}`
     : Value
   : never;
-
-// type AdvancedFormat<Stream extends string, Date extends DateFormat> = never;
-
-// type LocalizedFormat<Stream extends string, Date extends DateFormat> = never;
-
-type FormatterType = "simple" | "advanced" | "localized";
 
 type FormatDate<
   Date extends string,
   Format extends string = ""
 > = FormatDateHelper<Split<Date>, Format>;
-
-type A = FormatDate<"2022-01-01", "YYYY-MM-[DD]Thh:mm:ss.sTZZ">;
-//   ^?
-
-type B = FormatDate<"2022-01-01", "l">;
-//   ^?

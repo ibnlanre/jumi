@@ -14,7 +14,7 @@ type Merge<
 type Retrieve<
   Out extends Record<string, any>,
   In extends string,
-  FallBack = ""
+  FallBack = string
 > = In extends keyof Out ? NonNullable<Out[In]> : FallBack;
 
 type ValueAt<T extends object, U extends number> = U extends keyof T

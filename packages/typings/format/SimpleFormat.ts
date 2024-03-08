@@ -4,8 +4,7 @@ import type { AmPm } from "./AmPm";
 import type { DateFormat } from "./DateFormat";
 import type { DayOfWeek } from "./DayOfWeek";
 import type { Days } from "./Days";
-import type { HourClock } from "./HourClock";
-import { HourOfDay } from "./HourOfDay";
+import type { HourOfDay } from "./HourOfDay";
 import type { Months } from "./Months";
 
 export type SimpleFormatSymbols =
