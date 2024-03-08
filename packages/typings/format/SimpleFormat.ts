@@ -74,7 +74,7 @@ export type SimpleFormat<
   : In extends "hh"
   ? String.PadStart<String.ToString<HourOfDay<Object.Retrieve<Out, "hour">>>, 2>
   : In extends "m"
-  ? String.TrimStart<Object.Retrieve<Out, "minute">, 1>
+  ?"P"// String.TrimStart<Object.Retrieve<Out, "minute">, 1>
   : In extends "mm"
   ? Object.Retrieve<Out, "minute">
   : In extends "s"

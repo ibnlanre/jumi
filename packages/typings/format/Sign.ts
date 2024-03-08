@@ -14,6 +14,7 @@
 export type Sign =
   | "a"
   | "A"
+  | "B"
   | "m"
   | "M"
   | "h"
