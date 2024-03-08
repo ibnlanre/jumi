@@ -1,20 +1,20 @@
 import type { Add, Subtract } from "ts-arithmetic";
 import type { DaysInMonth } from "./DaysInMonth";
 
-type DayOfYearHelper<
+type YearToDateHelper<
   Year extends number,
   Month extends number,
   Stream extends number
 > = Month extends 0
   ? Stream
-  : DayOfYearHelper<
+  : YearToDateHelper<
       Year,
       Subtract<Month, 1>,
       Add<Stream, DaysInMonth<Month, Year>>
     >;
 
-export type DayOfYear<
+export type YearToDate<
   Year extends number,
   Month extends number,
   Day extends number
-> = DayOfYearHelper<Year, Subtract<Month, 1>, Day>;
+> = YearToDateHelper<Year, Subtract<Month, 1>, Day>;
