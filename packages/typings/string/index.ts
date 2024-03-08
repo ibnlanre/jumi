@@ -123,6 +123,20 @@ type EndsWith<T extends string, U extends string> = T extends `${string}${U}`
   ? 1
   : 0;
 
+// type PadEndHelper<
+
+type PadStart<
+  T extends string,
+  Len extends number,
+  Letter extends string = "0",
+> = Length<T> extends Len ? T : PadStart<Concat<Letter, T>, Len, Letter>;
+
+type PadEnd<
+  T extends string,
+  Len extends number,
+  Letter extends string = "0",
+> = Length<T> extends Len ? T : PadEnd<Concat<T, Letter>, Len, Letter>;
+
 export declare namespace String {
   export {
     Slice,
@@ -138,5 +152,7 @@ export declare namespace String {
     TrimStart,
     TrimEnd,
     Trim,
+    PadStart,
+    PadEnd,
   };
 }

@@ -1,6 +1,7 @@
 import { Array, Object, String } from "@ibnlanre/typings";
 import {
   Abs,
+  Add,
   Divide,
   Gt,
   IsPositive,
@@ -89,6 +90,9 @@ type Ordinal<
 
 type IsEqual<T, U> = T extends U ? (U extends T ? 1 : 0) : 0;
 
+type Floor<T extends number, U extends number> = Subtract<T, Mod<T, U>>;
+type Ceil<T extends number, U extends number> = Add<Floor<T, U>, U>;
+
 export declare namespace Number {
-  export { ToNumber, ParseInt, And, Ordinal, IsEqual };
+  export { ToNumber, ParseInt, And, Ordinal, IsEqual, Floor, Ceil };
 }

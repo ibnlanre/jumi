@@ -1,4 +1,4 @@
-export type Month = {
+export type Months = {
   "01": "January";
   "02": "February";
   "03": "March";

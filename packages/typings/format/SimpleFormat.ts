@@ -2,9 +2,11 @@ import type { Object, String } from "@ibnlanre/typings";
 
 import type { AmPm } from "./AmPm";
 import type { DateFormat } from "./DateFormat";
-import type { DayOfTheWeek } from "./DayOfTheWeek";
+import type { DayOfWeek } from "./DayOfWeek";
+import type { Days } from "./Days";
 import type { HourClock } from "./HourClock";
-import type { Month } from "./Month";
+import { HourOfDay } from "./HourOfDay";
+import type { Months } from "./Months";
 
 export type SimpleFormatSymbols =
   | "YY"
@@ -36,45 +38,42 @@ export type SimpleFormatSymbols =
 export type SimpleFormat<
   In extends string,
   Out extends DateFormat,
-  IYear extends string = Object.Retrieve<Out, "year">,
-  IMonth extends string = Object.Retrieve<Out, "month">,
-  IDay extends string = Object.Retrieve<Out, "day">,
-  WeekDay extends string = DayOfTheWeek<IYear, IMonth, IDay>
+  Year extends string = Object.Retrieve<Out, "year">,
+  Month extends string = Object.Retrieve<Out, "month">,
+  Day extends string = Object.Retrieve<Out, "day">,
+  DayOfTheWeek extends string = String.ToString<DayOfWeek<Year, Month, Day>>
 > = In extends "YY"
-  ? String.Slice<IYear, 2, 4>
+  ? String.Slice<Year, 2, 4>
   : In extends "YYYY"
-  ? IYear
+  ? Year
   : In extends "M"
-  ? String.TrimStart<IMonth>
+  ? String.TrimStart<Month>
   : In extends "MM"
-  ? IMonth
+  ? Month
   : In extends "MMM"
-  ? String.Slice<Object.Retrieve<Month, IMonth>, 0, 3>
+  ? String.Slice<Object.Retrieve<Months, Month>, 0, 3>
   : In extends "MMMM"
-  ? Object.Retrieve<Month, IMonth>
+  ? Object.Retrieve<Months, Month>
   : In extends "D"
-  ? String.TrimStart<IDay>
+  ? String.TrimStart<Day>
   : In extends "DD"
-  ? IDay
+  ? Day
   : In extends "d"
-  ? WeekDay
+  ? DayOfTheWeek
   : In extends "dd"
-  ? String.Slice<Object.Retrieve<Month, WeekDay>, 0, 2>
+  ? String.Slice<Object.Retrieve<Days, DayOfTheWeek>, 0, 2>
   : In extends "ddd"
-  ? String.Slice<Object.Retrieve<Month, WeekDay>, 0, 3>
+  ? String.Slice<Object.Retrieve<Days, DayOfTheWeek>, 0, 3>
   : In extends "dddd"
-  ? Object.Retrieve<Month, WeekDay>
+  ? Object.Retrieve<Days, DayOfTheWeek>
   : In extends "H"
   ? String.TrimStart<Object.Retrieve<Out, "hour">, 1>
   : In extends "HH"
   ? Object.Retrieve<Out, "hour">
   : In extends "h"
-  ? String.TrimStart<
-      Object.Retrieve<HourClock, Object.Retrieve<Out, "hour">>,
-      1
-    >
+  ? HourOfDay<Object.Retrieve<Out, "hour">>
   : In extends "hh"
-  ? Object.Retrieve<HourClock, Object.Retrieve<Out, "hour">>
+  ? String.PadStart<String.ToString<HourOfDay<Object.Retrieve<Out, "hour">>>, 2>
   : In extends "m"
   ? String.TrimStart<Object.Retrieve<Out, "minute">, 1>
   : In extends "mm"

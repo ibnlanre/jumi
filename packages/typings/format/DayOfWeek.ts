@@ -7,7 +7,7 @@ import { LeapYearCode } from "./LeapYearCode";
 import { MonthCode } from "./MonthCode";
 import { YearCode } from "./YearCode";
 
-type DayOfTheWeekHelper<
+type DayOfWeekHelper<
   Year extends number,
   Month extends number,
   Day extends number,
@@ -15,12 +15,12 @@ type DayOfTheWeekHelper<
   LeapYear extends number
 > = Mod<Subtract<Add<Add<Add<Year, Month>, Day>, Century>, LeapYear>, 7>;
 
-export type DayOfTheWeek<
+export type DayOfWeek<
   Year extends string,
   Month extends string,
   Day extends string
 > = String.ToString<
-  DayOfTheWeekHelper<
+  DayOfWeekHelper<
     Number.ToNumber<YearCode<String.Slice<Year, 2, 4>>>,
     Number.ToNumber<MonthCode<Month>>,
     Number.ToNumber<DayCode<Day>>,
