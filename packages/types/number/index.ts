@@ -1,15 +1,17 @@
-import { Array, Object, String } from "@ibnlanre/typings";
+import { Array, Object, String } from "@ibnlanre/types";
 import {
   Abs,
-  Add,
   Divide,
   Gt,
   IsPositive,
   Lt,
   Mod,
+  Multiply,
   Pow,
   Subtract,
 } from "ts-arithmetic";
+import { Ceil } from "./ceil";
+import { Floor } from "./floor";
 
 type Integers = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 
@@ -90,9 +92,11 @@ type Ordinal<
 
 type IsEqual<T, U> = T extends U ? (U extends T ? 1 : 0) : 0;
 
-type Floor<T extends number, U extends number> = Subtract<T, Mod<T, U>>;
-type Ceil<T extends number, U extends number> = Add<Floor<T, U>, U>;
+type Modulo<T extends number, U extends number> = Subtract<
+  T,
+  Multiply<U, Floor<Divide<T, U>>>
+>;
 
 export declare namespace Number {
-  export { ToNumber, ParseInt, And, Ordinal, IsEqual, Floor, Ceil };
+  export { ToNumber, ParseInt, And, Ordinal, IsEqual, Floor, Ceil, Modulo };
 }

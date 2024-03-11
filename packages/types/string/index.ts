@@ -1,4 +1,4 @@
-import { Array, Set } from "@ibnlanre/typings";
+import { Array, Set } from "@ibnlanre/types";
 import { Subtract } from "ts-arithmetic";
 
 type Slice<
@@ -128,13 +128,13 @@ type EndsWith<T extends string, U extends string> = T extends `${string}${U}`
 type PadStart<
   T extends string,
   Len extends number,
-  Letter extends string = "0",
+  Letter extends string = "0"
 > = Length<T> extends Len ? T : PadStart<Concat<Letter, T>, Len, Letter>;
 
 type PadEnd<
   T extends string,
   Len extends number,
-  Letter extends string = "0",
+  Letter extends string = "0"
 > = Length<T> extends Len ? T : PadEnd<Concat<T, Letter>, Len, Letter>;
 
 export declare namespace String {

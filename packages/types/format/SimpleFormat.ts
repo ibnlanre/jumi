@@ -1,4 +1,4 @@
-import type { Object, String } from "@ibnlanre/typings";
+import type { Object, String } from "@ibnlanre/types";
 
 import type { AmPm } from "./AmPm";
 import type { DateFormat } from "./DateFormat";
@@ -74,7 +74,7 @@ export type SimpleFormat<
   : In extends "hh"
   ? String.PadStart<String.ToString<HourOfDay<Object.Retrieve<Out, "hour">>>, 2>
   : In extends "m"
-  ?"P"// String.TrimStart<Object.Retrieve<Out, "minute">, 1>
+  ? String.TrimStart<Object.Retrieve<Out, "minute">, 1>
   : In extends "mm"
   ? Object.Retrieve<Out, "minute">
   : In extends "s"

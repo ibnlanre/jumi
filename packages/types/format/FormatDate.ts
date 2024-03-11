@@ -1,6 +1,9 @@
-import type { String } from "@ibnlanre/typings";
+import type { String } from "@ibnlanre/types";
 
-import type { AdvancedFormat, AdvancedFormatSymbols } from "./AdvancedFormat";
+import type {
+  AdvancedFormat,
+  AdvancedFormatSymbols,
+} from "./advanced-format/AdvancedFormat";
 import type { BuddhistEra, BuddhistEraSymbols } from "./BuddhistEra";
 import type { DateFormat } from "./DateFormat";
 import type {

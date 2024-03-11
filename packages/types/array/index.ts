@@ -1,4 +1,4 @@
-import type { String, Number } from "@ibnlanre/typings";
+import type { Number, String } from "@ibnlanre/types";
 import type { SpliceHelper } from "./SpliceHelper";
 
 type IndexAt<

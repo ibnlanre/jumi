@@ -1,4 +1,4 @@
-import { Array } from "@ibnlanre/typings";
+import { Array } from "@ibnlanre/types";
 
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
   k: infer I

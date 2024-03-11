@@ -1,4 +1,4 @@
-import type { Object } from "@ibnlanre/typings";
+import type { Object } from "@ibnlanre/types";
 import type { Separator } from "./Separator";
 
 import type { Break } from "./Break";

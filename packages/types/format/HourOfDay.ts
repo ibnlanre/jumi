@@ -1,4 +1,4 @@
-import { Number } from "@ibnlanre/typings";
+import { Number } from "@ibnlanre/types";
 import { Mod } from "ts-arithmetic";
 
 export type HourOfDay<Meridiem extends string, Out extends 12 | 24 = 24> = Mod<

@@ -1,10 +1,10 @@
-import type { Number, Object, String } from "@ibnlanre/typings";
+import type { Number, Object, String } from "@ibnlanre/types";
 
-import type { DateFormat } from "./DateFormat";
-import type { HourOfDay } from "./HourOfDay";
-import type { Quarter } from "./Quarter";
-import type { TimeZones } from "./TimeZones";
-import type { WeekOfYear } from "./WeekOfYear";
+import type { DateFormat } from "../DateFormat";
+import type { HourOfDay } from "../HourOfDay";
+import type { Quarter } from "../Quarter";
+import type { TimeZones } from "../TimeZones";
+import type { WeekOfYear } from "../WeekOfYear";
 
 export type AdvancedFormatSymbols =
   | "Q"
@@ -36,11 +36,7 @@ export type AdvancedFormat<
   Hour extends string = Object.Retrieve<Out, "hour">,
   Day extends string = Object.Retrieve<Out, "day">,
   HourOfTheDay extends string = String.ToString<HourOfDay<Hour>>,
-  WeekOfTheYear extends number = WeekOfYear<
-    Number.ToNumber<Year>,
-    Number.ToNumber<Month>,
-    Number.ToNumber<Day>
-  >,
+  WeekOfTheYear extends number = WeekOfYear<Year, Month, Day>,
   TimeZone extends ZoneData = Object.Retrieve<
     TimeZones,
     Object.Retrieve<Out, "timezone">,

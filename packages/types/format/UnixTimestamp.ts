@@ -1,4 +1,4 @@
-import type { Number, Object } from "@ibnlanre/typings";
+import type { Number, Object } from "@ibnlanre/types";
 import type { Add, Multiply, Subtract } from "ts-arithmetic";
 
 import type { DateFormat } from "./DateFormat";
