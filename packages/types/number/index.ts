@@ -72,30 +72,27 @@ type And<T extends number, U extends number> = T extends 1
 
 type Suffixes = ["th", "st", "nd", "rd"];
 
-type OrdinalHelper<
-  V extends number,
-  WithinRange extends number = Lt<V, String.Length<Suffixes>>,
-  NotNegative extends number = IsPositive<V>
+type Coordinate<
+  Digit extends number,
+  WithinRange extends number = Lt<Digit, String.Length<Suffixes>>,
+  NotNegative extends number = IsPositive<Digit>
 > = And<WithinRange, NotNegative> extends 1
-  ? Object.ValueAt<Suffixes, V>
+  ? Object.ValueAt<Suffixes, Digit>
   : never;
 
-type Ordinal<
-  T extends number,
-  U extends number = Mod<Abs<T>, 100>,
-  V extends number = Mod<Subtract<U, 20>, 10>
-> = Array.Includes<Suffixes, OrdinalHelper<V>> extends 1
-  ? String.Concat<T, OrdinalHelper<V>>
-  : Array.Includes<Suffixes, OrdinalHelper<U>> extends 1
-  ? String.Concat<T, OrdinalHelper<U>>
-  : String.Concat<T, Object.ValueAt<Suffixes, 0>>;
+type OrdinalHelper<
+  NumberToOrdinal extends number,
+  TensDigit extends number = Mod<Abs<NumberToOrdinal>, 100>,
+  UnitsDigit extends number = Mod<Subtract<TensDigit, 20>, 10>
+> = Array.Includes<Suffixes, Coordinate<UnitsDigit>> extends 1
+  ? String.Concat<NumberToOrdinal, Coordinate<UnitsDigit>>
+  : Array.Includes<Suffixes, Coordinate<TensDigit>> extends 1
+  ? String.Concat<NumberToOrdinal, Coordinate<TensDigit>>
+  : String.Concat<NumberToOrdinal, Object.ValueAt<Suffixes, 0>>;
+
+type Ordinal<T extends number> = OrdinalHelper<T>;
 
 type IsEqual<T, U> = T extends U ? (U extends T ? 1 : 0) : 0;
-
-type Modulo<T extends number, U extends number> = Subtract<
-  T,
-  Multiply<U, Floor<Divide<T, U>>>
->;
 
 export declare namespace Number {
   export { ToNumber, ParseInt, And, Ordinal, IsEqual, Floor, Ceil, Modulo };

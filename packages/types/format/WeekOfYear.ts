@@ -1,49 +1,54 @@
 import type { Number } from "@ibnlanre/types";
-import type { Add, Divide, Mod, Subtract } from "ts-arithmetic";
-import { DayOfWeek } from "./DayOfWeek";
-import type { IsLeapYear } from "./IsLeapYear";
-import type { YearToDate } from "./YearToDate";
+import type { Add, Divide } from "ts-arithmetic";
 
-export type WeekOfYear<
-  Year extends string,
-  Month extends string,
-  Day extends string
-> = Divide<
-  YearToDate<
-    Number.ToNumber<Year>,
-    Number.ToNumber<Month>,
-    Number.ToNumber<Day>
-  >,
-  7
-> extends infer R extends number
-  ? Number.Floor<Mod<Add<R, 1>, 53>> extends infer P
-    ? P extends 0
-      ? IsLeapYear<Number.ToNumber<Year>> extends 1
-        ? 53
-        : 52
-      : P
-    : never
-  : never;
+import type { DayOfWeek } from "./DayOfWeek";
+import type { DayOfYear } from "./DayOfYear";
 
-export type ISOWeekOfYear<
+type GregorianWeekOfYearHelper<
   Year extends string,
   Month extends string,
   Day extends string,
-  ZYear extends number = Number.ToNumber<Year>,
-  WeekDay extends number = Number.ToNumber<DayOfWeek<Year, Month, Day>>,
-  OrdinalDate extends number = YearToDate<
+  DayOfTheYear extends number = DayOfYear<
     Number.ToNumber<Year>,
     Number.ToNumber<Month>,
     Number.ToNumber<Day>
   >
-> = Number.Floor<
-  Divide<Subtract<OrdinalDate, WeekDay>, 7>
-> extends infer R extends number
-  ? IsLeapYear<ZYear> extends 1
-    ? Add<53, R>
-    : R
-  : never;
+> = Number.Ceil<Divide<DayOfTheYear, 7>>;
 
-type Test = ISOWeekOfYear<"2020", "01", "01">;
+type GregorianWeekOfYear<
+  Year extends string,
+  Month extends string,
+  Day extends string
+> = GregorianWeekOfYearHelper<Year, Month, Day>;
 
-type X = Number.Floor<Divide<1, 7>>;
+type ISOWeekOfYearHelper<
+  Year extends string,
+  Month extends string,
+  Day extends string,
+  DayOfTheWeek extends number = Add<
+    DayOfWeek<Year, Month, Day, "Gregorian">,
+    5
+  >,
+  DayOfTheYear extends number = DayOfYear<
+    Number.ToNumber<Year>,
+    Number.ToNumber<Month>,
+    Number.ToNumber<Day>
+  >
+> = Number.Floor<Divide<Add<DayOfTheYear, DayOfTheWeek>, 7>>;
+
+type ISOWeekOfYear<
+  Year extends string,
+  Month extends string,
+  Day extends string
+> = ISOWeekOfYearHelper<Year, Month, Day>;
+
+export type WeekOfYear<
+  Year extends string,
+  Month extends string,
+  Day extends string,
+  Calendar extends "Gregorian" | "ISO" = "Gregorian"
+> = Calendar extends "Gregorian"
+  ? GregorianWeekOfYear<Year, Month, Day>
+  : ISOWeekOfYear<Year, Month, Day>;
+
+type Test = WeekOfYear<"2019", "08", "05", "ISO">;

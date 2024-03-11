@@ -2,7 +2,7 @@ import type { Object } from "@ibnlanre/types";
 import type { Separator } from "./Separator";
 
 import type { Break } from "./Break";
-import type { BaseDateFormat } from "./DateFormat";
+import type { BaseDateFormat, DateFormat } from "./DateFormat";
 import type { UnixTimestamp } from "./UnixTimestamp";
 
 type SplitHelper<
@@ -10,11 +10,13 @@ type SplitHelper<
   In extends string = "",
   Out extends Record<string, any> = {},
   Stream extends string = ""
-> = Break<Part, In, Out, Stream> extends infer R extends Record<string, any>
-  ? Object.Merge<
-      { timestamp: UnixTimestamp<R> },
-      Object.Merge<R, BaseDateFormat>
-    >
+> = Break<Part, In, Out, Stream> extends infer R
+  ? R extends DateFormat
+    ? Object.Merge<
+        { timestamp: UnixTimestamp<R> },
+        Object.Merge<R, BaseDateFormat>
+      >
+    : never
   : never;
 
 export type Split<

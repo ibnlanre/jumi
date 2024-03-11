@@ -1,4 +1,4 @@
-import type { IsLeapYear } from "./IsLeapYear";
+import type { IsLeapYear } from "../IsLeapYear";
 
 export type DaysInMonth<
   Month extends number,

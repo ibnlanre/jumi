@@ -1,9 +1,14 @@
-import type { Number, Object } from "@ibnlanre/types";
+import type { Number, Object, String } from "@ibnlanre/types";
 import type { Add, Multiply, Subtract } from "ts-arithmetic";
 
 import type { DateFormat } from "./DateFormat";
+import type { DayOfYear } from "./DayOfYear";
 import type { IsLeapYear } from "./IsLeapYear";
-import type { YearToDate } from "./YearToDate";
+
+type DaysToMs<Days extends number> = Multiply<Days, 86400000>;
+type HoursToMs<Hours extends number> = Multiply<Hours, 3600000>;
+type MinutesToMs<Minutes extends number> = Multiply<Minutes, 60000>;
+type SecondsToMs<Seconds extends number> = Multiply<Seconds, 1000>;
 
 type LeapYearsSinceHelper<
   Year extends number,
@@ -18,47 +23,59 @@ type LeapYearsSinceHelper<
 type LeapYearsSince<
   Year extends number,
   Period extends number = 1970
-> = LeapYearsSinceHelper<Subtract<Year, 1>, Period>;
+> = LeapYearsSinceHelper<Subtract<Year, 1>, Period> extends infer R
+  ? R extends number
+    ? R
+    : never
+  : never;
 
-export type UnixTimestamp<
-  T extends Partial<DateFormat>,
-  Epoch extends number = Subtract<
-    Number.ToNumber<Object.Retrieve<T, "year">>,
-    1970
+type EpochToDateInMs<
+  Days extends number,
+  Hours extends number,
+  Minutes extends number,
+  Seconds extends number,
+  Milliseconds extends number
+> = Add<Add<Add<Add<Days, Hours>, Minutes>, Seconds>, Milliseconds>;
+
+type UnixTimestampHelper<
+  T extends DateFormat,
+  Year extends number = Number.ToNumber<Object.Retrieve<T, "year">>,
+  Month extends number = Number.ToNumber<Object.Retrieve<T, "month">>,
+  Day extends number = Number.ToNumber<Object.Retrieve<T, "day">>,
+  Hour extends number = Number.ToNumber<Object.Retrieve<T, "hour">>,
+  Minutes extends number = Number.ToNumber<Object.Retrieve<T, "minute">>,
+  Seconds extends number = Number.ToNumber<Object.Retrieve<T, "second">>,
+  Milliseconds extends number = Number.ToNumber<
+    Object.Retrieve<T, "millisecond">
   >,
-  LeapYears extends number = LeapYearsSince<
-    Number.ToNumber<Object.Retrieve<T, "year">>
-  >,
+  Epoch extends number = Subtract<Year, 1970>,
+  LeapYears extends number = LeapYearsSince<Year>,
+  DaysOfPeriod extends number = DayOfYear<Year, Month, Day>,
   NonLeapYears extends number = Subtract<Epoch, LeapYears>,
   EpochDays extends number = Add<
     Multiply<NonLeapYears, 365>,
     Multiply<LeapYears, 366>
   >,
-  DaysOfPeriod extends number = YearToDate<
-    Number.ToNumber<Object.Retrieve<T, "year">>,
-    Number.ToNumber<Object.Retrieve<T, "month">>,
-    Number.ToNumber<Object.Retrieve<T, "day">>
-  >,
   Days extends number = Add<EpochDays, Subtract<DaysOfPeriod, 1>>,
-  Hours extends number = Subtract<
-    Number.ToNumber<Object.Retrieve<T, "hour">>,
-    1
-  >,
-  DaysToMilliseconds extends number = Multiply<Days, 86400000>,
-  HoursToMilliseconds extends number = Add<
-    DaysToMilliseconds,
-    Multiply<Hours, 3600000>
-  >,
-  MinutesToMilliseconds extends number = Add<
-    HoursToMilliseconds,
-    Multiply<Number.ToNumber<Object.Retrieve<T, "minute">>, 60000>
-  >,
-  SecondsToMilliseconds extends number = Add<
-    MinutesToMilliseconds,
-    Multiply<Number.ToNumber<Object.Retrieve<T, "second">>, 1000>
-  >,
-  EpochToDate extends number = Add<
-    SecondsToMilliseconds,
-    Number.ToNumber<Object.Retrieve<T, "millisecond">>
-  >
-> = EpochToDate;
+  Hours extends number = Subtract<Hour, 1>
+> = EpochToDateInMs<
+  DaysToMs<Days>,
+  HoursToMs<Hours>,
+  MinutesToMs<Minutes>,
+  SecondsToMs<Seconds>,
+  Milliseconds
+>;
+
+export type UnixTimestamp<T extends DateFormat> = UnixTimestampHelper<T>;
+
+type Test = UnixTimestamp<{
+  year: "2019";
+  month: "08";
+  day: "05";
+  hour: "12";
+  minute: "00";
+  second: "00";
+  millisecond: "000";
+  timezone: "+00:00";
+  timestamp: 0;
+}>;
