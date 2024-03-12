@@ -1,4 +1,4 @@
-import type { Add } from "../add";
+import type { Insert } from "../insert";
 import type { Split } from "./Split";
 
 export type TimeBreak<
@@ -7,9 +7,9 @@ export type TimeBreak<
   Out extends Record<string, string> = {},
   Stream extends string = ""
 > = Part extends `T${infer H}:`
-  ? Split<In, Add<Out, "hour", H>, Stream>
+  ? Split<In, Insert<Out, "hour", H>, Stream>
   : Part extends `:${infer m}:`
-  ? Split<In, Add<Out, "minute", m>, Stream>
+  ? Split<In, Insert<Out, "minute", m>, Stream>
   : Part extends `:${infer s}.`
-  ? Split<In, Add<Out, "second", s>, Stream>
+  ? Split<In, Insert<Out, "second", s>, Stream>
   : Out;

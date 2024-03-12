@@ -1,4 +1,4 @@
-import type { Add } from "../add";
+import type { Insert } from "../insert";
 import type { Split } from "./Split";
 
 export type DayBreak<
@@ -7,7 +7,7 @@ export type DayBreak<
   Out extends Record<string, string> = {},
   Stream extends string = ""
 > = Part extends `${infer D}T`
-  ? Split<In, Add<Out, "day", D>, Stream>
+  ? Split<In, Insert<Out, "day", D>, Stream>
   : Part extends `${infer D}`
-  ? Split<In, Add<Out, "day", D>, Stream>
+  ? Split<In, Insert<Out, "day", D>, Stream>
   : never;

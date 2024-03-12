@@ -1,7 +1,7 @@
-import type { Add } from "../add";
+import type { Insert } from "../insert";
 
 export type TimeZoneBreak<
   In extends string,
   Out extends Record<string, string> = {},
   Stream extends string = "+"
-> = Add<Out, "timezone", `${Stream}${In}`>;
+> = Insert<Out, "timezone", `${Stream}${In}`>;
