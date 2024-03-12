@@ -1,0 +1,1 @@
+export { Trunc } from "./Trunc";

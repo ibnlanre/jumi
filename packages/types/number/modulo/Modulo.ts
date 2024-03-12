@@ -1,28 +1,24 @@
 import { Abs, Add, Divide, Mod, Multiply, Subtract } from "ts-arithmetic";
 import { Floor } from "../floor";
 
-type EuclideanDivisionHelper<
-  Dividend extends number,
-  Divisor extends number,
-  AbsDivisor extends number = Abs<Divisor>
-> = Mod<Add<Mod<Dividend, AbsDivisor>, AbsDivisor>, AbsDivisor>;
-
-type EuclideanDivision<
+type EuclideanMod<
   Dividend extends number,
   Divisor extends number
-> = EuclideanDivisionHelper<Dividend, Divisor>;
+> = Abs<Divisor> extends infer R extends number
+  ? Mod<Add<Mod<Dividend, R>, R>, R>
+  : never;
 
-type EuclideanKnuthianDivision<
+type EuclideanKnuthianMod<
   Dividend extends number,
   Divisor extends number
 > = Subtract<Dividend, Multiply<Floor<Divide<Dividend, Divisor>>, Divisor>>;
 
-type TruncatingDivision<Dividend extends number, Divisor extends number> = Mod<
+type TruncatingMod<Dividend extends number, Divisor extends number> = Mod<
   Dividend,
   Divisor
 >;
 
-type FlooredDivision<Dividend extends number, Divisor extends number> = Mod<
+type FlooredMod<Dividend extends number, Divisor extends number> = Mod<
   Add<Mod<Dividend, Divisor>, Divisor>,
   Divisor
 >;
@@ -45,13 +41,11 @@ export type Modulo<
     | "Truncating"
     | "Floored" = "Euclidean-Knuthian"
 > = Type extends "Euclidean"
-  ? EuclideanDivision<Dividend, Divisor>
+  ? EuclideanMod<Dividend, Divisor>
   : Type extends "Euclidean-Knuthian"
-  ? EuclideanKnuthianDivision<Dividend, Divisor>
+  ? EuclideanKnuthianMod<Dividend, Divisor>
   : Type extends "Truncating"
-  ? TruncatingDivision<Dividend, Divisor>
+  ? TruncatingMod<Dividend, Divisor>
   : Type extends "Floored"
-  ? FlooredDivision<Dividend, Divisor>
+  ? FlooredMod<Dividend, Divisor>
   : never;
-
-type a = Modulo<-5, 3, "Floored">;

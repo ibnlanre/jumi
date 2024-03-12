@@ -95,5 +95,5 @@ type Ordinal<T extends number> = OrdinalHelper<T>;
 type IsEqual<T, U> = T extends U ? (U extends T ? 1 : 0) : 0;
 
 export declare namespace Number {
-  export { ToNumber, ParseInt, And, Ordinal, IsEqual, Floor, Ceil, Modulo };
+  export { ToNumber, ParseInt, And, Ordinal, IsEqual, Floor, Ceil };
 }
