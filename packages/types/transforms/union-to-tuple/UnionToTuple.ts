@@ -1,8 +1,9 @@
-import type { Push } from "../../iterables/push";
-import type { LastOf } from "../last-of";
+import type { LastOfUnion } from "../last-of-union";
 
-export type UnionToTuple<T, L = LastOf<T>, N = Exclude<T, L>> = [L] extends [
-  never
-]
+type UnionToTupleHelper<T, L = LastOfUnion<T>, N = Exclude<T, L>> = [
+  L
+] extends [never]
   ? []
-  : Push<UnionToTuple<N>, L>;
+  : [...UnionToTupleHelper<N>, L];
+
+export type UnionToTuple<T> = UnionToTupleHelper<T>;

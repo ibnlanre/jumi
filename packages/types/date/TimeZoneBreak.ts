@@ -1,4 +1,4 @@
-import type { Insert } from "../insert";
+import type { Insert } from "../object/set";
 
 export type TimeZoneBreak<
   In extends string,

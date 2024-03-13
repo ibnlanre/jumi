@@ -1,4 +1,4 @@
-import type { Insert } from "../insert";
+import type { Insert } from "../object/set";
 import type { BaseDateFormat } from "./DateFormat";
 import type { DayBreak } from "./DayBreak";
 import type { Split } from "./Split";

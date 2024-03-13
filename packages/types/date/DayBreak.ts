@@ -1,4 +1,4 @@
-import type { Insert } from "../insert";
+import type { Insert } from "../object/set";
 import type { Split } from "./Split";
 
 export type DayBreak<

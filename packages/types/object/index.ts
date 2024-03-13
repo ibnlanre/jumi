@@ -1,27 +1,8 @@
-import { Intersect } from "@/types";
-import { LastOf } from "../transforms/last-of";
-
-type Merge<
-  T extends Record<string, any>,
-  U extends Record<string, any>
-> = Intersect<{
-  [K in keyof T | keyof U]: K extends keyof T
-    ? T[K]
-    : K extends keyof U
-    ? U[K]
-    : never;
-}>;
-
-type Retrieve<
-  Out extends object,
-  In extends string | number,
-  FallBack = never
-> = In extends keyof Out ? NonNullable<Out[In]> : FallBack;
-
-type ValueAt<T extends object, U extends number> = U extends keyof T
-  ? T[U]
-  : never;
-
-export declare namespace Object {
-  export { Merge, Retrieve, ValueAt };
-}
+export { Extend } from "./extend";
+export { FromEntries } from "./from-entries";
+export { Get } from "./get";
+export { Has } from "./has";
+export { Keys } from "./keys";
+export { SelectiveDeepPartial } from "./partial";
+export { Paths } from "./paths";
+export { SelectiveDeepRequired } from "./required";
