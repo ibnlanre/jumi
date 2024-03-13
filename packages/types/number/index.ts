@@ -22,16 +22,6 @@ type Diff<T extends number, U extends number, Len extends number> = Pow<
   ? Divide<T, R>
   : never;
 
-type ParseIntHelper<
-  T extends string,
-  Pos extends number = 0,
-  Length extends number = String.Length<T>
-> = T extends `${infer R extends number}`
-  ? And<Gt<Pos, 0>, Lt<Pos, Length>> extends 1
-    ? Diff<R, Pos, Length>
-    : R
-  : never;
-
 type ToNumberHelper<
   T extends string,
   U extends string = "",
@@ -44,7 +34,11 @@ type ToNumberHelper<
     : R extends "."
     ? ToNumberHelper<N, U, String.Length<U>>
     : ToNumberHelper<N, U, Pos>
-  : ParseIntHelper<U, Pos>;
+  : U extends `${infer R extends number}`
+  ? And<Gt<Pos, 0>, Lt<Pos, String.Length<U>>> extends 1
+    ? Diff<R, Pos, String.Length<U>>
+    : R
+  : never;
 
 type ToNumber<T extends any> = T extends string
   ? ToNumberHelper<T>
@@ -92,8 +86,6 @@ type OrdinalHelper<
 
 type Ordinal<T extends number> = OrdinalHelper<T>;
 
-type IsEqual<T, U> = T extends U ? (U extends T ? 1 : 0) : 0;
-
 export declare namespace Number {
-  export { ToNumber, ParseInt, And, Ordinal, IsEqual, Floor, Ceil };
+  export { ToNumber, ParseInt, And, Ordinal, Floor, Ceil };
 }

@@ -2,7 +2,7 @@ import type { Derivatives } from "./Derivatives";
 import type { Indexable } from "./Indexable";
 import type { Paths } from "./Paths";
 import type { SelectiveDeepPartial } from "./SelectiveDeepPartial";
-import type { Shear } from "./Shear";
+import type { SplitDelimitedKeys } from "./SplitDelimitedKeys";
 import type { Structures } from "./Structures";
 
 export type Value<
@@ -13,5 +13,9 @@ export type Value<
 > = T[Key] extends Record<string, any>
   ? T[Key] extends Indexable | Structures | Derivatives
     ? T[Key]
-    : SelectiveDeepPartial<T[Key], Shear<Path, Key, Delimiter>, Delimiter>
+    : SelectiveDeepPartial<
+        T[Key],
+        SplitDelimitedKeys<Path, Key, Delimiter>,
+        Delimiter
+      >
   : T[Key];

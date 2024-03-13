@@ -1,0 +1,1 @@
+export { TrimEnd } from "./TrimEnd";

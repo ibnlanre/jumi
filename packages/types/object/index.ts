@@ -1,4 +1,5 @@
 import { Intersect } from "@/types";
+import { LastOf } from "../transforms/last-of";
 
 type Merge<
   T extends Record<string, any>,

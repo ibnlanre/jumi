@@ -1,6 +1,6 @@
-import type { Prettify } from "../prettify";
+import type { Intersect } from "../transforms/intersect";
 
 export type SelectivePartial<
   T extends Record<string, any>,
   K extends keyof T
-> = Prettify<Partial<T> & Omit<T, K>>;
+> = Intersect<Partial<T> & Omit<T, K>>;
