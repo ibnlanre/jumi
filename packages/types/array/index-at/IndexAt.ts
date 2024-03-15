@@ -1,4 +1,4 @@
-import { If } from "@/packages/types/conditionals";
+import { If } from "@ibnlanre/types";
 import { GtOrEq, Subtract } from "ts-arithmetic";
 
 import { Indices } from "../indices";

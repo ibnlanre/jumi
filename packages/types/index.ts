@@ -1,4 +1,4 @@
-export {
+export type {
   Append,
   Concat,
   Contains,
@@ -11,36 +11,71 @@ export {
   Replace,
   Split,
   StartsWith,
+  Stringify,
   Substring,
+  Trim,
+  TrimEnd,
+  TrimStart,
 } from "./string";
 
-export {
+export type {
+  DeepPartial,
+  DeepRequired,
+  ExcludeKeys,
   Extend,
   FromEntries,
   Get,
   Has,
+  IncludeKeys,
   Keys,
+  OptionalKeys,
   Paths,
-  SelectiveDeepPartial,
+  RequiredKeys,
   Set,
   ToEntries,
 } from "./object";
 
-export {
-  Absolute,
-  Add,
+export type {
+  ArrayOfLength,
+  Head,
+  Includes,
+  IndexAt,
+  Indices,
+  Join,
+  Merge,
+  Pop,
+  Push,
+  Reverse,
+  Shift,
+  Size,
+  Slice,
+  SliceFrom,
+  SliceTo,
+  Tail,
+  Unshift,
+  ValueAt,
+  Zip,
+} from "./array";
+
+export type {
+  Bound,
   Ceil,
-  Divide,
   Floor,
-  Max,
-  Min,
   Modulo,
-  Multiply,
-  Negate,
+  Ordinal,
+  ParseInt,
+  Quotient,
   Round,
-  Subtract,
+  Sign,
+  Trunc,
 } from "./number";
 
-export { And, Not, Or, Xor } from "./boolean";
+export type {
+  FirstOfUnion,
+  Intersect,
+  LastOfUnion,
+  UnionToIntersection,
+  UnionToTuple,
+} from "./transforms";
 
-export { Intersect, Union } from "./transforms";
+export { Extends, If, IsPartial } from "./conditionals";

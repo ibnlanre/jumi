@@ -1,1 +1,0 @@
-export { Is } from "./Is";

@@ -1,1 +1,1 @@
-export type If<This, Then, Else> = This extends 1 | true ? Then : Else;
+export type If<This, Then, Else = never> = This extends 1 | true ? Then : Else;

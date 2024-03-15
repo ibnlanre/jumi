@@ -1,0 +1,1 @@
+export { Extends } from "./Extends";

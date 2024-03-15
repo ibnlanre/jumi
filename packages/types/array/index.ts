@@ -1,6 +1,3 @@
-import { Subtract } from "ts-arithmetic";
-import { UnionToTuple } from "../transforms";
-
 export { ArrayOfLength } from "./array-of-length";
 export { Head } from "./head";
 export { Includes } from "./includes";
