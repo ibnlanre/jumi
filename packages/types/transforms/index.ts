@@ -1,3 +1,4 @@
+export { FirstOfUnion } from "./first-of-union";
 export { Intersect } from "./intersect";
 export { LastOfUnion } from "./last-of-union";
 export { UnionToIntersection } from "./union-to-intersection";

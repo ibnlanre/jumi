@@ -1,5 +1,22 @@
+import { Keys } from "../keys";
+import { Paths } from "../paths";
+
+/**
+ * Represents the value at a path in a store.
+ *
+ * @template T The type of the store.
+ * @template Path The type of the path.
+ * @template Delimiter The type of the delimiter.
+ *
+ * @description It is a union of all the possible values in the store.
+ */
 export type Get<
-  Out extends object,
-  In extends keyof Out | (string & {}),
-  FallBack = never
-> = In extends keyof Out ? NonNullable<Out[In]> : FallBack;
+  ObjectType extends Record<string, any>,
+  Path extends Paths<ObjectType, Delimiter> | (string & {}),
+  FallBack = never,
+  Delimiter extends string = "."
+> = Path extends `${infer Key}${Delimiter}${infer Rest}`
+  ? Get<ObjectType[Key], Rest, FallBack>
+  : Path extends Keys<ObjectType>
+  ? ObjectType[Path]
+  : FallBack;

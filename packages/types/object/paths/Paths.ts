@@ -1,10 +1,56 @@
+import { Subtract } from "ts-arithmetic";
+import { Keys } from "../keys";
+
+type PathsHelper<
+  ObjectType extends Record<string, any>,
+  Key extends string | number,
+  Delimiter extends string,
+  Level extends number
+> = Level extends 0
+  ? `${Key}`
+  : Level extends -1
+  ? `${Key}` | `${Key}${Delimiter}${Paths<ObjectType, Delimiter>}`
+  :
+      | `${Key}`
+      | `${Key}${Delimiter}${Paths<ObjectType, Delimiter, Subtract<Level, 1>>}`;
+
+// type ImpartialKeys<ObjectType extends Record<string, any>> =
+//   keyof ObjectType extends undefined ? never : keyof ObjectType;
+
+/**
+ * Get all the possible paths of an object
+ *
+ * @param ObjectType - The object to get the paths from
+ * @param [Delimiter = "."] - The delimiter to use to separate the keys
+ * @param [Level = -1] - The level to stop the recursion
+ */
 export type Paths<
-  Base extends Record<string, any>,
-  Delimiter extends string = "."
-> = Base extends Record<infer Key extends string | number, any>
+  ObjectType extends Record<string, any>,
+  Delimiter extends string = ".",
+  Level extends number = -1
+> = ObjectType extends Record<string, any>
   ? {
-      [K in Key]: Base[K] extends Record<string, any>
-        ? `${K}` | `${K}${Delimiter}${Paths<Base[K], Delimiter>}`
-        : `${K}`;
-    }[Key]
+      [Key in Keys<ObjectType>]: Key extends string | number
+        ? ObjectType[Key] extends infer ObjectType
+          ? ObjectType extends Record<string, any>
+            ? PathsHelper<ObjectType, Key, Delimiter, Level>
+            : `${Key}`
+          : never
+        : never;
+    }[Keys<ObjectType>]
   : never;
+
+type X = {
+  a?: {
+    b: {
+      c?: string;
+    };
+  };
+  5?: {
+    hello: "world";
+  };
+};
+
+type Test2 = Paths<X>;
+
+type Test3 = keyof X;

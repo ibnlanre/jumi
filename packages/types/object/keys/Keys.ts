@@ -1,6 +1,6 @@
-export type Keys<Object extends object> = Object extends Record<
-  infer Key extends string | number,
-  any
->
-  ? `${Key}`
-  : never;
+export type Keys<ObjectType extends Record<string, any>> =
+  keyof ObjectType extends undefined
+    ? never
+    : keyof ObjectType extends infer Keys extends string | number
+    ? `${Keys}`
+    : never;

@@ -1,8 +1,15 @@
+export { DeepPartial } from "./deep-partial";
+export { DeepRequired } from "./deep-required";
+export { ExcludeKeys } from "./exclude-keys";
 export { Extend } from "./extend";
 export { FromEntries } from "./from-entries";
 export { Get } from "./get";
 export { Has } from "./has";
+export { IncludeKeys } from "./include-keys";
 export { Keys } from "./keys";
-export { SelectiveDeepPartial } from "./partial";
+export { OptionalKeys } from "./optional-keys";
 export { Paths } from "./paths";
-export { SelectiveDeepRequired } from "./required";
+export { RequiredKeys } from "./required-keys";
+export { Set } from "./set";
+export { ToEntries } from "./to-entries";
+export { Values } from "./values";

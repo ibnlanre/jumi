@@ -1,1 +1,1 @@
-export type Is<T, U> = T extends U ? (U extends T ? 1 : 0) : 0;
+export type Is<T, U> = [U] extends [T] ? 1 : 0;
