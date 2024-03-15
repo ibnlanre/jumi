@@ -1,13 +1,14 @@
-import type { Intersect } from "../../transforms";
-import type { IncludeKeys } from "../include-keys";
-
-import type { OptionalKeys } from "../optional-keys";
-import type { Paths } from "../paths";
-import type { RequiredKeys } from "../required-keys";
+import type {
+  IncludeKeys,
+  Intersect,
+  OptionalKeys,
+  Paths,
+  RequiredKeys,
+} from "@ibnlanre/types";
 
 import type { Derivatives } from "../derivatives";
+import type { ExtractNestedKeys } from "../extract-nested-keys";
 import type { Indexable } from "../indexable";
-import type { SplitDelimitedKeys } from "../split-delimited-keys";
 import type { Structures } from "../structures";
 
 type DeepPartialHelper<
@@ -18,7 +19,7 @@ type DeepPartialHelper<
   ? ObjectType extends Record<string, any>
     ? [PathType] extends [never]
       ? DeepPartial<ObjectType>
-      : DeepPartial<ObjectType, SplitDelimitedKeys<PathType, Key>>
+      : DeepPartial<ObjectType, ExtractNestedKeys<PathType, Key>>
     : ObjectType
   : never;
 

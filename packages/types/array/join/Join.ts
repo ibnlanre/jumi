@@ -1,4 +1,4 @@
-import { Stringify } from "../../string/stringify";
+import { Stringify } from "@ibnlanre/types";
 
 export type Join<T extends any[], Separator extends string = ""> = T extends [
   infer Head,

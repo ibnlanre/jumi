@@ -1,4 +1,4 @@
-export type SplitDelimitedKeys<
+export type ExtractNestedKeys<
   T extends string,
   K extends string | number | symbol,
   Delimiter extends string = "."

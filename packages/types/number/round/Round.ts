@@ -1,7 +1,5 @@
+import { Floor, Sign } from "@ibnlanre/types";
 import { Abs, Add, Mod, Multiply, Subtract } from "ts-arithmetic";
-
-import { Floor } from "../floor";
-import { Sign } from "../sign";
 
 export type Round<
   Value extends number,

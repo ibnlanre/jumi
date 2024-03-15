@@ -1,5 +1,4 @@
-import { Keys } from "../keys";
-import { Paths } from "../paths";
+import { Keys, Paths } from "@ibnlanre/types";
 
 export type ExcludeKeys<
   ObjectType extends Record<string, any>,

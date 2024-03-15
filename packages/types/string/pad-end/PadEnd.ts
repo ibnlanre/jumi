@@ -1,5 +1,4 @@
-import { Concat } from "../../array/merge";
-import { Length } from "../length";
+import { Concat, Length } from "@ibnlanre/types";
 
 export type PadEnd<
   Value extends string,

@@ -2,6 +2,7 @@ export { DeepPartial } from "./deep-partial";
 export { DeepRequired } from "./deep-required";
 export { ExcludeKeys } from "./exclude-keys";
 export { Extend } from "./extend";
+export { ExtractNestedKeys } from "./extract-nested-keys";
 export { FromEntries } from "./from-entries";
 export { Get } from "./get";
 export { Has } from "./has";

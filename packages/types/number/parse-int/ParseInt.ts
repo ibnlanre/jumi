@@ -33,7 +33,7 @@ type ParseIntHelper<
 
 export type ParseInt<
   Input extends string | number | boolean,
-  Output extends "Int" | "Float" = "Int"
+  Output extends "Integer" | "Float" = "Float"
 > = Input extends number
   ? Output extends "Float"
     ? Input

@@ -1,6 +1,5 @@
+import { Concat, Includes, Size, Stringify, ValueAt } from "@ibnlanre/types";
 import { Abs, And, Bit, IsPositive, Lt, Mod, Subtract } from "ts-arithmetic";
-import { Includes, Size, ValueAt } from "../../array";
-import { Concat, Stringify } from "../../string";
 
 type Suffixes = ["th", "st", "nd", "rd"];
 

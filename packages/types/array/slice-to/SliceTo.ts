@@ -1,7 +1,5 @@
+import { ArrayOfLength, Size } from "@ibnlanre/types";
 import { Gt, Lt, Subtract } from "ts-arithmetic";
-
-import { ArrayOfLength } from "../array-of-length";
-import { Size } from "../size";
 
 type SliceToHelper<
   Array extends unknown[],

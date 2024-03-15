@@ -1,8 +1,7 @@
-import { Slice } from "../../array/slice";
-import { Length } from "../length";
+import { Length, Substring } from "@ibnlanre/types";
 
 export type Place<
   T extends string,
   U extends string,
   Index extends number
-> = `${Slice<T, 0, Index>}${U}${Slice<T, Index, Length<T>>}`;
+> = `${Substring<T, 0, Index>}${U}${Substring<T, Index, Length<T>>}`;

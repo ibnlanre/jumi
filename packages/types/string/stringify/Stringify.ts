@@ -1,5 +1,4 @@
-import { Join } from "../../array/join";
-import { UnionToTuple } from "../../transforms/union-to-tuple";
+import { Join, UnionToTuple } from "@ibnlanre/types";
 
 type Serializable = string | number | boolean | null;
 

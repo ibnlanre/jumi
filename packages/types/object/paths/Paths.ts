@@ -1,5 +1,5 @@
+import { Keys } from "@ibnlanre/types";
 import { Subtract } from "ts-arithmetic";
-import { Keys } from "../keys";
 
 type PathsHelper<
   ObjectType extends Record<string, any>,
@@ -13,9 +13,6 @@ type PathsHelper<
   :
       | `${Key}`
       | `${Key}${Delimiter}${Paths<ObjectType, Delimiter, Subtract<Level, 1>>}`;
-
-// type ImpartialKeys<ObjectType extends Record<string, any>> =
-//   keyof ObjectType extends undefined ? never : keyof ObjectType;
 
 /**
  * Get all the possible paths of an object
@@ -39,18 +36,3 @@ export type Paths<
         : never;
     }[Keys<ObjectType>]
   : never;
-
-type X = {
-  a?: {
-    b: {
-      c?: string;
-    };
-  };
-  5?: {
-    hello: "world";
-  };
-};
-
-type Test2 = Paths<X>;
-
-type Test3 = keyof X;

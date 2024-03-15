@@ -1,4 +1,4 @@
-import { UnionToIntersection } from "../union-to-intersection";
+import { UnionToIntersection } from "@ibnlanre/types";
 
 export type FirstOfUnion<U, N = keyof U> = UnionToIntersection<
   U extends any ? () => U : never

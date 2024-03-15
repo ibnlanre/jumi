@@ -1,5 +1,4 @@
-import { TrimEnd } from "../trim-end";
-import { TrimStart } from "../trim-start";
+import { TrimEnd, TrimStart } from "@ibnlanre/types";
 
 export type Trim<
   T extends string,

@@ -1,5 +1,4 @@
-import { Join, Slice } from "../../array";
-import { Split } from "../split";
+import { Join, Slice, Split } from "@ibnlanre/types";
 
 export type Substring<
   Value extends string,

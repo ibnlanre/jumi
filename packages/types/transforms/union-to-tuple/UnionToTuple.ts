@@ -1,4 +1,4 @@
-import type { LastOfUnion } from "../last-of-union";
+import type { LastOfUnion } from "@ibnlanre/types";
 
 type UnionToTupleHelper<T, L = LastOfUnion<T>, N = Exclude<T, L>> = [
   L

@@ -1,5 +1,4 @@
-import { IsPartial } from "../../conditionals";
-import { Keys } from "../keys";
+import { IsPartial, Keys } from "@ibnlanre/types";
 
 export type RequiredKeys<ObjectType extends Record<string, any>> = {
   [Key in Keys<ObjectType>]: IsPartial<ObjectType[Key]> extends 1 ? never : Key;

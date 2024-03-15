@@ -1,5 +1,4 @@
-import { Keys } from "../keys";
-import { Paths } from "../paths";
+import { Keys, Paths } from "@ibnlanre/types";
 
 /**
  * Represents the value at a path in a store.

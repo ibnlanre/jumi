@@ -1,9 +1,5 @@
-import { Gt, Subtract } from "ts-arithmetic";
-
-import { Bound } from "../../number/bound";
-import { Size } from "../size";
-import { SliceFrom } from "../slice-from";
-import { SliceTo } from "../slice-to";
+import { Bound, Size, SliceFrom, SliceTo } from "@ibnlanre/types";
+import { Subtract } from "ts-arithmetic";
 
 export type Slice<
   Array extends unknown[],
@@ -18,5 +14,3 @@ export type Slice<
       : never
     : never
   : never;
-
-type Test = Slice<[1, 2, 3, 4, 5], 0>; // [2, 3]

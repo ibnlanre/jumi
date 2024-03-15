@@ -1,4 +1,4 @@
-import { IndexAt } from "../index-at";
+import { IndexAt } from "@ibnlanre/types";
 
 export type ValueAt<Array extends any[], Index extends number> = IndexAt<
   Array,

@@ -1,8 +1,5 @@
-import { If } from "@ibnlanre/types";
+import { If, Indices, Size } from "@ibnlanre/types";
 import { GtOrEq, Subtract } from "ts-arithmetic";
-
-import { Indices } from "../indices";
-import { Size } from "../size";
 
 export type IndexAt<
   Array extends any[],

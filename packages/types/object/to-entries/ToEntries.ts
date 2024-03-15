@@ -1,4 +1,4 @@
-import { UnionToTuple } from "../../transforms";
+import { UnionToTuple } from "@ibnlanre/types";
 
 export type ToEntries<T extends Record<string, any>> = UnionToTuple<
   {

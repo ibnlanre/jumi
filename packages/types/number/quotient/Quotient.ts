@@ -1,22 +1,6 @@
-import { Abs, Divide, Multiply } from "ts-arithmetic";
-
-import { Floor } from "../floor";
-import { Sign } from "../sign";
-import { Trunc } from "../trunc";
-
-type EuclideanDivision<
-  Dividend extends number,
-  Divisor extends number
-> = Multiply<Sign<Divisor>, Floor<Divide<Dividend, Abs<Divisor>>>>;
-
-type TruncatingDivision<
-  Dividend extends number,
-  Divisor extends number
-> = Trunc<Divide<Dividend, Divisor>>;
-
-type FlooredDivision<Dividend extends number, Divisor extends number> = Floor<
-  Divide<Dividend, Divisor>
->;
+import { EuclideanDivision } from "./EuclideanDivision";
+import { FlooredDivision } from "./FlooredDivision";
+import { TruncatingDivision } from "./TruncatingDivision";
 
 export type Quotient<
   Dividend extends number,

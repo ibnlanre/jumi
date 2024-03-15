@@ -1,4 +1,4 @@
-import { UnionToIntersection } from "../union-to-intersection";
+import { UnionToIntersection } from "@ibnlanre/types";
 
 export type LastOfUnion<T> = UnionToIntersection<
   T extends any ? () => T : never

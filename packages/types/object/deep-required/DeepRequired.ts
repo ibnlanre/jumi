@@ -1,12 +1,15 @@
-import { Intersect } from "../../transforms";
-import { Derivatives } from "../derivatives";
-import { IncludeKeys } from "../include-keys";
-import { Indexable } from "../indexable";
-import { OptionalKeys } from "../optional-keys";
-import { Paths } from "../paths";
-import { RequiredKeys } from "../required-keys";
-import { SplitDelimitedKeys } from "../split-delimited-keys";
-import { Structures } from "../structures";
+import type {
+  IncludeKeys,
+  Intersect,
+  OptionalKeys,
+  Paths,
+  RequiredKeys,
+} from "@ibnlanre/types";
+
+import type { Derivatives } from "../derivatives";
+import type { ExtractNestedKeys } from "../extract-nested-keys";
+import type { Indexable } from "../indexable";
+import type { Structures } from "../structures";
 
 type DeepRequiredHelper<
   ObjectType extends Record<string, any>,
@@ -16,7 +19,7 @@ type DeepRequiredHelper<
   ? ObjectType extends Record<string, any>
     ? [PathType] extends [never]
       ? DeepRequired<ObjectType>
-      : DeepRequired<ObjectType, SplitDelimitedKeys<PathType, Key>>
+      : DeepRequired<ObjectType, ExtractNestedKeys<PathType, Key>>
     : ObjectType
   : never;
 

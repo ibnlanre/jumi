@@ -23,6 +23,7 @@ export type {
   DeepRequired,
   ExcludeKeys,
   Extend,
+  ExtractNestedKeys,
   FromEntries,
   Get,
   Has,

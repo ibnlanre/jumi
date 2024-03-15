@@ -1,27 +1,7 @@
-import { Abs, Add, Divide, Mod, Multiply, Subtract } from "ts-arithmetic";
-import { Floor } from "../floor";
-
-type EuclideanMod<
-  Dividend extends number,
-  Divisor extends number
-> = Abs<Divisor> extends infer R extends number
-  ? Mod<Add<Mod<Dividend, R>, R>, R>
-  : never;
-
-type EuclideanKnuthianMod<
-  Dividend extends number,
-  Divisor extends number
-> = Subtract<Dividend, Multiply<Floor<Divide<Dividend, Divisor>>, Divisor>>;
-
-type TruncatingMod<Dividend extends number, Divisor extends number> = Mod<
-  Dividend,
-  Divisor
->;
-
-type FlooredMod<Dividend extends number, Divisor extends number> = Mod<
-  Add<Mod<Dividend, Divisor>, Divisor>,
-  Divisor
->;
+import { EuclideanKnuthianMod } from "./EuclideanKnuthianMod";
+import { EuclideanMod } from "./EuclideanMod";
+import { FlooredMod } from "./FlooredMod";
+import { TruncatingMod } from "./TruncatingMod";
 
 /**
  * Returns the remainder of the division of `Dividend` by `Divisor`.
