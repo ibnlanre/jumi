@@ -4,12 +4,8 @@ export type Bound<
   LowerBound extends number,
   UpperBound extends number,
   Value extends number
-> = UpperBound extends number
-  ? LtOrEq<Value, UpperBound> extends 1
-    ? Value
-    : LowerBound extends number
-    ? GtOrEq<Value, LowerBound> extends 1
-      ? Value
-      : LowerBound
-    : UpperBound
-  : never;
+> = GtOrEq<Value, UpperBound> extends 1
+  ? UpperBound
+  : LtOrEq<Value, LowerBound> extends 1
+  ? LowerBound
+  : Value;

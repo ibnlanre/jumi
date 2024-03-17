@@ -1,36 +1,34 @@
 import type {
+  Derivatives,
   IncludeKeys,
+  Indexable,
   Intersect,
+  Keys,
   OptionalKeys,
   Paths,
+  Primitives,
   RequiredKeys,
+  Structures,
 } from "@ibnlanre/types";
-
-import type { Derivatives } from "../derivatives";
-import type { ExtractNestedKeys } from "../extract-nested-keys";
-import type { Indexable } from "../indexable";
-import type { Structures } from "../structures";
 
 type DeepPartialHelper<
   ObjectType extends Record<string, any>,
-  PathType extends (string & {}) | Paths<ObjectType> = never,
-  Key extends keyof ObjectType = keyof ObjectType
-> = ObjectType[Key] extends infer ObjectType
-  ? ObjectType extends Record<string, any>
-    ? [PathType] extends [never]
-      ? DeepPartial<ObjectType>
-      : DeepPartial<ObjectType, ExtractNestedKeys<PathType, Key>>
-    : ObjectType
-  : never;
+  PathType extends string,
+  Key extends string
+> = [PathType] extends [never]
+  ? DeepPartial<ObjectType[Key]>
+  : PathType extends `${Key}.${infer Tail}`
+  ? DeepPartial<ObjectType[Key], Tail>
+  : DeepPartial<ObjectType[Key], "">;
 
 export type DeepPartial<
   ObjectType extends Record<string, any>,
   PathType extends (string & {}) | Paths<ObjectType> = never
-> = ObjectType extends Indexable | Structures | Derivatives
+> = ObjectType extends Primitives | Indexable | Structures | Derivatives
   ? ObjectType
   : [PathType] extends [never]
   ? {
-      [Key in keyof ObjectType]?: DeepPartialHelper<ObjectType, PathType, Key>;
+      [Key in Keys<ObjectType>]?: DeepPartialHelper<ObjectType, PathType, Key>;
     }
   : Intersect<
       {

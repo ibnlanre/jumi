@@ -1,21 +1,19 @@
-import { Keys, Paths } from "@ibnlanre/types";
+import { ArbitraryKey, Keys, Paths, Stringify } from "@ibnlanre/types";
 
 /**
- * Represents the value at a path in a store.
+ * Represents the value at a path in an object.
  *
- * @template T The type of the store.
+ * @template ObjectType The type of the object.
  * @template Path The type of the path.
  * @template Delimiter The type of the delimiter.
- *
- * @description It is a union of all the possible values in the store.
  */
 export type Get<
   ObjectType extends Record<string, any>,
-  Path extends Paths<ObjectType, Delimiter> | (string & {}),
+  Path extends Paths<ObjectType, Delimiter> | ArbitraryKey,
   FallBack = never,
   Delimiter extends string = "."
 > = Path extends `${infer Key}${Delimiter}${infer Rest}`
   ? Get<ObjectType[Key], Rest, FallBack>
-  : Path extends Keys<ObjectType>
-  ? ObjectType[Path]
+  : Stringify<Path> extends Keys<ObjectType>
+  ? ObjectType[Stringify<Path>]
   : FallBack;
