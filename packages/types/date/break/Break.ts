@@ -1,4 +1,4 @@
-import type { BaseDateFormat } from "./DateFormat";
+import type { BaseDateFormat } from "../DateFormat";
 import type { MillisecondBreak } from "./MillisecondBreak";
 import type { PeriodBreak } from "./PeriodBreak";
 

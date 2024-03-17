@@ -1,4 +1,7 @@
-export type Quarter<Month extends string> = Month extends "01" | "02" | "03"
+export type QuarterOfYear<Month extends string> = Month extends
+  | "01"
+  | "02"
+  | "03"
   ? 1
   : Month extends "04" | "05" | "06"
   ? 2

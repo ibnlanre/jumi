@@ -1,8 +1,8 @@
-import type { Number, Object, String } from "@ibnlanre/types";
+import type { Get, ParseInt } from "@ibnlanre/types";
 import type { Add, Multiply, Subtract } from "ts-arithmetic";
 
 import type { DateFormat } from "./DateFormat";
-import type { DayOfYear } from "./DayOfYear";
+import type { DayOfYear } from "./day-of-year";
 import type { IsLeapYear } from "./IsLeapYear";
 
 type DaysToMs<Days extends number> = Multiply<Days, 86400000>;
@@ -16,9 +16,11 @@ type LeapYearsSinceHelper<
   Stream extends number = 0
 > = Year extends Period
   ? Stream
-  : IsLeapYear<Year> extends 1
-  ? LeapYearsSinceHelper<Subtract<Year, 1>, Period, Add<Stream, 1>>
-  : LeapYearsSinceHelper<Subtract<Year, 1>, Period, Stream>;
+  : LeapYearsSinceHelper<
+      Subtract<Year, 1>,
+      Period,
+      IsLeapYear<Year> extends 1 ? Add<Stream, 1> : Stream
+    >;
 
 type LeapYearsSince<
   Year extends number,
@@ -39,15 +41,13 @@ type EpochToDateInMs<
 
 type UnixTimestampHelper<
   T extends DateFormat,
-  Year extends number = Number.ToNumber<Object.Retrieve<T, "year">>,
-  Month extends number = Number.ToNumber<Object.Retrieve<T, "month">>,
-  Day extends number = Number.ToNumber<Object.Retrieve<T, "day">>,
-  Hour extends number = Number.ToNumber<Object.Retrieve<T, "hour">>,
-  Minutes extends number = Number.ToNumber<Object.Retrieve<T, "minute">>,
-  Seconds extends number = Number.ToNumber<Object.Retrieve<T, "second">>,
-  Milliseconds extends number = Number.ToNumber<
-    Object.Retrieve<T, "millisecond">
-  >,
+  Year extends number = ParseInt<Get<T, "year">>,
+  Month extends number = ParseInt<Get<T, "month">>,
+  Day extends number = ParseInt<Get<T, "day">>,
+  Hour extends number = ParseInt<Get<T, "hour">>,
+  Minutes extends number = ParseInt<Get<T, "minute">>,
+  Seconds extends number = ParseInt<Get<T, "second">>,
+  Milliseconds extends number = ParseInt<Get<T, "millisecond">>,
   Epoch extends number = Subtract<Year, 1970>,
   LeapYears extends number = LeapYearsSince<Year>,
   DaysOfPeriod extends number = DayOfYear<Year, Month, Day>,

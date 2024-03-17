@@ -1,7 +1,7 @@
-import { If, Indices, Size } from "@ibnlanre/types";
+import { ArrayOfLength, If, Indices, Size } from "@ibnlanre/types";
 import { GtOrEq, Subtract } from "ts-arithmetic";
 
-export type IndexAt<
+type IndexAtHelper<
   Array extends any[],
   Index extends number
 > = `${Index}` extends `-${infer Index extends number}`
@@ -14,4 +14,13 @@ export type IndexAt<
   ? Index extends Keys
     ? Index
     : never
+  : never;
+
+export type IndexAt<
+  Array extends any[] | number,
+  Index extends number
+> = Array extends any[]
+  ? IndexAtHelper<Array, Index>
+  : Array extends number
+  ? IndexAtHelper<ArrayOfLength<Array>, Index>
   : never;

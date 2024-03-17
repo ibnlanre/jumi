@@ -1,9 +1,5 @@
 import type { String } from "@ibnlanre/types";
 
-import type {
-  AdvancedFormat,
-  AdvancedFormatSymbols,
-} from "./advanced-format/AdvancedFormat";
 import type { BuddhistEra, BuddhistEraSymbols } from "./BuddhistEra";
 import type { DateFormat } from "./DateFormat";
 import type {
@@ -12,7 +8,11 @@ import type {
 } from "./LocalizedFormat";
 import type { Sign } from "./Sign";
 import type { SimpleFormat, SimpleFormatSymbols } from "./SimpleFormat";
-import type { Split } from "./Split";
+import type {
+  AdvancedFormat,
+  AdvancedFormatSymbols,
+} from "./advanced-format/AdvancedFormat";
+import type { Split } from "./break/Split";
 
 type Symbols = AdvancedFormatSymbols | BuddhistEraSymbols | SimpleFormatSymbols;
 

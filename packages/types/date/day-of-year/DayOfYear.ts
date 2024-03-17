@@ -1,5 +1,5 @@
 import type { Add, Subtract } from "ts-arithmetic";
-import type { DaysInMonth } from "./days-in-month/DaysInMonth";
+import type { DaysInMonth } from "../days-in-month";
 
 type DayOfYearHelper<
   Year extends number,
@@ -26,5 +26,3 @@ export type DayOfYear<
     ? R
     : never
   : never;
-
-type Test = DayOfYear<2020, 1, 5>;

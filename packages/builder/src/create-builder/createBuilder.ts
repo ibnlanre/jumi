@@ -1,5 +1,4 @@
 import type { KeyBuilder, Builder } from "@ibnlanre/builder";
-import { withTypes } from "../with-types";
 
 /**
  * Returns a builder object that represents the nested keys of the provided object.

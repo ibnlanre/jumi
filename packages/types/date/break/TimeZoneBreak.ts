@@ -1,7 +1,7 @@
-import type { Insert } from "../object/set";
+import type { Set } from "@ibnlanre/types";
 
 export type TimeZoneBreak<
   In extends string,
   Out extends Record<string, string> = {},
   Stream extends string = "+"
-> = Insert<Out, "timezone", `${Stream}${In}`>;
+> = Set<Out, "timezone", `${Stream}${In}`>;

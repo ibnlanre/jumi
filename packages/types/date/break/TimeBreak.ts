@@ -1,4 +1,4 @@
-import type { Insert } from "../object/set";
+import type { Set } from "@ibnlanre/types";
 import type { Split } from "./Split";
 
 export type TimeBreak<
@@ -7,9 +7,9 @@ export type TimeBreak<
   Out extends Record<string, string> = {},
   Stream extends string = ""
 > = Part extends `T${infer H}:`
-  ? Split<In, Insert<Out, "hour", H>, Stream>
+  ? Split<In, Set<Out, "hour", H>, Stream>
   : Part extends `:${infer m}:`
-  ? Split<In, Insert<Out, "minute", m>, Stream>
+  ? Split<In, Set<Out, "minute", m>, Stream>
   : Part extends `:${infer s}.`
-  ? Split<In, Insert<Out, "second", s>, Stream>
+  ? Split<In, Set<Out, "second", s>, Stream>
   : Out;

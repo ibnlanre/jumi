@@ -19,8 +19,10 @@ export type {
 } from "./string";
 
 export type {
+  ArbitraryKey,
   DeepPartial,
   DeepRequired,
+  Derivatives,
   ExcludeKeys,
   Extend,
   ExtractNestedKeys,
@@ -28,12 +30,18 @@ export type {
   Get,
   Has,
   IncludeKeys,
+  Indexable,
   Keys,
+  ObjectFromPath,
+  OmitPath,
   OptionalKeys,
   Paths,
+  Primitives,
   RequiredKeys,
   Set,
+  Structures,
   ToEntries,
+  Values,
 } from "./object";
 
 export type {

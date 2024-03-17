@@ -1,10 +1,17 @@
-import type { Number, Object, String } from "@ibnlanre/types";
+import type {
+  Get,
+  Ordinal,
+  PadStart,
+  ParseInt,
+  Stringify,
+  Substring,
+} from "@ibnlanre/types";
 
 import type { DateFormat } from "../DateFormat";
-import type { HourOfDay } from "../HourOfDay";
-import type { Quarter } from "../Quarter";
+import type { HourOfDay } from "../hour-of-day";
+import type { QuarterOfYear } from "../quarter-of-year";
 import type { TimeZones } from "../TimeZones";
-import type { WeekOfYear } from "../WeekOfYear";
+import type { WeekOfYear } from "../week-of-year";
 
 export type AdvancedFormatSymbols =
   | "Q"
@@ -31,47 +38,45 @@ type ZoneData = {
 export type AdvancedFormat<
   In extends string,
   Out extends DateFormat,
-  Year extends string = Object.Retrieve<Out, "year">,
-  Month extends string = Object.Retrieve<Out, "month">,
-  Hour extends string = Object.Retrieve<Out, "hour">,
-  Day extends string = Object.Retrieve<Out, "day">,
-  HourOfTheDay extends string = String.ToString<HourOfDay<Hour>>,
+  Year extends string = Get<Out, "year">,
+  Month extends string = Get<Out, "month">,
+  Hour extends string = Get<Out, "hour">,
+  Day extends string = Get<Out, "day">,
+  HourOfTheDay extends string = Stringify<HourOfDay<Hour>>,
   WeekOfTheYear extends number = WeekOfYear<Year, Month, Day>,
-  TimeZone extends ZoneData = Object.Retrieve<
+  TimeZone extends ZoneData = Get<
     TimeZones,
-    Object.Retrieve<Out, "timezone">,
+    Get<Out, "timezone">,
     { abbr: ""; name: "" }
   >
 > = In extends "Q"
-  ? String.ToString<Quarter<Object.Retrieve<Out, "month">>>
+  ? Stringify<QuarterOfYear<Get<Out, "month">>>
   : In extends "Do"
-  ? String.ToString<
-      Number.Ordinal<Number.ToNumber<Object.Retrieve<Out, "day">>>
-    >
+  ? Stringify<Ordinal<ParseInt<Get<Out, "day">>>>
   : In extends "k"
   ? HourOfTheDay
   : In extends "kk"
-  ? String.PadStart<HourOfTheDay, 2>
+  ? PadStart<HourOfTheDay, 2>
   : In extends "X"
-  ? String.ToString<Object.Retrieve<Out, "timestamp">>
+  ? Stringify<Get<Out, "timestamp">>
   : In extends "x"
-  ? String.Slice<String.ToString<Object.Retrieve<Out, "timestamp">>, 0, 10>
+  ? Substring<Stringify<Get<Out, "timestamp">>, 0, 10>
   : In extends "w"
-  ? String.ToString<WeekOfTheYear>
+  ? Stringify<WeekOfTheYear>
   : In extends "ww"
-  ? String.PadStart<String.ToString<WeekOfTheYear>, 2>
+  ? PadStart<Stringify<WeekOfTheYear>, 2>
   : In extends "W"
-  ? String.ToString<WeekOfTheYear>
+  ? Stringify<WeekOfTheYear>
   : In extends "WW"
-  ? String.PadStart<String.ToString<WeekOfTheYear>, 2>
+  ? PadStart<Stringify<WeekOfTheYear>, 2>
   : In extends "wo"
-  ? String.ToString<Number.Ordinal<WeekOfTheYear>>
+  ? Stringify<Ordinal<WeekOfTheYear>>
   : In extends "gggg"
   ? Year
   : In extends "GGGG"
   ? Year
   : In extends "z"
-  ? Object.Retrieve<TimeZone, "abbr">
+  ? Get<TimeZone, "abbr">
   : In extends "zz"
-  ? Object.Retrieve<TimeZone, "name">
+  ? Get<TimeZone, "name">
   : never;
