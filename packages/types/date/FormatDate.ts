@@ -1,4 +1,4 @@
-import type { String } from "@ibnlanre/types";
+import type { Replace, Stringify } from "@ibnlanre/types";
 
 import type { BuddhistEra, BuddhistEraSymbols } from "./BuddhistEra";
 import type { DateFormat } from "./DateFormat";
@@ -8,10 +8,7 @@ import type {
 } from "./LocalizedFormat";
 import type { Sign } from "./Sign";
 import type { SimpleFormat, SimpleFormatSymbols } from "./SimpleFormat";
-import type {
-  AdvancedFormat,
-  AdvancedFormatSymbols,
-} from "./advanced-format/AdvancedFormat";
+import type { AdvancedFormat, AdvancedFormatSymbols } from "./advanced-format";
 import type { Split } from "./break/Split";
 
 type Symbols = AdvancedFormatSymbols | BuddhistEraSymbols | SimpleFormatSymbols;
@@ -38,13 +35,13 @@ type FormatterHelper<
 > = Stream extends LocalizedFormatSymbols
   ? FormatDateHelper<
       Date,
-      String.Replace<Format, Stream, LocalizedFormat<Stream>>,
+      Replace<Format, Stream, LocalizedFormat<Stream>>,
       Value,
       Stream
     >
   : Stream extends Symbols
   ? Formatter<Stream, Date> extends infer P
-    ? FormatDateHelper<Date, Format, `${Value}${String.ToString<P>}${Part}`>
+    ? FormatDateHelper<Date, Format, `${Value}${Stringify<P>}${Part}`>
     : never
   : FormatDateHelper<Date, Format, `${Value}${Stream}${Part}`>;
 

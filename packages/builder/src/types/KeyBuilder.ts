@@ -1,3 +1,4 @@
+import { RequiredKeys } from "@ibnlanre/types";
 import { Key } from "./Key";
 
 /**
@@ -9,7 +10,7 @@ export type KeyBuilder<
   T extends Record<string, any>,
   P extends readonly string[] = []
 > = {
-  [K in keyof T]: T[K] extends (...args: infer R) => any
+  [K in RequiredKeys<T>]: T[K] extends (...args: infer R) => infer U
     ? {
         get: <Y extends any[]>(...args: Y) => [...P, Extract<K, string>, ...Y];
         use: (...args: Parameters<T[K]>) => [...P, Extract<K, string>, ...R];

@@ -9,7 +9,7 @@ import { ArbitraryKey, Keys, Paths, Stringify } from "@ibnlanre/types";
  */
 export type Get<
   ObjectType extends Record<string, any>,
-  Path extends Paths<ObjectType, Delimiter> | ArbitraryKey,
+  Path extends Paths<ObjectType, Delimiter> | ArbitraryKey<number>,
   FallBack = never,
   Delimiter extends string = "."
 > = Path extends `${infer Key}${Delimiter}${infer Rest}`

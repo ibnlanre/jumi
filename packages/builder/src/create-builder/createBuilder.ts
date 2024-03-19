@@ -1,4 +1,4 @@
-import type { KeyBuilder, Builder } from "@ibnlanre/builder";
+import { type Builder, type KeyBuilder } from "@ibnlanre/builder";
 
 /**
  * Returns a builder object that represents the nested keys of the provided object.

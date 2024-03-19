@@ -1,1 +1,1 @@
-export type ArbitraryKey = number | (string & {});
+export type ArbitraryKey<T = undefined> = Exclude<T | (string & {}), undefined>;

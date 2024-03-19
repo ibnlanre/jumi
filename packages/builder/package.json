@@ -1,0 +1,42 @@
+{
+  "name": "@ibnlanre/builder",
+  "version": "0.0.1",
+  "description": "Creates a builder object for defining keys and values.",
+  "homepage": "https://github.com/ibnlanre/jumi#readme",
+  "type": "module",
+  "scripts": {
+    "bundle": "tsup",
+    "lint": "eslint --fix --ext .ts,.tsx .",
+    "test": "vitest -- --typecheck",
+    "package": "yarn publish --access public"
+  },
+  "main": "cjs/index.js",
+  "module": "esm/index.js",
+  "types": "cjs/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "exports": {
+    ".": {
+      "require": "./cjs/index.js",
+      "import": "./esm/index.js",
+      "types": "./cjs/index.d.ts"
+    }
+  },
+  "author": "Ridwan Olanrewaju <olaitanlanre28@gmail.com>",
+  "repository": {
+    "url": "https://github.com/ibnlanre/ibnlanre.git",
+    "type": "git",
+    "directory": "packages/builder",
+    "publishConfig": {
+      "access": "public"
+    }
+  },
+  "bugs": {
+    "url": "https://github.com/ibnlanre/jumi/issues"
+  },
+  "license": "MIT",
+  "keywords": [
+    "builder"
+  ]
+}

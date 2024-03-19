@@ -1,3 +1,4 @@
+import { DeepRequired, OmitOptionalValues } from "@ibnlanre/types";
 import { KeyBuilder } from "./KeyBuilder";
 
 /**
@@ -6,7 +7,7 @@ import { KeyBuilder } from "./KeyBuilder";
  * @template P The type of the path.
  */
 export type Builder<T extends Record<string, any>, P extends string[] = []> = {
-  use: () => T;
+  map: DeepRequired<T>;
+  use: () => OmitOptionalValues<T>;
   get: () => P;
-  typeof: T;
 } & KeyBuilder<T, P>;

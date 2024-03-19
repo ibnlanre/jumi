@@ -32,8 +32,11 @@ export type {
   IncludeKeys,
   Indexable,
   Keys,
+  Mutable,
   ObjectFromPath,
+  OmitOptionalValues,
   OmitPath,
+  OmitRequiredValues,
   OptionalKeys,
   Paths,
   Primitives,
@@ -87,4 +90,11 @@ export type {
   UnionToTuple,
 } from "./transforms";
 
-export { Extends, If, IsPartial } from "./conditionals";
+export {
+  If,
+  IsIntersection,
+  IsPartial,
+  IsReadonly,
+  IsSubType,
+  IsUnion,
+} from "./conditionals";

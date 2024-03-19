@@ -2,7 +2,7 @@ import type { Extend } from "@ibnlanre/types";
 
 import type { BaseDateFormat, DateFormat } from "../DateFormat";
 import type { Separator } from "../Separator";
-import type { UnixTimestamp } from "../UnixTimestamp";
+import type { UnixTimestamp } from "../unix-timestamp/UnixTimestamp";
 import type { Break } from "./Break";
 
 type SplitHelper<

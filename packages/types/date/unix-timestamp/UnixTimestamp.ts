@@ -1,9 +1,9 @@
 import type { Get, ParseInt } from "@ibnlanre/types";
 import type { Add, Multiply, Subtract } from "ts-arithmetic";
 
-import type { DateFormat } from "./DateFormat";
-import type { DayOfYear } from "./day-of-year";
-import type { IsLeapYear } from "./IsLeapYear";
+import type { DateFormat } from "../DateFormat";
+import type { DayOfYear } from "../day-of-year";
+import type { IsLeapYear } from "../IsLeapYear";
 
 type DaysToMs<Days extends number> = Multiply<Days, 86400000>;
 type HoursToMs<Hours extends number> = Multiply<Hours, 3600000>;

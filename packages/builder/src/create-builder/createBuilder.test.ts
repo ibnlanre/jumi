@@ -1,6 +1,5 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
-
-import { createBuilder } from "../create-builder/createBuilder";
+import { createBuilder } from "./createBuilder";
 
 describe("createBuilder", () => {
   const obj = {
@@ -94,6 +93,6 @@ describe("createBuilder", () => {
   });
 
   it("should return the correct type of the builder", () => {
-    expectTypeOf(builder.typeof).toEqualTypeOf(obj);
+    expectTypeOf(builder.map).toEqualTypeOf(obj);
   });
 });

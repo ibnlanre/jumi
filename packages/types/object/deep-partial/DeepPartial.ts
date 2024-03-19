@@ -50,3 +50,12 @@ export type DeepPartial<
         >;
       }
     >;
+
+type Test1 = { a: { b?: { c: string } } };
+type Test = DeepPartial<{ a: { b: { c: string } } }, "a.b">;
+
+// extends infer R
+//   ? [R] extends [never]
+//     ? undefined
+//     : R
+//   : never;

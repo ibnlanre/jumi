@@ -3,6 +3,7 @@ import type {
   IncludeKeys,
   Indexable,
   Intersect,
+  IsUnion,
   Keys,
   OptionalKeys,
   Paths,
@@ -21,6 +22,9 @@ type DeepRequiredHelper<
   ? DeepRequired<ObjectType[Key], Tail>
   : DeepRequired<ObjectType[Key], "">;
 
+type RequireValue<ObjectType extends Record<string, any>> =
+  IsUnion<ObjectType> extends 0 ? ObjectType : Exclude<ObjectType, undefined>;
+
 export type DeepRequired<
   ObjectType extends Record<string, any>,
   PathType extends (string & {}) | Paths<ObjectType> = never
@@ -28,9 +32,8 @@ export type DeepRequired<
   ? ObjectType
   : [PathType] extends [never]
   ? {
-      [Key in Keys<ObjectType>]: Exclude<
-        DeepRequiredHelper<ObjectType, PathType, Key>,
-        undefined
+      [Key in Keys<ObjectType>]: RequireValue<
+        DeepRequiredHelper<ObjectType, PathType, Key>
       >;
     }
   : Intersect<
@@ -45,9 +48,8 @@ export type DeepRequired<
           PathType
         >]?: DeepRequiredHelper<ObjectType, PathType, Key>;
       } & {
-        [Key in IncludeKeys<ObjectType, PathType>]: Exclude<
-          DeepRequiredHelper<ObjectType, PathType, Key>,
-          undefined
+        [Key in IncludeKeys<ObjectType, PathType>]: RequireValue<
+          DeepRequiredHelper<ObjectType, PathType, Key>
         >;
       }
     >;

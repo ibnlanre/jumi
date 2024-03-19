@@ -1,6 +1,5 @@
+import { Length, TrimStart } from "@ibnlanre/types";
 import { Divide, Pow, Subtract } from "ts-arithmetic";
-
-import { Length, TrimStart } from "../../string";
 
 type Digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 
@@ -29,7 +28,7 @@ type ParseIntHelper<
   ? Decimal extends 0
     ? Input
     : Float<Input, Subtract<NumberSize, Decimal>>
-  : never;
+  : 0;
 
 export type ParseInt<
   Input extends string | number | boolean,

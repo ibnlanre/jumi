@@ -1,0 +1,1 @@
+export { IsIntersection } from "./IsIntersection";

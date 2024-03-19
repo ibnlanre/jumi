@@ -1,3 +1,4 @@
-export type { Builder, Key, KeyBuilder } from "../types";
+export type { Builder, HasTypes, Key, KeyBuilder } from "./types";
+
 export { createBuilder } from "./create-builder";
-export { withTypes } from "./with-types";
+export { hasTypes } from "./has-types";
