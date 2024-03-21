@@ -7,6 +7,11 @@ describe("YearBreak", () => {
     expectTypeOf<Output>().toEqualTypeOf<{ year: "2022" }>();
   });
 
+  it("should correctly handle a valid year with trailing 'Z'", () => {
+    type Output = YearBreak<"2022Z">;
+    expectTypeOf<Output>().toEqualTypeOf<{ year: "2022" }>();
+  });
+
   it("should correctly handle a valid year with trailing hyphen", () => {
     type Output = YearBreak<"2022-">;
     expectTypeOf<Output>().toEqualTypeOf<{ year: "2022" }>();

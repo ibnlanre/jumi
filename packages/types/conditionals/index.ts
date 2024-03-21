@@ -1,5 +1,6 @@
 export { FallbackTo } from "./fallback-to";
 export { If } from "./if";
+export { IsBetween } from "./is-between";
 export { IsIntersection } from "./is-intersection";
 export { IsNever } from "./is-never";
 export { IsPartial } from "./is-partial";

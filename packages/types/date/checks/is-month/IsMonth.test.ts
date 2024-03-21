@@ -7,6 +7,11 @@ describe("IsMonth", () => {
     expectTypeOf<Output>().toEqualTypeOf<1>();
   });
 
+  it("should correctly validate a month with a trailing 'Z'", () => {
+    type Output = IsMonth<"-01Z">;
+    expectTypeOf<Output>().toEqualTypeOf<1>();
+  });
+
   it("should correctly validate a month with a trailing hyphen", () => {
     type Output = IsMonth<"-01">;
     expectTypeOf<Output>().toEqualTypeOf<1>();

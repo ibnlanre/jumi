@@ -23,7 +23,7 @@ import { YearBreak } from "../year-break";
 export type PeriodBreak<
   Token extends string,
   Output extends Record<string, any> = {}
-> = IsYear<Token> extends 1
+> = And<IsYear<Token>, Not<Has<Output, "year">>> extends 1
   ? YearBreak<Token, Output>
   : And<IsMonth<Token>, Not<Has<Output, "month">>> extends 1
   ? MonthBreak<Token, Output>
@@ -31,7 +31,7 @@ export type PeriodBreak<
   ? DayBreak<Token, Output>
   : And<IsHour<Token>, Not<Has<Output, "hour">>> extends 1
   ? HourBreak<Token, Output>
-  : IsMinutes<Token> extends 1
+  : And<IsMinutes<Token>, Not<Has<Output, "minutes">>> extends 1
   ? MinutesBreak<Token, Output>
   : IsSeconds<Token> extends 1
   ? SecondsBreak<Token, Output>
@@ -39,4 +39,4 @@ export type PeriodBreak<
   ? MillisecondsBreak<Token, Output>
   : IsTimeZone<Token> extends 1
   ? TimeZoneBreak<Token, Output>
-  : Output;
+  : "Invalid Date";

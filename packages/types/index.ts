@@ -96,6 +96,7 @@ export type {
 export {
   FallbackTo,
   If,
+  IsBetween,
   IsIntersection,
   IsNever,
   IsPartial,

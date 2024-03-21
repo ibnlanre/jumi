@@ -7,6 +7,16 @@ describe("IsMinutes", () => {
     expectTypeOf<Output>().toEqualTypeOf<1>();
   });
 
+  it("should correctly validate a minute without a trailing 'Z'", () => {
+    type Output = IsMinutes<":12Z">;
+    expectTypeOf<Output>().toEqualTypeOf<1>();
+  });
+
+  it("should correctly validate a minute without a trailing colon", () => {
+    type Output = IsMinutes<":12">;
+    expectTypeOf<Output>().toEqualTypeOf<1>();
+  });
+
   it("should correctly validate a minute with a trailing colon", () => {
     type Output = IsMinutes<"12:">;
     expectTypeOf<Output>().toEqualTypeOf<0>();
