@@ -1,7 +1,7 @@
 import type { Get, ParseInt } from "@ibnlanre/types";
 import type { Add, Multiply, Subtract } from "ts-arithmetic";
 
-import type { DateFormat } from "../DateFormat";
+import type { BaseDateFormat, DateFormat } from "../DateFormat";
 import type { DayOfYear } from "../day-of-year";
 import type { IsLeapYear } from "../IsLeapYear";
 
@@ -40,14 +40,13 @@ type EpochToDateInMs<
 > = Add<Add<Add<Add<Days, Hours>, Minutes>, Seconds>, Milliseconds>;
 
 type UnixTimestampHelper<
-  T extends DateFormat,
-  Year extends number = ParseInt<Get<T, "year">>,
-  Month extends number = ParseInt<Get<T, "month">>,
-  Day extends number = ParseInt<Get<T, "day">>,
-  Hour extends number = ParseInt<Get<T, "hour">>,
-  Minutes extends number = ParseInt<Get<T, "minute">>,
-  Seconds extends number = ParseInt<Get<T, "second">>,
-  Milliseconds extends number = ParseInt<Get<T, "millisecond">>,
+  Year extends number,
+  Month extends number,
+  Day extends number,
+  Hour extends number,
+  Minutes extends number,
+  Seconds extends number,
+  Milliseconds extends number,
   Epoch extends number = Subtract<Year, 1970>,
   LeapYears extends number = LeapYearsSince<Year>,
   DaysOfPeriod extends number = DayOfYear<Year, Month, Day>,
@@ -66,16 +65,16 @@ type UnixTimestampHelper<
   Milliseconds
 >;
 
-export type UnixTimestamp<T extends DateFormat> = UnixTimestampHelper<T>;
+export type UnixTimestamp<T extends Partial<DateFormat>> = UnixTimestampHelper<
+  ParseInt<Get<T, "year", BaseDateFormat["year"]>>,
+  ParseInt<Get<T, "month", BaseDateFormat["month"]>>,
+  ParseInt<Get<T, "day", BaseDateFormat["day"]>>,
+  ParseInt<Get<T, "hour", BaseDateFormat["hour"]>>,
+  ParseInt<Get<T, "minutes", BaseDateFormat["minutes"]>>,
+  ParseInt<Get<T, "seconds", BaseDateFormat["seconds"]>>,
+  ParseInt<Get<T, "milliseconds", BaseDateFormat["milliseconds"]>>
+>;
 
 type Test = UnixTimestamp<{
-  year: "2019";
-  month: "08";
-  day: "05";
-  hour: "12";
-  minute: "00";
-  second: "00";
-  millisecond: "000";
-  timezone: "+00:00";
-  timestamp: 0;
+  year: "1971";
 }>;

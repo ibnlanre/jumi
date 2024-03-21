@@ -1,5 +1,7 @@
 import type { Replace, Stringify } from "@ibnlanre/types";
 
+import type { AdvancedFormat, AdvancedFormatSymbols } from "./advanced-format";
+import type { Split } from "./break/Split";
 import type { BuddhistEra, BuddhistEraSymbols } from "./BuddhistEra";
 import type { DateFormat } from "./DateFormat";
 import type {
@@ -7,55 +9,54 @@ import type {
   LocalizedFormatSymbols,
 } from "./LocalizedFormat";
 import type { Sign } from "./Sign";
-import type { SimpleFormat, SimpleFormatSymbols } from "./SimpleFormat";
-import type { AdvancedFormat, AdvancedFormatSymbols } from "./advanced-format";
-import type { Split } from "./break/Split";
+import type {
+  SimpleFormat,
+  SimpleFormatSymbols,
+} from "./simple-format/SimpleFormat";
 
 type Symbols = AdvancedFormatSymbols | BuddhistEraSymbols | SimpleFormatSymbols;
 
 type Formatter<
-  Stream extends string,
+  Result extends string,
   Date extends DateFormat
-> = Stream extends LocalizedFormatSymbols
-  ? FormatDateHelper<Date, LocalizedFormat<Stream>>
-  : Stream extends BuddhistEraSymbols
-  ? BuddhistEra<Stream, Date>
-  : Stream extends AdvancedFormatSymbols
-  ? AdvancedFormat<Stream, Date>
-  : Stream extends SimpleFormatSymbols
-  ? SimpleFormat<Stream, Date>
-  : Stream;
+> = Result extends BuddhistEraSymbols
+  ? BuddhistEra<Result, Date>
+  : Result extends AdvancedFormatSymbols
+  ? AdvancedFormat<Result, Date>
+  : Result extends SimpleFormatSymbols
+  ? SimpleFormat<Result, Date>
+  : Result;
 
 type FormatterHelper<
   Date extends DateFormat,
   Format extends string,
   Value extends string = "",
-  Stream extends string = "",
-  Part extends string = ""
-> = Stream extends LocalizedFormatSymbols
+  Result extends string = "",
+  Letter extends string = ""
+> = Result extends LocalizedFormatSymbols
   ? FormatDateHelper<
       Date,
-      Replace<Format, Stream, LocalizedFormat<Stream>>,
+      Replace<Format, Result, LocalizedFormat<Result>>,
       Value,
-      Stream
+      Result
     >
-  : Stream extends Symbols
-  ? Formatter<Stream, Date> extends infer P
-    ? FormatDateHelper<Date, Format, `${Value}${Stringify<P>}${Part}`>
+  : Result extends Symbols
+  ? Formatter<Result, Date> extends infer Result
+    ? FormatDateHelper<Date, Format, `${Value}${Stringify<Result>}${Letter}`>
     : never
-  : FormatDateHelper<Date, Format, `${Value}${Stream}${Part}`>;
+  : FormatDateHelper<Date, Format, `${Value}${Result}${Letter}`>;
 
 type FormatDateHelper<
   Date extends DateFormat,
   Format extends string,
   Value extends string = "",
-  Stream extends string = ""
-> = Format extends `${infer Part}${infer Format}`
-  ? Part extends Sign
-    ? FormatDateHelper<Date, Format, Value, `${Stream}${Part}`>
-    : FormatterHelper<Date, Format, Value, Stream, Part>
+  Result extends string = ""
+> = Format extends `${infer Letter}${infer Format}`
+  ? Letter extends Sign
+    ? FormatDateHelper<Date, Format, Value, `${Result}${Letter}`>
+    : FormatterHelper<Date, Format, Value, Result, Letter>
   : Format extends ""
-  ? `${Value}${Formatter<Stream, Date>}`
+  ? `${Value}${Formatter<Result, Date>}`
   : never;
 
 export type FormatDate<

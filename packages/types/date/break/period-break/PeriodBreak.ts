@@ -1,0 +1,42 @@
+import { And, Not } from "ts-arithmetic";
+import {
+  IsDay,
+  IsHour,
+  IsMilliseconds,
+  IsMinutes,
+  IsMonth,
+  IsSeconds,
+  IsTimeZone,
+  IsYear,
+} from "../../checks";
+
+import { Has } from "@/packages/types/object";
+import { DayBreak } from "../day-break";
+import { HourBreak } from "../hour-break";
+import { MillisecondsBreak } from "../milliseconds-break";
+import { MinutesBreak } from "../minutes-break";
+import { MonthBreak } from "../month-break";
+import { SecondsBreak } from "../seconds-break";
+import { TimeZoneBreak } from "../time-zone-break";
+import { YearBreak } from "../year-break";
+
+export type PeriodBreak<
+  Token extends string,
+  Output extends Record<string, any> = {}
+> = IsYear<Token> extends 1
+  ? YearBreak<Token, Output>
+  : And<IsMonth<Token>, Not<Has<Output, "month">>> extends 1
+  ? MonthBreak<Token, Output>
+  : IsDay<Token> extends 1
+  ? DayBreak<Token, Output>
+  : And<IsHour<Token>, Not<Has<Output, "hour">>> extends 1
+  ? HourBreak<Token, Output>
+  : IsMinutes<Token> extends 1
+  ? MinutesBreak<Token, Output>
+  : IsSeconds<Token> extends 1
+  ? SecondsBreak<Token, Output>
+  : IsMilliseconds<Token> extends 1
+  ? MillisecondsBreak<Token, Output>
+  : IsTimeZone<Token> extends 1
+  ? TimeZoneBreak<Token, Output>
+  : Output;

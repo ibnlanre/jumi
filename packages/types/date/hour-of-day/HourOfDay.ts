@@ -6,6 +6,8 @@ export type HourOfDay<Meridiem extends string, Out extends 12 | 24 = 24> = Mod<
   Out
 > extends infer R extends number
   ? R extends 0
-    ? Out
+    ? Out extends 12
+      ? 12
+      : 0
     : R
   : never;

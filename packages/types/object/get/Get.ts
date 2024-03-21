@@ -1,4 +1,10 @@
-import { ArbitraryKey, Keys, Paths, Stringify } from "@ibnlanre/types";
+import {
+  ArbitraryKey,
+  FallbackTo,
+  Keys,
+  Paths,
+  Stringify,
+} from "@ibnlanre/types";
 
 /**
  * Represents the value at a path in an object.
@@ -10,10 +16,11 @@ import { ArbitraryKey, Keys, Paths, Stringify } from "@ibnlanre/types";
 export type Get<
   ObjectType extends Record<string, any>,
   Path extends Paths<ObjectType, Delimiter> | ArbitraryKey<number>,
-  FallBack = never,
-  Delimiter extends string = "."
+  Fallback = never,
+  Delimiter extends string = ".",
+  Value = ObjectType[Stringify<Path>]
 > = Path extends `${infer Key}${Delimiter}${infer Rest}`
-  ? Get<ObjectType[Key], Rest, FallBack>
+  ? Get<ObjectType[Key], Rest, Fallback>
   : Stringify<Path> extends Keys<ObjectType>
-  ? ObjectType[Stringify<Path>]
-  : FallBack;
+  ? FallbackTo<Value, Fallback>
+  : Fallback;

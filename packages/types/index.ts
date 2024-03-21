@@ -6,6 +6,7 @@ export type {
   Length,
   PadEnd,
   PadStart,
+  Pattern,
   Place,
   Prepend,
   Replace,
@@ -40,8 +41,10 @@ export type {
   OptionalKeys,
   Paths,
   Primitives,
+  RequireValue,
   RequiredKeys,
-  Set,
+  Serializable,
+  SetValue,
   Structures,
   ToEntries,
   Values,
@@ -91,8 +94,10 @@ export type {
 } from "./transforms";
 
 export {
+  FallbackTo,
   If,
   IsIntersection,
+  IsNever,
   IsPartial,
   IsReadonly,
   IsSubType,

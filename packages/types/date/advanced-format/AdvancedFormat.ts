@@ -5,9 +5,11 @@ import type {
   ParseInt,
   Stringify,
   Substring,
+  TrimStart,
 } from "@ibnlanre/types";
 
 import type { DateFormat } from "../DateFormat";
+import type { DayOfYear } from "../day-of-year";
 import type { HourOfDay } from "../hour-of-day";
 import type { QuarterOfYear } from "../quarter-of-year";
 import type { TimeZones } from "../TimeZones";
@@ -15,7 +17,11 @@ import type { WeekOfYear } from "../week-of-year";
 
 export type AdvancedFormatSymbols =
   | "Q"
+  | "Qo"
   | "Do"
+  | "DDD"
+  | "DDDo"
+  | "DDDD"
   | "k"
   | "kk"
   | "X"
@@ -44,6 +50,10 @@ export type AdvancedFormat<
   Day extends string = Get<Out, "day">,
   HourOfTheDay extends string = Stringify<HourOfDay<Hour>>,
   WeekOfTheYear extends number = WeekOfYear<Year, Month, Day>,
+  WeekOfTheYearISO extends number = WeekOfYear<Year, Month, Day, "ISO">,
+  DayOfTheYear extends string = Stringify<
+    DayOfYear<ParseInt<Year>, ParseInt<Month>, ParseInt<Day>>
+  >,
   TimeZone extends ZoneData = Get<
     TimeZones,
     Get<Out, "timezone">,
@@ -51,26 +61,36 @@ export type AdvancedFormat<
   >
 > = In extends "Q"
   ? Stringify<QuarterOfYear<Get<Out, "month">>>
+  : In extends "Qo"
+  ? Ordinal<QuarterOfYear<Get<Out, "month">>>
   : In extends "Do"
-  ? Stringify<Ordinal<ParseInt<Get<Out, "day">>>>
+  ? Ordinal<ParseInt<Get<Out, "day">>>
+  : In extends "DDD"
+  ? TrimStart<DayOfTheYear>
+  : In extends "DDDo"
+  ? Ordinal<ParseInt<DayOfTheYear>>
+  : In extends "DDDD"
+  ? PadStart<DayOfTheYear, 3>
   : In extends "k"
   ? HourOfTheDay
   : In extends "kk"
   ? PadStart<HourOfTheDay, 2>
   : In extends "X"
-  ? Stringify<Get<Out, "timestamp">>
-  : In extends "x"
   ? Substring<Stringify<Get<Out, "timestamp">>, 0, 10>
+  : In extends "x"
+  ? Stringify<Get<Out, "timestamp">>
   : In extends "w"
   ? Stringify<WeekOfTheYear>
+  : In extends "wo"
+  ? Ordinal<WeekOfTheYear>
   : In extends "ww"
   ? PadStart<Stringify<WeekOfTheYear>, 2>
   : In extends "W"
-  ? Stringify<WeekOfTheYear>
-  : In extends "WW"
-  ? PadStart<Stringify<WeekOfTheYear>, 2>
+  ? Stringify<WeekOfTheYearISO>
   : In extends "wo"
-  ? Stringify<Ordinal<WeekOfTheYear>>
+  ? Ordinal<WeekOfTheYearISO>
+  : In extends "WW"
+  ? PadStart<Stringify<WeekOfTheYearISO>, 2>
   : In extends "gggg"
   ? Year
   : In extends "GGGG"

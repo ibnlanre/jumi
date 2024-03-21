@@ -3,21 +3,21 @@ export type DateFormat = {
   month: string;
   day: string;
   hour: string;
-  minute: string;
-  second: string;
-  millisecond: string;
+  minutes: string;
+  seconds: string;
+  milliseconds: string;
   timezone: string;
   timestamp: number;
 };
 
-export type BaseDateFormat = {
+export interface BaseDateFormat {
   year: "1970";
   month: "01";
   day: "01";
   hour: "00";
-  minute: "00";
-  second: "00";
-  millisecond: "000";
+  minutes: "00";
+  seconds: "00";
+  milliseconds: "000";
   timezone: "+00:00";
   timestamp: 0;
-};
+}

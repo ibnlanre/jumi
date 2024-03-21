@@ -1,8 +1,3 @@
-export type Primitives =
-  | string
-  | number
-  | boolean
-  | symbol
-  | bigint
-  | null
-  | undefined;
+import { Serializable } from "../serializable";
+
+export type Primitives = Serializable | symbol;

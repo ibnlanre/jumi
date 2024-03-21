@@ -1,8 +1,8 @@
 import { Floor, ParseInt } from "@ibnlanre/types";
 import { Add, Divide } from "ts-arithmetic";
 
-import { DayOfWeek } from "../day-of-week/DayOfWeek";
-import { DayOfYear } from "../day-of-year/DayOfYear";
+import { DayOfWeek } from "../day-of-week";
+import { DayOfYear } from "../day-of-year";
 
 type ISOWeekOfYearHelper<
   Year extends string,

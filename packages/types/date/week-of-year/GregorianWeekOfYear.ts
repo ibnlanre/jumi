@@ -1,6 +1,7 @@
 import { Ceil, ParseInt } from "@ibnlanre/types";
 import { Divide } from "ts-arithmetic";
-import { DayOfYear } from "../day-of-year/DayOfYear";
+
+import { DayOfYear } from "../day-of-year";
 
 type GregorianWeekOfYearHelper<
   Year extends string,

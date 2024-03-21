@@ -19,9 +19,29 @@ describe("AdvancedFormat", () => {
     expectTypeOf<Result>().toEqualTypeOf<"1">();
   });
 
+  it("should correctly infer the output type for 'Qo'", () => {
+    type Result = AdvancedFormat<"Qo", DateFormat>;
+    expectTypeOf<Result>().toEqualTypeOf<"1st">();
+  });
+
   it("should correctly infer the output type for 'Do'", () => {
     type Result = AdvancedFormat<"Do", DateFormat>;
     expectTypeOf<Result>().toEqualTypeOf<"29th">();
+  });
+
+  it("should correctly infer the output type for 'DDD'", () => {
+    type Result = AdvancedFormat<"DDD", DateFormat>;
+    expectTypeOf<Result>().toEqualTypeOf<"60">();
+  });
+
+  it("should correctly infer the output type for 'DDDo'", () => {
+    type Result = AdvancedFormat<"DDDo", DateFormat>;
+    expectTypeOf<Result>().toEqualTypeOf<"60th">();
+  });
+
+  it("should correctly infer the output type for 'DDDD'", () => {
+    type Result = AdvancedFormat<"DDDD", DateFormat>;
+    expectTypeOf<Result>().toEqualTypeOf<"060">();
   });
 
   it("should correctly infer the output type for 'k'", () => {
@@ -34,14 +54,14 @@ describe("AdvancedFormat", () => {
     expectTypeOf<Result>().toEqualTypeOf<"02">();
   });
 
-  it("should correctly infer the output type for 'X'", () => {
+  it("should correctly infer the output type for 'X' in seconds", () => {
     type Result = AdvancedFormat<"X", DateFormat>;
-    expectTypeOf<Result>().toEqualTypeOf<"1640995199659">();
+    expectTypeOf<Result>().toEqualTypeOf<"1640995199">();
   });
 
-  it("should correctly infer the output type for 'x'", () => {
+  it("should correctly infer the output type for 'x' in milliseconds", () => {
     type Result = AdvancedFormat<"x", DateFormat>;
-    expectTypeOf<Result>().toEqualTypeOf<"1640995199">();
+    expectTypeOf<Result>().toEqualTypeOf<"1640995199659">();
   });
 
   it("should correctly infer the output type for 'w'", () => {

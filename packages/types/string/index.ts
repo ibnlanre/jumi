@@ -5,6 +5,7 @@ export { EndsWith } from "./ends-with";
 export { Length } from "./length";
 export { PadEnd } from "./pad-end";
 export { PadStart } from "./pad-start";
+export { Pattern } from "./pattern";
 export { Place } from "./place";
 export { Prepend } from "./prepend";
 export { Replace } from "./replace";

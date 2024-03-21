@@ -3,12 +3,12 @@ import type {
   IncludeKeys,
   Indexable,
   Intersect,
-  IsUnion,
   Keys,
   OptionalKeys,
   Paths,
   Primitives,
   RequiredKeys,
+  RequireValue,
   Structures,
 } from "@ibnlanre/types";
 
@@ -21,9 +21,6 @@ type DeepRequiredHelper<
   : PathType extends `${Key}.${infer Tail}`
   ? DeepRequired<ObjectType[Key], Tail>
   : DeepRequired<ObjectType[Key], "">;
-
-type RequireValue<ObjectType extends Record<string, any>> =
-  IsUnion<ObjectType> extends 0 ? ObjectType : Exclude<ObjectType, undefined>;
 
 export type DeepRequired<
   ObjectType extends Record<string, any>,
