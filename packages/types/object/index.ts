@@ -1,9 +1,9 @@
 export { ArbitraryKey } from "./arbitrary-key";
+export { Combine } from "./combine";
 export { DeepPartial } from "./deep-partial";
 export { DeepRequired } from "./deep-required";
 export { Derivatives } from "./derivatives";
 export { ExcludeKeys } from "./exclude-keys";
-export { Extend } from "./extend";
 export { ExtractNestedKeys } from "./extract-nested-keys";
 export { FromEntries } from "./from-entries";
 export { Get } from "./get";
@@ -11,6 +11,7 @@ export { Has } from "./has";
 export { IncludeKeys } from "./include-keys";
 export { Indexable } from "./indexable";
 export { Keys } from "./keys";
+export { Merge } from "./merge";
 export { Mutable } from "./mutable";
 export { ObjectFromPath } from "./object-from-path";
 export { OmitOptionalValues } from "./omit-optional-values";

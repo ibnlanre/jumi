@@ -17,10 +17,9 @@ export type Get<
   ObjectType extends Record<string, any>,
   Path extends Paths<ObjectType, Delimiter> | ArbitraryKey<number>,
   Fallback = never,
-  Delimiter extends string = ".",
-  Value = ObjectType[Stringify<Path>]
+  Delimiter extends string = "."
 > = Path extends `${infer Key}${Delimiter}${infer Rest}`
   ? Get<ObjectType[Key], Rest, Fallback>
   : Stringify<Path> extends Keys<ObjectType>
-  ? FallbackTo<Value, Fallback>
+  ? FallbackTo<ObjectType[Stringify<Path>], Fallback>
   : Fallback;

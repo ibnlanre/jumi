@@ -39,4 +39,6 @@ export type PeriodBreak<
   ? MillisecondsBreak<Token, Output>
   : IsTimeZone<Token> extends 1
   ? TimeZoneBreak<Token, Output>
+  : Token extends "Z"
+  ? Output
   : "Invalid Date";

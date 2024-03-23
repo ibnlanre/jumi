@@ -65,15 +65,16 @@ type UnixTimestampHelper<
   Milliseconds
 >;
 
-export type UnixTimestamp<T extends Partial<DateFormat>> = UnixTimestampHelper<
-  ParseInt<Get<T, "year", BaseDateFormat["year"]>>,
-  ParseInt<Get<T, "month", BaseDateFormat["month"]>>,
-  ParseInt<Get<T, "day", BaseDateFormat["day"]>>,
-  ParseInt<Get<T, "hour", BaseDateFormat["hour"]>>,
-  ParseInt<Get<T, "minutes", BaseDateFormat["minutes"]>>,
-  ParseInt<Get<T, "seconds", BaseDateFormat["seconds"]>>,
-  ParseInt<Get<T, "milliseconds", BaseDateFormat["milliseconds"]>>
->;
+export type UnixTimestamp<ObjectType extends Partial<DateFormat>> =
+  UnixTimestampHelper<
+    ParseInt<Get<ObjectType, "year", BaseDateFormat["year"]>>,
+    ParseInt<Get<ObjectType, "month", BaseDateFormat["month"]>>,
+    ParseInt<Get<ObjectType, "day", BaseDateFormat["day"]>>,
+    ParseInt<Get<ObjectType, "hour", BaseDateFormat["hour"]>>,
+    ParseInt<Get<ObjectType, "minutes", BaseDateFormat["minutes"]>>,
+    ParseInt<Get<ObjectType, "seconds", BaseDateFormat["seconds"]>>,
+    ParseInt<Get<ObjectType, "milliseconds", BaseDateFormat["milliseconds"]>>
+  >;
 
 type Test = UnixTimestamp<{
   year: "1971";

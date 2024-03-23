@@ -1,4 +1,4 @@
-import type { Extend } from "@ibnlanre/types";
+import type { Merge } from "@ibnlanre/types";
 
 import type { PeriodBreak } from "../break";
 import type { Separator } from "../Separator";
@@ -9,9 +9,7 @@ type ParseDateHelper<
   Date extends string = "",
   Output extends Record<string, any> = {},
   Result extends string = ""
-> = Token extends `Z${string}` | `T${string}Z`
-  ? "Invalid Date"
-  : Token extends `${"+" | "-"}` | `${"+" | "-"}${number}:`
+> = Token extends `${"+" | "-"}` | `${"+" | "-"}${number}:`
   ? Parser<Date, Output, Token>
   : PeriodBreak<Token, Output> extends infer Output
   ? Output extends Record<string, any>
@@ -27,12 +25,11 @@ type Parser<
   ? Token extends Separator
     ? ParseDateHelper<`${Result}${Token}`, Date, Output, Token>
     : Parser<Date, Output, `${Result}${Token}`>
-  : Date extends ""
-  ? PeriodBreak<Result, Output> extends infer Output
-    ? Output extends Record<string, any>
-      ? Extend<Output, { timestamp: UnixTimestamp<Output> }>
-      : Output
-    : never
+  : PeriodBreak<Result, Output> extends infer Output
+  ? Output extends Record<string, any>
+    ? Merge<Output, { timestamp: UnixTimestamp<Output> }>
+    : Output
   : never;
 
 export type ParseDate<Date extends string> = Parser<Date>;
+type Output = ParseDate<"2022-01-01Z">;
