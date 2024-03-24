@@ -1,4 +1,4 @@
-import type { Get, ParseInt } from "@ibnlanre/types";
+import type { Combine, Get, ParseInt, Replace } from "@ibnlanre/types";
 import type { Add, Multiply, Subtract } from "ts-arithmetic";
 
 import type { BaseDateFormat, DateFormat } from "../DateFormat";
@@ -13,19 +13,20 @@ type SecondsToMs<Seconds extends number> = Multiply<Seconds, 1000>;
 type LeapYearsSinceHelper<
   Year extends number,
   Period extends number,
-  Stream extends number = 0
+  Stream extends number = 0,
+  PreviousYear extends number = Subtract<Year, 1>
 > = Year extends Period
   ? Stream
   : LeapYearsSinceHelper<
-      Subtract<Year, 1>,
+      PreviousYear,
       Period,
-      IsLeapYear<Year> extends 1 ? Add<Stream, 1> : Stream
+      IsLeapYear<PreviousYear> extends 1 ? Add<Stream, 1> : Stream
     >;
 
 type LeapYearsSince<
   Year extends number,
   Period extends number = 1970
-> = LeapYearsSinceHelper<Subtract<Year, 1>, Period> extends infer R
+> = LeapYearsSinceHelper<Year, Period> extends infer R
   ? R extends number
     ? R
     : never
@@ -47,6 +48,7 @@ type UnixTimestampHelper<
   Minutes extends number,
   Seconds extends number,
   Milliseconds extends number,
+  Timezone extends number,
   Epoch extends number = Subtract<Year, 1970>,
   LeapYears extends number = LeapYearsSince<Year>,
   DaysOfPeriod extends number = DayOfYear<Year, Month, Day>,
@@ -56,7 +58,7 @@ type UnixTimestampHelper<
     Multiply<LeapYears, 366>
   >,
   Days extends number = Add<EpochDays, Subtract<DaysOfPeriod, 1>>,
-  Hours extends number = Subtract<Hour, 1>
+  Hours extends number = Subtract<Hour, Timezone>
 > = EpochToDateInMs<
   DaysToMs<Days>,
   HoursToMs<Hours>,
@@ -65,17 +67,29 @@ type UnixTimestampHelper<
   Milliseconds
 >;
 
-export type UnixTimestamp<ObjectType extends Partial<DateFormat>> =
-  UnixTimestampHelper<
-    ParseInt<Get<ObjectType, "year", BaseDateFormat["year"]>>,
-    ParseInt<Get<ObjectType, "month", BaseDateFormat["month"]>>,
-    ParseInt<Get<ObjectType, "day", BaseDateFormat["day"]>>,
-    ParseInt<Get<ObjectType, "hour", BaseDateFormat["hour"]>>,
-    ParseInt<Get<ObjectType, "minutes", BaseDateFormat["minutes"]>>,
-    ParseInt<Get<ObjectType, "seconds", BaseDateFormat["seconds"]>>,
-    ParseInt<Get<ObjectType, "milliseconds", BaseDateFormat["milliseconds"]>>
-  >;
+export type UnixTimestamp<Date extends Partial<DateFormat>> = Combine<
+  [BaseDateFormat, Date]
+> extends infer Date
+  ? Date extends DateFormat
+    ? UnixTimestampHelper<
+        ParseInt<Get<Date, "year">>,
+        ParseInt<Get<Date, "month">>,
+        ParseInt<Get<Date, "day">>,
+        ParseInt<Get<Date, "hour">>,
+        ParseInt<Get<Date, "minutes">>,
+        ParseInt<Get<Date, "seconds">>,
+        ParseInt<Get<Date, "milliseconds">>,
+        ParseInt<Replace<Get<Date, "timezone">, "0" | ":" | "+", "">, "Signed">
+      >
+    : never
+  : never;
 
-type Test = UnixTimestamp<{
-  year: "1971";
-}>;
+type Date = {
+  year: "2024";
+  month: "03";
+  day: "24";
+  hour: "01";
+  minutes: "12";
+  timezone: "+01:00";
+};
+type Test = UnixTimestamp<Date>;

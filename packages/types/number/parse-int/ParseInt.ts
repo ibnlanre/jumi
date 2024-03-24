@@ -1,4 +1,4 @@
-import { Length, TrimStart } from "@ibnlanre/types";
+import { Every, IsSubType, Length, TrimStart } from "@ibnlanre/types";
 import { Divide, Pow, Subtract } from "ts-arithmetic";
 
 type Digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
@@ -15,34 +15,44 @@ type Int<Input extends number> =
 
 type ParseIntHelper<
   Input extends string,
+  Outlook extends "Signed" | "Unsigned",
   Accumulator extends string = "",
   Decimal extends number = 0,
-  NumberSize extends number = Length<Accumulator>
+  Sign extends "-" | "" = ""
 > = Input extends `${infer Head}${infer Input}`
   ? Head extends Digit
-    ? ParseIntHelper<Input, `${Accumulator}${Head}`, Decimal>
+    ? ParseIntHelper<Input, Outlook, `${Accumulator}${Head}`, Decimal, Sign>
+    : Every<
+        [
+          IsSubType<Outlook, "Signed">,
+          IsSubType<Head, "-">,
+          IsSubType<Accumulator, "">
+        ]
+      > extends 1
+    ? ParseIntHelper<Input, Outlook, Accumulator, Decimal, "-">
     : Head extends "."
-    ? ParseIntHelper<Input, Accumulator, NumberSize>
-    : ParseIntHelper<Input, Accumulator, Decimal>
-  : TrimStart<Accumulator> extends `${infer Input extends number}`
+    ? ParseIntHelper<Input, Outlook, Accumulator, Length<Accumulator>, Sign>
+    : ParseIntHelper<Input, Outlook, Accumulator, Decimal, Sign>
+  : `${Sign}${TrimStart<Accumulator>}` extends `${infer Input extends number}`
   ? Decimal extends 0
     ? Input
-    : Float<Input, Subtract<NumberSize, Decimal>>
-  : 0;
+    : Float<Input, Subtract<Length<Accumulator>, Decimal>>
+  : Input;
 
 export type ParseInt<
   Input extends string | number | boolean,
+  Outlook extends "Signed" | "Unsigned" = "Unsigned",
   Output extends "Integer" | "Float" = "Float"
 > = Input extends number
   ? Output extends "Float"
     ? Input
     : Int<Input>
   : Input extends string
-  ? ParseIntHelper<Input> extends infer R extends number
+  ? ParseIntHelper<Input, Outlook> extends infer Number extends number
     ? Output extends "Float"
-      ? R
-      : Int<R>
-    : never
+      ? Number
+      : Int<Number>
+    : 0
   : Input extends true
   ? 1
   : Input extends false

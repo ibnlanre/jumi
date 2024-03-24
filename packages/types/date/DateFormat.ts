@@ -7,7 +7,6 @@ export type DateFormat = {
   seconds: string;
   milliseconds: string;
   timezone: string;
-  timestamp: number;
 };
 
 export interface BaseDateFormat {
@@ -19,5 +18,4 @@ export interface BaseDateFormat {
   seconds: "00";
   milliseconds: "000";
   timezone: "+00:00";
-  timestamp: 0;
 }

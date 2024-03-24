@@ -6,7 +6,7 @@ import {
   SetValue,
   Stringify,
 } from "@ibnlanre/types";
-import { Abs, And, Eq, GtOrEq } from "ts-arithmetic";
+import { Abs, Eq } from "ts-arithmetic";
 
 import { IsYear } from "../../checks";
 
@@ -15,7 +15,7 @@ type YearHelper<
   Output extends Record<string, any> = {},
   Year extends string = Stringify<Abs<ParseInt<Y>>>,
   Size extends number = Length<Year>
-> = And<GtOrEq<Size, 4>, IsBetween<ParseInt<Y>, -271820, 275759>> extends 1
+> = IsBetween<ParseInt<Y>, -271820, 275759> extends 1
   ? IsBetween<Size, 5, 6> extends 1
     ? SetValue<Output, "year", `+${PadStart<Year, 6>}`>
     : Eq<Size, 4> extends 1

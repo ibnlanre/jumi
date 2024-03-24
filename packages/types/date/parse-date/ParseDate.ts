@@ -1,8 +1,8 @@
-import type { Merge } from "@ibnlanre/types";
+import type { Combine, Contains } from "@ibnlanre/types";
 
 import type { PeriodBreak } from "../break";
+import type { BaseDateFormat } from "../DateFormat";
 import type { Separator } from "../Separator";
-import type { UnixTimestamp } from "../unix-timestamp";
 
 type ParseDateHelper<
   Token extends string = "",
@@ -25,11 +25,17 @@ type Parser<
   ? Token extends Separator
     ? ParseDateHelper<`${Result}${Token}`, Date, Output, Token>
     : Parser<Date, Output, `${Result}${Token}`>
-  : PeriodBreak<Result, Output> extends infer Output
-  ? Output extends Record<string, any>
-    ? Merge<Output, { timestamp: UnixTimestamp<Output> }>
-    : Output
-  : never;
+  : Contains<Result, number> extends 1
+  ? PeriodBreak<Result, Output> extends infer Output
+    ? Output extends Record<string, any>
+      ? Combine<[BaseDateFormat, Output]>
+      : Output
+    : never
+  : Combine<[BaseDateFormat, Output]>;
 
 export type ParseDate<Date extends string> = Parser<Date>;
-type Output = ParseDate<"2022-01-01Z">;
+type Output = ParseDate<"2022-12-31T12:56-1200">;
+
+type Test = "-12:56" extends `${infer Token extends number}:${number}`
+  ? Token
+  : "No";

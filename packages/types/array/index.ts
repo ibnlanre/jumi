@@ -1,4 +1,5 @@
 export { ArrayOfLength } from "./array-of-length";
+export { Every } from "./every";
 export { Head } from "./head";
 export { Includes } from "./includes";
 export { IndexAt } from "./index-at";
@@ -12,6 +13,7 @@ export { Size } from "./size";
 export { Slice } from "./slice";
 export { SliceFrom } from "./slice-from";
 export { SliceTo } from "./slice-to";
+export { Some } from "./some";
 export { Spread } from "./spread";
 export { Tail } from "./tail";
 export { Unshift } from "./unshift";

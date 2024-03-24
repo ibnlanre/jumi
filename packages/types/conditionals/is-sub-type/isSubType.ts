@@ -1,1 +1,1 @@
-export type IsSubType<T, U> = [U] extends [T] ? 1 : 0;
+export type IsSubType<Left, Right> = Left extends Right ? 1 : 0;

@@ -1,4 +1,6 @@
+import { Serializable } from "@ibnlanre/types";
+
 export type Contains<
-  T extends string,
-  U extends string
-> = T extends `${string}${U}${string}` ? 1 : 0;
+  Words extends string,
+  Substring extends Serializable
+> = Words extends `${string}${Substring}${string}` ? 1 : 0;

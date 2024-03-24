@@ -27,18 +27,16 @@ export type PeriodBreak<
   ? YearBreak<Token, Output>
   : And<IsMonth<Token>, Not<Has<Output, "month">>> extends 1
   ? MonthBreak<Token, Output>
-  : IsDay<Token> extends 1
+  : And<IsDay<Token>, Not<Has<Output, "day">>> extends 1
   ? DayBreak<Token, Output>
   : And<IsHour<Token>, Not<Has<Output, "hour">>> extends 1
   ? HourBreak<Token, Output>
   : And<IsMinutes<Token>, Not<Has<Output, "minutes">>> extends 1
   ? MinutesBreak<Token, Output>
-  : IsSeconds<Token> extends 1
+  : And<IsSeconds<Token>, Not<Has<Output, "seconds">>> extends 1
   ? SecondsBreak<Token, Output>
-  : IsMilliseconds<Token> extends 1
+  : And<IsMilliseconds<Token>, Not<Has<Output, "milliseconds">>> extends 1
   ? MillisecondsBreak<Token, Output>
   : IsTimeZone<Token> extends 1
   ? TimeZoneBreak<Token, Output>
-  : Token extends "Z"
-  ? Output
   : "Invalid Date";

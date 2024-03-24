@@ -21,12 +21,14 @@ export type {
 
 export type {
   ArbitraryKey,
+  Collect,
   Combine,
   DeepPartial,
   DeepRequired,
   Derivatives,
   ExcludeKeys,
   ExtractNestedKeys,
+  ExtractRootKey,
   FromEntries,
   Get,
   Has,
@@ -53,6 +55,7 @@ export type {
 
 export type {
   ArrayOfLength,
+  Every,
   Head,
   Includes,
   IndexAt,
@@ -66,6 +69,7 @@ export type {
   Slice,
   SliceFrom,
   SliceTo,
+  Some,
   Spread,
   Tail,
   Unshift,
@@ -92,16 +96,19 @@ export type {
   LastOfUnion,
   UnionToIntersection,
   UnionToTuple,
+  Unionize,
 } from "./transforms";
 
 export {
   FallbackTo,
   If,
   IsBetween,
+  IsExactType,
   IsIntersection,
   IsNever,
   IsPartial,
   IsReadonly,
   IsSubType,
+  IsSuperType,
   IsUnion,
 } from "./conditionals";

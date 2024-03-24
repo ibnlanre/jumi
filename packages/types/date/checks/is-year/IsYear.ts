@@ -1,8 +1,7 @@
-import { Pattern } from "@ibnlanre/types";
+import { IsSubType, Length, ParseInt, Pattern } from "@ibnlanre/types";
+import { And, GtOrEq } from "ts-arithmetic";
 
-export type IsYear<T extends string> = Pattern<
-  T,
-  number,
-  "-" | "",
-  "Z" | "-" | ""
+export type IsYear<Value extends string> = And<
+  GtOrEq<Length<ParseInt<Value>>, 3>,
+  IsSubType<Value, Pattern<number, "-" | "", "Z" | "-" | "">>
 >;

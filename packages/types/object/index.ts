@@ -1,10 +1,12 @@
 export { ArbitraryKey } from "./arbitrary-key";
+export { Collect } from "./collect";
 export { Combine } from "./combine";
 export { DeepPartial } from "./deep-partial";
 export { DeepRequired } from "./deep-required";
 export { Derivatives } from "./derivatives";
 export { ExcludeKeys } from "./exclude-keys";
 export { ExtractNestedKeys } from "./extract-nested-keys";
+export { ExtractRootKey } from "./extract-root-key";
 export { FromEntries } from "./from-entries";
 export { Get } from "./get";
 export { Has } from "./has";

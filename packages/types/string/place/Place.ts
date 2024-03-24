@@ -1,7 +1,17 @@
-import { Length, Substring } from "@ibnlanre/types";
+import { IndexAt, Length, Substring } from "@ibnlanre/types";
+
+type PlaceHelper<
+  Words extends string,
+  Letter extends string,
+  Index extends number
+> = `${Substring<Words, 0, Index>}${Letter}${Substring<
+  Words,
+  Index,
+  Length<Words>
+>}`;
 
 export type Place<
-  T extends string,
-  U extends string,
+  Words extends string,
+  Letter extends string,
   Index extends number
-> = `${Substring<T, 0, Index>}${U}${Substring<T, Index, Length<T>>}`;
+> = PlaceHelper<Words, Letter, IndexAt<Length<Words>, Index>>;
