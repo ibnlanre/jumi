@@ -1,4 +1,4 @@
-import { Floor, Modulo, ParseInt } from "@ibnlanre/types";
+import { Addition, Floor, Modulo, ParseInt } from "@ibnlanre/types";
 import { Add, Divide, Mod, Multiply, Subtract } from "ts-arithmetic";
 
 type GregorianDayOfWeekHelper<
@@ -15,11 +15,10 @@ type GregorianDayOfWeekHelper<
   K extends number = Mod<k, 100>,
   J extends number = Floor<Divide<k, 100>>,
   ZDate extends number = Floor<Divide<Multiply<13, Add<m, 1>>, 5>>,
-  ZYear extends number = Add<
-    Subtract<Floor<Divide<J, 4>>, Multiply<J, 2>>,
-    Add<Floor<Divide<K, 4>>, K>
+  ZYear extends number = Addition<
+    [Subtract<Floor<Divide<J, 4>>, Multiply<J, 2>>, Floor<Divide<K, 4>>, K]
   >
-> = Floor<Modulo<Add<q, Add<ZDate, ZYear>>, 7>>;
+> = Floor<Modulo<Addition<[q, ZDate, ZYear]>, 7>>;
 
 export type GregorianDayOfWeek<
   Year extends string,

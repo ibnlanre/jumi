@@ -1,7 +1,6 @@
 export { Bound } from "./bound";
 export { Ceil } from "./ceil";
 export { Floor } from "./floor";
-export { Modulo } from "./modulo";
 export { Ordinal } from "./ordinal";
 export { ParseInt } from "./parse-int";
 export { Quotient } from "./quotient";

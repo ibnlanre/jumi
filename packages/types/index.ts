@@ -81,7 +81,6 @@ export type {
   Bound,
   Ceil,
   Floor,
-  Modulo,
   Ordinal,
   ParseInt,
   Quotient,
@@ -89,6 +88,16 @@ export type {
   Sign,
   Trunc,
 } from "./number";
+
+export type {
+  Addition,
+  Division,
+  Maximum,
+  Minimum,
+  Modulo,
+  Multiplication,
+  Subtraction,
+} from "./math";
 
 export type {
   FirstOfUnion,

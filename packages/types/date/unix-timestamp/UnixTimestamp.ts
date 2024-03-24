@@ -1,4 +1,10 @@
-import type { Combine, Get, ParseInt, Replace } from "@ibnlanre/types";
+import type {
+  Addition,
+  Combine,
+  Get,
+  ParseInt,
+  Replace,
+} from "@ibnlanre/types";
 import type { Add, Multiply, Subtract } from "ts-arithmetic";
 
 import type { BaseDateFormat, DateFormat } from "../DateFormat";
@@ -26,9 +32,9 @@ type LeapYearsSinceHelper<
 type LeapYearsSince<
   Year extends number,
   Period extends number = 1970
-> = LeapYearsSinceHelper<Year, Period> extends infer R
-  ? R extends number
-    ? R
+> = LeapYearsSinceHelper<Year, Period> extends infer Count
+  ? Count extends number
+    ? Count
     : never
   : never;
 
@@ -38,7 +44,7 @@ type EpochToDateInMs<
   Minutes extends number,
   Seconds extends number,
   Milliseconds extends number
-> = Add<Add<Add<Add<Days, Hours>, Minutes>, Seconds>, Milliseconds>;
+> = Addition<[Days, Hours, Minutes, Seconds, Milliseconds]>;
 
 type UnixTimestampHelper<
   Year extends number,
