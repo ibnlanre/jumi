@@ -1,5 +1,6 @@
 export { ArrayOfLength } from "./array-of-length";
 export { Every } from "./every";
+export { Filter } from "./filter";
 export { Head } from "./head";
 export { Includes } from "./includes";
 export { IndexAt } from "./index-at";

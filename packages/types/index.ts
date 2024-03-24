@@ -56,6 +56,7 @@ export type {
 export type {
   ArrayOfLength,
   Every,
+  Filter,
   Head,
   Includes,
   IndexAt,
@@ -111,6 +112,7 @@ export type {
 export {
   FallbackTo,
   If,
+  IfNot,
   IsBetween,
   IsExactType,
   IsIntersection,
@@ -120,4 +122,5 @@ export {
   IsSubType,
   IsSuperType,
   IsUnion,
+  IsVoid,
 } from "./conditionals";

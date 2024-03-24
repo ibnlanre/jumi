@@ -1,5 +1,6 @@
 export { FallbackTo } from "./fallback-to";
 export { If } from "./if";
+export { IfNot } from "./if-not";
 export { IsBetween } from "./is-between";
 export { IsExactType } from "./is-exact-type";
 export { IsIntersection } from "./is-intersection";
@@ -9,3 +10,4 @@ export { IsReadonly } from "./is-readonly";
 export { IsSubType } from "./is-sub-type";
 export { IsSuperType } from "./is-super-type";
 export { IsUnion } from "./is-union";
+export { IsVoid } from "./is-void";
