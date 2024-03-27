@@ -16,3 +16,11 @@ export type SliceTo<
   : Lt<End, 0> extends 1
   ? []
   : SliceToHelper<Array, End>;
+
+export interface ISliceTo<
+  Array extends unknown[] | unset = unset,
+  To extends number | unset = unset
+> extends Fn {
+  [slot]: [Array, To];
+  [data]: SliceTo<this[0], this[1]>;
+}

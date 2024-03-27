@@ -1,1 +1,1 @@
-export { Every } from "./Every";
+export { Every, TEvery } from "./Every";

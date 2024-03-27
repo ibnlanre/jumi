@@ -64,6 +64,7 @@ export type {
   Join,
   Pop,
   Push,
+  Range,
   Reverse,
   Shift,
   Size,
@@ -75,6 +76,7 @@ export type {
   Tail,
   Unshift,
   ValueAt,
+  With,
   Zip,
 } from "./array";
 
@@ -124,3 +126,17 @@ export {
   IsUnion,
   IsVoid,
 } from "./conditionals";
+
+export {
+  Apply,
+  Call,
+  Fn,
+  TMap,
+  Pipe,
+  Reset,
+  _,
+  args,
+  data,
+  slot,
+  unset,
+} from "./function";

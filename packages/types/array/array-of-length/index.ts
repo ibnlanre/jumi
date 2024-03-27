@@ -1,1 +1,1 @@
-export { ArrayOfLength } from "./ArrayOfLength";
+export { ArrayOfLength, IArrayOfLength } from "./ArrayOfLength";
