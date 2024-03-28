@@ -1,5 +1,5 @@
 import { Intersect } from "@/types";
-import { Fn, unset } from "@ibnlanre/types";
+import { Fn } from "@ibnlanre/types";
 
 type IsIntersectionHelper<Left, Right> = (<T>() => T extends Left & T
   ? 1
@@ -12,7 +12,7 @@ export type IsIntersection<Value> = IsIntersectionHelper<
   Intersect<Value>
 >;
 
-export interface TIsIntersection<Value extends unknown | unset = unset>
+export interface TIsIntersection<Value extends unknown | void = void>
   extends Fn {
   slot: [Value];
   data: IsIntersection<this[0]>;

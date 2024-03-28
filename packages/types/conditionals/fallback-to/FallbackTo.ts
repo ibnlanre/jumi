@@ -1,4 +1,4 @@
-import { Fn, RequireValue, unset } from "@ibnlanre/types";
+import { Fn, RequireValue } from "@ibnlanre/types";
 
 export type FallbackTo<
   ActualValue,
@@ -9,8 +9,8 @@ export type FallbackTo<
   : RequireValue<ActualValue>;
 
 export interface TFallbackTo<
-  FallbackValue extends unknown | unset = unset,
-  ActualValue extends unknown | unset = unset,
+  FallbackValue extends unknown | void = void,
+  ActualValue extends unknown | void = void,
   PreventableValue extends unknown | undefined = undefined
 > extends Fn {
   slot: [FallbackValue, ActualValue, PreventableValue];

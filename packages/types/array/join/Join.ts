@@ -1,4 +1,4 @@
-import { Fn, Stringify, unset } from "@ibnlanre/types";
+import { Fn, Stringify } from "@ibnlanre/types";
 
 export type Join<T extends any[], Separator extends string = ""> = T extends [
   infer Head,
@@ -10,8 +10,8 @@ export type Join<T extends any[], Separator extends string = ""> = T extends [
   : "";
 
 export interface TJoin<
-  Separator extends string | unset = unset,
-  List extends unknown[] | unset = unset
+  Separator extends string | void = void,
+  List extends unknown[] | void = void
 > extends Fn {
   slot: [Separator, List];
   data: Join<this[1], this[0]>;

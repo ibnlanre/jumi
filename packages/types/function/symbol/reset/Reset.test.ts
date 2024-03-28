@@ -1,6 +1,4 @@
 import { describe, expectTypeOf, test } from "vitest";
-
-import { unset } from "..";
 import type { Reset } from "./Reset";
 
 describe("Reset", () => {
@@ -19,8 +17,8 @@ describe("Reset", () => {
     expectTypeOf<Result>().toEqualTypeOf<[1, 2, 3, 4, 5, 6]>();
   });
 
-  test("should unset the head of the state tuple", () => {
-    type Result = Reset<[unset, 2, 3], [4, 5, 6]>;
+  test("should void the head of the state tuple", () => {
+    type Result = Reset<[void, 2, 3], [4, 5, 6]>;
     expectTypeOf<Result>().toEqualTypeOf<[4, 2, 3, 5, 6]>();
   });
 

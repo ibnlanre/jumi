@@ -1,4 +1,4 @@
-import { ArrayOfLength, Fn, Size, unset } from "@ibnlanre/types";
+import { ArrayOfLength, Fn, Size } from "@ibnlanre/types";
 import { Gt, Lt, Subtract } from "ts-arithmetic";
 
 type SliceToHelper<
@@ -18,8 +18,8 @@ export type SliceTo<
   : SliceToHelper<Array, End>;
 
 export interface TSliceTo<
-  To extends number | unset = unset,
-  Array extends unknown[] | unset = unset
+  To extends number | void = void,
+  Array extends unknown[] | void = void
 > extends Fn {
   slot: [To, Array];
   data: SliceTo<this[1], this[0]>;

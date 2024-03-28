@@ -1,4 +1,4 @@
-import { Apply, Call, Fn, IsExactType, unset } from "@ibnlanre/types";
+import { Apply, Call, Fn, IsExactType } from "@ibnlanre/types";
 
 export type Filter<Left extends any[], Right> = Left extends [
   infer Head,
@@ -10,8 +10,8 @@ export type Filter<Left extends any[], Right> = Left extends [
   : [];
 
 export interface TFilter<
-  Callback extends Fn | unset = unset,
-  list extends unknown[] | unset = unset
+  Callback extends Fn | void = void,
+  list extends unknown[] | void = void
 > extends Fn {
   slot: [Callback, list];
   data: this[1] extends [infer head, ...infer rest]

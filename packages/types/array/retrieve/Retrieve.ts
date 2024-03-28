@@ -1,4 +1,4 @@
-import { Fn, unset } from "@ibnlanre/types";
+import { Fn } from "@ibnlanre/types";
 
 export type Retrieve<
   List extends unknown,
@@ -10,8 +10,8 @@ export type Retrieve<
   : never;
 
 export interface TRetrieve<
-  Index extends number | unset = unset,
-  List extends unknown | unset = unset
+  Index extends number | void = void,
+  List extends unknown | void = void
 > extends Fn {
   slot: [Index, List];
   data: Retrieve<this[1], this[0]>;

@@ -1,4 +1,4 @@
-import { Fn, unset } from "@ibnlanre/types";
+import { Fn } from "@ibnlanre/types";
 import { And, GtOrEq, LtOrEq } from "ts-arithmetic";
 
 export type IsBetween<
@@ -8,9 +8,9 @@ export type IsBetween<
 > = And<GtOrEq<Input, LowerBound>, LtOrEq<Input, UpperBound>>;
 
 export interface TIsBetween<
-  LowerBound extends number | unset = unset,
-  UpperBound extends number | unset = unset,
-  Input extends number | unset = unset
+  LowerBound extends number | void = void,
+  UpperBound extends number | void = void,
+  Input extends number | void = void
 > extends Fn {
   slot: [LowerBound, UpperBound, Input];
   data: IsBetween<this[2], this[0], this[1]>;

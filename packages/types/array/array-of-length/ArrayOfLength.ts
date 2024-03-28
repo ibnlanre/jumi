@@ -1,4 +1,4 @@
-import { Fn, unset } from "@ibnlanre/types";
+import { Fn } from "@ibnlanre/types";
 
 type ArrayOfLengthHelper<
   Length extends number,
@@ -9,7 +9,7 @@ type ArrayOfLengthHelper<
 
 export type ArrayOfLength<Length extends number> = ArrayOfLengthHelper<Length>;
 
-export interface TArrayOfLength<Length extends number | unset = unset>
+export interface TArrayOfLength<Length extends number | void = void>
   extends Fn {
   slot: [Length];
   data: [this[0]] extends [never] ? [] : ArrayOfLength<this[0]>;

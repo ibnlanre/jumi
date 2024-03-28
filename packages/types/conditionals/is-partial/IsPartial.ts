@@ -1,4 +1,4 @@
-import { Fn, unset } from "@ibnlanre/types";
+import { Fn } from "@ibnlanre/types";
 
 export type IsPartial<Value> = undefined extends Value
   ? [Value] extends [undefined]
@@ -6,7 +6,7 @@ export type IsPartial<Value> = undefined extends Value
     : 1
   : 0;
 
-export interface TIsPartial<Value extends unknown | unset = unset> extends Fn {
+export interface TIsPartial<Value extends unknown | void = void> extends Fn {
   slot: [Value];
   data: IsPartial<this[0]>;
 }

@@ -1,4 +1,4 @@
-import { Fn, IndexAt, unset } from "@ibnlanre/types";
+import { Fn, IndexAt } from "@ibnlanre/types";
 
 export type ValueAt<Array extends any[], Index extends number> = IndexAt<
   Array,
@@ -10,8 +10,8 @@ export type ValueAt<Array extends any[], Index extends number> = IndexAt<
   : never;
 
 export interface TValueAt<
-  Index extends number | unset = unset,
-  Array extends unknown[] | unset = unset
+  Index extends number | void = void,
+  Array extends unknown[] | void = void
 > extends Fn {
   slot: [Index, Array];
   data: ValueAt<this[1], this[0]>;

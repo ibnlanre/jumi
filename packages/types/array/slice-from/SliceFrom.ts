@@ -1,4 +1,4 @@
-import { ArrayOfLength, Fn, Size, unset } from "@ibnlanre/types";
+import { ArrayOfLength, Fn, Size } from "@ibnlanre/types";
 import { Gt, Lt } from "ts-arithmetic";
 
 type SliceFromHelper<
@@ -16,8 +16,8 @@ export type SliceFrom<Array extends unknown[], Start extends number> = Gt<
   : SliceFromHelper<Array, Start>;
 
 export interface TSliceFrom<
-  Start extends number | unset = unset,
-  Array extends unknown[] | unset = unset
+  Start extends number | void = void,
+  Array extends unknown[] | void = void
 > extends Fn {
   slot: [Start, Array];
   data: SliceFrom<this[1], this[0]>;

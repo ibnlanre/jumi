@@ -1,4 +1,4 @@
-import { Fn, unset } from "@ibnlanre/types";
+import { Fn } from "@ibnlanre/types";
 import { Bit } from "ts-arithmetic";
 
 export type If<
@@ -8,9 +8,9 @@ export type If<
 > = Condition extends 1 | true ? Then : Else;
 
 export interface TIf<
-  Then extends unset = unset,
-  Else extends unset = unset,
-  Condition extends Bit | boolean | unset = unset
+  Then extends unknown | void = void,
+  Else extends unknown | void = void,
+  Condition extends Bit | boolean | void = void
 > extends Fn {
   slot: [Then, Else, Condition];
   data: If<this[2], this[0], this[1]>;

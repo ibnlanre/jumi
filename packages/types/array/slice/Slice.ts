@@ -1,4 +1,4 @@
-import { Bound, Fn, Size, SliceFrom, SliceTo, unset } from "@ibnlanre/types";
+import { Bound, Fn, Size, SliceFrom, SliceTo } from "@ibnlanre/types";
 import { Subtract } from "ts-arithmetic";
 
 export type Slice<
@@ -16,9 +16,9 @@ export type Slice<
   : never;
 
 export interface TSlice<
-  Start extends number | unset = unset,
-  End extends number | unset = unset,
-  Array extends unknown[] | unset = unset
+  Start extends number | void = void,
+  End extends number | void = void,
+  Array extends unknown[] | void = void
 > extends Fn {
   slot: [Start, End, Array];
   data: Slice<this[2], this[0], this[1]>;

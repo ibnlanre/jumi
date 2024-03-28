@@ -1,4 +1,4 @@
-import { Fn, unset } from "@ibnlanre/types";
+import { Fn } from "@ibnlanre/types";
 
 export type Indices<List extends any[]> = Exclude<
   keyof List,
@@ -7,7 +7,7 @@ export type Indices<List extends any[]> = Exclude<
   ? R
   : never;
 
-export interface TIndices<List extends any[] | unset = unset> extends Fn {
+export interface TIndices<List extends any[] | void = void> extends Fn {
   slot: [List];
   data: Indices<this[0]>;
 }

@@ -1,10 +1,10 @@
-import { Fn, unset } from "@ibnlanre/types";
+import { Fn } from "@ibnlanre/types";
 
 export type Shift<List extends any[]> = List extends [any, ...infer Rest]
   ? Rest
   : never;
 
-export interface TShift<List extends unknown[] | unset = unset> extends Fn {
+export interface TShift<List extends unknown[] | void = void> extends Fn {
   slot: [List];
   data: Shift<this[0]>;
 }

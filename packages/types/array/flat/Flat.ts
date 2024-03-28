@@ -1,4 +1,4 @@
-import { Fn, unset } from "@ibnlanre/types";
+import { Fn } from "@ibnlanre/types";
 
 type FlatHelper<
   T extends unknown[][],
@@ -9,7 +9,7 @@ type FlatHelper<
 
 export type Flat<T extends unknown[][]> = FlatHelper<T>;
 
-export interface TFlat<List extends unknown[][] | unset = unset> extends Fn {
+export interface TFlat<List extends unknown[][] | void = void> extends Fn {
   slot: [List];
   data: Flat<this[0]>;
 }

@@ -1,4 +1,4 @@
-import { Fn, unset } from "@ibnlanre/types";
+import { Fn } from "@ibnlanre/types";
 
 export type Zip<Left extends any[], Right extends any[]> = Left extends [
   infer HeadA,
@@ -10,8 +10,8 @@ export type Zip<Left extends any[], Right extends any[]> = Left extends [
   : [];
 
 export interface TZip<
-  Left extends unknown[] | unset = unset,
-  Right extends unknown[] | unset = unset
+  Left extends unknown[] | void = void,
+  Right extends unknown[] | void = void
 > extends Fn {
   slot: [Left, Right];
   data: Zip<this[0], this[1]>;

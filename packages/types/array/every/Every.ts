@@ -1,4 +1,4 @@
-import { Fn, Map, unset } from "@ibnlanre/types";
+import { Fn, Map } from "@ibnlanre/types";
 import { And, Bit } from "ts-arithmetic";
 
 export type Every<List extends Bit[]> = List extends []
@@ -8,8 +8,8 @@ export type Every<List extends Bit[]> = List extends []
   : 0;
 
 export interface TEvery<
-  Callback extends Fn | unset = unset,
-  List extends unknown[] | unset = unset
+  Callback extends Fn | void = void,
+  List extends unknown[] | void = void
 > extends Fn {
   slot: [Callback, List];
   data: Map<this[0], this[1]> extends infer List

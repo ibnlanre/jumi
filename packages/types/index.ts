@@ -166,15 +166,4 @@ export {
   TIsVoid,
 } from "./conditionals";
 
-export {
-  Apply,
-  Call,
-  Fn,
-  Map,
-  Pipe,
-  Reset,
-  TMap,
-  TPipe,
-  _,
-  unset,
-} from "./function";
+export { Apply, Call, Fn, Map, Pipe, Reset, TMap, TPipe } from "./function";
