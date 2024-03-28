@@ -1,4 +1,4 @@
-import { unset } from "../symbol";
+import { unset } from "..";
 
 export type Dissect<T extends unknown> = T extends []
   ? []

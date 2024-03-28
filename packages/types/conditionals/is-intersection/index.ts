@@ -1,1 +1,1 @@
-export { IsIntersection } from "./IsIntersection";
+export { IsIntersection, TIsIntersection } from "./IsIntersection";

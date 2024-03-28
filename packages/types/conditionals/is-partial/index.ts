@@ -1,1 +1,1 @@
-export { IsPartial } from "./IsPartial";
+export { IsPartial, TIsPartial } from "./IsPartial";

@@ -1,1 +1,1 @@
-export { Some } from "./Some";
+export { Some, TSome } from "./Some";

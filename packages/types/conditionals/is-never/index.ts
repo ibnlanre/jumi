@@ -1,1 +1,1 @@
-export { IsNever } from "./IsNever";
+export { IsNever, TIsNever } from "./IsNever";

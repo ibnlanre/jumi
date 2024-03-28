@@ -1,1 +1,1 @@
-export { Indices } from "./Indices";
+export { Indices, TIndices } from "./Indices";

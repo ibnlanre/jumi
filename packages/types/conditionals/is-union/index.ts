@@ -1,1 +1,1 @@
-export { IsUnion } from "./IsUnion";
+export { IsUnion, TIsUnion } from "./IsUnion";

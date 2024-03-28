@@ -1,1 +1,1 @@
-export { IsBetween } from "./IsBetween";
+export { IsBetween, TIsBetween } from "./IsBetween";

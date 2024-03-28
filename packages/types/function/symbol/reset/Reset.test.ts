@@ -1,6 +1,6 @@
 import { describe, expectTypeOf, test } from "vitest";
 
-import { unset } from "../symbol";
+import { unset } from "..";
 import type { Reset } from "./Reset";
 
 describe("Reset", () => {

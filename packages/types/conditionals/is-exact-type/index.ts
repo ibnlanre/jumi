@@ -1,1 +1,1 @@
-export { IsExactType } from "./IsExactType";
+export { IsExactType, TIsExactType } from "./IsExactType";

@@ -1,1 +1,1 @@
-export { Push } from "./Push";
+export { Push, TPush } from "./Push";

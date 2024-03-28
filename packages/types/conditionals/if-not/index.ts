@@ -1,1 +1,1 @@
-export { IfNot } from "./IfNot";
+export { IfNot, TIfNot } from "./IfNot";

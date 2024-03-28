@@ -1,1 +1,1 @@
-export { SliceFrom } from "./SliceFrom";
+export { SliceFrom, TSliceFrom } from "./SliceFrom";

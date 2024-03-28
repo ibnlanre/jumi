@@ -1,8 +1,15 @@
-import { Fn } from "../../fn";
-import { Apply } from "../apply";
+import { Apply, Fn, unset } from "@ibnlanre/types";
 
-export type Pipe<arg extends unknown, fns extends Fn[]> = (Fn & {
-  data: fns extends [infer head extends Fn, ...infer rest extends Fn[]]
-    ? Pipe<Apply<head, [arg]>, rest>
-    : arg;
+export type Pipe<Item extends unknown, List extends Fn[]> = (Fn & {
+  data: List extends [infer Head extends Fn, ...infer Rest extends Fn[]]
+    ? Pipe<Apply<Head, [Item]>, Rest>
+    : Item;
 })["data"];
+
+export interface TPipe<
+  List extends Fn[] | unset = unset,
+  Item extends unknown | unset = unset
+> extends Fn {
+  slot: [List, Item];
+  data: Pipe<this[1], this[0]>;
+}

@@ -1,1 +1,1 @@
-export { IsVoid } from "./IsVoid";
+export { IsVoid, TIsVoid } from "./IsVoid";

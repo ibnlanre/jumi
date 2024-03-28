@@ -1,4 +1,4 @@
-import { unset } from "../symbol";
+import { unset } from "..";
 
 export type Preset<T extends unknown> = T extends []
   ? 1

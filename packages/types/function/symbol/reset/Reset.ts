@@ -1,5 +1,5 @@
+import { unset } from "..";
 import { Dissect } from "../dissect";
-import { unset } from "../symbol";
 
 export type Reset<S extends unknown = [], V extends unknown = []> = Dissect<
   S extends []

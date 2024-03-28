@@ -1,20 +1,15 @@
-import { Apply, Call, Fn, unset } from "@ibnlanre/types";
+import { Apply, Fn, unset } from "@ibnlanre/types";
 
-export type Map<fn extends Fn, list extends unknown[]> = (Fn & {
+export type Map<Callback extends Fn, List extends unknown[]> = (Fn & {
   data: {
-    [K in keyof list]: Apply<fn, [list[K]]>;
+    [K in keyof List]: Apply<Callback, [List[K]]>;
   };
 })["data"];
 
 export interface TMap<
-  fn extends Fn | unset = unset,
-  list extends unknown[] | unset = unset
+  Callback extends Fn | unset = unset,
+  List extends unknown[] | unset = unset
 > extends Fn {
-  slot: [fn, list];
-  data: this[1] extends [
-    infer head extends unknown,
-    ...infer rest extends unknown[]
-  ]
-    ? [Apply<this[0], [head]>, ...Call<TMap<this[0], rest>>]
-    : [];
+  slot: [Callback, List];
+  data: Map<this[0], this[1]>;
 }

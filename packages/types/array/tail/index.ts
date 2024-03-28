@@ -1,1 +1,1 @@
-export { Tail } from "./Tail";
+export { TTail, Tail } from "./Tail";

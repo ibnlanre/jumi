@@ -1,1 +1,1 @@
-export { IndexAt } from "./IndexAt";
+export { IndexAt, TIndexAt } from "./IndexAt";

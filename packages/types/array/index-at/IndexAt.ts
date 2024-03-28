@@ -1,4 +1,4 @@
-import { ArrayOfLength, If, Indices, Size } from "@ibnlanre/types";
+import { ArrayOfLength, Fn, If, Indices, Size, unset } from "@ibnlanre/types";
 import { GtOrEq, Subtract } from "ts-arithmetic";
 
 type IndexAtHelper<
@@ -24,3 +24,11 @@ export type IndexAt<
   : Array extends number
   ? IndexAtHelper<ArrayOfLength<Array>, Index>
   : never;
+
+export interface TIndexAt<
+  Index extends number | unset = unset,
+  Array extends any[] | number | unset = unset
+> extends Fn {
+  slot: [Index, Array];
+  data: IndexAt<this[1], this[0]>;
+}

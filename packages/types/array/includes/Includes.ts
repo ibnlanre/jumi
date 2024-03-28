@@ -1,21 +1,17 @@
-import { args, data, Fn, IsExactType, slot, unset } from "@ibnlanre/types";
+import { Fn, IsExactType, unset } from "@ibnlanre/types";
 
-export type Includes<List extends any[], Element> = List extends []
+export type Includes<List extends any[], Item> = List extends []
   ? 0
   : List extends [infer Head, ...infer Rest]
-  ? IsExactType<Head, Element> extends 1
+  ? IsExactType<Head, Item> extends 1
     ? 1
-    : Includes<Rest, Element>
+    : Includes<Rest, Item>
   : 0;
 
 export interface TIncludes<
-  Element extends unknown | unset = unset,
+  Item extends unknown | unset = unset,
   List extends unknown[] | unset = unset
 > extends Fn {
-  [slot]: [Element, List];
-  [data]: this[0] extends unknown
-    ? this[1] extends unknown[]
-      ? Includes<this[1], this[0]>
-      : never
-    : never;
+  slot: [Item, List];
+  data: Includes<this[1], this[0]>;
 }

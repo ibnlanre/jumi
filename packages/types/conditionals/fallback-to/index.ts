@@ -1,1 +1,1 @@
-export { FallbackTo } from "./FallbackTo";
+export { FallbackTo, TFallbackTo } from "./FallbackTo";
