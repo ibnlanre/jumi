@@ -1,1 +1,1 @@
-export { Round } from "./Round";
+export { Round, TRound } from "./Round";

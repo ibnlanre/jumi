@@ -1,6 +1,14 @@
-import { Serializable } from "@ibnlanre/types";
+import { Fn, Serializable } from "@ibnlanre/types";
 
 export type EndsWith<
-  T extends string,
-  U extends Serializable
-> = T extends `${string}${U}` ? 1 : 0;
+  Text extends string,
+  Segment extends Serializable
+> = Text extends `${string}${Segment}` ? 1 : 0;
+
+export interface TEndsWith<
+  Segment extends Serializable | void = void,
+  Text extends string | void = void
+> extends Fn {
+  slot: [Segment, Text];
+  data: EndsWith<this[1], this[0]>;
+}

@@ -1,4 +1,5 @@
 export { ArrayOfLength, TArrayOfLength } from "./array-of-length";
+export { Concat, TConcat } from "./concat";
 export { Every, TEvery } from "./every";
 export { Filter, TFilter } from "./filter";
 export { Flat, TFlat } from "./flat";

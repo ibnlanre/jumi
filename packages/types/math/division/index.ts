@@ -1,1 +1,1 @@
-export { Division } from "./Division";
+export { Division, TDivision } from "./Division";

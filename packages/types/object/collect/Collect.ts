@@ -1,5 +1,4 @@
-import { Intersect } from "@/types";
-import { Get, Paths, Unionize, UnionToIntersection } from "@ibnlanre/types";
+import { Get, Paths, Unionize } from "@ibnlanre/types";
 
 type ObjectHelper<
   ObjectType extends Record<string, any>,

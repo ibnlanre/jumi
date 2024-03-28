@@ -1,3 +1,4 @@
+import { Fn } from "@ibnlanre/types";
 import { Divide } from "ts-arithmetic";
 
 export type Division<Numbers extends number[]> = Numbers extends [
@@ -8,3 +9,8 @@ export type Division<Numbers extends number[]> = Numbers extends [
     ? Last
     : Divide<Division<Rest>, Last>
   : 1;
+
+export interface TDivision<Numbers extends number[] | void = void> extends Fn {
+  slot: [Numbers];
+  data: Division<this[0]>;
+}

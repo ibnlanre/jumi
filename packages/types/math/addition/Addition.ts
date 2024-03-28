@@ -1,3 +1,4 @@
+import { Fn } from "@ibnlanre/types";
 import { Add } from "ts-arithmetic";
 
 export type Addition<Numbers extends number[]> = Numbers extends [
@@ -6,3 +7,8 @@ export type Addition<Numbers extends number[]> = Numbers extends [
 ]
   ? Add<First, Addition<Rest>>
   : 0;
+
+export interface TAddition<Numbers extends number[] | void = void> extends Fn {
+  slot: [Numbers];
+  data: Addition<this[0]>;
+}

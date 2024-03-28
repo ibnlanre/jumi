@@ -1,21 +1,34 @@
-import { IsNever, LastOfUnion } from "@ibnlanre/types";
+import { Fn, IsNever, LastOfUnion } from "@ibnlanre/types";
 
 type ReplaceHelper<
-  Words extends string,
-  Find extends string,
-  With extends string
-> = Words extends `${infer X}${Find}${infer U}`
-  ? `${X}${With}${ReplaceHelper<U, Find, With>}`
-  : Words;
+  Text extends string,
+  Search extends string,
+  Replacement extends string
+> = Text extends `${infer X}${Search}${infer U}`
+  ? `${X}${Replacement}${ReplaceHelper<U, Search, Replacement>}`
+  : Text;
 
 export type Replace<
-  Words extends string,
-  Find extends string,
-  With extends string
-> = LastOfUnion<Find> extends infer L
+  Text extends string,
+  Search extends string,
+  Replacement extends string
+> = LastOfUnion<Search> extends infer L
   ? IsNever<L> extends 1
-    ? Words
+    ? Text
     : L extends string
-    ? Replace<ReplaceHelper<Words, L, With>, Exclude<Find, L>, With>
-    : Words
+    ? Replace<
+        ReplaceHelper<Text, L, Replacement>,
+        Exclude<Search, L>,
+        Replacement
+      >
+    : Text
   : never;
+
+export interface TReplace<
+  Search extends string | void = void,
+  Replacement extends string | void = void,
+  Text extends string | void = void
+> extends Fn {
+  slot: [Search, Replacement, Text];
+  data: Replace<this[2], this[0], this[1]>;
+}

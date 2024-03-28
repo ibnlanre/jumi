@@ -1,21 +1,31 @@
+import { Fn } from "@ibnlanre/types";
 import { Subtract } from "ts-arithmetic";
 
 type TrimEndHelper<
-  T extends string,
+  Text extends string,
   Count extends number,
   Letter extends string = "0"
-> = T extends `${infer U}${Letter}`
+> = Text extends `${infer U}${Letter}`
   ? TrimEnd<U, Subtract<Count, 1>, Letter>
-  : T;
+  : Text;
 
 export type TrimEnd<
-  T extends string,
+  Text extends string,
   Count extends number = -1,
   Letter extends string = "0"
 > = Count extends -1
-  ? T extends `${infer U}${Letter}`
+  ? Text extends `${infer U}${Letter}`
     ? TrimEndHelper<U, Count, Letter>
-    : T
+    : Text
   : Count extends 0
-  ? T
-  : TrimEndHelper<T, Count, Letter>;
+  ? Text
+  : TrimEndHelper<Text, Count, Letter>;
+
+export interface TTrimEnd<
+  Text extends string | void = void,
+  Count extends number | void = -1,
+  Letter extends string | void = "0"
+> extends Fn {
+  slot: [Text, Count, Letter];
+  data: TrimEnd<this[0], this[1], this[2]>;
+}

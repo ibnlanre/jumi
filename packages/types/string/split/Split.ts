@@ -1,19 +1,16 @@
-import { Join } from "../../array";
-import { IsNever } from "../../conditionals";
-import { LastOfUnion } from "../../transforms";
-import { Replace } from "../replace";
+import { Fn, IsNever, Join, LastOfUnion, Replace } from "@ibnlanre/types";
 
 type SplitHelper<
-  S extends string,
+  Text extends string,
   Delimiter extends string
-> = S extends `${infer T}${Delimiter}${infer U}`
+> = Text extends `${infer T}${Delimiter}${infer U}`
   ? [T, ...SplitHelper<U, Delimiter>]
-  : [S];
+  : [Text];
 
 type FinalSplit<
-  S extends string,
-  Delimiter extends string = "[/]"
-> = SplitHelper<S, Delimiter>;
+  Text extends string,
+  Delimiter extends string = "<>"
+> = SplitHelper<Text, Delimiter>;
 
 type DefaultOptions = {
   treatConsecutiveDelimitersAsOne: false;
@@ -21,7 +18,7 @@ type DefaultOptions = {
 };
 
 export type Split<
-  S extends string,
+  Text extends string,
   Delimiter extends string = "",
   Options extends {
     treatConsecutiveDelimitersAsOne: boolean;
@@ -29,15 +26,20 @@ export type Split<
 > = LastOfUnion<Delimiter> extends infer L
   ? IsNever<L> extends 1
     ? Options["treatConsecutiveDelimitersAsOne"] extends true
-      ? FinalSplit<Replace<S, "[/][/]", "[/]">>
-      : FinalSplit<S>
+      ? FinalSplit<Replace<Text, "<><>", "<>">>
+      : FinalSplit<Text>
     : L extends string
-    ? Split<Join<SplitHelper<S, L>, "[/]">, Exclude<Delimiter, L>, Options>
+    ? Split<Join<SplitHelper<Text, L>, "<>">, Exclude<Delimiter, L>, Options>
     : never
   : never;
 
-type SplitTest = Split<
-  "foo bar baz",
-  " " | "ba",
-  { treatConsecutiveDelimitersAsOne: true }
->;
+export interface TSplit<
+  Delimiter extends string | void = void,
+  Text extends string | void = void,
+  Options extends {
+    treatConsecutiveDelimitersAsOne: boolean;
+  } | void = DefaultOptions
+> extends Fn {
+  slot: [Delimiter, Text, Options];
+  data: Split<this[1], this[0], this[2]>;
+}

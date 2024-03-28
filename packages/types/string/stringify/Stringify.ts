@@ -1,24 +1,29 @@
-import { Join, UnionToTuple } from "@ibnlanre/types";
+import { Fn, Join, UnionToTuple } from "@ibnlanre/types";
 
 type Serializable = string | number | boolean | null;
 
-type ArrayToString<T extends any[]> = `[${Join<T>}]`;
+type ArrayToString<Input extends any[]> = `[${Join<Input>}]`;
 
-type ObjectToString<T extends Record<string, any>> = Join<
+type ObjectToString<Input extends Record<string, any>> = Join<
   UnionToTuple<
     {
-      [K in keyof T]: `${Stringify<K>}: ${Stringify<T[K]>}`;
-    }[keyof T]
+      [K in keyof Input]: `${Stringify<K>}: ${Stringify<Input[K]>}`;
+    }[keyof Input]
   >,
   ", "
 >;
 
-export type Stringify<T> = T extends string
-  ? T
-  : T extends Serializable
-  ? `${T}`
-  : T extends any[]
-  ? ArrayToString<T>
-  : T extends Record<string, any>
-  ? ObjectToString<T>
+export type Stringify<Input> = Input extends string
+  ? Input
+  : Input extends Serializable
+  ? `${Input}`
+  : Input extends any[]
+  ? ArrayToString<Input>
+  : Input extends Record<string, any>
+  ? ObjectToString<Input>
   : never;
+
+export interface TStringify<Input extends unknown | void = void> extends Fn {
+  slot: [Input];
+  data: Stringify<this[0]>;
+}

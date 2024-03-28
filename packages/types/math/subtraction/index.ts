@@ -1,1 +1,1 @@
-export { Subtraction } from "./Subtraction";
+export { Subtraction, TSubtraction } from "./Subtraction";

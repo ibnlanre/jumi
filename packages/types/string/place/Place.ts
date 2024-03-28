@@ -1,4 +1,5 @@
 import {
+  Fn,
   IndexAt,
   IsNever,
   LastOfUnion,
@@ -7,27 +8,36 @@ import {
 } from "@ibnlanre/types";
 
 type PlaceHelper<
-  Words extends string,
-  Letter extends string,
+  Text extends string,
+  Segment extends string,
   Index extends number
-> = `${Substring<Words, 0, Index>}${Letter}${Substring<
-  Words,
+> = `${Substring<Text, 0, Index>}${Segment}${Substring<
+  Text,
   Index,
-  Length<Words>
+  Length<Text>
 >}`;
 
 export type Place<
-  Words extends string,
-  Letter extends string,
+  Text extends string,
+  Segment extends string,
   Index extends number
 > = LastOfUnion<Index> extends infer L
   ? IsNever<L> extends 1
-    ? Words
+    ? Text
     : L extends number
     ? Place<
-        PlaceHelper<Words, Letter, IndexAt<Length<Words>, L>>,
-        Letter,
+        PlaceHelper<Text, Segment, IndexAt<Length<Text>, L>>,
+        Segment,
         Exclude<Index, L>
       >
-    : Words
+    : Text
   : never;
+
+export interface TPlace<
+  Segment extends string | void = void,
+  Index extends number | void = void,
+  Text extends string | void = void
+> extends Fn {
+  slot: [Segment, Index, Text];
+  data: Place<this[2], this[0], this[1]>;
+}

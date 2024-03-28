@@ -1,1 +1,1 @@
-export { Split } from "./Split";
+export { Split, TSplit } from "./Split";

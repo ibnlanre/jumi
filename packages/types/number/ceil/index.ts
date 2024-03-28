@@ -1,1 +1,1 @@
-export { Ceil } from "./Ceil";
+export { Ceil, TCeil } from "./Ceil";

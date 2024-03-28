@@ -1,1 +1,1 @@
-export { Substring } from "./Substring";
+export { Substring, TSubstring } from "./Substring";

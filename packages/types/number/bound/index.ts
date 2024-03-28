@@ -1,1 +1,1 @@
-export { Bound } from "./Bound";
+export { Bound, TBound } from "./Bound";

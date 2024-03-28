@@ -1,3 +1,4 @@
+import { Fn } from "@ibnlanre/types";
 import { Multiply } from "ts-arithmetic";
 
 export type Multiplication<Numbers extends number[]> = Numbers extends [
@@ -6,3 +7,9 @@ export type Multiplication<Numbers extends number[]> = Numbers extends [
 ]
   ? Multiply<First, Multiplication<Rest>>
   : 1;
+
+export interface TMultiplication<Numbers extends number[] | void = void>
+  extends Fn {
+  slot: [Numbers];
+  data: Multiplication<this[0]>;
+}

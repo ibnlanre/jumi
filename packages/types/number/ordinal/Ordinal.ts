@@ -1,4 +1,11 @@
-import { Concat, Includes, Size, Stringify, ValueAt } from "@ibnlanre/types";
+import {
+  Append,
+  Fn,
+  Includes,
+  Size,
+  Stringify,
+  ValueAt,
+} from "@ibnlanre/types";
 import {
   Abs,
   And,
@@ -26,14 +33,19 @@ type OrdinalHelper<
   UnitsDigit extends number = Gt<TensDigit, 10> extends 1
     ? Mod<Subtract<TensDigit, 20>, 10>
     : TensDigit
-> = Stringify<NumberToOrdinal> extends infer R
-  ? R extends string
+> = Stringify<NumberToOrdinal> extends infer Value
+  ? Value extends string
     ? Includes<Suffixes, Coordinate<UnitsDigit>> extends 1
-      ? Concat<R, Coordinate<UnitsDigit>>
+      ? Append<Value, Coordinate<UnitsDigit>>
       : Includes<Suffixes, Coordinate<TensDigit>> extends 1
-      ? Concat<R, Coordinate<TensDigit>>
-      : Concat<R, ValueAt<Suffixes, 0>>
+      ? Append<Value, Coordinate<TensDigit>>
+      : Append<Value, ValueAt<Suffixes, 0>>
     : never
   : never;
 
-export type Ordinal<T extends number> = OrdinalHelper<T>;
+export type Ordinal<Number extends number> = OrdinalHelper<Number>;
+
+export interface TOrdinal<Number extends number | void = void> extends Fn {
+  slot: [Number];
+  data: Ordinal<this[0]>;
+}

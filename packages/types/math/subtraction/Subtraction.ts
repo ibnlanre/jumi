@@ -1,3 +1,4 @@
+import { Fn } from "@ibnlanre/types";
 import { Subtract } from "ts-arithmetic";
 
 export type Subtraction<Numbers extends number[]> = Numbers extends [
@@ -8,3 +9,9 @@ export type Subtraction<Numbers extends number[]> = Numbers extends [
     ? Last
     : Subtract<Subtraction<Rest>, Last>
   : 1;
+
+export interface TSubtraction<Numbers extends number[] | void = void>
+  extends Fn {
+  slot: [Numbers];
+  data: Subtraction<this[0]>;
+}

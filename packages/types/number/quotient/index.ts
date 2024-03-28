@@ -1,1 +1,1 @@
-export { Quotient } from "./Quotient";
+export { Quotient, TQuotient } from "./Quotient";

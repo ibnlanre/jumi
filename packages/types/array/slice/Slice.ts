@@ -5,9 +5,9 @@ export type Slice<
   Array extends unknown[],
   Start extends number = 0,
   End extends number = Size<Array>
-> = Bound<0, Size<Array>, Start> extends infer Start
+> = Bound<Start, 0, Size<Array>> extends infer Start
   ? Start extends number
-    ? Bound<0, Size<Array>, End> extends infer End
+    ? Bound<End, 0, Size<Array>> extends infer End
       ? End extends number
         ? SliceTo<SliceFrom<Array, Start>, Subtract<End, Start>>
         : never

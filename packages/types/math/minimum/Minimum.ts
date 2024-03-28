@@ -1,3 +1,4 @@
+import { Fn } from "@ibnlanre/types";
 import { Min } from "ts-arithmetic";
 
 export type Minimum<Numbers extends number[]> = Numbers extends [
@@ -8,3 +9,8 @@ export type Minimum<Numbers extends number[]> = Numbers extends [
     ? Last
     : Min<Minimum<Rest>, Last>
   : 0;
+
+export interface TMinimum<Numbers extends number[] | void = void> extends Fn {
+  slot: [Numbers];
+  data: Minimum<this[0]>;
+}

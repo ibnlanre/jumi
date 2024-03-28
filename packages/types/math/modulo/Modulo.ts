@@ -1,3 +1,5 @@
+import { Fn } from "@ibnlanre/types";
+
 import { EuclideanKnuthianMod } from "./EuclideanKnuthianMod";
 import { EuclideanMod } from "./EuclideanMod";
 import { FlooredMod } from "./FlooredMod";
@@ -29,3 +31,17 @@ export type Modulo<
   : Type extends "Floored"
   ? FlooredMod<Dividend, Divisor>
   : never;
+
+export interface TModulo<
+  Divisor extends number | void = void,
+  Dividend extends number | void = void,
+  Type extends
+    | "Euclidean"
+    | "Euclidean-Knuthian"
+    | "Truncating"
+    | "Floored"
+    | void = "Euclidean-Knuthian"
+> extends Fn {
+  slot: [Divisor, Dividend, Type];
+  data: Modulo<this[1], this[0], this[2]>;
+}

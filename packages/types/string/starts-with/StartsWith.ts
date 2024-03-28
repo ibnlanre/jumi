@@ -1,6 +1,14 @@
-import { Serializable } from "@ibnlanre/types";
+import { Fn, Serializable } from "@ibnlanre/types";
 
 export type StartsWith<
-  T extends string,
-  U extends Serializable
-> = T extends `${U}${string}` ? 1 : 0;
+  Text extends string,
+  Segment extends Serializable
+> = Text extends `${Segment}${string}` ? 1 : 0;
+
+export interface TStartsWith<
+  Segment extends Serializable | void = void,
+  Text extends string | void = void
+> extends Fn {
+  slot: [Segment, Text];
+  data: StartsWith<this[1], this[0]>;
+}

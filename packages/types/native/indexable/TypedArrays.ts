@@ -1,6 +1,6 @@
-export type Indexable =
-  | Array<any>
-  | ReadonlyArray<any>
+export type TypedArrays =
+  | ArrayBuffer
+  | DataView
   | Int8Array
   | Uint8Array
   | Uint8ClampedArray

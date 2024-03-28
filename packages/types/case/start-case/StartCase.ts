@@ -1,4 +1,4 @@
-import { Merge } from "../../object";
+import { Digits, Merge, Symbols } from "@ibnlanre/types";
 
 export type StartCase<T extends string> = Capitalize<Lowercase<T>>;
 
@@ -87,42 +87,6 @@ type DefaultSpaceOutOptions = {
   match_whitespace: true;
 };
 
-type Digits = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
-
-type Symbols =
-  | "~"
-  | "!"
-  | "@"
-  | "#"
-  | "$"
-  | "%"
-  | "^"
-  | "&"
-  | "*"
-  | "("
-  | ")"
-  | "-"
-  | "_"
-  | "="
-  | "+"
-  | "["
-  | "{"
-  | "]"
-  | "}"
-  | "\\"
-  | "/"
-  | "|"
-  | ";"
-  | ":"
-  | "'"
-  | '"'
-  | ","
-  | "<"
-  | "."
-  | ">"
-  | "?"
-  | "`";
-
 type SpaceOutHelper<
   Word extends string,
   Matcher extends string,
@@ -153,6 +117,10 @@ type SpaceOutWords<
     match_number: true;
     match_symbol: true;
     match_whitespace: true;
+    preserve_uppercase: false;
+    remove_whitespace: false;
+    remove_number: false;
+    remove_symbol: false;
   }
 > = SpaceOut<Uncapitalize<Sentence>, Merge<DefaultSpaceOutOptions, Options>>;
 

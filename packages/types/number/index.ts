@@ -1,9 +1,9 @@
-export { Bound } from "./bound";
-export { Ceil } from "./ceil";
-export { Floor } from "./floor";
-export { Ordinal } from "./ordinal";
-export { ParseInt } from "./parse-int";
-export { Quotient } from "./quotient";
-export { Round } from "./round";
-export { Sign } from "./sign";
-export { Trunc } from "./trunc";
+export { Bound, TBound } from "./bound";
+export { Ceil, TCeil } from "./ceil";
+export { Floor, TFloor } from "./floor";
+export { Ordinal, TOrdinal } from "./ordinal";
+export { ParseInt, TParseInt } from "./parse-int";
+export { Quotient, TQuotient } from "./quotient";
+export { Round, TRound } from "./round";
+export { Sign, TSign } from "./sign";
+export { TTrunc, Trunc } from "./trunc";

@@ -1,3 +1,10 @@
-import { Serializable, Split, Stringify } from "@ibnlanre/types";
+import { Fn, Serializable, Split, Stringify } from "@ibnlanre/types";
 
-export type Length<T extends Serializable> = Split<Stringify<T>>["length"];
+export type Length<Text extends Serializable> = Split<
+  Stringify<Text>
+>["length"];
+
+export interface TLength<Text extends Serializable | void = void> extends Fn {
+  slot: [Text];
+  data: Length<this[0]>;
+}

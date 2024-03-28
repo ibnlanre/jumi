@@ -1,1 +1,1 @@
-export { PadStart } from "./PadStart";
+export { PadStart, TPadStart } from "./PadStart";

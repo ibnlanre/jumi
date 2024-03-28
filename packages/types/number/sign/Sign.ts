@@ -1,1 +1,10 @@
-export type Sign<T extends number> = `${T}` extends `-${number}` ? -1 : 1;
+import { Fn } from "@ibnlanre/types";
+
+export type Sign<Number extends number> = `${Number}` extends `-${number}`
+  ? -1
+  : 1;
+
+export interface TSign<Number extends number | void = void> extends Fn {
+  slot: [Number];
+  data: Sign<this[0]>;
+}

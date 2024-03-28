@@ -1,4 +1,4 @@
-import { Every, IsSubType, Length, TrimStart } from "@ibnlanre/types";
+import { Every, Fn, IsSubType, Length, TrimStart } from "@ibnlanre/types";
 import { Divide, Pow, Subtract } from "ts-arithmetic";
 
 type Digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
@@ -58,3 +58,12 @@ export type ParseInt<
   : Input extends false
   ? 0
   : never;
+
+export interface TParseInt<
+  Input extends string | number | boolean | void = void,
+  Outlook extends "Signed" | "Unsigned" | void = "Unsigned",
+  Output extends "Integer" | "Float" | void = "Float"
+> extends Fn {
+  slot: [Input, Outlook, Output];
+  data: ParseInt<this[0], this[1], this[2]>;
+}

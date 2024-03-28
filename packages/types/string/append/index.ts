@@ -1,1 +1,1 @@
-export { Append } from "./Append";
+export { Append, TAppend } from "./Append";
