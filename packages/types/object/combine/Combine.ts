@@ -1,17 +1,21 @@
-import { Merge, Paths } from "@ibnlanre/types";
+import { Dictionary, Fn, Merge } from "@ibnlanre/types";
 
 type CombineHelper<
-  Source extends Record<string, any>[] | Record<string, any>,
-  Result extends Record<string, any> = {}
+  Source extends Dictionary[],
+  Result extends Dictionary = {}
 > = Source extends [
-  infer Head extends Record<string, any>,
-  ...infer Rest extends Record<string, any>[]
+  infer Head extends Dictionary,
+  ...infer Rest extends Dictionary[]
 ]
   ? CombineHelper<Rest, Merge<Result, Head>>
-  : Source extends []
-  ? Result
-  : Merge<Result, Source>;
+  : Source extends Dictionary
+  ? Merge<Result, Source>
+  : Result;
 
-export type Combine<
-  Source extends Record<string, any>[] | Record<string, any>
-> = CombineHelper<Source>;
+export type Combine<Source extends Dictionary[]> = CombineHelper<Source>;
+
+export interface TCombine<Source extends Dictionary[] | void = void>
+  extends Fn {
+  slot: [Source];
+  data: Combine<this[0]>;
+}

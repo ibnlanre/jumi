@@ -1,3 +1,11 @@
-export type FromEntries<T extends any[][]> = {
-  [K in T[number][0]]: Extract<T[number], [K, any]>[1];
+import { Fn } from "@ibnlanre/types";
+
+export type FromEntries<EntryList extends any[][]> = {
+  [Key in EntryList[number][0]]: Extract<EntryList[number], [Key, any]>[1];
 };
+
+export interface TFromEntries<EntryList extends unknown[][] | void = void>
+  extends Fn {
+  slot: [EntryList];
+  data: FromEntries<this[0]>;
+}

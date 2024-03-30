@@ -9,9 +9,9 @@ export type Round<
   : Floor<Subtract<Add<Value, 0.5>, Mod<Floor<Add<Value, 0.5>>, 1>>>;
 
 export interface TRound<
-  Value extends number | void = void,
-  MidPointRounding extends "AwayFromZero" | "ToEven" | void = "ToEven"
+  MidPointRounding extends "AwayFromZero" | "ToEven" | void = "ToEven",
+  Value extends number | void = void
 > extends Fn {
-  slot: [Value, MidPointRounding];
-  data: Round<this[0], this[1]>;
+  slot: [MidPointRounding, Value];
+  data: Round<this[1], this[0]>;
 }

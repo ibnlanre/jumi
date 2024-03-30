@@ -1,6 +1,7 @@
 export { ArbitraryKey } from "./arbitrary-key";
 export { Buffers } from "./buffers";
 export { Derivatives } from "./derivatives";
+export { Dictionary } from "./dictionary";
 export { Digits } from "./digits";
 export { Errors } from "./errors";
 export { Events } from "./events";

@@ -18,9 +18,9 @@ export type Quotient<
 
 export interface TQuotient<
   Divisor extends number | void = void,
-  Dividend extends number | void = void,
-  Type extends "Euclidean" | "Truncating" | "Floored" | void = "Truncating"
+  Type extends "Euclidean" | "Truncating" | "Floored" | void = "Truncating",
+  Dividend extends number | void = void
 > extends Fn {
-  slot: [Divisor, Dividend, Type];
-  data: Quotient<this[1], this[0], this[2]>;
+  slot: [Divisor, Type, Dividend];
+  data: Quotient<this[2], this[0], this[1]>;
 }

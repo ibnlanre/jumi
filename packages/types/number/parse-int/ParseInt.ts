@@ -60,10 +60,10 @@ export type ParseInt<
   : never;
 
 export interface TParseInt<
-  Input extends string | number | boolean | void = void,
   Outlook extends "Signed" | "Unsigned" | void = "Unsigned",
-  Output extends "Integer" | "Float" | void = "Float"
+  Output extends "Integer" | "Float" | void = "Float",
+  Input extends string | number | boolean | void = void
 > extends Fn {
-  slot: [Input, Outlook, Output];
-  data: ParseInt<this[0], this[1], this[2]>;
+  slot: [Outlook, Output, Input];
+  data: ParseInt<this[2], this[0], this[1]>;
 }

@@ -1,18 +1,17 @@
 import type {
-  Derivatives,
+  ArbitraryKey,
+  Dictionary,
+  Fn,
   IncludeKeys,
-  Indexable,
   Intersect,
   Keys,
   OptionalKeys,
   Paths,
-  Primitives,
   RequiredKeys,
-  Structures,
 } from "@ibnlanre/types";
 
 type DeepPartialHelper<
-  ObjectType extends Record<string, any>,
+  ObjectType extends Dictionary,
   PathType extends string,
   Key extends string
 > = [PathType] extends [never]
@@ -22,15 +21,14 @@ type DeepPartialHelper<
   : DeepPartial<ObjectType[Key], "">;
 
 export type DeepPartial<
-  ObjectType extends Record<string, any>,
-  PathType extends (string & {}) | Paths<ObjectType> = never
-> = ObjectType extends Primitives | Indexable | Structures | Derivatives
-  ? ObjectType
-  : [PathType] extends [never]
+  ObjectType extends Dictionary,
+  PathType extends ArbitraryKey | Paths<ObjectType> = never
+> = [PathType] extends [never]
   ? {
       [Key in Keys<ObjectType>]?: DeepPartialHelper<ObjectType, PathType, Key>;
     }
-  : Intersect<
+  : ObjectType extends Dictionary
+  ? Intersect<
       {
         [Key in Exclude<RequiredKeys<ObjectType>, PathType>]: DeepPartialHelper<
           ObjectType,
@@ -49,13 +47,16 @@ export type DeepPartial<
           Key
         >;
       }
-    >;
+    >
+  : ObjectType;
 
-type Test1 = { a: { b?: { c: string } } };
-type Test = DeepPartial<{ a: { b: { c: string } } }, "a.b">;
-
-// extends infer R
-//   ? [R] extends [never]
-//     ? undefined
-//     : R
-//   : never;
+export interface TDeepPartial<
+  PathType extends
+    | ArbitraryKey
+    | Paths<Exclude<ObjectType, void>>
+    | void = void,
+  ObjectType extends Dictionary | void = void
+> extends Fn {
+  slot: [PathType, ObjectType];
+  data: DeepPartial<this[1], this[0]>;
+}

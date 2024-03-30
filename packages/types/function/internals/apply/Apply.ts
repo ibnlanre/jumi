@@ -1,13 +1,19 @@
-import { Fn, Reset } from "@ibnlanre/types";
+import { Fn } from "@ibnlanre/types";
+import { Inspect, Select } from "../../symbol";
 
-export type Apply<CallBack extends Fn, List extends unknown> = (CallBack & {
-  args: Reset<CallBack["slot"], List>;
+export type Apply<
+  Callback extends Fn,
+  List extends Inspect<Callback>
+> = (Callback & {
+  args: List extends Inspect<Callback>
+    ? Select<Callback["slot"], List>
+    : "Invalid argument type";
 })["data"];
 
 export interface TApply<
-  CallBack extends Fn | void = void,
-  List extends unknown | void = void
+  Callback extends Fn,
+  List extends Inspect<Callback> | void = void
 > extends Fn {
-  slot: [CallBack, List];
+  slot: [Callback, List];
   data: Apply<this[0], this[1]>;
 }

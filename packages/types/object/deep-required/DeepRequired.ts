@@ -1,19 +1,18 @@
 import type {
-  Derivatives,
+  ArbitraryKey,
+  Dictionary,
+  Fn,
   IncludeKeys,
-  Indexable,
   Intersect,
   Keys,
   OptionalKeys,
   Paths,
-  Primitives,
   RequiredKeys,
   RequireValue,
-  Structures,
 } from "@ibnlanre/types";
 
 type DeepRequiredHelper<
-  ObjectType extends Record<string, any>,
+  ObjectType extends Dictionary,
   PathType extends string,
   Key extends string
 > = [PathType] extends [never]
@@ -23,17 +22,16 @@ type DeepRequiredHelper<
   : DeepRequired<ObjectType[Key], "">;
 
 export type DeepRequired<
-  ObjectType extends Record<string, any>,
-  PathType extends (string & {}) | Paths<ObjectType> = never
-> = ObjectType extends Primitives | Indexable | Structures | Derivatives
-  ? ObjectType
-  : [PathType] extends [never]
+  ObjectType extends Dictionary,
+  PathType extends ArbitraryKey | Paths<ObjectType> = never
+> = [PathType] extends [never]
   ? {
       [Key in Keys<ObjectType>]: RequireValue<
         DeepRequiredHelper<ObjectType, PathType, Key>
       >;
     }
-  : Intersect<
+  : ObjectType extends Dictionary
+  ? Intersect<
       {
         [Key in Exclude<
           RequiredKeys<ObjectType>,
@@ -49,4 +47,16 @@ export type DeepRequired<
           DeepRequiredHelper<ObjectType, PathType, Key>
         >;
       }
-    >;
+    >
+  : ObjectType;
+
+export interface TDeepRequired<
+  PathType extends
+    | ArbitraryKey
+    | Paths<Exclude<ObjectType, void>>
+    | void = void,
+  ObjectType extends Dictionary | void = void
+> extends Fn {
+  slot: [PathType, ObjectType];
+  data: DeepRequired<this[1], this[0]>;
+}

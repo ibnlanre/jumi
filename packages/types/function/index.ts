@@ -1,3 +1,4 @@
+export { Fn } from "./fn";
 export {
   Apply,
   Call,
@@ -8,7 +9,4 @@ export {
   TMap,
   TPipe,
 } from "./internals";
-
-export { Fn } from "./fn";
-export { unset } from "./symbol";
-export { Reset } from "./symbol/reset";
+export { Deflect, Dissect, Interject, Resect, Select, unset } from "./symbol";

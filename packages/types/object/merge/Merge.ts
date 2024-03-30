@@ -1,8 +1,8 @@
-import { Intersect } from "@ibnlanre/types";
+import { Dictionary, Intersect } from "@ibnlanre/types";
 
 export type Merge<
-  Source extends Record<string, any>,
-  Target extends Record<string, any>
+  Source extends Dictionary,
+  Target extends Dictionary
 > = Intersect<
   {
     [Key in keyof Source as Key extends keyof Target
@@ -13,11 +13,8 @@ export type Merge<
       ? never
       : Key]: Target[Key];
   } & {
-    [Key in keyof Source & keyof Target]: Source[Key] extends Record<
-      string,
-      any
-    >
-      ? Target[Key] extends Record<string, any>
+    [Key in keyof Source & keyof Target]: Source[Key] extends Dictionary
+      ? Target[Key] extends Dictionary
         ? Merge<Source[Key], Target[Key]>
         : Target[Key]
       : Target[Key];

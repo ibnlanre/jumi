@@ -1,8 +1,8 @@
-import { Keys } from "@ibnlanre/types";
+import { Dictionary, Keys } from "@ibnlanre/types";
 import { Subtract } from "ts-arithmetic";
 
 type PathsHelper<
-  ObjectType extends Record<string, any>,
+  ObjectType extends Dictionary,
   Key extends string | number,
   Delimiter extends string,
   Level extends number
@@ -22,14 +22,14 @@ type PathsHelper<
  * @param [Level = -1] - The level to stop the recursion
  */
 export type Paths<
-  ObjectType extends Record<string, any>,
+  ObjectType extends Dictionary,
   Delimiter extends string = ".",
   Level extends number = -1
-> = ObjectType extends Record<string, any>
+> = ObjectType extends Dictionary
   ? {
       [Key in Keys<ObjectType>]: Key extends string | number
         ? ObjectType[Key] extends infer ObjectType
-          ? ObjectType extends Record<string, any>
+          ? ObjectType extends Dictionary
             ? PathsHelper<ObjectType, Key, Delimiter, Level>
             : `${Key}`
           : never

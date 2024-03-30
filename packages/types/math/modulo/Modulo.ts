@@ -34,14 +34,18 @@ export type Modulo<
 
 export interface TModulo<
   Divisor extends number | void = void,
-  Dividend extends number | void = void,
   Type extends
     | "Euclidean"
     | "Euclidean-Knuthian"
     | "Truncating"
     | "Floored"
-    | void = "Euclidean-Knuthian"
-> extends Fn {
-  slot: [Divisor, Dividend, Type];
-  data: Modulo<this[1], this[0], this[2]>;
+    | void = "Euclidean-Knuthian",
+  Dividend extends number | void = void
+> extends Fn<{
+    0: number;
+    1: "Euclidean" | "Euclidean-Knuthian" | "Truncating" | "Floored";
+    2: number;
+  }> {
+  slot: [Divisor, Type, Dividend];
+  data: Modulo<this[2], this[0], this[1]>;
 }

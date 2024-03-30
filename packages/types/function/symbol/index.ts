@@ -1,4 +1,7 @@
 export { Dissect } from "./dissect";
+export { Inspect } from "./inspect";
+export { Interject } from "./interject";
 export { Preset } from "./preset";
-export { Reset } from "./reset";
+export { Resect } from "./resect";
+export { Select } from "./select";
 export { unset } from "./unset";

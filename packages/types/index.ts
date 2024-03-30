@@ -229,11 +229,11 @@ export {
   Fn,
   Map,
   Pipe,
-  Reset,
   TApply,
   TCall,
   TMap,
   TPipe,
+  unset,
 } from "./function";
 
 export {
@@ -241,6 +241,7 @@ export {
   Arrays,
   Buffers,
   Derivatives,
+  Dictionary,
   Digits,
   Errors,
   Events,

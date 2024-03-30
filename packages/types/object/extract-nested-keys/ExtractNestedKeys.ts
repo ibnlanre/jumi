@@ -1,4 +1,14 @@
+import { Fn } from "@ibnlanre/types";
+
 export type ExtractNestedKeys<
-  T extends string,
+  Text extends string,
   Delimiter extends string = "."
-> = T extends `${string}${Delimiter}${infer R}` ? R : T;
+> = Text extends `${string}${Delimiter}${infer Segment}` ? Segment : Text;
+
+export interface TExtractNestedKeys<
+  Delimiter extends string | void = ".",
+  Text extends string | void = void
+> extends Fn {
+  slot: [Delimiter, Text];
+  data: ExtractNestedKeys<this[1], this[0]>;
+}

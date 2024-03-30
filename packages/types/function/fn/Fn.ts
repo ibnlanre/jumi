@@ -43,4 +43,24 @@ interface FnArgs extends FnImpl {
  * Parameterized function type
  * @see https://github.com/microsoft/TypeScript/issues/1213#issuecomment-1215039765
  */
-export type Fn = FnArgs;
+export interface Fn<Params extends Record<number, unknown> = {}>
+  extends FnArgs {
+  /**
+   * Field for parameters within higher-order functions
+   *
+   * @description
+   * This field is used to represent parameters in a higher-order function.
+   */
+  params: [
+    Params[0],
+    Params[1],
+    Params[2],
+    Params[3],
+    Params[4],
+    Params[5],
+    Params[6],
+    Params[7],
+    Params[8],
+    Params[9]
+  ];
+}
