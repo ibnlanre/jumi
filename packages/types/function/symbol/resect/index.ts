@@ -1,1 +1,0 @@
-export { Resect } from "./Resect";

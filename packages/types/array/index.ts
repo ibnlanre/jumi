@@ -1,5 +1,6 @@
-export { ArrayOfLength, TArrayOfLength } from "./array-of-length";
+export { ArrayOf, TArrayOf } from "./array-of";
 export { Concat, TConcat } from "./concat";
+export { Elements, TElements } from "./elements";
 export { Every, TEvery } from "./every";
 export { Filter, TFilter } from "./filter";
 export { Flat, TFlat } from "./flat";
@@ -8,6 +9,7 @@ export { Includes, TIncludes } from "./includes";
 export { IndexAt, TIndexAt } from "./index-at";
 export { Indices, TIndices } from "./indices";
 export { Join, TJoin } from "./join";
+export { NonEmptyArray } from "./non-empty-array";
 export { Pop, TPop } from "./pop";
 export { Push, TPush } from "./push";
 export { Range, TRange } from "./range";

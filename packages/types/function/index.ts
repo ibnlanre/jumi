@@ -9,4 +9,4 @@ export {
   TMap,
   TPipe,
 } from "./internals";
-export { Deflect, Dissect, Interject, Resect, Select, unset } from "./symbol";
+export { Inspect, Select, unset } from "./symbol";

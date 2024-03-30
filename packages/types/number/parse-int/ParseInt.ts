@@ -1,4 +1,11 @@
-import { Every, Fn, IsSubType, Length, TrimStart } from "@ibnlanre/types";
+import {
+  Every,
+  Fn,
+  IsSubType,
+  Length,
+  TIsSubType,
+  TrimStart,
+} from "@ibnlanre/types";
 import { Divide, Pow, Subtract } from "ts-arithmetic";
 
 type Digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
@@ -19,10 +26,13 @@ type ParseIntHelper<
   Accumulator extends string = "",
   Decimal extends number = 0,
   Sign extends "-" | "" = ""
-> = Input extends `${infer Head}${infer Input}`
+> = Input extends `${infer Significand extends number}e-${infer Exponential extends number}`
+  ? Float<Significand, Exponential>
+  : Input extends `${infer Head}${infer Input}`
   ? Head extends Digit
     ? ParseIntHelper<Input, Outlook, `${Accumulator}${Head}`, Decimal, Sign>
     : Every<
+        TIsSubType<1>,
         [
           IsSubType<Outlook, "Signed">,
           IsSubType<Head, "-">,

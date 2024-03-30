@@ -1,10 +1,11 @@
-import { Apply, Fn } from "@ibnlanre/types";
+import { Apply, Fn, Inspect } from "@ibnlanre/types";
 
-export type Pipe<Item extends unknown, List extends Fn[]> = (Fn & {
-  data: List extends [infer Head extends Fn, ...infer Rest extends Fn[]]
-    ? Pipe<Apply<Head, [Item]>, Rest>
-    : Item;
-})["data"];
+export type Pipe<Item extends unknown, List extends Fn[]> = List extends [
+  infer Callback extends Fn,
+  ...infer Rest extends Fn[]
+]
+  ? Pipe<Apply<Callback, Item extends Inspect<Callback> ? Item : never>, Rest>
+  : Item;
 
 export interface TPipe<
   List extends Fn[] | void = void,

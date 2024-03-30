@@ -1,4 +1,4 @@
-import { ArrayOfLength, Fn, If, Indices, Size } from "@ibnlanre/types";
+import { ArrayOf, Fn, If, Indices, Size } from "@ibnlanre/types";
 import { GtOrEq, Subtract } from "ts-arithmetic";
 
 type IndexAtHelper<
@@ -22,7 +22,7 @@ export type IndexAt<
 > = Array extends any[]
   ? IndexAtHelper<Array, Index>
   : Array extends number
-  ? IndexAtHelper<ArrayOfLength<Array>, Index>
+  ? IndexAtHelper<ArrayOf<Array>, Index>
   : never;
 
 export interface TIndexAt<

@@ -1,13 +1,13 @@
-import { Apply, Call, Fn, TModulo } from "@ibnlanre/types";
-import { Inspect } from "../../symbol";
+import { Apply, Fn, Inspect } from "@ibnlanre/types";
 
-export type Map<Callback extends Fn, List extends Inspect<Callback>[]> = (Fn & {
-  data: {
-    [K in keyof List]: List[K] extends Inspect<Callback>
-      ? Apply<Callback, List[K]>
-      : "Invalid argument type";
-  };
-})["data"];
+export type Map<
+  Callback extends Fn,
+  List extends Inspect<Callback>[]
+> = List extends [infer Element, ...infer Rest extends Inspect<Callback>[]]
+  ? Element extends Inspect<Callback>
+    ? [Apply<Callback, Element>, ...Map<Callback, Rest>]
+    : [never, ...Map<Callback, Rest>]
+  : [];
 
 export interface TMap<
   Callback extends Fn | void = void,
@@ -16,5 +16,3 @@ export interface TMap<
   slot: [Callback, List];
   data: Map<this[0], this[1]>;
 }
-
-type Test = Call<TMap<TModulo, [[2, 3], [3]]>>;

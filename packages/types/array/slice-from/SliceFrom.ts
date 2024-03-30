@@ -1,10 +1,10 @@
-import { ArrayOfLength, Fn, Size } from "@ibnlanre/types";
+import { ArrayOf, Fn, Size } from "@ibnlanre/types";
 import { Gt, Lt } from "ts-arithmetic";
 
 type SliceFromHelper<
   Array extends unknown[],
   Start extends number
-> = Array extends [...ArrayOfLength<Start>, ...infer Rest] ? Rest : never;
+> = Array extends [...ArrayOf<Start>, ...infer Rest] ? Rest : never;
 
 export type SliceFrom<Array extends unknown[], Start extends number> = Gt<
   Start,

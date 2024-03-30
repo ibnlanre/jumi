@@ -1,10 +1,10 @@
-import { ArrayOfLength, Fn, Size } from "@ibnlanre/types";
+import { ArrayOf, Fn, Size } from "@ibnlanre/types";
 import { Gt, Lt, Subtract } from "ts-arithmetic";
 
 type SliceToHelper<
   Array extends unknown[],
   End extends number
-> = Array extends [...infer Rest, ...ArrayOfLength<Subtract<Size<Array>, End>>]
+> = Array extends [...infer Rest, ...ArrayOf<Subtract<Size<Array>, End>>]
   ? Rest
   : never;
 

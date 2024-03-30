@@ -1,7 +1,7 @@
 export type Serializable =
   | string
   | number
-  | boolean
   | bigint
+  | boolean
   | null
   | undefined;

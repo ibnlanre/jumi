@@ -1,13 +1,12 @@
-import { Fn } from "@ibnlanre/types";
-import { Inspect, Select } from "../../symbol";
+import { Fn, Inspect, Select } from "@ibnlanre/types";
 
 export type Apply<
   Callback extends Fn,
   List extends Inspect<Callback>
 > = (Callback & {
   args: List extends Inspect<Callback>
-    ? Select<Callback["slot"], List>
-    : "Invalid argument type";
+    ? Select<Callback["slot"], List extends unknown[] ? List : [List]>
+    : never;
 })["data"];
 
 export interface TApply<

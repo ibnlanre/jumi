@@ -1,20 +1,22 @@
-import { Fn, Map } from "@ibnlanre/types";
-import { And, Bit } from "ts-arithmetic";
+import { Apply, Fn, Inspect } from "@ibnlanre/types";
 
-export type Every<List extends Bit[]> = List extends []
+export type Every<
+  Callback extends Fn,
+  List extends Inspect<Callback>[]
+> = List extends []
   ? 1
-  : List extends [infer Head extends Bit, ...infer Tail extends Bit[]]
-  ? And<Head, Every<Tail>>
+  : List extends [infer Element, ...infer Rest extends Inspect<Callback>[]]
+  ? [Element] extends Inspect<Callback>
+    ? Apply<Callback, [Element]> extends 1
+      ? Every<Callback, Rest>
+      : 0
+    : 0
   : 0;
 
 export interface TEvery<
-  Callback extends Fn | void = void,
-  List extends unknown[] | void = void
+  Callback extends Fn,
+  List extends Inspect<Callback>[] | void = void
 > extends Fn {
   slot: [Callback, List];
-  data: Map<this[0], this[1]> extends infer List
-    ? List extends Bit[]
-      ? Every<List>
-      : never
-    : never;
+  data: Every<this[0], this[1]>;
 }
