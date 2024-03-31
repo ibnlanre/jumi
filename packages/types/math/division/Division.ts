@@ -10,7 +10,10 @@ export type Division<Numbers extends number[]> = Numbers extends [
     : Divide<Division<Rest>, Last>
   : 1;
 
-export interface TDivision<Numbers extends number[] | void = void> extends Fn {
+export interface TDivision<Numbers extends number[] | void = void>
+  extends Fn<{
+    0: number[];
+  }> {
   slot: [Numbers];
   data: Division<this[0]>;
 }

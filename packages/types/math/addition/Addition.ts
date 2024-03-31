@@ -8,7 +8,10 @@ export type Addition<Numbers extends number[]> = Numbers extends [
   ? Add<First, Addition<Rest>>
   : 0;
 
-export interface TAddition<Numbers extends number[] | void = void> extends Fn {
+export interface TAddition<Numbers extends number[] | void = void>
+  extends Fn<{
+    0: number[];
+  }> {
   slot: [Numbers];
   data: Addition<this[0]>;
 }

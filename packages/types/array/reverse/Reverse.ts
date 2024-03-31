@@ -7,7 +7,10 @@ export type Reverse<List extends any[]> = List extends [
   ? [...Reverse<Rest>, Head]
   : [];
 
-export interface TReverse<List extends unknown[] | void = void> extends Fn {
+export interface TReverse<List extends unknown[] | void = void>
+  extends Fn<{
+    0: unknown[];
+  }> {
   slot: [List];
   data: Reverse<this[0]>;
 }

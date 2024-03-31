@@ -45,7 +45,10 @@ type OrdinalHelper<
 
 export type Ordinal<Number extends number> = OrdinalHelper<Number>;
 
-export interface TOrdinal<Number extends number | void = void> extends Fn {
+export interface TOrdinal<Number extends number | void = void>
+  extends Fn<{
+    0: number;
+  }> {
   slot: [Number];
   data: Ordinal<this[0]>;
 }

@@ -3,6 +3,21 @@
 //   [data]: Uppercase<this[0]>;
 // }
 
+import {
+  Pipe,
+  TAdd,
+  TAddition,
+  TJoin,
+  TMap,
+  TParseInt,
+  TPrepend,
+  TRange,
+  TSliceTo,
+  TSplit,
+  TStringify,
+  TWith,
+} from "@ibnlanre/types";
+
 // interface PlaceFn extends Fn {
 //   [data]: Place<this[0], this[1], this[2]>;
 // }
@@ -46,13 +61,19 @@
 // type Test9 = Call<IForEach<WithFn, [[[1, 2], 0, "🔥"], [[1, 2], 1, "📜"]]>>;
 // type Test11 = Call<IForEach<UpperCase, [["hi"], ["hello"]]>>;
 
-// type Test = Pipe<
-//   7,
-//   [
-//     RangeFn<1>,
-//     SliceToFn<unset, 2>,
-//     WithFn<unset, 0, "🔥">,
-//     WithFn<unset, 1, "📜">,
-//     JoinFn<unset, " HotScript ">
-//   ]
-// >;
+type Test1 = Pipe<
+  7,
+  [TRange<1>, TSliceTo<2>, TWith<0, "🔥">, TWith<1, "📜">, TJoin<" HotScript ">]
+>;
+
+type Test2 = Pipe<
+  //  ^? 62
+  [1, 2, 3, 4],
+  [
+    TMap<TAdd<3>>, // [4, 5, 6, 7]
+    TMap<TStringify>, // ["4", "5", "6", "7"]
+    TMap<TPrepend<"1">>, // ["14", "15", "16", "17"]
+    TMap<TParseInt>, // [14, 15, 16, 17]
+    TAddition // 62
+  ]
+>;

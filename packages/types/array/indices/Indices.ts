@@ -7,7 +7,10 @@ export type Indices<List extends any[]> = Exclude<
   ? R
   : never;
 
-export interface TIndices<List extends any[] | void = void> extends Fn {
+export interface TIndices<List extends unknown[] | void = void>
+  extends Fn<{
+    0: unknown[];
+  }> {
   slot: [List];
   data: Indices<this[0]>;
 }

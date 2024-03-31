@@ -1,10 +1,13 @@
 import { Fn } from "@ibnlanre/types";
 
-export type Tail<T extends string | any[]> = T extends [any, ...infer Tail]
+export type Tail<T extends any[]> = T extends [any, ...infer Tail]
   ? Tail
   : never;
 
-export interface TTail<T extends string | unknown[] | void = void> extends Fn {
+export interface TTail<T extends unknown[] | void = void>
+  extends Fn<{
+    0: unknown[];
+  }> {
   slot: [T];
   data: Tail<this[0]>;
 }

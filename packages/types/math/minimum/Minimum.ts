@@ -10,7 +10,10 @@ export type Minimum<Numbers extends number[]> = Numbers extends [
     : Min<Minimum<Rest>, Last>
   : 0;
 
-export interface TMinimum<Numbers extends number[] | void = void> extends Fn {
+export interface TMinimum<Numbers extends number[] | void = void>
+  extends Fn<{
+    0: number[];
+  }> {
   slot: [Numbers];
   data: Minimum<this[0]>;
 }

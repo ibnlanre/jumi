@@ -1,18 +1,21 @@
 import { Fn, IndexAt } from "@ibnlanre/types";
 
-export type ValueAt<Array extends any[], Index extends number> = IndexAt<
-  Array,
+export type ValueAt<List extends any[], Index extends number> = IndexAt<
+  List,
   Index
 > extends infer Index
   ? Index extends number
-    ? Array[Index]
+    ? List[Index]
     : never
   : never;
 
 export interface TValueAt<
   Index extends number | void = void,
-  Array extends unknown[] | void = void
-> extends Fn {
-  slot: [Index, Array];
+  List extends unknown[] | void = void
+> extends Fn<{
+    0: number;
+    1: unknown[];
+  }> {
+  slot: [Index, List];
   data: ValueAt<this[1], this[0]>;
 }

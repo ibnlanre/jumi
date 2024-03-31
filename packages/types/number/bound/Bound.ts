@@ -15,7 +15,11 @@ export interface TBound<
   LowerBound extends number | void = void,
   UpperBound extends number | void = void,
   Value extends number | void = void
-> extends Fn {
+> extends Fn<{
+    0: number;
+    1: number;
+    2: number;
+  }> {
   slot: [LowerBound, UpperBound, Value];
   data: Bound<this[2], this[0], this[1]>;
 }

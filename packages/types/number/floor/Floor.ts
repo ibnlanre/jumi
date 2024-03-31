@@ -13,7 +13,10 @@ type FloorHelper<
 
 export type Floor<Number extends number> = FloorHelper<Number>;
 
-export interface TFloor<Number extends number | void = void> extends Fn {
+export interface TFloor<Number extends number | void = void>
+  extends Fn<{
+    0: number;
+  }> {
   slot: [Number];
   data: Floor<this[0]>;
 }

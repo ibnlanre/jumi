@@ -9,7 +9,9 @@ export type Multiplication<Numbers extends number[]> = Numbers extends [
   : 1;
 
 export interface TMultiplication<Numbers extends number[] | void = void>
-  extends Fn {
+  extends Fn<{
+    0: number[];
+  }> {
   slot: [Numbers];
   data: Multiplication<this[0]>;
 }

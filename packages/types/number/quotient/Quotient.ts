@@ -20,7 +20,11 @@ export interface TQuotient<
   Divisor extends number | void = void,
   Type extends "Euclidean" | "Truncating" | "Floored" | void = "Truncating",
   Dividend extends number | void = void
-> extends Fn {
+> extends Fn<{
+    0: number;
+    1: "Euclidean" | "Truncating" | "Floored";
+    2: number;
+  }> {
   slot: [Divisor, Type, Dividend];
   data: Quotient<this[2], this[0], this[1]>;
 }

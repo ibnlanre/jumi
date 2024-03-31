@@ -1,15 +1,21 @@
 import { Fn } from "@ibnlanre/types";
 
 type FlatHelper<
-  T extends unknown[][],
+  List extends unknown[][],
   Result extends unknown[] = []
-> = T extends [infer Head extends unknown[], ...infer Tail extends unknown[][]]
-  ? FlatHelper<Tail, [...Result, ...Head]>
+> = List extends [
+  infer Head extends unknown[],
+  ...infer Rest extends unknown[][]
+]
+  ? FlatHelper<Rest, [...Result, ...Head]>
   : Result;
 
-export type Flat<T extends unknown[][]> = FlatHelper<T>;
+export type Flat<List extends unknown[][]> = FlatHelper<List>;
 
-export interface TFlat<List extends unknown[][] | void = void> extends Fn {
+export interface TFlat<List extends unknown[][] | void = void>
+  extends Fn<{
+    0: unknown[][];
+  }> {
   slot: [List];
   data: Flat<this[0]>;
 }

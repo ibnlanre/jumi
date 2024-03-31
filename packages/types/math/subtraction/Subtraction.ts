@@ -11,7 +11,9 @@ export type Subtraction<Numbers extends number[]> = Numbers extends [
   : 1;
 
 export interface TSubtraction<Numbers extends number[] | void = void>
-  extends Fn {
+  extends Fn<{
+    0: number[];
+  }> {
   slot: [Numbers];
   data: Subtraction<this[0]>;
 }

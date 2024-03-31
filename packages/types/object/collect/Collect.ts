@@ -41,7 +41,13 @@ export interface TCollect<
     | Paths<Exclude<ObjectType, void>>
     | void = void,
   ObjectType extends Dictionary | void = void
-> extends Fn {
+> extends Fn<{
+    0:
+      | Record<string, Paths<Exclude<ObjectType, void>>>
+      | Paths<Exclude<ObjectType, void>>[]
+      | Paths<Exclude<ObjectType, void>>;
+    1: ObjectType;
+  }> {
   slot: [PickType, ObjectType];
   data: Collect<this[1], this[0]>;
 }

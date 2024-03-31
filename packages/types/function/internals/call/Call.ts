@@ -4,7 +4,10 @@ export type Call<Callback extends Fn> = (Callback & {
   args: Callback["slot"];
 })["data"];
 
-export interface TCall<Callback extends Fn | void = void> extends Fn {
+export interface TCall<Callback extends Fn | void = void>
+  extends Fn<{
+    0: Fn;
+  }> {
   slot: [Callback];
   data: Call<this[0]>;
 }

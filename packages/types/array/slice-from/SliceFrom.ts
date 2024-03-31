@@ -2,23 +2,26 @@ import { ArrayOf, Fn, Size } from "@ibnlanre/types";
 import { Gt, Lt } from "ts-arithmetic";
 
 type SliceFromHelper<
-  Array extends unknown[],
+  List extends unknown[],
   Start extends number
-> = Array extends [...ArrayOf<Start>, ...infer Rest] ? Rest : never;
+> = List extends [...ArrayOf<Start>, ...infer Rest] ? Rest : never;
 
-export type SliceFrom<Array extends unknown[], Start extends number> = Gt<
+export type SliceFrom<List extends unknown[], Start extends number> = Gt<
   Start,
-  Size<Array>
+  Size<List>
 > extends 1
-  ? SliceFromHelper<Array, Size<Array>>
+  ? SliceFromHelper<List, Size<List>>
   : Lt<Start, 0> extends 1
-  ? SliceFromHelper<Array, 0>
-  : SliceFromHelper<Array, Start>;
+  ? SliceFromHelper<List, 0>
+  : SliceFromHelper<List, Start>;
 
 export interface TSliceFrom<
   Start extends number | void = void,
-  Array extends unknown[] | void = void
-> extends Fn {
-  slot: [Start, Array];
+  List extends unknown[] | void = void
+> extends Fn<{
+    0: number;
+    1: unknown[];
+  }> {
+  slot: [Start, List];
   data: SliceFrom<this[1], this[0]>;
 }

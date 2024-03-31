@@ -73,7 +73,11 @@ export interface TParseInt<
   Outlook extends "Signed" | "Unsigned" | void = "Unsigned",
   Output extends "Integer" | "Float" | void = "Float",
   Input extends string | number | boolean | void = void
-> extends Fn {
+> extends Fn<{
+    0: "Signed" | "Unsigned";
+    1: "Integer" | "Float";
+    2: string | number | boolean;
+  }> {
   slot: [Outlook, Output, Input];
   data: ParseInt<this[2], this[0], this[1]>;
 }

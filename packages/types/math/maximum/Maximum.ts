@@ -8,7 +8,10 @@ export type Maximum<Numbers extends number[]> = Numbers extends [
   ? Max<First, Maximum<Rest>>
   : 0;
 
-export interface TMaximum<Numbers extends number[] | void = void> extends Fn {
+export interface TMaximum<Numbers extends number[] | void = void>
+  extends Fn<{
+    0: number[];
+  }> {
   slot: [Numbers];
   data: Maximum<this[0]>;
 }

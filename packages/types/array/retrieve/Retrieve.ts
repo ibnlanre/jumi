@@ -12,7 +12,10 @@ export type Retrieve<
 export interface TRetrieve<
   Index extends number | void = void,
   List extends unknown | void = void
-> extends Fn {
+> extends Fn<{
+    0: number;
+    1: unknown;
+  }> {
   slot: [Index, List];
   data: Retrieve<this[1], this[0]>;
 }

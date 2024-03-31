@@ -1,17 +1,20 @@
 import { Fn, IsExactType } from "@ibnlanre/types";
 
-export type Includes<List extends any[], Item> = List extends []
+export type Includes<List extends any[], Element> = List extends []
   ? 0
   : List extends [infer Head, ...infer Rest]
-  ? IsExactType<Head, Item> extends 1
+  ? IsExactType<Head, Element> extends 1
     ? 1
-    : Includes<Rest, Item>
+    : Includes<Rest, Element>
   : 0;
 
 export interface TIncludes<
-  Item extends unknown | void = void,
+  Element extends unknown | void = void,
   List extends unknown[] | void = void
-> extends Fn {
-  slot: [Item, List];
+> extends Fn<{
+    0: unknown;
+    1: unknown[];
+  }> {
+  slot: [Element, List];
   data: Includes<this[1], this[0]>;
 }

@@ -13,7 +13,10 @@ type CeilHelper<
 
 export type Ceil<Number extends number> = CeilHelper<Number>;
 
-export interface TCeil<Number extends number | void = void> extends Fn {
+export interface TCeil<Number extends number | void = void>
+  extends Fn<{
+    0: number;
+  }> {
   slot: [Number];
   data: Ceil<this[0]>;
 }

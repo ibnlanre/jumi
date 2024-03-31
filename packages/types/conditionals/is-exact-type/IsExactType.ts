@@ -11,7 +11,10 @@ export type IsExactType<Left, Right> = And<
 export interface TIsExactType<
   Left extends unknown | void = void,
   Right extends unknown | void = void
-> extends Fn {
+> extends Fn<{
+    0: unknown;
+    1: unknown;
+  }> {
   slot: [Left, Right];
   data: IsExactType<this[0], this[1]>;
 }

@@ -13,7 +13,9 @@ export type IsIntersection<Value> = IsIntersectionHelper<
 >;
 
 export interface TIsIntersection<Value extends unknown | void = void>
-  extends Fn {
+  extends Fn<{
+    0: unknown;
+  }> {
   slot: [Value];
   data: IsIntersection<this[0]>;
 }
