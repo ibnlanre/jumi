@@ -2,5 +2,6 @@
   "atom": "Atom",
   "builder": "Builder",
   "portal": "Portal",
-  "signals": "Signals"
+  "signals": "Signals",
+  "types": "Types"
 }

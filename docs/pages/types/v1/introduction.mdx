@@ -1,0 +1,18 @@
+---
+title: types - introduction
+description: Learn how to use TypeScript's advanced type features to model function composition and create type-safe function compositions.
+---
+
+# Introduction
+
+In TypeScript, the type system provides a powerful tool for developers to ensure type safety and predictability in their code. One such feature is the ability to create parameterized interfaces and types, which can be used to model complex behaviors such as function composition.
+
+The core concept revolves around the `Fn` interface, a parameterized interface that represents a function with arguments and a return value. The `Fn` interface uses TypeScript's unknown type, which is a type-safe counterpart of the any type. The unknown type is useful in this context because when it is used in an intersection type (e.g., unknown & {}), it is replaced by the other part of the intersection.
+
+This behavior is leveraged to create a `Call` type, which takes a `Fn` and an argument type, and returns the return type of the `Fn` when called with that argument. The `Call` type works by intersecting the `Fn` with an object that has the provided argument type, effectively replacing the unknown argument type in the `Fn` with the provided argument type. Then, it accesses the return property of the `Fn`, which now has the correct type based on the provided argument.
+
+This approach allows for the creation of complex types that represent composed functions, where the output of one function is the input of another. By using TypeScript's advanced type features, developers can create type-safe representations of function composition, leading to more predictable and reliable code.
+
+In the following sections, we will explore the `Fn` interface, the `Call` type, and how they can be used to model function composition in TypeScript. We will also look at some practical examples of using these types to create complex type-safe function compositions.
+
+Let's dive in! 🚀
