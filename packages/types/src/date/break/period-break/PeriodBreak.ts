@@ -10,7 +10,7 @@ import {
   IsYear,
 } from "../../checks";
 
-import { Has } from "@/packages/types/object";
+import { Has } from "@/packages/types/src/object";
 import { DayBreak } from "../day-break";
 import { HourBreak } from "../hour-break";
 import { MillisecondsBreak } from "../milliseconds-break";

@@ -177,6 +177,36 @@ export type {
 } from "./number";
 
 export type {
+  Abs,
+  Add,
+  And,
+  Bit,
+  Compare,
+  Divide,
+  Eq,
+  Gt,
+  GtOrEq,
+  IsEven,
+  IsInt,
+  IsNegative,
+  IsNotInt,
+  IsOdd,
+  IsPositive,
+  Lt,
+  LtOrEq,
+  Max,
+  Min,
+  Mod,
+  Multiply,
+  Negate,
+  Not,
+  Or,
+  Pow,
+  Subtract,
+  Xor,
+} from "ts-arithmetic";
+
+export type {
   IsInteger,
   IsNotInteger,
   TAbs,
