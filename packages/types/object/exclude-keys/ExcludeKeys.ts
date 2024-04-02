@@ -11,7 +11,10 @@ export interface TExcludeKeys<
     | Paths<Exclude<ObjectType, void>>
     | void = void,
   ObjectType extends Dictionary | void = void
-> extends Fn {
+> extends Fn<{
+    0: ArbitraryKey | Paths<Exclude<ObjectType, void>>;
+    1: Dictionary;
+  }> {
   slot: [PathType, ObjectType];
   data: ExcludeKeys<this[1], this[0]>;
 }

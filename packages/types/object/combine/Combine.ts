@@ -15,7 +15,9 @@ type CombineHelper<
 export type Combine<Source extends Dictionary[]> = CombineHelper<Source>;
 
 export interface TCombine<Source extends Dictionary[] | void = void>
-  extends Fn {
+  extends Fn<{
+    0: Source;
+  }> {
   slot: [Source];
   data: Combine<this[0]>;
 }

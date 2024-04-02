@@ -7,10 +7,14 @@ export type Trim<
 > = TrimStart<TrimEnd<Text, Count, Letter>, Count, Letter>;
 
 export interface TTrim<
-  Text extends string | void = void,
   Count extends number | void = -1,
-  Letter extends string | void = "0"
-> extends Fn {
-  slot: [Text, Count, Letter];
-  data: Trim<this[0], this[1], this[2]>;
+  Letter extends string | void = "0",
+  Text extends string | void = void
+> extends Fn<{
+    0: number;
+    1: string;
+    2: string;
+  }> {
+  slot: [Count, Letter, Text];
+  data: Trim<this[2], this[0], this[1]>;
 }

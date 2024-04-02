@@ -5,7 +5,9 @@ export type FromEntries<EntryList extends any[][]> = {
 };
 
 export interface TFromEntries<EntryList extends unknown[][] | void = void>
-  extends Fn {
+  extends Fn<{
+    0: unknown[][];
+  }> {
   slot: [EntryList];
   data: FromEntries<this[0]>;
 }

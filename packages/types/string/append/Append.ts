@@ -8,7 +8,10 @@ export type Append<
 export interface TAppend<
   Segment extends string | void = void,
   Text extends string | void = void
-> extends Fn {
+> extends Fn<{
+    0: string;
+    1: string;
+  }> {
   slot: [Segment, Text];
   data: Append<this[1], this[0]>;
 }

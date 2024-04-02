@@ -10,9 +10,13 @@ export type PadStart<
 
 export interface TPadStart<
   Size extends number | void = void,
-  Text extends string | void = void,
-  Prefix extends string | void = "0"
-> extends Fn {
-  slot: [Size, Text, Prefix];
-  data: PadStart<this[1], this[0], this[2]>;
+  Prefix extends string | void = "0",
+  Text extends string | void = void
+> extends Fn<{
+    0: number;
+    1: string;
+    2: string;
+  }> {
+  slot: [Size, Prefix, Text];
+  data: PadStart<this[2], this[0], this[1]>;
 }

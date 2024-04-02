@@ -28,7 +28,11 @@ export interface TReplace<
   Search extends string | void = void,
   Replacement extends string | void = void,
   Text extends string | void = void
-> extends Fn {
+> extends Fn<{
+    0: string;
+    1: string;
+    2: string;
+  }> {
   slot: [Search, Replacement, Text];
   data: Replace<this[2], this[0], this[1]>;
 }

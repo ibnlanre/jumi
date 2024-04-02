@@ -10,9 +10,13 @@ export type PadEnd<
 
 export interface TPadEnd<
   Size extends number | void = void,
-  Text extends string | void = void,
-  Suffix extends string | void = "0"
-> extends Fn {
-  slot: [Size, Text, Suffix];
-  data: PadEnd<this[1], this[0], this[2]>;
+  Suffix extends string | void = "0",
+  Text extends string | void = void
+> extends Fn<{
+    0: number;
+    1: string;
+    2: string;
+  }> {
+  slot: [Size, Suffix, Text];
+  data: PadEnd<this[2], this[0], this[1]>;
 }

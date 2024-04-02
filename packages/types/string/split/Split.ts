@@ -35,11 +35,18 @@ export type Split<
 
 export interface TSplit<
   Delimiter extends string | void = void,
-  Text extends string | void = void,
   Options extends {
     treatConsecutiveDelimitersAsOne: boolean;
-  } | void = DefaultOptions
-> extends Fn {
-  slot: [Delimiter, Text, Options];
-  data: Split<this[1], this[0], this[2]>;
+  } | void = DefaultOptions,
+  Text extends string | void = void
+> extends Fn<{
+    0: string;
+    1: {
+      treatConsecutiveDelimitersAsOne: boolean;
+      removeEmptyEntries: boolean;
+    };
+    2: string;
+  }> {
+  slot: [Delimiter, Options, Text];
+  data: Split<this[2], this[0], this[1]>;
 }

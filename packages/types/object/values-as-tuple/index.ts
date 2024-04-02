@@ -1,1 +1,0 @@
-export { ValuesAsTuple } from "./ValuesAsTuple";

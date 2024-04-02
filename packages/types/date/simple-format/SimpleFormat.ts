@@ -96,13 +96,13 @@ export type SimpleFormat<
   : In extends "hh"
   ? PadStart<Stringify<HourOfDay<Get<Out, "hour">, 12>>, 2>
   : In extends "m"
-  ? TrimStart<Get<Out, "minute">>
+  ? TrimStart<Get<Out, "minutes">>
   : In extends "mm"
-  ? PadStart<Get<Out, "minute">, 2>
+  ? PadStart<Get<Out, "minutes">, 2>
   : In extends "s"
-  ? TrimStart<Get<Out, "second">>
+  ? TrimStart<Get<Out, "seconds">>
   : In extends "ss"
-  ? PadStart<Get<Out, "second">, 2>
+  ? PadStart<Get<Out, "seconds">, 2>
   : In extends "SSS"
   ? Get<Out, "millisecond">
   : In extends "Z"

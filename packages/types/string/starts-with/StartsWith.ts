@@ -8,7 +8,10 @@ export type StartsWith<
 export interface TStartsWith<
   Segment extends Serializable | void = void,
   Text extends string | void = void
-> extends Fn {
+> extends Fn<{
+    0: Serializable;
+    1: string;
+  }> {
   slot: [Segment, Text];
   data: StartsWith<this[1], this[0]>;
 }

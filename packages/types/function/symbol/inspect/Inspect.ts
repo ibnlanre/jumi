@@ -1,5 +1,4 @@
-import { ArrayOf, Fn } from "@ibnlanre/types";
-import { Subtract } from "ts-arithmetic";
+import { Fn, Size, SliceTo } from "@ibnlanre/types";
 
 type SingleOut<List extends unknown[]> = List extends [infer Value]
   ? Value
@@ -16,15 +15,11 @@ type MarkOut<List extends unknown[], Types> = List extends [
     : []
   : [];
 
-export type Inspect<Callback extends Fn> = Callback["params"] extends unknown[]
-  ? Callback["slot"] extends unknown[]
-    ? Callback["params"] extends [
-        ...infer List,
-        ...ArrayOf<
-          Subtract<Callback["params"]["length"], Callback["slot"]["length"]>
-        >
-      ]
-      ? SingleOut<MarkOut<Callback["slot"], List>>
-      : never
-    : never
+export type Inspect<Callback extends Fn> = Callback["slot"] extends unknown[]
+  ? SingleOut<
+      MarkOut<
+        Callback["slot"],
+        SliceTo<Callback["params"], Size<Callback["slot"]>>
+      >
+    >
   : never;

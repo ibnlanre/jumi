@@ -1,4 +1,4 @@
-import { Retrieve } from "@ibnlanre/types";
+import { Dictionary, Retrieve } from "@ibnlanre/types";
 
 interface FnImpl {
   /**
@@ -42,9 +42,9 @@ interface FnArgs extends FnImpl {
 /**
  * Parameterized function type
  * @see https://github.com/microsoft/TypeScript/issues/1213#issuecomment-1215039765
+ * @see https://stackoverflow.com/a/73533674
  */
-export interface Fn<Params extends Record<number, unknown> = {}>
-  extends FnArgs {
+export interface Fn<Params extends Dictionary<number> = {}> extends FnArgs {
   /**
    * Field for parameters within higher-order functions
    *

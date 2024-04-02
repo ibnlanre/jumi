@@ -8,7 +8,10 @@ export type Prepend<
 export interface TPrepend<
   Segment extends string | void = void,
   Text extends string | void = void
-> extends Fn {
+> extends Fn<{
+    0: string;
+    1: string;
+  }> {
   slot: [Segment, Text];
   data: Prepend<this[1], this[0]>;
 }

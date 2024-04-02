@@ -23,7 +23,10 @@ export type Stringify<Input> = Input extends string
   ? ObjectToString<Input>
   : never;
 
-export interface TStringify<Input extends unknown | void = void> extends Fn {
+export interface TStringify<Input extends unknown | void = void>
+  extends Fn<{
+    0: unknown;
+  }> {
   slot: [Input];
   data: Stringify<this[0]>;
 }

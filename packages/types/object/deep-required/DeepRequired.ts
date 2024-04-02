@@ -15,11 +15,13 @@ type DeepRequiredHelper<
   ObjectType extends Dictionary,
   PathType extends string,
   Key extends string
-> = [PathType] extends [never]
-  ? DeepRequired<ObjectType[Key]>
-  : PathType extends `${Key}.${infer Tail}`
-  ? DeepRequired<ObjectType[Key], Tail>
-  : DeepRequired<ObjectType[Key], "">;
+> = ObjectType[Key] extends Dictionary
+  ? [PathType] extends [never]
+    ? DeepRequired<ObjectType[Key]>
+    : PathType extends `${Key}.${infer Tail}`
+    ? DeepRequired<ObjectType[Key], Tail>
+    : DeepRequired<ObjectType[Key], "">
+  : ObjectType[Key];
 
 export type DeepRequired<
   ObjectType extends Dictionary,
@@ -56,7 +58,10 @@ export interface TDeepRequired<
     | Paths<Exclude<ObjectType, void>>
     | void = void,
   ObjectType extends Dictionary | void = void
-> extends Fn {
+> extends Fn<{
+    0: ArbitraryKey | Paths<Exclude<ObjectType, void>>;
+    1: Dictionary;
+  }> {
   slot: [PathType, ObjectType];
   data: DeepRequired<this[1], this[0]>;
 }

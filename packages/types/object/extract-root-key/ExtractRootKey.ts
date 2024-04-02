@@ -6,9 +6,12 @@ export type ExtractRootKey<
 > = Text extends `${infer Segment}${Delimiter}${string}` ? Segment : Text;
 
 export interface TExtractRootKey<
-  Text extends string | void = void,
-  Delimiter extends string | void = "."
-> extends Fn {
-  slot: [Text, Delimiter];
-  data: ExtractRootKey<this[0], this[1]>;
+  Delimiter extends string | void = ".",
+  Text extends string | void = void
+> extends Fn<{
+    0: string;
+    1: string;
+  }> {
+  slot: [Delimiter, Text];
+  data: ExtractRootKey<this[1], this[0]>;
 }

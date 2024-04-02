@@ -22,10 +22,10 @@ export type TrimEnd<
   : TrimEndHelper<Text, Count, Letter>;
 
 export interface TTrimEnd<
-  Text extends string | void = void,
   Count extends number | void = -1,
-  Letter extends string | void = "0"
+  Letter extends string | void = "0",
+  Text extends string | void = void
 > extends Fn {
-  slot: [Text, Count, Letter];
-  data: TrimEnd<this[0], this[1], this[2]>;
+  slot: [Count, Letter, Text];
+  data: TrimEnd<this[2], this[0], this[1]>;
 }

@@ -4,9 +4,14 @@
 // }
 
 import {
+  Apply,
+  Call,
+  Map,
   Pipe,
   TAdd,
   TAddition,
+  TAppend,
+  TApply,
   TJoin,
   TMap,
   TParseInt,
@@ -15,6 +20,7 @@ import {
   TSliceTo,
   TSplit,
   TStringify,
+  TSubtraction,
   TWith,
 } from "@ibnlanre/types";
 
@@ -62,12 +68,13 @@ import {
 // type Test11 = Call<IForEach<UpperCase, [["hi"], ["hello"]]>>;
 
 type Test1 = Pipe<
+  // ^?
   7,
   [TRange<1>, TSliceTo<2>, TWith<0, "🔥">, TWith<1, "📜">, TJoin<" HotScript ">]
 >;
 
 type Test2 = Pipe<
-  //  ^? 62
+  //  ^?
   [1, 2, 3, 4],
   [
     TMap<TAdd<3>>, // [4, 5, 6, 7]
@@ -77,3 +84,19 @@ type Test2 = Pipe<
     TAddition // 62
   ]
 >;
+
+// type Test3 = Call<TApply<TMap<TAdd<3>>, [[8]]>>;
+
+type Test4 = Pipe<
+  //  ^?
+  [1, 2, 3, 4, 5],
+  [
+    TMap<TAdd<3>>, // [4, 5, 6, 7, 8]
+    TMap<TStringify>, // ["4", "5", "6", "7", "8"]
+    TMap<TAppend<"1">>, // ["41", "51", "61", "71", "81"]
+    TMap<TParseInt>, // [14, 15, 16, 17, 18]
+    TSubtraction
+  ]
+>;
+
+type Test3 = Call<TApply<TMap<TAdd<3>>, [[8]]>>;

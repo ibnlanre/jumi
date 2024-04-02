@@ -10,7 +10,11 @@ export interface TSubstring<
   Start extends number | void = void,
   End extends number | void = void,
   Text extends string | void = void
-> extends Fn {
+> extends Fn<{
+    0: number;
+    1: number;
+    2: string;
+  }> {
   slot: [Start, End, Text];
   data: Substring<this[2], this[0], this[1]>;
 }

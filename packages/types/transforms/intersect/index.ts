@@ -1,1 +1,1 @@
-export { Intersect } from "./Intersect";
+export { Intersect, TIntersect } from "./Intersect";

@@ -33,4 +33,3 @@ export { RequiredKeysDeep } from "./required-keys-deep";
 export { SetValue } from "./set-value";
 export { ToEntries } from "./to-entries";
 export { Values } from "./values";
-export { ValuesAsTuple } from "./values-as-tuple";

@@ -8,7 +8,10 @@ export type Contains<
 export interface TContains<
   Segment extends Serializable | void = void,
   Text extends string | void = void
-> extends Fn {
+> extends Fn<{
+    0: Serializable;
+    1: string;
+  }> {
   slot: [Segment, Text];
   data: Contains<this[1], this[0]>;
 }

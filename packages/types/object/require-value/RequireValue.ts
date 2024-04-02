@@ -1,5 +1,7 @@
-import { IsUnion } from "@ibnlanre/types";
+import { IsNever } from "@ibnlanre/types";
 
-export type RequireValue<Value> = IsUnion<Value> extends 1
-  ? Exclude<Value, undefined>
-  : Value;
+export type RequireValue<Value> = Exclude<Value, undefined> extends infer Value
+  ? IsNever<Value> extends 1
+    ? undefined
+    : Value
+  : never;

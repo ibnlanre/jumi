@@ -1,1 +1,1 @@
-export { Unionize } from "./Unionize";
+export { TUnionize, Unionize } from "./Unionize";

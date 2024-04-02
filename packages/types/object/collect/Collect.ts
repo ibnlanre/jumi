@@ -2,7 +2,7 @@ import { Dictionary, Fn, Get, Paths, Unionize } from "@ibnlanre/types";
 
 type ObjectHelper<
   ObjectType extends Dictionary,
-  PickType extends Record<string, Paths<ObjectType>>
+  PickType extends Dictionary<string, Paths<ObjectType>>
 > = {
   [Key in keyof PickType]: Get<ObjectType, PickType[Key]>;
 };
@@ -21,13 +21,13 @@ type StringHelper<ObjectType extends Dictionary, PickType extends string> = {
 export type Collect<
   ObjectType extends Dictionary,
   PickType extends
-    | Record<string, Paths<ObjectType>>
+    | Dictionary<string, Paths<ObjectType>>
     | Paths<ObjectType>[]
     | Paths<ObjectType>
 > = Unionize<
   PickType extends Paths<ObjectType>[]
     ? ArrayHelper<ObjectType, PickType>
-    : PickType extends Record<string, Paths<ObjectType>>
+    : PickType extends Dictionary<string, Paths<ObjectType>>
     ? ObjectHelper<ObjectType, PickType>
     : PickType extends Paths<ObjectType>
     ? StringHelper<ObjectType, PickType>
@@ -36,14 +36,14 @@ export type Collect<
 
 export interface TCollect<
   PickType extends
-    | Record<string, Paths<Exclude<ObjectType, void>>>
+    | Dictionary<string, Paths<Exclude<ObjectType, void>>>
     | Paths<Exclude<ObjectType, void>>[]
     | Paths<Exclude<ObjectType, void>>
     | void = void,
   ObjectType extends Dictionary | void = void
 > extends Fn<{
     0:
-      | Record<string, Paths<Exclude<ObjectType, void>>>
+      | Dictionary<string, Paths<Exclude<ObjectType, void>>>
       | Paths<Exclude<ObjectType, void>>[]
       | Paths<Exclude<ObjectType, void>>;
     1: ObjectType;

@@ -8,7 +8,10 @@ export type ExtractNestedKeys<
 export interface TExtractNestedKeys<
   Delimiter extends string | void = ".",
   Text extends string | void = void
-> extends Fn {
+> extends Fn<{
+    0: string;
+    1: string;
+  }> {
   slot: [Delimiter, Text];
   data: ExtractNestedKeys<this[1], this[0]>;
 }

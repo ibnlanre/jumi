@@ -7,10 +7,14 @@ export type Pattern<
 > = `${StartsWith}${Text}${EndsWith}`;
 
 export interface TPattern<
-  Text extends Serializable | void = void,
   StartsWith extends Serializable | void = "",
-  EndsWith extends Serializable | void = ""
-> extends Fn {
-  slot: [Text, StartsWith, EndsWith];
-  data: Pattern<this[0], this[1], this[2]>;
+  EndsWith extends Serializable | void = "",
+  Text extends Serializable | void = void
+> extends Fn<{
+    0: Serializable;
+    1: Serializable;
+    2: Serializable;
+  }> {
+  slot: [StartsWith, EndsWith, Text];
+  data: Pattern<this[2], this[0], this[1]>;
 }

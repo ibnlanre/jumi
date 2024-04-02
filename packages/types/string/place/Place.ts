@@ -37,7 +37,11 @@ export interface TPlace<
   Segment extends string | void = void,
   Index extends number | void = void,
   Text extends string | void = void
-> extends Fn {
+> extends Fn<{
+    0: string;
+    1: number;
+    2: string;
+  }> {
   slot: [Segment, Index, Text];
   data: Place<this[2], this[0], this[1]>;
 }
