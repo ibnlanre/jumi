@@ -1,1 +1,1 @@
-export { RequireValue } from "./RequireValue";
+export { RequireValue, TRequireValue } from "./RequireValue";

@@ -1,1 +1,1 @@
-export { JoinKeys } from "./JoinKeys";
+export { JoinKeys, TJoinKeys } from "./JoinKeys";

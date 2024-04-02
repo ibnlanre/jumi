@@ -1,1 +1,1 @@
-export { ObjectFromPath } from "./ObjectFromPath";
+export { ObjectFromPath, TObjectFromPath } from "./ObjectFromPath";

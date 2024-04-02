@@ -1,4 +1,4 @@
-import { Dictionary, Intersect } from "@ibnlanre/types";
+import { Dictionary, Fn, Intersect } from "@ibnlanre/types";
 
 export type Merge<
   Source extends Dictionary,
@@ -20,3 +20,14 @@ export type Merge<
       : Target[Key];
   }
 >;
+
+export interface TMerge<
+  Target extends Dictionary | void = void,
+  Source extends Dictionary | void = void
+> extends Fn<{
+    0: Dictionary;
+    1: Dictionary;
+  }> {
+  slot: [Target, Source];
+  data: Merge<this[1], this[0]>;
+}

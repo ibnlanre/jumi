@@ -1,7 +1,15 @@
-import { UnionToTuple } from "@ibnlanre/types";
+import { Dictionary, Fn, UnionToTuple } from "@ibnlanre/types";
 
-export type ToEntries<T extends Record<string, any>> = UnionToTuple<
+export type ToEntries<ObjectType extends Dictionary> = UnionToTuple<
   {
-    [K in keyof T]: [K, T[K]];
-  }[keyof T]
+    [Key in keyof ObjectType]: [Key, ObjectType[Key]];
+  }[keyof ObjectType]
 >;
+
+export interface TToEntries<ObjectType extends Dictionary | void = void>
+  extends Fn<{
+    0: Dictionary;
+  }> {
+  slot: [ObjectType];
+  data: ToEntries<this[0]>;
+}

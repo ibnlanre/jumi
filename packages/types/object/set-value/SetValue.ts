@@ -1,5 +1,8 @@
 import {
+  ArbitraryKey,
   Derivatives,
+  Dictionary,
+  Fn,
   Indexable,
   Intersect,
   ObjectFromPath,
@@ -11,22 +14,24 @@ import {
 } from "@ibnlanre/types";
 
 type SetValueHelper<
-  ObjectType extends Record<string, any>,
+  ObjectType extends Dictionary,
   PathType extends string,
   Key extends string,
   ValueType = never
 > = PathType extends `${Key}.${infer Tail}`
   ? ObjectType[Key] extends infer ObjectType
-    ? ObjectType extends Record<string, any>
+    ? ObjectType extends Dictionary
       ? SetValue<ObjectType, Tail, ValueType>
       : SetValue<ObjectFromPath<Tail, ValueType>>
     : never
   : PathType extends Key
   ? ValueType
-  : SetValue<ObjectType[Key]>;
+  : ObjectType[Key] extends Dictionary
+  ? SetValue<ObjectType[Key]>
+  : ObjectType[Key];
 
 type Setter<
-  ObjectType extends Record<string, any>,
+  ObjectType extends Dictionary,
   PathType extends string,
   ValueType = never
 > = Intersect<
@@ -42,9 +47,9 @@ type Setter<
 >;
 
 export type SetValue<
-  ObjectType extends Record<string, any>,
-  PathType extends Paths<ObjectType> | (string & {}) = "",
-  ValueType = never
+  ObjectType extends Dictionary,
+  PathType extends Paths<ObjectType> | ArbitraryKey = "",
+  ValueType extends any = never
 > = ObjectType extends Primitives | Indexable | Structures | Derivatives
   ? ObjectType
   : PathType extends keyof ObjectType | `${infer Head}.${string}` | ""
@@ -61,3 +66,19 @@ export type SetValue<
         ? ObjectType[Key]
         : ValueType;
     };
+
+export interface TSetValue<
+  PathType extends
+    | Paths<Exclude<ObjectType, void>>
+    | ArbitraryKey
+    | void = void,
+  ValueType extends unknown = never,
+  ObjectType extends Dictionary | void = void
+> extends Fn<{
+    0: Paths<Exclude<ObjectType, void>> | ArbitraryKey;
+    1: unknown;
+    2: Dictionary;
+  }> {
+  slot: [PathType, ValueType, ObjectType];
+  data: SetValue<this[2], this[0], this[1]>;
+}

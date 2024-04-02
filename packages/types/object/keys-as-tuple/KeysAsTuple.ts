@@ -1,4 +1,4 @@
-import { Dictionary, LastOfUnion } from "@ibnlanre/types";
+import { Dictionary, Fn, LastOfUnion } from "@ibnlanre/types";
 
 type KeysAsTupleHelper<
   ObjectType extends Dictionary,
@@ -13,3 +13,11 @@ type KeysAsTupleHelper<
 
 export type KeysAsTuple<ObjectType extends Dictionary> =
   KeysAsTupleHelper<ObjectType>;
+
+export interface TKeysAsTuple<ObjectType extends Dictionary | void = void>
+  extends Fn<{
+    0: Dictionary;
+  }> {
+  slot: [ObjectType];
+  data: KeysAsTuple<this[0]>;
+}

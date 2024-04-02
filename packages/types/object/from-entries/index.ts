@@ -1,1 +1,1 @@
-export { FromEntries } from "./FromEntries";
+export { FromEntries, TFromEntries } from "./FromEntries";

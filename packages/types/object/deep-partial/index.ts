@@ -1,1 +1,1 @@
-export { DeepPartial } from "./DeepPartial";
+export { DeepPartial, TDeepPartial } from "./DeepPartial";

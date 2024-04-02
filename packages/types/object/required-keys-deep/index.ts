@@ -1,1 +1,1 @@
-export { RequiredKeysDeep } from "./RequiredKeysDeep";
+export { RequiredKeysDeep, TRequiredKeysDeep } from "./RequiredKeysDeep";

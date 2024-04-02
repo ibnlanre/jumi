@@ -1,1 +1,1 @@
-export { Has } from "./Has";
+export { Has, THas } from "./Has";

@@ -1,28 +1,28 @@
 import {
-  Derivatives,
-  Indexable,
+  ArbitraryKey,
+  Dictionary,
+  Fn,
   Intersect,
   OptionalKeys,
   Paths,
-  Primitives,
   RequiredKeys,
-  Structures,
 } from "@ibnlanre/types";
 
 type OmitPathHelper<
-  ObjectType extends Record<string, any>,
+  ObjectType extends Dictionary,
   PathType extends string,
   Key extends string
-> = PathType extends `${Key}.${infer Tail}`
-  ? OmitPath<ObjectType[Key], Tail>
-  : OmitPath<ObjectType[Key]>;
+> = ObjectType[Key] extends Dictionary
+  ? PathType extends `${Key}.${infer Tail}`
+    ? OmitPath<ObjectType[Key], Tail>
+    : OmitPath<ObjectType[Key]>
+  : ObjectType[Key];
 
 export type OmitPath<
-  ObjectType extends Record<string, any>,
-  PathType extends Paths<ObjectType> | (string & {}) = ""
-> = ObjectType extends Primitives | Indexable | Structures | Derivatives
-  ? ObjectType
-  : Intersect<
+  ObjectType extends Dictionary,
+  PathType extends Paths<ObjectType> | ArbitraryKey = ""
+> = ObjectType extends Dictionary
+  ? Intersect<
       {
         [Key in Exclude<RequiredKeys<ObjectType>, PathType>]: OmitPathHelper<
           ObjectType,
@@ -36,4 +36,16 @@ export type OmitPath<
           Key
         >;
       }
-    >;
+    >
+  : ObjectType;
+
+export interface TOmitPath<
+  PathType extends Paths<Exclude<ObjectType, void>> | void = void,
+  ObjectType extends Dictionary | void = void
+> extends Fn<{
+    0: Paths<Exclude<ObjectType, void>>;
+    1: Dictionary;
+  }> {
+  slot: [PathType, ObjectType];
+  data: OmitPath<this[1], this[0]>;
+}

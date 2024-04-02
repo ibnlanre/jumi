@@ -1,1 +1,1 @@
-export { Merge } from "./Merge";
+export { Merge, TMerge } from "./Merge";

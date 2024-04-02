@@ -1,1 +1,1 @@
-export { ExcludeKeys } from "./ExcludeKeys";
+export { ExcludeKeys, TExcludeKeys } from "./ExcludeKeys";

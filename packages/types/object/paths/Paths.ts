@@ -1,4 +1,4 @@
-import { Dictionary, Keys } from "@ibnlanre/types";
+import { Dictionary, Fn, Keys } from "@ibnlanre/types";
 import { Subtract } from "ts-arithmetic";
 
 type PathsHelper<
@@ -36,3 +36,16 @@ export type Paths<
         : never;
     }[Keys<ObjectType>]
   : never;
+
+export interface TPaths<
+  Delimiter extends string | void = ".",
+  Level extends number | void = -1,
+  ObjectType extends Dictionary | void = void
+> extends Fn<{
+    0: string;
+    1: number;
+    2: Dictionary;
+  }> {
+  slot: [Delimiter, Level, ObjectType];
+  data: Paths<this[2], this[0], this[1]>;
+}

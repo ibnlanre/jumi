@@ -1,6 +1,7 @@
 import {
   Dictionary,
   Elements,
+  Fn,
   IsPartial,
   JoinKeys,
   Keys,
@@ -24,3 +25,11 @@ type RequiredKeysDeepHelper<
 
 export type RequiredKeysDeep<ObjectType extends Dictionary> =
   RequiredKeysDeepHelper<ObjectType>;
+
+export interface TRequiredKeysDeep<ObjectType extends Dictionary | void = void>
+  extends Fn<{
+    0: Dictionary;
+  }> {
+  slot: [ObjectType];
+  data: RequiredKeysDeep<this[0]>;
+}

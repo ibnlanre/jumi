@@ -1,1 +1,1 @@
-export { Values } from "./Values";
+export { Values, TValues } from "./Values";

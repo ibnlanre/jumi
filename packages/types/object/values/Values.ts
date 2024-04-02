@@ -1,4 +1,4 @@
-import { Dictionary, LastOfUnion } from "@ibnlanre/types";
+import { Dictionary, Fn, LastOfUnion } from "@ibnlanre/types";
 
 type ValuesHelper<
   ObjectType extends Dictionary,
@@ -12,3 +12,11 @@ type ValuesHelper<
   : Values;
 
 export type Values<ObjectType extends Dictionary> = ValuesHelper<ObjectType>;
+
+export interface TValues<ObjectType extends Dictionary | void = void>
+  extends Fn<{
+    0: Dictionary;
+  }> {
+  slot: [ObjectType];
+  data: Values<this[0]>;
+}

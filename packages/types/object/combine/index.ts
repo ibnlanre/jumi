@@ -1,1 +1,1 @@
-export { Combine } from "./Combine";
+export { Combine, TCombine } from "./Combine";

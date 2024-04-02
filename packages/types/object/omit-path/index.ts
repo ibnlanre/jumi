@@ -1,1 +1,1 @@
-export { OmitPath } from "./OmitPath";
+export { OmitPath, TOmitPath } from "./OmitPath";

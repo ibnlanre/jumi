@@ -46,7 +46,7 @@ export interface TCollect<
       | Dictionary<string, Paths<Exclude<ObjectType, void>>>
       | Paths<Exclude<ObjectType, void>>[]
       | Paths<Exclude<ObjectType, void>>;
-    1: ObjectType;
+    1: Dictionary;
   }> {
   slot: [PickType, ObjectType];
   data: Collect<this[1], this[0]>;

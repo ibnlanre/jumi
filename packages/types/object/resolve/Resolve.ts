@@ -1,4 +1,11 @@
-import { ArbitraryKey, Combine, Dictionary, Get, Paths } from "@ibnlanre/types";
+import {
+  ArbitraryKey,
+  Combine,
+  Dictionary,
+  Fn,
+  Get,
+  Paths,
+} from "@ibnlanre/types";
 
 export type Resolve<
   Source extends Dictionary[] | Dictionary,
@@ -12,3 +19,31 @@ export type Resolve<
   never,
   Delimiter
 >;
+
+export interface TResolve<
+  Path extends
+    | Paths<
+        Source extends Dictionary[]
+          ? Combine<Exclude<Source, void>>
+          : Exclude<Source, void>,
+        Delimiter
+      >
+    | ArbitraryKey<number>
+    | void = void,
+  Delimiter extends string = ".",
+  Source extends Dictionary[] | Dictionary | void = void
+> extends Fn<{
+    0:
+      | Paths<
+          Source extends Dictionary[]
+            ? Combine<Exclude<Source, void>>
+            : Exclude<Source, void>,
+          Delimiter
+        >
+      | ArbitraryKey<number>;
+    1: string;
+    2: Dictionary[] | Dictionary;
+  }> {
+  slot: [Path, Delimiter, Source];
+  data: Resolve<this[2], this[0], this[1]>;
+}

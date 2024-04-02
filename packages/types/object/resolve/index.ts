@@ -1,1 +1,1 @@
-export { Resolve } from "./Resolve";
+export { Resolve, TResolve } from "./Resolve";

@@ -9,7 +9,7 @@ export type Has<
 export interface THas<
   Key extends string | number | symbol | void = void,
   Delimiter extends string | void = ".",
-  ObjectType extends object | void = void
+  ObjectType extends Dictionary | void = void
 > extends Fn<{
     0: string | number | symbol;
     1: string;

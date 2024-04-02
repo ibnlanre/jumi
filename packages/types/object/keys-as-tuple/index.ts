@@ -1,1 +1,1 @@
-export { KeysAsTuple } from "./KeysAsTuple";
+export { KeysAsTuple, TKeysAsTuple } from "./KeysAsTuple";

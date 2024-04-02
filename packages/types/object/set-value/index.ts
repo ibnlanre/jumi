@@ -1,1 +1,1 @@
-export { SetValue } from "./SetValue";
+export { SetValue, TSetValue } from "./SetValue";

@@ -1,1 +1,1 @@
-export { OptionalKeysDeep } from "./OptionalKeysDeep";
+export { OptionalKeysDeep, TOptionalKeysDeep } from "./OptionalKeysDeep";

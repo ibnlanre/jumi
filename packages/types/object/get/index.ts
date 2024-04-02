@@ -1,1 +1,1 @@
-export { Get } from "./Get";
+export { Get, TGet } from "./Get";

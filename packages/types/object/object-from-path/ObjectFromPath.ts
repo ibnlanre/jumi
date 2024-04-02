@@ -1,7 +1,22 @@
+import { Fn } from "@ibnlanre/types";
+
 export type ObjectFromPath<
-  T extends string,
-  Value,
+  Path extends string,
+  Value extends any,
   Delimiter extends string = "."
-> = T extends `${infer Head}${Delimiter}${infer Tail}`
+> = Path extends `${infer Head}${Delimiter}${infer Tail}`
   ? { [K in Head]: ObjectFromPath<Tail, Value> }
-  : { [K in T]: Value };
+  : { [K in Path]: Value };
+
+export interface TObjectFromPath<
+  Value extends unknown = void,
+  Delimiter extends string | void = ".",
+  Path extends string | void = void
+> extends Fn<{
+    0: string;
+    1: unknown;
+    2: string;
+  }> {
+  slot: [Value, Delimiter, Path];
+  data: ObjectFromPath<this[2], this[0], this[1]>;
+}

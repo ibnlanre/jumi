@@ -1,1 +1,1 @@
-export { ExtractNestedKeys } from "./ExtractNestedKeys";
+export { ExtractNestedKeys, TExtractNestedKeys } from "./ExtractNestedKeys";
