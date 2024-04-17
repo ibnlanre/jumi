@@ -1,1 +1,0 @@
-export { QuarterOfYear } from "./QuarterOfYear";

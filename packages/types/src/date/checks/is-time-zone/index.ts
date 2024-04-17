@@ -1,1 +1,0 @@
-export { IsTimeZone } from "./IsTimeZone";

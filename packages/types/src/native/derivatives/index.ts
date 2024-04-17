@@ -1,1 +1,0 @@
-export { Derivatives } from "./Derivatives";

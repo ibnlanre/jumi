@@ -1,1 +1,0 @@
-export { SimpleFormat } from "./SimpleFormat";

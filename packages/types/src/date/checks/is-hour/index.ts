@@ -1,1 +1,0 @@
-export { IsHour } from "./IsHour";

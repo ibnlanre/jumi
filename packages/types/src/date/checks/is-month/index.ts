@@ -1,1 +1,0 @@
-export { IsMonth } from "./IsMonth";

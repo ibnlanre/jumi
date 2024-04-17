@@ -1,1 +1,0 @@
-export { IsSeconds } from "./IsSeconds";
