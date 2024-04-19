@@ -1,25 +1,25 @@
 /**
  * Deeply sorts an array.
  *
- * @param a - The first value to compare.
- * @param b - The second value to compare.
+ * @param left - The first value to compare.
+ * @param right - The second value to compare.
  *
  * @returns The result of the comparison.
  */
-export function arraySort(a: any, b: any): number {
-  if (typeof a === "object" && typeof b === "object") {
-    if (a === b) return 0;
+export function arraySort(left: any, right: any): number {
+  if (typeof left === "object" && typeof right === "object") {
+    if (left === right) return 0;
 
-    const aKeys = Object.keys(a).sort();
-    const bKeys = Object.keys(b).sort();
+    const leftKeys = Object.keys(left).sort();
+    const rightKeys = Object.keys(right).sort();
 
-    if (aKeys.length !== bKeys.length) {
-      return aKeys.length - bKeys.length;
+    if (leftKeys.length !== rightKeys.length) {
+      return leftKeys.length - rightKeys.length;
     }
 
-    for (let i = 0; i < aKeys.length; i++) {
-      const key = aKeys[i];
-      const result = arraySort(a[key], b[key]);
+    for (let i = 0; i < leftKeys.length; i++) {
+      const key = leftKeys[i];
+      const result = arraySort(left[key], right[key]);
       if (result !== 0) {
         return result;
       }
@@ -27,8 +27,8 @@ export function arraySort(a: any, b: any): number {
 
     return 0;
   } else {
-    if (a < b) return -1;
-    if (a > b) return 1;
+    if (left < right) return -1;
+    if (left > right) return 1;
     return 0;
   }
 }

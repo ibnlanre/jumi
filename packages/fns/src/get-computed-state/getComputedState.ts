@@ -1,4 +1,3 @@
-
 import { SetStateAction } from "react";
 import { isSetStateFunction } from "../is-set-state-function";
 
@@ -13,6 +12,7 @@ export function getComputedState<State>(
   initialState: SetStateAction<State>,
   previousState: State
 ): State {
-  if (isSetStateFunction(initialState)) return initialState(previousState);
-  return initialState;
+  if (isSetStateFunction(initialState)) {
+    return initialState(previousState);
+  } else return initialState;
 }
