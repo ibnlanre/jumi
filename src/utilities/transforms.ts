@@ -2,23 +2,44 @@ import { PluginAPI, Direction, DirectionConfig } from "../types";
 import { defaultTheme } from "../config/defaults";
 
 /**
- * Transform utilities (translate, rotate, scale, perspective)
+ * Transform utilities with intelligent defaults
+ * - animate-scale-{value} implies uniform scaling
+ * - animate-rotate-{value} implies z-axis clockwise
+ * - animate-translate-{direction}-{value} requires explicit direction
  */
 
 // Direction mappings for transforms
 const directionMappings: Record<Direction, DirectionConfig> = {
-  x: { x: 1, y: 0, z: 0, axis: "x" }, // right
-  y: { x: 0, y: 1, z: 0, axis: "y" }, // down
-  z: { x: 0, y: 0, z: 1, axis: "z" }, // forward
-  t: { x: 0, y: -1, z: 0, axis: "y" }, // top
-  r: { x: 1, y: 0, z: 0, axis: "x" }, // right
-  b: { x: 0, y: 1, z: 0, axis: "y" }, // bottom
-  l: { x: -1, y: 0, z: 0, axis: "x" }, // left
-  tl: { x: -1, y: -1, z: 0, axis: "d" }, // top-left
-  tr: { x: 1, y: -1, z: 0, axis: "d" }, // top-right
-  bl: { x: -1, y: 1, z: 0, axis: "d" }, // bottom-left
-  br: { x: 1, y: 1, z: 0, axis: "d" }, // bottom-right
-  c: { x: 0, y: 0, z: 0, axis: "x" }, // center (for rotation)
+  // Axis-based (explicit)
+  x: { x: 1, y: 0, z: 0, axis: "x" },
+  y: { x: 0, y: 1, z: 0, axis: "y" },
+  z: { x: 0, y: 0, z: 1, axis: "z" },
+
+  // Semantic directions (physical)
+  top: { x: 0, y: -1, z: 0, axis: "y" },
+  right: { x: 1, y: 0, z: 0, axis: "x" },
+  bottom: { x: 0, y: 1, z: 0, axis: "y" },
+  left: { x: -1, y: 0, z: 0, axis: "x" },
+
+  // Logical directions (i18n-friendly)
+  start: { x: -1, y: 0, z: 0, axis: "x" }, // Maps to left in LTR, right in RTL
+  end: { x: 1, y: 0, z: 0, axis: "x" }, // Maps to right in LTR, left in RTL
+
+  // Diagonal directions (physical)
+  "top-left": { x: -1, y: -1, z: 0, axis: "d" },
+  "top-right": { x: 1, y: -1, z: 0, axis: "d" },
+  "bottom-left": { x: -1, y: 1, z: 0, axis: "d" },
+  "bottom-right": { x: 1, y: 1, z: 0, axis: "d" },
+
+  // Diagonal directions (logical)
+  "top-start": { x: -1, y: -1, z: 0, axis: "d" },
+  "top-end": { x: 1, y: -1, z: 0, axis: "d" },
+  "bottom-start": { x: -1, y: 1, z: 0, axis: "d" },
+  "bottom-end": { x: 1, y: 1, z: 0, axis: "d" },
+  "start-start": { x: -1, y: -1, z: 0, axis: "d" }, // Alternative naming
+  "start-end": { x: -1, y: 1, z: 0, axis: "d" },
+  "end-start": { x: 1, y: -1, z: 0, axis: "d" },
+  "end-end": { x: 1, y: 1, z: 0, axis: "d" },
 };
 
 export function addTransformUtilities({
@@ -45,11 +66,123 @@ export function addTransformUtilities({
     },
   });
 
-  // Translate utilities
-  Object.entries(directionMappings).forEach(([direction, config]) => {
-    if (direction === "c") return; // Skip center for translate
+  // === SCALE UTILITIES (Intelligent Defaults) ===
 
-    const { x, y, z, axis } = config;
+  // Uniform scale (default behavior)
+  matchUtilities(
+    {
+      "animate-scale": (value: string) => ({
+        "animation-name": "jumi-scale-uniform",
+        "animation-duration": "var(--jumi-duration)",
+        "animation-timing-function": "var(--jumi-timing-function)",
+        "animation-delay": "var(--jumi-delay)",
+        "animation-direction": "var(--jumi-direction)",
+        "animation-iteration-count": "var(--jumi-iteration-count)",
+        "animation-fill-mode": "var(--jumi-fill-mode)",
+        "animation-play-state": "var(--jumi-play-state)",
+        "--jumi-scale": value,
+      }),
+    },
+    {
+      values: theme("jumi.scales") ?? defaultTheme.scales,
+      type: "number",
+    }
+  );
+
+  // Axis-specific scale
+  ["x", "y", "z"].forEach((axis) => {
+    matchUtilities(
+      {
+        [`animate-scale-${axis}`]: (value: string) => ({
+          "animation-name": `jumi-scale-${axis}`,
+          "animation-duration": "var(--jumi-duration)",
+          "animation-timing-function": "var(--jumi-timing-function)",
+          "animation-delay": "var(--jumi-delay)",
+          "animation-direction": "var(--jumi-direction)",
+          "animation-iteration-count": "var(--jumi-iteration-count)",
+          "animation-fill-mode": "var(--jumi-fill-mode)",
+          "animation-play-state": "var(--jumi-play-state)",
+          [`--jumi-scale-${axis}`]: value,
+        }),
+      },
+      {
+        values: theme("jumi.scales") ?? defaultTheme.scales,
+        type: "number",
+      }
+    );
+  });
+
+  // === ROTATION UTILITIES (Intelligent Defaults) ===
+
+  // Default rotation (z-axis clockwise)
+  matchUtilities(
+    {
+      "animate-rotate": (value: string) => ({
+        "animation-name": "jumi-rotate-z",
+        "animation-duration": "var(--jumi-duration)",
+        "animation-timing-function": "var(--jumi-timing-function)",
+        "animation-delay": "var(--jumi-delay)",
+        "animation-direction": "var(--jumi-direction)",
+        "animation-iteration-count": "var(--jumi-iteration-count)",
+        "animation-fill-mode": "var(--jumi-fill-mode)",
+        "animation-play-state": "var(--jumi-play-state)",
+        "--jumi-rotate-z": value,
+      }),
+    },
+    {
+      values: theme("jumi.rotations") ?? defaultTheme.rotations,
+      type: "any",
+    }
+  );
+
+  // Counter-clockwise rotation
+  matchUtilities(
+    {
+      "animate-rotate-ccw": (value: string) => ({
+        "animation-name": "jumi-rotate-z",
+        "animation-duration": "var(--jumi-duration)",
+        "animation-timing-function": "var(--jumi-timing-function)",
+        "animation-delay": "var(--jumi-delay)",
+        "animation-direction": "var(--jumi-direction)",
+        "animation-iteration-count": "var(--jumi-iteration-count)",
+        "animation-fill-mode": "var(--jumi-fill-mode)",
+        "animation-play-state": "var(--jumi-play-state)",
+        "--jumi-rotate-z": `calc(-1 * ${value})`,
+      }),
+    },
+    {
+      values: theme("jumi.rotations") ?? defaultTheme.rotations,
+      type: "any",
+    }
+  );
+
+  // Axis-specific rotation
+  ["x", "y", "z"].forEach((axis) => {
+    matchUtilities(
+      {
+        [`animate-rotate-${axis}`]: (value: string) => ({
+          "animation-name": `jumi-rotate-${axis}`,
+          "animation-duration": "var(--jumi-duration)",
+          "animation-timing-function": "var(--jumi-timing-function)",
+          "animation-delay": "var(--jumi-delay)",
+          "animation-direction": "var(--jumi-direction)",
+          "animation-iteration-count": "var(--jumi-iteration-count)",
+          "animation-fill-mode": "var(--jumi-fill-mode)",
+          "animation-play-state": "var(--jumi-play-state)",
+          [`--jumi-rotate-${axis}`]: value,
+        }),
+      },
+      {
+        values: theme("jumi.rotations") ?? defaultTheme.rotations,
+        type: "any",
+      }
+    );
+  });
+
+  // === TRANSLATE UTILITIES (Explicit Direction Required) ===
+
+  Object.entries(directionMappings).forEach(([direction, config]) => {
+    const { x, y, z } = config;
 
     matchUtilities(
       {
@@ -65,7 +198,7 @@ export function addTransformUtilities({
             "animation-play-state": "var(--jumi-play-state)",
           };
 
-          // Set CSS variables for the transform
+          // Set the target translate values
           if (x !== 0) styles["--jumi-translate-x"] = `calc(${value} * ${x})`;
           if (y !== 0) styles["--jumi-translate-y"] = `calc(${value} * ${y})`;
           if (z !== 0) styles["--jumi-translate-z"] = `calc(${value} * ${z})`;
@@ -78,107 +211,22 @@ export function addTransformUtilities({
         type: "length",
       }
     );
-
-    // Base (immediate) translate utilities
-    matchUtilities(
-      {
-        [`animate-translate-${direction}-base`]: (value: string) => {
-          const styles: Record<string, string> = {};
-
-          if (x !== 0) styles["--jumi-translate-x"] = `calc(${value} * ${x})`;
-          if (y !== 0) styles["--jumi-translate-y"] = `calc(${value} * ${y})`;
-          if (z !== 0) styles["--jumi-translate-z"] = `calc(${value} * ${z})`;
-
-          styles["transform"] =
-            "translate3d(var(--jumi-translate-x), var(--jumi-translate-y), var(--jumi-translate-z))";
-
-          return styles;
-        },
-      },
-      {
-        values: theme("jumi.distances") ?? defaultTheme.distances,
-        type: "length",
-      }
-    );
   });
 
-  // Rotate utilities
-  Object.entries(directionMappings).forEach(([direction, config]) => {
-    const { x, y, z } = config;
+  // === PERSPECTIVE UTILITIES ===
 
-    matchUtilities(
-      {
-        [`animate-rotate-${direction}`]: (value: string) => {
-          const styles: Record<string, string> = {
-            "animation-name": `jumi-rotate-${direction}`,
-            "animation-duration": "var(--jumi-duration)",
-            "animation-timing-function": "var(--jumi-timing-function)",
-            "animation-delay": "var(--jumi-delay)",
-            "animation-direction": "var(--jumi-direction)",
-            "animation-iteration-count": "var(--jumi-iteration-count)",
-            "animation-fill-mode": "var(--jumi-fill-mode)",
-            "animation-play-state": "var(--jumi-play-state)",
-          };
-
-          // For rotation, we typically use z-axis for 2D rotation (center)
-          if (direction === "c" || (x === 0 && y === 0)) {
-            styles["--jumi-rotate-z"] = value;
-          } else if (x !== 0) {
-            styles["--jumi-rotate-x"] = value;
-          } else if (y !== 0) {
-            styles["--jumi-rotate-y"] = value;
-          }
-
-          return styles;
-        },
-      },
-      {
-        values: theme("jumi.rotations") ?? defaultTheme.rotations,
-        type: "angle",
-      }
-    );
-  });
-
-  // Scale utilities
-  const scaleDirections = ["x", "y", "z", "uniform"];
-  scaleDirections.forEach((direction) => {
-    matchUtilities(
-      {
-        [`animate-scale-${direction}`]: (value: string) => {
-          const styles: Record<string, string> = {
-            "animation-name": `jumi-scale-${direction}`,
-            "animation-duration": "var(--jumi-duration)",
-            "animation-timing-function": "var(--jumi-timing-function)",
-            "animation-delay": "var(--jumi-delay)",
-            "animation-direction": "var(--jumi-direction)",
-            "animation-iteration-count": "var(--jumi-iteration-count)",
-            "animation-fill-mode": "var(--jumi-fill-mode)",
-            "animation-play-state": "var(--jumi-play-state)",
-          };
-
-          if (direction === "uniform") {
-            styles["--jumi-scale-x"] = value;
-            styles["--jumi-scale-y"] = value;
-            styles["--jumi-scale-z"] = value;
-          } else {
-            styles[`--jumi-scale-${direction}`] = value;
-          }
-
-          return styles;
-        },
-      },
-      {
-        values: theme("jumi.scales") ?? defaultTheme.scales,
-      }
-    );
-  });
-
-  // Perspective utilities
   matchUtilities(
     {
       "animate-perspective": (value: string) => ({
+        "animation-name": "jumi-perspective",
+        "animation-duration": "var(--jumi-duration)",
+        "animation-timing-function": "var(--jumi-timing-function)",
+        "animation-delay": "var(--jumi-delay)",
+        "animation-direction": "var(--jumi-direction)",
+        "animation-iteration-count": "var(--jumi-iteration-count)",
+        "animation-fill-mode": "var(--jumi-fill-mode)",
+        "animation-play-state": "var(--jumi-play-state)",
         "--jumi-perspective": value,
-        perspective: value,
       }),
     },
     {
@@ -188,7 +236,7 @@ export function addTransformUtilities({
   );
 
   // Transform origin utilities
-  const origins = {
+  const originValues = {
     center: "center",
     top: "top",
     "top-right": "top right",
@@ -203,86 +251,79 @@ export function addTransformUtilities({
   matchUtilities(
     {
       "animate-origin": (value: string) => ({
+        "animation-name": "jumi-origin",
+        "animation-duration": "var(--jumi-duration)",
+        "animation-timing-function": "var(--jumi-timing-function)",
+        "animation-delay": "var(--jumi-delay)",
+        "animation-direction": "var(--jumi-direction)",
+        "animation-iteration-count": "var(--jumi-iteration-count)",
+        "animation-fill-mode": "var(--jumi-fill-mode)",
+        "animation-play-state": "var(--jumi-play-state)",
         "--jumi-transform-origin": value,
-        "transform-origin": value,
       }),
     },
     {
-      values: origins,
+      values: originValues,
+      type: "lookup",
     }
   );
+}
 
-  // Perspective origin utilities
-  matchUtilities(
-    {
-      "animate-perspective-origin": (value: string) => ({
-        "--jumi-perspective-origin": value,
-        "perspective-origin": value,
-      }),
-    },
-    {
-      values: origins,
-    }
-  );
+// Generate transform keyframes for the new system
+export function generateTransformKeyframes(): Record<string, any> {
+  const keyframes: Record<string, any> = {};
 
-  // Transform style utilities
-  const transformStyleUtilities = {
-    ".animate-flat": {
-      "--jumi-transform-style": "flat",
-      "transform-style": "flat",
-    },
-    ".animate-preserve-3d": {
-      "--jumi-transform-style": "preserve-3d",
-      "transform-style": "preserve-3d",
+  // Scale keyframes
+  keyframes["@keyframes jumi-scale-uniform"] = {
+    to: {
+      transform: "scale(var(--jumi-scale, 1))",
     },
   };
 
-  Object.entries(transformStyleUtilities).forEach(([selector, styles]) => {
-    matchUtilities(
-      { [selector.substring(1)]: () => styles },
-      { values: { DEFAULT: "DEFAULT" } }
-    );
+  ["x", "y", "z"].forEach((axis) => {
+    const scaleFunc =
+      axis === "z" ? "scaleZ" : axis === "y" ? "scaleY" : "scaleX";
+    keyframes[`@keyframes jumi-scale-${axis}`] = {
+      to: {
+        transform: `${scaleFunc}(var(--jumi-scale-${axis}, 1))`,
+      },
+    };
   });
-}
 
-/**
- * Generate keyframes for transform animations
- */
-export function generateTransformKeyframes() {
-  const keyframes: Record<string, Record<string, any>> = {};
+  // Rotation keyframes
+  ["x", "y", "z"].forEach((axis) => {
+    const rotateFunc =
+      axis === "z" ? "rotateZ" : axis === "y" ? "rotateY" : "rotateX";
+    keyframes[`@keyframes jumi-rotate-${axis}`] = {
+      to: {
+        transform: `${rotateFunc}(var(--jumi-rotate-${axis}, 0deg))`,
+      },
+    };
+  });
 
-  // Generate translate keyframes
-  Object.entries(directionMappings).forEach(([direction]) => {
-    if (direction === "c") return;
-
+  // Translation keyframes
+  Object.keys(directionMappings).forEach((direction) => {
     keyframes[`@keyframes jumi-translate-${direction}`] = {
       to: {
         transform:
-          "translate3d(var(--jumi-translate-x), var(--jumi-translate-y), var(--jumi-translate-z))",
+          "translate3d(var(--jumi-translate-x, 0), var(--jumi-translate-y, 0), var(--jumi-translate-z, 0))",
       },
     };
   });
 
-  // Generate rotate keyframes
-  Object.entries(directionMappings).forEach(([direction]) => {
-    keyframes[`@keyframes jumi-rotate-${direction}`] = {
-      to: {
-        transform:
-          "rotateX(var(--jumi-rotate-x)) rotateY(var(--jumi-rotate-y)) rotateZ(var(--jumi-rotate-z))",
-      },
-    };
-  });
+  // Perspective keyframes
+  keyframes["@keyframes jumi-perspective"] = {
+    to: {
+      perspective: "var(--jumi-perspective, none)",
+    },
+  };
 
-  // Generate scale keyframes
-  const scaleDirections = ["x", "y", "z", "uniform"];
-  scaleDirections.forEach((direction) => {
-    keyframes[`@keyframes jumi-scale-${direction}`] = {
-      to: {
-        transform:
-          "scale3d(var(--jumi-scale-x), var(--jumi-scale-y), var(--jumi-scale-z))",
-      },
-    };
-  });
+  // Transform origin keyframes
+  keyframes["@keyframes jumi-origin"] = {
+    to: {
+      "transform-origin": "var(--jumi-transform-origin, center)",
+    },
+  };
 
   return keyframes;
 }

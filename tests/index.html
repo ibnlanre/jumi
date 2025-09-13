@@ -34,7 +34,7 @@
           <div class="p-4 bg-blue-100 rounded text-center">
             <h3 class="font-medium mb-2">Translate</h3>
             <div
-              class="w-16 h-16 bg-blue-500 rounded mx-auto animate-translate-r-5 animate-duration-2 animate-infinite animate-alternate"
+              class="w-16 h-16 bg-blue-500 rounded mx-auto animate-translate-right-5 animate-duration-2 animate-infinite animate-alternate"
             ></div>
           </div>
 
@@ -42,7 +42,7 @@
           <div class="p-4 bg-green-100 rounded text-center">
             <h3 class="font-medium mb-2">Rotate</h3>
             <div
-              class="w-16 h-16 bg-green-500 rounded mx-auto animate-rotate-c-360 animate-duration-3 animate-infinite"
+              class="w-16 h-16 bg-green-500 rounded mx-auto animate-rotate-360 animate-duration-3 animate-infinite"
             ></div>
           </div>
 
@@ -50,7 +50,7 @@
           <div class="p-4 bg-purple-100 rounded text-center">
             <h3 class="font-medium mb-2">Scale</h3>
             <div
-              class="w-16 h-16 bg-purple-500 rounded mx-auto animate-scale-uniform-125 animate-duration-1 animate-infinite animate-alternate"
+              class="w-16 h-16 bg-purple-500 rounded mx-auto animate-scale-125 animate-duration-1 animate-infinite animate-alternate"
             ></div>
           </div>
 
@@ -58,7 +58,7 @@
           <div class="p-4 bg-red-100 rounded text-center">
             <h3 class="font-medium mb-2">Combined</h3>
             <div
-              class="w-16 h-16 bg-red-500 rounded mx-auto animate-translate-tr-3 animate-rotate-c-45 animate-scale-uniform-110 animate-duration-2 animate-infinite animate-alternate"
+              class="w-16 h-16 bg-red-500 rounded mx-auto animate-translate-top-right-3 animate-rotate-45 animate-scale-110 animate-duration-2 animate-infinite animate-alternate"
             ></div>
           </div>
         </div>
@@ -102,6 +102,76 @@
         </div>
       </section>
 
+      <!-- Property Animations (New in v2.1) -->
+      <section class="bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-semibold mb-4">Property Animations</h2>
+        <p class="text-gray-600 mb-4">
+          Animate CSS properties from current state to target value
+        </p>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <!-- Width -->
+          <div class="p-4 bg-blue-100 rounded text-center">
+            <h3 class="font-medium mb-2">Width</h3>
+            <div
+              class="h-16 bg-blue-500 rounded mx-auto animate-w-32 animate-duration-2 animate-infinite animate-alternate w-1/5"
+            ></div>
+          </div>
+
+          <!-- Height -->
+          <div class="p-4 bg-green-100 rounded text-center">
+            <h3 class="font-medium mb-2">Height</h3>
+            <div
+              class="w-16 bg-green-500 rounded mx-auto animate-h-20 animate-duration-2 animate-infinite animate-alternate h-[2rem]"
+            ></div>
+          </div>
+
+          <!-- Opacity -->
+          <div class="p-4 bg-purple-100 rounded text-center">
+            <h3 class="font-medium mb-2">Opacity</h3>
+            <div
+              class="w-16 h-16 bg-purple-500 rounded mx-auto animate-fade-20 animate-duration-2 animate-infinite animate-alternate"
+            ></div>
+          </div>
+
+          <!-- Border Radius -->
+          <div class="p-4 bg-red-100 rounded text-center">
+            <h3 class="font-medium mb-2">Border Radius</h3>
+            <div
+              class="w-16 h-16 bg-red-500 mx-auto animate-rounded-full animate-duration-2 animate-infinite animate-alternate rounded-none"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Second row with color animations -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+          <!-- Background Color -->
+          <div class="p-4 bg-gray-100 rounded text-center">
+            <h3 class="font-medium mb-2">Background Color</h3>
+            <div
+              class="w-16 h-16 bg-gray-300 rounded mx-auto animate-bg-blue-500 animate-duration-2 animate-infinite animate-alternate"
+            ></div>
+          </div>
+
+          <!-- Text Color -->
+          <div class="p-4 bg-gray-100 rounded text-center">
+            <h3 class="font-medium mb-2">Text Color</h3>
+            <div
+              class="w-16 h-16 bg-white rounded mx-auto flex items-center justify-center text-gray-800 animate-text-red-500 animate-duration-2 animate-infinite animate-alternate"
+            >
+              Text
+            </div>
+          </div>
+
+          <!-- Blur Effect -->
+          <div class="p-4 bg-gray-100 rounded text-center">
+            <h3 class="font-medium mb-2">Blur</h3>
+            <div
+              class="w-16 h-16 bg-gradient-to-r from-pink-500 to-yellow-500 rounded mx-auto animate-blur-md animate-duration-2 animate-infinite animate-alternate"
+            ></div>
+          </div>
+        </div>
+      </section>
+
       <!-- Hover Effects -->
       <section class="bg-white p-6 rounded-lg shadow-lg">
         <h2 class="text-2xl font-semibold mb-4">Hover Effects</h2>
@@ -113,13 +183,13 @@
           </div>
 
           <div
-            class="p-6 bg-gray-200 rounded-lg text-center cursor-pointer hover:animate-scale-uniform-110 hover:animate-duration-300"
+            class="p-6 bg-gray-200 rounded-lg text-center cursor-pointer hover:animate-scale-110 hover:animate-duration-300"
           >
             Hover to Scale
           </div>
 
           <div
-            class="p-6 bg-gray-200 rounded-lg text-center cursor-pointer hover:animate-rotate-c-5 hover:animate-duration-200"
+            class="p-6 bg-gray-200 rounded-lg text-center cursor-pointer hover:animate-rotate-5 hover:animate-duration-200"
           >
             Hover to Rotate
           </div>
@@ -167,8 +237,7 @@
           <div class="text-center">
             <h3 class="font-medium mb-2">Width Animation</h3>
             <div
-              class="h-8 bg-gradient-to-r from-blue-400 to-purple-600 rounded animate-w-to-full animate-duration-3 animate-infinite animate-alternate"
-              style="width: 20%"
+              class="h-8 bg-gradient-to-r from-blue-400 to-purple-600 rounded animate-w-full animate-duration-3 animate-infinite animate-alternate w-1/5"
             ></div>
           </div>
 
@@ -176,8 +245,7 @@
           <div class="text-center">
             <h3 class="font-medium mb-2">Background Color Animation</h3>
             <div
-              class="w-32 h-32 rounded-full mx-auto animate-bg-to-red-500 animate-duration-2 animate-infinite animate-alternate"
-              style="background-color: blue"
+              class="w-32 h-32 rounded-full mx-auto animate-bg-red-500 animate-duration-2 animate-infinite animate-alternate bg-blue-700"
             ></div>
           </div>
         </div>

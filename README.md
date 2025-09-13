@@ -54,14 +54,12 @@ module.exports = {
 </div>
 
 <!-- Transform animations -->
-<div class="animate-translate-r-5 animate-rotate-c-45 animate-duration-2">
+<div class="animate-translate-right-5 animate-rotate-45 animate-duration-2">
   I move and rotate!
 </div>
 
 <!-- Hover effects -->
-<button class="hover:animate-scale-uniform-110 animate-duration-300">
-  Hover me!
-</button>
+<button class="hover:animate-scale-110 animate-duration-300">Hover me!</button>
 ```
 
 ## 📚 Core Concepts
@@ -92,21 +90,19 @@ Create dynamic movement with transform utilities:
 
 ```html
 <!-- Translation -->
-<div class="animate-translate-r-5">Move right</div>
-<div class="animate-translate-tl-3">Move to top-left</div>
+<div class="animate-translate-right-5">Move right</div>
+<div class="animate-translate-top-left-3">Move to top-left</div>
 
 <!-- Rotation -->
-<div class="animate-rotate-c-90">Rotate 90 degrees</div>
-<div class="animate-rotate-c-360 animate-infinite">Spin forever</div>
+<div class="animate-rotate-90">Rotate 90 degrees</div>
+<div class="animate-rotate-360 animate-infinite">Spin forever</div>
 
 <!-- Scaling -->
-<div class="animate-scale-uniform-125">Scale up 25%</div>
+<div class="animate-scale-125">Scale up 25%</div>
 <div class="animate-scale-x-150">Scale width only</div>
 
 <!-- Combined transforms -->
-<div
-  class="animate-translate-r-5 animate-rotate-c-45 animate-scale-uniform-110"
->
+<div class="animate-translate-right-5 animate-rotate-45 animate-scale-110">
   Move, rotate, and scale!
 </div>
 ```
@@ -138,21 +134,19 @@ Animate CSS properties directly:
 
 ```html
 <!-- Size animations -->
-<div class="animate-w-to-full animate-duration-2">Width grows</div>
-<div class="animate-h-to-64 animate-duration-1">Height changes</div>
+<div class="animate-w-full animate-duration-2">Width grows</div>
+<div class="animate-h-64 animate-duration-1">Height changes</div>
 
 <!-- Color animations -->
-<div class="animate-bg-to-red-500 animate-duration-1">Background changes</div>
-<div class="animate-text-to-blue-600 animate-duration-500">
-  Text color changes
-</div>
+<div class="animate-bg-red-500 animate-duration-1">Background changes</div>
+<div class="animate-text-blue-600 animate-duration-500">Text color changes</div>
 
 <!-- Border animations -->
-<div class="animate-rounded-to-full animate-duration-1">Becomes circular</div>
-<div class="animate-border-to-4 animate-duration-500">Border grows</div>
+<div class="animate-rounded-full animate-duration-1">Becomes circular</div>
+<div class="animate-border-4 animate-duration-500">Border grows</div>
 
 <!-- Shadow animations -->
-<div class="animate-shadow-to-xl animate-duration-300">Shadow grows</div>
+<div class="animate-shadow-xl animate-duration-300">Shadow grows</div>
 ```
 
 ## 🎛️ Configuration
@@ -205,10 +199,10 @@ Use arbitrary values for custom animations:
 <div class="animate-fade-in animate-duration-[350ms]">Custom timing</div>
 
 <!-- Custom distance -->
-<div class="animate-translate-r-[150px]">Custom distance</div>
+<div class="animate-translate-right-[150px]">Custom distance</div>
 
 <!-- Custom rotation -->
-<div class="animate-rotate-c-[23deg]">Custom angle</div>
+<div class="animate-rotate-[23deg]">Custom angle</div>
 ```
 
 ### Responsive Animations
@@ -275,13 +269,13 @@ Jumi maintains CSS custom properties for dynamic control:
 
 ### From Jumi v1 (Sass) to v2 (TailwindCSS Plugin)
 
-| Old (v1)                  | New (v2)                     | Notes                           |
-| ------------------------- | ---------------------------- | ------------------------------- |
-| `jumi-duration-2s`        | `animate-duration-2`         | Simplified naming               |
-| `jumi-translate-l-5`      | `animate-translate-l-5`      | Added `animate-` prefix         |
-| `jumi-bounce-in`          | `animate-bounce-in`          | Added `animate-` prefix         |
-| `base:jumi-translate-l-5` | `animate-translate-l-5-base` | Base classes renamed            |
-| `hover:jumi-bounce-in`    | `hover:animate-bounce-in`    | Works with TailwindCSS variants |
+| Old (v1)                  | New (v2)                        | Notes                           |
+| ------------------------- | ------------------------------- | ------------------------------- |
+| `jumi-duration-2s`        | `animate-duration-2`            | Simplified naming               |
+| `jumi-translate-l-5`      | `animate-translate-left-5`      | Added `animate-` prefix         |
+| `jumi-bounce-in`          | `animate-bounce-in`             | Added `animate-` prefix         |
+| `base:jumi-translate-l-5` | `animate-translate-left-5-base` | Base classes renamed            |
+| `hover:jumi-bounce-in`    | `hover:animate-bounce-in`       | Works with TailwindCSS variants |
 
 ### Key Changes
 
@@ -310,18 +304,18 @@ Jumi maintains CSS custom properties for dynamic control:
 
 | Class Pattern                        | Description            | Example                     |
 | ------------------------------------ | ---------------------- | --------------------------- |
-| `animate-translate-{dir}-{distance}` | Translate in direction | `animate-translate-r-5`     |
-| `animate-rotate-{axis}-{angle}`      | Rotate around axis     | `animate-rotate-c-90`       |
-| `animate-scale-{axis}-{scale}`       | Scale on axis          | `animate-scale-uniform-125` |
+| `animate-translate-{dir}-{distance}` | Translate in direction | `animate-translate-right-5` |
+| `animate-rotate-{angle}`             | Rotate around z-axis   | `animate-rotate-90`         |
+| `animate-scale-{scale}`              | Scale uniformly        | `animate-scale-125`         |
 | `animate-perspective-{distance}`     | Set 3D perspective     | `animate-perspective-500`   |
 | `animate-origin-{position}`          | Set transform origin   | `animate-origin-top-left`   |
 
 **Transform Directions:**
 
 - `x`, `y`, `z` - Single axis
-- `t`, `r`, `b`, `l` - Top, right, bottom, left
-- `tl`, `tr`, `bl`, `br` - Diagonal corners
-- `c` - Center (for rotation)
+- `top`, `right`, `bottom`, `left` - Physical directions
+- `start`, `end` - Logical directions (i18n-friendly)
+- `top-left`, `top-right`, `bottom-left`, `bottom-right` - Diagonal corners
 
 ### Effect Animations
 
@@ -343,15 +337,15 @@ Jumi maintains CSS custom properties for dynamic control:
 
 ### Property Animations
 
-| Class Pattern                 | Description           | Example                    |
-| ----------------------------- | --------------------- | -------------------------- |
-| `animate-w-to-{size}`         | Animate width         | `animate-w-to-full`        |
-| `animate-h-to-{size}`         | Animate height        | `animate-h-to-64`          |
-| `animate-bg-to-{color}`       | Animate background    | `animate-bg-to-red-500`    |
-| `animate-text-to-{color}`     | Animate text color    | `animate-text-to-blue-600` |
-| `animate-rounded-to-{radius}` | Animate border radius | `animate-rounded-to-full`  |
-| `animate-shadow-to-{shadow}`  | Animate box shadow    | `animate-shadow-to-xl`     |
-| `animate-blur-to-{blur}`      | Animate blur filter   | `animate-blur-to-md`       |
+| Class Pattern              | Description           | Example                 |
+| -------------------------- | --------------------- | ----------------------- |
+| `animate-w-{size}`         | Animate width         | `animate-w-full`        |
+| `animate-h-{size}`         | Animate height        | `animate-h-64`          |
+| `animate-bg-{color}`       | Animate background    | `animate-bg-red-500`    |
+| `animate-text-{color}`     | Animate text color    | `animate-text-blue-600` |
+| `animate-rounded-{radius}` | Animate border radius | `animate-rounded-full`  |
+| `animate-shadow-{shadow}`  | Animate box shadow    | `animate-shadow-xl`     |
+| `animate-blur-{blur}`      | Animate blur filter   | `animate-blur-md`       |
 
 ## 🤝 Contributing
 

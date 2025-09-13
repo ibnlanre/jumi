@@ -44,7 +44,7 @@ export function addAnimationUtilities({
     },
     {
       values: theme("jumi.durations") ?? defaultTheme.durations,
-      type: "time",
+      
     }
   );
 
@@ -58,7 +58,6 @@ export function addAnimationUtilities({
     },
     {
       values: theme("jumi.delays") ?? defaultTheme.delays,
-      type: "time",
     }
   );
 

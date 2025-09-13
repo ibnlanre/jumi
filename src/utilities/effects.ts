@@ -95,8 +95,8 @@ export function addEffectUtilities({
 
   matchUtilities(
     {
-      "animate-fade-to": (value: string) => ({
-        "animation-name": "jumi-fade-to",
+      "animate-fade": (value: string) => ({
+        "animation-name": "jumi-fade",
         "animation-duration": "var(--jumi-duration)",
         "animation-timing-function": "var(--jumi-timing-function)",
         "animation-delay": "var(--jumi-delay)",
@@ -104,19 +104,20 @@ export function addEffectUtilities({
         "animation-iteration-count": "var(--jumi-iteration-count)",
         "animation-fill-mode": "var(--jumi-fill-mode)",
         "animation-play-state": "var(--jumi-play-state)",
-        "--jumi-fade-to-opacity": value,
+        "--jumi-fade-opacity": value,
       }),
     },
     {
       values: opacityValues,
+      type: "number",
     }
   );
 
-  // Add custom fade-to keyframe
+  // Add custom fade keyframe
   addBase({
-    "@keyframes jumi-fade-to": {
+    "@keyframes jumi-fade": {
       to: {
-        opacity: "var(--jumi-fade-to-opacity, 1)",
+        opacity: "var(--jumi-fade-opacity, 1)",
       },
     },
   });
@@ -135,8 +136,8 @@ export function addEffectUtilities({
 
   matchUtilities(
     {
-      "animate-blur-to": (value: string) => ({
-        "animation-name": "jumi-blur-to",
+      "animate-blur": (value: string) => ({
+        "animation-name": "jumi-blur",
         "animation-duration": "var(--jumi-duration)",
         "animation-timing-function": "var(--jumi-timing-function)",
         "animation-delay": "var(--jumi-delay)",
@@ -144,7 +145,7 @@ export function addEffectUtilities({
         "animation-iteration-count": "var(--jumi-iteration-count)",
         "animation-fill-mode": "var(--jumi-fill-mode)",
         "animation-play-state": "var(--jumi-play-state)",
-        "--jumi-blur-to": value,
+        "--jumi-blur": value,
       }),
     },
     {
@@ -153,11 +154,11 @@ export function addEffectUtilities({
     }
   );
 
-  // Add custom blur-to keyframe
+  // Add custom blur keyframe
   addBase({
-    "@keyframes jumi-blur-to": {
+    "@keyframes jumi-blur": {
       to: {
-        filter: "blur(var(--jumi-blur-to, 0))",
+        filter: "blur(var(--jumi-blur, 0))",
       },
     },
   });
@@ -165,8 +166,8 @@ export function addEffectUtilities({
   // Background color animation utilities
   matchUtilities(
     {
-      "animate-bg-to": (value: string) => ({
-        "animation-name": "jumi-bg-to",
+      "animate-bg": (value: string) => ({
+        "animation-name": "jumi-bg",
         "animation-duration": "var(--jumi-duration)",
         "animation-timing-function": "var(--jumi-timing-function)",
         "animation-delay": "var(--jumi-delay)",
@@ -174,7 +175,7 @@ export function addEffectUtilities({
         "animation-iteration-count": "var(--jumi-iteration-count)",
         "animation-fill-mode": "var(--jumi-fill-mode)",
         "animation-play-state": "var(--jumi-play-state)",
-        "--jumi-bg-to": value,
+        "--jumi-bg": value,
       }),
     },
     {
@@ -185,9 +186,9 @@ export function addEffectUtilities({
 
   // Add custom background color keyframe
   addBase({
-    "@keyframes jumi-bg-to": {
+    "@keyframes jumi-bg": {
       to: {
-        "background-color": "var(--jumi-bg-to)",
+        "background-color": "var(--jumi-bg)",
       },
     },
   });
@@ -195,8 +196,8 @@ export function addEffectUtilities({
   // Text color animation utilities
   matchUtilities(
     {
-      "animate-text-to": (value: string) => ({
-        "animation-name": "jumi-text-to",
+      "animate-text": (value: string) => ({
+        "animation-name": "jumi-text",
         "animation-duration": "var(--jumi-duration)",
         "animation-timing-function": "var(--jumi-timing-function)",
         "animation-delay": "var(--jumi-delay)",
@@ -204,7 +205,7 @@ export function addEffectUtilities({
         "animation-iteration-count": "var(--jumi-iteration-count)",
         "animation-fill-mode": "var(--jumi-fill-mode)",
         "animation-play-state": "var(--jumi-play-state)",
-        "--jumi-text-to": value,
+        "--jumi-text": value,
       }),
     },
     {
@@ -215,9 +216,9 @@ export function addEffectUtilities({
 
   // Add custom text color keyframe
   addBase({
-    "@keyframes jumi-text-to": {
+    "@keyframes jumi-text": {
       to: {
-        color: "var(--jumi-text-to)",
+        color: "var(--jumi-text)",
       },
     },
   });
