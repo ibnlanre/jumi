@@ -1,22 +1,49 @@
 {
   "name": "jumi",
-  "version": "1.0.0",
-  "description": "composable animation classes",
-  "main": "jumi.css",
+  "version": "2.0.0",
+  "description": "A comprehensive CSS animation library built as a TailwindCSS plugin",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "develop": "sass src/jumi.scss tests/jumi.css"
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "test": "npm run build && npm run test:integration",
+    "test:integration": "tailwindcss -i tests/input.css -o tests/output.css --config tests/tailwind.config.js",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build"
   },
   "keywords": [
-    "gsap",
     "tailwindcss",
     "animation",
-    "composable"
+    "css",
+    "plugin",
+    "transforms",
+    "effects",
+    "composable",
+    "typescript"
   ],
   "author": "Ridwan Olanrewaju",
   "license": "MIT",
-  "dependencies": {
-    "aes-js": "^3.1.2",
-    "purgecss": "^4.1.3",
-    "sass": "^1.43.5"
+  "peerDependencies": {
+    "tailwindcss": ">=3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tailwindcss": "^3.4.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ibnlanre/jumi"
   }
 }

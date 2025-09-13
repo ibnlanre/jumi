@@ -4,39 +4,199 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="jumi.css" />
+    <link rel="stylesheet" href="output.css" />
     <link
       rel="stylesheet"
-      href="https://www.unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css"
+      href="https://www.unpkg.com/tailwindcss@3.4.0/dist/tailwind.min.css"
     />
-    <title>Document</title>
+    <title>Jumi Animation Plugin Demo</title>
   </head>
-  <body class="grid h-full w-full place-items-center">
-    <div
-      class="w-2/5 h-2/5 relative jumi base:jumi-perspective-5 jumi-transform jumi-perspective-origin-2"
-    >
-      <div
-        class="w-full h-full bg-green-500 relative jumi jumi-reset jumi-transform jumi-translate-delay-2s jumi-translate-l-9 jumi-translate-b-5"
-      >
-        <hr
-          class="jumi jumi-reset jumi-border-bl-10 left-1/2 border-t-4 border-black jumi-border-delay-1s jumi-border-duration-1s"
-        />
-        <hr
-          class="jumi jumi-reset jumi-border-ru-10 border-l-4 border-black jumi-border-delay-2s jumi-border-duration-1s"
-        />
-        <hr
-          class="jumi jumi-reset jumi-border-tr-10 right-1/2 border-t-4 border-black jumi-border-delay-1s jumi-border-duration-1s"
-        />
-        <hr
-          class="jumi jumi-reset jumi-border-ld-10 border-l-4 border-black jumi-border-delay-2s jumi-border-duration-1s"
-        />
-      </div>
+  <body class="grid h-full w-full place-items-center bg-gray-100">
+    <div class="max-w-4xl mx-auto p-8 space-y-8">
+      <header class="text-center mb-12">
+        <h1
+          class="text-4xl font-bold text-gray-900 animate-fade-in animate-duration-1"
+        >
+          Jumi Animation Plugin
+        </h1>
+        <p
+          class="text-lg text-gray-600 animate-fade-in animate-duration-2 animate-delay-500"
+        >
+          A comprehensive TailwindCSS animation library
+        </p>
+      </header>
 
-      <div
-        class="jumi bg-green-500 w-2/5 h-2/5 jumi-transform jumi-translate-b-5 jumi-rotate-c-10 jumi-transform-duration-8s jumi-transform-origin-l"
-      ></div>
+      <!-- Transform Animations -->
+      <section class="bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-semibold mb-4">Transform Animations</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <!-- Translate -->
+          <div class="p-4 bg-blue-100 rounded text-center">
+            <h3 class="font-medium mb-2">Translate</h3>
+            <div
+              class="w-16 h-16 bg-blue-500 rounded mx-auto animate-translate-r-5 animate-duration-2 animate-infinite animate-alternate"
+            ></div>
+          </div>
+
+          <!-- Rotate -->
+          <div class="p-4 bg-green-100 rounded text-center">
+            <h3 class="font-medium mb-2">Rotate</h3>
+            <div
+              class="w-16 h-16 bg-green-500 rounded mx-auto animate-rotate-c-360 animate-duration-3 animate-infinite"
+            ></div>
+          </div>
+
+          <!-- Scale -->
+          <div class="p-4 bg-purple-100 rounded text-center">
+            <h3 class="font-medium mb-2">Scale</h3>
+            <div
+              class="w-16 h-16 bg-purple-500 rounded mx-auto animate-scale-uniform-125 animate-duration-1 animate-infinite animate-alternate"
+            ></div>
+          </div>
+
+          <!-- Combined -->
+          <div class="p-4 bg-red-100 rounded text-center">
+            <h3 class="font-medium mb-2">Combined</h3>
+            <div
+              class="w-16 h-16 bg-red-500 rounded mx-auto animate-translate-tr-3 animate-rotate-c-45 animate-scale-uniform-110 animate-duration-2 animate-infinite animate-alternate"
+            ></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Effect Animations -->
+      <section class="bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-semibold mb-4">Effect Animations</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <!-- Bounce In -->
+          <div class="p-4 bg-yellow-100 rounded text-center">
+            <h3 class="font-medium mb-2">Bounce In</h3>
+            <div
+              class="w-16 h-16 bg-yellow-500 rounded-full mx-auto animate-bounce-in animate-duration-1 animate-infinite"
+            ></div>
+          </div>
+
+          <!-- Fade In -->
+          <div class="p-4 bg-indigo-100 rounded text-center">
+            <h3 class="font-medium mb-2">Fade In</h3>
+            <div
+              class="w-16 h-16 bg-indigo-500 rounded-full mx-auto animate-fade-in animate-duration-2 animate-infinite animate-alternate"
+            ></div>
+          </div>
+
+          <!-- Slide In Up -->
+          <div class="p-4 bg-pink-100 rounded text-center">
+            <h3 class="font-medium mb-2">Slide In Up</h3>
+            <div
+              class="w-16 h-16 bg-pink-500 rounded-full mx-auto animate-slide-in-up animate-duration-1 animate-infinite"
+            ></div>
+          </div>
+
+          <!-- Zoom In -->
+          <div class="p-4 bg-teal-100 rounded text-center">
+            <h3 class="font-medium mb-2">Zoom In</h3>
+            <div
+              class="w-16 h-16 bg-teal-500 rounded-full mx-auto animate-zoom-in animate-duration-2 animate-infinite"
+            ></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Hover Effects -->
+      <section class="bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-semibold mb-4">Hover Effects</h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div
+            class="p-6 bg-gray-200 rounded-lg text-center cursor-pointer hover:animate-bounce-in hover:animate-duration-500"
+          >
+            Hover to Bounce
+          </div>
+
+          <div
+            class="p-6 bg-gray-200 rounded-lg text-center cursor-pointer hover:animate-scale-uniform-110 hover:animate-duration-300"
+          >
+            Hover to Scale
+          </div>
+
+          <div
+            class="p-6 bg-gray-200 rounded-lg text-center cursor-pointer hover:animate-rotate-c-5 hover:animate-duration-200"
+          >
+            Hover to Rotate
+          </div>
+        </div>
+      </section>
+
+      <!-- Timing Controls -->
+      <section class="bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-semibold mb-4">Timing Controls</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Duration -->
+          <div class="text-center">
+            <h3 class="font-medium mb-2">Duration</h3>
+            <div
+              class="w-16 h-16 bg-orange-500 rounded mx-auto animate-bounce-in animate-duration-3 animate-infinite"
+            ></div>
+            <p class="text-sm text-gray-600 mt-2">3s duration</p>
+          </div>
+
+          <!-- Delay -->
+          <div class="text-center">
+            <h3 class="font-medium mb-2">Delay</h3>
+            <div
+              class="w-16 h-16 bg-orange-500 rounded mx-auto animate-bounce-in animate-duration-1 animate-delay-1 animate-infinite"
+            ></div>
+            <p class="text-sm text-gray-600 mt-2">1s delay</p>
+          </div>
+
+          <!-- Easing -->
+          <div class="text-center">
+            <h3 class="font-medium mb-2">Easing</h3>
+            <div
+              class="w-16 h-16 bg-orange-500 rounded mx-auto animate-translate-r-5 animate-duration-2 animate-ease-ease-in-out-back animate-infinite animate-alternate"
+            ></div>
+            <p class="text-sm text-gray-600 mt-2">Back easing</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Property Animations -->
+      <section class="bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-semibold mb-4">Property Animations</h2>
+        <div class="space-y-4">
+          <!-- Width Animation -->
+          <div class="text-center">
+            <h3 class="font-medium mb-2">Width Animation</h3>
+            <div
+              class="h-8 bg-gradient-to-r from-blue-400 to-purple-600 rounded animate-w-to-full animate-duration-3 animate-infinite animate-alternate"
+              style="width: 20%"
+            ></div>
+          </div>
+
+          <!-- Color Animation -->
+          <div class="text-center">
+            <h3 class="font-medium mb-2">Background Color Animation</h3>
+            <div
+              class="w-32 h-32 rounded-full mx-auto animate-bg-to-red-500 animate-duration-2 animate-infinite animate-alternate"
+              style="background-color: blue"
+            ></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Custom CSS Variables -->
+      <section class="bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-semibold mb-4">Custom CSS Variables</h2>
+        <p class="text-gray-600 mb-4">
+          Jumi maintains CSS custom properties for dynamic control:
+        </p>
+        <div class="bg-gray-100 p-4 rounded">
+          <code class="text-sm">
+            --jumi-duration, --jumi-delay, --jumi-timing-function, <br />
+            --jumi-translate-x, --jumi-translate-y, --jumi-rotate-z, <br />
+            --jumi-scale-x, --jumi-scale-y, etc.
+          </code>
+        </div>
+      </section>
     </div>
   </body>
 </html>
-
-<!-- give the container of the element a perspective value not the eleement itself -->
