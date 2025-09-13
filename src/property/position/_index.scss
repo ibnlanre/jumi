@@ -1,9 +1,0 @@
-:root,
-.jumi-reset {
-  @include animation-generator("position");
-}
-
-@import "bottom";
-@import "left";
-@import "right";
-@import "top";

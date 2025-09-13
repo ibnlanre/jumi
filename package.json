@@ -15,8 +15,7 @@
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "test": "npm run build && npm run test:integration",
     "test:integration": "tailwindcss -i tests/input.css -o tests/output.css --config tests/tailwind.config.js",
-    "clean": "rm -rf dist",
-    "prepublishOnly": "npm run clean && npm run build"
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "tailwindcss",
