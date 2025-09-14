@@ -90,7 +90,6 @@ export {
 export type {
   JumiPluginOptions,
   JumiTheme,
-  EasingDefinition,
   KeyframeDefinition,
   Direction,
   DirectionConfig,

@@ -1,4 +1,5 @@
 import { PluginAPI } from "../types";
+import { defaultTheme } from "../config/defaults";
 
 /**
  * Property-based animation utilities with current state → target state paradigm
@@ -12,17 +13,6 @@ export function addPropertyUtilities({
   theme,
 }: PluginAPI) {
   // Width animation utilities
-  const sizeValues = {
-    ...(theme("width") ?? {}),
-    "0": "0px",
-    auto: "auto",
-    full: "100%",
-    screen: "100vw",
-    min: "min-content",
-    max: "max-content",
-    fit: "fit-content",
-  };
-
   matchUtilities(
     {
       "animate-w": (value: string) => ({
@@ -31,7 +21,10 @@ export function addPropertyUtilities({
       }),
     },
     {
-      values: sizeValues,
+      values: {
+        ...(theme("width") ?? {}),
+        ...(theme("jumi.sizes") ?? defaultTheme.sizes),
+      },
       type: "length",
     }
   );
@@ -47,32 +40,13 @@ export function addPropertyUtilities({
     {
       values: {
         ...(theme("height") ?? {}),
-        "0": "0px",
-        auto: "auto",
-        full: "100%",
-        screen: "100vh",
-        min: "min-content",
-        max: "max-content",
-        fit: "fit-content",
+        ...(theme("jumi.sizes") ?? defaultTheme.sizes),
       },
       type: "length",
     }
   );
 
   // Border radius animation utilities
-  const borderRadiusValues = {
-    ...(theme("borderRadius") ?? {}),
-    none: "0px",
-    sm: "0.125rem",
-    DEFAULT: "0.25rem",
-    md: "0.375rem",
-    lg: "0.5rem",
-    xl: "0.75rem",
-    "2xl": "1rem",
-    "3xl": "1.5rem",
-    full: "9999px",
-  };
-
   matchUtilities(
     {
       "animate-rounded": (value: string) => ({
@@ -81,21 +55,15 @@ export function addPropertyUtilities({
       }),
     },
     {
-      values: borderRadiusValues,
+      values: {
+        ...(theme("borderRadius") ?? {}),
+        ...(theme("jumi.borderRadius") ?? defaultTheme.borderRadius),
+      },
       type: "length",
     }
   );
 
   // Border width animation utilities
-  const borderWidthValues = {
-    ...(theme("borderWidth") ?? {}),
-    "0": "0px",
-    "2": "2px",
-    "4": "4px",
-    "8": "8px",
-    DEFAULT: "1px",
-  };
-
   matchUtilities(
     {
       "animate-border": (value: string) => ({
@@ -104,24 +72,116 @@ export function addPropertyUtilities({
       }),
     },
     {
-      values: borderWidthValues,
+      values: {
+        ...(theme("borderWidth") ?? {}),
+        ...(theme("jumi.borderWidths") ?? defaultTheme.borderWidths),
+      },
+      type: "line-width",
+    }
+  );
+
+  // Border reveal animation utilities - directional border drawing effects
+  matchUtilities(
+    {
+      "animate-border-reveal-top": (value: string) => ({
+        position: "relative",
+        "&::before": {
+          content: "''",
+          position: "absolute",
+          top: "0",
+          left: "0",
+          width: "0%",
+          height: value,
+          backgroundColor: "var(--jumi-border-color, currentColor)",
+          animationName: "jumi-border-reveal-top",
+        },
+      }),
+    },
+    {
+      values: {
+        ...(theme("borderWidth") ?? {}),
+        ...(theme("jumi.borderWidths") ?? defaultTheme.borderWidths),
+      },
+      type: "line-width",
+    }
+  );
+
+  matchUtilities(
+    {
+      "animate-border-reveal-right": (value: string) => ({
+        position: "relative",
+        "&::before": {
+          content: "''",
+          position: "absolute",
+          top: "0",
+          right: "0",
+          width: value,
+          height: "0%",
+          backgroundColor: "var(--jumi-border-color, currentColor)",
+          animationName: "jumi-border-reveal-right",
+        },
+      }),
+    },
+    {
+      values: {
+        ...(theme("borderWidth") ?? {}),
+        ...(theme("jumi.borderWidths") ?? defaultTheme.borderWidths),
+      },
+      type: "line-width",
+    }
+  );
+
+  matchUtilities(
+    {
+      "animate-border-reveal-bottom": (value: string) => ({
+        position: "relative",
+        "&::before": {
+          content: "''",
+          position: "absolute",
+          bottom: "0",
+          right: "0",
+          width: "0%",
+          height: value,
+          backgroundColor: "var(--jumi-border-color, currentColor)",
+          animationName: "jumi-border-reveal-bottom",
+        },
+      }),
+    },
+    {
+      values: {
+        ...(theme("borderWidth") ?? {}),
+        ...(theme("jumi.borderWidths") ?? defaultTheme.borderWidths),
+      },
+      type: "line-width",
+    }
+  );
+
+  matchUtilities(
+    {
+      "animate-border-reveal-left": (value: string) => ({
+        position: "relative",
+        "&::before": {
+          content: "''",
+          position: "absolute",
+          bottom: "0",
+          left: "0",
+          width: value,
+          height: "0%",
+          backgroundColor: "var(--jumi-border-color, currentColor)",
+          animationName: "jumi-border-reveal-left",
+        },
+      }),
+    },
+    {
+      values: {
+        ...(theme("borderWidth") ?? {}),
+        ...(theme("jumi.borderWidths") ?? defaultTheme.borderWidths),
+      },
       type: "line-width",
     }
   );
 
   // Shadow animation utilities
-  const shadowValues = {
-    ...(theme("boxShadow") ?? {}),
-    sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-    DEFAULT: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
-    md: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
-    lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
-    xl: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
-    "2xl": "0 25px 50px -12px rgb(0 0 0 / 0.25)",
-    inner: "inset 0 2px 4px 0 rgb(0 0 0 / 0.05)",
-    none: "0 0 #0000",
-  };
-
   matchUtilities(
     {
       "animate-shadow": (value: string) => ({
@@ -130,7 +190,10 @@ export function addPropertyUtilities({
       }),
     },
     {
-      values: shadowValues,
+      values: {
+        ...(theme("boxShadow") ?? {}),
+        ...(theme("jumi.shadows") ?? defaultTheme.shadows),
+      },
       type: "shadow",
     }
   );
@@ -138,25 +201,6 @@ export function addPropertyUtilities({
   // === EXPANDED PROPERTY COVERAGE ===
 
   // Opacity animation utilities
-  const opacityValues = {
-    ...(theme("opacity") ?? {}),
-    "0": "0",
-    "5": "0.05",
-    "10": "0.1",
-    "20": "0.2",
-    "25": "0.25",
-    "30": "0.3",
-    "40": "0.4",
-    "50": "0.5",
-    "60": "0.6",
-    "70": "0.7",
-    "75": "0.75",
-    "80": "0.8",
-    "90": "0.9",
-    "95": "0.95",
-    "100": "1",
-  };
-
   matchUtilities(
     {
       "animate-opacity": (value: string) => ({
@@ -165,65 +209,32 @@ export function addPropertyUtilities({
       }),
     },
     {
-      values: opacityValues,
+      values: {
+        ...(theme("opacity") ?? {}),
+        ...(theme("jumi.opacity") ?? defaultTheme.opacity),
+      },
       type: "number",
     }
   );
 
   // Font size animation utilities
-  const fontSizeValues = {
-    ...(theme("fontSize") ?? {}),
-    xs: "0.75rem",
-    sm: "0.875rem",
-    base: "1rem",
-    lg: "1.125rem",
-    xl: "1.25rem",
-    "2xl": "1.5rem",
-    "3xl": "1.875rem",
-    "4xl": "2.25rem",
-    "5xl": "3rem",
-    "6xl": "3.75rem",
-    "7xl": "4.5rem",
-    "8xl": "6rem",
-    "9xl": "8rem",
-  };
-
   matchUtilities(
     {
-      "animate-text": (value: string) => {
-        // Handle array values from theme (fontSize can be [size, lineHeight])
-        const fontSize = Array.isArray(value) ? value[0] : value;
-        return {
-          "animation-name": "jumi-font-size",
-          "--jumi-font-size": fontSize,
-        };
-      },
+      "animate-text": (value: string) => ({
+        "animation-name": "jumi-font-size",
+        "--jumi-font-size": value,
+      }),
     },
     {
-      values: fontSizeValues,
-      type: "absolute-size",
+      values: {
+        ...(theme("fontSize") ?? {}),
+        ...(theme("jumi.fontSizes") ?? defaultTheme.fontSizes),
+      },
+      type: "length",
     }
   );
 
   // Line height animation utilities
-  const lineHeightValues = {
-    ...(theme("lineHeight") ?? {}),
-    "3": ".75rem",
-    "4": "1rem",
-    "5": "1.25rem",
-    "6": "1.5rem",
-    "7": "1.75rem",
-    "8": "2rem",
-    "9": "2.25rem",
-    "10": "2.5rem",
-    none: "1",
-    tight: "1.25",
-    snug: "1.375",
-    normal: "1.5",
-    relaxed: "1.625",
-    loose: "2",
-  };
-
   matchUtilities(
     {
       "animate-leading": (value: string) => ({
@@ -232,7 +243,10 @@ export function addPropertyUtilities({
       }),
     },
     {
-      values: lineHeightValues,
+      values: {
+        ...(theme("lineHeight") ?? {}),
+        ...(theme("jumi.lineHeights") ?? defaultTheme.lineHeights),
+      },
       type: "length",
     }
   );
@@ -312,48 +326,6 @@ export function addPropertyUtilities({
   // === ADVANCED VISUAL EFFECTS ===
 
   // Filter animation utilities
-  const filterValues = {
-    ...(theme("filter") ?? {}),
-    none: "none",
-    blur: "blur(8px)",
-    "blur-sm": "blur(4px)",
-    "blur-md": "blur(12px)",
-    "blur-lg": "blur(16px)",
-    "blur-xl": "blur(24px)",
-    "blur-2xl": "blur(40px)",
-    "blur-3xl": "blur(64px)",
-    brightness: "brightness(1.25)",
-    "brightness-50": "brightness(0.5)",
-    "brightness-75": "brightness(0.75)",
-    "brightness-90": "brightness(0.9)",
-    "brightness-105": "brightness(1.05)",
-    "brightness-110": "brightness(1.1)",
-    "brightness-125": "brightness(1.25)",
-    "brightness-150": "brightness(1.5)",
-    "brightness-200": "brightness(2)",
-    contrast: "contrast(1.25)",
-    "contrast-50": "contrast(0.5)",
-    "contrast-75": "contrast(0.75)",
-    "contrast-125": "contrast(1.25)",
-    "contrast-150": "contrast(1.5)",
-    "contrast-200": "contrast(2)",
-    grayscale: "grayscale(100%)",
-    "grayscale-50": "grayscale(50%)",
-    invert: "invert(100%)",
-    "invert-50": "invert(50%)",
-    sepia: "sepia(100%)",
-    "sepia-50": "sepia(50%)",
-    "hue-rotate-15": "hue-rotate(15deg)",
-    "hue-rotate-30": "hue-rotate(30deg)",
-    "hue-rotate-60": "hue-rotate(60deg)",
-    "hue-rotate-90": "hue-rotate(90deg)",
-    "hue-rotate-180": "hue-rotate(180deg)",
-    saturate: "saturate(1.5)",
-    "saturate-50": "saturate(0.5)",
-    "saturate-150": "saturate(1.5)",
-    "saturate-200": "saturate(2)",
-  };
-
   matchUtilities(
     {
       "animate-filter": (value: string) => ({
@@ -362,48 +334,15 @@ export function addPropertyUtilities({
       }),
     },
     {
-      values: filterValues,
+      values: {
+        ...(theme("filter") ?? {}),
+        ...(theme("jumi.filters") ?? defaultTheme.filters),
+      },
       type: "any",
     }
   );
 
   // Backdrop filter animation utilities
-  const backdropFilterValues = {
-    ...(theme("backdropFilter") ?? {}),
-    none: "none",
-    blur: "blur(8px)",
-    "blur-sm": "blur(4px)",
-    "blur-md": "blur(12px)",
-    "blur-lg": "blur(16px)",
-    "blur-xl": "blur(24px)",
-    "blur-2xl": "blur(40px)",
-    "blur-3xl": "blur(64px)",
-    brightness: "brightness(1.25)",
-    "brightness-50": "brightness(0.5)",
-    "brightness-75": "brightness(0.75)",
-    "brightness-125": "brightness(1.25)",
-    "brightness-150": "brightness(1.5)",
-    "brightness-200": "brightness(2)",
-    contrast: "contrast(1.25)",
-    "contrast-50": "contrast(0.5)",
-    "contrast-75": "contrast(0.75)",
-    "contrast-125": "contrast(1.25)",
-    "contrast-150": "contrast(1.5)",
-    "contrast-200": "contrast(2)",
-    grayscale: "grayscale(100%)",
-    invert: "invert(100%)",
-    sepia: "sepia(100%)",
-    "hue-rotate-15": "hue-rotate(15deg)",
-    "hue-rotate-30": "hue-rotate(30deg)",
-    "hue-rotate-60": "hue-rotate(60deg)",
-    "hue-rotate-90": "hue-rotate(90deg)",
-    "hue-rotate-180": "hue-rotate(180deg)",
-    saturate: "saturate(1.5)",
-    "saturate-50": "saturate(0.5)",
-    "saturate-150": "saturate(1.5)",
-    "saturate-200": "saturate(2)",
-  };
-
   matchUtilities(
     {
       "animate-backdrop": (value: string) => ({
@@ -412,7 +351,10 @@ export function addPropertyUtilities({
       }),
     },
     {
-      values: backdropFilterValues,
+      values: {
+        ...(theme("backdropFilter") ?? {}),
+        ...(theme("jumi.backdrops") ?? defaultTheme.backdrops),
+      },
       type: "any",
     }
   );
@@ -553,6 +495,24 @@ function generatePropertyKeyframes() {
     },
     "@keyframes jumi-border-width": {
       to: { "border-width": "var(--jumi-border-width)" },
+    },
+
+    // Border reveal keyframes - animated border drawing effects
+    "@keyframes jumi-border-reveal-top": {
+      "0%": { width: "0%" },
+      "100%": { width: "100%" },
+    },
+    "@keyframes jumi-border-reveal-right": {
+      "0%": { height: "0%" },
+      "100%": { height: "100%" },
+    },
+    "@keyframes jumi-border-reveal-bottom": {
+      "0%": { width: "0%" },
+      "100%": { width: "100%" },
+    },
+    "@keyframes jumi-border-reveal-left": {
+      "0%": { height: "0%" },
+      "100%": { height: "100%" },
     },
     "@keyframes jumi-shadow": {
       to: { "box-shadow": "var(--jumi-shadow)" },

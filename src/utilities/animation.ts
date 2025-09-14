@@ -47,99 +47,60 @@ export function addAnimationUtilities({
 
   matchUtilities(
     {
-      "animate-ease": (value: string) => ({
+      "animate-timing": (value: string) => ({
         "--jumi-timing-function": value,
       }),
     },
     {
-      values: theme("jumi.easings") ?? defaultTheme.easings,
+      values: theme("jumi.timingFunctions") ?? defaultTheme.timingFunctions,
     }
   );
 
-  const directionUtilities = {
-    ".animate-reverse": {
-      "--jumi-direction": "reverse",
+  matchUtilities(
+    {
+      "animate-direction": (value: string) => ({
+        "--jumi-direction": value,
+      }),
     },
-    ".animate-alternate": {
-      "--jumi-direction": "alternate",
-    },
-    ".animate-alternate-reverse": {
-      "--jumi-direction": "alternate-reverse",
-    },
-  };
-
-  const fillModeUtilities = {
-    ".animate-fill-none": {
-      "--jumi-fill-mode": "none",
-    },
-    ".animate-fill-forwards": {
-      "--jumi-fill-mode": "forwards",
-    },
-    ".animate-fill-backwards": {
-      "--jumi-fill-mode": "backwards",
-    },
-    ".animate-fill-both": {
-      "--jumi-fill-mode": "both",
-    },
-  };
-
-  const playStateUtilities = {
-    ".animate-play": {
-      "--jumi-play-state": "running",
-    },
-    ".animate-pause": {
-      "--jumi-play-state": "paused",
-    },
-  };
-
-  const iterationUtilities = {
-    ".animate-once": {
-      "--jumi-iteration-count": "1",
-    },
-    ".animate-twice": {
-      "--jumi-iteration-count": "2",
-    },
-    ".animate-thrice": {
-      "--jumi-iteration-count": "3",
-    },
-    ".animate-infinite": {
-      "--jumi-iteration-count": "infinite",
-    },
-  };
+    {
+      values: theme("jumi.directions") ?? defaultTheme.directions,
+    }
+  );
 
   matchUtilities(
     {
-      "animate-repeat": (value: string) => ({
+      "animate-fill": (value: string) => ({
+        "--jumi-fill-mode": value,
+      }),
+    },
+    {
+      values: theme("jumi.fillModes") ?? defaultTheme.fillModes,
+    }
+  );
+
+  matchUtilities(
+    {
+      "animate-play": (value: string) => ({
+        "--jumi-play-state": value,
+      }),
+    },
+    {
+      values: theme("jumi.playStates") ?? defaultTheme.playStates,
+    }
+  );
+
+  matchUtilities(
+    {
+      "animate-count": (value: string) => ({
         "--jumi-iteration-count": value,
       }),
     },
     {
-      values: {
-        "1": "1",
-        "2": "2",
-        "3": "3",
-        "4": "4",
-        "5": "5",
-        "10": "10",
-        infinite: "infinite",
-      },
+      values: theme("jumi.iterationCounts") ?? defaultTheme.iterationCounts,
     }
   );
 
-  const allUtilities = {
-    ...directionUtilities,
-    ...fillModeUtilities,
-    ...playStateUtilities,
-    ...iterationUtilities,
-  };
-
-  Object.entries(allUtilities).forEach(([selector, styles]) => {
-    matchUtilities(
-      { [selector.substring(1)]: () => styles },
-      { values: { DEFAULT: "DEFAULT" } }
-    );
-  });
-
+  // Arbitrary value utilities for direct CSS animation properties
   matchUtilities({
     "animation-name": (value: string) => ({
       "animation-name": value,

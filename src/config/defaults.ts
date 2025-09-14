@@ -1,5 +1,6 @@
 import { JumiTheme } from "../types";
-import { getAllEasings } from "./easings";
+import { easings } from "./easings";
+import { getAllKeyframes, keyframes } from "./keyframes";
 
 /**
  * Default theme configuration for Jumi animations
@@ -65,7 +66,199 @@ export const defaultTheme: JumiTheme = {
   },
 
   // Easing functions
-  easings: getAllEasings(),
+  timingFunctions: easings,
+
+  // Animation directions
+  directions: {
+    normal: "normal",
+    reverse: "reverse",
+    alternate: "alternate",
+    "alternate-reverse": "alternate-reverse",
+  },
+
+  // Animation iteration counts
+  iterationCounts: {
+    "1": "1",
+    "2": "2",
+    "3": "3",
+    "4": "4",
+    "5": "5",
+    "10": "10",
+    infinite: "infinite",
+  },
+
+  // Animation fill modes
+  fillModes: {
+    none: "none",
+    forwards: "forwards",
+    backwards: "backwards",
+    both: "both",
+  },
+
+  // Animation play states
+  playStates: {
+    running: "running",
+    paused: "paused",
+  },
+
+  // Opacity values for effects
+  opacity: {
+    "0": "0",
+    "5": "0.05",
+    "10": "0.1",
+    "20": "0.2",
+    "25": "0.25",
+    "30": "0.3",
+    "40": "0.4",
+    "50": "0.5",
+    "60": "0.6",
+    "70": "0.7",
+    "75": "0.75",
+    "80": "0.8",
+    "90": "0.9",
+    "95": "0.95",
+    "100": "1",
+  },
+
+  // Blur values for effects
+  blur: {
+    "0": "0",
+    sm: "4px",
+    DEFAULT: "8px",
+    md: "12px",
+    lg: "16px",
+    xl: "24px",
+    "2xl": "40px",
+    "3xl": "64px",
+  },
+
+  // Size values for width/height animations
+  sizes: {
+    "0": "0px",
+    auto: "auto",
+    full: "100%",
+    screen: "100vw",
+    min: "min-content",
+    max: "max-content",
+    fit: "fit-content",
+  },
+
+  // Border radius values
+  borderRadius: {
+    none: "0px",
+    sm: "0.125rem",
+    DEFAULT: "0.25rem",
+    md: "0.375rem",
+    lg: "0.5rem",
+    xl: "0.75rem",
+    "2xl": "1rem",
+    "3xl": "1.5rem",
+    full: "9999px",
+  },
+
+  // Border width values
+  borderWidths: {
+    "0": "0px",
+    DEFAULT: "1px",
+    "2": "2px",
+    "4": "4px",
+    "8": "8px",
+  },
+
+  // Box shadow values
+  shadows: {
+    sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+    DEFAULT: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+    md: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+    lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+    xl: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+    "2xl": "0 25px 50px -12px rgb(0 0 0 / 0.25)",
+    inner: "inset 0 2px 4px 0 rgb(0 0 0 / 0.05)",
+    none: "0 0 #0000",
+  },
+
+  // Font size values
+  fontSizes: {
+    xs: "0.75rem",
+    sm: "0.875rem",
+    base: "1rem",
+    lg: "1.125rem",
+    xl: "1.25rem",
+    "2xl": "1.5rem",
+    "3xl": "1.875rem",
+    "4xl": "2.25rem",
+    "5xl": "3rem",
+    "6xl": "3.75rem",
+    "7xl": "4.5rem",
+    "8xl": "6rem",
+    "9xl": "8rem",
+  },
+
+  // Line height values
+  lineHeights: {
+    "3": "0.75rem",
+    "4": "1rem",
+    "5": "1.25rem",
+    "6": "1.5rem",
+    "7": "1.75rem",
+    "8": "2rem",
+    "9": "2.25rem",
+    "10": "2.5rem",
+    none: "1",
+    tight: "1.25",
+    snug: "1.375",
+    normal: "1.5",
+    relaxed: "1.625",
+    loose: "2",
+  },
+
+  // Filter values
+  filters: {
+    "blur-none": "blur(0)",
+    "blur-sm": "blur(4px)",
+    blur: "blur(8px)",
+    "blur-md": "blur(12px)",
+    "blur-lg": "blur(16px)",
+    "blur-xl": "blur(24px)",
+    "blur-2xl": "blur(40px)",
+    "blur-3xl": "blur(64px)",
+    "brightness-0": "brightness(0)",
+    "brightness-50": "brightness(.5)",
+    "brightness-75": "brightness(.75)",
+    "brightness-90": "brightness(.9)",
+    "brightness-95": "brightness(.95)",
+    "brightness-100": "brightness(1)",
+    "brightness-105": "brightness(1.05)",
+    "brightness-110": "brightness(1.1)",
+    "brightness-125": "brightness(1.25)",
+    "brightness-150": "brightness(1.5)",
+    "brightness-200": "brightness(2)",
+  },
+
+  // Backdrop filter values
+  backdrops: {
+    "backdrop-blur-none": "blur(0)",
+    "backdrop-blur-sm": "blur(4px)",
+    "backdrop-blur": "blur(8px)",
+    "backdrop-blur-md": "blur(12px)",
+    "backdrop-blur-lg": "blur(16px)",
+    "backdrop-blur-xl": "blur(24px)",
+    "backdrop-blur-2xl": "blur(40px)",
+    "backdrop-blur-3xl": "blur(64px)",
+  },
+
+  // Transform origin values
+  origins: {
+    center: "center",
+    top: "top",
+    "top-right": "top right",
+    right: "right",
+    "bottom-right": "bottom right",
+    bottom: "bottom",
+    "bottom-left": "bottom left",
+    left: "left",
+    "top-left": "top left",
+  },
 
   // Transform distances (percentage-based like original)
   distances: {
@@ -169,58 +362,18 @@ export const defaultTheme: JumiTheme = {
     none: "none",
   },
 
+  properties: {
+    name: "name",
+    duration: "duration",
+    delay: "delay",
+    "timing-function": "timing-function",
+    direction: "direction",
+    "iteration-count": "iteration-count",
+    "fill-mode": "fill-mode",
+    "play-state": "play-state",
+    composition: "composition",
+  },
+
   // Animation effects (predefined keyframes)
-  effects: [
-    // Fade animations
-    "fade-in",
-    "fade-out",
-    "fade-up",
-    "fade-down",
-    "fade-left",
-    "fade-right",
-    "fade-up-right",
-    "fade-up-left",
-    "fade-down-right",
-    "fade-down-left",
-
-    // Slide animations
-    "slide-in-up",
-    "slide-in-down",
-    "slide-in-left",
-    "slide-in-right",
-
-    // Zoom animations
-    "zoom-in",
-    "zoom-in-up",
-    "zoom-in-down",
-    "zoom-in-left",
-    "zoom-in-right",
-    "zoom-out",
-    "zoom-out-up",
-    "zoom-out-down",
-    "zoom-out-left",
-    "zoom-out-right",
-
-    // Flip animations
-    "flip-x",
-    "flip-y",
-    "flip-up",
-    "flip-down",
-    "flip-left",
-    "flip-right",
-
-    // Bounce effects
-    "bounce-in",
-    "bounce-out",
-
-    // Back effects
-    "back-in",
-    "back-out",
-
-    // Special effects
-    "pulse",
-    "shake",
-    "wobble",
-    "swing",
-  ],
+  effects: getAllKeyframes(),
 };

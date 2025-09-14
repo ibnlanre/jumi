@@ -186,18 +186,6 @@ export function addTransformUtilities({
   );
 
   // Transform origin utilities
-  const originValues = {
-    center: "center",
-    top: "top",
-    "top-right": "top right",
-    right: "right",
-    "bottom-right": "bottom right",
-    bottom: "bottom",
-    "bottom-left": "bottom left",
-    left: "left",
-    "top-left": "top left",
-  };
-
   matchUtilities(
     {
       "animate-origin": (value: string) => ({
@@ -206,7 +194,7 @@ export function addTransformUtilities({
       }),
     },
     {
-      values: originValues,
+      values: theme("jumi.origins") ?? defaultTheme.origins,
       type: "lookup",
     }
   );

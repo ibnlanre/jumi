@@ -37,26 +37,30 @@ export interface MatchUtilitiesOptions {
 
 // Jumi specific types
 export interface JumiTheme {
-  durations?: Record<string, string>;
-  delays?: Record<string, string>;
-  easings?: Record<string, string>;
-  distances?: Record<string, string>;
-  rotations?: Record<string, string>;
-  scales?: Record<string, string>;
-  perspectives?: Record<string, string>;
-  effects?: string[];
-
-  // Extended property theme support
-  filters?: Record<string, string>;
-  backdropFilters?: Record<string, string>;
-  colors?: Record<string, string | Record<string, string>>;
-  spacing?: Record<string, string>;
-  fontSizes?: Record<string, string | [string, string]>;
-  lineHeights?: Record<string, string>;
-  borderRadius?: Record<string, string>;
-  borderWidth?: Record<string, string>;
-  boxShadow?: Record<string, string>;
-  opacity?: Record<string, string>;
+  durations: Record<string, string>;
+  delays: Record<string, string>;
+  timingFunctions: Record<string, string>;
+  directions: Record<string, string>;
+  iterationCounts: Record<string, string>;
+  fillModes: Record<string, string>;
+  playStates: Record<string, string>;
+  distances: Record<string, string>;
+  rotations: Record<string, string>;
+  scales: Record<string, string>;
+  perspectives: Record<string, string>;
+  effects: Record<string, string>;
+  opacity: Record<string, string>;
+  blur: Record<string, string>;
+  sizes: Record<string, string>;
+  borderRadius: Record<string, string>;
+  borderWidths: Record<string, string>;
+  shadows: Record<string, string>;
+  fontSizes: Record<string, string>;
+  lineHeights: Record<string, string>;
+  filters: Record<string, string>;
+  backdrops: Record<string, string>;
+  origins: Record<string, string>;
+  properties: Record<string, string>;
 }
 
 export interface JumiConfig {
@@ -75,16 +79,7 @@ export interface JumiConfig {
   defaultPlayState?: string;
 }
 
-export interface EasingDefinition {
-  name: string;
-  value: string;
-  category: "ease-in" | "ease-out" | "ease-in-out" | "linear" | "custom";
-}
-
-export interface KeyframeDefinition {
-  name: string;
-  keyframes: Record<string, Record<string, any>>;
-}
+export type KeyframeDefinition = Record<string, Record<string, any>>;
 
 // Enhanced property type definitions
 export interface PropertyUtility {
