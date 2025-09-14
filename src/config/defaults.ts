@@ -169,23 +169,58 @@ export const defaultTheme: JumiTheme = {
     none: "none",
   },
 
-  // Predefined effect animations
-  effects: {
-    "bounce-in": "bounce-in",
-    "bounce-out": "bounce-out",
-    "fade-in": "fade-in",
-    "fade-out": "fade-out",
-    "slide-in-up": "slide-in-up",
-    "slide-in-down": "slide-in-down",
-    "slide-in-left": "slide-in-left",
-    "slide-in-right": "slide-in-right",
-    "zoom-in": "zoom-in",
-    "zoom-out": "zoom-out",
-    "flip-x": "flip-x",
-    "flip-y": "flip-y",
-    shake: "shake",
-    pulse: "pulse",
-    swing: "swing",
-    wobble: "wobble",
-  },
+  // Animation effects (predefined keyframes)
+  effects: [
+    // Fade animations
+    "fade-in",
+    "fade-out",
+    "fade-up",
+    "fade-down",
+    "fade-left",
+    "fade-right",
+    "fade-up-right",
+    "fade-up-left",
+    "fade-down-right",
+    "fade-down-left",
+
+    // Slide animations
+    "slide-in-up",
+    "slide-in-down",
+    "slide-in-left",
+    "slide-in-right",
+
+    // Zoom animations
+    "zoom-in",
+    "zoom-in-up",
+    "zoom-in-down",
+    "zoom-in-left",
+    "zoom-in-right",
+    "zoom-out",
+    "zoom-out-up",
+    "zoom-out-down",
+    "zoom-out-left",
+    "zoom-out-right",
+
+    // Flip animations
+    "flip-x",
+    "flip-y",
+    "flip-up",
+    "flip-down",
+    "flip-left",
+    "flip-right",
+
+    // Bounce effects
+    "bounce-in",
+    "bounce-out",
+
+    // Back effects
+    "back-in",
+    "back-out",
+
+    // Special effects
+    "pulse",
+    "shake",
+    "wobble",
+    "swing",
+  ],
 };

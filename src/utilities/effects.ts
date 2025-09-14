@@ -15,57 +15,14 @@ export function addEffectUtilities({
   addBase(getKeyframesAsCSS());
 
   // Get available effects from theme or defaults
-  const effects = theme("jumi.effects") ?? defaultTheme.effects;
+  const effects: string[] = theme("jumi.effects") ?? defaultTheme.effects;
 
-  // Generate effect utilities
-  matchUtilities(
-    {
-      animate: (value: string) => {
-        // Check if it's a predefined effect
-        if (keyframes[value]) {
-          return {
-            "animation-name": value,
-            "animation-duration": "var(--jumi-duration)",
-            "animation-timing-function": "var(--jumi-timing-function)",
-            "animation-delay": "var(--jumi-delay)",
-            "animation-direction": "var(--jumi-direction)",
-            "animation-iteration-count": "var(--jumi-iteration-count)",
-            "animation-fill-mode": "var(--jumi-fill-mode)",
-            "animation-play-state": "var(--jumi-play-state)",
-          };
-        }
-
-        // Fallback for custom animation names
-        return {
-          "animation-name": value,
-          "animation-duration": "var(--jumi-duration)",
-          "animation-timing-function": "var(--jumi-timing-function)",
-          "animation-delay": "var(--jumi-delay)",
-          "animation-direction": "var(--jumi-direction)",
-          "animation-iteration-count": "var(--jumi-iteration-count)",
-          "animation-fill-mode": "var(--jumi-fill-mode)",
-          "animation-play-state": "var(--jumi-play-state)",
-        };
-      },
-    },
-    {
-      values: effects,
-    }
-  );
-
-  // Individual effect utilities for better naming
-  Object.keys(keyframes).forEach((effectName) => {
+  // Individual effect utilities with intelligent naming
+  effects.forEach((effectName) => {
     matchUtilities(
       {
         [`animate-${effectName}`]: () => ({
           "animation-name": effectName,
-          "animation-duration": "var(--jumi-duration)",
-          "animation-timing-function": "var(--jumi-timing-function)",
-          "animation-delay": "var(--jumi-delay)",
-          "animation-direction": "var(--jumi-direction)",
-          "animation-iteration-count": "var(--jumi-iteration-count)",
-          "animation-fill-mode": "var(--jumi-fill-mode)",
-          "animation-play-state": "var(--jumi-play-state)",
         }),
       },
       {
@@ -95,16 +52,9 @@ export function addEffectUtilities({
 
   matchUtilities(
     {
-      "animate-fade": (value: string) => ({
-        "animation-name": "jumi-fade",
-        "animation-duration": "var(--jumi-duration)",
-        "animation-timing-function": "var(--jumi-timing-function)",
-        "animation-delay": "var(--jumi-delay)",
-        "animation-direction": "var(--jumi-direction)",
-        "animation-iteration-count": "var(--jumi-iteration-count)",
-        "animation-fill-mode": "var(--jumi-fill-mode)",
-        "animation-play-state": "var(--jumi-play-state)",
-        "--jumi-fade-opacity": value,
+      "animate-opacity": (value: string) => ({
+        "animation-name": "jumi-opacity",
+        "--jumi-opacity": value,
       }),
     },
     {
@@ -115,9 +65,9 @@ export function addEffectUtilities({
 
   // Add custom fade keyframe
   addBase({
-    "@keyframes jumi-fade": {
+    "@keyframes jumi-opacity": {
       to: {
-        opacity: "var(--jumi-fade-opacity, 1)",
+        opacity: "var(--jumi-opacity, 1)",
       },
     },
   });
@@ -138,13 +88,6 @@ export function addEffectUtilities({
     {
       "animate-blur": (value: string) => ({
         "animation-name": "jumi-blur",
-        "animation-duration": "var(--jumi-duration)",
-        "animation-timing-function": "var(--jumi-timing-function)",
-        "animation-delay": "var(--jumi-delay)",
-        "animation-direction": "var(--jumi-direction)",
-        "animation-iteration-count": "var(--jumi-iteration-count)",
-        "animation-fill-mode": "var(--jumi-fill-mode)",
-        "animation-play-state": "var(--jumi-play-state)",
         "--jumi-blur": value,
       }),
     },
@@ -168,13 +111,6 @@ export function addEffectUtilities({
     {
       "animate-bg": (value: string) => ({
         "animation-name": "jumi-bg",
-        "animation-duration": "var(--jumi-duration)",
-        "animation-timing-function": "var(--jumi-timing-function)",
-        "animation-delay": "var(--jumi-delay)",
-        "animation-direction": "var(--jumi-direction)",
-        "animation-iteration-count": "var(--jumi-iteration-count)",
-        "animation-fill-mode": "var(--jumi-fill-mode)",
-        "animation-play-state": "var(--jumi-play-state)",
         "--jumi-bg": value,
       }),
     },
@@ -198,13 +134,6 @@ export function addEffectUtilities({
     {
       "animate-text": (value: string) => ({
         "animation-name": "jumi-text",
-        "animation-duration": "var(--jumi-duration)",
-        "animation-timing-function": "var(--jumi-timing-function)",
-        "animation-delay": "var(--jumi-delay)",
-        "animation-direction": "var(--jumi-direction)",
-        "animation-iteration-count": "var(--jumi-iteration-count)",
-        "animation-fill-mode": "var(--jumi-fill-mode)",
-        "animation-play-state": "var(--jumi-play-state)",
         "--jumi-text": value,
       }),
     },

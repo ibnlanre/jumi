@@ -44,7 +44,7 @@ export interface JumiTheme {
   rotations?: Record<string, string>;
   scales?: Record<string, string>;
   perspectives?: Record<string, string>;
-  effects?: Record<string, string>;
+  effects?: string[];
 
   // Extended property theme support
   filters?: Record<string, string>;

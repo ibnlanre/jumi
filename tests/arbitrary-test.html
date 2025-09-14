@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jumi Arbitrary Animation Values Test</title>
+    <link rel="stylesheet" href="output.css" />
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem;
+      }
+      .test-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 1rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .animation-box {
+        width: 100px;
+        height: 100px;
+        margin: 1rem auto;
+        border-radius: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        text-align: center;
+        font-size: 0.75rem;
+        line-height: 1.2;
+      }
+      .code-example {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin: 0.5rem 0;
+        font-family: "Monaco", "Consolas", monospace;
+        font-size: 0.875rem;
+        overflow-x: auto;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1 style="text-align: center; margin-bottom: 1rem; color: #333">
+        🎬 Jumi Arbitrary Animation Values
+      </h1>
+      <p style="text-align: center; color: #666; margin-bottom: 2rem">
+        Manually compose animations using arbitrary values with the
+        <code>animation-*</code> prefix
+      </p>
+
+      <div class="grid-3">
+        <!-- Test 1: Multiple Animation Names -->
+        <div>
+          <h3>🎭 Multiple Animations</h3>
+          <div
+            class="animation-box animate animation-name-[jumi-rotate-z,_jumi-scale-uniform] animation-duration-[2s,_2s] animation-iteration-count-[infinite,_infinite] animation-direction-[normal,_alternate] animate-scale-50 animate-rotate-3"
+            style="background: #3b82f6"
+          >
+            Rotate + Scale
+          </div>
+          <div class="code-example">
+            animation-name-[jumi-rotate-z,_jumi-scale-uniform]
+            animation-duration-[2s,_2s]
+            animation-iteration-count-[infinite,_infinite]
+            animation-direction-[normal,_alternate]
+          </div>
+        </div>
+
+        <!-- Test 2: Custom Timing Functions -->
+        <div>
+          <h3>⏱️ Custom Easing</h3>
+          <div
+            class="animation-box animate animation-name-[jumi-bounce-in] animation-duration-[1.5s] animation-timing-function-[cubic-bezier(0.68,_-0.55,_0.265,_1.55)] animation-iteration-count-[infinite]"
+            style="background: #ef4444"
+          >
+            Bouncy
+          </div>
+          <div class="code-example">
+            animation-name-[jumi-bounce-in] animation-duration-[1.5s]
+            animation-timing-function-[cubic-bezier(0.68,_-0.55,_0.265,_1.55)]
+            animation-iteration-count-[infinite]
+          </div>
+        </div>
+
+        <!-- Test 3: Staggered Delays -->
+        <div>
+          <h3>🔄 Staggered Delays</h3>
+          <div
+            class="animation-box animate animation-name-[jumi-fade-in,_jumi-scale-uniform] animation-duration-[1s,_2s] animation-delay-[0s,_0.5s] animation-iteration-count-[infinite,_infinite]"
+            style="background: #10b981"
+          >
+            Fade then Scale
+          </div>
+          <div class="code-example">
+            animation-name-[jumi-fade-in,_jumi-scale-uniform]
+            animation-duration-[1s,_2s] animation-delay-[0s,_0.5s]
+            animation-iteration-count-[infinite,_infinite]
+          </div>
+        </div>
+
+        <!-- Test 4: Full Animation Shorthand -->
+        <div>
+          <h3>⚡ Shorthand</h3>
+          <div
+            class="animation-box animate animation-[jumi-rotate-z_3s_ease-in-out_infinite_alternate]"
+            style="background: #8b5cf6"
+          >
+            Shorthand
+          </div>
+          <div class="code-example">
+            animation-[jumi-rotate-z_3s_ease-in-out_infinite_alternate]
+          </div>
+        </div>
+
+        <!-- Test 5: Complex Multi-Stage -->
+        <div>
+          <h3>🎪 Complex Multi-Stage</h3>
+          <div
+            class="animation-box animate animation-name-[jumi-scale-uniform,_jumi-rotate-z,_jumi-fade-in] animation-duration-[1s,_2s,_0.5s] animation-delay-[0s,_0.5s,_1.5s] animation-iteration-count-[1,_infinite,_1] animation-fill-mode-[forwards,_none,_forwards]"
+            style="background: #f59e0b"
+          >
+            Multi-Stage
+          </div>
+          <div class="code-example">
+            animation-name-[jumi-scale-uniform,_jumi-rotate-z,_jumi-fade-in]
+            animation-duration-[1s,_2s,_0.5s] animation-delay-[0s,_0.5s,_1.5s]
+            animation-iteration-count-[1,_infinite,_1]
+            animation-fill-mode-[forwards,_none,_forwards]
+          </div>
+        </div>
+
+        <!-- Test 6: Play State Control -->
+        <div>
+          <h3>⏸️ Play State</h3>
+          <div style="text-align: center">
+            <div
+              class="animation-box animate animation-name-[jumi-rotate-z] animation-duration-[2s] animation-iteration-count-[infinite] animation-play-state-[running]"
+              style="background: #ec4899"
+              id="playStateBox"
+            >
+              Running
+            </div>
+            <button
+              onclick="togglePlayState()"
+              style="
+                margin-top: 1rem;
+                padding: 0.5rem 1rem;
+                border: none;
+                border-radius: 0.25rem;
+                background: #ec4899;
+                color: white;
+                cursor: pointer;
+              "
+            >
+              Toggle Pause/Play
+            </button>
+          </div>
+          <div class="code-example">
+            animation-play-state-[running] / animation-play-state-[paused]
+          </div>
+        </div>
+      </div>
+
+      <div
+        style="
+          margin-top: 3rem;
+          padding: 1.5rem;
+          background: #f8fafc;
+          border-radius: 0.5rem;
+          border-left: 4px solid #3b82f6;
+        "
+      >
+        <h4>💡 Usage Notes:</h4>
+        <ul style="margin: 0.5rem 0; padding-left: 1.5rem; line-height: 1.6">
+          <li>
+            <strong>Underscores (_)</strong> in arbitrary values are converted
+            to spaces
+          </li>
+          <li><strong>Commas</strong> separate multiple animation values</li>
+          <li>
+            <strong>All CSS animation properties</strong> are available as
+            arbitrary values
+          </li>
+          <li>
+            <strong>Mix and match</strong> different timing, easing, and
+            iteration behaviors
+          </li>
+          <li>
+            <strong>Full control</strong> over animation composition without
+            conflicts
+          </li>
+        </ul>
+      </div>
+
+      <div
+        style="
+          margin-top: 2rem;
+          padding: 1.5rem;
+          background: #fef7cd;
+          border-radius: 0.5rem;
+          border-left: 4px solid #f59e0b;
+        "
+      >
+        <h4>🔧 Advanced Examples:</h4>
+        <div class="code-example">
+          &lt;!-- Triple animation with different timings --&gt; &lt;div
+          class="animation-name-[bounce,_fadeIn,_rotateZ]
+          animation-duration-[1s,_0.5s,_2s]
+          animation-delay-[0s,_0.2s,_0.8s]"&gt; &lt;!-- Complex easing with
+          custom cubic-bezier --&gt; &lt;div
+          class="animation-timing-function-[cubic-bezier(0.25,_0.46,_0.45,_0.94)]"&gt;
+          &lt;!-- Shorthand for quick setup --&gt; &lt;div
+          class="animation-[slideIn_1s_ease-out_forwards,_pulse_2s_infinite]"&gt;
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function togglePlayState() {
+        const box = document.getElementById("playStateBox");
+        const isRunning = box.classList.contains(
+          "animation-play-state-[running]"
+        );
+
+        if (isRunning) {
+          box.classList.remove("animation-play-state-[running]");
+          box.classList.add("animation-play-state-[paused]");
+          box.textContent = "Paused";
+        } else {
+          box.classList.remove("animation-play-state-[paused]");
+          box.classList.add("animation-play-state-[running]");
+          box.textContent = "Running";
+        }
+      }
+    </script>
+  </body>
+</html>

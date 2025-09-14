@@ -1,6 +1,7 @@
 import { JumiPluginOptions, PluginAPI } from "./types";
 import { defaultTheme } from "./config/defaults";
 import { addAnimationUtilities } from "./utilities/animation";
+import { addAnimateUtilities } from "./utilities/animate";
 import {
   addTransformUtilities,
   generateTransformKeyframes,
@@ -22,6 +23,9 @@ import { addPropertyUtilities } from "./utilities/properties";
  */
 function jumiPlugin(api: PluginAPI, options: JumiPluginOptions = {}) {
   const { addBase, addVariant } = api;
+
+  // Add composable animation infrastructure first
+  addAnimateUtilities(api);
 
   // Add transform keyframes to base
   addBase(generateTransformKeyframes());
@@ -70,10 +74,8 @@ function jumiPluginWithConfig(options: JumiPluginOptions = {}) {
   };
 }
 
-// Default export (function that can be called with options)
 export default jumiPluginWithConfig;
 
-// Named exports for advanced usage
 export {
   jumiPlugin,
   jumiPluginWithConfig,

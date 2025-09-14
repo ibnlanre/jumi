@@ -27,13 +27,6 @@ export function addPropertyUtilities({
     {
       "animate-w": (value: string) => ({
         "animation-name": "jumi-width",
-        "animation-duration": "var(--jumi-duration)",
-        "animation-timing-function": "var(--jumi-timing-function)",
-        "animation-delay": "var(--jumi-delay)",
-        "animation-direction": "var(--jumi-direction)",
-        "animation-iteration-count": "var(--jumi-iteration-count)",
-        "animation-fill-mode": "var(--jumi-fill-mode)",
-        "animation-play-state": "var(--jumi-play-state)",
         "--jumi-width": value,
       }),
     },
@@ -48,13 +41,6 @@ export function addPropertyUtilities({
     {
       "animate-h": (value: string) => ({
         "animation-name": "jumi-height",
-        "animation-duration": "var(--jumi-duration)",
-        "animation-timing-function": "var(--jumi-timing-function)",
-        "animation-delay": "var(--jumi-delay)",
-        "animation-direction": "var(--jumi-direction)",
-        "animation-iteration-count": "var(--jumi-iteration-count)",
-        "animation-fill-mode": "var(--jumi-fill-mode)",
-        "animation-play-state": "var(--jumi-play-state)",
         "--jumi-height": value,
       }),
     },
@@ -91,13 +77,6 @@ export function addPropertyUtilities({
     {
       "animate-rounded": (value: string) => ({
         "animation-name": "jumi-border-radius",
-        "animation-duration": "var(--jumi-duration)",
-        "animation-timing-function": "var(--jumi-timing-function)",
-        "animation-delay": "var(--jumi-delay)",
-        "animation-direction": "var(--jumi-direction)",
-        "animation-iteration-count": "var(--jumi-iteration-count)",
-        "animation-fill-mode": "var(--jumi-fill-mode)",
-        "animation-play-state": "var(--jumi-play-state)",
         "--jumi-border-radius": value,
       }),
     },
@@ -121,13 +100,6 @@ export function addPropertyUtilities({
     {
       "animate-border": (value: string) => ({
         "animation-name": "jumi-border-width",
-        "animation-duration": "var(--jumi-duration)",
-        "animation-timing-function": "var(--jumi-timing-function)",
-        "animation-delay": "var(--jumi-delay)",
-        "animation-direction": "var(--jumi-direction)",
-        "animation-iteration-count": "var(--jumi-iteration-count)",
-        "animation-fill-mode": "var(--jumi-fill-mode)",
-        "animation-play-state": "var(--jumi-play-state)",
         "--jumi-border-width": value,
       }),
     },
@@ -154,13 +126,6 @@ export function addPropertyUtilities({
     {
       "animate-shadow": (value: string) => ({
         "animation-name": "jumi-shadow",
-        "animation-duration": "var(--jumi-duration)",
-        "animation-timing-function": "var(--jumi-timing-function)",
-        "animation-delay": "var(--jumi-delay)",
-        "animation-direction": "var(--jumi-direction)",
-        "animation-iteration-count": "var(--jumi-iteration-count)",
-        "animation-fill-mode": "var(--jumi-fill-mode)",
-        "animation-play-state": "var(--jumi-play-state)",
         "--jumi-shadow": value,
       }),
     },
@@ -196,13 +161,6 @@ export function addPropertyUtilities({
     {
       "animate-opacity": (value: string) => ({
         "animation-name": "jumi-opacity",
-        "animation-duration": "var(--jumi-duration)",
-        "animation-timing-function": "var(--jumi-timing-function)",
-        "animation-delay": "var(--jumi-delay)",
-        "animation-direction": "var(--jumi-direction)",
-        "animation-iteration-count": "var(--jumi-iteration-count)",
-        "animation-fill-mode": "var(--jumi-fill-mode)",
-        "animation-play-state": "var(--jumi-play-state)",
         "--jumi-opacity": value,
       }),
     },
@@ -237,13 +195,6 @@ export function addPropertyUtilities({
         const fontSize = Array.isArray(value) ? value[0] : value;
         return {
           "animation-name": "jumi-font-size",
-          "animation-duration": "var(--jumi-duration)",
-          "animation-timing-function": "var(--jumi-timing-function)",
-          "animation-delay": "var(--jumi-delay)",
-          "animation-direction": "var(--jumi-direction)",
-          "animation-iteration-count": "var(--jumi-iteration-count)",
-          "animation-fill-mode": "var(--jumi-fill-mode)",
-          "animation-play-state": "var(--jumi-play-state)",
           "--jumi-font-size": fontSize,
         };
       },
@@ -277,13 +228,6 @@ export function addPropertyUtilities({
     {
       "animate-leading": (value: string) => ({
         "animation-name": "jumi-line-height",
-        "animation-duration": "var(--jumi-duration)",
-        "animation-timing-function": "var(--jumi-timing-function)",
-        "animation-delay": "var(--jumi-delay)",
-        "animation-direction": "var(--jumi-direction)",
-        "animation-iteration-count": "var(--jumi-iteration-count)",
-        "animation-fill-mode": "var(--jumi-fill-mode)",
-        "animation-play-state": "var(--jumi-play-state)",
         "--jumi-line-height": value,
       }),
     },
@@ -328,13 +272,6 @@ export function addPropertyUtilities({
       {
         [`animate-${variant}`]: (value: string) => ({
           "animation-name": `jumi-${propertyName}`,
-          "animation-duration": "var(--jumi-duration)",
-          "animation-timing-function": "var(--jumi-timing-function)",
-          "animation-delay": "var(--jumi-delay)",
-          "animation-direction": "var(--jumi-direction)",
-          "animation-iteration-count": "var(--jumi-iteration-count)",
-          "animation-fill-mode": "var(--jumi-fill-mode)",
-          "animation-play-state": "var(--jumi-play-state)",
           [`--jumi-${propertyName}`]: value,
         }),
       },
@@ -362,13 +299,6 @@ export function addPropertyUtilities({
       {
         [`animate-${variant}`]: (value: string) => ({
           "animation-name": `jumi-${propertyName}`,
-          "animation-duration": "var(--jumi-duration)",
-          "animation-timing-function": "var(--jumi-timing-function)",
-          "animation-delay": "var(--jumi-delay)",
-          "animation-direction": "var(--jumi-direction)",
-          "animation-iteration-count": "var(--jumi-iteration-count)",
-          "animation-fill-mode": "var(--jumi-fill-mode)",
-          "animation-play-state": "var(--jumi-play-state)",
           [`--jumi-${propertyName}`]: value,
         }),
       },
@@ -428,13 +358,6 @@ export function addPropertyUtilities({
     {
       "animate-filter": (value: string) => ({
         "animation-name": "jumi-filter",
-        "animation-duration": "var(--jumi-duration)",
-        "animation-timing-function": "var(--jumi-timing-function)",
-        "animation-delay": "var(--jumi-delay)",
-        "animation-direction": "var(--jumi-direction)",
-        "animation-iteration-count": "var(--jumi-iteration-count)",
-        "animation-fill-mode": "var(--jumi-fill-mode)",
-        "animation-play-state": "var(--jumi-play-state)",
         "--jumi-filter": value,
       }),
     },
@@ -485,13 +408,6 @@ export function addPropertyUtilities({
     {
       "animate-backdrop": (value: string) => ({
         "animation-name": "jumi-backdrop-filter",
-        "animation-duration": "var(--jumi-duration)",
-        "animation-timing-function": "var(--jumi-timing-function)",
-        "animation-delay": "var(--jumi-delay)",
-        "animation-direction": "var(--jumi-direction)",
-        "animation-iteration-count": "var(--jumi-iteration-count)",
-        "animation-fill-mode": "var(--jumi-fill-mode)",
-        "animation-play-state": "var(--jumi-play-state)",
         "--jumi-backdrop-filter": value,
       }),
     },
@@ -581,13 +497,6 @@ export function addPropertyUtilities({
     {
       "animate-text-color": (value: string) => ({
         "animation-name": "jumi-text-color",
-        "animation-duration": "var(--jumi-duration)",
-        "animation-timing-function": "var(--jumi-timing-function)",
-        "animation-delay": "var(--jumi-delay)",
-        "animation-direction": "var(--jumi-direction)",
-        "animation-iteration-count": "var(--jumi-iteration-count)",
-        "animation-fill-mode": "var(--jumi-fill-mode)",
-        "animation-play-state": "var(--jumi-play-state)",
         "--jumi-text-color": value,
       }),
     },
@@ -602,13 +511,6 @@ export function addPropertyUtilities({
     {
       "animate-bg": (value: string) => ({
         "animation-name": "jumi-bg-color",
-        "animation-duration": "var(--jumi-duration)",
-        "animation-timing-function": "var(--jumi-timing-function)",
-        "animation-delay": "var(--jumi-delay)",
-        "animation-direction": "var(--jumi-direction)",
-        "animation-iteration-count": "var(--jumi-iteration-count)",
-        "animation-fill-mode": "var(--jumi-fill-mode)",
-        "animation-play-state": "var(--jumi-play-state)",
         "--jumi-bg-color": value,
       }),
     },
@@ -623,13 +525,6 @@ export function addPropertyUtilities({
     {
       "animate-border-color": (value: string) => ({
         "animation-name": "jumi-border-color",
-        "animation-duration": "var(--jumi-duration)",
-        "animation-timing-function": "var(--jumi-timing-function)",
-        "animation-delay": "var(--jumi-delay)",
-        "animation-direction": "var(--jumi-direction)",
-        "animation-iteration-count": "var(--jumi-iteration-count)",
-        "animation-fill-mode": "var(--jumi-fill-mode)",
-        "animation-play-state": "var(--jumi-play-state)",
         "--jumi-border-color": value,
       }),
     },

@@ -1,5 +1,6 @@
 import { PluginAPI, Direction, DirectionConfig } from "../types";
 import { defaultTheme } from "../config/defaults";
+import { createAdditiveAnimation } from "./animate";
 
 /**
  * Transform utilities with intelligent defaults
@@ -49,7 +50,7 @@ export function addTransformUtilities({
 }: PluginAPI) {
   // Add CSS custom properties base for transforms
   addBase({
-    ":root, .animate-reset": {
+    ".animate": {
       "--jumi-translate-x": "0",
       "--jumi-translate-y": "0",
       "--jumi-translate-z": "0",
@@ -68,20 +69,13 @@ export function addTransformUtilities({
 
   // === SCALE UTILITIES (Intelligent Defaults) ===
 
-  // Uniform scale (default behavior)
+  // Uniform scale (default behavior) - Additive approach
   matchUtilities(
     {
-      "animate-scale": (value: string) => ({
-        "animation-name": "jumi-scale-uniform",
-        "animation-duration": "var(--jumi-duration)",
-        "animation-timing-function": "var(--jumi-timing-function)",
-        "animation-delay": "var(--jumi-delay)",
-        "animation-direction": "var(--jumi-direction)",
-        "animation-iteration-count": "var(--jumi-iteration-count)",
-        "animation-fill-mode": "var(--jumi-fill-mode)",
-        "animation-play-state": "var(--jumi-play-state)",
-        "--jumi-scale": value,
-      }),
+      "animate-scale": (value: string) =>
+        createAdditiveAnimation("jumi-scale-uniform", {
+          "--jumi-scale": value,
+        }),
     },
     {
       values: theme("jumi.scales") ?? defaultTheme.scales,
@@ -89,21 +83,14 @@ export function addTransformUtilities({
     }
   );
 
-  // Axis-specific scale
+  // Axis-specific scale - Additive approach
   ["x", "y", "z"].forEach((axis) => {
     matchUtilities(
       {
-        [`animate-scale-${axis}`]: (value: string) => ({
-          "animation-name": `jumi-scale-${axis}`,
-          "animation-duration": "var(--jumi-duration)",
-          "animation-timing-function": "var(--jumi-timing-function)",
-          "animation-delay": "var(--jumi-delay)",
-          "animation-direction": "var(--jumi-direction)",
-          "animation-iteration-count": "var(--jumi-iteration-count)",
-          "animation-fill-mode": "var(--jumi-fill-mode)",
-          "animation-play-state": "var(--jumi-play-state)",
-          [`--jumi-scale-${axis}`]: value,
-        }),
+        [`animate-scale-${axis}`]: (value: string) =>
+          createAdditiveAnimation(`jumi-scale-${axis}`, {
+            [`--jumi-scale-${axis}`]: value,
+          }),
       },
       {
         values: theme("jumi.scales") ?? defaultTheme.scales,
@@ -114,20 +101,11 @@ export function addTransformUtilities({
 
   // === ROTATION UTILITIES (Intelligent Defaults) ===
 
-  // Default rotation (z-axis clockwise)
+  // Default rotation (z-axis clockwise) - Additive approach
   matchUtilities(
     {
-      "animate-rotate": (value: string) => ({
-        "animation-name": "jumi-rotate-z",
-        "animation-duration": "var(--jumi-duration)",
-        "animation-timing-function": "var(--jumi-timing-function)",
-        "animation-delay": "var(--jumi-delay)",
-        "animation-direction": "var(--jumi-direction)",
-        "animation-iteration-count": "var(--jumi-iteration-count)",
-        "animation-fill-mode": "var(--jumi-fill-mode)",
-        "animation-play-state": "var(--jumi-play-state)",
-        "--jumi-rotate-z": value,
-      }),
+      "animate-rotate": (value: string) =>
+        createAdditiveAnimation("jumi-rotate-z", { "--jumi-rotate-z": value }),
     },
     {
       values: theme("jumi.rotations") ?? defaultTheme.rotations,
@@ -135,20 +113,13 @@ export function addTransformUtilities({
     }
   );
 
-  // Counter-clockwise rotation
+  // Counter-clockwise rotation - Additive approach
   matchUtilities(
     {
-      "animate-rotate-ccw": (value: string) => ({
-        "animation-name": "jumi-rotate-z",
-        "animation-duration": "var(--jumi-duration)",
-        "animation-timing-function": "var(--jumi-timing-function)",
-        "animation-delay": "var(--jumi-delay)",
-        "animation-direction": "var(--jumi-direction)",
-        "animation-iteration-count": "var(--jumi-iteration-count)",
-        "animation-fill-mode": "var(--jumi-fill-mode)",
-        "animation-play-state": "var(--jumi-play-state)",
-        "--jumi-rotate-z": `calc(-1 * ${value})`,
-      }),
+      "animate-rotate-ccw": (value: string) =>
+        createAdditiveAnimation("jumi-rotate-z", {
+          "--jumi-rotate-z": `calc(-1 * ${value})`,
+        }),
     },
     {
       values: theme("jumi.rotations") ?? defaultTheme.rotations,
@@ -156,21 +127,14 @@ export function addTransformUtilities({
     }
   );
 
-  // Axis-specific rotation
+  // Axis-specific rotation - Additive approach
   ["x", "y", "z"].forEach((axis) => {
     matchUtilities(
       {
-        [`animate-rotate-${axis}`]: (value: string) => ({
-          "animation-name": `jumi-rotate-${axis}`,
-          "animation-duration": "var(--jumi-duration)",
-          "animation-timing-function": "var(--jumi-timing-function)",
-          "animation-delay": "var(--jumi-delay)",
-          "animation-direction": "var(--jumi-direction)",
-          "animation-iteration-count": "var(--jumi-iteration-count)",
-          "animation-fill-mode": "var(--jumi-fill-mode)",
-          "animation-play-state": "var(--jumi-play-state)",
-          [`--jumi-rotate-${axis}`]: value,
-        }),
+        [`animate-rotate-${axis}`]: (value: string) =>
+          createAdditiveAnimation(`jumi-rotate-${axis}`, {
+            [`--jumi-rotate-${axis}`]: value,
+          }),
       },
       {
         values: theme("jumi.rotations") ?? defaultTheme.rotations,
@@ -189,13 +153,6 @@ export function addTransformUtilities({
         [`animate-translate-${direction}`]: (value: string) => {
           const styles: Record<string, string> = {
             "animation-name": `jumi-translate-${direction}`,
-            "animation-duration": "var(--jumi-duration)",
-            "animation-timing-function": "var(--jumi-timing-function)",
-            "animation-delay": "var(--jumi-delay)",
-            "animation-direction": "var(--jumi-direction)",
-            "animation-iteration-count": "var(--jumi-iteration-count)",
-            "animation-fill-mode": "var(--jumi-fill-mode)",
-            "animation-play-state": "var(--jumi-play-state)",
           };
 
           // Set the target translate values
@@ -219,13 +176,6 @@ export function addTransformUtilities({
     {
       "animate-perspective": (value: string) => ({
         "animation-name": "jumi-perspective",
-        "animation-duration": "var(--jumi-duration)",
-        "animation-timing-function": "var(--jumi-timing-function)",
-        "animation-delay": "var(--jumi-delay)",
-        "animation-direction": "var(--jumi-direction)",
-        "animation-iteration-count": "var(--jumi-iteration-count)",
-        "animation-fill-mode": "var(--jumi-fill-mode)",
-        "animation-play-state": "var(--jumi-play-state)",
         "--jumi-perspective": value,
       }),
     },
@@ -252,13 +202,6 @@ export function addTransformUtilities({
     {
       "animate-origin": (value: string) => ({
         "animation-name": "jumi-origin",
-        "animation-duration": "var(--jumi-duration)",
-        "animation-timing-function": "var(--jumi-timing-function)",
-        "animation-delay": "var(--jumi-delay)",
-        "animation-direction": "var(--jumi-direction)",
-        "animation-iteration-count": "var(--jumi-iteration-count)",
-        "animation-fill-mode": "var(--jumi-fill-mode)",
-        "animation-play-state": "var(--jumi-play-state)",
         "--jumi-transform-origin": value,
       }),
     },
@@ -283,6 +226,7 @@ export function generateTransformKeyframes(): Record<string, any> {
   ["x", "y", "z"].forEach((axis) => {
     const scaleFunc =
       axis === "z" ? "scaleZ" : axis === "y" ? "scaleY" : "scaleX";
+
     keyframes[`@keyframes jumi-scale-${axis}`] = {
       to: {
         transform: `${scaleFunc}(var(--jumi-scale-${axis}, 1))`,
