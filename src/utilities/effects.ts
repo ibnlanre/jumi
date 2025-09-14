@@ -95,27 +95,4 @@ export function addEffectUtilities({
       },
     },
   });
-
-  // Text color animation utilities
-  matchUtilities(
-    {
-      "animate-text": (value: string) => ({
-        "animation-name": "jumi-text",
-        "--jumi-text": value,
-      }),
-    },
-    {
-      values: theme("colors"),
-      type: "color",
-    }
-  );
-
-  // Add custom text color keyframe
-  addBase({
-    "@keyframes jumi-text": {
-      to: {
-        color: "var(--jumi-text)",
-      },
-    },
-  });
 }

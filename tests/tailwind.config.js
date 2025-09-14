@@ -10,16 +10,6 @@ module.exports = {
       enableHover: true,
       enableGroup: true,
       enableDark: false,
-      theme: {
-        // Custom theme overrides
-        durations: {
-          "ultra-fast": "50ms",
-          "super-slow": "5s",
-        },
-        distances: {
-          huge: "200%",
-        },
-      },
     }),
   ],
 };

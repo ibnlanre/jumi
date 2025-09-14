@@ -739,7 +739,7 @@ video {
   --jumi-duration: 1s;
   --jumi-timing-function: ease;
   --jumi-delay: 0s;
-  --jumi-direction: normal;
+  --jumi-direction: alternate-reverse;
   --jumi-iteration-count: 1;
   --jumi-fill-mode: forwards;
   --jumi-play-state: running;
@@ -1372,12 +1372,6 @@ video {
   }
 }
 
-@keyframes jumi-text {
-  to {
-    color: var(--jumi-text);
-  }
-}
-
 @keyframes jumi-width {
   to {
     width: var(--jumi-width);
@@ -1479,9 +1473,15 @@ video {
   }
 }
 
-@keyframes jumi-text-color {
+@keyframes jumi-color {
   to {
-    color: var(--jumi-text-color);
+    color: var(--jumi-color);
+  }
+}
+
+@keyframes jumi-fill {
+  to {
+    fill: var(--jumi-fill);
   }
 }
 
@@ -1582,6 +1582,150 @@ video {
   to {
     padding-top: var(--jumi-padding-y);
     padding-bottom: var(--jumi-padding-y);
+  }
+}
+
+@keyframes jumi-min-width {
+  to {
+    min-width: var(--jumi-min-width);
+  }
+}
+
+@keyframes jumi-max-width {
+  to {
+    max-width: var(--jumi-max-width);
+  }
+}
+
+@keyframes jumi-min-height {
+  to {
+    min-height: var(--jumi-min-height);
+  }
+}
+
+@keyframes jumi-max-height {
+  to {
+    max-height: var(--jumi-max-height);
+  }
+}
+
+@keyframes jumi-top {
+  to {
+    top: var(--jumi-top);
+  }
+}
+
+@keyframes jumi-right {
+  to {
+    right: var(--jumi-right);
+  }
+}
+
+@keyframes jumi-bottom {
+  to {
+    bottom: var(--jumi-bottom);
+  }
+}
+
+@keyframes jumi-left {
+  to {
+    left: var(--jumi-left);
+  }
+}
+
+@keyframes jumi-z-index {
+  to {
+    z-index: var(--jumi-z-index);
+  }
+}
+
+@keyframes jumi-font-weight {
+  to {
+    font-weight: var(--jumi-font-weight);
+  }
+}
+
+@keyframes jumi-letter-spacing {
+  to {
+    letter-spacing: var(--jumi-letter-spacing);
+  }
+}
+
+@keyframes jumi-text-shadow {
+  to {
+    text-shadow: var(--jumi-text-shadow);
+  }
+}
+
+@keyframes jumi-flex-grow {
+  to {
+    flex-grow: var(--jumi-flex-grow);
+  }
+}
+
+@keyframes jumi-flex-shrink {
+  to {
+    flex-shrink: var(--jumi-flex-shrink);
+  }
+}
+
+@keyframes jumi-flex-basis {
+  to {
+    flex-basis: var(--jumi-flex-basis);
+  }
+}
+
+@keyframes jumi-gap {
+  to {
+    gap: var(--jumi-gap);
+  }
+}
+
+@keyframes jumi-order {
+  to {
+    order: var(--jumi-order);
+  }
+}
+
+@keyframes jumi-outline-width {
+  to {
+    outline-width: var(--jumi-outline-width);
+  }
+}
+
+@keyframes jumi-outline-color {
+  to {
+    outline-color: var(--jumi-outline-color);
+  }
+}
+
+@keyframes jumi-outline-offset {
+  to {
+    outline-offset: var(--jumi-outline-offset);
+  }
+}
+
+@keyframes jumi-bg-size {
+  to {
+    background-size: var(--jumi-bg-size);
+  }
+}
+
+@keyframes jumi-bg-position {
+  to {
+    background-position: var(--jumi-bg-position);
+  }
+}
+
+@keyframes jumi-stroke {
+  to {
+    stroke: var(--jumi-stroke);
+  }
+}
+
+@keyframes jumi-stroke-width {
+  to {
+    stroke-width: var(--jumi-stroke-width);
   }
 }
 
@@ -1932,12 +2076,28 @@ video {
   animation-play-state: var(--jumi-play-state);
 }
 
+.animate-duration-1 {
+  --jumi-duration: 1s;
+}
+
+.animate-duration-2 {
+  --jumi-duration: 2s;
+}
+
+.animate-duration-3 {
+  --jumi-duration: 3s;
+}
+
 .animate-delay-1 {
   --jumi-delay: 1s;
 }
 
 .animate-delay-500 {
   --jumi-delay: 500ms;
+}
+
+.animate-count-infinite {
+  --jumi-iteration-count: infinite;
 }
 
 .animation-name-\[bounce\2c _fadeIn\2c _rotateZ\] {
@@ -1962,6 +2122,30 @@ video {
 
 .animation-name-\[jumi-scale-uniform\2c _jumi-rotate-z\2c _jumi-fade-in\] {
   animation-name: jumi-scale-uniform, jumi-rotate-z, jumi-fade-in;
+}
+
+.animation-name-bounce-in {
+  animation-name: bounce-in;
+}
+
+.animation-name-bounce-out {
+  animation-name: bounce-out;
+}
+
+.animation-name-fade-in {
+  animation-name: fade-in;
+}
+
+.animation-name-zoom-in {
+  animation-name: zoom-in;
+}
+
+.animation-name-zoom-out {
+  animation-name: zoom-out;
+}
+
+.animation-duration-500 {
+  animation-duration: 500ms;
 }
 
 .animation-duration-\[1\.5s\] {
@@ -1996,6 +2180,14 @@ video {
   animation-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
+.animation-timing-function-ease-in {
+  animation-timing-function: ease-in;
+}
+
+.animation-timing-function-ease-out {
+  animation-timing-function: ease-out;
+}
+
 .animation-delay-\[0s\2c _0\.2s\2c _0\.8s\] {
   animation-delay: 0s, 0.2s, 0.8s;
 }
@@ -2008,15 +2200,11 @@ video {
   animation-delay: 0s, 0.5s;
 }
 
-.animation-iteration-count-\[1\2c _infinite\2c _1\] {
-  animation-iteration-count: 1, infinite, 1;
+.animation-iteration-count-2 {
+  animation-iteration-count: 2;
 }
 
-.animation-iteration-count-\[infinite\2c _infinite\] {
-  animation-iteration-count: infinite, infinite;
-}
-
-.animation-iteration-count-\[infinite\] {
+.animation-iteration-count-infinite {
   animation-iteration-count: infinite;
 }
 
@@ -2024,8 +2212,24 @@ video {
   animation-direction: normal, alternate;
 }
 
+.animation-direction-alternate {
+  animation-direction: alternate;
+}
+
+.animation-direction-reverse {
+  animation-direction: reverse;
+}
+
 .animation-fill-mode-\[forwards\2c _none\2c _forwards\] {
   animation-fill-mode: forwards, none, forwards;
+}
+
+.animation-fill-mode-both {
+  animation-fill-mode: both;
+}
+
+.animation-fill-mode-forwards {
+  animation-fill-mode: forwards;
 }
 
 .animation-play-state-\[paused\] {
@@ -2033,6 +2237,14 @@ video {
 }
 
 .animation-play-state-\[running\] {
+  animation-play-state: running;
+}
+
+.animation-play-state-paused {
+  animation-play-state: paused;
+}
+
+.animation-play-state-running {
   animation-play-state: running;
 }
 
@@ -2077,6 +2289,17 @@ video {
 .animate-rotate-90 {
   --jumi-animation: jumi-rotate-z;
   --jumi-rotate-z: 90deg;
+}
+
+.animate-translate-right-5 {
+  animation-name: jumi-translate-right;
+  --jumi-translate-x: calc(25% * 1);
+}
+
+.animate-translate-top-right-3 {
+  animation-name: jumi-translate-top-right;
+  --jumi-translate-x: calc(15% * 1);
+  --jumi-translate-y: calc(15% * -1);
 }
 
 .animate-bounce-in {
@@ -2205,6 +2428,16 @@ video {
   --jumi-opacity: 0.2;
 }
 
+.animate-color-red-500 {
+  animation-name: jumi-color;
+  --jumi-color: #ef4444;
+}
+
+.animate-fill-purple-500 {
+  animation-name: jumi-fill;
+  --jumi-fill: #a855f7;
+}
+
 .animate-bg-blue-500 {
   animation-name: jumi-bg-color;
   --jumi-bg-color: #3b82f6;
@@ -2213,6 +2446,18 @@ video {
 .animate-bg-red-500 {
   animation-name: jumi-bg-color;
   --jumi-bg-color: #ef4444;
+}
+
+.hover\:animate-duration-200:hover {
+  --jumi-duration: 200ms;
+}
+
+.hover\:animate-duration-300:hover {
+  --jumi-duration: 300ms;
+}
+
+.hover\:animate-duration-500:hover {
+  --jumi-duration: 500ms;
 }
 
 .hover\:animate-scale-110:hover {

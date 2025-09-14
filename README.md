@@ -80,7 +80,7 @@ Control the timing of your animations with precision:
 <div class="animate-slide-in-up animate-ease-ease-out-back">Bouncy slide</div>
 
 <!-- Iteration -->
-<div class="animate-pulse animate-infinite">Infinite pulse</div>
+<div class="animate-pulse animate-count-infinite">Infinite pulse</div>
 <div class="animate-bounce-in animate-repeat-3">Bounce 3 times</div>
 ```
 
@@ -95,7 +95,7 @@ Create dynamic movement with transform utilities:
 
 <!-- Rotation -->
 <div class="animate-rotate-90">Rotate 90 degrees</div>
-<div class="animate-rotate-360 animate-infinite">Spin forever</div>
+<div class="animate-rotate-360 animate-count-infinite">Spin forever</div>
 
 <!-- Scaling -->
 <div class="animate-scale-125">Scale up 25%</div>
@@ -123,9 +123,9 @@ Beautiful pre-built animation effects:
 <div class="animate-fade-out">Fades out</div>
 
 <!-- Attention seeking -->
-<div class="animate-shake animate-infinite">Shaking</div>
-<div class="animate-pulse animate-infinite">Pulsing</div>
-<div class="animate-wobble animate-infinite">Wobbling</div>
+<div class="animate-shake animate-count-infinite">Shaking</div>
+<div class="animate-pulse animate-count-infinite">Pulsing</div>
+<div class="animate-wobble animate-count-infinite">Wobbling</div>
 ```
 
 ### Property Animations
@@ -139,7 +139,10 @@ Animate CSS properties directly:
 
 <!-- Color animations -->
 <div class="animate-bg-red-500 animate-duration-1">Background changes</div>
-<div class="animate-text-blue-600 animate-duration-500">Text color changes</div>
+<div class="animate-color-blue-600 animate-duration-500">
+  Text color changes
+</div>
+<div class="animate-fill-green-500 animate-duration-750">SVG fill changes</div>
 
 <!-- Border animations -->
 <div class="animate-rounded-full animate-duration-1">Becomes circular</div>
@@ -337,15 +340,16 @@ Jumi maintains CSS custom properties for dynamic control:
 
 ### Property Animations
 
-| Class Pattern              | Description           | Example                 |
-| -------------------------- | --------------------- | ----------------------- |
-| `animate-w-{size}`         | Animate width         | `animate-w-full`        |
-| `animate-h-{size}`         | Animate height        | `animate-h-64`          |
-| `animate-bg-{color}`       | Animate background    | `animate-bg-red-500`    |
-| `animate-text-{color}`     | Animate text color    | `animate-text-blue-600` |
-| `animate-rounded-{radius}` | Animate border radius | `animate-rounded-full`  |
-| `animate-shadow-{shadow}`  | Animate box shadow    | `animate-shadow-xl`     |
-| `animate-blur-{blur}`      | Animate blur filter   | `animate-blur-md`       |
+| Class Pattern              | Description           | Example                  |
+| -------------------------- | --------------------- | ------------------------ |
+| `animate-w-{size}`         | Animate width         | `animate-w-full`         |
+| `animate-h-{size}`         | Animate height        | `animate-h-64`           |
+| `animate-bg-{color}`       | Animate background    | `animate-bg-red-500`     |
+| `animate-color-{color}`    | Animate text color    | `animate-color-blue-600` |
+| `animate-fill-{color}`     | Animate SVG fill      | `animate-fill-green-500` |
+| `animate-rounded-{radius}` | Animate border radius | `animate-rounded-full`   |
+| `animate-shadow-{shadow}`  | Animate box shadow    | `animate-shadow-xl`      |
+| `animate-blur-{blur}`      | Animate blur filter   | `animate-blur-md`        |
 
 ## 🤝 Contributing
 

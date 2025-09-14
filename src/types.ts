@@ -61,6 +61,26 @@ export interface JumiTheme {
   backdrops: Record<string, string>;
   origins: Record<string, string>;
   properties: Record<string, string>;
+  spacing: Record<string, string>;
+  fontWeights: Record<string, string>;
+  letterSpacing: Record<string, string>;
+  textShadow: Record<string, string>;
+  flexGrow: Record<string, string>;
+  flexShrink: Record<string, string>;
+  flexBasis: Record<string, string>;
+  gap: Record<string, string>;
+  order: Record<string, string>;
+  zIndex: Record<string, string>;
+  outlineWidth: Record<string, string>;
+  outlineOffset: Record<string, string>;
+  backgroundSize: Record<string, string>;
+  backgroundPosition: Record<string, string>;
+  strokeWidth: Record<string, string>;
+  minWidth: Record<string, string>;
+  maxWidth: Record<string, string>;
+  minHeight: Record<string, string>;
+  maxHeight: Record<string, string>;
+  colors: Record<string, string | Record<string, string>>;
 }
 
 export interface JumiConfig {

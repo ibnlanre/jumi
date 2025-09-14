@@ -1,5 +1,6 @@
 import { PluginAPI } from "../types";
 import { defaultTheme } from "../config/defaults";
+import { getAllKeyframes } from "../config/keyframes";
 
 /**
  * Animation timing utilities (duration, delay, timing-function)
@@ -16,7 +17,7 @@ export function addAnimationUtilities({
       "--jumi-duration": "1s",
       "--jumi-timing-function": "ease",
       "--jumi-delay": "0s",
-      "--jumi-direction": "normal",
+      "--jumi-direction": "alternate-reverse",
       "--jumi-iteration-count": "1",
       "--jumi-fill-mode": "forwards",
       "--jumi-play-state": "running",
@@ -101,57 +102,154 @@ export function addAnimationUtilities({
   );
 
   // Arbitrary value utilities for direct CSS animation properties
-  matchUtilities({
-    "animation-name": (value: string) => ({
-      "animation-name": value,
-    }),
-  });
+  matchUtilities(
+    {
+      "animation-name": (value: string) => ({
+        "animation-name": value,
+      }),
+    },
+    {
+      values: {
+        // All available effect keyframes
+        ...(theme("jumi.effects") ?? getAllKeyframes()),
+        // Common CSS animation names
+        none: "none",
+        // Allow custom arbitrary values
+      },
+      type: "any",
+    }
+  );
 
-  matchUtilities({
-    "animation-duration": (value: string) => ({
-      "animation-duration": value,
-    }),
-  });
+  matchUtilities(
+    {
+      "animation-duration": (value: string) => ({
+        "animation-duration": value,
+      }),
+    },
+    {
+      values: {
+        // All available durations
+        ...(theme("jumi.durations") ?? defaultTheme.durations),
+        // Common additional durations
+        "0.5s": "0.5s",
+        "1.5s": "1.5s",
+        "2.5s": "2.5s",
+        "4s": "4s",
+        "5s": "5s",
+      },
+      type: "any",
+    }
+  );
 
-  matchUtilities({
-    "animation-timing-function": (value: string) => ({
-      "animation-timing-function": value,
-    }),
-  });
+  matchUtilities(
+    {
+      "animation-timing-function": (value: string) => ({
+        "animation-timing-function": value,
+      }),
+    },
+    {
+      values: {
+        // All available timing functions
+        ...(theme("jumi.timingFunctions") ?? defaultTheme.timingFunctions),
+        // Additional common easing functions
+        linear: "linear",
+        "ease-in": "ease-in",
+        "ease-out": "ease-out",
+        "ease-in-out": "ease-in-out",
+      },
+      type: "any",
+    }
+  );
 
-  matchUtilities({
-    "animation-delay": (value: string) => ({
-      "animation-delay": value,
-    }),
-  });
+  matchUtilities(
+    {
+      "animation-delay": (value: string) => ({
+        "animation-delay": value,
+      }),
+    },
+    {
+      values: {
+        // All available delays
+        ...(theme("jumi.delays") ?? defaultTheme.delays),
+      },
+      type: "any",
+    }
+  );
 
-  matchUtilities({
-    "animation-iteration-count": (value: string) => ({
-      "animation-iteration-count": value,
-    }),
-  });
+  matchUtilities(
+    {
+      "animation-iteration-count": (value: string) => ({
+        "animation-iteration-count": value,
+      }),
+    },
+    {
+      values: {
+        // All available iteration counts
+        ...(theme("jumi.iterationCounts") ?? defaultTheme.iterationCounts),
+        // Additional common values
+        "0": "0",
+        "0.5": "0.5",
+        "1.5": "1.5",
+        "2.5": "2.5",
+      },
+      type: "number",
+    }
+  );
 
-  matchUtilities({
-    "animation-direction": (value: string) => ({
-      "animation-direction": value,
-    }),
-  });
+  matchUtilities(
+    {
+      "animation-direction": (value: string) => ({
+        "animation-direction": value,
+      }),
+    },
+    {
+      values: {
+        // All available directions
+        ...(theme("jumi.directions") ?? defaultTheme.directions),
+      },
+      type: "any",
+    }
+  );
 
-  matchUtilities({
-    "animation-fill-mode": (value: string) => ({
-      "animation-fill-mode": value,
-    }),
-  });
+  matchUtilities(
+    {
+      "animation-fill-mode": (value: string) => ({
+        "animation-fill-mode": value,
+      }),
+    },
+    {
+      values: {
+        // All available fill modes
+        ...(theme("jumi.fillModes") ?? defaultTheme.fillModes),
+      },
+      type: "any",
+    }
+  );
 
-  matchUtilities({
-    "animation-play-state": (value: string) => ({
-      "animation-play-state": value,
-    }),
-  });
+  matchUtilities(
+    {
+      "animation-play-state": (value: string) => ({
+        "animation-play-state": value,
+      }),
+    },
+    {
+      values: {
+        // All available play states
+        ...(theme("jumi.playStates") ?? defaultTheme.playStates),
+      },
+      type: "any",
+    }
+  );
 
-  matchUtilities({
-    animation: (value: string) => ({
-      animation: value,
-    }),
-  });
+  // Animation shorthand utility for full animation definitions
+  matchUtilities(
+    {
+      animation: (value: string) => ({
+        animation: value,
+      }),
+    },
+    {
+      type: "any",
+    }
+  );
 }

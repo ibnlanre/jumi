@@ -7,6 +7,20 @@ import { defaultTheme } from "../config/defaults";
  * - animate-h-80 means animate from current height to h-80
  */
 
+/**
+ * Helper function to create composable property animations that work with timing utilities
+ */
+function createPropertyAnimation(
+  animationName: string,
+  cssProperty: string,
+  value: string
+) {
+  return {
+    "animation-name": animationName,
+    [cssProperty]: value,
+  };
+}
+
 export function addPropertyUtilities({
   addBase,
   matchUtilities,
@@ -15,10 +29,8 @@ export function addPropertyUtilities({
   // Width animation utilities
   matchUtilities(
     {
-      "animate-w": (value: string) => ({
-        "animation-name": "jumi-width",
-        "--jumi-width": value,
-      }),
+      "animate-w": (value: string) =>
+        createPropertyAnimation("jumi-width", "--jumi-width", value),
     },
     {
       values: {
@@ -32,10 +44,8 @@ export function addPropertyUtilities({
   // Height animation utilities
   matchUtilities(
     {
-      "animate-h": (value: string) => ({
-        "animation-name": "jumi-height",
-        "--jumi-height": value,
-      }),
+      "animate-h": (value: string) =>
+        createPropertyAnimation("jumi-height", "--jumi-height", value),
     },
     {
       values: {
@@ -46,13 +56,83 @@ export function addPropertyUtilities({
     }
   );
 
+  // === MIN/MAX DIMENSION UTILITIES ===
+
+  // Min-width animation utilities
+  matchUtilities(
+    {
+      "animate-min-w": (value: string) =>
+        createPropertyAnimation("jumi-min-width", "--jumi-min-width", value),
+    },
+    {
+      values: {
+        "0": "0px",
+        full: "100%",
+        min: "min-content",
+        max: "max-content",
+        fit: "fit-content",
+        ...(theme("minWidth") ?? {}),
+        ...(theme("width") ?? {}),
+      },
+      type: "length",
+    }
+  );
+
+  // Max-width animation utilities
+  matchUtilities(
+    {
+      "animate-max-w": (value: string) =>
+        createPropertyAnimation("jumi-max-width", "--jumi-max-width", value),
+    },
+    {
+      values: {
+        ...(theme("maxWidth") ?? {}),
+        ...(theme("jumi.maxWidth") ?? defaultTheme.maxWidth),
+      },
+      type: "length",
+    }
+  );
+
+  // Min-height animation utilities
+  matchUtilities(
+    {
+      "animate-min-h": (value: string) =>
+        createPropertyAnimation("jumi-min-height", "--jumi-min-height", value),
+    },
+    {
+      values: {
+        ...(theme("minHeight") ?? {}),
+        ...(theme("height") ?? {}),
+        ...(theme("jumi.minHeight") ?? defaultTheme.minHeight),
+      },
+      type: "length",
+    }
+  );
+
+  // Max-height animation utilities
+  matchUtilities(
+    {
+      "animate-max-h": (value: string) =>
+        createPropertyAnimation("jumi-max-height", "--jumi-max-height", value),
+    },
+    {
+      values: {
+        ...(theme("maxHeight") ?? {}),
+        ...(theme("jumi.maxHeight") ?? defaultTheme.maxHeight),
+      },
+      type: "length",
+    }
+  );
+
   // Border radius animation utilities
   matchUtilities(
     {
-      "animate-rounded": (value: string) => ({
-        "animation-name": "jumi-border-radius",
-        "--jumi-border-radius": value,
-      }),
+      "animate-rounded": (value: string) =>
+        createPropertyAnimation(
+          "jumi-border-radius",
+          "--jumi-border-radius",
+          value
+        ),
     },
     {
       values: {
@@ -251,22 +331,69 @@ export function addPropertyUtilities({
     }
   );
 
+  // === ADVANCED TYPOGRAPHY UTILITIES ===
+
+  // Font weight animation utilities
+  matchUtilities(
+    {
+      "animate-font-weight": (value: string) =>
+        createPropertyAnimation(
+          "jumi-font-weight",
+          "--jumi-font-weight",
+          value
+        ),
+    },
+    {
+      values: {
+        ...(theme("fontWeight") ?? {}),
+        ...(theme("jumi.fontWeights") ?? defaultTheme.fontWeights),
+      },
+      type: "number",
+    }
+  );
+
+  // Letter spacing animation utilities
+  matchUtilities(
+    {
+      "animate-tracking": (value: string) =>
+        createPropertyAnimation(
+          "jumi-letter-spacing",
+          "--jumi-letter-spacing",
+          value
+        ),
+    },
+    {
+      values: {
+        ...(theme("letterSpacing") ?? {}),
+        ...(theme("jumi.letterSpacing") ?? defaultTheme.letterSpacing),
+      },
+      type: "length",
+    }
+  );
+
+  // Text shadow animation utilities
+  matchUtilities(
+    {
+      "animate-text-shadow": (value: string) =>
+        createPropertyAnimation(
+          "jumi-text-shadow",
+          "--jumi-text-shadow",
+          value
+        ),
+    },
+    {
+      values: {
+        ...(theme("textShadow") ?? {}),
+        ...(theme("jumi.textShadow") ?? defaultTheme.textShadow),
+      },
+      type: "shadow",
+    }
+  );
+
   // Spacing animation utilities (margin/padding) - individual directions
-  const spacingValues = theme("spacing") ?? {
-    "0": "0px",
-    "1": "0.25rem",
-    "2": "0.5rem",
-    "3": "0.75rem",
-    "4": "1rem",
-    "5": "1.25rem",
-    "6": "1.5rem",
-    "8": "2rem",
-    "10": "2.5rem",
-    "12": "3rem",
-    "16": "4rem",
-    "20": "5rem",
-    "24": "6rem",
-    "32": "8rem",
+  const spacingValues = {
+    ...(theme("spacing") ?? {}),
+    ...(theme("jumi.spacing") ?? defaultTheme.spacing),
   };
 
   // Margin utilities
@@ -323,6 +450,154 @@ export function addPropertyUtilities({
     );
   });
 
+  // === POSITIONING UTILITIES ===
+
+  // Position animation utilities (top, right, bottom, left)
+  const positionValues = {
+    ...(theme("spacing") ?? {}),
+    ...(theme("jumi.spacing") ?? defaultTheme.spacing),
+  };
+
+  matchUtilities(
+    {
+      "animate-top": (value: string) =>
+        createPropertyAnimation("jumi-top", "--jumi-top", value),
+    },
+    {
+      values: positionValues,
+      type: "length",
+    }
+  );
+
+  matchUtilities(
+    {
+      "animate-right": (value: string) =>
+        createPropertyAnimation("jumi-right", "--jumi-right", value),
+    },
+    {
+      values: positionValues,
+      type: "length",
+    }
+  );
+
+  matchUtilities(
+    {
+      "animate-bottom": (value: string) =>
+        createPropertyAnimation("jumi-bottom", "--jumi-bottom", value),
+    },
+    {
+      values: positionValues,
+      type: "length",
+    }
+  );
+
+  matchUtilities(
+    {
+      "animate-left": (value: string) =>
+        createPropertyAnimation("jumi-left", "--jumi-left", value),
+    },
+    {
+      values: positionValues,
+      type: "length",
+    }
+  );
+
+  // Z-index animation utilities
+  matchUtilities(
+    {
+      "animate-z": (value: string) =>
+        createPropertyAnimation("jumi-z-index", "--jumi-z-index", value),
+    },
+    {
+      values: {
+        ...(theme("zIndex") ?? {}),
+        ...(theme("jumi.zIndex") ?? defaultTheme.zIndex),
+      },
+      type: "integer",
+    }
+  );
+
+  // === FLEXBOX LAYOUT UTILITIES ===
+
+  // Flex grow animation utilities
+  matchUtilities(
+    {
+      "animate-flex-grow": (value: string) =>
+        createPropertyAnimation("jumi-flex-grow", "--jumi-flex-grow", value),
+    },
+    {
+      values: {
+        ...(theme("flexGrow") ?? {}),
+        ...(theme("jumi.flexGrow") ?? defaultTheme.flexGrow),
+      },
+      type: "number",
+    }
+  );
+
+  // Flex shrink animation utilities
+  matchUtilities(
+    {
+      "animate-flex-shrink": (value: string) =>
+        createPropertyAnimation(
+          "jumi-flex-shrink",
+          "--jumi-flex-shrink",
+          value
+        ),
+    },
+    {
+      values: {
+        ...(theme("flexShrink") ?? {}),
+        ...(theme("jumi.flexShrink") ?? defaultTheme.flexShrink),
+      },
+      type: "number",
+    }
+  );
+
+  // Flex basis animation utilities
+  matchUtilities(
+    {
+      "animate-flex-basis": (value: string) =>
+        createPropertyAnimation("jumi-flex-basis", "--jumi-flex-basis", value),
+    },
+    {
+      values: {
+        ...(theme("flexBasis") ?? {}),
+        ...(theme("jumi.flexBasis") ?? defaultTheme.flexBasis),
+      },
+      type: "length",
+    }
+  );
+
+  // Gap animation utilities
+  matchUtilities(
+    {
+      "animate-gap": (value: string) =>
+        createPropertyAnimation("jumi-gap", "--jumi-gap", value),
+    },
+    {
+      values: {
+        ...(theme("gap") ?? {}),
+        ...(theme("jumi.gap") ?? defaultTheme.gap),
+      },
+      type: "length",
+    }
+  );
+
+  // Order animation utilities
+  matchUtilities(
+    {
+      "animate-order": (value: string) =>
+        createPropertyAnimation("jumi-order", "--jumi-order", value),
+    },
+    {
+      values: {
+        ...(theme("order") ?? {}),
+        ...(theme("jumi.order") ?? defaultTheme.order),
+      },
+      type: "integer",
+    }
+  );
+
   // === ADVANCED VISUAL EFFECTS ===
 
   // Filter animation utilities
@@ -360,60 +635,7 @@ export function addPropertyUtilities({
   );
 
   // Color animation utilities (text, background, border colors)
-  const colorValues = theme("colors") ?? {
-    transparent: "transparent",
-    current: "currentColor",
-    black: "#000000",
-    white: "#ffffff",
-    gray: {
-      50: "#f9fafb",
-      100: "#f3f4f6",
-      200: "#e5e7eb",
-      300: "#d1d5db",
-      400: "#9ca3af",
-      500: "#6b7280",
-      600: "#4b5563",
-      700: "#374151",
-      800: "#1f2937",
-      900: "#111827",
-    },
-    red: {
-      50: "#fef2f2",
-      100: "#fee2e2",
-      200: "#fecaca",
-      300: "#fca5a5",
-      400: "#f87171",
-      500: "#ef4444",
-      600: "#dc2626",
-      700: "#b91c1c",
-      800: "#991b1b",
-      900: "#7f1d1d",
-    },
-    blue: {
-      50: "#eff6ff",
-      100: "#dbeafe",
-      200: "#bfdbfe",
-      300: "#93c5fd",
-      400: "#60a5fa",
-      500: "#3b82f6",
-      600: "#2563eb",
-      700: "#1d4ed8",
-      800: "#1e40af",
-      900: "#1e3a8a",
-    },
-    green: {
-      50: "#f0fdf4",
-      100: "#dcfce7",
-      200: "#bbf7d0",
-      300: "#86efac",
-      400: "#4ade80",
-      500: "#22c55e",
-      600: "#16a34a",
-      700: "#15803d",
-      800: "#166534",
-      900: "#14532d",
-    },
-  };
+  const colorValues = theme("colors") ?? defaultTheme.colors;
 
   // Flatten nested color objects for utility generation
   const flattenColors = (colors: any, prefix = ""): Record<string, string> => {
@@ -434,13 +656,23 @@ export function addPropertyUtilities({
 
   const flatColorValues = flattenColors(colorValues);
 
-  // Text color animation
+  // Text color animation (standardized as animate-color)
   matchUtilities(
     {
-      "animate-text-color": (value: string) => ({
-        "animation-name": "jumi-text-color",
-        "--jumi-text-color": value,
-      }),
+      "animate-color": (value: string) =>
+        createPropertyAnimation("jumi-color", "--jumi-color", value),
+    },
+    {
+      values: flatColorValues,
+      type: "color",
+    }
+  );
+
+  // SVG fill color animation
+  matchUtilities(
+    {
+      "animate-fill": (value: string) =>
+        createPropertyAnimation("jumi-fill", "--jumi-fill", value),
     },
     {
       values: flatColorValues,
@@ -451,10 +683,8 @@ export function addPropertyUtilities({
   // Background color animation
   matchUtilities(
     {
-      "animate-bg": (value: string) => ({
-        "animation-name": "jumi-bg-color",
-        "--jumi-bg-color": value,
-      }),
+      "animate-bg": (value: string) =>
+        createPropertyAnimation("jumi-bg-color", "--jumi-bg-color", value),
     },
     {
       values: flatColorValues,
@@ -473,6 +703,132 @@ export function addPropertyUtilities({
     {
       values: flatColorValues,
       type: "color",
+    }
+  );
+
+  // === OUTLINE UTILITIES ===
+
+  // Outline width animation utilities
+  matchUtilities(
+    {
+      "animate-outline": (value: string) =>
+        createPropertyAnimation(
+          "jumi-outline-width",
+          "--jumi-outline-width",
+          value
+        ),
+    },
+    {
+      values: {
+        ...(theme("outlineWidth") ?? {}),
+        ...(theme("jumi.outlineWidth") ?? defaultTheme.outlineWidth),
+      },
+      type: "line-width",
+    }
+  );
+
+  // Outline color animation utilities
+  matchUtilities(
+    {
+      "animate-outline-color": (value: string) =>
+        createPropertyAnimation(
+          "jumi-outline-color",
+          "--jumi-outline-color",
+          value
+        ),
+    },
+    {
+      values: flatColorValues,
+      type: "color",
+    }
+  );
+
+  // Outline offset animation utilities
+  matchUtilities(
+    {
+      "animate-outline-offset": (value: string) =>
+        createPropertyAnimation(
+          "jumi-outline-offset",
+          "--jumi-outline-offset",
+          value
+        ),
+    },
+    {
+      values: {
+        ...(theme("outlineOffset") ?? {}),
+        ...(theme("jumi.outlineOffset") ?? defaultTheme.outlineOffset),
+      },
+      type: "length",
+    }
+  );
+
+  // === BACKGROUND UTILITIES ===
+
+  // Background size animation utilities
+  matchUtilities(
+    {
+      "animate-bg-size": (value: string) =>
+        createPropertyAnimation("jumi-bg-size", "--jumi-bg-size", value),
+    },
+    {
+      values: {
+        ...(theme("backgroundSize") ?? {}),
+        ...(theme("jumi.backgroundSize") ?? defaultTheme.backgroundSize),
+      },
+      type: "length",
+    }
+  );
+
+  // Background position animation utilities
+  matchUtilities(
+    {
+      "animate-bg-position": (value: string) =>
+        createPropertyAnimation(
+          "jumi-bg-position",
+          "--jumi-bg-position",
+          value
+        ),
+    },
+    {
+      values: {
+        ...(theme("backgroundPosition") ?? {}),
+        ...(theme("jumi.backgroundPosition") ??
+          defaultTheme.backgroundPosition),
+      },
+      type: "position",
+    }
+  );
+
+  // === SVG UTILITIES ===
+
+  // SVG stroke color animation utilities
+  matchUtilities(
+    {
+      "animate-stroke": (value: string) =>
+        createPropertyAnimation("jumi-stroke", "--jumi-stroke", value),
+    },
+    {
+      values: flatColorValues,
+      type: "color",
+    }
+  );
+
+  // SVG stroke width animation utilities
+  matchUtilities(
+    {
+      "animate-stroke-width": (value: string) =>
+        createPropertyAnimation(
+          "jumi-stroke-width",
+          "--jumi-stroke-width",
+          value
+        ),
+    },
+    {
+      values: {
+        ...(theme("strokeWidth") ?? {}),
+        ...(theme("jumi.strokeWidth") ?? defaultTheme.strokeWidth),
+      },
+      type: "number",
     }
   );
 
@@ -538,8 +894,11 @@ function generatePropertyKeyframes() {
     },
 
     // Color animations
-    "@keyframes jumi-text-color": {
-      to: { color: "var(--jumi-text-color)" },
+    "@keyframes jumi-color": {
+      to: { color: "var(--jumi-color)" },
+    },
+    "@keyframes jumi-fill": {
+      to: { fill: "var(--jumi-fill)" },
     },
     "@keyframes jumi-bg-color": {
       to: { "background-color": "var(--jumi-bg-color)" },
@@ -604,6 +963,94 @@ function generatePropertyKeyframes() {
         "padding-top": "var(--jumi-padding-y)",
         "padding-bottom": "var(--jumi-padding-y)",
       },
+    },
+
+    // === NEW ANIMATION KEYFRAMES ===
+
+    // Min/Max dimension keyframes
+    "@keyframes jumi-min-width": {
+      to: { "min-width": "var(--jumi-min-width)" },
+    },
+    "@keyframes jumi-max-width": {
+      to: { "max-width": "var(--jumi-max-width)" },
+    },
+    "@keyframes jumi-min-height": {
+      to: { "min-height": "var(--jumi-min-height)" },
+    },
+    "@keyframes jumi-max-height": {
+      to: { "max-height": "var(--jumi-max-height)" },
+    },
+
+    // Positioning keyframes
+    "@keyframes jumi-top": {
+      to: { top: "var(--jumi-top)" },
+    },
+    "@keyframes jumi-right": {
+      to: { right: "var(--jumi-right)" },
+    },
+    "@keyframes jumi-bottom": {
+      to: { bottom: "var(--jumi-bottom)" },
+    },
+    "@keyframes jumi-left": {
+      to: { left: "var(--jumi-left)" },
+    },
+    "@keyframes jumi-z-index": {
+      to: { "z-index": "var(--jumi-z-index)" },
+    },
+
+    // Typography keyframes
+    "@keyframes jumi-font-weight": {
+      to: { "font-weight": "var(--jumi-font-weight)" },
+    },
+    "@keyframes jumi-letter-spacing": {
+      to: { "letter-spacing": "var(--jumi-letter-spacing)" },
+    },
+    "@keyframes jumi-text-shadow": {
+      to: { "text-shadow": "var(--jumi-text-shadow)" },
+    },
+
+    // Flexbox keyframes
+    "@keyframes jumi-flex-grow": {
+      to: { "flex-grow": "var(--jumi-flex-grow)" },
+    },
+    "@keyframes jumi-flex-shrink": {
+      to: { "flex-shrink": "var(--jumi-flex-shrink)" },
+    },
+    "@keyframes jumi-flex-basis": {
+      to: { "flex-basis": "var(--jumi-flex-basis)" },
+    },
+    "@keyframes jumi-gap": {
+      to: { gap: "var(--jumi-gap)" },
+    },
+    "@keyframes jumi-order": {
+      to: { order: "var(--jumi-order)" },
+    },
+
+    // Outline keyframes
+    "@keyframes jumi-outline-width": {
+      to: { "outline-width": "var(--jumi-outline-width)" },
+    },
+    "@keyframes jumi-outline-color": {
+      to: { "outline-color": "var(--jumi-outline-color)" },
+    },
+    "@keyframes jumi-outline-offset": {
+      to: { "outline-offset": "var(--jumi-outline-offset)" },
+    },
+
+    // Background keyframes
+    "@keyframes jumi-bg-size": {
+      to: { "background-size": "var(--jumi-bg-size)" },
+    },
+    "@keyframes jumi-bg-position": {
+      to: { "background-position": "var(--jumi-bg-position)" },
+    },
+
+    // SVG keyframes
+    "@keyframes jumi-stroke": {
+      to: { stroke: "var(--jumi-stroke)" },
+    },
+    "@keyframes jumi-stroke-width": {
+      to: { "stroke-width": "var(--jumi-stroke-width)" },
     },
   };
 }
