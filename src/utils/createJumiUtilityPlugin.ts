@@ -149,11 +149,11 @@ export function createJumiUtilityPlugin(
   const transformValue =
     options.valueTransformer || transformThemeValue(themeKey);
 
-  return function ({ addDefaults, matchUtilities, theme, addBase }: PluginAPI) {
-    // Add default CSS custom properties if specified
-    if (options.defaultProperties) {
-      addDefaults(`jumi-${themeKey}`, options.defaultProperties);
-    }
+  return function ({ matchUtilities, theme, addBase }: PluginAPI) {
+    // // Add default CSS custom properties if specified
+    // if (options.defaultProperties) {
+    //   addDefaults(`jumi-${themeKey}`, options.defaultProperties);
+    // }
 
     for (const variation of utilityVariations) {
       const { classPrefix, properties, defaults } = variation;
@@ -200,7 +200,7 @@ export function createJumiUtilityPlugin(
                 ...(theme(`jumi.${themeKey}`) ?? {}),
                 ...((defaultTheme as any)[themeKey] ?? {}),
               },
-          type: options.type,
+          // type: options.type,
           supportsNegativeValues: options.supportsNegativeValues,
           respectPrefix: options.respectPrefix,
           respectImportant: options.respectImportant,
@@ -214,23 +214,7 @@ export function createJumiUtilityPlugin(
  * Create composable transform utilities that work together
  */
 export function createTransformUtilities(): (api: PluginAPI) => void {
-  return function ({ addDefaults, matchUtilities, theme }: PluginAPI) {
-    // Add transform defaults
-    addDefaults("jumi-transform", {
-      "--jumi-translate-x": "0",
-      "--jumi-translate-y": "0",
-      "--jumi-translate-z": "0",
-      "--jumi-rotate": "0deg",
-      "--jumi-rotate-x": "0deg",
-      "--jumi-rotate-y": "0deg",
-      "--jumi-rotate-z": "0deg",
-      "--jumi-skew-x": "0deg",
-      "--jumi-skew-y": "0deg",
-      "--jumi-scale-x": "1",
-      "--jumi-scale-y": "1",
-      "--jumi-scale-z": "1",
-    });
-
+  return function ({ matchUtilities, theme }: PluginAPI) {
     // Translation utilities
     matchUtilities(
       {
@@ -359,20 +343,7 @@ export function createTransformUtilities(): (api: PluginAPI) => void {
  * Create composable filter utilities
  */
 export function createFilterUtilities(): (api: PluginAPI) => void {
-  return function ({ addDefaults, matchUtilities, theme }: PluginAPI) {
-    // Add filter defaults
-    addDefaults("jumi-filter", {
-      "--jumi-blur": "blur(0)",
-      "--jumi-brightness": "brightness(1)",
-      "--jumi-contrast": "contrast(1)",
-      "--jumi-grayscale": "grayscale(0)",
-      "--jumi-hue-rotate": "hue-rotate(0deg)",
-      "--jumi-invert": "invert(0)",
-      "--jumi-saturate": "saturate(1)",
-      "--jumi-sepia": "sepia(0)",
-      "--jumi-drop-shadow": "drop-shadow(0 0 0 transparent)",
-    });
-
+  return function ({ matchUtilities, theme }: PluginAPI) {
     // Filter utilities
     const filterUtilities = {
       "animate-blur": "blur",

@@ -1,5 +1,8 @@
-import { PluginAPI } from "../types";
-import { defaultTheme } from "../config/defaults";
+import type { PluginAPI } from "tailwindcss/types/config";
+
+import { addProperties, matchProperties } from "@/config";
+import { defaultTheme } from "@/config/defaults";
+import { mergeTheme } from "@/utils/merge-theme";
 
 /**
  * Property-based animation utilities with current state → target state paradigm
@@ -23,142 +26,25 @@ function createPropertyAnimation(
 
 export function addPropertyUtilities({
   addBase,
+  addUtilities,
   matchUtilities,
   theme,
 }: PluginAPI) {
-  // Width animation utilities
-  matchUtilities(
-    {
-      "animate-w": (value: string) =>
-        createPropertyAnimation("jumi-width", "--jumi-width", value),
-    },
-    {
-      values: {
-        ...(theme("width") ?? {}),
-        ...(theme("jumi.sizes") ?? defaultTheme.sizes),
-      },
-      type: "length",
-    }
-  );
+  matchProperties.forEach((item) => {
+    const { property, name, key, values, ...options } = item;
 
-  // Height animation utilities
-  matchUtilities(
-    {
-      "animate-h": (value: string) =>
-        createPropertyAnimation("jumi-height", "--jumi-height", value),
-    },
-    {
-      values: {
-        ...(theme("height") ?? {}),
-        ...(theme("jumi.sizes") ?? defaultTheme.sizes),
-      },
-      type: "length",
-    }
-  );
+    matchUtilities(
+      { [name]: property },
+      {
+        values: mergeTheme(theme(key), values),
+        ...options,
+      }
+    );
+  });
 
-  // === MIN/MAX DIMENSION UTILITIES ===
-
-  // Min-width animation utilities
-  matchUtilities(
-    {
-      "animate-min-w": (value: string) =>
-        createPropertyAnimation("jumi-min-width", "--jumi-min-width", value),
-    },
-    {
-      values: {
-        "0": "0px",
-        full: "100%",
-        min: "min-content",
-        max: "max-content",
-        fit: "fit-content",
-        ...(theme("minWidth") ?? {}),
-        ...(theme("width") ?? {}),
-      },
-      type: "length",
-    }
-  );
-
-  // Max-width animation utilities
-  matchUtilities(
-    {
-      "animate-max-w": (value: string) =>
-        createPropertyAnimation("jumi-max-width", "--jumi-max-width", value),
-    },
-    {
-      values: {
-        ...(theme("maxWidth") ?? {}),
-        ...(theme("jumi.maxWidth") ?? defaultTheme.maxWidth),
-      },
-      type: "length",
-    }
-  );
-
-  // Min-height animation utilities
-  matchUtilities(
-    {
-      "animate-min-h": (value: string) =>
-        createPropertyAnimation("jumi-min-height", "--jumi-min-height", value),
-    },
-    {
-      values: {
-        ...(theme("minHeight") ?? {}),
-        ...(theme("height") ?? {}),
-        ...(theme("jumi.minHeight") ?? defaultTheme.minHeight),
-      },
-      type: "length",
-    }
-  );
-
-  // Max-height animation utilities
-  matchUtilities(
-    {
-      "animate-max-h": (value: string) =>
-        createPropertyAnimation("jumi-max-height", "--jumi-max-height", value),
-    },
-    {
-      values: {
-        ...(theme("maxHeight") ?? {}),
-        ...(theme("jumi.maxHeight") ?? defaultTheme.maxHeight),
-      },
-      type: "length",
-    }
-  );
-
-  // Border radius animation utilities
-  matchUtilities(
-    {
-      "animate-rounded": (value: string) =>
-        createPropertyAnimation(
-          "jumi-border-radius",
-          "--jumi-border-radius",
-          value
-        ),
-    },
-    {
-      values: {
-        ...(theme("borderRadius") ?? {}),
-        ...(theme("jumi.borderRadius") ?? defaultTheme.borderRadius),
-      },
-      type: "length",
-    }
-  );
-
-  // Border width animation utilities
-  matchUtilities(
-    {
-      "animate-border": (value: string) => ({
-        "animation-name": "jumi-border-width",
-        "--jumi-border-width": value,
-      }),
-    },
-    {
-      values: {
-        ...(theme("borderWidth") ?? {}),
-        ...(theme("jumi.borderWidths") ?? defaultTheme.borderWidths),
-      },
-      type: "line-width",
-    }
-  );
+  addProperties.forEach(({ name, values }) => {
+    addUtilities({ [`.${name}`]: values });
+  });
 
   // Border reveal animation utilities - directional border drawing effects
   matchUtilities(
@@ -964,8 +850,6 @@ function generatePropertyKeyframes() {
         "padding-bottom": "var(--jumi-padding-y)",
       },
     },
-
-    // === NEW ANIMATION KEYFRAMES ===
 
     // Min/Max dimension keyframes
     "@keyframes jumi-min-width": {

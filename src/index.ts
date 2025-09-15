@@ -1,7 +1,14 @@
 import { JumiPluginOptions, PluginAPI } from "./types";
 import { defaultTheme } from "./config/defaults";
 import { addAnimationUtilities } from "./utilities/animation";
-import { createEnhancedJumiUtilities } from "./utils/enhancedUtilities";
+import { addAnimateUtilities } from "./utilities/animate";
+import {
+  addTransformUtilities,
+  generateTransformKeyframes,
+} from "./utilities/transforms";
+import { addEffectUtilities } from "./utilities/effects";
+import { addPropertyUtilities } from "./utilities/properties";
+import { variables } from "./config/variables";
 
 /**
  * Jumi - TailwindCSS Animation Plugin
@@ -17,13 +24,18 @@ import { createEnhancedJumiUtilities } from "./utils/enhancedUtilities";
  * @param options Configuration options for the plugin
  */
 function jumiPlugin(api: PluginAPI, options: JumiPluginOptions = {}) {
-  const { addVariant } = api;
+  const { addBase, addVariant, addUtilities } = api;
 
-  // Add core animation timing utilities (duration, delay, easing)
+  addBase(generateTransformKeyframes());
+  addBase({
+    ".animate": variables,
+  });
+
+  addAnimateUtilities(api);
   addAnimationUtilities(api);
-
-  // Add all enhanced utilities with the new composable architecture
-  createEnhancedJumiUtilities()(api);
+  addTransformUtilities(api);
+  addEffectUtilities(api);
+  addPropertyUtilities(api);
 
   // Add hover variants if enabled (default: true)
   if (options.enableHover !== false) {
@@ -70,7 +82,6 @@ export {
   jumiPluginWithConfig,
   defaultTheme,
   addAnimationUtilities,
-  createEnhancedJumiUtilities,
 };
 
 // Type exports

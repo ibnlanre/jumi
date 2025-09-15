@@ -1,38 +1,103 @@
-/**
- * Jumi - TailwindCSS Animation Plugin
- * A comprehensive CSS animation library built as a TailwindCSS plugin
- */
+import type { PropertiesHyphen } from "csstype";
+import type {
+  KeyValuePair,
+  RecursiveKeyValuePair,
+  ThemeConfig,
+  ValueType,
+} from "tailwindcss/types/config";
 
-// Core TailwindCSS types
-export interface PluginAPI {
-  addBase: (base: Record<string, any>) => void;
-  addUtilities: (
-    utilities: Record<string, any>,
-    options?: { respectPrefix?: boolean; respectImportant?: boolean }
-  ) => void;
-  matchUtilities: (
-    utilities: Record<string, (value: string) => Record<string, any>>,
-    options?: MatchUtilitiesOptions
-  ) => void;
-  addComponents: (
-    components: Record<string, any>,
-    options?: { respectPrefix?: boolean; respectImportant?: boolean }
-  ) => void;
-  addVariant: (
-    name: string,
-    definition: string | string[] | (() => string)
-  ) => void;
-  theme: (path?: string) => any;
-  config: (path?: string) => any;
-  corePlugins: (path: string) => boolean;
-  e: (className: string) => string;
+type BorderRadius =
+  | "border-radius"
+  | "border-start-start-radius" // top-left
+  | "border-start-end-radius" // top-right
+  | "border-end-start-radius" // bottom-left
+  | "border-end-end-radius" // bottom-right
+  | "border-top-left-radius"
+  | "border-top-right-radius"
+  | "border-bottom-left-radius"
+  | "border-bottom-right-radius"
+  | "border-block-start-radius" // top
+  | "border-block-end-radius" // bottom
+  | "border-inline-start-radius" // left
+  | "border-inline-end-radius" // right
+  | "border-top-radius"
+  | "border-bottom-radius"
+  | "border-left-radius"
+  | "border-right-radius";
+
+type BorderWidth =
+  | "border-width"
+  | "border-block-width" // top-bottom
+  | "border-inline-width" // left-right
+  | "border-block-start-width" // top
+  | "border-block-end-width" // bottom
+  | "border-inline-start-width" // left
+  | "border-inline-end-width" // right
+  | "border-top-width"
+  | "border-bottom-width"
+  | "border-left-width"
+  | "border-right-width";
+
+type BorderLength =
+  | "border-length"
+  | "border-block-length" // top-bottom
+  | "border-inline-length" // left-right
+  | "border-top-length"
+  | "border-bottom-length"
+  | "border-left-length"
+  | "border-right-length";
+
+type Height = "height" | "min-height" | "max-height";
+type Width = "width" | "min-width" | "max-width";
+
+export type Property =
+  | BorderRadius
+  | BorderWidth
+  | BorderLength
+  | Height
+  | Width
+  | "opacity";
+
+type Animate =
+  | "animate"
+  | "animate-duration"
+  | "animate-timing-function"
+  | "animate-delay"
+  | "animate-direction"
+  | "animate-iteration-count"
+  | "animate-fill-mode"
+  | "animate-play-state"
+  | "animate-composition";
+
+type Animation = `animate-${Property}`;
+
+export interface Options {
+  respectPrefix: boolean;
+  respectImportant: boolean;
+  type: ValueType | ValueType[];
+  values: KeyValuePair<string, string>;
+  modifiers: "any" | KeyValuePair<string, string>;
+  supportsNegativeValues: boolean;
 }
 
-export interface MatchUtilitiesOptions {
-  respectPrefix?: boolean;
-  respectImportant?: boolean;
-  type?: string | string[];
-  values?: Record<string, string>;
+export interface MatchProperty extends Partial<Options> {
+  name: Animate | Animation;
+  property: (value: string) => Record<string, string>;
+  key?: keyof ThemeConfig;
+}
+
+export type Utility = RecursiveKeyValuePair<string, string | string[] | null>;
+
+export interface AddProperty {
+  name: "animate" | "animate-transform" | Property;
+  values: Utility;
+}
+
+export type Keyframes = Record<string, PropertiesHyphen>;
+
+export interface AnimationKeyframes {
+  name: Property;
+  keyframes: Keyframes;
 }
 
 // Jumi specific types

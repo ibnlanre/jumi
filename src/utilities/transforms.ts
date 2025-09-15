@@ -1,6 +1,7 @@
 import { PluginAPI, Direction, DirectionConfig } from "../types";
 import { defaultTheme } from "../config/defaults";
 import { createAdditiveAnimation } from "./animate";
+import { mergeTheme } from "../utils/merge-theme";
 
 /**
  * Transform utilities with intelligent defaults
@@ -43,31 +44,8 @@ const directionMappings: Record<Direction, DirectionConfig> = {
   "end-end": { x: 1, y: 1, z: 0, axis: "d" },
 };
 
-export function addTransformUtilities({
-  addBase,
-  matchUtilities,
-  theme,
-}: PluginAPI) {
-  // Add CSS custom properties base for transforms
-  addBase({
-    ".animate": {
-      "--jumi-translate-x": "0",
-      "--jumi-translate-y": "0",
-      "--jumi-translate-z": "0",
-      "--jumi-rotate-x": "0deg",
-      "--jumi-rotate-y": "0deg",
-      "--jumi-rotate-z": "0deg",
-      "--jumi-scale-x": "1",
-      "--jumi-scale-y": "1",
-      "--jumi-scale-z": "1",
-      "--jumi-perspective": "none",
-      "--jumi-transform-origin": "center",
-      "--jumi-perspective-origin": "center",
-      "--jumi-transform-style": "flat",
-    },
-  });
-
-  // === SCALE UTILITIES (Intelligent Defaults) ===
+export function addTransformUtilities({ matchUtilities, theme }: PluginAPI) {
+  // === SCALE UTILITIES ===
 
   // Uniform scale (default behavior) - Additive approach
   matchUtilities(
@@ -78,7 +56,8 @@ export function addTransformUtilities({
         }),
     },
     {
-      values: theme("jumi.scales") ?? defaultTheme.scales,
+      values: mergeTheme(defaultTheme.scales, theme("jumi.scales")),
+      supportsNegativeValues: true,
       type: "number",
     }
   );
@@ -93,13 +72,14 @@ export function addTransformUtilities({
           }),
       },
       {
-        values: theme("jumi.scales") ?? defaultTheme.scales,
+        values: mergeTheme(defaultTheme.scales, theme("jumi.scales")),
+        supportsNegativeValues: true,
         type: "number",
       }
     );
   });
 
-  // === ROTATION UTILITIES (Intelligent Defaults) ===
+  // === ROTATION UTILITIES ===
 
   // Default rotation (z-axis clockwise) - Additive approach
   matchUtilities(
@@ -108,7 +88,8 @@ export function addTransformUtilities({
         createAdditiveAnimation("jumi-rotate-z", { "--jumi-rotate-z": value }),
     },
     {
-      values: theme("jumi.rotations") ?? defaultTheme.rotations,
+      values: mergeTheme(defaultTheme.rotations, theme("jumi.rotations")),
+      supportsNegativeValues: true,
       type: "any",
     }
   );
@@ -122,7 +103,8 @@ export function addTransformUtilities({
         }),
     },
     {
-      values: theme("jumi.rotations") ?? defaultTheme.rotations,
+      values: mergeTheme(defaultTheme.rotations, theme("jumi.rotations")),
+      supportsNegativeValues: true,
       type: "any",
     }
   );
@@ -137,7 +119,25 @@ export function addTransformUtilities({
           }),
       },
       {
-        values: theme("jumi.rotations") ?? defaultTheme.rotations,
+        values: mergeTheme(defaultTheme.rotations, theme("jumi.rotations")),
+        type: "any",
+      }
+    );
+  });
+
+  // === SKEW UTILITIES (Legacy, Non-Additive) ===
+
+  ["x", "y"].forEach((axis) => {
+    matchUtilities(
+      {
+        [`animate-skew-${axis}`]: (value: string) => ({
+          "animation-name": `jumi-skew-${axis}`,
+          [`--jumi-skew-${axis}`]: value,
+        }),
+      },
+      {
+        values: mergeTheme(defaultTheme.rotations, theme("jumi.rotations")),
+        supportsNegativeValues: true,
         type: "any",
       }
     );
@@ -164,7 +164,8 @@ export function addTransformUtilities({
         },
       },
       {
-        values: theme("jumi.distances") ?? defaultTheme.distances,
+        values: mergeTheme(defaultTheme.distances, theme("jumi.distances")),
+        supportsNegativeValues: true,
         type: "length",
       }
     );
@@ -180,7 +181,7 @@ export function addTransformUtilities({
       }),
     },
     {
-      values: theme("jumi.perspectives") ?? defaultTheme.perspectives,
+      values: mergeTheme(defaultTheme.perspectives, theme("jumi.perspectives")),
       type: "length",
     }
   );
@@ -194,7 +195,7 @@ export function addTransformUtilities({
       }),
     },
     {
-      values: theme("jumi.origins") ?? defaultTheme.origins,
+      values: mergeTheme(defaultTheme.origins, theme("jumi.origins")),
       type: "lookup",
     }
   );

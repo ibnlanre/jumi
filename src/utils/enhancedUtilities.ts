@@ -1,3 +1,4 @@
+import { variables } from "../config/variables";
 import { PluginAPI } from "../types";
 import {
   createJumiUtilityPlugin,
@@ -5,10 +6,9 @@ import {
   createFilterUtilities,
 } from "./createJumiUtilityPlugin";
 import {
-  cssJumiTransformValue,
-  cssJumiFilterValue,
-  cssJumiBackdropFilterValue,
-  jumiDefaults,
+  transformValue,
+  filterValue,
+  backdropFilterValue,
 } from "./cssComposition";
 
 /**
@@ -207,95 +207,95 @@ export function generateComposedKeyframes(): (api: PluginAPI) => void {
     addBase({
       // Transform keyframes using CSS custom properties
       "@keyframes jumi-translate-x": {
-        to: { transform: cssJumiTransformValue },
+        to: { transform: transformValue },
       },
       "@keyframes jumi-translate-y": {
-        to: { transform: cssJumiTransformValue },
+        to: { transform: transformValue },
       },
       "@keyframes jumi-translate-z": {
-        to: { transform: cssJumiTransformValue },
+        to: { transform: transformValue },
       },
       "@keyframes jumi-rotate": {
-        to: { transform: cssJumiTransformValue },
+        to: { transform: transformValue },
       },
       "@keyframes jumi-rotate-x": {
-        to: { transform: cssJumiTransformValue },
+        to: { transform: transformValue },
       },
       "@keyframes jumi-rotate-y": {
-        to: { transform: cssJumiTransformValue },
+        to: { transform: transformValue },
       },
       "@keyframes jumi-rotate-z": {
-        to: { transform: cssJumiTransformValue },
+        to: { transform: transformValue },
       },
       "@keyframes jumi-scale-uniform": {
-        to: { transform: cssJumiTransformValue },
+        to: { transform: transformValue },
       },
       "@keyframes jumi-scale-x": {
-        to: { transform: cssJumiTransformValue },
+        to: { transform: transformValue },
       },
       "@keyframes jumi-scale-y": {
-        to: { transform: cssJumiTransformValue },
+        to: { transform: transformValue },
       },
       "@keyframes jumi-scale-z": {
-        to: { transform: cssJumiTransformValue },
+        to: { transform: transformValue },
       },
       "@keyframes jumi-skew-x": {
-        to: { transform: cssJumiTransformValue },
+        to: { transform: transformValue },
       },
       "@keyframes jumi-skew-y": {
-        to: { transform: cssJumiTransformValue },
+        to: { transform: transformValue },
       },
 
       // Filter keyframes using CSS custom properties
       "@keyframes jumi-blur": {
-        to: { filter: cssJumiFilterValue },
+        to: { filter: filterValue },
       },
       "@keyframes jumi-brightness": {
-        to: { filter: cssJumiFilterValue },
+        to: { filter: filterValue },
       },
       "@keyframes jumi-contrast": {
-        to: { filter: cssJumiFilterValue },
+        to: { filter: filterValue },
       },
       "@keyframes jumi-grayscale": {
-        to: { filter: cssJumiFilterValue },
+        to: { filter: filterValue },
       },
       "@keyframes jumi-hue-rotate": {
-        to: { filter: cssJumiFilterValue },
+        to: { filter: filterValue },
       },
       "@keyframes jumi-invert": {
-        to: { filter: cssJumiFilterValue },
+        to: { filter: filterValue },
       },
       "@keyframes jumi-saturate": {
-        to: { filter: cssJumiFilterValue },
+        to: { filter: filterValue },
       },
       "@keyframes jumi-sepia": {
-        to: { filter: cssJumiFilterValue },
+        to: { filter: filterValue },
       },
 
       // Backdrop filter keyframes
       "@keyframes jumi-backdrop-blur": {
-        to: { backdropFilter: cssJumiBackdropFilterValue },
+        to: { backdropFilter: backdropFilterValue },
       },
       "@keyframes jumi-backdrop-brightness": {
-        to: { backdropFilter: cssJumiBackdropFilterValue },
+        to: { backdropFilter: backdropFilterValue },
       },
       "@keyframes jumi-backdrop-contrast": {
-        to: { backdropFilter: cssJumiBackdropFilterValue },
+        to: { backdropFilter: backdropFilterValue },
       },
       "@keyframes jumi-backdrop-grayscale": {
-        to: { backdropFilter: cssJumiBackdropFilterValue },
+        to: { backdropFilter: backdropFilterValue },
       },
       "@keyframes jumi-backdrop-hue-rotate": {
-        to: { backdropFilter: cssJumiBackdropFilterValue },
+        to: { backdropFilter: backdropFilterValue },
       },
       "@keyframes jumi-backdrop-invert": {
-        to: { backdropFilter: cssJumiBackdropFilterValue },
+        to: { backdropFilter: backdropFilterValue },
       },
       "@keyframes jumi-backdrop-saturate": {
-        to: { backdropFilter: cssJumiBackdropFilterValue },
+        to: { backdropFilter: backdropFilterValue },
       },
       "@keyframes jumi-backdrop-sepia": {
-        to: { backdropFilter: cssJumiBackdropFilterValue },
+        to: { backdropFilter: backdropFilterValue },
       },
     });
   };
@@ -307,7 +307,7 @@ export function generateComposedKeyframes(): (api: PluginAPI) => void {
 export function addJumiDefaults(): (api: PluginAPI) => void {
   return function ({ addBase }: PluginAPI) {
     addBase({
-      "*": jumiDefaults,
+      ".animate": variables,
     });
   };
 }

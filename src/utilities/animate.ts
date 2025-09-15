@@ -1,22 +1,18 @@
-import { PluginAPI } from "../types";
-
-/**
- * Composable animation system - Base animate class and infrastructure
- * Inspired by TailwindCSS transform pattern for combining multiple animations
- */
+import type { PluginAPI } from "tailwindcss/types/config";
 
 export function addAnimateUtilities({ addUtilities }: PluginAPI) {
-  // Main animate class that enables composable animations
   addUtilities({
     ".animate": {
-      "animation-name": "var(--jumi-animation)",
-      "animation-duration": "var(--jumi-duration)",
-      "animation-timing-function": "var(--jumi-timing-function)",
-      "animation-delay": "var(--jumi-delay)",
-      "animation-direction": "var(--jumi-direction)",
-      "animation-iteration-count": "var(--jumi-iteration-count)",
-      "animation-fill-mode": "var(--jumi-fill-mode)",
-      "animation-play-state": "var(--jumi-play-state)",
+      "animation-name": "var(--jumi-animation-name)",
+      "animation-duration": "var(--jumi-animation-duration)",
+      "animation-timing-function": "var(--jumi-animation-timing-function)",
+      "animation-delay": "var(--jumi-animation-delay)",
+      "animation-direction": "var(--jumi-animation-direction)",
+      "animation-iteration-count": "var(--jumi-animation-iteration-count)",
+      "animation-fill-mode": "var(--jumi-animation-fill-mode)",
+      "animation-play-state": "var(--jumi-animation-play-state)",
+      "animation-composition": "var(--jumi-animation-composition)",
+      transform: "var(--jumi-transform)",
     },
   });
 }
@@ -39,30 +35,30 @@ export function createAdditiveAnimation(
   } = {}
 ): Record<string, string> {
   const styles: Record<string, string> = {
-    "--jumi-animation": animationName,
+    "--jumi-animation-name": animationName,
   };
 
   // Add optional per-animation timing properties
   if (options.duration) {
-    styles["--jumi-duration"] = options.duration;
+    styles["--jumi-animation-duration"] = options.duration;
   }
   if (options.timingFunction) {
-    styles["--jumi-timing-function"] = options.timingFunction;
+    styles["--jumi-animation-timing-function"] = options.timingFunction;
   }
   if (options.delay) {
-    styles["--jumi-delay"] = options.delay;
+    styles["--jumi-animation-delay"] = options.delay;
   }
   if (options.direction) {
-    styles["--jumi-direction"] = options.direction;
+    styles["--jumi-animation-direction"] = options.direction;
   }
   if (options.iterationCount) {
-    styles["--jumi-iteration-count"] = options.iterationCount;
+    styles["--jumi-animation-iteration-count"] = options.iterationCount;
   }
   if (options.fillMode) {
-    styles["--jumi-fill-mode"] = options.fillMode;
+    styles["--jumi-animation-fill-mode"] = options.fillMode;
   }
   if (options.playState) {
-    styles["--jumi-play-state"] = options.playState;
+    styles["--jumi-animation-play-state"] = options.playState;
   }
 
   // Add custom properties for this specific animation
