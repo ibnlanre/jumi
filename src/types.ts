@@ -95,6 +95,32 @@ export interface AddProperty {
 
 export type Keyframes = Record<string, PropertiesHyphen>;
 
+type X = Record<string, string | number>;
+type Y = [1, 2, 3];
+// type Xs<T extends Record<PropertyKey, number>> = {
+//   [K in ]
+// }
+
+const primitiveDataTypes = [
+  "string",
+  "number",
+  "bigint",
+  "null",
+  "undefined",
+  "boolean",
+  "symbol",
+];
+let a: Record<string, string> | number = { b: "c" };
+let referenceDataTypes = ["array", a];
+let d = a;
+a = 8;
+
+function record(key, value) {
+  return {
+    key: value,
+  };
+}
+
 export interface AnimationKeyframes {
   name: Property;
   keyframes: Keyframes;

@@ -70,6 +70,180 @@ export const propertyKeyframes: Array<AnimationKeyframes> = [
       },
     },
   },
+  {
+    name: "border-bottom-right-radius",
+    keyframes: {
+      to: {
+        "border-bottom-right-radius": "var(--jumi-border-bottom-right-radius)",
+      },
+    },
+  },
+  {
+    name: "border-block-start-radius",
+    keyframes: {
+      to: {
+        "border-start-start-radius": "var(--jumi-border-start-start-radius)",
+        "border-start-end-radius": "var(--jumi-border-start-end-radius)",
+      },
+    },
+  },
+  {
+    name: "border-block-end-radius",
+    keyframes: {
+      to: {
+        "border-end-start-radius": "var(--jumi-border-end-start-radius)",
+        "border-end-end-radius": "var(--jumi-border-end-end-radius)",
+      },
+    },
+  },
+  {
+    name: "border-inline-start-radius",
+    keyframes: {
+      to: {
+        "border-start-start-radius": "var(--jumi-border-start-start-radius)",
+        "border-end-start-radius": "var(--jumi-border-end-start-radius)",
+      },
+    },
+  },
+  {
+    name: "border-inline-end-radius",
+    keyframes: {
+      to: {
+        "border-start-end-radius": "var(--jumi-border-start-end-radius)",
+        "border-end-end-radius": "var(--jumi-border-end-end-radius)",
+      },
+    },
+  },
+  {
+    name: "border-top-radius",
+    keyframes: {
+      to: {
+        "border-top-left-radius": "var(--jumi-border-top-left-radius)",
+        "border-top-right-radius": "var(--jumi-border-top-right-radius)",
+      },
+    },
+  },
+  {
+    name: "border-bottom-radius",
+    keyframes: {
+      to: {
+        "border-bottom-left-radius": "var(--jumi-border-bottom-left-radius)",
+        "border-bottom-right-radius": "var(--jumi-border-bottom-right-radius)",
+      },
+    },
+  },
+  {
+    name: "border-left-radius",
+    keyframes: {
+      to: {
+        "border-top-left-radius": "var(--jumi-border-top-left-radius)",
+        "border-bottom-left-radius": "var(--jumi-border-bottom-left-radius)",
+      },
+    },
+  },
+  {
+    name: "border-right-radius",
+    keyframes: {
+      to: {
+        "border-top-right-radius": "var(--jumi-border-top-right-radius)",
+        "border-bottom-right-radius": "var(--jumi-border-bottom-right-radius)",
+      },
+    },
+  },
+  {
+    name: "border-width",
+    keyframes: {
+      to: { "border-width": "var(--jumi-border-width)" },
+    },
+  },
+  {
+    name: "border-block-width",
+    keyframes: {
+      to: {
+        "border-block-start-width": "var(--jumi-border-block-start-width)",
+        "border-block-end-width": "var(--jumi-border-block-end-width)",
+      },
+    },
+  },
+  {
+    name: "border-inline-width",
+    keyframes: {
+      to: {
+        "border-inline-start-width": "var(--jumi-border-inline-start-width)",
+        "border-inline-end-width": "var(--jumi-border-inline-end-width)",
+      },
+    },
+  },
+  {
+    name: "border-block-start-width",
+    keyframes: {
+      to: {
+        "border-block-start-width": "var(--jumi-border-block-start-width)",
+      },
+    },
+  },
+  {
+    name: "border-block-end-width",
+    keyframes: {
+      to: {
+        "border-block-end-width": "var(--jumi-border-block-end-width)",
+      },
+    },
+  },
+  {
+    name: "border-inline-start-width",
+    keyframes: {
+      to: {
+        "border-inline-start-width": "var(--jumi-border-inline-start-width)",
+      },
+    },
+  },
+  {
+    name: "border-inline-end-width",
+    keyframes: {
+      to: {
+        "border-inline-end-width": "var(--jumi-border-inline-end-width)",
+      },
+    },
+  },
+  {
+    name: "border-top-width",
+    keyframes: {
+      to: {
+        "border-top-width": "var(--jumi-border-top-width)",
+      },
+    },
+  },
+  {
+    name: "border-bottom-width",
+    keyframes: {
+      to: {
+        "border-bottom-width": "var(--jumi-border-bottom-width)",
+      },
+    },
+  },
+  {
+    name: "border-left-width",
+    keyframes: {
+      to: {
+        "border-left-width": "var(--jumi-border-left-width)",
+      },
+    },
+  },
+  {
+    name: "border-right-width",
+    keyframes: {
+      to: {
+        "border-right-width": "var(--jumi-border-right-width)",
+      },
+    },
+  },
+  {
+    name: "border-top-length",
+    keyframes: {
+
+    }
+  }
 ];
 
 let x = {
