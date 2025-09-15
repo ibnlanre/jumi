@@ -513,7 +513,7 @@ export function addPropertyUtilities({
         ...(theme("zIndex") ?? {}),
         ...(theme("jumi.zIndex") ?? defaultTheme.zIndex),
       },
-      type: "integer",
+      type: "number",
     }
   );
 
@@ -594,7 +594,7 @@ export function addPropertyUtilities({
         ...(theme("order") ?? {}),
         ...(theme("jumi.order") ?? defaultTheme.order),
       },
-      type: "integer",
+      type: "number",
     }
   );
 

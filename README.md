@@ -15,6 +15,7 @@ A comprehensive CSS animation library built as a TailwindCSS plugin. Transform y
 - 📱 **Responsive** - Works with all TailwindCSS variants (hover, responsive, dark mode)
 - 🎛️ **Highly Configurable** - Customize durations, easings, and more
 - 🌟 **Tree Shakable** - Only includes the utilities you actually use
+- 🚀 **Enhanced Architecture** - Built with TailwindCSS patterns for better performance
 
 ## 🚀 Quick Start
 
@@ -48,6 +49,20 @@ module.exports = {
 <!-- Fade in animation -->
 <div class="animate-fade-in animate-duration-1">Hello World!</div>
 
+<!-- Composable animations (NEW!) -->
+<div
+  class="animate-translate-x-4 animate-scale-110 animate-rotate-12 animate-duration-500"
+>
+  Multiple transforms in one animation!
+</div>
+
+<!-- Enhanced property animations -->
+<div
+  class="animate-opacity-50 animate-w-64 animate-bg-blue-500 animate-duration-1000"
+>
+  Animate multiple properties smoothly
+</div>
+
 <!-- Bounce with custom timing -->
 <div class="animate-bounce-in animate-duration-500 animate-delay-200">
   I bounce on load!
@@ -60,6 +75,114 @@ module.exports = {
 
 <!-- Hover effects -->
 <button class="hover:animate-scale-110 animate-duration-300">Hover me!</button>
+```
+
+## 🎯 Enhanced Architecture (v2.0)
+
+Jumi v2.0 introduces a revolutionary architecture inspired by TailwindCSS core plugins, providing unprecedented performance and composability.
+
+### Composable Animations
+
+Unlike traditional CSS animations that conflict with each other, Jumi's new system allows multiple animations to work together seamlessly:
+
+```html
+<!-- Multiple transforms compose into a single, smooth animation -->
+<div
+  class="animate-translate-x-8 animate-rotate-45 animate-scale-110 animate-duration-500"
+>
+  All transforms work together!
+</div>
+
+<!-- Complex property combinations -->
+<div
+  class="animate-w-64 animate-h-32 animate-bg-gradient-to-r animate-opacity-75 animate-duration-1000"
+>
+  Width, height, background, and opacity animate simultaneously
+</div>
+
+<!-- Filter compositions -->
+<div
+  class="animate-blur-sm animate-brightness-110 animate-saturate-150 animate-duration-2000"
+>
+  Multiple filter effects in harmony
+</div>
+```
+
+### CSS Custom Property System
+
+The new architecture leverages CSS custom properties for optimal performance:
+
+```css
+/* Generated CSS for composable transforms */
+.animate-translate-x-8 {
+  @defaults jumi-transform;
+  --jumi-translate-x: 2rem;
+  animation-name: jumi-translate-x;
+}
+
+.animate-rotate-45 {
+  @defaults jumi-transform;
+  --jumi-rotate: 45deg;
+  animation-name: jumi-rotate;
+}
+
+/* Single keyframe that uses all transform variables */
+@keyframes jumi-translate-x, jumi-rotate {
+  to {
+    transform: translateX(var(--jumi-translate-x, 0)) translateY(
+        var(--jumi-translate-y, 0)
+      )
+      rotate(var(--jumi-rotate, 0deg)) scale(
+        var(--jumi-scale-x, 1),
+        var(--jumi-scale-y, 1)
+      );
+  }
+}
+```
+
+### Performance Benefits
+
+1. **Reduced CSS Bundle Size** - Shared keyframes for property combinations
+2. **Better Browser Optimization** - CSS custom properties are highly optimized
+3. **No Animation Conflicts** - Multiple utilities work together instead of overriding
+4. **Smoother Animations** - Browser can optimize custom property changes
+5. **Dynamic Control** - Runtime animation customization via JavaScript
+
+### Enhanced Property Animations
+
+```html
+<!-- Direct property animations with intelligent defaults -->
+<div class="animate-opacity-50">Animates opacity from current value to 0.5</div>
+<div class="animate-w-full">Animates width from current to 100%</div>
+<div class="animate-bg-red-500">Smoothly transitions background color</div>
+
+<!-- Combine with timing controls -->
+<div class="animate-h-64 animate-duration-500 animate-ease-out">
+  Fast height change
+</div>
+<div class="animate-rounded-full animate-duration-2000 animate-ease-bounce">
+  Bouncy border radius
+</div>
+```
+
+### Advanced Utility Patterns
+
+The new system follows TailwindCSS patterns for consistency and power:
+
+```html
+<!-- Negative values support -->
+<div class="animate-translate-x-[-50px] animate-rotate-[-45deg]">
+  Custom negative values
+</div>
+
+<!-- Arbitrary value support -->
+<div class="animate-w-[250px] animate-duration-[350ms]">
+  Precise custom values
+</div>
+
+<!-- Type-safe property validation -->
+<div class="animate-opacity-[0.75]">Validated opacity value</div>
+<div class="animate-scale-[1.25]">Validated scale value</div>
 ```
 
 ## 📚 Core Concepts

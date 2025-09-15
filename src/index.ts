@@ -1,40 +1,29 @@
 import { JumiPluginOptions, PluginAPI } from "./types";
 import { defaultTheme } from "./config/defaults";
 import { addAnimationUtilities } from "./utilities/animation";
-import { addAnimateUtilities } from "./utilities/animate";
-import {
-  addTransformUtilities,
-  generateTransformKeyframes,
-} from "./utilities/transforms";
-import { addEffectUtilities } from "./utilities/effects";
-import { addPropertyUtilities } from "./utilities/properties";
+import { createEnhancedJumiUtilities } from "./utils/enhancedUtilities";
 
 /**
  * Jumi - TailwindCSS Animation Plugin
  *
  * A comprehensive CSS animation library that provides:
  * - Rich timing utilities (duration, delay, easing curves)
- * - Transform animations (translate, rotate, scale)
+ * - Transform animations (translate, rotate, scale) with composability
  * - Effect animations (bounce, fade, slide, zoom)
  * - Property animations (width, height, colors, borders)
  * - Composable animation system with CSS custom properties
+ * - Enhanced architecture inspired by TailwindCSS core plugins
  *
  * @param options Configuration options for the plugin
  */
 function jumiPlugin(api: PluginAPI, options: JumiPluginOptions = {}) {
-  const { addBase, addVariant } = api;
+  const { addVariant } = api;
 
-  // Add composable animation infrastructure first
-  addAnimateUtilities(api);
-
-  // Add transform keyframes to base
-  addBase(generateTransformKeyframes());
-
-  // Add core utilities
+  // Add core animation timing utilities (duration, delay, easing)
   addAnimationUtilities(api);
-  addTransformUtilities(api);
-  addEffectUtilities(api);
-  addPropertyUtilities(api);
+
+  // Add all enhanced utilities with the new composable architecture
+  createEnhancedJumiUtilities()(api);
 
   // Add hover variants if enabled (default: true)
   if (options.enableHover !== false) {
@@ -81,9 +70,7 @@ export {
   jumiPluginWithConfig,
   defaultTheme,
   addAnimationUtilities,
-  addTransformUtilities,
-  addEffectUtilities,
-  addPropertyUtilities,
+  createEnhancedJumiUtilities,
 };
 
 // Type exports
