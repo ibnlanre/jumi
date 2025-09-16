@@ -1,7 +1,8 @@
-import { PluginAPI, Direction, DirectionConfig } from "../types";
 import { defaultTheme } from "../config/defaults";
 import { createAdditiveAnimation } from "./animate";
 import { mergeTheme } from "../utils/merge-theme";
+import type { Direction, DirectionConfig } from "@/types";
+import type { PluginAPI } from "tailwindcss/types/config";
 
 /**
  * Transform utilities with intelligent defaults

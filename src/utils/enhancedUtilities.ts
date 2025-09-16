@@ -1,5 +1,5 @@
+import type { PluginAPI } from "tailwindcss/types/config";
 import { variables } from "../config/variables";
-import { PluginAPI } from "../types";
 import {
   createJumiUtilityPlugin,
   createTransformUtilities,

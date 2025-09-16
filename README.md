@@ -1,5 +1,7 @@
 # Jumi 🎬
 
+All CSS properties are animatable [see list](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_animated_properties).
+
 A comprehensive CSS animation library built as a TailwindCSS plugin. Transform your web interfaces with smooth, composable animations powered by CSS custom properties and TailwindCSS.
 
 [![npm version](https://badge.fury.io/js/jumi.svg)](https://badge.fury.io/js/jumi)

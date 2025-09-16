@@ -1,4 +1,4 @@
-import { PluginAPI } from "../types";
+import type { PluginAPI } from "tailwindcss/types/config";
 import { defaultTheme } from "../config/defaults";
 import { getKeyframesAsCSS } from "../config/keyframes";
 

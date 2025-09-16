@@ -7,5 +7,6 @@ export const filter = [
   "var(--jumi-invert, invert(0))",
   "var(--jumi-saturate, saturate(1))",
   "var(--jumi-sepia, sepia(0))",
+  'var(--jumi-opacity, opacity(1))',
   "var(--jumi-drop-shadow, drop-shadow(0 0 0 transparent))",
 ].join(" ");

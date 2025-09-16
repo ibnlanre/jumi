@@ -1,12 +1,9 @@
 export const animationTimingFunction = {
-  // defaults
   linear: "linear",
   ease: "ease",
   "ease-in": "ease-in",
   "ease-out": "ease-out",
   "ease-in-out": "ease-in-out",
-
-  // ease-in curves
   "ease-in-quad": "cubic-bezier(0.11, 0, 0.5, 0)",
   "ease-in-cubic": "cubic-bezier(0.32, 0, 0.67, 0)",
   "ease-in-quart": "cubic-bezier(0.5, 0, 0.75, 0)",
@@ -15,8 +12,6 @@ export const animationTimingFunction = {
   "ease-in-expo": "cubic-bezier(0.7, 0, 0.84, 0)",
   "ease-in-circ": "cubic-bezier(0.55, 0, 1, 0.45)",
   "ease-in-back": "cubic-bezier(0.36, 0, 0.66, -0.56)",
-
-  // ease-out curves
   "ease-out-quad": "cubic-bezier(0.5, 1, 0.89, 1)",
   "ease-out-cubic": "cubic-bezier(0.33, 1, 0.68, 1)",
   "ease-out-quart": "cubic-bezier(0.25, 1, 0.5, 1)",
@@ -25,8 +20,6 @@ export const animationTimingFunction = {
   "ease-out-expo": "cubic-bezier(0.16, 1, 0.3, 1)",
   "ease-out-circ": "cubic-bezier(0, 0.55, 0.45, 1)",
   "ease-out-back": "cubic-bezier(0.34, 1.56, 0.64, 1)",
-
-  // ease-in-out curves
   "ease-in-out-quad": "cubic-bezier(0.45, 0, 0.55, 1)",
   "ease-in-out-cubic": "cubic-bezier(0.65, 0, 0.35, 1)",
   "ease-in-out-quart": "cubic-bezier(0.76, 0, 0.24, 1)",

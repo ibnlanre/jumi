@@ -3,16 +3,6 @@ import type { Property } from "@/types";
 export type PropertyVariable = `var(--jumi-${Property}, ${string})`;
 
 const properties: Array<PropertyVariable> = [
-  // Width
-  "var(--jumi-width, auto)",
-  "var(--jumi-min-width, 0)",
-  "var(--jumi-max-width, none)",
-
-  // Height
-  "var(--jumi-height, auto)",
-  "var(--jumi-min-height, 0)",
-  "var(--jumi-max-height, none)",
-
   // Border radius
   "var(--jumi-border-radius, 0)",
 
@@ -40,8 +30,18 @@ const properties: Array<PropertyVariable> = [
   "var(--jumi-border-left-radius, 0)",
   "var(--jumi-border-right-radius, 0)",
 
+  // Height
+  "var(--jumi-height, auto)",
+  "var(--jumi-min-height, 0)",
+  "var(--jumi-max-height, none)",
+
   // Opacity
   "var(--jumi-opacity, 1)",
+
+  // Width
+  "var(--jumi-width, auto)",
+  "var(--jumi-min-width, 0)",
+  "var(--jumi-max-width, none)",
 ];
 
 export const animation = properties.join(", ");

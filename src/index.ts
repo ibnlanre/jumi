@@ -1,11 +1,6 @@
-import { JumiPluginOptions, PluginAPI } from "./types";
-import { defaultTheme } from "./config/defaults";
-import { addAnimationUtilities } from "./utilities/animation";
-import { addAnimateUtilities } from "./utilities/animate";
-import {
-  addTransformUtilities,
-  generateTransformKeyframes,
-} from "./utilities/transforms";
+import type { PluginAPI, PluginCreator } from "tailwindcss/types/config";
+
+import { addTransformUtilities } from "./utilities/transforms";
 import { addEffectUtilities } from "./utilities/effects";
 import { addPropertyUtilities } from "./utilities/properties";
 import { variables } from "./config/variables";
@@ -23,72 +18,20 @@ import { variables } from "./config/variables";
  *
  * @param options Configuration options for the plugin
  */
-function jumiPlugin(api: PluginAPI, options: JumiPluginOptions = {}) {
-  const { addBase, addVariant, addUtilities } = api;
+const jumiPlugin: PluginCreator = (api) => {
+  const { addBase, addVariant } = api;
 
-  addBase(generateTransformKeyframes());
+  // addBase(generateTransformKeyframes());
   addBase({
     ".animate": variables,
   });
 
-  addAnimateUtilities(api);
-  addAnimationUtilities(api);
   addTransformUtilities(api);
   addEffectUtilities(api);
   addPropertyUtilities(api);
 
-  // Add hover variants if enabled (default: true)
-  if (options.enableHover !== false) {
-    addVariant("animate-hover", "&:hover");
-  }
-
-  // Add group hover variants if enabled (default: true)
-  if (options.enableGroup !== false) {
-    addVariant("group-animate-hover", ":merge(.group):hover &");
-  }
-
-  // Add responsive variants if enabled (default: true)
-  // These are automatically handled by TailwindCSS's responsive system
-
-  // Add dark mode variants if enabled (default: false)
-  if (options.enableDark === true) {
-    addVariant("dark-animate", ":merge(.dark) &");
-    addVariant("dark-animate-hover", ":merge(.dark) &:hover");
-  }
+  addVariant("animate-hover", "&:hover");
+  addVariant("group-animate-hover", ":merge(.group):hover &");
 }
 
-// Plugin with configuration function
-function jumiPluginWithConfig(options: JumiPluginOptions = {}) {
-  return {
-    handler: (api: PluginAPI) => jumiPlugin(api, options),
-    config: {
-      theme: {
-        extend: {
-          // Merge user theme with defaults
-          jumi: {
-            ...defaultTheme,
-            ...(options.theme || {}),
-          },
-        },
-      },
-    },
-  };
-}
-
-export default jumiPluginWithConfig;
-
-export {
-  jumiPlugin,
-  jumiPluginWithConfig,
-  defaultTheme,
-  addAnimationUtilities,
-};
-
-// Type exports
-export type {
-  JumiPluginOptions,
-  JumiTheme,
-  KeyframeDefinition,
-  Direction,
-  DirectionConfig,
-} from "./types";
+export default jumiPlugin;

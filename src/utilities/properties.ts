@@ -1,6 +1,6 @@
 import type { PluginAPI } from "tailwindcss/types/config";
 
-import { addProperties, matchProperties } from "@/config";
+import { addProperties, matchProperties } from "@/config/properties";
 import { defaultTheme } from "@/config/defaults";
 import { mergeTheme } from "@/utils/merge-theme";
 
@@ -45,107 +45,6 @@ export function addPropertyUtilities({
   addProperties.forEach(({ name, values }) => {
     addUtilities({ [`.${name}`]: values });
   });
-
-  // Border reveal animation utilities - directional border drawing effects
-  matchUtilities(
-    {
-      "animate-border-reveal-top": (value: string) => ({
-        position: "relative",
-        "&::before": {
-          content: "''",
-          position: "absolute",
-          top: "0",
-          left: "0",
-          width: "0%",
-          height: value,
-          backgroundColor: "var(--jumi-border-color, currentColor)",
-          animationName: "jumi-border-reveal-top",
-        },
-      }),
-    },
-    {
-      values: {
-        ...(theme("borderWidth") ?? {}),
-        ...(theme("jumi.borderWidths") ?? defaultTheme.borderWidths),
-      },
-      type: "line-width",
-    }
-  );
-
-  matchUtilities(
-    {
-      "animate-border-reveal-right": (value: string) => ({
-        position: "relative",
-        "&::before": {
-          content: "''",
-          position: "absolute",
-          top: "0",
-          right: "0",
-          width: value,
-          height: "0%",
-          backgroundColor: "var(--jumi-border-color, currentColor)",
-          animationName: "jumi-border-reveal-right",
-        },
-      }),
-    },
-    {
-      values: {
-        ...(theme("borderWidth") ?? {}),
-        ...(theme("jumi.borderWidths") ?? defaultTheme.borderWidths),
-      },
-      type: "line-width",
-    }
-  );
-
-  matchUtilities(
-    {
-      "animate-border-reveal-bottom": (value: string) => ({
-        position: "relative",
-        "&::before": {
-          content: "''",
-          position: "absolute",
-          bottom: "0",
-          right: "0",
-          width: "0%",
-          height: value,
-          backgroundColor: "var(--jumi-border-color, currentColor)",
-          animationName: "jumi-border-reveal-bottom",
-        },
-      }),
-    },
-    {
-      values: {
-        ...(theme("borderWidth") ?? {}),
-        ...(theme("jumi.borderWidths") ?? defaultTheme.borderWidths),
-      },
-      type: "line-width",
-    }
-  );
-
-  matchUtilities(
-    {
-      "animate-border-reveal-left": (value: string) => ({
-        position: "relative",
-        "&::before": {
-          content: "''",
-          position: "absolute",
-          bottom: "0",
-          left: "0",
-          width: value,
-          height: "0%",
-          backgroundColor: "var(--jumi-border-color, currentColor)",
-          animationName: "jumi-border-reveal-left",
-        },
-      }),
-    },
-    {
-      values: {
-        ...(theme("borderWidth") ?? {}),
-        ...(theme("jumi.borderWidths") ?? defaultTheme.borderWidths),
-      },
-      type: "line-width",
-    }
-  );
 
   // Shadow animation utilities
   matchUtilities(

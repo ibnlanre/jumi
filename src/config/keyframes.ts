@@ -1,11 +1,43 @@
 import type { Properties } from "csstype";
-import { animationName } from "./animation-name";
+import { animationName } from "./theme/animation-name";
 import type { AnimationKeyframes } from "@/types";
 
 type AnimationName = keyof typeof animationName;
 type Keyframes = Record<string, Properties<string | number>>;
 
 export const propertyKeyframes: Array<AnimationKeyframes> = [
+  {
+    name: "align-content",
+    keyframes: {
+      to: {
+        "align-content": "var(--jumi-align-content)",
+      },
+    },
+  },
+  {
+    name: "align-items",
+    keyframes: {
+      to: {
+        "align-items": "var(--jumi-align-items)",
+      },
+    },
+  },
+  {
+    name: "align-self",
+    keyframes: {
+      to: {
+        "align-self": "var(--jumi-align-self)",
+      },
+    },
+  },
+  {
+    name: "alignment-baseline",
+    keyframes: {
+      to: {
+        "alignment-baseline": "var(--jumi-alignment-baseline)",
+      },
+    },
+  },
   {
     name: "width",
     keyframes: {
@@ -241,9 +273,31 @@ export const propertyKeyframes: Array<AnimationKeyframes> = [
   {
     name: "border-top-length",
     keyframes: {
-
-    }
-  }
+      "0%": { width: "0%" },
+      "100%": { width: "100%" },
+    },
+  },
+  {
+    name: "border-bottom-length",
+    keyframes: {
+      "0%": { width: "0%" },
+      "100%": { width: "100%" },
+    },
+  },
+  {
+    name: "border-left-length",
+    keyframes: {
+      "0%": { height: "0%" },
+      "100%": { height: "100%" },
+    },
+  },
+  {
+    name: "border-right-length",
+    keyframes: {
+      "0%": { height: "0%" },
+      "100%": { height: "100%" },
+    },
+  },
 ];
 
 let x = {

@@ -1,11 +1,13 @@
-import { backdropFilter } from "../composition/backdrop-filter";
-import { filter } from "../composition/filter";
-import { transform } from "../composition/transform";
+import {
+  animationRange,
+  animationRangeEnd,
+  animationRangeStart,
+} from "@/composition/animation-range";
+import { animationTimelineInset } from "@/composition/animation-timeline";
+import { backdropFilter } from "@/composition/backdrop-filter";
+import { filter } from "@/composition/filter";
+import { transform, transformGpu } from "@/composition/transform";
 
-/**
- * Default values for all Jumi CSS custom properties
- * Similar to TailwindCSS's @defaults system
- */
 export const variables = {
   // Animation defaults
   "--jumi-animation-name": "none",
@@ -17,9 +19,14 @@ export const variables = {
   "--jumi-animation-fill-mode": "forwards",
   "--jumi-animation-play-state": "running",
   "--jumi-animation-composition": "replace",
+  "--jumi-animation-timeline-inset": animationTimelineInset,
+  "--jumi-animation-range": animationRange,
+  "--jumi-animation-range-start": animationRangeStart,
+  "--jumi-animation-range-end": animationRangeEnd,
 
   // Transform defaults
   "--jumi-transform": transform,
+  "--jumi-transform-gpu": transformGpu,
   "--jumi-translate-x": "0",
   "--jumi-translate-y": "0",
   "--jumi-translate-z": "0",
@@ -39,7 +46,7 @@ export const variables = {
   "--jumi-transform-origin-z": "0px",
   "--jumi-perspective": "none",
   "--jumi-perspective-origin": "center",
-  
+
   // Filter defaults
   "--jumi-filter": filter,
   "--jumi-blur": "blur(0)",

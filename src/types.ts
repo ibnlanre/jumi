@@ -1,12 +1,24 @@
 import type { PropertiesHyphen } from "csstype";
 import type {
+  CSSRuleObject,
   KeyValuePair,
   RecursiveKeyValuePair,
   ThemeConfig,
   ValueType,
 } from "tailwindcss/types/config";
 
-type BorderRadius =
+
+type Height = "height" | "min-height" | "max-height";
+type Width = "width" | "min-width" | "max-width";
+
+export type Property =
+  | "accent-color"
+  | "align-content"
+  | "align-items"
+  | "align-self"
+  | "alignment-baseline"
+  | "all"
+  | "appearance"
   | "border-radius"
   | "border-start-start-radius" // top-left
   | "border-start-end-radius" // top-right
@@ -23,9 +35,7 @@ type BorderRadius =
   | "border-top-radius"
   | "border-bottom-radius"
   | "border-left-radius"
-  | "border-right-radius";
-
-type BorderWidth =
+  | "border-right-radius"
   | "border-width"
   | "border-block-width" // top-bottom
   | "border-inline-width" // left-right
@@ -36,30 +46,33 @@ type BorderWidth =
   | "border-top-width"
   | "border-bottom-width"
   | "border-left-width"
-  | "border-right-width";
-
-type BorderLength =
+  | "border-right-width"
   | "border-length"
   | "border-block-length" // top-bottom
   | "border-inline-length" // left-right
+  | "border-block-start-length" // top
+  | "border-block-end-length" // bottom
+  | "border-inline-start-length" // left
+  | "border-inline-end-length" // right
   | "border-top-length"
   | "border-bottom-length"
   | "border-left-length"
-  | "border-right-length";
-
-type Height = "height" | "min-height" | "max-height";
-type Width = "width" | "min-width" | "max-width";
-
-export type Property =
-  | BorderRadius
-  | BorderWidth
-  | BorderLength
+  | "border-right-length"
   | Height
   | Width
   | "opacity";
 
 type Animate =
   | "animate"
+  | "animate-timeline"
+  | "animate-timeline-scroller"
+  | "animate-timeline-axis"
+  | "animate-timeline-inset"
+  | "animate-timeline-inset-start"
+  | "animate-timeline-inset-end"
+  | "animate-range"
+  | "animate-range-start"
+  | "animate-range-end"
   | "animate-duration"
   | "animate-timing-function"
   | "animate-delay"
@@ -82,44 +95,21 @@ export interface Options {
 
 export interface MatchProperty extends Partial<Options> {
   name: Animate | Animation;
-  property: (value: string) => Record<string, string>;
+  property: (value: string) => CSSRuleObject;
   key?: keyof ThemeConfig;
 }
 
 export type Utility = RecursiveKeyValuePair<string, string | string[] | null>;
 
 export interface AddProperty {
-  name: "animate" | "animate-transform" | Property;
+  name: "animate" | "animate-transform" | "animate-transform-gpu" | Property;
   values: Utility;
 }
 
-export type Keyframes = Record<string, PropertiesHyphen>;
-
-type X = Record<string, string | number>;
-type Y = [1, 2, 3];
-// type Xs<T extends Record<PropertyKey, number>> = {
-//   [K in ]
-// }
-
-const primitiveDataTypes = [
-  "string",
-  "number",
-  "bigint",
-  "null",
-  "undefined",
-  "boolean",
-  "symbol",
-];
-let a: Record<string, string> | number = { b: "c" };
-let referenceDataTypes = ["array", a];
-let d = a;
-a = 8;
-
-function record(key, value) {
-  return {
-    key: value,
-  };
-}
+export type Keyframes = Record<
+  string,
+  PropertiesHyphen | Record<string & {}, string>
+>;
 
 export interface AnimationKeyframes {
   name: Property;

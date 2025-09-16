@@ -1,4 +1,5 @@
-import { MatchUtilitiesType, PluginAPI } from "../types";
+
+import type { PluginAPI, ValueType } from "tailwindcss/types/config";
 import { defaultTheme } from "../config/defaults";
 
 /**
@@ -15,7 +16,7 @@ export interface JumiUtilityOptions {
   /**
    * CSS property types for validation
    */
-  type?: MatchUtilitiesType;
+  type?: ValueType | ValueType[];
 
   /**
    * Whether to filter out DEFAULT values

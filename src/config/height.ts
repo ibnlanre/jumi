@@ -1,4 +1,4 @@
-import { ratio } from "./ratio";
+import { ratio } from "./theme/ratio";
 import { size } from "./size";
 
 export const height = {
