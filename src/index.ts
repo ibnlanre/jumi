@@ -1,4 +1,4 @@
-import type { PluginAPI, PluginCreator } from "tailwindcss/types/config";
+import type { PluginCreator } from "tailwindcss/types/config";
 
 import { addTransformUtilities } from "./utilities/transforms";
 import { addEffectUtilities } from "./utilities/effects";
@@ -22,9 +22,7 @@ const jumiPlugin: PluginCreator = (api) => {
   const { addBase, addVariant } = api;
 
   // addBase(generateTransformKeyframes());
-  addBase({
-    ".animate": variables,
-  });
+  addBase({ ".animate": variables });
 
   addTransformUtilities(api);
   addEffectUtilities(api);
@@ -32,6 +30,6 @@ const jumiPlugin: PluginCreator = (api) => {
 
   addVariant("animate-hover", "&:hover");
   addVariant("group-animate-hover", ":merge(.group):hover &");
-}
+};
 
 export default jumiPlugin;

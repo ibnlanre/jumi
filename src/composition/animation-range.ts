@@ -1,14 +1,14 @@
 export const animationRange = [
-  "--jumi-animation-range-start",
-  "--jumi-animation-range-end",
+  "var(--jumi-animation-range-start, normal)",
+  "var(--jumi-animation-range-end, normal)",
 ].join(" ");
 
 export const animationRangeStart = [
-  "--jumi-animation-range-start-name",
-  "--jumi-animation-range-start-percentage",
+  "var(--jumi-animation-range-start-name, normal)",
+  "var(--jumi-animation-range-start-percentage, 0%)",
 ].join(" ");
 
 export const animationRangeEnd = [
-  "--jumi-animation-range-end-name",
-  "--jumi-animation-range-end-percentage",
+  "var(--jumi-animation-range-end-name, normal)",
+  "var(--jumi-animation-range-end-percentage, 100%)",
 ].join(" ");

@@ -1,326 +1,190 @@
 import type { Properties } from "csstype";
-import { animationName } from "./theme/animation-name";
-import type { AnimationKeyframes } from "@/types";
+import type { AnimationKeyframes, PropertyKeyframes } from "@/types";
 
-type AnimationName = keyof typeof animationName;
 type Keyframes = Record<string, Properties<string | number>>;
 
-export const propertyKeyframes: Array<AnimationKeyframes> = [
-  {
-    name: "align-content",
-    keyframes: {
-      to: {
-        "align-content": "var(--jumi-align-content)",
-      },
+export const propertyKeyframes: PropertyKeyframes = {
+  "@keyframes jumi-align-content": {
+    to: {
+      "align-content": "var(--jumi-align-content)",
     },
   },
-  {
-    name: "align-items",
-    keyframes: {
-      to: {
-        "align-items": "var(--jumi-align-items)",
-      },
+  "@keyframes jumi-align-items": {
+    to: {
+      "align-items": "var(--jumi-align-items)",
     },
   },
-  {
-    name: "align-self",
-    keyframes: {
-      to: {
-        "align-self": "var(--jumi-align-self)",
-      },
+  "@keyframes jumi-align-self": {
+    to: {
+      "align-self": "var(--jumi-align-self)",
     },
   },
-  {
-    name: "alignment-baseline",
-    keyframes: {
-      to: {
-        "alignment-baseline": "var(--jumi-alignment-baseline)",
-      },
+  "@keyframes jumi-alignment-baseline": {
+    to: {
+      "alignment-baseline": "var(--jumi-alignment-baseline)",
     },
   },
-  {
-    name: "width",
-    keyframes: {
-      to: { width: "var(--jumi-width)" },
+  "@keyframes jumi-width": {
+    to: { width: "var(--jumi-width)" },
+  },
+  "@keyframes jumi-min-width": {
+    to: { "min-width": "var(--jumi-min-width)" },
+  },
+  "@keyframes jumi-height": {
+    to: { height: "var(--jumi-height)" },
+  },
+  "@keyframes jumi-border-radius": {
+    to: { "border-radius": "var(--jumi-border-radius)" },
+  },
+  "@keyframes jumi-border-start-start-radius": {
+    to: {
+      "border-start-start-radius": "var(--jumi-border-start-start-radius)",
     },
   },
-  {
-    name: "height",
-    keyframes: {
-      to: { height: "var(--jumi-height)" },
+  "@keyframes jumi-border-start-end-radius": {
+    to: { "border-start-end-radius": "var(--jumi-border-start-end-radius)" },
+  },
+  "@keyframes jumi-border-end-start-radius": {
+    to: { "border-end-start-radius": "var(--jumi-border-end-start-radius)" },
+  },
+  "@keyframes jumi-border-end-end-radius": {
+    to: { "border-end-end-radius": "var(--jumi-border-end-end-radius)" },
+  },
+  "@keyframes jumi-border-top-left-radius": {
+    to: { "border-top-left-radius": "var(--jumi-border-top-left-radius)" },
+  },
+  "@keyframes jumi-border-top-right-radius": {
+    to: { "border-top-right-radius": "var(--jumi-border-top-right-radius)" },
+  },
+  "@keyframes jumi-border-bottom-left-radius": {
+    to: {
+      "border-bottom-left-radius": "var(--jumi-border-bottom-left-radius)",
     },
   },
-  {
-    name: "border-radius",
-    keyframes: {
-      to: { "border-radius": "var(--jumi-border-radius)" },
+  "@keyframes jumi-border-bottom-right-radius": {
+    to: {
+      "border-bottom-right-radius": "var(--jumi-border-bottom-right-radius)",
     },
   },
-  {
-    name: "border-start-start-radius",
-    keyframes: {
-      to: {
-        "border-start-start-radius": "var(--jumi-border-start-start-radius)",
-      },
+  "@keyframes jumi-border-block-start-radius": {
+    to: {
+      "border-start-start-radius": "var(--jumi-border-start-start-radius)",
+      "border-start-end-radius": "var(--jumi-border-start-end-radius)",
     },
   },
-  {
-    name: "border-start-end-radius",
-    keyframes: {
-      to: { "border-start-end-radius": "var(--jumi-border-start-end-radius)" },
+  "@keyframes jumi-border-block-end-radius": {
+    to: {
+      "border-end-start-radius": "var(--jumi-border-end-start-radius)",
+      "border-end-end-radius": "var(--jumi-border-end-end-radius)",
     },
   },
-  {
-    name: "border-end-start-radius",
-    keyframes: {
-      to: { "border-end-start-radius": "var(--jumi-border-end-start-radius)" },
+  "@keyframes jumi-border-inline-start-radius": {
+    to: {
+      "border-start-start-radius": "var(--jumi-border-start-start-radius)",
+      "border-end-start-radius": "var(--jumi-border-end-start-radius)",
     },
   },
-  {
-    name: "border-end-end-radius",
-    keyframes: {
-      to: { "border-end-end-radius": "var(--jumi-border-end-end-radius)" },
+  "@keyframes jumi-border-inline-end-radius": {
+    to: {
+      "border-start-end-radius": "var(--jumi-border-start-end-radius)",
+      "border-end-end-radius": "var(--jumi-border-end-end-radius)",
     },
   },
-  {
-    name: "border-top-left-radius",
-    keyframes: {
-      to: { "border-top-left-radius": "var(--jumi-border-top-left-radius)" },
+  "@keyframes jumi-border-top-radius": {
+    to: {
+      "border-top-left-radius": "var(--jumi-border-top-left-radius)",
+      "border-top-right-radius": "var(--jumi-border-top-right-radius)",
     },
   },
-  {
-    name: "border-top-right-radius",
-    keyframes: {
-      to: { "border-top-right-radius": "var(--jumi-border-top-right-radius)" },
+  "@keyframes jumi-border-bottom-radius": {
+    to: {
+      "border-bottom-left-radius": "var(--jumi-border-bottom-left-radius)",
+      "border-bottom-right-radius": "var(--jumi-border-bottom-right-radius)",
     },
   },
-  {
-    name: "border-bottom-left-radius",
-    keyframes: {
-      to: {
-        "border-bottom-left-radius": "var(--jumi-border-bottom-left-radius)",
-      },
+  "@keyframes jumi-border-left-radius": {
+    to: {
+      "border-top-left-radius": "var(--jumi-border-top-left-radius)",
+      "border-bottom-left-radius": "var(--jumi-border-bottom-left-radius)",
     },
   },
-  {
-    name: "border-bottom-right-radius",
-    keyframes: {
-      to: {
-        "border-bottom-right-radius": "var(--jumi-border-bottom-right-radius)",
-      },
+  "@keyframes jumi-border-right-radius": {
+    to: {
+      "border-top-right-radius": "var(--jumi-border-top-right-radius)",
+      "border-bottom-right-radius": "var(--jumi-border-bottom-right-radius)",
     },
   },
-  {
-    name: "border-block-start-radius",
-    keyframes: {
-      to: {
-        "border-start-start-radius": "var(--jumi-border-start-start-radius)",
-        "border-start-end-radius": "var(--jumi-border-start-end-radius)",
-      },
-    },
-  },
-  {
-    name: "border-block-end-radius",
-    keyframes: {
-      to: {
-        "border-end-start-radius": "var(--jumi-border-end-start-radius)",
-        "border-end-end-radius": "var(--jumi-border-end-end-radius)",
-      },
-    },
-  },
-  {
-    name: "border-inline-start-radius",
-    keyframes: {
-      to: {
-        "border-start-start-radius": "var(--jumi-border-start-start-radius)",
-        "border-end-start-radius": "var(--jumi-border-end-start-radius)",
-      },
-    },
-  },
-  {
-    name: "border-inline-end-radius",
-    keyframes: {
-      to: {
-        "border-start-end-radius": "var(--jumi-border-start-end-radius)",
-        "border-end-end-radius": "var(--jumi-border-end-end-radius)",
-      },
-    },
-  },
-  {
-    name: "border-top-radius",
-    keyframes: {
-      to: {
-        "border-top-left-radius": "var(--jumi-border-top-left-radius)",
-        "border-top-right-radius": "var(--jumi-border-top-right-radius)",
-      },
-    },
-  },
-  {
-    name: "border-bottom-radius",
-    keyframes: {
-      to: {
-        "border-bottom-left-radius": "var(--jumi-border-bottom-left-radius)",
-        "border-bottom-right-radius": "var(--jumi-border-bottom-right-radius)",
-      },
-    },
-  },
-  {
-    name: "border-left-radius",
-    keyframes: {
-      to: {
-        "border-top-left-radius": "var(--jumi-border-top-left-radius)",
-        "border-bottom-left-radius": "var(--jumi-border-bottom-left-radius)",
-      },
-    },
-  },
-  {
-    name: "border-right-radius",
-    keyframes: {
-      to: {
-        "border-top-right-radius": "var(--jumi-border-top-right-radius)",
-        "border-bottom-right-radius": "var(--jumi-border-bottom-right-radius)",
-      },
-    },
-  },
-  {
-    name: "border-width",
-    keyframes: {
-      to: { "border-width": "var(--jumi-border-width)" },
-    },
-  },
-  {
-    name: "border-block-width",
-    keyframes: {
-      to: {
-        "border-block-start-width": "var(--jumi-border-block-start-width)",
-        "border-block-end-width": "var(--jumi-border-block-end-width)",
-      },
-    },
-  },
-  {
-    name: "border-inline-width",
-    keyframes: {
-      to: {
-        "border-inline-start-width": "var(--jumi-border-inline-start-width)",
-        "border-inline-end-width": "var(--jumi-border-inline-end-width)",
-      },
-    },
-  },
-  {
-    name: "border-block-start-width",
-    keyframes: {
-      to: {
-        "border-block-start-width": "var(--jumi-border-block-start-width)",
-      },
-    },
-  },
-  {
-    name: "border-block-end-width",
-    keyframes: {
-      to: {
-        "border-block-end-width": "var(--jumi-border-block-end-width)",
-      },
-    },
-  },
-  {
-    name: "border-inline-start-width",
-    keyframes: {
-      to: {
-        "border-inline-start-width": "var(--jumi-border-inline-start-width)",
-      },
-    },
-  },
-  {
-    name: "border-inline-end-width",
-    keyframes: {
-      to: {
-        "border-inline-end-width": "var(--jumi-border-inline-end-width)",
-      },
-    },
-  },
-  {
-    name: "border-top-width",
-    keyframes: {
-      to: {
-        "border-top-width": "var(--jumi-border-top-width)",
-      },
-    },
-  },
-  {
-    name: "border-bottom-width",
-    keyframes: {
-      to: {
-        "border-bottom-width": "var(--jumi-border-bottom-width)",
-      },
-    },
-  },
-  {
-    name: "border-left-width",
-    keyframes: {
-      to: {
-        "border-left-width": "var(--jumi-border-left-width)",
-      },
-    },
-  },
-  {
-    name: "border-right-width",
-    keyframes: {
-      to: {
-        "border-right-width": "var(--jumi-border-right-width)",
-      },
-    },
-  },
-  {
-    name: "border-top-length",
-    keyframes: {
-      "0%": { width: "0%" },
-      "100%": { width: "100%" },
-    },
-  },
-  {
-    name: "border-bottom-length",
-    keyframes: {
-      "0%": { width: "0%" },
-      "100%": { width: "100%" },
-    },
-  },
-  {
-    name: "border-left-length",
-    keyframes: {
-      "0%": { height: "0%" },
-      "100%": { height: "100%" },
-    },
-  },
-  {
-    name: "border-right-length",
-    keyframes: {
-      "0%": { height: "0%" },
-      "100%": { height: "100%" },
-    },
-  },
-];
-
-let x = {
   "@keyframes jumi-border-width": {
     to: { "border-width": "var(--jumi-border-width)" },
   },
+  "@keyframes jumi-border-block-width": {
+    to: {
+      "border-block-start-width": "var(--jumi-border-block-start-width)",
+      "border-block-end-width": "var(--jumi-border-block-end-width)",
+    },
+  },
 
-  // Border reveal keyframes - animated border drawing effects
-  "@keyframes jumi-border-reveal-top": {
-    "0%": { width: "0%" },
-    "100%": { width: "100%" },
+  "@keyframes jumi-border-inline-width": {
+    to: {
+      "border-inline-start-width": "var(--jumi-border-inline-start-width)",
+      "border-inline-end-width": "var(--jumi-border-inline-end-width)",
+    },
   },
-  "@keyframes jumi-border-reveal-right": {
-    "0%": { height: "0%" },
-    "100%": { height: "100%" },
+  "@keyframes jumi-border-block-start-width": {
+    to: {
+      "border-block-start-width": "var(--jumi-border-block-start-width)",
+    },
   },
-  "@keyframes jumi-border-reveal-bottom": {
-    "0%": { width: "0%" },
-    "100%": { width: "100%" },
+  "@keyframes jumi-border-block-end-width": {
+    to: {
+      "border-block-end-width": "var(--jumi-border-block-end-width)",
+    },
   },
-  "@keyframes jumi-border-reveal-left": {
-    "0%": { height: "0%" },
-    "100%": { height: "100%" },
+  "@keyframes jumi-border-inline-start-width": {
+    to: {
+      "border-inline-start-width": "var(--jumi-border-inline-start-width)",
+    },
+  },
+  "@keyframes jumi-border-inline-end-width": {
+    to: {
+      "border-inline-end-width": "var(--jumi-border-inline-end-width)",
+    },
+  },
+  "@keyframes jumi-border-top-width": {
+    to: {
+      "border-top-width": "var(--jumi-border-top-width)",
+    },
+  },
+  "@keyframes jumi-border-bottom-width": {
+    to: {
+      "border-bottom-width": "var(--jumi-border-bottom-width)",
+    },
+  },
+  "@keyframes jumi-border-left-width": {
+    to: {
+      "border-left-width": "var(--jumi-border-left-width)",
+    },
+  },
+  "@keyframes jumi-border-right-width": {
+    to: {
+      "border-right-width": "var(--jumi-border-right-width)",
+    },
+  },
+  "@keyframes jumi-border-top-length": {
+    from: { width: "0%" },
+    to: { width: "100%" },
+  },
+  "@keyframes jumi-border-bottom-length": {
+    from: { width: "0%" },
+    to: { width: "100%" },
+  },
+  "@keyframes jumi-border-left-length": {
+    from: { height: "0%" },
+    to: { height: "100%" },
+  },
+  "@keyframes jumi-border-right-length": {
+    from: { height: "0%" },
+    to: { height: "100%" },
   },
   "@keyframes jumi-shadow": {
     to: { "box-shadow": "var(--jumi-shadow)" },
@@ -328,38 +192,27 @@ let x = {
   "@keyframes jumi-opacity": {
     to: { opacity: "var(--jumi-opacity)" },
   },
-
-  // Typography
   "@keyframes jumi-font-size": {
     to: { "font-size": "var(--jumi-font-size)" },
   },
   "@keyframes jumi-line-height": {
     to: { "line-height": "var(--jumi-line-height)" },
   },
-
-  // Advanced visual effects
   "@keyframes jumi-filter": {
     to: { filter: "var(--jumi-filter)" },
   },
   "@keyframes jumi-backdrop-filter": {
     to: { "backdrop-filter": "var(--jumi-backdrop-filter)" },
   },
-
-  // Color animations
   "@keyframes jumi-color": {
     to: { color: "var(--jumi-color)" },
   },
-  "@keyframes jumi-fill": {
-    to: { fill: "var(--jumi-fill)" },
-  },
-  "@keyframes jumi-bg-color": {
-    to: { "background-color": "var(--jumi-bg-color)" },
+  "@keyframes jumi-background-color": {
+    to: { "background-color": "var(--jumi-background-color)" },
   },
   "@keyframes jumi-border-color": {
     to: { "border-color": "var(--jumi-border-color)" },
   },
-
-  // Margin keyframes
   "@keyframes jumi-margin": {
     to: { margin: "var(--jumi-margin)" },
   },
@@ -375,20 +228,18 @@ let x = {
   "@keyframes jumi-margin-left": {
     to: { "margin-left": "var(--jumi-margin-left)" },
   },
-  "@keyframes jumi-margin-x": {
+  "@keyframes jumi-margin-inline": {
     to: {
-      "margin-left": "var(--jumi-margin-x)",
-      "margin-right": "var(--jumi-margin-x)",
+      "margin-left": "var(--jumi-margin-inline)",
+      "margin-right": "var(--jumi-margin-inline)",
     },
   },
-  "@keyframes jumi-margin-y": {
+  "@keyframes jumi-margin-block": {
     to: {
-      "margin-top": "var(--jumi-margin-y)",
-      "margin-bottom": "var(--jumi-margin-y)",
+      "margin-top": "var(--jumi-margin-block)",
+      "margin-bottom": "var(--jumi-margin-block)",
     },
   },
-
-  // Padding keyframes
   "@keyframes jumi-padding": {
     to: { padding: "var(--jumi-padding)" },
   },
@@ -404,34 +255,18 @@ let x = {
   "@keyframes jumi-padding-left": {
     to: { "padding-left": "var(--jumi-padding-left)" },
   },
-  "@keyframes jumi-padding-x": {
+  "@keyframes jumi-padding-inline": {
     to: {
-      "padding-left": "var(--jumi-padding-x)",
-      "padding-right": "var(--jumi-padding-x)",
+      "padding-left": "var(--jumi-padding-inline)",
+      "padding-right": "var(--jumi-padding-inline)",
     },
   },
-  "@keyframes jumi-padding-y": {
+  "@keyframes jumi-padding-block": {
     to: {
-      "padding-top": "var(--jumi-padding-y)",
-      "padding-bottom": "var(--jumi-padding-y)",
+      "padding-top": "var(--jumi-padding-block)",
+      "padding-bottom": "var(--jumi-padding-block)",
     },
   },
-
-  // Min/Max dimension keyframes
-  "@keyframes jumi-min-width": {
-    to: { "min-width": "var(--jumi-min-width)" },
-  },
-  "@keyframes jumi-max-width": {
-    to: { "max-width": "var(--jumi-max-width)" },
-  },
-  "@keyframes jumi-min-height": {
-    to: { "min-height": "var(--jumi-min-height)" },
-  },
-  "@keyframes jumi-max-height": {
-    to: { "max-height": "var(--jumi-max-height)" },
-  },
-
-  // Positioning keyframes
   "@keyframes jumi-top": {
     to: { top: "var(--jumi-top)" },
   },
@@ -447,8 +282,6 @@ let x = {
   "@keyframes jumi-z-index": {
     to: { "z-index": "var(--jumi-z-index)" },
   },
-
-  // Typography keyframes
   "@keyframes jumi-font-weight": {
     to: { "font-weight": "var(--jumi-font-weight)" },
   },
@@ -458,8 +291,6 @@ let x = {
   "@keyframes jumi-text-shadow": {
     to: { "text-shadow": "var(--jumi-text-shadow)" },
   },
-
-  // Flexbox keyframes
   "@keyframes jumi-flex-grow": {
     to: { "flex-grow": "var(--jumi-flex-grow)" },
   },
@@ -475,8 +306,6 @@ let x = {
   "@keyframes jumi-order": {
     to: { order: "var(--jumi-order)" },
   },
-
-  // Outline keyframes
   "@keyframes jumi-outline-width": {
     to: { "outline-width": "var(--jumi-outline-width)" },
   },
@@ -486,33 +315,21 @@ let x = {
   "@keyframes jumi-outline-offset": {
     to: { "outline-offset": "var(--jumi-outline-offset)" },
   },
-
-  // Background keyframes
-  "@keyframes jumi-bg-size": {
-    to: { "background-size": "var(--jumi-bg-size)" },
+  "@keyframes jumi-background-size": {
+    to: { "background-size": "var(--jumi-background-size)" },
   },
-  "@keyframes jumi-bg-position": {
-    to: { "background-position": "var(--jumi-bg-position)" },
-  },
-
-  // SVG keyframes
-  "@keyframes jumi-stroke": {
-    to: { stroke: "var(--jumi-stroke)" },
-  },
-  "@keyframes jumi-stroke-width": {
-    to: { "stroke-width": "var(--jumi-stroke-width)" },
+  "@keyframes jumi-background-position": {
+    to: { "background-position": "var(--jumi-background-position)" },
   },
 };
-
-export const animationKeyframes: Array<AnimationKeyframes> = [];
 
 /**
  * Keyframe definitions for animation effects
  * Based on the existing Sass keyframes but optimized for TailwindCSS
  */
-export const keyframes: Record<AnimationName, Keyframes> = {
+export const keyframes: AnimationKeyframes = {
   // Bounce effects
-  "bounce-in": {
+  "@keyframes bounce-in": {
     "from, 20%, 40%, 60%, 80%, to": {
       animationTimingFunction: "cubic-bezier(0.215, 0.61, 0.355, 1)",
     },
@@ -536,7 +353,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "bounce-out": {
+  "@keyframes bounce-out": {
     "20%": {
       transform: "scale3d(0.9, 0.9, 0.9)",
     },
@@ -549,7 +366,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
   },
 
   // Fade effects
-  "fade-in": {
+  "@keyframes fade-in": {
     from: {
       opacity: "0",
     },
@@ -558,7 +375,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "fade-out": {
+  "@keyframes fade-out": {
     from: {
       opacity: "1",
     },
@@ -567,7 +384,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "fade-up": {
+  "@keyframes fade-up": {
     from: {
       opacity: "0",
       transform: "translate3d(0, 40px, 0)",
@@ -578,7 +395,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "fade-down": {
+  "@keyframes fade-down": {
     from: {
       opacity: "0",
       transform: "translate3d(0, -40px, 0)",
@@ -589,7 +406,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "fade-left": {
+  "@keyframes fade-left": {
     from: {
       opacity: "0",
       transform: "translate3d(-40px, 0, 0)",
@@ -600,7 +417,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "fade-right": {
+  "@keyframes fade-right": {
     from: {
       opacity: "0",
       transform: "translate3d(40px, 0, 0)",
@@ -611,7 +428,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "fade-up-right": {
+  "@keyframes fade-up-right": {
     from: {
       opacity: "0",
       transform: "translate3d(40px, 40px, 0)",
@@ -622,7 +439,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "fade-up-left": {
+  "@keyframes fade-up-left": {
     from: {
       opacity: "0",
       transform: "translate3d(-40px, 40px, 0)",
@@ -633,7 +450,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "fade-down-right": {
+  "@keyframes fade-down-right": {
     from: {
       opacity: "0",
       transform: "translate3d(40px, -40px, 0)",
@@ -644,7 +461,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "fade-down-left": {
+  "@keyframes fade-down-left": {
     from: {
       opacity: "0",
       transform: "translate3d(-40px, -40px, 0)",
@@ -656,7 +473,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
   },
 
   // Slide effects
-  "slide-in-up": {
+  "@keyframes slide-in-up": {
     from: {
       transform: "translate3d(0, 100%, 0)",
       visibility: "visible",
@@ -666,7 +483,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "slide-in-down": {
+  "@keyframes slide-in-down": {
     from: {
       transform: "translate3d(0, -100%, 0)",
       visibility: "visible",
@@ -676,7 +493,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "slide-in-left": {
+  "@keyframes slide-in-left": {
     from: {
       transform: "translate3d(-100%, 0, 0)",
       visibility: "visible",
@@ -686,7 +503,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "slide-in-right": {
+  "@keyframes slide-in-right": {
     from: {
       transform: "translate3d(100%, 0, 0)",
       visibility: "visible",
@@ -697,7 +514,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
   },
 
   // Zoom effects
-  "zoom-in": {
+  "@keyframes zoom-in": {
     from: {
       transform: "scale3d(0.3, 0.3, 0.3)",
     },
@@ -709,7 +526,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "zoom-in-up": {
+  "@keyframes zoom-in-up": {
     from: {
       transform: "scale3d(0.3, 0.3, 0.3) translate3d(0, 100%, 0)",
     },
@@ -721,7 +538,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "zoom-in-down": {
+  "@keyframes zoom-in-down": {
     from: {
       transform: "scale3d(0.3, 0.3, 0.3) translate3d(0, -100%, 0)",
     },
@@ -733,7 +550,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "zoom-in-left": {
+  "@keyframes zoom-in-left": {
     from: {
       transform: "scale3d(0.3, 0.3, 0.3) translate3d(-100%, 0, 0)",
     },
@@ -745,7 +562,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "zoom-in-right": {
+  "@keyframes zoom-in-right": {
     from: {
       transform: "scale3d(0.3, 0.3, 0.3) translate3d(100%, 0, 0)",
     },
@@ -757,7 +574,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "zoom-out": {
+  "@keyframes zoom-out": {
     from: {
       transform: "scale3d(1, 1, 1)",
     },
@@ -769,7 +586,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "zoom-out-up": {
+  "@keyframes zoom-out-up": {
     from: {
       transform: "scale3d(1, 1, 1) translate3d(0, 0, 0)",
     },
@@ -781,7 +598,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "zoom-out-down": {
+  "@keyframes zoom-out-down": {
     from: {
       transform: "scale3d(1, 1, 1) translate3d(0, 0, 0)",
     },
@@ -793,7 +610,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "zoom-out-left": {
+  "@keyframes zoom-out-left": {
     from: {
       transform: "scale3d(1, 1, 1) translate3d(0, 0, 0)",
     },
@@ -805,7 +622,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "zoom-out-right": {
+  "@keyframes zoom-out-right": {
     from: {
       transform: "scale3d(1, 1, 1) translate3d(0, 0, 0)",
     },
@@ -818,7 +635,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
   },
 
   // Flip effects
-  "flip-x": {
+  "@keyframes flip-x": {
     from: {
       transform: "perspective(400px) rotateX(-90deg)",
       animationTimingFunction: "ease-in",
@@ -838,7 +655,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "flip-y": {
+  "@keyframes flip-y": {
     from: {
       transform: "perspective(400px) rotateY(-90deg)",
       animationTimingFunction: "ease-in",
@@ -858,7 +675,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "flip-up": {
+  "@keyframes flip-up": {
     from: {
       transform: "perspective(400px) rotateX(90deg)",
       animationTimingFunction: "ease-in",
@@ -880,7 +697,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "flip-down": {
+  "@keyframes flip-down": {
     from: {
       transform: "perspective(400px) rotateX(-90deg)",
       animationTimingFunction: "ease-in",
@@ -902,7 +719,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "flip-left": {
+  "@keyframes flip-left": {
     from: {
       transform: "perspective(400px) rotateY(-90deg)",
       animationTimingFunction: "ease-in",
@@ -924,7 +741,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "flip-right": {
+  "@keyframes flip-right": {
     from: {
       transform: "perspective(400px) rotateY(90deg)",
       animationTimingFunction: "ease-in",
@@ -947,7 +764,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
   },
 
   // Special effects
-  shake: {
+  "@keyframes shake": {
     "from, to": {
       transform: "translate3d(0, 0, 0)",
     },
@@ -959,7 +776,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  pulse: {
+  "@keyframes pulse": {
     from: {
       transform: "scale3d(1, 1, 1)",
     },
@@ -971,7 +788,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  swing: {
+  "@keyframes swing": {
     "20%": {
       transform: "rotateZ(15deg)",
     },
@@ -989,7 +806,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  wobble: {
+  "@keyframes wobble": {
     from: {
       transform: "translate3d(0, 0, 0)",
     },
@@ -1013,7 +830,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  tada: {
+  "@keyframes tada": {
     from: {
       transform: "scale3d(1, 1, 1)",
     },
@@ -1031,7 +848,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  jello: {
+  "@keyframes jello": {
     from: {
       transform: "none",
     },
@@ -1064,7 +881,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "heart-beat": {
+  "@keyframes heart-beat": {
     from: {
       transform: "scale3d(1, 1, 1)",
     },
@@ -1082,7 +899,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "back-in-left": {
+  "@keyframes back-in-left": {
     "0%": {
       transform: "scale(0) translateX(-2000px) rotateZ(-360deg)",
     },
@@ -1091,7 +908,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "back-in-right": {
+  "@keyframes back-in-right": {
     "0%": {
       transform: "scale(0) translateX(2000px) rotateZ(360deg)",
     },
@@ -1100,7 +917,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "back-in-down": {
+  "@keyframes back-in-down": {
     "0%": {
       transform: "scale(0) translateY(-2000px) rotateZ(-360deg)",
     },
@@ -1109,7 +926,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "back-in-up": {
+  "@keyframes back-in-up": {
     "0%": {
       transform: "scale(0) translateY(2000px) rotateZ(360deg)",
     },
@@ -1118,7 +935,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "back-in": {
+  "@keyframes back-in": {
     "0%": {
       transform: "scale(0) rotateZ(-360deg)",
     },
@@ -1127,7 +944,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "back-out-left": {
+  "@keyframes back-out-left": {
     "0%": {
       transform: "scale(1) translateX(0) rotateZ(0deg)",
     },
@@ -1136,7 +953,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "back-out-right": {
+  "@keyframes back-out-right": {
     "0%": {
       transform: "scale(1) translateX(0) rotateZ(0deg)",
     },
@@ -1145,7 +962,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "back-out-down": {
+  "@keyframes back-out-down": {
     "0%": {
       transform: "scale(1) translateY(0) rotateZ(0deg)",
     },
@@ -1154,7 +971,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "back-out-up": {
+  "@keyframes back-out-up": {
     "0%": {
       transform: "scale(1) translateY(0) rotateZ(0deg)",
     },
@@ -1163,7 +980,7 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 
-  "back-out": {
+  "@keyframes back-out": {
     "0%": {
       transform: "scale(1) rotateZ(0deg)",
     },
@@ -1172,22 +989,3 @@ export const keyframes: Record<AnimationName, Keyframes> = {
     },
   },
 };
-
-/**
- * Helper function to get all keyframe names
- */
-export function getAllKeyframes() {
-  return Object.fromEntries(Object.keys(keyframes).map((key) => [key, key]));
-}
-
-/**
- * Helper function to get keyframes as CSS-in-JS format
- */
-export function getKeyframesAsCSS(): Record<string, Record<string, any>> {
-  return Object.fromEntries(
-    Object.entries(keyframes).map(([name, keyframes]) => [
-      `@keyframes ${name}`,
-      keyframes,
-    ])
-  );
-}

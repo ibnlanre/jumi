@@ -1,14 +1,13 @@
 
 import type { JumiTheme } from "@/types";
 import { easings } from "./easings";
-import { getAllKeyframes } from "./keyframes";
 
 /**
  * Default theme configuration for Jumi animations
  * This provides the base values that users can override
  */
 
-export const defaultTheme: JumiTheme = {
+export const defaultTheme = {
   // Animation durations in milliseconds and seconds
   durations: {
     // Milliseconds (for quick micro-interactions)
@@ -910,7 +909,4 @@ export const defaultTheme: JumiTheme = {
       "950": "#4c0519",
     },
   },
-
-  // Animation effects (predefined keyframes)
-  effects: getAllKeyframes(),
 };

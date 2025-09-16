@@ -6,10 +6,7 @@ import type {
   ThemeConfig,
   ValueType,
 } from "tailwindcss/types/config";
-
-
-type Height = "height" | "min-height" | "max-height";
-type Width = "width" | "min-width" | "max-width";
+import type { animationName } from "./config/theme/animation-name";
 
 export type Property =
   | "accent-color"
@@ -19,6 +16,25 @@ export type Property =
   | "alignment-baseline"
   | "all"
   | "appearance"
+  | "aspect-ratio"
+  | "backdrop-filter"
+  | "backdrop-blur"
+  | "backdrop-brightness"
+  | "backdrop-contrast"
+  | "backdrop-grayscale"
+  | "backdrop-hue-rotate"
+  | "backdrop-invert"
+  | "backdrop-opacity"
+  | "backdrop-saturate"
+  | "backdrop-sepia"
+  | "background-color"
+  | "background-position"
+  | "background-size"
+  | "background-clip"
+  | "background-origin"
+  | "background-image"
+  | "border-color"
+  | "border-style"
   | "border-radius"
   | "border-start-start-radius" // top-left
   | "border-start-end-radius" // top-right
@@ -58,9 +74,157 @@ export type Property =
   | "border-bottom-length"
   | "border-left-length"
   | "border-right-length"
-  | Height
-  | Width
-  | "opacity";
+  | "shadow"
+  | "box-shadow"
+  | "caret-color"
+  | "color"
+  | "column-gap"
+  | "columns"
+  | "column-width"
+  | "column-count"
+  | "contrast"
+  | "cursor"
+  | "display"
+  | "drop-shadow"
+  | "fill"
+  | "filter"
+  | "flex"
+  | "flex-direction"
+  | "flex-wrap"
+  | "flex-flow"
+  | "flex-basis"
+  | "flex-grow"
+  | "flex-shrink"
+  | "font-family"
+  | "font-size"
+  | "font-smoothing"
+  | "font-style"
+  | "font-variant-numeric"
+  | "font-weight"
+  | "gap"
+  | "grid-auto-columns"
+  | "grid-auto-flow"
+  | "grid-auto-rows"
+  | "grid-column"
+  | "grid-column-end"
+  | "grid-column-start"
+  | "grid-row"
+  | "grid-row-end"
+  | "grid-row-start"
+  | "grid-template-columns"
+  | "grid-template-rows"
+  | "height"
+  | "inset"
+  | "inset-block"
+  | "inset-block-start"
+  | "inset-block-end"
+  | "inset-inline"
+  | "inset-inline-start"
+  | "inset-inline-end"
+  | "inset-top"
+  | "inset-bottom"
+  | "inset-left"
+  | "inset-right"
+  | "isolation"
+  | "justify-content"
+  | "justify-items"
+  | "justify-self"
+  | "letter-spacing"
+  | "line-height"
+  | "list-style-type"
+  | "margin"
+  | "margin-block"
+  | "margin-block-start"
+  | "margin-block-end"
+  | "margin-inline"
+  | "margin-inline-start"
+  | "margin-inline-end"
+  | "margin-top"
+  | "margin-bottom"
+  | "margin-left"
+  | "margin-right"
+  | "max-height"
+  | "max-width"
+  | "min-height"
+  | "min-width"
+  | "object-fit"
+  | "object-position"
+  | "opacity"
+  | "order"
+  | "outline-color"
+  | "outline-offset"
+  | "outline-style"
+  | "outline-width"
+  | "overflow"
+  | "overflow-x"
+  | "overflow-y"
+  | "padding"
+  | "padding-block"
+  | "padding-block-start"
+  | "padding-block-end"
+  | "padding-inline"
+  | "padding-inline-start"
+  | "padding-inline-end"
+  | "padding-top"
+  | "padding-bottom"
+  | "padding-left"
+  | "padding-right"
+  | "perspective"
+  | "perspective-origin"
+  | "place-content"
+  | "place-items"
+  | "place-self"
+  | "position"
+  | "resize"
+  | "top"
+  | "right"
+  | "bottom"
+  | "left"
+  | "scroll-margin"
+  | "scroll-margin-block"
+  | "scroll-margin-block-start"
+  | "scroll-margin-block-end"
+  | "scroll-margin-inline"
+  | "scroll-margin-inline-start"
+  | "scroll-margin-inline-end"
+  | "scroll-margin-top"
+  | "scroll-margin-bottom"
+  | "scroll-margin-left"
+  | "scroll-margin-right"
+  | "scroll-padding"
+  | "scroll-padding-block"
+  | "scroll-padding-block-start"
+  | "scroll-padding-block-end"
+  | "scroll-padding-inline"
+  | "scroll-padding-inline-start"
+  | "scroll-padding-inline-end"
+  | "scroll-padding-top"
+  | "scroll-padding-bottom"
+  | "scroll-padding-left"
+  | "scroll-padding-right"
+  | "shape-outside"
+  | "stroke"
+  | "stroke-width"
+  | "table-layout"
+  | "text-align"
+  | "text-decoration-color"
+  | "text-decoration-thickness"
+  | "text-indent"
+  | "text-shadow"
+  | "text-transform"
+  | "transform-origin"
+  | "transform-style"
+  | "transition-property"
+  | "transition-timing-function"
+  | "transition-duration"
+  | "transition-delay"
+  | "user-select"
+  | "vertical-align"
+  | "visibility"
+  | "white-space"
+  | "width"
+  | "word-break"
+  | "z-index";
 
 type Animate =
   | "animate"
@@ -101,20 +265,29 @@ export interface MatchProperty extends Partial<Options> {
 
 export type Utility = RecursiveKeyValuePair<string, string | string[] | null>;
 
-export interface AddProperty {
-  name: "animate" | "animate-transform" | "animate-transform-gpu" | Property;
-  values: Utility;
-}
+type AddPropertyKeys =
+  | "animate"
+  | "animate-transform"
+  | "animate-transform-gpu"
+  | Property;
+
+export type AddProperty = {
+  [K in AddPropertyKeys as `.${K}`]?: Utility;
+};
 
 export type Keyframes = Record<
   string,
   PropertiesHyphen | Record<string & {}, string>
 >;
 
-export interface AnimationKeyframes {
-  name: Property;
-  keyframes: Keyframes;
-}
+export type PropertyKeyframes = {
+  [K in Property as `@keyframes jumi-${K}`]?: Keyframes;
+};
+
+type AnimationName = keyof typeof animationName;
+export type AnimationKeyframes = {
+  [K in AnimationName as `@keyframes ${K}`]?: Keyframes;
+};
 
 // Jumi specific types
 export interface JumiTheme {

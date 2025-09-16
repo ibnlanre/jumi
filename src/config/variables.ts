@@ -4,6 +4,7 @@ import {
   animationRangeStart,
 } from "@/composition/animation-range";
 import { animationTimelineInset } from "@/composition/animation-timeline";
+import { aspectRatio } from "@/composition/aspect-ratio";
 import { backdropFilter } from "@/composition/backdrop-filter";
 import { filter } from "@/composition/filter";
 import { transform, transformGpu } from "@/composition/transform";
@@ -23,6 +24,9 @@ export const variables = {
   "--jumi-animation-range": animationRange,
   "--jumi-animation-range-start": animationRangeStart,
   "--jumi-animation-range-end": animationRangeEnd,
+  "--jumi-aspect-ratio-width": "auto",
+  "--jumi-aspect-ratio-height": "auto",
+  "--jumi-aspect-ratio": aspectRatio,
 
   // Transform defaults
   "--jumi-transform": transform,

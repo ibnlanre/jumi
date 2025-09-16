@@ -18,34 +18,33 @@ import { animationTimelineScroller } from "./theme/animation-timeline-scroller";
 import { animationTimelineInset } from "./theme/animation-timeline-inset";
 import { animationRange } from "./theme/animation-range";
 import { percentage } from "./theme/percentage";
+import { all } from "./theme/all";
+import { appearance } from "./theme/appearance";
 
-export const addProperties: Array<AddProperty> = [
-  {
-    name: "animate",
-    values: {
-      "animation-name": "var(--jumi-animation-name)",
-      "animation-duration": "var(--jumi-animation-duration)",
-      "animation-timing-function": "var(--jumi-animation-timing-function)",
-      "animation-delay": "var(--jumi-animation-delay)",
-      "animation-direction": "var(--jumi-animation-direction)",
-      "animation-iteration-count": "var(--jumi-animation-iteration-count)",
-      "animation-fill-mode": "var(--jumi-animation-fill-mode)",
-      "animation-play-state": "var(--jumi-animation-play-state)",
-      "animation-composition": "var(--jumi-animation-composition)",
-      "animation-timeline": "var(--jumi-animation-timeline, auto)",
-      "animation-range": "var(--jumi-animation-range, normal)",
-      "animation-range-start": "var(--jumi-animation-range-start, normal)",
-      "animation-range-end": "var(--jumi-animation-range-end, normal)",
-      transform: "var(--jumi-transform)",
-    },
+export const addProperties: AddProperty = {
+  ".animate": {
+    "animation-name": "var(--jumi-animation-name)",
+    "animation-duration": "var(--jumi-animation-duration)",
+    "animation-timing-function": "var(--jumi-animation-timing-function)",
+    "animation-delay": "var(--jumi-animation-delay)",
+    "animation-direction": "var(--jumi-animation-direction)",
+    "animation-iteration-count": "var(--jumi-animation-iteration-count)",
+    "animation-fill-mode": "var(--jumi-animation-fill-mode)",
+    "animation-play-state": "var(--jumi-animation-play-state)",
+    "animation-composition": "var(--jumi-animation-composition)",
+    "animation-timeline": "var(--jumi-animation-timeline, auto)",
+    "animation-range": "var(--jumi-animation-range, normal)",
+    "animation-range-start": "var(--jumi-animation-range-start, normal)",
+    "animation-range-end": "var(--jumi-animation-range-end, normal)",
+    transform: "var(--jumi-transform)",
   },
-  {
-    name: "animate-transform",
-    values: {
-      transform: "var(--jumi-transform)",
-    },
+  ".animate-transform": {
+    transform: "var(--jumi-transform)",
   },
-];
+  ".animate-transform-gpu": {
+    transform: "var(--jumi-transform-gpu)",
+  },
+};
 
 export const matchProperties: Array<MatchProperty> = [
   {
@@ -59,6 +58,11 @@ export const matchProperties: Array<MatchProperty> = [
     property: (value) => ({ "--jumi-accent-color": value }),
     key: "accentColor",
     values: { auto: "auto" },
+  },
+  {
+    name: "animate-all",
+    property: (value) => ({ "--jumi-all": value }),
+    values: all,
   },
   {
     name: "animate-align-content",
@@ -79,6 +83,68 @@ export const matchProperties: Array<MatchProperty> = [
     name: "animate-alignment-baseline",
     property: (value) => ({ "--jumi-alignment-baseline": value }),
     values: alignmentBaseline,
+  },
+  {
+    name: "animate-appearance",
+    property: (value) => ({ "--jumi-appearance": value }),
+    values: appearance,
+  },
+  {
+    name: "animate-backdrop-filter",
+    property: (value) => ({ "--jumi-backdrop-filter": value }),
+    values: { none: "none" },
+  },
+  {
+    name: "animate-backdrop-blur",
+    property: (value) => ({ "--jumi-backdrop-blur": value }),
+    key: "backdropBlur",
+  },
+  {
+    name: "animate-backdrop-brightness",
+    property: (value) => ({ "--jumi-backdrop-brightness": value }),
+    key: "backdropBrightness",
+  }, {
+    name: "animate-backdrop-contrast",
+    property: (value) => ({ "--jumi-backdrop-contrast": value }),
+    key: "backdropContrast",
+  },
+  {
+    name: "animate-backdrop-grayscale",
+    property: (value) => ({ "--jumi-backdrop-grayscale": value }),
+    key: "backdropGrayscale",
+  }, {
+    name: "animate-backdrop-hue-rotate",
+    property: (value) => ({ "--jumi-backdrop-hue-rotate": value }),
+    key: "backdropHueRotate",
+  },
+  {
+    name: "animate-backdrop-invert",
+    property: (value) => ({ "--jumi-backdrop-invert": value }),
+    key: "backdropInvert",
+  }, {
+    name: "animate-backdrop-opacity",
+    property: (value) => ({ "--jumi-backdrop-opacity": value }),
+    key: "backdropOpacity",
+  },
+  {
+    name: "animate-backdrop-saturate",
+    property: (value) => ({ "--jumi-backdrop-saturate": value }),
+    key: "backdropSaturate",  
+  },
+  {
+    name: "animate-backdrop-sepia",
+    property: (value) => ({ "--jumi-backdrop-sepia": value }),
+    key: "backdropSepia",
+  },
+  {
+    name: "animate-background-color",
+    property: (value) => ({ "--jumi-background-color": value }),
+    key: "backgroundColor",
+  },
+  {
+    name: "animate-border-color",
+    property: (value) => ({ "--jumi-border-color": value }),
+    key: "borderColor",
   },
   {
     name: "animate-border-radius",

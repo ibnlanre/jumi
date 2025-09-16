@@ -17,8 +17,6 @@ export default defineConfig({
     environment: "happy-dom",
     globals: true,
     logHeapUsage: false,
-    setupFiles: "vitest.setup.ts",
     reporters: ["default"],
-    exclude: defaultExclude.concat(["**/*.ssr.test.ts"]),
   },
 });
