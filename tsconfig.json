@@ -4,6 +4,7 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "checkJs": false,
+    "jsx": "react-jsx",
     "declaration": true,
     "declarationMap": true,
     "emitDeclarationOnly": true,
@@ -33,7 +34,8 @@
   },
   "exclude": ["node_modules", "dist", "build", "coverage", "examples", "examples"],
   "include": [
-    "src/**/*",
+    "./**/*.ts",
+    "./**/*.tsx",
     "vitest.config.mts",
     "vitest.setup.ts",
     "tsup.config.ts"

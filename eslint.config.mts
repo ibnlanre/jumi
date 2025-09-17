@@ -32,7 +32,6 @@ const EXT = {
 
 const ignoresConfig = defineConfig({
   ignores: [
-    '.storybook',
     '**/node_modules/**',
     '**/coverage/**',
     '**/build/**',
@@ -200,6 +199,6 @@ export default defineConfig([
   typescriptConfig,
   perfectionistConfig,
   storybookConfig,
-  prettierConfig,
+  // prettierConfig,  
   stylisticConfig,
 ])

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { mergeTheme } from './merge-theme'
+import { mergeTheme } from './index'
 
 describe('mergeTheme', () => {
   it('should merge multiple theme objects', () => {

@@ -1,5 +1,3 @@
-import type { CSSRuleObject, PluginCreator, ThemeConfig } from 'tailwindcss/types/config'
-
 import type { MatchPropertyKeys } from '@/types'
 
 import { baseVariables } from '@/config/variables'
@@ -10,7 +8,10 @@ import { propertyKeyframes } from '@/keyframes/property'
 import { addProperties } from '@/properties/add'
 import { matchProperties } from '@/properties/match'
 
-const themeColors: Array<keyof ThemeConfig> = [
+import createPlugin from 'tailwindcss/plugin'
+
+// Theme colors that support color flattening
+const themeColors = [
   'accentColor',
   'ringColor',
   'borderColor',
@@ -42,11 +43,9 @@ const themeColors: Array<keyof ThemeConfig> = [
  *
  * @param options Configuration options for the plugin
  */
-const jumiPlugin: PluginCreator = (api) => {
-  const { addBase, addUtilities, addVariant, matchUtilities, theme } = api
-
-  addBase(propertyKeyframes as CSSRuleObject)
-  addBase(animationKeyframes as CSSRuleObject)
+const jumi = createPlugin(({ addBase, addUtilities, addVariant, matchUtilities, theme }) => {
+  addBase(propertyKeyframes as any)
+  addBase(animationKeyframes as any)
   addBase(baseVariables)
   addUtilities(addProperties)
 
@@ -56,9 +55,9 @@ const jumiPlugin: PluginCreator = (api) => {
     if (!item) continue
     const { key, property, values, ...options } = item
 
-    const isColor = key ? themeColors.includes(key) : false
-    const resolvedTheme = key ? theme(key) : undefined
-    const current = isColor ? flattenColorPalette(theme(key)) : resolvedTheme
+    const isColor = key ? themeColors.includes(key as string) : false
+    const resolvedTheme = key ? theme(key as string) : undefined
+    const current = isColor && key ? flattenColorPalette(theme(key as string)) : resolvedTheme
 
     matchUtilities(
       {
@@ -73,6 +72,6 @@ const jumiPlugin: PluginCreator = (api) => {
 
   addVariant('animate-hover', '&:hover')
   addVariant('group-animate-hover', ':merge(.group):hover &')
-}
+})
 
-export default jumiPlugin
+export default jumi as any

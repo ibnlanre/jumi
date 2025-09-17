@@ -1,23 +1,20 @@
 import type { PropertiesHyphen } from 'csstype'
-import type {
-  CSSRuleObject,
-  KeyValuePair,
-  RecursiveKeyValuePair,
-  ThemeConfig,
-  ValueType,
-} from 'tailwindcss/types/config'
-
-import type { AnimationName } from '@/theme/animation-name'
 
 export type AddProperty = {
-  [K in AddPropertyKeys as `.${K}`]?: Utility
+  [K in AddPropertyKeys as `.${K}`]?: CssInJs
 }
-
 export type AddPropertyKeys = 'animate'
-
 export type AnimationKeyframes = {
   [K in AnimationName as `@keyframes ${K}`]?: Keyframes
 }
+
+import type { AnimationName } from '@/theme/animation-name'
+
+export type CssInJs = {
+  [key: string]: CssInJs | CssInJs[] | string | string[]
+}
+
+export type CSSRuleObject = CssInJs | CssInJs[]
 
 export type KeyframeDefinition = Record<string, Record<string, any>>
 
@@ -30,17 +27,15 @@ export type MatchProperty = {
 export type MatchPropertyKeys = 'animate' | `animate-${Property}`
 
 export interface MatchPropertyValue extends Partial<Options> {
-  key?: keyof ThemeConfig
+  key?: ThemeKeys
   property: (value: string) => CSSRuleObject
 }
 
 export interface Options {
-  modifiers: 'any' | KeyValuePair<string, string>
-  respectImportant: boolean
-  respectPrefix: boolean
+  modifiers: 'any' | Record<string, string>
   supportsNegativeValues: boolean
   type: ValueType | ValueType[]
-  values: KeyValuePair<string, string>
+  values: Record<string, string>
 }
 
 export type Property
@@ -331,4 +326,137 @@ export type PropertyKeyframes = {
   [K in Property as `@keyframes jumi-${K}`]?: Keyframes
 }
 
-export type Utility = RecursiveKeyValuePair<string, null | string | string[]>
+export type ThemeKeys = | 'accentColor'
+  | 'animation'
+  | 'aspectRatio'
+  | 'backdropBlur'
+  | 'backdropBrightness'
+  | 'backdropContrast'
+  | 'backdropGrayscale'
+  | 'backdropHueRotate'
+  | 'backdropInvert'
+  | 'backdropOpacity'
+  | 'backdropSaturate'
+  | 'backdropSepia'
+  | 'backgroundColor'
+  | 'backgroundImage'
+  | 'backgroundOpacity'
+  | 'backgroundPosition'
+  | 'backgroundSize'
+  | 'blur'
+  | 'borderColor'
+  | 'borderOpacity'
+  | 'borderRadius'
+  | 'borderSpacing'
+  | 'borderWidth'
+  | 'boxShadow'
+  | 'boxShadowColor'
+  | 'brightness'
+  | 'caretColor'
+  | 'colors'
+  | 'columns'
+  | 'container'
+  | 'content'
+  | 'contrast'
+  | 'cursor'
+  | 'data'
+  | 'divideColor'
+  | 'divideOpacity'
+  | 'divideWidth'
+  | 'dropShadow'
+  | 'fill'
+  | 'flex'
+  | 'flexBasis'
+  | 'flexGrow'
+  | 'flexShrink'
+  | 'fontFamily'
+  | 'fontSize'
+  | 'fontWeight'
+  | 'gap'
+  | 'gradientColorStops'
+  | 'grayscale'
+  | 'gridAutoColumns'
+  | 'gridAutoRows'
+  | 'gridColumn'
+  | 'gridColumnEnd'
+  | 'gridColumnStart'
+  | 'gridRow'
+  | 'gridRowEnd'
+  | 'gridRowStart'
+  | 'gridTemplateColumns'
+  | 'gridTemplateRows'
+  | 'height'
+  | 'hueRotate'
+  | 'inset'
+  | 'invert'
+  | 'keyframes'
+  | 'letterSpacing'
+  | 'lineHeight'
+  | 'listStyleType'
+  | 'margin'
+  | 'maxHeight'
+  | 'maxWidth'
+  | 'minHeight'
+  | 'minWidth'
+  | 'objectPosition'
+  | 'opacity'
+  | 'order'
+  | 'outlineColor'
+  | 'outlineOffset'
+  | 'outlineWidth'
+  | 'padding'
+  | 'placeholderColor'
+  | 'placeholderOpacity'
+  | 'ringColor'
+  | 'ringOffsetColor'
+  | 'ringOffsetWidth'
+  | 'ringOpacity'
+  | 'ringWidth'
+  | 'rotate'
+  | 'saturate'
+  | 'scale'
+  | 'screens'
+  | 'scrollMargin'
+  | 'scrollPadding'
+  | 'sepia'
+  | 'skew'
+  | 'space'
+  | 'spacing'
+  | 'stroke'
+  | 'strokeWidth'
+  | 'supports'
+  | 'textColor'
+  | 'textDecorationColor'
+  | 'textDecorationThickness'
+  | 'textIndent'
+  | 'textOpacity'
+  | 'textUnderlineOffset'
+  | 'transformOrigin'
+  | 'transitionDelay'
+  | 'transitionDuration'
+  | 'transitionProperty'
+  | 'transitionTimingFunction'
+  | 'translate'
+  | 'width'
+  | 'willChange'
+  | 'zIndex'
+
+export type ValueType
+  = | 'absolute-size'
+    | 'angle'
+    | 'any'
+    | 'bg-size'
+    | 'color'
+    | 'family-name'
+    | 'generic-name'
+    | 'image'
+    | 'integer'
+    | 'length'
+    | 'line-width'
+    | 'number'
+    | 'percentage'
+    | 'position'
+    | 'ratio'
+    | 'relative-size'
+    | 'url'
+    | 'vector'
