@@ -1,9 +1,10 @@
-import type { PluginCreator } from "tailwindcss/types/config";
+import type { CSSRuleObject, PluginCreator } from 'tailwindcss/types/config'
 
-import { addTransformUtilities } from "./utilities/transforms";
-import { addEffectUtilities } from "./utilities/effects";
-import { addPropertyUtilities } from "./utilities/properties";
-import { variables } from "./config/variables";
+import { animationKeyframes } from './keyframes/animation'
+import { propertyKeyframes } from './keyframes/property'
+import { baseVariables } from './config/variables'
+import { addPropertyUtilities } from './utilities/properties'
+import { addTransformUtilities } from './utilities/transforms'
 
 /**
  * Jumi - TailwindCSS Animation Plugin
@@ -18,18 +19,18 @@ import { variables } from "./config/variables";
  *
  * @param options Configuration options for the plugin
  */
-const jumiPlugin: PluginCreator = (api) => {
-  const { addBase, addVariant } = api;
+const jumiPlugin: PluginCreator = api => {
+  const { addBase, addVariant } = api
 
-  // addBase(generateTransformKeyframes());
-  addBase({ ".animate": variables });
+  addBase(propertyKeyframes as CSSRuleObject)
+  addBase(animationKeyframes as CSSRuleObject)
+  addBase(baseVariables)
 
-  addTransformUtilities(api);
-  addEffectUtilities(api);
-  addPropertyUtilities(api);
+  addTransformUtilities(api)
+  addPropertyUtilities(api)
 
-  addVariant("animate-hover", "&:hover");
-  addVariant("group-animate-hover", ":merge(.group):hover &");
-};
+  addVariant('animate-hover', '&:hover')
+  addVariant('group-animate-hover', ':merge(.group):hover &')
+}
 
-export default jumiPlugin;
+export default jumiPlugin

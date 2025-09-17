@@ -1,0 +1,9 @@
+export const animationIterationCount = {
+  1: '1',
+  2: '2',
+  3: '3',
+  4: '4',
+  5: '5',
+  10: '10',
+  infinite: 'infinite',
+} as const

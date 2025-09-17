@@ -1,0 +1,17 @@
+export const alignItems = {
+  'anchor-center': 'anchor-center',
+  'baseline': 'baseline',
+  'center': 'center',
+  'end': 'end',
+  'first baseline': 'first baseline',
+  'flex-end': 'flex-end',
+  'flex-start': 'flex-start',
+  'last baseline': 'last baseline',
+  'normal': 'normal',
+  'safe center': 'safe center',
+  'self-end': 'self-end',
+  'self-start': 'self-start',
+  'start': 'start',
+  'stretch': 'stretch',
+  'unsafe center': 'unsafe center',
+} as const

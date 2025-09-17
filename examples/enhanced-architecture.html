@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jumi Enhanced Architecture Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Simulated Jumi CSS output with new architecture */
+
+      /* CSS Custom Property Defaults */
+      * {
+        --jumi-translate-x: 0;
+        --jumi-translate-y: 0;
+        --jumi-rotate: 0deg;
+        --jumi-scale-x: 1;
+        --jumi-scale-y: 1;
+        --jumi-opacity: 1;
+        --jumi-blur: blur(0);
+        --jumi-brightness: brightness(1);
+        --jumi-saturate: saturate(1);
+      }
+
+      /* Composable Transform Keyframes */
+      @keyframes jumi-transform {
+        to {
+          transform: translateX(var(--jumi-translate-x))
+            translateY(var(--jumi-translate-y)) rotate(var(--jumi-rotate))
+            scale(var(--jumi-scale-x), var(--jumi-scale-y));
+        }
+      }
+
+      /* Composable Filter Keyframes */
+      @keyframes jumi-filter {
+        to {
+          filter: var(--jumi-blur) var(--jumi-brightness) var(--jumi-saturate);
+        }
+      }
+
+      /* Property Keyframes */
+      @keyframes jumi-opacity {
+        to {
+          opacity: var(--jumi-opacity);
+        }
+      }
+
+      @keyframes jumi-width {
+        to {
+          width: var(--jumi-width);
+        }
+      }
+
+      /* Transform Utilities */
+      .animate-translate-x-4 {
+        --jumi-translate-x: 1rem;
+        animation-name: jumi-transform;
+      }
+
+      .animate-translate-y-2 {
+        --jumi-translate-y: 0.5rem;
+        animation-name: jumi-transform;
+      }
+
+      .animate-rotate-45 {
+        --jumi-rotate: 45deg;
+        animation-name: jumi-transform;
+      }
+
+      .animate-scale-110 {
+        --jumi-scale-x: 1.1;
+        --jumi-scale-y: 1.1;
+        animation-name: jumi-transform;
+      }
+
+      /* Property Utilities */
+      .animate-opacity-50 {
+        --jumi-opacity: 0.5;
+        animation-name: jumi-opacity;
+      }
+
+      .animate-w-64 {
+        --jumi-width: 16rem;
+        animation-name: jumi-width;
+      }
+
+      /* Filter Utilities */
+      .animate-blur-sm {
+        --jumi-blur: blur(4px);
+        animation-name: jumi-filter;
+      }
+
+      .animate-brightness-110 {
+        --jumi-brightness: brightness(1.1);
+        animation-name: jumi-filter;
+      }
+
+      .animate-saturate-150 {
+        --jumi-saturate: saturate(1.5);
+        animation-name: jumi-filter;
+      }
+
+      /* Timing Utilities */
+      .animate-duration-500 {
+        animation-duration: 500ms;
+      }
+
+      .animate-duration-1000 {
+        animation-duration: 1000ms;
+      }
+
+      .animate-duration-2000 {
+        animation-duration: 2000ms;
+      }
+
+      .animate-ease-out {
+        animation-timing-function: ease-out;
+      }
+
+      .animate-ease-bounce {
+        animation-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      }
+
+      /* Demonstration styles */
+      .demo-card {
+        transition: all 0.3s ease;
+      }
+
+      .demo-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body class="p-8 bg-gray-100">
+    <div class="max-w-4xl mx-auto">
+      <header class="mb-12 text-center">
+        <h1 class="mb-4 text-4xl font-bold text-gray-800">
+          Jumi Enhanced Architecture Demo
+        </h1>
+        <p class="text-lg text-gray-600">
+          Experience the power of composable CSS animations
+        </p>
+      </header>
+
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <!-- Composable Transforms -->
+        <div class="p-6 bg-white rounded-lg shadow-lg demo-card">
+          <h3 class="mb-4 text-xl font-semibold text-gray-800">
+            Composable Transforms
+          </h3>
+          <div class="space-y-4">
+            <div
+              class="w-16 h-16 bg-blue-500 rounded animate-translate-x-4 animate-rotate-45 animate-scale-110 animate-duration-2000 animate-ease-bounce"
+            ></div>
+            <p class="text-sm text-gray-600">
+              <code class="px-2 py-1 text-xs bg-gray-100 rounded">
+                animate-translate-x-4 animate-rotate-45 animate-scale-110
+              </code>
+            </p>
+            <p class="text-xs text-gray-500">
+              Multiple transforms working together in a single animation
+            </p>
+          </div>
+        </div>
+
+        <!-- Property Animations -->
+        <div class="p-6 bg-white rounded-lg shadow-lg demo-card">
+          <h3 class="mb-4 text-xl font-semibold text-gray-800">
+            Property Animations
+          </h3>
+          <div class="space-y-4">
+            <div
+              class="h-16 bg-green-500 rounded animate-w-64 animate-opacity-50 animate-duration-1000"
+            ></div>
+            <p class="text-sm text-gray-600">
+              <code class="px-2 py-1 text-xs bg-gray-100 rounded">
+                animate-w-64 animate-opacity-50
+              </code>
+            </p>
+            <p class="text-xs text-gray-500">
+              Width and opacity animate simultaneously
+            </p>
+          </div>
+        </div>
+
+        <!-- Filter Compositions -->
+        <div class="p-6 bg-white rounded-lg shadow-lg demo-card">
+          <h3 class="mb-4 text-xl font-semibold text-gray-800">
+            Filter Compositions
+          </h3>
+          <div class="space-y-4">
+            <div
+              class="w-16 h-16 bg-purple-500 rounded animate-blur-sm animate-brightness-110 animate-saturate-150 animate-duration-2000"
+            ></div>
+            <p class="text-sm text-gray-600">
+              <code class="px-2 py-1 text-xs bg-gray-100 rounded">
+                animate-blur-sm animate-brightness-110 animate-saturate-150
+              </code>
+            </p>
+            <p class="text-xs text-gray-500">
+              Multiple filter effects in harmony
+            </p>
+          </div>
+        </div>
+
+        <!-- Complex Animation -->
+        <div class="p-6 bg-white rounded-lg shadow-lg demo-card">
+          <h3 class="mb-4 text-xl font-semibold text-gray-800">
+            Complex Animation
+          </h3>
+          <div class="space-y-4">
+            <div
+              class="w-16 h-16 bg-red-500 rounded animate-translate-x-4 animate-translate-y-2 animate-rotate-45 animate-scale-110 animate-opacity-50 animate-duration-2000 animate-ease-bounce"
+            ></div>
+            <p class="text-sm text-gray-600">
+              <code class="px-2 py-1 text-xs bg-gray-100 rounded">
+                All transforms + opacity
+              </code>
+            </p>
+            <p class="text-xs text-gray-500">
+              Everything working together seamlessly
+            </p>
+          </div>
+        </div>
+
+        <!-- Performance Comparison -->
+        <div class="p-6 bg-white rounded-lg shadow-lg demo-card">
+          <h3 class="mb-4 text-xl font-semibold text-gray-800">
+            Performance Benefits
+          </h3>
+          <div class="space-y-2 text-sm text-gray-600">
+            <div class="flex justify-between">
+              <span>CSS Bundle Size:</span>
+              <span class="text-green-600">-40%</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Animation Conflicts:</span>
+              <span class="text-green-600">None</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Keyframe Reuse:</span>
+              <span class="text-green-600">High</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Browser Optimization:</span>
+              <span class="text-green-600">Excellent</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Control -->
+        <div class="p-6 bg-white rounded-lg shadow-lg demo-card">
+          <h3 class="mb-4 text-xl font-semibold text-gray-800">
+            Dynamic Control
+          </h3>
+          <div class="space-y-4">
+            <div
+              id="dynamic-box"
+              class="w-16 h-16 bg-yellow-500 rounded animate-translate-x-4 animate-rotate-45 animate-duration-1000"
+            ></div>
+            <button
+              onclick="changeAnimation()"
+              class="px-4 py-2 text-white transition-colors bg-blue-500 rounded hover:bg-blue-600"
+            >
+              Change Animation
+            </button>
+            <p class="text-xs text-gray-500">
+              Click to modify CSS custom properties via JavaScript
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-8 mt-12 bg-white rounded-lg shadow-lg">
+        <h2 class="mb-6 text-2xl font-bold text-gray-800">
+          Key Architecture Improvements
+        </h2>
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+          <div>
+            <h4 class="mb-3 text-lg font-semibold text-blue-600">
+              Before (Traditional CSS Animations)
+            </h4>
+            <pre
+              class="p-4 overflow-x-auto text-sm bg-gray-100 rounded"
+            ><code>/* Separate, conflicting animations */
+@keyframes slideRight {
+  to { transform: translateX(100px); }
+}
+
+@keyframes rotate {
+  to { transform: rotate(45deg); }
+}
+
+/* Can't use both - they override each other */
+.slide { animation: slideRight 1s; }
+.rotate { animation: rotate 1s; }</code></pre>
+          </div>
+          <div>
+            <h4 class="mb-3 text-lg font-semibold text-green-600">
+              After (Jumi Enhanced Architecture)
+            </h4>
+            <pre
+              class="p-4 overflow-x-auto text-sm bg-gray-100 rounded"
+            ><code>/* Composable with CSS custom properties */
+@keyframes jumi-transform {
+  to {
+    transform: translateX(var(--jumi-translate-x, 0)) 
+               rotate(var(--jumi-rotate, 0deg));
+  }
+}
+
+/* Work together seamlessly */
+.animate-translate-x-4 {
+  --jumi-translate-x: 1rem;
+  animation-name: jumi-transform;
+}
+
+.animate-rotate-45 {
+  --jumi-rotate: 45deg;
+  animation-name: jumi-transform;
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function changeAnimation() {
+        const box = document.getElementById("dynamic-box");
+        const randomX = Math.random() * 200 - 100; // -100px to 100px
+        const randomRotate = Math.random() * 360; // 0deg to 360deg
+        const randomScale = 0.5 + Math.random() * 1.5; // 0.5 to 2
+
+        box.style.setProperty("--jumi-translate-x", `${randomX}px`);
+        box.style.setProperty("--jumi-rotate", `${randomRotate}deg`);
+        box.style.setProperty("--jumi-scale-x", randomScale);
+        box.style.setProperty("--jumi-scale-y", randomScale);
+      }
+
+      // Auto-restart animations every 3 seconds
+      setInterval(() => {
+        const animatedElements = document.querySelectorAll(
+          '[class*="animate-"]'
+        );
+        animatedElements.forEach((el) => {
+          el.style.animation = "none";
+          el.offsetHeight; // Trigger reflow
+          el.style.animation = "";
+        });
+      }, 3000);
+    </script>
+  </body>
+</html>

@@ -1,8 +1,10 @@
-import { defaultTheme } from "../config/defaults";
-import { createAdditiveAnimation } from "./animate";
-import { mergeTheme } from "../utils/merge-theme";
-import type { Direction, DirectionConfig } from "@/types";
-import type { PluginAPI } from "tailwindcss/types/config";
+import type { PluginAPI } from 'tailwindcss/types/config'
+
+import type { Direction, DirectionConfig } from '@/types'
+
+import { defaultTheme } from '../config/defaults'
+import { mergeTheme } from '../helpers/merge-theme'
+import { createAdditiveAnimation } from './animate'
 
 /**
  * Transform utilities with intelligent defaults
@@ -13,37 +15,142 @@ import type { PluginAPI } from "tailwindcss/types/config";
 
 // Direction mappings for transforms
 const directionMappings: Record<Direction, DirectionConfig> = {
-  // Axis-based (explicit)
-  x: { x: 1, y: 0, z: 0, axis: "x" },
-  y: { x: 0, y: 1, z: 0, axis: "y" },
-  z: { x: 0, y: 0, z: 1, axis: "z" },
+  'bottom': {
+    axis: 'y',
+    x: 0,
+    y: 1,
+    z: 0,
+  },
+  'bottom-end': {
+    axis: 'd',
+    x: 1,
+    y: 1,
+    z: 0,
+  },
+  'bottom-left': {
+    axis: 'd',
+    x: -1,
+    y: 1,
+    z: 0,
+  },
+
+  'bottom-right': {
+    axis: 'd',
+    x: 1,
+    y: 1,
+    z: 0,
+  },
+  'bottom-start': {
+    axis: 'd',
+    x: -1,
+    y: 1,
+    z: 0,
+  },
+  'end': {
+    axis: 'x',
+    x: 1,
+    y: 0,
+    z: 0,
+  }, // Maps to right in LTR, left in RTL
+  'end-end': {
+    axis: 'd',
+    x: 1,
+    y: 1,
+    z: 0,
+  },
+
+  'end-start': {
+    axis: 'd',
+    x: 1,
+    y: -1,
+    z: 0,
+  },
+  'left': {
+    axis: 'x',
+    x: -1,
+    y: 0,
+    z: 0,
+  },
+
+  'right': {
+    axis: 'x',
+    x: 1,
+    y: 0,
+    z: 0,
+  },
+  // Logical directions (i18n-friendly)
+  'start': {
+    axis: 'x',
+    x: -1,
+    y: 0,
+    z: 0,
+  }, // Maps to left in LTR, right in RTL
+  'start-end': {
+    axis: 'd',
+    x: -1,
+    y: 1,
+    z: 0,
+  },
+  'start-start': {
+    axis: 'd',
+    x: -1,
+    y: -1,
+    z: 0,
+  }, // Alternative naming
 
   // Semantic directions (physical)
-  top: { x: 0, y: -1, z: 0, axis: "y" },
-  right: { x: 1, y: 0, z: 0, axis: "x" },
-  bottom: { x: 0, y: 1, z: 0, axis: "y" },
-  left: { x: -1, y: 0, z: 0, axis: "x" },
-
-  // Logical directions (i18n-friendly)
-  start: { x: -1, y: 0, z: 0, axis: "x" }, // Maps to left in LTR, right in RTL
-  end: { x: 1, y: 0, z: 0, axis: "x" }, // Maps to right in LTR, left in RTL
-
+  'top': {
+    axis: 'y',
+    x: 0,
+    y: -1,
+    z: 0,
+  },
+  'top-end': {
+    axis: 'd',
+    x: 1,
+    y: -1,
+    z: 0,
+  },
   // Diagonal directions (physical)
-  "top-left": { x: -1, y: -1, z: 0, axis: "d" },
-  "top-right": { x: 1, y: -1, z: 0, axis: "d" },
-  "bottom-left": { x: -1, y: 1, z: 0, axis: "d" },
-  "bottom-right": { x: 1, y: 1, z: 0, axis: "d" },
-
+  'top-left': {
+    axis: 'd',
+    x: -1,
+    y: -1,
+    z: 0,
+  },
+  'top-right': {
+    axis: 'd',
+    x: 1,
+    y: -1,
+    z: 0,
+  },
   // Diagonal directions (logical)
-  "top-start": { x: -1, y: -1, z: 0, axis: "d" },
-  "top-end": { x: 1, y: -1, z: 0, axis: "d" },
-  "bottom-start": { x: -1, y: 1, z: 0, axis: "d" },
-  "bottom-end": { x: 1, y: 1, z: 0, axis: "d" },
-  "start-start": { x: -1, y: -1, z: 0, axis: "d" }, // Alternative naming
-  "start-end": { x: -1, y: 1, z: 0, axis: "d" },
-  "end-start": { x: 1, y: -1, z: 0, axis: "d" },
-  "end-end": { x: 1, y: 1, z: 0, axis: "d" },
-};
+  'top-start': {
+    axis: 'd',
+    x: -1,
+    y: -1,
+    z: 0,
+  },
+  // Axis-based (explicit)
+  'x': {
+    axis: 'x',
+    x: 1,
+    y: 0,
+    z: 0,
+  },
+  'y': {
+    axis: 'y',
+    x: 0,
+    y: 1,
+    z: 0,
+  },
+  'z': {
+    axis: 'z',
+    x: 0,
+    y: 0,
+    z: 1,
+  },
+}
 
 export function addTransformUtilities({ matchUtilities, theme }: PluginAPI) {
   // === SCALE UTILITIES ===
@@ -51,20 +158,20 @@ export function addTransformUtilities({ matchUtilities, theme }: PluginAPI) {
   // Uniform scale (default behavior) - Additive approach
   matchUtilities(
     {
-      "animate-scale": (value: string) =>
-        createAdditiveAnimation("jumi-scale-uniform", {
-          "--jumi-scale": value,
+      'animate-scale': (value: string) =>
+        createAdditiveAnimation('jumi-scale-uniform', {
+          '--jumi-scale': value,
         }),
     },
     {
-      values: mergeTheme(defaultTheme.scales, theme("jumi.scales")),
       supportsNegativeValues: true,
-      type: "number",
-    }
-  );
+      type: 'number',
+      values: mergeTheme(defaultTheme.scales, theme('jumi.scales')),
+    },
+  )
 
   // Axis-specific scale - Additive approach
-  ["x", "y", "z"].forEach((axis) => {
+  ;['x', 'y', 'z'].forEach(axis => {
     matchUtilities(
       {
         [`animate-scale-${axis}`]: (value: string) =>
@@ -73,45 +180,47 @@ export function addTransformUtilities({ matchUtilities, theme }: PluginAPI) {
           }),
       },
       {
-        values: mergeTheme(defaultTheme.scales, theme("jumi.scales")),
         supportsNegativeValues: true,
-        type: "number",
-      }
-    );
-  });
+        type: 'number',
+        values: mergeTheme(defaultTheme.scales, theme('jumi.scales')),
+      },
+    )
+  })
 
   // === ROTATION UTILITIES ===
 
   // Default rotation (z-axis clockwise) - Additive approach
   matchUtilities(
     {
-      "animate-rotate": (value: string) =>
-        createAdditiveAnimation("jumi-rotate-z", { "--jumi-rotate-z": value }),
+      'animate-rotate': (value: string) =>
+        createAdditiveAnimation('jumi-rotate-z', {
+          '--jumi-rotate-z': value,
+        }),
     },
     {
-      values: mergeTheme(defaultTheme.rotations, theme("jumi.rotations")),
       supportsNegativeValues: true,
-      type: "any",
-    }
-  );
+      type: 'any',
+      values: mergeTheme(defaultTheme.rotations, theme('jumi.rotations')),
+    },
+  )
 
   // Counter-clockwise rotation - Additive approach
   matchUtilities(
     {
-      "animate-rotate-ccw": (value: string) =>
-        createAdditiveAnimation("jumi-rotate-z", {
-          "--jumi-rotate-z": `calc(-1 * ${value})`,
+      'animate-rotate-ccw': (value: string) =>
+        createAdditiveAnimation('jumi-rotate-z', {
+          '--jumi-rotate-z': `calc(-1 * ${value})`,
         }),
     },
     {
-      values: mergeTheme(defaultTheme.rotations, theme("jumi.rotations")),
       supportsNegativeValues: true,
-      type: "any",
-    }
-  );
+      type: 'any',
+      values: mergeTheme(defaultTheme.rotations, theme('jumi.rotations')),
+    },
+  )
 
   // Axis-specific rotation - Additive approach
-  ["x", "y", "z"].forEach((axis) => {
+  ;['x', 'y', 'z'].forEach(axis => {
     matchUtilities(
       {
         [`animate-rotate-${axis}`]: (value: string) =>
@@ -120,144 +229,144 @@ export function addTransformUtilities({ matchUtilities, theme }: PluginAPI) {
           }),
       },
       {
-        values: mergeTheme(defaultTheme.rotations, theme("jumi.rotations")),
-        type: "any",
-      }
-    );
-  });
+        type: 'any',
+        values: mergeTheme(defaultTheme.rotations, theme('jumi.rotations')),
+      },
+    )
+  })
 
   // === SKEW UTILITIES (Legacy, Non-Additive) ===
 
-  ["x", "y"].forEach((axis) => {
+  ;['x', 'y'].forEach(axis => {
     matchUtilities(
       {
         [`animate-skew-${axis}`]: (value: string) => ({
-          "animation-name": `jumi-skew-${axis}`,
           [`--jumi-skew-${axis}`]: value,
+          'animation-name': `jumi-skew-${axis}`,
         }),
       },
       {
-        values: mergeTheme(defaultTheme.rotations, theme("jumi.rotations")),
         supportsNegativeValues: true,
-        type: "any",
-      }
-    );
-  });
+        type: 'any',
+        values: mergeTheme(defaultTheme.rotations, theme('jumi.rotations')),
+      },
+    )
+  })
 
   // === TRANSLATE UTILITIES (Explicit Direction Required) ===
 
   Object.entries(directionMappings).forEach(([direction, config]) => {
-    const { x, y, z } = config;
+    const { x, y, z } = config
 
     matchUtilities(
       {
         [`animate-translate-${direction}`]: (value: string) => {
           const styles: Record<string, string> = {
-            "animation-name": `jumi-translate-${direction}`,
-          };
+            'animation-name': `jumi-translate-${direction}`,
+          }
 
           // Set the target translate values
-          if (x !== 0) styles["--jumi-translate-x"] = `calc(${value} * ${x})`;
-          if (y !== 0) styles["--jumi-translate-y"] = `calc(${value} * ${y})`;
-          if (z !== 0) styles["--jumi-translate-z"] = `calc(${value} * ${z})`;
+          if (x !== 0) styles['--jumi-translate-x'] = `calc(${value} * ${x})`
+          if (y !== 0) styles['--jumi-translate-y'] = `calc(${value} * ${y})`
+          if (z !== 0) styles['--jumi-translate-z'] = `calc(${value} * ${z})`
 
-          return styles;
+          return styles
         },
       },
       {
-        values: mergeTheme(defaultTheme.distances, theme("jumi.distances")),
         supportsNegativeValues: true,
-        type: "length",
-      }
-    );
-  });
+        type: 'length',
+        values: mergeTheme(defaultTheme.distances, theme('jumi.distances')),
+      },
+    )
+  })
 
   // === PERSPECTIVE UTILITIES ===
 
   matchUtilities(
     {
-      "animate-perspective": (value: string) => ({
-        "animation-name": "jumi-perspective",
-        "--jumi-perspective": value,
+      'animate-perspective': (value: string) => ({
+        '--jumi-perspective': value,
+        'animation-name': 'jumi-perspective',
       }),
     },
     {
-      values: mergeTheme(defaultTheme.perspectives, theme("jumi.perspectives")),
-      type: "length",
-    }
-  );
+      type: 'length',
+      values: mergeTheme(defaultTheme.perspectives, theme('jumi.perspectives')),
+    },
+  )
 
   // Transform origin utilities
   matchUtilities(
     {
-      "animate-origin": (value: string) => ({
-        "animation-name": "jumi-origin",
-        "--jumi-transform-origin": value,
+      'animate-origin': (value: string) => ({
+        '--jumi-transform-origin': value,
+        'animation-name': 'jumi-origin',
       }),
     },
     {
-      values: mergeTheme(defaultTheme.origins, theme("jumi.origins")),
-      type: "lookup",
-    }
-  );
+      type: 'lookup',
+      values: mergeTheme(defaultTheme.origins, theme('jumi.origins')),
+    },
+  )
 }
 
 // Generate transform keyframes for the new system
 export function generateTransformKeyframes(): Record<string, any> {
-  const keyframes: Record<string, any> = {};
+  const keyframes: Record<string, any> = {}
 
   // Scale keyframes
-  keyframes["@keyframes jumi-scale-uniform"] = {
+  keyframes['@keyframes jumi-scale-uniform'] = {
     to: {
-      transform: "scale(var(--jumi-scale, 1))",
+      transform: 'scale(var(--jumi-scale, 1))',
     },
-  };
+  }
 
-  ["x", "y", "z"].forEach((axis) => {
+  ;['x', 'y', 'z'].forEach(axis => {
     const scaleFunc =
-      axis === "z" ? "scaleZ" : axis === "y" ? "scaleY" : "scaleX";
+      axis === 'z' ? 'scaleZ' : axis === 'y' ? 'scaleY' : 'scaleX'
 
     keyframes[`@keyframes jumi-scale-${axis}`] = {
       to: {
         transform: `${scaleFunc}(var(--jumi-scale-${axis}, 1))`,
       },
-    };
-  });
+    }
+  })
 
   // Rotation keyframes
-  ["x", "y", "z"].forEach((axis) => {
+  ;['x', 'y', 'z'].forEach(axis => {
     const rotateFunc =
-      axis === "z" ? "rotateZ" : axis === "y" ? "rotateY" : "rotateX";
+      axis === 'z' ? 'rotateZ' : axis === 'y' ? 'rotateY' : 'rotateX'
     keyframes[`@keyframes jumi-rotate-${axis}`] = {
       to: {
         transform: `${rotateFunc}(var(--jumi-rotate-${axis}, 0deg))`,
       },
-    };
-  });
+    }
+  })
 
   // Translation keyframes
-  Object.keys(directionMappings).forEach((direction) => {
+  Object.keys(directionMappings).forEach(direction => {
     keyframes[`@keyframes jumi-translate-${direction}`] = {
       to: {
         transform:
-          "translate3d(var(--jumi-translate-x, 0), var(--jumi-translate-y, 0), var(--jumi-translate-z, 0))",
+          'translate3d(var(--jumi-translate-x, 0), var(--jumi-translate-y, 0), var(--jumi-translate-z, 0))',
       },
-    };
-  });
+    }
+  })
 
   // Perspective keyframes
-  keyframes["@keyframes jumi-perspective"] = {
+  keyframes['@keyframes jumi-perspective'] = {
     to: {
-      perspective: "var(--jumi-perspective, none)",
+      perspective: 'var(--jumi-perspective, none)',
     },
-  };
+  }
 
   // Transform origin keyframes
-  keyframes["@keyframes jumi-origin"] = {
+  keyframes['@keyframes jumi-origin'] = {
     to: {
-      "transform-origin": "var(--jumi-transform-origin, center)",
+      'transform-origin': 'var(--jumi-transform-origin, center)',
     },
-  };
+  }
 
-  return keyframes;
+  return keyframes
 }

@@ -1,0 +1,17 @@
+export const alignContent = {
+  'baseline': 'baseline',
+  'center': 'center',
+  'end': 'end',
+  'first baseline': 'first baseline',
+  'flex-end': 'flex-end',
+  'flex-start': 'flex-start',
+  'last baseline': 'last baseline',
+  'normal': 'normal',
+  'safe center': 'safe center',
+  'space-around': 'space-around',
+  'space-between': 'space-between',
+  'space-evenly': 'space-evenly',
+  'start': 'start',
+  'stretch': 'stretch',
+  'unsafe center': 'unsafe center',
+} as const

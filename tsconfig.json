@@ -9,33 +9,33 @@
     "emitDeclarationOnly": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "noEmit": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noUncheckedIndexedAccess": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "isolatedModules": true,
-    "resolveJsonModule": true,
-    "noEmit": true,
     "paths": {
       "@/*": ["./src/*"],
       "~/*": ["./*"]
     },
+    "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
     "strictNullChecks": true,
     "target": "es2022",
     "verbatimModuleSyntax": true
   },
+  "exclude": ["node_modules", "dist", "build", "coverage", "examples", "examples"],
   "include": [
     "src/**/*",
     "vitest.config.mts",
     "vitest.setup.ts",
     "tsup.config.ts"
-  ],
-  "exclude": ["node_modules", "dist", "build", "coverage", "examples", "tests"]
+  ]
 }

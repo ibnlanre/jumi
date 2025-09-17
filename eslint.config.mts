@@ -1,63 +1,65 @@
-import "eslint-plugin-only-warn";
+import 'eslint-plugin-only-warn'
 
-import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
-import { defineConfig } from "eslint/config";
+import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript'
+import { defineConfig } from 'eslint/config'
 
-import typescript from "@typescript-eslint/parser";
-import vitestPlugin from "@vitest/eslint-plugin";
-import importX from "eslint-plugin-import-x";
-import tsPaths from "eslint-plugin-paths";
-import perfectionist from "eslint-plugin-perfectionist";
-import prettier from "eslint-plugin-prettier";
-import storybookPlugin from "eslint-plugin-storybook";
-import globals from "globals";
-import tseslint from "typescript-eslint";
+import stylistic from '@stylistic/eslint-plugin'
+import typescript from '@typescript-eslint/parser'
+import vitestPlugin from '@vitest/eslint-plugin'
+import importX from 'eslint-plugin-import-x'
+import tsPaths from 'eslint-plugin-paths'
+import perfectionist from 'eslint-plugin-perfectionist'
+import prettier from 'eslint-plugin-prettier'
+import storybookPlugin from 'eslint-plugin-storybook'
+import globals from 'globals'
+import tseslint from 'typescript-eslint'
 
 const EXT = {
-  COMMONJS: "**/*.cjs",
-  CSS: "**/*.{css,scss,sass,less}",
-  DEFINITION_FILES: "**/*.{d.ts,tsbuildinfo}",
-  HTML: "**/*.{htm,html,xml,xhtml}",
-  JS: "**/*.{js,jsx}",
-  JSON: "**/*.{json,json5,jsonc}",
-  MD: "**/*.{md,mdx,markdown}",
-  MODULE: "**/*.{mjs,mjsx,mtsx}",
-  STORYBOOK: "**/*.{stories,story}.{js,jsx,ts,tsx}",
-  TEST: "**/*.{spec,test,cy}.{js,ts,jsx,tsx}",
-  TS: "**/*.{ts,tsx}",
-  TYPE_DEFINITION: "**/types/**",
-  YML: "**/*.{yml,yaml}",
-};
+  COMMONJS: '**/*.cjs',
+  CSS: '**/*.{css,scss,sass,less}',
+  DEFINITION_FILES: '**/*.{d.ts,tsbuildinfo}',
+  HTML: '**/*.{htm,html,xml,xhtml}',
+  JS: '**/*.{js,jsx}',
+  JSON: '**/*.{json,json5,jsonc}',
+  MD: '**/*.{md,mdx,markdown}',
+  MODULE: '**/*.{mjs,mjsx,mtsx}',
+  STORYBOOK: '**/*.{stories,story}.{js,jsx,ts,tsx}',
+  TEST: '**/*.{spec,test,cy}.{js,ts,jsx,tsx}',
+  TS: '**/*.{ts,tsx}',
+  TYPE_DEFINITION: '**/types/**',
+  YML: '**/*.{yml,yaml}',
+}
 
 const ignoresConfig = defineConfig({
   ignores: [
-    ".storybook",
-    "**/node_modules/**",
-    "**/coverage/**",
-    "**/build/**",
-    "**/public/**",
-    "**/dist/**",
-    "**/.vscode/**",
-    "**/.github/**",
-    "**/.next/**",
-    "**/.turbo/**",
-    "**/.vercel/**",
-    "**/.output/**",
-    "**/.yarn/**",
-    "**/.yarn-cache/**",
-    "**/.yarnrc.yml",
-    "**/.yarnrc",
-    "**/yarn.lock",
-    "**/package.json",
-    "**/package-lock.json",
-    "**/pnpm-lock.yaml",
-    "**/npm-shrinkwrap.json",
-    "**/lerna-debug.log",
-    "**/lerna.json",
-    "**/tsconfig*.tsbuildinfo",
-    "**/*.d.ts",
+    '.storybook',
+    '**/node_modules/**',
+    '**/coverage/**',
+    '**/build/**',
+    '**/public/**',
+    '**/dist/**',
+    '**/.vscode/**',
+    '**/.github/**',
+    '**/.next/**',
+    '**/.turbo/**',
+    '**/.vercel/**',
+    '**/.output/**',
+    '**/.yarn/**',
+    '**/.yarn-cache/**',
+    '**/.yarnrc.yml',
+    '**/.yarnrc',
+    '**/yarn.lock',
+    '**/package.json',
+    '**/package-lock.json',
+    '**/tsconfig*.json',
+    '**/pnpm-lock.yaml',
+    '**/npm-shrinkwrap.json',
+    '**/lerna-debug.log',
+    '**/lerna.json',
+    '**/tsconfig*.tsbuildinfo',
+    '**/*.d.ts',
   ],
-});
+})
 
 const vitestConfig = defineConfig({
   extends: [vitestPlugin.configs.recommended],
@@ -68,39 +70,39 @@ const vitestConfig = defineConfig({
   },
   rules: {
     ...vitestPlugin.configs.recommended.rules,
-    "vitest/expect-expect": "off",
+    'vitest/expect-expect': 'off',
   },
-});
+})
 
 const importConfig = defineConfig({
   extends: [importX.flatConfigs.typescript as any],
   files: [EXT.JS, EXT.MODULE, EXT.COMMONJS, EXT.TS],
-  ignores: ["**/*.d.ts"],
+  ignores: ['**/*.d.ts'],
   languageOptions: {
     parser: typescript,
     parserOptions: {
       ecmaFeatures: { jsx: true },
-      ecmaVersion: "latest",
+      ecmaVersion: 'latest',
     },
   },
   plugins: { typescript },
   rules: {
-    "import-x/no-cycle": ["warn", { maxDepth: "∞" }],
+    'import-x/no-cycle': ['warn', { maxDepth: '∞' }],
   },
   settings: {
-    "import-x/extensions": [".js", ".jsx", ".ts", ".tsx"],
-    "import-x/ignore": ["node_modules", "\\.(coffee|scss|css|less|hbs|svg)$"],
-    "import-x/parsers": {
-      "@typescript-eslint/parser": [".ts", ".tsx"],
+    'import-x/extensions': ['.js', '.jsx', '.ts', '.tsx'],
+    'import-x/ignore': ['node_modules', '\\.(coffee|scss|css|less|hbs|svg)$'],
+    'import-x/parsers': {
+      '@typescript-eslint/parser': ['.ts', '.tsx'],
     },
-    "import-x/resolver-next": [
+    'import-x/resolver-next': [
       createTypeScriptImportResolver({
         alwaysTryTypes: true,
-        project: "./tsconfig.json",
+        project: './tsconfig.json',
       }),
     ],
   },
-});
+})
 
 const typescriptConfig = defineConfig({
   extends: [tseslint.configs.eslintRecommended],
@@ -114,114 +116,82 @@ const typescriptConfig = defineConfig({
       projectService: true,
     },
   },
-  plugins: { "ts-paths": tsPaths },
+  plugins: { 'ts-paths': tsPaths },
   rules: {
-    "ts-paths/alias": ["warn"],
+    'ts-paths/alias': ['warn'],
   },
-});
+})
 
 const perfectionistConfig = defineConfig({
   files: [EXT.COMMONJS, EXT.JS, EXT.MODULE, EXT.TS, EXT.JSON, EXT.YML],
-  ignores: ["**/*.d.ts"],
-  languageOptions: {
-    parser: tseslint.parser,
-    parserOptions: {
-      ecmaFeatures: { jsx: true },
-      ecmaVersion: "latest",
-    },
-  },
+  ignores: ['**/*.d.ts'],
   plugins: { perfectionist },
   rules: {
-    ...perfectionist.configs["recommended-natural"].rules,
-    "perfectionist/sort-exports": [
-      "warn",
+    ...perfectionist.configs['recommended-natural'].rules,
+    'perfectionist/sort-exports': [
+      'warn',
       {
-        fallbackSort: { order: "asc", type: "alphabetical" },
-        groups: ["type-export", ["value-export", "unknown"]],
+        fallbackSort: { order: 'asc', type: 'alphabetical' },
+        groups: ['type-export', ['value-export', 'unknown']],
         partitionByNewLine: true,
-        type: "natural",
+        type: 'natural',
       },
     ],
-    "perfectionist/sort-imports": [
-      "warn",
+    'perfectionist/sort-imports': [
+      'warn',
       {
-        fallbackSort: { order: "asc", type: "alphabetical" },
+        fallbackSort: { order: 'asc', type: 'alphabetical' },
         groups: [
-          ["type-builtin", "type-subpath", "type-external"],
-          ["type-internal", "type-parent", "type-sibling", "type-index"],
-          ["named-type-builtin", "named-type-subpath", "named-type-external"],
+          ['type-builtin', 'type-subpath', 'type-external'],
+          ['type-internal', 'type-parent', 'type-sibling', 'type-index'],
+          ['named-type-builtin', 'named-type-subpath', 'named-type-external'],
           [
-            "named-type-internal",
-            "named-type-parent",
-            "named-type-sibling",
-            "named-type-index",
+            'named-type-internal',
+            'named-type-parent',
+            'named-type-sibling',
+            'named-type-index',
           ],
-          ["ts-equals-import"],
+          ['ts-equals-import'],
           [
-            "named-value-builtin",
-            "named-value-subpath",
-            "named-value-external",
+            'named-value-builtin',
+            'named-value-subpath',
+            'named-value-external',
           ],
-          ["named-value-internal"],
-          ["named-value-parent", "named-value-sibling", "named-value-index"],
-          ["value-builtin", "value-subpath", "value-external"],
-          ["value-internal"],
-          ["value-parent", "value-sibling", "value-index"],
-          ["value-side-effect", "value-side-effect-style"],
-          ["require-import"],
-          ["unknown"],
+          ['named-value-internal'],
+          ['named-value-parent', 'named-value-sibling', 'named-value-index'],
+          ['value-builtin', 'value-subpath', 'value-external'],
+          ['value-internal'],
+          ['value-parent', 'value-sibling', 'value-index'],
+          ['value-side-effect', 'value-side-effect-style'],
+          ['require-import'],
+          ['unknown'],
         ],
-        type: "natural",
+        type: 'natural',
       },
     ],
   },
-});
+})
+
+const stylisticConfig = defineConfig({
+  extends: [stylistic.configs.recommended],
+  files: [EXT.JS, EXT.MODULE, EXT.COMMONJS, EXT.TS],
+  ignores: [EXT.DEFINITION_FILES, EXT.TYPE_DEFINITION, EXT.JSON, EXT.YML],
+  plugins: { stylistic },
+})
 
 const storybookConfig = defineConfig({
-  extends: storybookPlugin.configs["flat/recommended"],
+  extends: storybookPlugin.configs['flat/recommended'],
   files: [EXT.STORYBOOK],
   languageOptions: {
     globals: globals.browser,
-    parser: tseslint.parser,
-    parserOptions: {
-      ecmaVersion: "latest",
-      sourceType: "module",
-    },
   },
   plugins: { storybookPlugin: storybookPlugin as any },
-});
+})
 
 const prettierConfig = defineConfig({
   files: [EXT.JS, EXT.MODULE, EXT.COMMONJS, EXT.TS],
   plugins: { prettier },
-  rules: {
-    "prettier/prettier": [
-      "warn",
-      {
-        arrowParens: "always",
-        bracketSameLine: false,
-        bracketSpacing: true,
-        embeddedLanguageFormatting: "auto",
-        endOfLine: "lf",
-        experimentalTernaries: false,
-        htmlWhitespaceSensitivity: "css",
-        insertPragma: false,
-        jsxSingleQuote: false,
-        printWidth: 80,
-        proseWrap: "preserve",
-        quoteProps: "as-needed",
-        requirePragma: false,
-        semi: true,
-        singleAttributePerLine: false,
-        singleQuote: false,
-        tabWidth: 2,
-        trailingComma: "es5",
-        useTabs: false,
-        vueIndentScriptAndStyle: false,
-      },
-    ],
-  },
-});
+})
 
 export default defineConfig([
   ignoresConfig,
@@ -231,4 +201,5 @@ export default defineConfig([
   perfectionistConfig,
   prettierConfig,
   storybookConfig,
-]);
+  stylisticConfig,
+])

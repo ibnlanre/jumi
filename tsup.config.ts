@@ -1,16 +1,18 @@
-import type { Options } from "tsup";
+import type { Options } from 'tsup'
 
-export default {
-  entry: ["src/index.ts"],
-  format: ["cjs", "esm"],
-  dts: true,
+const options: Options = {
   clean: true,
-  splitting: false,
-  sourcemap: true,
-  external: ["tailwindcss"],
+  dts: true,
+  entry: ['src/index.ts'],
   esbuildOptions(options) {
     options.banner = {
       js: '"use client"',
-    };
+    }
   },
-} satisfies Options;
+  external: ['tailwindcss'],
+  format: ['cjs', 'esm'],
+  sourcemap: true,
+  splitting: false,
+}
+
+export default options
