@@ -33,7 +33,6 @@ import { visibility } from '@/theme/visibility'
 
 export const matchProperties: Partial<MatchProperty> = {
   'animate': {
-    key: 'animation',
     property: value => ({
       animation: value,
     }),
@@ -946,6 +945,41 @@ export const matchProperties: Partial<MatchProperty> = {
     supportsNegativeValues: true,
     type: 'number',
   },
+  'animate-skew': {
+    key: 'skew',
+    property: value => ({
+      '--jumi-skew': 'skew(' + value + ')',
+    }),
+    supportsNegativeValues: true,
+  },
+  'animate-skew-sx': {
+    key: 'skew',
+    property: value => ({
+      '--jumi-skew-sx': value,
+    }),
+    supportsNegativeValues: true,
+  },
+  'animate-skew-sy': {
+    key: 'skew',
+    property: value => ({
+      '--jumi-skew-sy': value,
+    }),
+    supportsNegativeValues: true,
+  },
+  'animate-skew-x': {
+    key: 'skew',
+    property: value => ({
+      '--jumi-skew-x': 'skewX(' + value + ')',
+    }),
+    supportsNegativeValues: true,
+  },
+  'animate-skew-y': {
+    key: 'skew',
+    property: value => ({
+      '--jumi-skew-y': 'skewY(' + value + ')',
+    }),
+    supportsNegativeValues: true,
+  },
   'animate-stroke': {
     key: 'colors',
     property: value => ({
@@ -1032,6 +1066,57 @@ export const matchProperties: Partial<MatchProperty> = {
       transition: value,
     }),
     values: empty.none,
+  },
+  'animate-translate-3d': {
+    property: value => ({
+      '--jumi-translate-3d': 'translate3d(' + value + ')',
+    }),
+    values: empty.default,
+  },
+  'animate-translate-3x': {
+    property: value => ({
+      '--jumi-translate-3x': value,
+    }),
+    supportsNegativeValues: true,
+    type: ['length', 'percentage'],
+    values: empty.default,
+  },
+  'animate-translate-3y': {
+    property: value => ({
+      '--jumi-translate-3y': value,
+    }),
+    supportsNegativeValues: true,
+    type: ['length', 'percentage'],
+    values: empty.default,
+  },
+  'animate-translate-3z': {
+    property: value => ({
+      '--jumi-translate-3z': value,
+    }),
+    supportsNegativeValues: true,
+    type: ['length', 'percentage'],
+    values: empty.default,
+  },
+  'animate-translate-x': {
+    property: value => ({
+      '--jumi-translate-x': 'translateX(' + value + ')',
+    }),
+    supportsNegativeValues: true,
+    values: empty.default,
+  },
+  'animate-translate-y': {
+    property: value => ({
+      '--jumi-translate-y': 'translateY(' + value + ')',
+    }),
+    supportsNegativeValues: true,
+    values: empty.default,
+  },
+  'animate-translate-z': {
+    property: value => ({
+      '--jumi-translate-z': 'translateZ(' + value + ')',
+    }),
+    supportsNegativeValues: true,
+    values: empty.default,
   },
   'animate-visibility': {
     property: value => ({

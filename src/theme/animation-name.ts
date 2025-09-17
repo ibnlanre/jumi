@@ -29,7 +29,7 @@ export const animationName = {
   'flip-y': 'flip-y',
   'heart-beat': 'heart-beat',
   'jello': 'jello',
-  'pulse': 'pulse',
+  'pulsate': 'pulsate',
   'shake': 'shake',
   'slide-in-down': 'slide-in-down',
   'slide-in-left': 'slide-in-left',
@@ -49,3 +49,5 @@ export const animationName = {
   'zoom-out-right': 'zoom-out-right',
   'zoom-out-up': 'zoom-out-up',
 } as const
+
+export type AnimationName = keyof typeof animationName

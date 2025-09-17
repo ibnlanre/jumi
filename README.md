@@ -205,7 +205,7 @@ Control the timing of your animations with precision:
 <div class="animate-slide-in-up animate-ease-ease-out-back">Bouncy slide</div>
 
 <!-- Iteration -->
-<div class="animate-pulse animate-count-infinite">Infinite pulse</div>
+<div class="animate-pulsate animate-count-infinite">Infinite pulsating</div>
 <div class="animate-bounce-in animate-repeat-3">Bounce 3 times</div>
 ```
 
@@ -249,7 +249,7 @@ Beautiful pre-built animation effects:
 
 <!-- Attention seeking -->
 <div class="animate-shake animate-count-infinite">Shaking</div>
-<div class="animate-pulse animate-count-infinite">Pulsing</div>
+<div class="animate-pulsate animate-count-infinite">Pulsing</div>
 <div class="animate-wobble animate-count-infinite">Wobbling</div>
 ```
 
@@ -459,7 +459,7 @@ Jumi maintains CSS custom properties for dynamic control:
 | `animate-flip-x`               | Flip on X axis       |
 | `animate-flip-y`               | Flip on Y axis       |
 | `animate-shake`                | Shake effect         |
-| `animate-pulse`                | Pulse effect         |
+| `animate-pulsate`                | Pulsing effect         |
 | `animate-swing`                | Swing effect         |
 | `animate-wobble`               | Wobble effect        |
 

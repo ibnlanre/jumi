@@ -382,7 +382,7 @@ export const animationKeyframes: AnimationKeyframes = {
       transform: 'none',
     },
   },
-  '@keyframes pulse': {
+  '@keyframes pulsate': {
     '50%': {
       transform: 'scale3d(1.05, 1.05, 1.05)',
     },

@@ -199,7 +199,7 @@ export default defineConfig([
   importConfig,
   typescriptConfig,
   perfectionistConfig,
-  prettierConfig,
   storybookConfig,
+  prettierConfig,
   stylisticConfig,
 ])

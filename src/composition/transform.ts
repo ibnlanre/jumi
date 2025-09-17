@@ -49,20 +49,20 @@ const scale3dValue = [
 ].join(', ')
 export const scale3d = 'scale3d(' + scale3dValue + ')'
 
-const skewValue = ['var(--jumi-skew-sx)', 'var(--jumi-skew-sy)'].join(' ')
+const skewValue = ['var(--jumi-skew-sx)', 'var(--jumi-skew-sy)'].join(', ')
 export const skew = 'skew(' + skewValue + ')'
 
 const translateValue = [
   'var(--jumi-translate-sx)',
   'var(--jumi-translate-sy)',
-].join(' ')
+].join(', ')
 export const translate = 'translate(' + translateValue + ')'
 
 const translate3dValue = [
   'var(--jumi-translate-3x)',
   'var(--jumi-translate-3y)',
   'var(--jumi-translate-3z)',
-].join(' ')
+].join(', ')
 export const translate3d = 'translate3d(' + translate3dValue + ')'
 
 export const transform = [
@@ -80,6 +80,8 @@ export const transform = [
   'var(--jumi-scale-y)',
   'var(--jumi-scale-z)',
   'var(--jumi-skew)',
+  'var(--jumi-skew-x)',
+  'var(--jumi-skew-y)',
   'var(--jumi-translate)',
   'var(--jumi-translate-3d)',
 ].join(' ')
