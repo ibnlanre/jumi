@@ -103,19 +103,32 @@ export type Property
     | 'background-size-height'
     | 'background-size-width'
     | 'block-size'
+    | 'border'
+    | 'border-block'
+    | 'border-block-color'
+    | 'border-block-end-color' // bottom
     | 'border-block-end-length' // bottom
     | 'border-block-end-radius' // bottom
+    | 'border-block-end-style' // bottom
     | 'border-block-end-width' // bottom
     | 'border-block-length' // top-bottom
+    | 'border-block-start-color' // top
     | 'border-block-start-length' // top
     | 'border-block-start-radius' // top
+    | 'border-block-start-style' // top
     | 'border-block-start-width' // top
+    | 'border-block-style' // top-bottom
     | 'border-block-width' // top-bottom
+    | 'border-bottom'
+    | 'border-bottom-color'
     | 'border-bottom-left-radius'
     | 'border-bottom-length'
     | 'border-bottom-radius'
     | 'border-bottom-right-radius'
+    | 'border-bottom-style'
     | 'border-bottom-width'
+    | 'border-bottom-width'
+    | 'border-collapse'
     | 'border-color'
     | 'border-end-end-radius' // bottom-right
     | 'border-end-start-radius' // bottom-left

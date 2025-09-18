@@ -331,6 +331,13 @@ export const matchProperties: Partial<MatchProperty> = {
     type: ['length', 'percentage', 'any'],
     values: empty.auto,
   },
+  'animate-border': {
+    property: value => ({
+      '--jumi-border': value,
+    }),
+    type: ['line-width', 'length'],
+    values: empty.none,
+  },
   'animate-border-block-end-radius': {
     key: 'borderRadius',
     property: value => ({
