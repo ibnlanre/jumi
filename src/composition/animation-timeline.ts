@@ -1,14 +1,14 @@
 export const animationTimelineView = [
-  'var(--jumi-animation-timeline-axis, block)',
-  'var(--jumi-animation-timeline-inset, auto)',
+  'var(--jumi-animation-timeline-axis)',
+  'var(--jumi-animation-timeline-inset)',
 ].join(' ')
 
 export const animationTimelineScroll = [
-  'var(--jumi-animation-timeline-scroller, nearest)',
-  'var(--jumi-animation-timeline-axis, block)',
+  'var(--jumi-animation-timeline-scroller)',
+  'var(--jumi-animation-timeline-axis)',
 ].join(' ')
 
 export const animationTimelineInset = [
-  'var(--jumi-animation-timeline-inset-start, auto)',
-  'var(--jumi-animation-timeline-inset-end, auto)',
+  'var(--jumi-animation-timeline-inset-start)',
+  'var(--jumi-animation-timeline-inset-end)',
 ].join(' ')

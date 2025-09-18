@@ -16,6 +16,26 @@ export type CssInJs = {
 
 export type CSSRuleObject = CssInJs | CssInJs[]
 
+export type DataType
+  = | 'absolute-size'
+    | 'angle'
+    | 'any'
+    | 'bg-size'
+    | 'color'
+    | 'family-name'
+    | 'generic-name'
+    | 'image'
+    | 'integer'
+    | 'length'
+    | 'line-width'
+    | 'number'
+    | 'percentage'
+    | 'position'
+    | 'ratio'
+    | 'relative-size'
+    | 'url'
+    | 'vector'
+
 export type KeyframeDefinition = Record<string, Record<string, any>>
 
 export type Keyframes = Record<string, PropertiesHyphen>
@@ -34,7 +54,7 @@ export interface MatchPropertyValue extends Partial<Options> {
 export interface Options {
   modifiers: 'any' | Record<string, string>
   supportsNegativeValues: boolean
-  type: ValueType | ValueType[]
+  type: DataType | DataType[]
   values: Record<string, string>
 }
 
@@ -45,8 +65,11 @@ export type Property
     | 'align-self'
     | 'alignment-baseline'
     | 'all'
+    | 'anchor-name'
     | 'appearance'
     | 'aspect-ratio'
+    | 'aspect-ratio-height'
+    | 'aspect-ratio-width'
     | 'backdrop-blur'
     | 'backdrop-brightness'
     | 'backdrop-contrast'
@@ -57,13 +80,29 @@ export type Property
     | 'backdrop-opacity'
     | 'backdrop-saturate'
     | 'backdrop-sepia'
+    | 'backdrop-url'
+    | 'backface-visibility'
     | 'background'
+    | 'background-attachment'
+    | 'background-blend-mode'
     | 'background-clip'
     | 'background-color'
     | 'background-image'
     | 'background-origin'
     | 'background-position'
+    | 'background-position-x'
+    | 'background-position-x-edge'
+    | 'background-position-x-offset'
+    | 'background-position-y'
+    | 'background-position-y-edge'
+    | 'background-position-y-offset'
+    | 'background-repeat'
+    | 'background-repeat-x'
+    | 'background-repeat-y'
     | 'background-size'
+    | 'background-size-height'
+    | 'background-size-width'
+    | 'block-size'
     | 'border-block-end-length' // bottom
     | 'border-block-end-radius' // bottom
     | 'border-block-end-width' // bottom
@@ -114,7 +153,6 @@ export type Property
     | 'column-width'
     | 'columns'
     | 'composition'
-    | 'contrast'
     | 'cursor'
     | 'delay'
     | 'direction'
@@ -124,6 +162,17 @@ export type Property
     | 'fill'
     | 'fill-mode'
     | 'filter'
+    | 'filter-blur'
+    | 'filter-brightness'
+    | 'filter-contrast'
+    | 'filter-contrast'
+    | 'filter-grayscale'
+    | 'filter-hue-rotate'
+    | 'filter-invert'
+    | 'filter-opacity'
+    | 'filter-saturate'
+    | 'filter-sepia'
+    | 'filter-url'
     | 'flex'
     | 'flex-basis'
     | 'flex-direction'
@@ -440,23 +489,3 @@ export type ThemeKeys = | 'accentColor'
   | 'width'
   | 'willChange'
   | 'zIndex'
-
-export type ValueType
-  = | 'absolute-size'
-    | 'angle'
-    | 'any'
-    | 'bg-size'
-    | 'color'
-    | 'family-name'
-    | 'generic-name'
-    | 'image'
-    | 'integer'
-    | 'length'
-    | 'line-width'
-    | 'number'
-    | 'percentage'
-    | 'position'
-    | 'ratio'
-    | 'relative-size'
-    | 'url'
-    | 'vector'

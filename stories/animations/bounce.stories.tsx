@@ -31,7 +31,7 @@ type Story = StoryObj<typeof meta>
 
 export const BounceIn: Story = {
   args: {
-    animationClass: 'animate-bounce-in',
+    animationClass: 'animate animate-bounce-in',
     description: 'Element bounces in with elastic scaling effect',
     show: true,
     title: 'Bounce In',
@@ -40,7 +40,7 @@ export const BounceIn: Story = {
 
 export const BounceOut: Story = {
   args: {
-    animationClass: 'animate-bounce-out',
+    animationClass: 'animate animate-bounce-out',
     description: 'Element bounces out with elastic scaling effect',
     show: true,
     title: 'Bounce Out',

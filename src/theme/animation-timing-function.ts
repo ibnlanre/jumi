@@ -28,4 +28,6 @@ export const animationTimingFunction = {
   'ease-out-quint': 'cubic-bezier(0.22, 1, 0.36, 1)',
   'ease-out-sine': 'cubic-bezier(0.61, 1, 0.88, 1)',
   'linear': 'linear',
+  'step-end': 'step-end',
+  'step-start': 'step-start',
 } as const

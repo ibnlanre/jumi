@@ -31,7 +31,7 @@ type Story = StoryObj<typeof meta>
 
 export const BackIn: Story = {
   args: {
-    animationClass: 'animate-back-in',
+    animationClass: 'animate animate-back-in',
     description: 'Element scales from 0 with a full rotation entrance',
     show: true,
     title: 'Back In',
@@ -40,7 +40,7 @@ export const BackIn: Story = {
 
 export const BackInDown: Story = {
   args: {
-    animationClass: 'animate-back-in-down',
+    animationClass: 'animate animate-back-in-down',
     description: 'Element scales and slides down from above with rotation',
     show: true,
     title: 'Back In Down',
@@ -49,7 +49,7 @@ export const BackInDown: Story = {
 
 export const BackInLeft: Story = {
   args: {
-    animationClass: 'animate-back-in-left',
+    animationClass: 'animate animate-back-in-left',
     description: 'Element scales and slides in from the left with rotation',
     show: true,
     title: 'Back In Left',
@@ -58,7 +58,7 @@ export const BackInLeft: Story = {
 
 export const BackInRight: Story = {
   args: {
-    animationClass: 'animate-back-in-right',
+    animationClass: 'animate animate-back-in-right',
     description: 'Element scales and slides in from the right with rotation',
     show: true,
     title: 'Back In Right',
@@ -67,7 +67,7 @@ export const BackInRight: Story = {
 
 export const BackInUp: Story = {
   args: {
-    animationClass: 'animate-back-in-up',
+    animationClass: 'animate animate-back-in-up',
     description: 'Element scales and slides up from below with rotation',
     show: true,
     title: 'Back In Up',

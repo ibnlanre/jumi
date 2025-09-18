@@ -395,7 +395,7 @@ export const propertyKeyframes: PropertyKeyframes = {
   '@keyframes jumi-justify-content': {
     to: {
       'justify-content':
-        'var(--jumi-justify-content)' as Property.JustifyContent,
+        'var(--jumi-justify-content)',
     },
   },
   '@keyframes jumi-left': {
@@ -502,7 +502,7 @@ export const propertyKeyframes: PropertyKeyframes = {
   },
   '@keyframes jumi-overflow': {
     to: {
-      overflow: 'var(--jumi-overflow)' as Property.Overflow,
+      overflow: 'var(--jumi-overflow)',
     },
   },
   '@keyframes jumi-overflow-x': {
@@ -603,3 +603,8 @@ export const propertyKeyframes: PropertyKeyframes = {
     },
   },
 }
+
+const keyframesLength = '@keyframes '.length
+export const keyframes = Object.keys(propertyKeyframes).map((key) => {
+  return key.slice(keyframesLength)
+}).join(', ')

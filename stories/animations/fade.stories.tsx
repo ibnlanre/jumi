@@ -31,7 +31,7 @@ type Story = StoryObj<typeof meta>
 
 export const FadeIn: Story = {
   args: {
-    animationClass: 'animate-fade-in',
+    animationClass: 'animate animate-fade-in',
     description: 'Element fades in with smooth opacity transition',
     show: true,
     title: 'Fade In',
@@ -40,7 +40,7 @@ export const FadeIn: Story = {
 
 export const FadeOut: Story = {
   args: {
-    animationClass: 'animate-fade-out',
+    animationClass: 'animate animate-fade-out',
     description: 'Element fades out with smooth opacity transition',
     show: true,
     title: 'Fade Out',
@@ -49,7 +49,7 @@ export const FadeOut: Story = {
 
 export const FadeDown: Story = {
   args: {
-    animationClass: 'animate-fade-down',
+    animationClass: 'animate animate-fade-down',
     description: 'Element fades and slides down',
     show: true,
     title: 'Fade Down',
@@ -58,7 +58,7 @@ export const FadeDown: Story = {
 
 export const FadeUp: Story = {
   args: {
-    animationClass: 'animate-fade-up',
+    animationClass: 'animate animate-fade-up',
     description: 'Element fades and slides up',
     show: true,
     title: 'Fade Up',
@@ -67,7 +67,7 @@ export const FadeUp: Story = {
 
 export const FadeLeft: Story = {
   args: {
-    animationClass: 'animate-fade-left',
+    animationClass: 'animate animate-fade-left',
     description: 'Element fades and slides to the left',
     show: true,
     title: 'Fade Left',
@@ -76,7 +76,7 @@ export const FadeLeft: Story = {
 
 export const FadeRight: Story = {
   args: {
-    animationClass: 'animate-fade-right',
+    animationClass: 'animate animate-fade-right',
     description: 'Element fades and slides to the right',
     show: true,
     title: 'Fade Right',

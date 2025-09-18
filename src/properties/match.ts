@@ -1,5 +1,6 @@
 import type { MatchProperty } from '@/types'
 
+import { mergeTheme } from '@/helpers/merge-theme'
 import { alignContent } from '@/theme/align-content'
 import { alignItems } from '@/theme/align-items'
 import { alignSelf } from '@/theme/align-self'
@@ -19,10 +20,16 @@ import { animationTimelineInset } from '@/theme/animation-timeline-inset'
 import { animationTimelineScroller } from '@/theme/animation-timeline-scroller'
 import { animationTimingFunction } from '@/theme/animation-timing-function'
 import { appearance } from '@/theme/appearance'
+import { backfaceVisibility } from '@/theme/backface-visibility'
+import { backgroundAttachment } from '@/theme/background-attachment'
+import { backgroundOrigin } from '@/theme/background-origin'
+import { backgroundPosition } from '@/theme/background-position'
+import { backgroundRepeat, backgroundRepeatAxis } from '@/theme/background-repeat'
 import { display } from '@/theme/display'
 import { empty } from '@/theme/empty'
 import { flexDirection } from '@/theme/flex-direction'
 import { justifyContent } from '@/theme/justify-content'
+import { mixBlendMode } from '@/theme/mix-blend-mode'
 import { overflow } from '@/theme/overflow'
 import { percentage } from '@/theme/percentage'
 import { position } from '@/theme/position'
@@ -34,7 +41,7 @@ import { visibility } from '@/theme/visibility'
 export const matchProperties: Partial<MatchProperty> = {
   'animate': {
     property: value => ({
-      animation: value,
+      'animation-name': value,
     }),
     values: animationName,
   },
@@ -43,9 +50,7 @@ export const matchProperties: Partial<MatchProperty> = {
     property: value => ({
       '--jumi-accent-color': value,
     }),
-    values: {
-      auto: 'auto',
-    },
+    type: 'color',
   },
   'animate-align-content': {
     property: value => ({
@@ -77,95 +82,254 @@ export const matchProperties: Partial<MatchProperty> = {
     }),
     values: all,
   },
+  'animate-anchor-name': {
+    property: value => ({
+      'anchor-name': value,
+    }),
+    type: 'any',
+    values: empty.none,
+  },
   'animate-appearance': {
     property: value => ({
       '--jumi-appearance': value,
     }),
     values: appearance,
   },
+  'animate-aspect-ratio': {
+    key: 'aspectRatio',
+    property: value => ({
+      '--jumi-aspect-ratio': value,
+    }),
+    type: ['ratio', 'any'],
+    values: empty.auto,
+  },
+  'animate-aspect-ratio-height': {
+    property: value => ({
+      '--jumi-aspect-ratio-height': value,
+    }),
+    type: 'ratio',
+    values: empty.auto,
+  },
+  'animate-aspect-ratio-width': {
+    property: value => ({
+      '--jumi-aspect-ratio-width': value,
+    }),
+    type: 'ratio',
+    values: empty.auto,
+  },
   'animate-backdrop-blur': {
     key: 'backdropBlur',
     property: value => ({
-      '--jumi-backdrop-blur': value,
+      '--jumi-backdrop-blur': 'blur(' + value + ')',
     }),
+    type: 'length',
   },
   'animate-backdrop-brightness': {
     key: 'backdropBrightness',
     property: value => ({
-      '--jumi-backdrop-brightness': value,
+      '--jumi-backdrop-brightness': 'brightness(' + value + ')',
     }),
+    type: ['number', 'percentage'],
   },
   'animate-backdrop-contrast': {
     key: 'backdropContrast',
     property: value => ({
-      '--jumi-backdrop-contrast': value,
+      '--jumi-backdrop-contrast': 'contrast(' + value + ')',
     }),
+    type: ['number', 'percentage'],
   },
   'animate-backdrop-filter': {
     property: value => ({
       '--jumi-backdrop-filter': value,
     }),
+    type: 'any',
     values: empty.none,
   },
   'animate-backdrop-grayscale': {
     key: 'backdropGrayscale',
     property: value => ({
-      '--jumi-backdrop-grayscale': value,
+      '--jumi-backdrop-grayscale': 'grayscale(' + value + ')',
     }),
+    type: ['number', 'percentage'],
   },
   'animate-backdrop-hue-rotate': {
     key: 'backdropHueRotate',
     property: value => ({
-      '--jumi-backdrop-hue-rotate': value,
+      '--jumi-backdrop-hue-rotate': 'hue-rotate(' + value + ')',
     }),
+    type: 'angle',
   },
   'animate-backdrop-invert': {
     key: 'backdropInvert',
     property: value => ({
-      '--jumi-backdrop-invert': value,
+      '--jumi-backdrop-invert': 'invert(' + value + ')',
     }),
+    type: ['number', 'percentage'],
   },
   'animate-backdrop-opacity': {
     key: 'backdropOpacity',
     property: value => ({
-      '--jumi-backdrop-opacity': value,
+      '--jumi-backdrop-opacity': 'opacity(' + value + ')',
     }),
+    type: ['number', 'percentage'],
   },
   'animate-backdrop-saturate': {
     key: 'backdropSaturate',
     property: value => ({
-      '--jumi-backdrop-saturate': value,
+      '--jumi-backdrop-saturate': 'saturate(' + value + ')',
     }),
+    type: ['number', 'percentage'],
   },
   'animate-backdrop-sepia': {
     key: 'backdropSepia',
     property: value => ({
-      '--jumi-backdrop-sepia': value,
+      '--jumi-backdrop-sepia': 'sepia(' + value + ')',
     }),
+    type: ['number', 'percentage'],
+  },
+  'animate-backdrop-url': {
+    property: value => ({
+      '--jumi-backdrop-url': `url(${value})`,
+    }),
+    type: 'url',
+    values: empty.string,
+  },
+  'animate-backface-visibility': {
+    property: value => ({
+      '--jumi-backface-visibility': value,
+    }),
+    values: backfaceVisibility,
   },
   'animate-background': {
     property: value => ({
       '--jumi-background': value,
     }),
+    type: 'any',
     values: empty.none,
+  },
+  'animate-background-attachment': {
+    property: value => ({
+      '--jumi-background-attachment': value,
+    }),
+    values: backgroundAttachment,
+  },
+  'animate-background-blend-mode': {
+    property: value => ({
+      '--jumi-background-blend-mode': value,
+    }),
+    values: mixBlendMode,
   },
   'animate-background-color': {
     key: 'backgroundColor',
     property: value => ({
       '--jumi-background-color': value,
     }),
+    type: 'color',
+  },
+  'animate-background-image': {
+    key: 'backgroundImage',
+    property: value => ({
+      '--jumi-background-image': value,
+    }),
+    type: 'image',
+  },
+  'animate-background-origin': {
+    property: value => ({
+      '--jumi-background-origin': value,
+    }),
+    values: backgroundOrigin,
   },
   'animate-background-position': {
     key: 'backgroundPosition',
     property: value => ({
       '--jumi-background-position': value,
     }),
+    type: ['position', 'percentage', 'length', 'any'],
+  },
+  'animate-background-position-x': {
+    property: value => ({
+      '--jumi-background-position-x': value,
+    }),
+    type: ['position', 'percentage', 'length', 'any'],
+    values: mergeTheme(backgroundPosition, percentage),
+  },
+  'animate-background-position-x-edge': {
+    property: value => ({
+      '--jumi-background-position-x-edge': value,
+    }),
+    values: backgroundPosition,
+  },
+  'animate-background-position-x-offset': {
+    property: value => ({
+      '--jumi-background-position-x-offset': value,
+    }),
+    type: ['percentage', 'length'],
+    values: percentage,
+  },
+  'animate-background-position-y': {
+    property: value => ({
+      '--jumi-background-position-y': value,
+    }),
+    type: ['position', 'percentage', 'length', 'any'],
+    values: mergeTheme(backgroundPosition, percentage),
+  },
+  'animate-background-position-y-edge': {
+    property: value => ({
+      '--jumi-background-position-y-edge': value,
+    }),
+    values: backgroundPosition,
+  },
+  'animate-background-position-y-offset': {
+    property: value => ({
+      '--jumi-background-position-y-offset': value,
+    }),
+    type: ['percentage', 'length'],
+    values: percentage,
+  },
+  'animate-background-repeat': {
+    property: value => ({
+      '--jumi-background-repeat': value,
+    }),
+    values: backgroundRepeat,
+  },
+  'animate-background-repeat-x': {
+    property: value => ({
+      '--jumi-background-repeat-x': value,
+    }),
+    values: backgroundRepeatAxis,
+  },
+  'animate-background-repeat-y': {
+    property: value => ({
+      '--jumi-background-repeat-y': value,
+    }),
+    values: backgroundRepeatAxis,
   },
   'animate-background-size': {
     key: 'backgroundSize',
     property: value => ({
       '--jumi-background-size': value,
     }),
+  },
+  'animate-background-size-height': {
+    key: 'backgroundSize',
+    property: value => ({
+      '--jumi-background-size-height': value,
+    }),
+    type: ['length', 'percentage'],
+  },
+  'animate-background-size-width': {
+    key: 'backgroundSize',
+    property: value => ({
+      '--jumi-background-size-width': value,
+    }),
+    type: ['length', 'percentage'],
+  },
+  'animate-block-size': {
+    property: value => ({
+      '--jumi-block-size': value,
+    }),
+    type: ['length', 'percentage', 'any'],
+    values: empty.auto,
   },
   'animate-border-block-end-radius': {
     key: 'borderRadius',
@@ -214,7 +378,7 @@ export const matchProperties: Partial<MatchProperty> = {
     property: value => ({
       '&::before': {
         'animation-name': 'jumi-border-bottom-length',
-        'background-color': 'var(--jumi-border-color, currentColor)',
+        'background-color': 'var(--jumi-border-color)',
         'bottom': '0',
         'content': '""',
         'height': value,
@@ -305,7 +469,7 @@ export const matchProperties: Partial<MatchProperty> = {
     property: value => ({
       '&::before': {
         'animation-name': 'jumi-border-left-length',
-        'background-color': 'var(--jumi-border-color, currentColor)',
+        'background-color': 'var(--jumi-border-color)',
         'bottom': '0',
         'content': '""',
         'height': '0%',
@@ -336,7 +500,7 @@ export const matchProperties: Partial<MatchProperty> = {
     property: value => ({
       '&::before': {
         'animation-name': 'jumi-border-length',
-        'background-color': 'var(--jumi-border-color, currentColor)',
+        'background-color': 'var(--jumi-border-color)',
         'content': '""',
         'height': value,
         'inset': '0',
@@ -358,7 +522,7 @@ export const matchProperties: Partial<MatchProperty> = {
     property: value => ({
       '&::before': {
         'animation-name': 'jumi-border-right-length',
-        'background-color': 'var(--jumi-border-color, currentColor)',
+        'background-color': 'var(--jumi-border-color)',
         'content': '""',
         'height': '0%',
         'position': 'absolute',
@@ -407,7 +571,7 @@ export const matchProperties: Partial<MatchProperty> = {
     property: value => ({
       '&::before': {
         'animation-name': 'jumi-border-top-length',
-        'background-color': 'var(--jumi-border-color, currentColor)',
+        'background-color': 'var(--jumi-border-color)',
         'content': '""',
         'height': value,
         'left': '0',
@@ -508,9 +672,80 @@ export const matchProperties: Partial<MatchProperty> = {
   },
   'animate-filter': {
     property: value => ({
-      '--jumi-filter': value,
+      '--jumi-filter-filter': value,
     }),
+    type: 'any',
     values: empty.none,
+  },
+  'animate-filter-blur': {
+    key: 'backdropBlur',
+    property: value => ({
+      '--jumi-filter-blur': 'blur(' + value + ')',
+    }),
+    type: 'length',
+  },
+  'animate-filter-brightness': {
+    key: 'backdropBrightness',
+    property: value => ({
+      '--jumi-filter-brightness': 'brightness(' + value + ')',
+    }),
+    type: ['number', 'percentage'],
+  },
+  'animate-filter-contrast': {
+    key: 'backdropContrast',
+    property: value => ({
+      '--jumi-filter-contrast': 'contrast(' + value + ')',
+    }),
+    type: ['number', 'percentage'],
+  },
+  'animate-filter-grayscale': {
+    key: 'backdropGrayscale',
+    property: value => ({
+      '--jumi-filter-grayscale': 'grayscale(' + value + ')',
+    }),
+    type: ['number', 'percentage'],
+  },
+  'animate-filter-hue-rotate': {
+    key: 'backdropHueRotate',
+    property: value => ({
+      '--jumi-filter-hue-rotate': 'hue-rotate(' + value + ')',
+    }),
+    type: 'angle',
+  },
+  'animate-filter-invert': {
+    key: 'backdropInvert',
+    property: value => ({
+      '--jumi-filter-invert': 'invert(' + value + ')',
+    }),
+    type: ['number', 'percentage'],
+  },
+  'animate-filter-opacity': {
+    key: 'backdropOpacity',
+    property: value => ({
+      '--jumi-filter-opacity': 'opacity(' + value + ')',
+    }),
+    type: ['number', 'percentage'],
+  },
+  'animate-filter-saturate': {
+    key: 'backdropSaturate',
+    property: value => ({
+      '--jumi-filter-saturate': 'saturate(' + value + ')',
+    }),
+    type: ['number', 'percentage'],
+  },
+  'animate-filter-sepia': {
+    key: 'backdropSepia',
+    property: value => ({
+      '--jumi-filter-sepia': 'sepia(' + value + ')',
+    }),
+    type: ['number', 'percentage'],
+  },
+  'animate-filter-url': {
+    property: value => ({
+      '--jumi-filter-url': `url(${value})`,
+    }),
+    type: 'url',
+    values: empty.string,
   },
   'animate-flex': {
     key: 'flex',
@@ -844,6 +1079,7 @@ export const matchProperties: Partial<MatchProperty> = {
       '--jumi-rotate-angle': value,
     }),
     supportsNegativeValues: true,
+    type: 'angle',
   },
   'animate-rotate-3d': {
     property: value => ({
@@ -877,18 +1113,21 @@ export const matchProperties: Partial<MatchProperty> = {
     property: value => ({
       '--jumi-rotate-x': 'rotateX(' + value + ')',
     }),
+    type: 'angle',
   },
   'animate-rotate-y': {
     key: 'rotate',
     property: value => ({
       '--jumi-rotate-y': 'rotateY(' + value + ')',
     }),
+    type: 'angle',
   },
   'animate-rotate-z': {
     key: 'rotate',
     property: value => ({
       '--jumi-rotate-z': 'rotateZ(' + value + ')',
     }),
+    type: 'angle',
   },
   'animate-scale': {
     key: 'scale',

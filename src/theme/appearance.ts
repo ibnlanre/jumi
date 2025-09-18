@@ -1,5 +1,6 @@
 export const appearance = {
   'auto': 'auto',
+  'base': 'base',
   'base-select': 'base-select',
   'button': 'button',
   'checkbox': 'checkbox',
@@ -9,11 +10,8 @@ export const appearance = {
   'meter': 'meter',
   'none': 'none',
   'progress-bar': 'progress-bar',
-  'push-button': 'push-button',
   'radio': 'radio',
   'searchfield': 'searchfield',
-  'slider-horizontal': 'slider-horizontal',
-  'square-button': 'square-button',
   'textarea': 'textarea',
   'textfield': 'textfield',
 } as const
