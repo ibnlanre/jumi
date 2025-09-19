@@ -15,8 +15,5 @@ export const addProperties: AddProperty = {
     'animation-range-start': 'var(--jumi-animation-range-start)',
     'animation-timeline': 'var(--jumi-animation-timeline)',
     'animation-timing-function': 'var(--jumi-animation-timing-function)',
-    'backdrop-filter': 'var(--jumi-backdrop-filter)',
-    'filter': 'var(--jumi-filter)',
-    'transform': 'var(--jumi-transform)',
   },
 }

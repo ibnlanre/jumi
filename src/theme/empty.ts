@@ -1,11 +1,10 @@
 export const empty = {
-  auto: { auto: 'auto' },
+  auto: { DEFAULT: 'auto' },
   color: { current: 'currentColor', transparent: 'transparent' },
-  default: { DEFAULT: '' },
-  fraction: { '': '1fr' },
-  length: { '': '0px' },
-  none: { none: 'none' },
-  number: { '': 0 },
-  percentage: { '': '0%' },
-  string: { '': '' },
+  fraction: { DEFAULT: '1fr' },
+  length: { DEFAULT: '0px' },
+  none: { DEFAULT: 'none' },
+  number: { DEFAULT: '0' },
+  percentage: { DEFAULT: '0%' },
+  string: { DEFAULT: '' },
 } as const

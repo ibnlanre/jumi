@@ -393,6 +393,46 @@ export const animationKeyframes: AnimationKeyframes = {
       transform: 'scale3d(1, 1, 1)',
     },
   },
+  '@keyframes reveal-bottom': {
+    from: {
+      'bottom': 0,
+      'inset-inline': 0,
+      'width': '100%',
+    },
+    to: {
+      width: '0%',
+    },
+  },
+  '@keyframes reveal-left': {
+    from: {
+      'inset-block': 0,
+      'left': 0,
+      'width': '0%',
+    },
+    to: {
+      width: '100%',
+    },
+  },
+  '@keyframes reveal-right': {
+    from: {
+      'inset-block': 0,
+      'right': 0,
+      'width': '0%',
+    },
+    to: {
+      width: '100%',
+    },
+  },
+  '@keyframes reveal-top': {
+    from: {
+      'height': '0%',
+      'inset-inline': 0,
+      'top': 0,
+    },
+    to: {
+      height: '100%',
+    },
+  },
   '@keyframes shake': {
     '10%, 30%, 50%, 70%, 90%': {
       transform: 'translate3d(-10px, 0, 0)',

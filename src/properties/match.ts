@@ -25,6 +25,9 @@ import { backgroundAttachment } from '@/theme/background-attachment'
 import { backgroundOrigin } from '@/theme/background-origin'
 import { backgroundPosition } from '@/theme/background-position'
 import { backgroundRepeat, backgroundRepeatAxis } from '@/theme/background-repeat'
+import { borderCollapse } from '@/theme/border-collapse'
+import { borderImageRepeat } from '@/theme/border-image-repeat'
+import { boxShadowInset } from '@/theme/box-shadow-inset'
 import { display } from '@/theme/display'
 import { empty } from '@/theme/empty'
 import { flexDirection } from '@/theme/flex-direction'
@@ -380,23 +383,6 @@ export const matchProperties: Partial<MatchProperty> = {
       '--jumi-border-bottom-left-radius': value,
     }),
   },
-  'animate-border-bottom-length': {
-    key: 'borderWidth',
-    property: value => ({
-      '&::before': {
-        'animation-name': 'jumi-border-bottom-length',
-        'background-color': 'var(--jumi-border-color)',
-        'bottom': '0',
-        'content': '""',
-        'height': value,
-        'position': 'absolute',
-        'right': '0',
-        'width': '0%',
-      },
-      'position': 'relative',
-    }),
-    type: ['line-width', 'length'],
-  },
   'animate-border-bottom-radius': {
     key: 'borderRadius',
     property: value => ({
@@ -417,11 +403,18 @@ export const matchProperties: Partial<MatchProperty> = {
     }),
     type: ['line-width', 'length'],
   },
+  'animate-border-collapse': {
+    property: value => ({
+      '--jumi-border-collapse': value,
+    }),
+    values: borderCollapse,
+  },
   'animate-border-color': {
     key: 'borderColor',
     property: value => ({
       '--jumi-border-color': value,
     }),
+    type: 'color',
   },
   'animate-border-end-end-radius': {
     key: 'borderRadius',
@@ -434,6 +427,81 @@ export const matchProperties: Partial<MatchProperty> = {
     property: value => ({
       '--jumi-border-end-start-radius': value,
     }),
+  },
+  'animate-border-image': {
+    property: value => ({
+      '--jumi-border-image': value,
+    }),
+    type: 'any',
+  },
+  'animate-border-image-outset': {
+    property: value => ({
+      '--jumi-border-image-outset': value,
+    }),
+    type: ['number', 'length'],
+    values: empty.number,
+  },
+  'animate-border-image-outset-bottom': {
+    property: value => ({
+      '--jumi-border-image-outset-bottom': value,
+    }),
+    type: ['number', 'length'],
+    values: empty.number,
+  },
+  'animate-border-image-outset-left': {
+    property: value => ({
+      '--jumi-border-image-outset-left': value,
+    }),
+    type: ['number', 'length'],
+    values: empty.number,
+  },
+  'animate-border-image-outset-right': {
+    property: value => ({
+      '--jumi-border-image-outset-right': value,
+    }),
+    type: ['number', 'length'],
+    values: empty.number,
+  },
+  'animate-border-image-outset-top': {
+    property: value => ({
+      '--jumi-border-image-outset-top': value,
+    }),
+    type: ['number', 'length'],
+    values: empty.number,
+  },
+  'animate-border-image-outset-x': {
+    property: value => ({
+      '--jumi-border-image-outset-left': value,
+      '--jumi-border-image-outset-right': value,
+    }),
+    type: ['number', 'length'],
+    values: empty.number,
+  },
+  'animate-border-image-outset-y': {
+    property: value => ({
+      '--jumi-border-image-outset-bottom': value,
+      '--jumi-border-image-outset-top': value,
+    }),
+    type: ['number', 'length'],
+    values: empty.number,
+  },
+  'animate-border-image-repeat': {
+    property: value => ({
+      '--jumi-border-image-repeat': value,
+    }),
+    values: borderImageRepeat,
+  },
+  'animate-border-image-repeat-x': {
+    property: value => ({
+      '--jumi-border-image-repeat-x': value,
+    }),
+    values: borderImageRepeat,
+  },
+  'animate-border-image-repeat-y': {
+    property: value => ({
+      '--jumi-border-image-repeat-y': value,
+    }),
+    values: borderImageRepeat,
   },
   'animate-border-inline-end-radius': {
     key: 'borderRadius',
@@ -471,23 +539,6 @@ export const matchProperties: Partial<MatchProperty> = {
     }),
     type: ['line-width', 'length'],
   },
-  'animate-border-left-length': {
-    key: 'borderWidth',
-    property: value => ({
-      '&::before': {
-        'animation-name': 'jumi-border-left-length',
-        'background-color': 'var(--jumi-border-color)',
-        'bottom': '0',
-        'content': '""',
-        'height': '0%',
-        'left': '0',
-        'position': 'absolute',
-        'width': value,
-      },
-      'position': 'relative',
-    }),
-    type: ['line-width', 'length'],
-  },
   'animate-border-left-radius': {
     key: 'borderRadius',
     property: value => ({
@@ -502,44 +553,11 @@ export const matchProperties: Partial<MatchProperty> = {
     }),
     type: ['line-width', 'length'],
   },
-  'animate-border-length': {
-    key: 'borderWidth',
-    property: value => ({
-      '&::before': {
-        'animation-name': 'jumi-border-length',
-        'background-color': 'var(--jumi-border-color)',
-        'content': '""',
-        'height': value,
-        'inset': '0',
-        'position': 'absolute',
-        'width': value,
-      },
-      'position': 'relative',
-    }),
-    type: ['line-width', 'length'],
-  },
   'animate-border-radius': {
     key: 'borderRadius',
     property: value => ({
       '--jumi-border-radius': value,
     }),
-  },
-  'animate-border-right-length': {
-    key: 'borderWidth',
-    property: value => ({
-      '&::before': {
-        'animation-name': 'jumi-border-right-length',
-        'background-color': 'var(--jumi-border-color)',
-        'content': '""',
-        'height': '0%',
-        'position': 'absolute',
-        'right': '0',
-        'top': '0',
-        'width': value,
-      },
-      'position': 'relative',
-    }),
-    type: ['line-width', 'length'],
   },
   'animate-border-right-radius': {
     key: 'borderRadius',
@@ -573,23 +591,7 @@ export const matchProperties: Partial<MatchProperty> = {
       '--jumi-border-top-left-radius': value,
     }),
   },
-  'animate-border-top-length': {
-    key: 'borderWidth',
-    property: value => ({
-      '&::before': {
-        'animation-name': 'jumi-border-top-length',
-        'background-color': 'var(--jumi-border-color)',
-        'content': '""',
-        'height': value,
-        'left': '0',
-        'position': 'absolute',
-        'top': '0',
-        'width': '0%',
-      },
-      'position': 'relative',
-    }),
-    type: ['line-width', 'length'],
-  },
+
   'animate-border-top-radius': {
     key: 'borderRadius',
     property: value => ({
@@ -629,11 +631,58 @@ export const matchProperties: Partial<MatchProperty> = {
       '--jumi-box-shadow': value,
     }),
   },
+  'animate-box-shadow-blur': {
+    property: value => ({
+      '--jumi-box-shadow-blur': value,
+    }),
+    type: ['length', 'percentage'],
+    values: empty.string,
+  },
+  'animate-box-shadow-color': {
+    key: 'boxShadowColor',
+    property: value => ({
+      '--jumi-box-shadow-color': value,
+    }),
+    type: 'color',
+  },
+  'animate-box-shadow-inset': {
+    property: value => ({
+      '--jumi-box-shadow-inset': value,
+    }),
+    values: boxShadowInset,
+  },
+  'animate-box-shadow-offset-x': {
+    property: value => ({
+      '--jumi-box-shadow-offset-x': value,
+    }),
+    type: ['length', 'percentage'],
+    values: empty.string,
+  },
+  'animate-box-shadow-offset-y': {
+    property: value => ({
+      '--jumi-box-shadow-offset-y': value,
+    }),
+    type: ['length', 'percentage'],
+    values: empty.string,
+  },
+  'animate-box-shadow-spread': {
+    property: value => ({
+      '--jumi-box-shadow-spread': value,
+    }),
+    type: ['length', 'percentage'],
+    values: empty.string,
+  },
   'animate-color': {
     key: 'colors',
     property: value => ({
       '--jumi-color': value,
     }),
+  },
+  'animate-column-gap': {
+    property: value => ({
+      '--jumi-column-gap': value,
+    }),
+    values: empty.number,
   },
   'animate-composition': {
     property: value => ({
@@ -1030,14 +1079,14 @@ export const matchProperties: Partial<MatchProperty> = {
     property: value => ({
       '--jumi-animation-range': value,
     }),
-    values: empty.default,
+    values: empty.string,
   },
   'animate-range-end': {
     property: value => ({
       '--jumi-animation-range-end': value,
     }),
     type: ['length', 'percentage', 'any'],
-    values: empty.default,
+    values: empty.string,
   },
   'animate-range-end-length': {
     property: value => ({
@@ -1057,7 +1106,7 @@ export const matchProperties: Partial<MatchProperty> = {
       '--jumi-animation-range-start': value,
     }),
     type: ['length', 'percentage', 'any'],
-    values: empty.default,
+    values: empty.string,
   },
   'animate-range-start-length': {
     property: value => ({
@@ -1071,6 +1120,20 @@ export const matchProperties: Partial<MatchProperty> = {
       '--jumi-animation-range-start-name': value,
     }),
     values: animationRange,
+  },
+  'animate-reveal-bottom': {
+    key: 'borderWidth',
+    property: value => ({
+      '&::before': {
+        '--jumi-width': value,
+        'animation-name': 'reveal-bottom',
+        'background-color': 'var(--jumi-border-color)',
+        'content': '""',
+        'position': 'absolute',
+      },
+      'position': 'relative',
+    }),
+    type: ['line-width', 'length'],
   },
   'animate-right': {
     key: 'inset',
@@ -1092,28 +1155,28 @@ export const matchProperties: Partial<MatchProperty> = {
     property: value => ({
       '--jumi-rotate-3d': 'rotate3d(' + value + ')',
     }),
-    values: empty.default,
+    values: empty.string,
   },
   'animate-rotate-3x': {
     property: value => ({
       '--jumi-rotate-3x': value,
     }),
     type: 'number',
-    values: empty.default,
+    values: empty.string,
   },
   'animate-rotate-3y': {
     property: value => ({
       '--jumi-rotate-3y': value,
     }),
     type: 'number',
-    values: empty.default,
+    values: empty.string,
   },
   'animate-rotate-3z': {
     property: value => ({
       '--jumi-rotate-3z': value,
     }),
     type: 'number',
-    values: empty.default,
+    values: empty.string,
   },
   'animate-rotate-x': {
     key: 'rotate',
@@ -1136,6 +1199,13 @@ export const matchProperties: Partial<MatchProperty> = {
     }),
     type: 'angle',
   },
+  'animate-row-gap': {
+    property: value => ({
+      '--jumi-row-gap': value,
+    }),
+    values: empty.number,
+  },
+
   'animate-scale': {
     key: 'scale',
     property: value => ({
@@ -1241,12 +1311,14 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-text-align': {
     property: value => ({
       '--jumi-text-align': value,
+      '--jumi-text-align-keyframes': 'jumi-text-align',
     }),
     values: textAlign,
   },
   'animate-text-shadow': {
     property: value => ({
       '--jumi-text-shadow': value,
+      '--jumi-text-shadow-keyframes': 'jumi-text-shadow',
     }),
     values: textShadow,
   },
@@ -1292,81 +1364,87 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-top': {
     key: 'inset',
     property: value => ({
+      '--jumi-inset-keyframes': 'jumi-inset',
       '--jumi-top': value,
     }),
   },
   'animate-transform': {
     property: value => ({
       '--jumi-transform': value,
+      '--jumi-transform-keyframes': 'jumi-transform',
     }),
     values: empty.none,
   },
   'animate-transform-style': {
     property: value => ({
+      '--jumi-transform-keyframes': 'jumi-transform',
       '--jumi-transform-style': value,
     }),
     values: transformStyle,
   },
-  'animate-transition': {
-    property: value => ({
-      transition: value,
-    }),
-    values: empty.none,
-  },
   'animate-translate-3d': {
     property: value => ({
+      '--jumi-transform-keyframes': 'jumi-transform',
       '--jumi-translate-3d': 'translate3d(' + value + ')',
     }),
-    values: empty.default,
+    type: ['length', 'percentage', 'any'],
+    values: empty.string,
   },
   'animate-translate-3x': {
     property: value => ({
+      '--jumi-transform-keyframes': 'jumi-transform',
       '--jumi-translate-3x': value,
     }),
     supportsNegativeValues: true,
     type: ['length', 'percentage'],
-    values: empty.default,
+    values: empty.string,
   },
   'animate-translate-3y': {
     property: value => ({
+      '--jumi-transform-keyframes': 'jumi-transform',
       '--jumi-translate-3y': value,
     }),
     supportsNegativeValues: true,
     type: ['length', 'percentage'],
-    values: empty.default,
+    values: empty.string,
   },
   'animate-translate-3z': {
     property: value => ({
+      '--jumi-transform-keyframes': 'jumi-transform',
       '--jumi-translate-3z': value,
     }),
     supportsNegativeValues: true,
     type: ['length', 'percentage'],
-    values: empty.default,
+    values: empty.string,
   },
   'animate-translate-x': {
     property: value => ({
+      '--jumi-transform-keyframes': 'jumi-transform',
       '--jumi-translate-x': 'translateX(' + value + ')',
     }),
     supportsNegativeValues: true,
-    values: empty.default,
+    values: empty.string,
   },
   'animate-translate-y': {
     property: value => ({
+      '--jumi-transform-keyframes': 'jumi-transform',
       '--jumi-translate-y': 'translateY(' + value + ')',
     }),
     supportsNegativeValues: true,
-    values: empty.default,
+    values: empty.string,
   },
   'animate-translate-z': {
     property: value => ({
+      '--jumi-transform-keyframes': 'jumi-transform',
       '--jumi-translate-z': 'translateZ(' + value + ')',
     }),
     supportsNegativeValues: true,
-    values: empty.default,
+    values: empty.string,
   },
   'animate-visibility': {
     property: value => ({
       '--jumi-visibility': value,
+      '--jumi-visibility-keyframes': 'jumi-visibility',
     }),
     values: visibility,
   },
@@ -1374,12 +1452,14 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'width',
     property: value => ({
       '--jumi-width': value,
+      '--jumi-width-keyframes': 'jumi-width',
     }),
   },
   'animate-z-index': {
     key: 'zIndex',
     property: value => ({
       '--jumi-z-index': value,
+      '--jumi-z-index-keyframes': 'jumi-z-index',
     }),
   },
 }
