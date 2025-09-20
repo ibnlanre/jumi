@@ -1,8 +1,3 @@
-/**
- * Text shadow theme configuration for Jumi animations
- * Provides text shadow values for animations
- */
-
 export const textShadow = {
   '2xl': '0 25px 50px rgb(0 0 0 / 0.25)',
   'DEFAULT': '0 1px 3px rgb(0 0 0 / 0.1), 0 1px 2px rgb(0 0 0 / 0.06)',

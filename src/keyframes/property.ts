@@ -301,6 +301,11 @@ export const propertyKeyframes: PropertyKeyframes = {
       'text-align': 'var(--jumi-text-align)' as Property.TextAlign,
     },
   },
+  '@keyframes jumi-text-align-last': {
+    to: {
+      'text-align-last': 'var(--jumi-text-align-last)' as Property.TextAlignLast,
+    },
+  },
   '@keyframes jumi-text-shadow': {
     to: {
       'text-shadow': 'var(--jumi-text-shadow)',
@@ -328,3 +333,10 @@ export const keyframes = Object.keys(propertyKeyframes).map((key) => {
   const variable = [animation, rule.slice(1)].join('-')
   return `var(--${variable})`
 }).join(', ')
+
+export const modifiers = Object.keys(propertyKeyframes).reduce((acc, key) => {
+  const [, animation] = key.split(' ')
+  const property = animation.replace('jumi-', '')
+  acc[property] = property
+  return acc
+}, {} as Record<string, string>)

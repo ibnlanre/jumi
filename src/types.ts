@@ -12,8 +12,105 @@ export type AnimationKeyframes = {
   [K in AnimationName as `@keyframes ${K}`]?: Keyframes
 }
 
-export type CssInJs = {
-  [key: string]: CssInJs | CssInJs[] | string | string[]
+export type AnimationProperty
+  = | 'composition'
+    | 'delay'
+    | 'direction'
+    | 'duration'
+    | 'fill-mode'
+    | 'iteration-count'
+    | 'name'
+    | 'play-state'
+    | 'range'
+    | 'range-end'
+    | 'range-end-length'
+    | 'range-end-name'
+    | 'range-start'
+    | 'range-start-length'
+    | 'range-start-name'
+    | 'timeline'
+    | 'timeline-axis'
+    | 'timeline-inset'
+    | 'timeline-inset-end'
+    | 'timeline-inset-start'
+    | 'timeline-scroller'
+    | 'timing-function'
+
+export type AnimationVariables = {
+  [key in AnimationProperty as `--jumi-animation-${key}`]: string
+}
+
+export type Attribute
+  = 'accent-color'
+    | 'align-content'
+    | 'align-items'
+    | 'align-self'
+    | 'alignment-baseline'
+    | 'all'
+    | 'appearance'
+    | 'aspect-ratio'
+    | 'backdrop-filter'
+    | 'backface-visibility'
+    | 'background'
+    | 'background-blend-mode'
+    | 'block-size'
+    | 'border'
+    | 'border-collapse'
+    | 'border-image'
+    | 'border-radius'
+    | 'box-shadow'
+    | 'color'
+    | 'column-fill'
+    | 'column-gap'
+    | 'column-rule'
+    | 'column-span'
+    | 'columns'
+    | 'display'
+    | 'fill'
+    | 'filter'
+    | 'flex'
+    | 'flex-direction'
+    | 'font-family'
+    | 'font-size'
+    | 'font-weight'
+    | 'gap'
+    | 'height'
+    | 'initial-letter'
+    | 'inset'
+    | 'justify-content'
+    | 'letter-spacing'
+    | 'line-height'
+    | 'margin'
+    | 'max-height'
+    | 'max-width'
+    | 'min-height'
+    | 'min-width'
+    | 'opacity'
+    | 'order'
+    | 'outline'
+    | 'outline-offset'
+    | 'overflow'
+    | 'padding'
+    | 'position'
+    | 'stroke'
+    | 'stroke-dasharray'
+    | 'stroke-dashoffset'
+    | 'stroke-linecap'
+    | 'stroke-linejoin'
+    | 'stroke-miterlimit'
+    | 'stroke-opacity'
+    | 'stroke-width'
+    | 'text-align'
+    | 'text-align-last'
+    | 'text-shadow'
+    | 'transform'
+    | 'width'
+    | 'z-index'
+
+export type Collection<T = any> = Record<string, T>
+
+export interface CssInJs extends Partial<KeyframeVariables>, Partial<PropertyVariables> {
+  [key: string]: Collection | string | string[]
 }
 
 export type CSSRuleObject = CssInJs | CssInJs[]
@@ -35,28 +132,35 @@ export type DataType
     | 'position'
     | 'ratio'
     | 'relative-size'
+    | 'shadow'
     | 'url'
     | 'vector'
 
-export type KeyframeDefinition = Record<string, Record<string, any>>
+export type KeyframeDefinition = Collection<Collection<number | string>>
 
-export type Keyframes = Record<string, PropertiesHyphen>
+export type Keyframes = Collection<PropertiesHyphen>
 
+export type KeyframeVariables = {
+  [key in Attribute as `--jumi-${key}-keyframes`]: string
+}
 export type MatchProperty = {
   [K in MatchPropertyKeys]: MatchPropertyValue
 }
 
-export type MatchPropertyKeys = 'animate' | `animate-${Property}` | `animate-${RevealAnimation}`
+export type MatchPropertyFunction = (value: string, extra: { modifier: null | string }) => CSSRuleObject
+
+export type MatchPropertyKeys = 'animate' | `animate-${AnimationProperty}` | `animate-${Property}` | `animate-${RevealAnimation}`
+
 export interface MatchPropertyValue extends Partial<Options> {
   key?: TailwindTheme
-  property: (value: string) => CSSRuleObject
+  property: MatchPropertyFunction
 }
 
 export interface Options {
-  modifiers: 'any' | Record<string, string>
+  modifiers: Collection<string>
   supportsNegativeValues: boolean
   type: DataType | DataType[]
-  values: Record<string, string>
+  values: Theme
 }
 
 export type Property
@@ -74,6 +178,12 @@ export type Property
     | 'backdrop-blur'
     | 'backdrop-brightness'
     | 'backdrop-contrast'
+    | 'backdrop-drop-shadow'
+    | 'backdrop-drop-shadow-blur'
+    | 'backdrop-drop-shadow-color'
+    | 'backdrop-drop-shadow-offset-x'
+    | 'backdrop-drop-shadow-offset-y'
+    | 'backdrop-drop-shadow-opacity'
     | 'backdrop-filter'
     | 'backdrop-grayscale'
     | 'backdrop-hue-rotate'
@@ -168,28 +278,37 @@ export type Property
     | 'box-shadow-inset'
     | 'box-shadow-offset-x'
     | 'box-shadow-offset-y'
+    | 'box-shadow-opacity'
     | 'box-shadow-spread'
     | 'caret-color'
+    | 'clip-path'
+    | 'clip-path-geometry'
+    | 'clip-path-shape'
     | 'color'
     | 'column-count'
+    | 'column-fill'
     | 'column-gap'
     | 'column-gap'
+    | 'column-rule'
+    | 'column-rule-color'
+    | 'column-rule-style'
+    | 'column-rule-width'
+    | 'column-span'
     | 'column-width'
     | 'columns'
-    | 'composition'
     | 'cursor'
-    | 'delay'
-    | 'direction'
     | 'display'
+    | 'display-inside'
+    | 'display-outside'
     | 'drop-shadow'
-    | 'duration'
     | 'fill'
-    | 'fill-mode'
+    | 'fill-opacity'
     | 'filter'
     | 'filter-blur'
     | 'filter-brightness'
     | 'filter-contrast'
     | 'filter-contrast'
+    | 'filter-drop-shadow'
     | 'filter-grayscale'
     | 'filter-hue-rotate'
     | 'filter-invert'
@@ -220,9 +339,12 @@ export type Property
     | 'grid-row'
     | 'grid-row-end'
     | 'grid-row-start'
+    | 'grid-template-areas'
     | 'grid-template-columns'
     | 'grid-template-rows'
     | 'height'
+    | 'image-rendering'
+    | 'initial-letter'
     | 'inset'
     | 'inset-block'
     | 'inset-block-end'
@@ -235,7 +357,6 @@ export type Property
     | 'inset-right'
     | 'inset-top'
     | 'isolation'
-    | 'iteration-count'
     | 'justify-content'
     | 'justify-items'
     | 'justify-self'
@@ -254,8 +375,30 @@ export type Property
     | 'margin-left'
     | 'margin-right'
     | 'margin-top'
-    | 'matrix3d'
     | 'matrix'
+    | 'matrix-3d'
+    | 'matrix-a1'
+    | 'matrix-a2'
+    | 'matrix-a3'
+    | 'matrix-a4'
+    | 'matrix-a'
+    | 'matrix-b1'
+    | 'matrix-b2'
+    | 'matrix-b3'
+    | 'matrix-b4'
+    | 'matrix-b'
+    | 'matrix-c1'
+    | 'matrix-c2'
+    | 'matrix-c3'
+    | 'matrix-c4'
+    | 'matrix-c'
+    | 'matrix-d1'
+    | 'matrix-d2'
+    | 'matrix-d3'
+    | 'matrix-d4'
+    | 'matrix-d'
+    | 'matrix-tx'
+    | 'matrix-ty'
     | 'max-height'
     | 'max-width'
     | 'min-height'
@@ -288,15 +431,7 @@ export type Property
     | 'place-content'
     | 'place-items'
     | 'place-self'
-    | 'play-state'
     | 'position'
-    | 'range'
-    | 'range-end'
-    | 'range-end-length'
-    | 'range-end-name'
-    | 'range-start'
-    | 'range-start-length'
-    | 'range-start-name'
     | 'resize'
     | 'right'
     | 'rotate'
@@ -304,6 +439,7 @@ export type Property
     | 'rotate-3x'
     | 'rotate-3y'
     | 'rotate-3z'
+    | 'rotate-angle'
     | 'rotate-x'
     | 'rotate-y'
     | 'rotate-z'
@@ -359,21 +495,48 @@ export type Property
     | 'stroke-width'
     | 'table-layout'
     | 'text-align'
+    | 'text-align-last'
+    | 'text-anchor'
+    | 'text-autospace'
+    | 'text-box'
+    | 'text-box-edge'
+    | 'text-box-trim'
+    | 'text-combine-upright'
+    | 'text-decoration'
     | 'text-decoration-color'
+    | 'text-decoration-line'
+    | 'text-decoration-skip-ink'
+    | 'text-decoration-style'
     | 'text-decoration-thickness'
+    | 'text-emphasis'
+    | 'text-emphasis-color'
+    | 'text-emphasis-position'
+    | 'text-emphasis-style'
     | 'text-indent'
+    | 'text-indent'
+    | 'text-justify'
+    | 'text-orientation'
+    | 'text-overflow'
+    | 'text-rendering'
     | 'text-shadow'
+    | 'text-shadow-blur-radius'
+    | 'text-shadow-color'
+    | 'text-shadow-offset-x'
+    | 'text-shadow-offset-y'
+    | 'text-shadow-opacity'
     | 'text-transform'
-    | 'timeline'
-    | 'timeline-axis'
-    | 'timeline-inset'
-    | 'timeline-inset-end'
-    | 'timeline-inset-start'
-    | 'timeline-scroller'
-    | 'timing-function'
+    | 'text-underline-offset'
+    | 'text-underline-position'
+    | 'text-wrap'
+    | 'text-wrap-mode'
+    | 'text-wrap-style'
     | 'top'
     | 'transform'
+    | 'transform-box'
     | 'transform-origin'
+    | 'transform-origin-x'
+    | 'transform-origin-y'
+    | 'transform-origin-z'
     | 'transform-style'
     | 'translate'
     | 'translate-3d'
@@ -395,7 +558,11 @@ export type Property
     | 'z-index'
 
 export type PropertyKeyframes = {
-  [K in CSSKeyframeAttribute as `@keyframes jumi-${K}`]: Keyframes
+  [K in Attribute as `@keyframes jumi-${K}`]: Keyframes
+}
+
+export type PropertyVariables = {
+  [key in Property as `--jumi-${key}`]: string
 }
 
 export type RevealAnimation = 'reveal-bottom' | 'reveal-left' | 'reveal-right' | 'reveal-top'
@@ -525,67 +692,10 @@ export type TailwindTheme
     | 'willChange'
     | 'zIndex'
 
-type CSSKeyframeAttribute
-  = 'accent-color'
-    | 'align-content'
-    | 'align-items'
-    | 'align-self'
-    | 'alignment-baseline'
-    | 'all'
-    | 'appearance'
-    | 'aspect-ratio'
-    | 'backdrop-filter'
-    | 'backface-visibility'
-    | 'background'
-    | 'background-blend-mode'
-    | 'block-size'
-    | 'border'
-    | 'border-collapse'
-    | 'border-image'
-    | 'border-radius'
-    | 'box-shadow'
-    | 'color'
-    | 'column-fill'
-    | 'column-gap'
-    | 'column-rule'
-    | 'column-span'
-    | 'columns'
-    | 'display'
-    | 'fill'
-    | 'filter'
-    | 'flex'
-    | 'flex-direction'
-    | 'font-family'
-    | 'font-size'
-    | 'font-weight'
-    | 'gap'
-    | 'height'
-    | 'inset'
-    | 'justify-content'
-    | 'letter-spacing'
-    | 'line-height'
-    | 'margin'
-    | 'max-height'
-    | 'max-width'
-    | 'min-height'
-    | 'min-width'
-    | 'opacity'
-    | 'order'
-    | 'outline'
-    | 'outline-offset'
-    | 'overflow'
-    | 'padding'
-    | 'position'
-    | 'stroke'
-    | 'stroke-dasharray'
-    | 'stroke-dashoffset'
-    | 'stroke-linecap'
-    | 'stroke-linejoin'
-    | 'stroke-miterlimit'
-    | 'stroke-opacity'
-    | 'stroke-width'
-    | 'text-align'
-    | 'text-shadow'
-    | 'transform'
-    | 'width'
-    | 'z-index'
+export type Theme = {
+  [key: number | string]: string | Theme
+}
+
+export interface Variables extends AnimationVariables, KeyframeVariables, PropertyVariables {
+  [key: string]: string
+}

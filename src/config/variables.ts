@@ -1,3 +1,5 @@
+import type { Variables } from '@/types'
+
 import {
   animationRange,
   animationRangeEnd,
@@ -5,6 +7,7 @@ import {
 } from '@/composition/animation-range'
 import { animationTimelineInset } from '@/composition/animation-timeline'
 import { aspectRatio } from '@/composition/aspect-ratio'
+import { backdropDropShadow } from '@/composition/backdrop-drop-shadow'
 import { backdropFilter } from '@/composition/backdrop-filter'
 import { background } from '@/composition/background'
 import { backgroundPosition, backgroundPositionX, backgroundPositionY } from '@/composition/background-position'
@@ -20,8 +23,10 @@ import { columns } from '@/composition/columns'
 import { display } from '@/composition/display'
 import { filter } from '@/composition/filter'
 import { flex } from '@/composition/flex'
+import { outline } from '@/composition/outline'
 import { overflow } from '@/composition/overflow'
 import { padding, paddingBlock, paddingInline } from '@/composition/padding'
+import { textShadow } from '@/composition/text-shadow'
 import {
   matrix,
   matrix3d,
@@ -36,14 +41,13 @@ import {
 } from '@/composition/transform'
 import { keyframes } from '@/keyframes/property'
 
-export const variables = {
+export const variables: Variables = {
   '--jumi-accent-color': 'auto',
   '--jumi-align-content': 'normal',
   '--jumi-align-items': 'normal',
   '--jumi-align-self': 'auto',
   '--jumi-alignment-baseline': 'auto',
   '--jumi-all': 'initial',
-  '--jumi-anchor-name': 'none',
   '--jumi-animation-composition': 'replace',
   '--jumi-animation-delay': '0s',
   '--jumi-animation-direction': 'alternate',
@@ -66,12 +70,20 @@ export const variables = {
   '--jumi-animation-timeline-inset-start': 'auto',
   '--jumi-animation-timeline-scroller': 'nearest',
   '--jumi-animation-timing-function': 'ease',
+  // '--jumi-anchor-name': 'none',
+  '--jumi-appearance': 'auto',
   '--jumi-aspect-ratio': aspectRatio,
   '--jumi-aspect-ratio-height': 'auto',
   '--jumi-aspect-ratio-width': 'auto',
   '--jumi-backdrop-blur': 'blur(0)',
   '--jumi-backdrop-brightness': 'brightness(1)',
   '--jumi-backdrop-contrast': 'contrast(1)',
+  '--jumi-backdrop-drop-shadow': backdropDropShadow,
+  '--jumi-backdrop-drop-shadow-blur': '0',
+  '--jumi-backdrop-drop-shadow-color': 'transparent',
+  '--jumi-backdrop-drop-shadow-offset-x': '0',
+  '--jumi-backdrop-drop-shadow-offset-y': '0',
+  '--jumi-backdrop-drop-shadow-opacity': '1',
   '--jumi-backdrop-filter': backdropFilter,
   '--jumi-backdrop-grayscale': 'grayscale(0)',
   '--jumi-backdrop-hue-rotate': 'hue-rotate(0deg)',
@@ -83,6 +95,7 @@ export const variables = {
   '--jumi-backface-visibility': 'visible',
   '--jumi-background': background,
   '--jumi-background-attachment': 'scroll',
+  '--jumi-background-blend-mode': 'normal',
   '--jumi-background-clip': 'border-box',
   '--jumi-background-color': 'transparent',
   '--jumi-background-image': 'none',
@@ -127,6 +140,7 @@ export const variables = {
   '--jumi-box-shadow-color': 'transparent',
   '--jumi-box-shadow-offset-x': '0',
   '--jumi-box-shadow-offset-y': '0',
+  '--jumi-box-shadow-opacity': '1',
   '--jumi-box-shadow-spread': '0',
   '--jumi-caret-color': 'auto',
   '--jumi-clip-path': 'none',
@@ -144,7 +158,7 @@ export const variables = {
   '--jumi-cursor': 'auto',
   '--jumi-display': display,
   '--jumi-display-inside': 'flow',
-  '--jumi-display-ouside': 'block',
+  '--jumi-display-outside': 'block',
   '--jumi-fill': 'currentColor',
   '--jumi-fill-opacity': '1',
   '--jumi-filter': filter,
@@ -169,14 +183,13 @@ export const variables = {
   '--jumi-font-size': '1rem',
   '--jumi-font-weight': '400',
   '--jumi-gap': '0',
-  '--jumi-gap-column': '0',
-  '--jumi-gap-row': '0',
-  '--jumi-grids-auto-columns': 'auto',
-  '--jumi-grids-auto-flow': 'row',
-  '--jumi-grids-auto-rows': 'auto',
-  '--jumi-grids-template-areas': 'none',
-  '--jumi-grids-template-columns': 'none',
-  '--jumi-grids-template-rows': 'none',
+  '--jumi-grid-auto-columns': 'auto',
+  '--jumi-grid-auto-flow': 'row',
+  '--jumi-grid-auto-rows': 'auto',
+  '--jumi-grid-template-areas': 'none',
+  '--jumi-grid-template-columns': 'none',
+  '--jumi-grid-template-rows': 'none',
+  '--jumi-height': 'auto',
   '--jumi-image-rendering': 'auto',
   '--jumi-initial-letter': 'normal',
   '--jumi-inset': 'auto',
@@ -186,6 +199,7 @@ export const variables = {
   '--jumi-inset-inline': 'auto',
   '--jumi-inset-inline-end': 'auto',
   '--jumi-inset-inline-start': 'auto',
+  '--jumi-justify-content': 'normal',
   '--jumi-left': 'auto',
   '--jumi-letter-spacing': 'normal',
   '--jumi-line-height': 'normal',
@@ -214,7 +228,13 @@ export const variables = {
   '--jumi-matrix-d4': '1',
   '--jumi-matrix-tx': '0',
   '--jumi-matrix-ty': '0',
+  '--jumi-max-height': 'none',
+  '--jumi-max-width': 'none',
+  '--jumi-min-height': 'auto',
+  '--jumi-min-width': 'auto',
+  '--jumi-opacity': '1',
   '--jumi-order': '0',
+  '--jumi-outline': outline,
   '--jumi-outline-color': 'currentColor',
   '--jumi-outline-offset': '0',
   '--jumi-outline-width': '0',
@@ -270,18 +290,24 @@ export const variables = {
   '--jumi-stroke-opacity': '1',
   '--jumi-stroke-width': '1px',
   '--jumi-text-align': 'baseline',
+  '--jumi-text-align-last': 'auto',
   '--jumi-text-decoration': 'none',
   '--jumi-text-decoration-color': 'currentColor',
   '--jumi-text-decoration-line': 'none',
   '--jumi-text-decoration-style': 'solid',
-  '--jumi-text-fill-color': 'currentColor',
   '--jumi-text-indent': '0',
   '--jumi-text-overflow': 'clip',
   '--jumi-text-rendering': 'auto',
-  '--jumi-text-shadow': 'none',
+  '--jumi-text-shadow': textShadow,
+  '--jumi-text-shadow-blur-radius': '0',
+  '--jumi-text-shadow-color': 'transparent',
+  '--jumi-text-shadow-offset-x': '0',
+  '--jumi-text-shadow-offset-y': '0',
+  '--jumi-text-shadow-opacity': '1',
   '--jumi-text-transform': 'none',
   '--jumi-top': 'auto',
   '--jumi-transform': transform,
+  '--jumi-transform-box': 'view-box',
   '--jumi-transform-origin': 'center',
   '--jumi-transform-origin-x': '50%',
   '--jumi-transform-origin-y': '50%',
@@ -298,7 +324,7 @@ export const variables = {
   '--jumi-translate-y': 'translateY(0)',
   '--jumi-translate-z': 'translateZ(0)',
   '--jumi-width': 'auto',
-  '--jumi-width-keyframes': 'none',
+  '--jumi-width-keyframes': 'jumi-width-keyframes',
   '--jumi-z-index': 'auto',
 }
 

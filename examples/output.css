@@ -1190,6 +1190,9 @@
   .text-end {
     text-align: end;
   }
+  .text-justify {
+    text-align: justify;
+  }
   .align-super {
     vertical-align: super;
   }
@@ -1247,6 +1250,9 @@
   .tracking-widest {
     --tw-tracking: var(--tracking-widest);
     letter-spacing: var(--tracking-widest);
+  }
+  .text-wrap {
+    text-wrap: wrap;
   }
   .break-keep {
     word-break: keep-all;
@@ -1625,6 +1631,26 @@
     animation-timeline: var(--jumi-animation-timeline);
     animation-timing-function: var(--jumi-animation-timing-function);
   }
+  .animate-back-in {
+    animation-name: back-in;
+    animation-timeline: auto;
+  }
+  .animate-back-in-down {
+    animation-name: back-in-down;
+    animation-timeline: auto;
+  }
+  .animate-back-in-left {
+    animation-name: back-in-left;
+    animation-timeline: auto;
+  }
+  .animate-back-in-right {
+    animation-name: back-in-right;
+    animation-timeline: auto;
+  }
+  .animate-back-in-up {
+    animation-name: back-in-up;
+    animation-timeline: auto;
+  }
   .animate-border-block-end-radius {
     --jumi-border-end-end-radius: 0.25rem;
     --jumi-border-end-start-radius: 0.25rem;
@@ -1640,6 +1666,14 @@
   .animate-border-bottom-radius {
     --jumi-border-bottom-left-radius: 0.25rem;
     --jumi-border-bottom-right-radius: 0.25rem;
+  }
+  .animate-border-image-outset-x {
+    --jumi-border-image-outset-left: 0;
+    --jumi-border-image-outset-right: 0;
+  }
+  .animate-border-image-outset-y {
+    --jumi-border-image-outset-bottom: 0;
+    --jumi-border-image-outset-top: 0;
   }
   .animate-border-inline-end-radius {
     --jumi-border-end-end-radius: 0.25rem;
@@ -1664,6 +1698,54 @@
   .animate-border-top-radius {
     --jumi-border-top-left-radius: 0.25rem;
     --jumi-border-top-right-radius: 0.25rem;
+  }
+  .animate-bounce-in {
+    animation-name: bounce-in;
+    animation-timeline: auto;
+  }
+  .animate-bounce-out {
+    animation-name: bounce-out;
+    animation-timeline: auto;
+  }
+  .animate-fade-down {
+    animation-name: fade-down;
+    animation-timeline: auto;
+  }
+  .animate-fade-in {
+    animation-name: fade-in;
+    animation-timeline: auto;
+  }
+  .animate-fade-left {
+    animation-name: fade-left;
+    animation-timeline: auto;
+  }
+  .animate-fade-out {
+    animation-name: fade-out;
+    animation-timeline: auto;
+  }
+  .animate-fade-right {
+    animation-name: fade-right;
+    animation-timeline: auto;
+  }
+  .animate-fade-up {
+    animation-name: fade-up;
+    animation-timeline: auto;
+  }
+  .animate-flip-x {
+    animation-name: flip-x;
+    animation-timeline: auto;
+  }
+  .animate-flip-y {
+    animation-name: flip-y;
+    animation-timeline: auto;
+  }
+  .animate-pulsate {
+    animation-name: pulsate;
+    animation-timeline: auto;
+  }
+  .animate-reveal-bottom {
+    animation-name: reveal-bottom;
+    animation-timeline: auto;
   }
   .animate-rotate-3 {
     --jumi-rotate: rotate(3deg);
@@ -1693,6 +1775,78 @@
     --jumi-rotate: rotate(23deg);
     --jumi-rotate-angle: 23deg;
   }
+  .animate-shake {
+    animation-name: shake;
+    animation-timeline: auto;
+  }
+  .animate-slide-in-up {
+    animation-name: slide-in-up;
+    animation-timeline: auto;
+  }
+  .animate-swing {
+    animation-name: swing;
+    animation-timeline: auto;
+  }
+  .animate-text-shadow {
+    --jumi-text-shadow: 0 1px 3px rgb(0 0 0 / 0.1), 0 1px 2px rgb(0 0 0 / 0.06);
+    --jumi-text-shadow-keyframes: jumi-text-shadow;
+  }
+  .animate-text-shadow-2xl {
+    --jumi-text-shadow: 0 25px 50px rgb(0 0 0 / 0.25);
+    --jumi-text-shadow-keyframes: jumi-text-shadow;
+  }
+  .animate-transform {
+    --jumi-transform: none;
+    --jumi-transform-keyframes: jumi-transform;
+  }
+  .animate-translate-3d {
+    --jumi-transform-keyframes: jumi-transform;
+    --jumi-translate-3d: translate3d();
+  }
+  .animate-translate-3x {
+    --jumi-transform-keyframes: jumi-transform;
+    --jumi-translate-3x: ;
+  }
+  .animate-translate-3y {
+    --jumi-transform-keyframes: jumi-transform;
+    --jumi-translate-3y: ;
+  }
+  .animate-translate-3z {
+    --jumi-transform-keyframes: jumi-transform;
+    --jumi-translate-3z: ;
+  }
+  .animate-translate-x {
+    --jumi-transform-keyframes: jumi-transform;
+    --jumi-translate-x: translateX();
+  }
+  .animate-translate-x-\[-50px\] {
+    --jumi-transform-keyframes: jumi-transform;
+    --jumi-translate-x: translateX(-50px);
+  }
+  .animate-translate-x-\[20px\] {
+    --jumi-transform-keyframes: jumi-transform;
+    --jumi-translate-x: translateX(20px);
+  }
+  .animate-translate-y {
+    --jumi-transform-keyframes: jumi-transform;
+    --jumi-translate-y: translateY();
+  }
+  .animate-translate-z {
+    --jumi-transform-keyframes: jumi-transform;
+    --jumi-translate-z: translateZ();
+  }
+  .animate-wobble {
+    animation-name: wobble;
+    animation-timeline: auto;
+  }
+  .animate-zoom-in {
+    animation-name: zoom-in;
+    animation-timeline: auto;
+  }
+  .animate-zoom-out {
+    animation-name: zoom-out;
+    animation-timeline: auto;
+  }
   .outline-double {
     --tw-outline-style: double;
     outline-style: double;
@@ -1701,23 +1855,38 @@
     -webkit-user-select: auto;
     user-select: auto;
   }
-  .animate-back-in {
-    animation-name: back-in;
+  .animate-anchor-name {
+    anchor-name: none;
   }
-  .animate-back-in-down {
-    animation-name: back-in-down;
+  .animate-aspect-ratio {
+    --jumi-aspect-ratio: auto;
   }
-  .animate-back-in-left {
-    animation-name: back-in-left;
+  .animate-aspect-ratio-height {
+    --jumi-aspect-ratio-height: auto;
   }
-  .animate-back-in-right {
-    animation-name: back-in-right;
-  }
-  .animate-back-in-up {
-    animation-name: back-in-up;
+  .animate-aspect-ratio-width {
+    --jumi-aspect-ratio-width: auto;
   }
   .animate-backdrop-blur {
     --jumi-backdrop-blur: blur(8px);
+  }
+  .animate-backdrop-drop-shadow {
+    --jumi-backdrop-drop-shadow: drop-shadow(none);
+  }
+  .animate-backdrop-drop-shadow-blur {
+    --jumi-backdrop-drop-shadow-blur: ;
+  }
+  .animate-backdrop-drop-shadow-offset-x {
+    --jumi-backdrop-drop-shadow-offset-x: ;
+  }
+  .animate-backdrop-drop-shadow-offset-y {
+    --jumi-backdrop-drop-shadow-offset-y: ;
+  }
+  .animate-backdrop-drop-shadow-opacity {
+    --jumi-backdrop-drop-shadow-opacity: 0;
+  }
+  .animate-backdrop-filter {
+    --jumi-backdrop-filter: none;
   }
   .animate-backdrop-grayscale {
     --jumi-backdrop-grayscale: grayscale(100%);
@@ -1727,6 +1896,18 @@
   }
   .animate-backdrop-sepia {
     --jumi-backdrop-sepia: sepia(100%);
+  }
+  .animate-backdrop-url {
+    --jumi-backdrop-url: url();
+  }
+  .animate-background {
+    --jumi-background: none;
+  }
+  .animate-block-size {
+    --jumi-block-size: auto;
+  }
+  .animate-border {
+    --jumi-border: none;
   }
   .animate-border-block-end-width {
     --jumi-border-block-end-width: 1px;
@@ -1751,6 +1932,21 @@
   }
   .animate-border-end-start-radius {
     --jumi-border-end-start-radius: 0.25rem;
+  }
+  .animate-border-image-outset {
+    --jumi-border-image-outset: 0;
+  }
+  .animate-border-image-outset-bottom {
+    --jumi-border-image-outset-bottom: 0;
+  }
+  .animate-border-image-outset-left {
+    --jumi-border-image-outset-left: 0;
+  }
+  .animate-border-image-outset-right {
+    --jumi-border-image-outset-right: 0;
+  }
+  .animate-border-image-outset-top {
+    --jumi-border-image-outset-top: 0;
   }
   .animate-border-inline-end-width {
     --jumi-border-inline-end-width: 1px;
@@ -1785,14 +1981,20 @@
   .animate-border-width {
     --jumi-border-width: 1px;
   }
-  .animate-bounce-in {
-    animation-name: bounce-in;
-  }
-  .animate-bounce-out {
-    animation-name: bounce-out;
-  }
   .animate-box-shadow {
     --jumi-box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  }
+  .animate-box-shadow-blur {
+    --jumi-box-shadow-blur: ;
+  }
+  .animate-box-shadow-offset-x {
+    --jumi-box-shadow-offset-x: ;
+  }
+  .animate-box-shadow-offset-y {
+    --jumi-box-shadow-offset-y: ;
+  }
+  .animate-box-shadow-spread {
+    --jumi-box-shadow-spread: ;
   }
   .animate-color-blue-600 {
     --jumi-color: oklch(54.6% 0.245 262.881);
@@ -1802,6 +2004,9 @@
   }
   .animate-color-red-500 {
     --jumi-color: oklch(63.7% 0.237 25.331);
+  }
+  .animate-column-gap {
+    --jumi-column-gap: 0;
   }
   .animate-delay-1 {
     --jumi-animation-delay: 1s;
@@ -1830,29 +2035,17 @@
   .animate-duration-\[350ms\] {
     --jumi-animation-duration: 350ms;
   }
-  .animate-fade-down {
-    animation-name: fade-down;
-  }
-  .animate-fade-in {
-    animation-name: fade-in;
-  }
-  .animate-fade-left {
-    animation-name: fade-left;
-  }
-  .animate-fade-out {
-    animation-name: fade-out;
-  }
-  .animate-fade-right {
-    animation-name: fade-right;
-  }
-  .animate-fade-up {
-    animation-name: fade-up;
+  .animate-fill-amber-100 {
+    --jumi-fill: oklch(96.2% 0.059 95.617);
   }
   .animate-fill-green-500 {
     --jumi-fill: oklch(72.3% 0.219 149.579);
   }
   .animate-fill-purple-500 {
     --jumi-fill: oklch(62.7% 0.265 303.9);
+  }
+  .animate-filter {
+    --jumi-filter-filter: none;
   }
   .animate-filter-blur {
     --jumi-filter-blur: blur(8px);
@@ -1866,17 +2059,14 @@
   .animate-filter-sepia {
     --jumi-filter-sepia: sepia(100%);
   }
+  .animate-filter-url {
+    --jumi-filter-url: url();
+  }
   .animate-flex-grow {
     --jumi-flex-grow: 1;
   }
   .animate-flex-shrink {
     --jumi-flex-shrink: 1;
-  }
-  .animate-flip-x {
-    animation-name: flip-x;
-  }
-  .animate-flip-y {
-    animation-name: flip-y;
   }
   .animate-iteration-count-infinite {
     --jumi-animation-iteration-count: infinite;
@@ -1893,9 +2083,6 @@
   .animate-opacity-\[0\.75\] {
     --jumi-opacity: 0.75;
   }
-  .animate-pulsate {
-    animation-name: pulsate;
-  }
   .animate-range {
     --jumi-animation-range: ;
   }
@@ -1904,9 +2091,6 @@
   }
   .animate-range-start {
     --jumi-animation-range-start: ;
-  }
-  .animate-reveal-bottom {
-    animation-name: reveal-bottom;
   }
   .animate-rotate-3d {
     --jumi-rotate-3d: rotate3d();
@@ -1919,6 +2103,9 @@
   }
   .animate-rotate-3z {
     --jumi-rotate-3z: ;
+  }
+  .animate-row-gap {
+    --jumi-row-gap: 0;
   }
   .animate-scale-50 {
     --jumi-scale: scale(.5);
@@ -1935,56 +2122,8 @@
   .animate-scale-x-150 {
     --jumi-scale-x: scaleX(1.5);
   }
-  .animate-shake {
-    animation-name: shake;
-  }
   .animate-skew-y-15 {
     --jumi-skew-y: skewY(15deg);
-  }
-  .animate-slide-in-up {
-    animation-name: slide-in-up;
-  }
-  .animate-swing {
-    animation-name: swing;
-  }
-  .animate-text-shadow {
-    --jumi-text-shadow: 0 1px 3px rgb(0 0 0 / 0.1), 0 1px 2px rgb(0 0 0 / 0.06);
-  }
-  .animate-translate-3d {
-    --jumi-translate-3d: translate3d();
-  }
-  .animate-translate-3x {
-    --jumi-translate-3x: ;
-  }
-  .animate-translate-3y {
-    --jumi-translate-3y: ;
-  }
-  .animate-translate-3z {
-    --jumi-translate-3z: ;
-  }
-  .animate-translate-x {
-    --jumi-translate-x: translateX();
-  }
-  .animate-translate-x-\[-50px\] {
-    --jumi-translate-x: translateX(-50px);
-  }
-  .animate-translate-x-\[20px\] {
-    --jumi-translate-x: translateX(20px);
-  }
-  .animate-translate-y {
-    --jumi-translate-y: translateY();
-  }
-  .animate-translate-z {
-    --jumi-translate-z: translateZ();
-  }
-  .animate-wobble {
-    animation-name: wobble;
-  }
-  .animate-zoom-in {
-    animation-name: zoom-in;
-  }
-  .animate-zoom-out {
-    animation-name: zoom-out;
   }
   .perspective-distant {
     perspective: var(--perspective-distant);
@@ -2074,18 +2213,19 @@
       }
     }
   }
+  .hover\:animate-bounce-in {
+    &:hover {
+      @media (hover: hover) {
+        animation-name: bounce-in;
+        animation-timeline: auto;
+      }
+    }
+  }
   .hover\:animate-rotate-5 {
     &:hover {
       @media (hover: hover) {
         --jumi-rotate: rotate(5deg);
         --jumi-rotate-angle: 5deg;
-      }
-    }
-  }
-  .hover\:animate-bounce-in {
-    &:hover {
-      @media (hover: hover) {
-        animation-name: bounce-in;
       }
     }
   }
@@ -2181,14 +2321,15 @@
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
-  .md\:animate-duration-1 {
-    @media (width >= 48rem) {
-      --jumi-animation-duration: 1s;
-    }
-  }
   .md\:animate-slide-in-left {
     @media (width >= 48rem) {
       animation-name: slide-in-left;
+      animation-timeline: auto;
+    }
+  }
+  .md\:animate-duration-1 {
+    @media (width >= 48rem) {
+      --jumi-animation-duration: 1s;
     }
   }
   .lg\:grid-cols-3 {
@@ -2196,14 +2337,15 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
-  .lg\:animate-duration-2 {
-    @media (width >= 64rem) {
-      --jumi-animation-duration: 2s;
-    }
-  }
   .lg\:animate-fade-in {
     @media (width >= 64rem) {
       animation-name: fade-in;
+      animation-timeline: auto;
+    }
+  }
+  .lg\:animate-duration-2 {
+    @media (width >= 64rem) {
+      --jumi-animation-duration: 2s;
     }
   }
   .\@sm\:flex {
@@ -2351,9 +2493,19 @@
       appearance: var(--jumi-appearance);
     }
   }
+  @keyframes jumi-aspect-ratio {
+    to {
+      aspect-ratio: var(--jumi-aspect-ratio);
+    }
+  }
   @keyframes jumi-backdrop-filter {
     to {
       backdrop-filter: var(--jumi-backdrop-filter);
+    }
+  }
+  @keyframes jumi-backface-visibility {
+    to {
+      backface-visibility: var(--jumi-backface-visibility);
     }
   }
   @keyframes jumi-background {
@@ -2361,34 +2513,34 @@
       background: var(--jumi-background);
     }
   }
-  @keyframes jumi-background-color {
+  @keyframes jumi-background-blend-mode {
     to {
-      background-color: var(--jumi-background-color);
+      background-blend-mode: var(--jumi-background-blend-mode);
     }
   }
-  @keyframes jumi-background-position {
+  @keyframes jumi-block-size {
     to {
-      background-position: var(--jumi-background-position);
+      block-size: var(--jumi-block-size);
     }
   }
-  @keyframes jumi-background-size {
+  @keyframes jumi-border {
     to {
-      background-size: var(--jumi-background-size);
+      border: var(--jumi-border);
     }
   }
-  @keyframes jumi-border-color {
+  @keyframes jumi-border-collapse {
     to {
-      border-color: var(--jumi-border-color);
+      border-collapse: var(--jumi-border-collapse);
+    }
+  }
+  @keyframes jumi-border-image {
+    to {
+      border-image: var(--jumi-border-image);
     }
   }
   @keyframes jumi-border-radius {
     to {
       border-radius: var(--jumi-border-radius);
-    }
-  }
-  @keyframes jumi-border-width {
-    to {
-      border-width: var(--jumi-border-width);
     }
   }
   @keyframes jumi-box-shadow {
@@ -2399,6 +2551,31 @@
   @keyframes jumi-color {
     to {
       color: var(--jumi-color);
+    }
+  }
+  @keyframes jumi-column-fill {
+    to {
+      column-fill: var(--jumi-column-fill);
+    }
+  }
+  @keyframes jumi-column-gap {
+    to {
+      column-gap: var(--jumi-column-gap);
+    }
+  }
+  @keyframes jumi-column-rule {
+    to {
+      column-rule: var(--jumi-column-rule);
+    }
+  }
+  @keyframes jumi-column-span {
+    to {
+      column-span: var(--jumi-column-span);
+    }
+  }
+  @keyframes jumi-columns {
+    to {
+      columns: var(--jumi-columns);
     }
   }
   @keyframes jumi-display {
@@ -2536,6 +2713,36 @@
       stroke: var(--jumi-stroke);
     }
   }
+  @keyframes jumi-stroke-dasharray {
+    to {
+      stroke-dasharray: var(--jumi-stroke-dasharray);
+    }
+  }
+  @keyframes jumi-stroke-dashoffset {
+    to {
+      stroke-dashoffset: var(--jumi-stroke-dashoffset);
+    }
+  }
+  @keyframes jumi-stroke-linecap {
+    to {
+      stroke-linecap: var(--jumi-stroke-linecap);
+    }
+  }
+  @keyframes jumi-stroke-linejoin {
+    to {
+      stroke-linejoin: var(--jumi-stroke-linejoin);
+    }
+  }
+  @keyframes jumi-stroke-miterlimit {
+    to {
+      stroke-miterlimit: var(--jumi-stroke-miterlimit);
+    }
+  }
+  @keyframes jumi-stroke-opacity {
+    to {
+      stroke-opacity: var(--jumi-stroke-opacity);
+    }
+  }
   @keyframes jumi-stroke-width {
     to {
       stroke-width: var(--jumi-stroke-width);
@@ -2544,6 +2751,11 @@
   @keyframes jumi-text-align {
     to {
       text-align: var(--jumi-text-align);
+    }
+  }
+  @keyframes jumi-text-align-last {
+    to {
+      text-align-last: var(--jumi-text-align-last);
     }
   }
   @keyframes jumi-text-shadow {
@@ -3230,7 +3442,7 @@
     --jumi-animation-duration: 1s;
     --jumi-animation-fill-mode: forwards;
     --jumi-animation-iteration-count: 1;
-    --jumi-animation-name: var(--jumi-width-keyframes), jumi-transform;
+    --jumi-animation-name: var(--jumi-accent-color-keyframes), var(--jumi-align-content-keyframes), var(--jumi-align-items-keyframes), var(--jumi-align-self-keyframes), var(--jumi-alignment-baseline-keyframes), var(--jumi-all-keyframes), var(--jumi-appearance-keyframes), var(--jumi-aspect-ratio-keyframes), var(--jumi-backdrop-filter-keyframes), var(--jumi-backface-visibility-keyframes), var(--jumi-background-keyframes), var(--jumi-background-blend-mode-keyframes), var(--jumi-block-size-keyframes), var(--jumi-border-keyframes), var(--jumi-border-collapse-keyframes), var(--jumi-border-image-keyframes), var(--jumi-border-radius-keyframes), var(--jumi-box-shadow-keyframes), var(--jumi-color-keyframes), var(--jumi-column-fill-keyframes), var(--jumi-column-gap-keyframes), var(--jumi-column-rule-keyframes), var(--jumi-column-span-keyframes), var(--jumi-columns-keyframes), var(--jumi-display-keyframes), var(--jumi-fill-keyframes), var(--jumi-filter-keyframes), var(--jumi-flex-keyframes), var(--jumi-flex-direction-keyframes), var(--jumi-font-family-keyframes), var(--jumi-font-size-keyframes), var(--jumi-font-weight-keyframes), var(--jumi-gap-keyframes), var(--jumi-height-keyframes), var(--jumi-inset-keyframes), var(--jumi-justify-content-keyframes), var(--jumi-letter-spacing-keyframes), var(--jumi-line-height-keyframes), var(--jumi-margin-keyframes), var(--jumi-max-height-keyframes), var(--jumi-max-width-keyframes), var(--jumi-min-height-keyframes), var(--jumi-min-width-keyframes), var(--jumi-opacity-keyframes), var(--jumi-order-keyframes), var(--jumi-outline-keyframes), var(--jumi-outline-offset-keyframes), var(--jumi-overflow-keyframes), var(--jumi-padding-keyframes), var(--jumi-position-keyframes), var(--jumi-stroke-keyframes), var(--jumi-stroke-dasharray-keyframes), var(--jumi-stroke-dashoffset-keyframes), var(--jumi-stroke-linecap-keyframes), var(--jumi-stroke-linejoin-keyframes), var(--jumi-stroke-miterlimit-keyframes), var(--jumi-stroke-opacity-keyframes), var(--jumi-stroke-width-keyframes), var(--jumi-text-align-keyframes), var(--jumi-text-align-last-keyframes), var(--jumi-text-shadow-keyframes), var(--jumi-transform-keyframes), var(--jumi-width-keyframes), var(--jumi-z-index-keyframes);
     --jumi-animation-play-state: running;
     --jumi-animation-range: var(--jumi-animation-range-start) var(--jumi-animation-range-end);
     --jumi-animation-range-end: var(--jumi-animation-range-end-name) var(--jumi-animation-range-end-length);
@@ -3252,7 +3464,13 @@
     --jumi-backdrop-blur: blur(0);
     --jumi-backdrop-brightness: brightness(1);
     --jumi-backdrop-contrast: contrast(1);
-    --jumi-backdrop-filter: var(--jumi-backdrop-blur) var(--jumi-backdrop-brightness) var(--jumi-backdrop-contrast) var(--jumi-backdrop-grayscale) var(--jumi-backdrop-hue-rotate) var(--jumi-backdrop-invert) var(--jumi-backdrop-opacity) var(--jumi-backdrop-saturate) var(--jumi-backdrop-sepia);
+    --jumi-backdrop-drop-shadow: drop-shadow(var(--jumi-backdrop-drop-shadow-offset-x) var(--jumi-backdrop-drop-shadow-offset-y) var(--jumi-backdrop-drop-shadow-blur) oklch(from var(--jumi-backdrop-drop-shadow-color) l c h / var(--jumi-backdrop-drop-shadow-opacity)));
+    --jumi-backdrop-drop-shadow-blur: 0;
+    --jumi-backdrop-drop-shadow-color: transparent;
+    --jumi-backdrop-drop-shadow-offset-x: 0;
+    --jumi-backdrop-drop-shadow-offset-y: 0;
+    --jumi-backdrop-drop-shadow-opacity: 1;
+    --jumi-backdrop-filter: var(--jumi-backdrop-blur) var(--jumi-backdrop-brightness) var(--jumi-backdrop-contrast) var(--jumi-backdrop-drop-shadow) var(--jumi-backdrop-grayscale) var(--jumi-backdrop-hue-rotate) var(--jumi-backdrop-invert) var(--jumi-backdrop-opacity) var(--jumi-backdrop-saturate) var(--jumi-backdrop-sepia);
     --jumi-backdrop-grayscale: grayscale(0);
     --jumi-backdrop-hue-rotate: hue-rotate(0deg);
     --jumi-backdrop-invert: invert(0);
@@ -3260,10 +3478,13 @@
     --jumi-backdrop-saturate: saturate(1);
     --jumi-backdrop-sepia: sepia(0);
     --jumi-backdrop-url: url();
+    --jumi-backface-visibility: visible;
+    --jumi-background: var(--jumi-background-attachment) var(--jumi-background-clip) var(--jumi-background-color) var(--jumi-background-image) var(--jumi-background-origin) var(--jumi-background-position) var(--jumi-background-repeat) var(--jumi-background-size);
     --jumi-background-attachment: scroll;
     --jumi-background-clip: border-box;
     --jumi-background-color: transparent;
     --jumi-background-image: none;
+    --jumi-background-origin: padding-box;
     --jumi-background-position: var(--jumi-background-position-x) var(--jumi-background-position-y);
     --jumi-background-position-x: var(--jumi-background-position-x-edge) var(--jumi-background-position-x-offset);
     --jumi-background-position-x-edge: left;
@@ -3272,25 +3493,55 @@
     --jumi-background-position-y-edge: top;
     --jumi-background-position-y-offset: 0%;
     --jumi-background-repeat: var(--jumi-background-repeat-x) var(--jumi-background-repeat-y);
-    --jumi-background-repeat-x: no-repeat;
-    --jumi-background-repeat-y: no-repeat;
+    --jumi-background-repeat-x: repeat;
+    --jumi-background-repeat-y: repeat;
     --jumi-background-size: var(--jumi-background-size-width) var(--jumi-background-size-height);
     --jumi-background-size-height: auto;
     --jumi-background-size-width: auto;
+    --jumi-block-size: auto;
+    --jumi-border: var(--jumi-border-width) var(--jumi-border-style) var(--jumi-border-color);
+    --jumi-border-collapse: separate;
     --jumi-border-color: currentColor;
+    --jumi-border-image: var(--jumi-border-image-outset) var(--jumi-border-image-repeat) var(--jumi-border-image-slice) var(--jumi-border-image-source) var(--jumi-border-image-width);
+    --jumi-border-image-outset: var(--jumi-border-image-outset-top) var(--jumi-border-image-outset-right) var(--jumi-border-image-outset-bottom) var(--jumi-border-image-outset-left);
+    --jumi-border-image-outset-bottom: 0;
+    --jumi-border-image-outset-left: 0;
+    --jumi-border-image-outset-right: 0;
+    --jumi-border-image-outset-top: 0;
+    --jumi-border-image-outset-x: var(--jumi-border-image-outset-right) var(--jumi-border-image-outset-left);
+    --jumi-border-image-outset-y: var(--jumi-border-image-outset-top) var(--jumi-border-image-outset-bottom);
+    --jumi-border-image-repeat: var(--jumi-border-image-repeat-x) var(--jumi-border-image-repeat-y);
+    --jumi-border-image-repeat-x: stretch;
+    --jumi-border-image-repeat-y: stretch;
+    --jumi-border-image-slice: 100%;
+    --jumi-border-image-source: none;
+    --jumi-border-image-width: 1;
     --jumi-border-radius: 0;
-    --jumi-border-width: 0;
+    --jumi-border-style: none;
+    --jumi-border-width: medium;
     --jumi-bottom: auto;
-    --jumi-box-shadow: var(--jumi-box-shadow-offset-x) var(--jumi-box-shadow-offset-y) var(--jumi-box-shadow-blur) var(--jumi-box-shadow-spread) var(--jumi-box-shadow-color) var(--jumi-box-shadow-inset);
+    --jumi-box-shadow: var(--jumi-box-shadow-offset-x) var(--jumi-box-shadow-offset-y) var(--jumi-box-shadow-blur) var(--jumi-box-shadow-spread) oklch(from var(--jumi-box-shadow-color) l c h / var(--jumi-box-shadow-opacity)) var(--jumi-box-shadow-inset);
     --jumi-box-shadow-blur: 0;
     --jumi-box-shadow-color: transparent;
     --jumi-box-shadow-offset-x: 0;
     --jumi-box-shadow-offset-y: 0;
+    --jumi-box-shadow-opacity: 1;
     --jumi-box-shadow-spread: 0;
     --jumi-caret-color: auto;
     --jumi-clip-path: none;
     --jumi-color: inherit;
-    --jumi-column-gap: 0;
+    --jumi-column-count: auto;
+    --jumi-column-fill: balance;
+    --jumi-column-gap: normal;
+    --jumi-column-rule: var(--jumi-column-rule-width);
+    --jumi-column-rule: var(--jumi-column-rule-style);
+    --jumi-column-rule: var(--jumi-column-rule-color);
+    --jumi-column-rule-color: medium;
+    --jumi-column-rule-style: none;
+    --jumi-column-rule-width: currentColor;
+    --jumi-column-span: none;
+    --jumi-column-width: auto;
+    --jumi-columns: var(--jumi-column-count) var(--jumi-column-width);
     --jumi-cursor: auto;
     --jumi-display: var(--jumi-display-ouside), var(--jumi-display-inside);
     --jumi-display-inside: flow;
@@ -3414,7 +3665,11 @@
     --jumi-stroke: none;
     --jumi-stroke-dasharray: none;
     --jumi-stroke-dashoffset: 0;
-    --jumi-stroke-width: 0;
+    --jumi-stroke-linecap: butt;
+    --jumi-stroke-linejoin: miter;
+    --jumi-stroke-miterlimit: 4;
+    --jumi-stroke-opacity: 1;
+    --jumi-stroke-width: 1px;
     --jumi-text-align: baseline;
     --jumi-text-decoration: none;
     --jumi-text-decoration-color: currentColor;
@@ -3424,7 +3679,12 @@
     --jumi-text-indent: 0;
     --jumi-text-overflow: clip;
     --jumi-text-rendering: auto;
-    --jumi-text-shadow: none;
+    --jumi-text-shadow: var(--jumi-text-shadow-offset-x) var(--jumi-text-shadow-offset-y) var(--jumi-text-shadow-blur-radius) var(--jumi-text-shadow-color);
+    --jumi-text-shadow-blur-radius: 0;
+    --jumi-text-shadow-color: transparent;
+    --jumi-text-shadow-offset-x: 0;
+    --jumi-text-shadow-offset-y: 0;
+    --jumi-text-shadow-opacity: 1;
     --jumi-text-transform: none;
     --jumi-top: auto;
     --jumi-transform: var(--jumi-matrix) var(--jumi-matrix-3d) var(--jumi-perspective) var(--jumi-rotate) var(--jumi-rotate-x) var(--jumi-rotate-y) var(--jumi-rotate-z) var(--jumi-rotate-3d) var(--jumi-scale) var(--jumi-scale-x) var(--jumi-scale-y) var(--jumi-scale-z) var(--jumi-scale-3d) var(--jumi-skew) var(--jumi-skew-x) var(--jumi-skew-y) var(--jumi-translate) var(--jumi-translate-x) var(--jumi-translate-y) var(--jumi-translate-z) var(--jumi-translate-3d);

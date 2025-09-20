@@ -5,22 +5,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="output.css" />
-    <link
-      rel="stylesheet"
-      href="https://www.unpkg.com/tailwindcss@3.4.0/dist/tailwind.min.css"
-    />
     <title>Jumi Animation Plugin Demo</title>
   </head>
   <body class="grid w-full h-full bg-gray-100 place-items-center">
     <div class="max-w-4xl p-8 mx-auto space-y-8">
       <header class="mb-12 text-center">
         <h1
-          class="text-4xl font-bold text-gray-900 animate animate-fade-in animate-duration-1"
+          class="text-4xl font-bold text-gray-900 animate-zoom-in animate-duration-1 animate-text-shadow-2xl hover:before:animate-width-full before:animate-duration-1 before:border-b-2"
         >
           Jumi Animation Plugin
         </h1>
         <p
-          class="text-lg text-gray-600 animate animate-fade-in animate-duration-2 animate-delay-500 animate-skew-y-15 animate-translate animate-color-gray-500"
+          class="text-lg text-gray-600 animate animate-fade-in animate-duration-2 animate-delay-500 animate-skew-y-15 animate-translate animate-color-gray-500 hover:animate-accent-color-amber-100 animate-iteration-count-infinite animate-direc"
         >
           A comprehensive TailwindCSS animation library
         </p>
@@ -42,7 +38,7 @@
           <div class="p-4 text-center bg-green-100 rounded">
             <h3 class="mb-2 font-medium">Rotate</h3>
             <div
-              class="w-16 h-16 mx-auto bg-green-500 rounded animate animate-rotate-360 animate-duration-3 animate-iteration-count-infinite"
+              class="w-16 h-16 mx-auto bg-green-500 rounded animate-fill-amber-100 animate animate-rotate-360 animate-duration-3 animate-iteration-count-infinite"
             ></div>
           </div>
 

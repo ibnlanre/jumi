@@ -1,16 +1,16 @@
 import { describe, expect, it } from 'vitest'
 
-import { flattenColorPalette } from '.'
+import { flattenColors } from '.'
 
-describe('flattenColorPalette', () => {
+describe('flattenColors', () => {
   it('should handle empty object', () => {
-    const result = flattenColorPalette({})
+    const result = flattenColors({})
     expect(result).toEqual({})
   })
 
   it('should handle null/undefined input', () => {
-    expect(flattenColorPalette(null as any)).toEqual({})
-    expect(flattenColorPalette(undefined as any)).toEqual({})
+    expect(flattenColors(null as any)).toEqual({})
+    expect(flattenColors(undefined as any)).toEqual({})
   })
 
   it('should handle flat color values', () => {
@@ -19,7 +19,7 @@ describe('flattenColorPalette', () => {
       transparent: 'transparent',
       white: '#ffffff',
     }
-    const result = flattenColorPalette(colors)
+    const result = flattenColors(colors)
     expect(result).toEqual({
       black: '#000000',
       transparent: 'transparent',
@@ -35,7 +35,7 @@ describe('flattenColorPalette', () => {
         DEFAULT: '#dc2626',
       },
     }
-    const result = flattenColorPalette(colors)
+    const result = flattenColors(colors)
     expect(result).toEqual({
       'red': '#dc2626',
       'red-500': '#ef4444',
@@ -58,7 +58,7 @@ describe('flattenColorPalette', () => {
         },
       },
     }
-    const result = flattenColorPalette(colors)
+    const result = flattenColors(colors)
     expect(result).toEqual({
       'primary-dark': '#1e40af',
       'primary-dark-800': '#1e3a8a',
@@ -80,7 +80,7 @@ describe('flattenColorPalette', () => {
       transparent: 'transparent',
       white: '#ffffff',
     }
-    const result = flattenColorPalette(colors)
+    const result = flattenColors(colors)
     expect(result).toEqual({
       'black': '#000000',
       'blue': '#3b82f6',
@@ -112,7 +112,7 @@ describe('flattenColorPalette', () => {
       transparent: 'transparent',
       white: '#fff',
     }
-    const result = flattenColorPalette(colors)
+    const result = flattenColors(colors)
     expect(result).toEqual({
       'black': '#000',
       'current': 'currentColor',
@@ -139,7 +139,7 @@ describe('flattenColorPalette', () => {
         200: '#e5e7eb',
       },
     }
-    const result = flattenColorPalette(colors)
+    const result = flattenColors(colors)
     expect(result).toEqual({
       'gray-50': '#f9fafb',
       'gray-100': '#f3f4f6',
@@ -159,7 +159,7 @@ describe('flattenColorPalette', () => {
         100: 1,
       },
     }
-    const result = flattenColorPalette(colors)
+    const result = flattenColors(colors)
     expect(result).toEqual({
       'custom': 'rgb(255, 0, 0)',
       'custom-hsl': 'hsl(0, 100%, 50%)',
@@ -177,7 +177,7 @@ describe('flattenColorPalette', () => {
       },
       gradient: ['#ff0000', '#00ff00', '#0000ff'],
     }
-    const result = flattenColorPalette(colors)
+    const result = flattenColors(colors)
     expect(result).toEqual({
       'blue': '#3b82f6',
       'blue-500': '#3b82f6',
@@ -194,7 +194,7 @@ describe('flattenColorPalette', () => {
       },
       z: '#zzz',
     }
-    const result = flattenColorPalette(colors)
+    const result = flattenColors(colors)
     const keys = Object.keys(result)
     expect(keys).toContain('a')
     expect(keys).toContain('b')

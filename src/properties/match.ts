@@ -1,6 +1,7 @@
 import type { MatchProperty } from '@/types'
 
-import { mergeTheme } from '@/helpers/merge-theme'
+import { merge } from '@/helpers/merge'
+import { modifiers } from '@/keyframes/property'
 import { alignContent } from '@/theme/align-content'
 import { alignItems } from '@/theme/align-items'
 import { alignSelf } from '@/theme/align-self'
@@ -8,6 +9,7 @@ import { alignmentBaseline } from '@/theme/alignment-baseline'
 import { all } from '@/theme/all'
 import { animationComposition } from '@/theme/animation-composition'
 import { animationDelay } from '@/theme/animation-delay'
+import { animationDirection } from '@/theme/animation-direction'
 import { animationDuration } from '@/theme/animation-duration'
 import { animationFillMode } from '@/theme/animation-fill-mode'
 import { animationIterationCount } from '@/theme/animation-iteration-count'
@@ -22,15 +24,18 @@ import { animationTimingFunction } from '@/theme/animation-timing-function'
 import { appearance } from '@/theme/appearance'
 import { backfaceVisibility } from '@/theme/backface-visibility'
 import { backgroundAttachment } from '@/theme/background-attachment'
+import { backgroundClip } from '@/theme/background-clip'
 import { backgroundOrigin } from '@/theme/background-origin'
 import { backgroundPosition } from '@/theme/background-position'
 import { backgroundRepeat, backgroundRepeatAxis } from '@/theme/background-repeat'
 import { borderCollapse } from '@/theme/border-collapse'
 import { borderImageRepeat } from '@/theme/border-image-repeat'
 import { boxShadowInset } from '@/theme/box-shadow-inset'
+import { clipPathGeometry } from '@/theme/clip-path-geometry'
 import { display } from '@/theme/display'
 import { empty } from '@/theme/empty'
 import { flexDirection } from '@/theme/flex-direction'
+import { imageRendering } from '@/theme/image-rendering'
 import { justifyContent } from '@/theme/justify-content'
 import { mixBlendMode } from '@/theme/mix-blend-mode'
 import { overflow } from '@/theme/overflow'
@@ -43,9 +48,13 @@ import { visibility } from '@/theme/visibility'
 
 export const matchProperties: Partial<MatchProperty> = {
   'animate': {
-    property: value => ({
-      'animation-name': value,
-    }),
+    modifiers,
+    property: (value, { modifier }) => {
+      return {
+        'animation-name': value,
+        'animation-timeline': modifier ? `view(${modifier})` : 'auto',
+      }
+    },
     values: animationName,
   },
   'animate-accent-color': {
@@ -141,6 +150,48 @@ export const matchProperties: Partial<MatchProperty> = {
     }),
     type: ['number', 'percentage'],
   },
+  'animate-backdrop-drop-shadow': {
+    property: value => ({
+      '--jumi-backdrop-drop-shadow': 'drop-shadow(' + value + ')',
+    }),
+    type: 'shadow',
+    values: empty.none,
+  },
+  'animate-backdrop-drop-shadow-blur': {
+    property: value => ({
+      '--jumi-backdrop-drop-shadow-blur': value,
+    }),
+    type: ['length', 'percentage'],
+    values: empty.string,
+  },
+  'animate-backdrop-drop-shadow-color': {
+    property: value => ({
+      '--jumi-backdrop-drop-shadow-color': value,
+    }),
+    type: 'color',
+  },
+  'animate-backdrop-drop-shadow-offset-x': {
+    property: value => ({
+      '--jumi-backdrop-drop-shadow-offset-x': value,
+    }),
+    type: ['length', 'percentage'],
+    values: empty.string,
+  },
+  'animate-backdrop-drop-shadow-offset-y': {
+    property: value => ({
+      '--jumi-backdrop-drop-shadow-offset-y': value,
+    }),
+    type: ['length', 'percentage'],
+    values: empty.string,
+  },
+  'animate-backdrop-drop-shadow-opacity': {
+    key: 'opacity',
+    property: value => ({
+      '--jumi-backdrop-drop-shadow-opacity': value,
+    }),
+    type: ['number', 'percentage'],
+    values: empty.number,
+  },
   'animate-backdrop-filter': {
     property: value => ({
       '--jumi-backdrop-filter': value,
@@ -222,6 +273,12 @@ export const matchProperties: Partial<MatchProperty> = {
     }),
     values: mixBlendMode,
   },
+  'animate-background-clip': {
+    property: value => ({
+      '--jumi-background-clip': value,
+    }),
+    values: backgroundClip,
+  },
   'animate-background-color': {
     key: 'backgroundColor',
     property: value => ({
@@ -254,7 +311,7 @@ export const matchProperties: Partial<MatchProperty> = {
       '--jumi-background-position-x': value,
     }),
     type: ['position', 'percentage', 'length', 'any'],
-    values: mergeTheme(backgroundPosition, percentage),
+    values: merge(backgroundPosition, percentage),
   },
   'animate-background-position-x-edge': {
     property: value => ({
@@ -274,7 +331,7 @@ export const matchProperties: Partial<MatchProperty> = {
       '--jumi-background-position-y': value,
     }),
     type: ['position', 'percentage', 'length', 'any'],
-    values: mergeTheme(backgroundPosition, percentage),
+    values: merge(backgroundPosition, percentage),
   },
   'animate-background-position-y-edge': {
     property: value => ({
@@ -672,11 +729,19 @@ export const matchProperties: Partial<MatchProperty> = {
     type: ['length', 'percentage'],
     values: empty.string,
   },
+  'animate-clip-path-geometry': {
+    property: value => ({
+      '--jumi-clip-path-geometry': value,
+      '--jumi-clip-path-geometry-keyframes': 'jumi-clip-path-geometry',
+    }),
+    values: clipPathGeometry,
+  },
   'animate-color': {
     key: 'colors',
     property: value => ({
       '--jumi-color': value,
     }),
+    type: 'color',
   },
   'animate-column-gap': {
     property: value => ({
@@ -700,7 +765,7 @@ export const matchProperties: Partial<MatchProperty> = {
     property: value => ({
       '--jumi-animation-direction': value,
     }),
-    values: animationDuration,
+    values: animationDirection,
   },
   'animate-display': {
     property: value => ({
@@ -863,6 +928,20 @@ export const matchProperties: Partial<MatchProperty> = {
       '--jumi-height': value,
     }),
   },
+  'animate-image-rendering': {
+    property: value => ({
+      '--jumi-image-rendering': value,
+    }),
+    values: imageRendering,
+  },
+  'animate-initial-letter': {
+    property: value => ({
+      '--jumi-initial-letter': value,
+      '--jumi-initial-letter-keyframes': 'jumi-initial-letter',
+      '-webkit-initial-letter': 'normal',
+    }),
+    values: empty.string,
+  },
   'animate-inset': {
     key: 'inset',
     property: value => ({
@@ -898,7 +977,9 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'lineHeight',
     property: value => ({
       '--jumi-line-height': value,
+      '--jumi-line-height-keyframes': 'jumi-line-height',
     }),
+    type: ['number', 'length', 'percentage'],
   },
   'animate-margin': {
     key: 'margin',
@@ -1185,6 +1266,7 @@ export const matchProperties: Partial<MatchProperty> = {
     }),
     type: 'angle',
   },
+
   'animate-rotate-y': {
     key: 'rotate',
     property: value => ({
@@ -1205,7 +1287,6 @@ export const matchProperties: Partial<MatchProperty> = {
     }),
     values: empty.number,
   },
-
   'animate-scale': {
     key: 'scale',
     property: value => ({
