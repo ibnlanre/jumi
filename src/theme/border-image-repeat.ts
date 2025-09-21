@@ -3,4 +3,4 @@ export const borderImageRepeat = {
   round: 'round',
   space: 'space',
   stretch: 'stretch',
-}
+} as const

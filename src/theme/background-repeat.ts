@@ -5,11 +5,11 @@ export const backgroundRepeat = {
   'repeat-y': 'repeat-y',
   'round': 'round',
   'space': 'space',
-}
+} as const
 
 export const backgroundRepeatAxis = {
   'no-repeat': 'no-repeat',
   'repeat': 'repeat',
   'round': 'round',
   'space': 'space',
-}
+} as const

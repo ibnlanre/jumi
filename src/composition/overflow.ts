@@ -1,4 +1,6 @@
+import { css } from '@/helpers/css'
+
 export const overflow = [
-  'var(--jumi-overflow-x)',
-  'var(--jumi-overflow-y)',
+  css('var', '--jumi-overflow-x'),
+  css('var', '--jumi-overflow-y'),
 ].join(' ')

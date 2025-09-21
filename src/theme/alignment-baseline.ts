@@ -5,6 +5,8 @@ export const alignmentBaseline = {
   'ideographic': 'ideographic',
   'mathematical': 'mathematical',
   'middle': 'middle',
+  'text-after-edge': 'text-after-edge',
+  'text-before-edge': 'text-before-edge',
   'text-bottom': 'text-bottom',
   'text-top': 'text-top',
 } as const

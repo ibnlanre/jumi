@@ -1,6 +1,6 @@
-import type { AnimationKeyframes } from '@/types'
+import type { EffectKeyframes } from '@/types'
 
-export const animationKeyframes: AnimationKeyframes = {
+export const effectKeyframes: EffectKeyframes = {
   '@keyframes back-in': {
     '0%': {
       transform: 'scale(0) rotateZ(-360deg)',

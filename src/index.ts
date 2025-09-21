@@ -1,9 +1,9 @@
 import type { CssInJs, MatchPropertyKeys } from '@/types'
 
-import { baseVariables } from '@/config/variables'
+import { html } from '@/config/html'
+import { animationVariables, keyframeVariables, propertyVariables } from '@/config/variables'
 import { merge } from '@/helpers/merge'
-import { rebase } from '@/helpers/rebase'
-import { animationKeyframes } from '@/keyframes/animation'
+import { effectKeyframes } from '@/keyframes/effects'
 import { propertyKeyframes } from '@/keyframes/property'
 import { addProperties } from '@/properties/add'
 import { matchProperties } from '@/properties/match'
@@ -11,17 +11,57 @@ import { matchProperties } from '@/properties/match'
 import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette'
 import createPlugin from 'tailwindcss/plugin'
 
+export interface MatchVariant {
+  generator: (value: string) => string
+  name: string
+  values: Record<string, string>
+}
+
+const variants: MatchVariant[] = [
+  {
+    generator: value => `& ${value}`,
+    name: 'if-child-is',
+    values: html,
+  },
+  {
+    generator: value => `& > ${value}`,
+    name: 'if-direct-child-is',
+    values: html,
+  },
+  {
+    generator: value => `& + ${value}`,
+    name: 'if-next-sibling-is',
+    values: html,
+  },
+  {
+    generator: value => `& ~ ${value}`,
+    name: 'if-sibling-is',
+    values: html,
+  },
+]
+
+const baseVariables: CssInJs[] = [
+  effectKeyframes,
+  animationVariables,
+  keyframeVariables,
+  propertyKeyframes,
+  propertyVariables,
+]
+
 /**
  * Jumi - TailwindCSS Animation Plugin
  *
  * @param options Configuration options for the plugin
  */
-const jumi = createPlugin(({ addBase, addUtilities, addVariant, matchUtilities, theme }) => {
-  addBase(rebase<CssInJs>(propertyKeyframes))
-  addBase(rebase<CssInJs>(animationKeyframes))
-  addBase(baseVariables)
+const jumi = createPlugin(({ addBase, addUtilities, matchUtilities, matchVariant, theme }) => {
+  baseVariables.forEach(item => addBase(item))
 
-  addVariant('animate-hover', '&:hover')
+  variants.forEach((variant) => {
+    matchVariant(variant.name, variant.generator, {
+      values: variant.values,
+    })
+  })
+
   addUtilities(addProperties)
 
   for (const name in matchProperties) {

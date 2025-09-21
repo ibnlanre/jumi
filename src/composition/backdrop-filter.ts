@@ -1,12 +1,14 @@
+import { css } from '@/helpers/css'
+
 export const backdropFilter = [
-  'var(--jumi-backdrop-blur)',
-  'var(--jumi-backdrop-brightness)',
-  'var(--jumi-backdrop-contrast)',
-  'var(--jumi-backdrop-drop-shadow)',
-  'var(--jumi-backdrop-grayscale)',
-  'var(--jumi-backdrop-hue-rotate)',
-  'var(--jumi-backdrop-invert)',
-  'var(--jumi-backdrop-opacity)',
-  'var(--jumi-backdrop-saturate)',
-  'var(--jumi-backdrop-sepia)',
+  css('var', '--jumi-backdrop-blur'),
+  css('var', '--jumi-backdrop-brightness'),
+  css('var', '--jumi-backdrop-contrast'),
+  css('var', '--jumi-backdrop-drop-shadow'),
+  css('var', '--jumi-backdrop-grayscale'),
+  css('var', '--jumi-backdrop-hue-rotate'),
+  css('var', '--jumi-backdrop-invert'),
+  css('var', '--jumi-backdrop-opacity'),
+  css('var', '--jumi-backdrop-saturate'),
+  css('var', '--jumi-backdrop-sepia'),
 ].join(' ')

@@ -16,7 +16,7 @@
           Jumi Animation Plugin
         </h1>
         <p
-          class="text-lg text-gray-600 animate animate-fade-in animate-duration-2 animate-delay-500 animate-skew-y-15 animate-translate animate-color-gray-500 hover:animate-accent-color-amber-100 animate-iteration-count-infinite animate-direc"
+          class="text-lg text-gray-600 animate animate-fade-in animate-duration-2 animate-delay-500 animate-skew-y-15 animate-translate animate-color-gray-500 hover:animate-accent-color-amber-100 animate-iteration-count-infinite animate-justify-items-safe-center animate-backdrop-drop-shadow-color-amber-100/75 animate-backd"
         >
           A comprehensive TailwindCSS animation library
         </p>
@@ -30,7 +30,7 @@
           <div class="p-4 text-center bg-blue-100 rounded">
             <h3 class="mb-2 font-medium">Translate</h3>
             <div
-              class="w-16 h-16 mx-auto bg-blue-500 rounded animate animate-translate-x-[20px] animate-duration-2 animate-iteration-count-infinite animate-alternate"
+              class="w-16 h-16 mx-auto bg-blue-500 rounded animate animate-translate-x-[20px] animate-duration-2 animate-iteration-count-infinite animate-direction-alternate"
             ></div>
           </div>
 
@@ -46,7 +46,7 @@
           <div class="p-4 text-center bg-purple-100 rounded">
             <h3 class="mb-2 font-medium">Scale</h3>
             <div
-              class="w-16 h-16 mx-auto bg-purple-500 rounded animate animate-scale-125 animate-duration-1 animate-iteration-count-infinite animate-alternate"
+              class="w-16 h-16 mx-auto bg-purple-500 rounded animate animate-scale-125 animate-duration-1 animate-iteration-count-infinite animate-direction-alternate"
             ></div>
           </div>
 
@@ -54,7 +54,7 @@
           <div class="p-4 text-center bg-red-100 rounded">
             <h3 class="mb-2 font-medium">Combined</h3>
             <div
-              class="w-16 h-16 mx-auto bg-red-500 rounded animate animate-translate-top-right-3 animate-rotate-45 animate-scale-110 animate-duration-2 animate-iteration-count-infinite animate-alternate"
+              class="w-16 h-16 mx-auto bg-red-500 rounded animate animate-translate-top-right-3 animate-rotate-45 animate-scale-110 animate-duration-2 animate-iteration-count-infinite animate-direction-alternate"
             ></div>
           </div>
         </div>
@@ -76,7 +76,7 @@
           <div class="p-4 text-center bg-indigo-100 rounded">
             <h3 class="mb-2 font-medium">Fade In</h3>
             <div
-              class="w-16 h-16 mx-auto bg-indigo-500 rounded-full animate animate-fade-in animate-duration-2 animate-iteration-count-infinite animate-alternate"
+              class="w-16 h-16 mx-auto bg-indigo-500 rounded-full animate animate-fade-in animate-duration-2 animate-iteration-count-infinite animate-direction-alternate if-sibling-is-[*]:animate-accent-color-amber-500"
             ></div>
           </div>
 
@@ -84,7 +84,7 @@
           <div class="p-4 text-center bg-pink-100 rounded">
             <h3 class="mb-2 font-medium">Slide In Up</h3>
             <div
-              class="w-16 h-16 mx-auto bg-pink-500 rounded-full animate animate-slide-in-up animate-duration-1 animate-iteration-count-infinite"
+              class="w-16 h-16 mx-auto bg-pink-500 rounded-full animate animate-slide-in-up animate-duration-1 animate-iteration-count-infinite animate-direction-alternate"
             ></div>
           </div>
 
@@ -101,7 +101,7 @@
       <!-- Property Animations (New in v2.1) -->
       <section class="p-6 bg-white rounded-lg shadow-lg">
         <h2 class="mb-4 text-2xl font-semibold">Property Animations</h2>
-        <p class="mb-4 text-gray-600">
+        <p class="mb-4 text-gray-600 subsequent-[h2]:animate-height-full">
           Animate CSS properties from current state to target value
         </p>
         <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -109,7 +109,7 @@
           <div class="p-4 text-center bg-blue-100 rounded">
             <h3 class="mb-2 font-medium">Width</h3>
             <div
-              class="w-1/5 h-16 mx-auto bg-blue-500 rounded animate animate-w-32 animate-duration-2 animate-iteration-count-infinite animate-alternate"
+              class="w-1/5 h-16 mx-auto bg-blue-500 rounded animate animate-width-32 animate-duration-2 animate-iteration-count-infinite animate-direction-alternate next-[h2]:animate-width-full if-child-is-[h2]:animate-width-16"
             ></div>
           </div>
 
@@ -117,7 +117,7 @@
           <div class="p-4 text-center bg-green-100 rounded">
             <h3 class="mb-2 font-medium">Height</h3>
             <div
-              class="animate w-16 bg-green-500 rounded mx-auto animate-h-20 animate-duration-2 animate-iteration-count-infinite animate-alternate h-[2rem]"
+              class="animate w-16 bg-green-500 rounded mx-auto animate-height-20 animate-duration-2 animate-iteration-count-infinite animate-direction-alternate h-[2rem]"
             ></div>
           </div>
 
@@ -125,7 +125,7 @@
           <div class="p-4 text-center bg-purple-100 rounded">
             <h3 class="mb-2 font-medium">Opacity</h3>
             <div
-              class="w-16 h-16 mx-auto bg-purple-500 rounded animate animate-opacity-20 animate-duration-2 animate-iteration-count-infinite animate-alternate"
+              class="w-16 h-16 mx-auto bg-purple-500 rounded animate animate-opacity-20 animate-duration-2 animate-iteration-count-infinite animate-direction-alternate"
             ></div>
           </div>
 
@@ -133,7 +133,7 @@
           <div class="p-4 text-center bg-red-100 rounded">
             <h3 class="mb-2 font-medium">Border Radius</h3>
             <div
-              class="w-16 h-16 mx-auto bg-red-500 rounded-none animate animate-rounded-full animate-duration-2 animate-iteration-count-infinite animate-alternate"
+              class="w-16 h-16 mx-auto bg-red-500 rounded-[0px] animate animate-border-radius-[20px] animate-duration-2 animate-iteration-count-infinite animate-direction-alternate"
             ></div>
           </div>
         </div>
@@ -144,7 +144,7 @@
           <div class="p-4 text-center bg-gray-100 rounded">
             <h3 class="mb-2 font-medium">Background Color</h3>
             <div
-              class="w-16 h-16 mx-auto bg-gray-300 rounded animate animate-bg-blue-500 animate-duration-2 animate-iteration-count-infinite animate-alternate"
+              class="w-16 h-16 mx-auto bg-gray-300 rounded animate animate-background-color-blue-500 animate-duration-2 animate-iteration-count-infinite animate-direction-alternate"
             ></div>
           </div>
 
@@ -152,7 +152,7 @@
           <div class="p-4 text-center bg-gray-100 rounded">
             <h3 class="mb-2 font-medium">Text Color</h3>
             <div
-              class="flex items-center justify-center w-16 h-16 mx-auto text-gray-800 bg-white rounded animate animate-color-red-500 animate-duration-2 animate-iteration-count-infinite animate-alternate"
+              class="flex items-center justify-center w-16 h-16 mx-auto text-gray-800 bg-white rounded animate animate-color-red-500 animate-duration-2 animate-iteration-count-infinite animate-direction-alternate"
             >
               Text
             </div>
@@ -162,7 +162,7 @@
           <div class="p-4 text-center bg-gray-100 rounded">
             <h3 class="mb-2 font-medium">Blur</h3>
             <div
-              class="w-16 h-16 mx-auto rounded animate bg-gradient-to-r from-pink-500 to-yellow-500 animate-blur-md animate-duration-2 animate-iteration-count-infinite animate-alternate"
+              class="w-16 h-16 mx-auto rounded animate bg-gradient-to-r from-pink-500 to-yellow-500 animate-filter-blur-md animate-duration-2 animate-iteration-count-infinite animate-direction-alternate supports-[backdrop-filter:_blur(0)]:bg-white/75"
             ></div>
           </div>
 
@@ -170,7 +170,7 @@
           <div class="p-4 text-center bg-yellow-100 rounded">
             <h3 class="mb-2 font-medium">SVG Fill</h3>
             <svg
-              class="w-16 h-16 mx-auto animate animate-fill-purple-500 animate-duration-3 animate-iteration-count-infinite animate-alternate"
+              class="w-16 h-16 mx-auto animate animate-fill-purple-500 animate-duration-3 animate-iteration-count-infinite animate-direction-alternate"
               viewBox="0 0 24 24"
               fill="currentColor"
             >
@@ -228,14 +228,14 @@
           <div class="p-4 text-center bg-gray-100 rounded">
             <h3 class="mb-2 font-medium">Thick Border (4px)</h3>
             <div
-              class="w-32 h-32 mx-auto bg-indigo-500 rounded animate animate-border-reveal-top-4 animate-duration-2 animate-iteration-count-infinite animate-alternate"
+              class="w-32 h-32 mx-auto bg-indigo-500 rounded animate animate-border-reveal-top-4 animate-duration-2 animate-iteration-count-infinite animate-direction-alternate"
             ></div>
           </div>
 
           <div class="p-4 text-center bg-gray-100 rounded">
             <h3 class="mb-2 font-medium">Thin Border (1px)</h3>
             <div
-              class="w-32 h-32 mx-auto bg-orange-500 rounded animate animate-border-reveal-bottom-1 animate-duration-2 animate-iteration-count-infinite animate-alternate"
+              class="w-32 h-32 mx-auto bg-orange-500 rounded animate animate-border-reveal-bottom-1 animate-duration-2 animate-iteration-count-infinite animate-direction-alternate"
             ></div>
           </div>
         </div>
@@ -291,7 +291,7 @@
           <div class="text-center">
             <h3 class="mb-2 font-medium">Easing</h3>
             <div
-              class="w-16 h-16 mx-auto bg-orange-500 rounded animate animate-translate-x-5 animate-duration-2 animate-ease-ease-in-out-back animate-iteration-count-infinite animate-alternate"
+              class="w-16 h-16 mx-auto bg-orange-500 rounded animate animate-translate-x-[20px] animate-duration-2 animate-ease-ease-in-out-back animate-iteration-count-infinite animate-direction-alternate"
             ></div>
             <p class="mt-2 text-sm text-gray-600">Back easing</p>
           </div>
@@ -306,7 +306,7 @@
           <div class="text-center">
             <h3 class="mb-2 font-medium">Width Animation</h3>
             <div
-              class="w-1/5 h-8 rounded animate bg-gradient-to-r from-blue-400 to-purple-600 animate-w-full animate-duration-3 animate-iteration-count-infinite animate-alternate"
+              class="w-1/5 h-8 rounded animate bg-gradient-to-r from-blue-400 to-purple-600 animate-width-full animate-duration-3 animate-iteration-count-infinite animate-direction-alternate"
             ></div>
           </div>
 
@@ -314,7 +314,7 @@
           <div class="text-center">
             <h3 class="mb-2 font-medium">Background Color Animation</h3>
             <div
-              class="w-32 h-32 mx-auto bg-blue-700 rounded-full animate animate-bg-red-500 animate-duration-2 animate-iteration-count-infinite animate-alternate"
+              class="w-32 h-32 mx-auto bg-blue-700 rounded-full animate animate-background-color-red-500 animate-duration-2 animate-iteration-count-infinite animate-direction-alternate"
             ></div>
           </div>
         </div>

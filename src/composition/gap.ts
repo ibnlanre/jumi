@@ -1,4 +1,6 @@
+import { css } from '@/helpers/css'
+
 export const gap = [
-  'var(--jumi-row-gap)',
-  'var(--jumi-column-gap)',
+  css('var', '--jumi-row-gap'),
+  css('var', '--jumi-column-gap'),
 ].join(' ')

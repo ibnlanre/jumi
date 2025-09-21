@@ -9,4 +9,4 @@ export const blockSize = {
   'self-block': 'anchor-size(self-block)',
   'self-inline': 'anchor-size(self-inline)',
   'width': 'anchor-size(width)',
-}
+} as const

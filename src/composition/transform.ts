@@ -1,90 +1,98 @@
+import { css } from '@/helpers/css'
+
 const matrixValue = [
-  'var(--jumi-matrix-a)',
-  'var(--jumi-matrix-b)',
-  'var(--jumi-matrix-c)',
-  'var(--jumi-matrix-d)',
-  'var(--jumi-matrix-tx)',
-  'var(--jumi-matrix-ty)',
+  css('var', '--jumi-matrix-a'),
+  css('var', '--jumi-matrix-b'),
+  css('var', '--jumi-matrix-c'),
+  css('var', '--jumi-matrix-d'),
+  css('var', '--jumi-matrix-tx'),
+  css('var', '--jumi-matrix-ty'),
 ].join(', ')
-export const matrix = 'matrix(' + matrixValue + ')'
+export const matrix = css('matrix', matrixValue)
 
 const matrix3dValue = [
-  'var(--jumi-matrix-a1)',
-  'var(--jumi-matrix-b1)',
-  'var(--jumi-matrix-c1)',
-  'var(--jumi-matrix-d1)',
-  'var(--jumi-matrix-a2)',
-  'var(--jumi-matrix-b2)',
-  'var(--jumi-matrix-c2)',
-  'var(--jumi-matrix-d2)',
-  'var(--jumi-matrix-a3)',
-  'var(--jumi-matrix-b3)',
-  'var(--jumi-matrix-c3)',
-  'var(--jumi-matrix-d3)',
-  'var(--jumi-matrix-a4)',
-  'var(--jumi-matrix-b4)',
-  'var(--jumi-matrix-c4)',
-  'var(--jumi-matrix-d4)',
+  css('var', '--jumi-matrix-a1'),
+  css('var', '--jumi-matrix-b1'),
+  css('var', '--jumi-matrix-c1'),
+  css('var', '--jumi-matrix-d1'),
+  css('var', '--jumi-matrix-a2'),
+  css('var', '--jumi-matrix-b2'),
+  css('var', '--jumi-matrix-c2'),
+  css('var', '--jumi-matrix-d2'),
+  css('var', '--jumi-matrix-a3'),
+  css('var', '--jumi-matrix-b3'),
+  css('var', '--jumi-matrix-c3'),
+  css('var', '--jumi-matrix-d3'),
+  css('var', '--jumi-matrix-a4'),
+  css('var', '--jumi-matrix-b4'),
+  css('var', '--jumi-matrix-c4'),
+  css('var', '--jumi-matrix-d4'),
 ].join(', ')
-export const matrix3d = 'matrix3d(' + matrix3dValue + ')'
+export const matrix3d = css('matrix3d', matrix3dValue)
 
-const rotateValue = ['var(--jumi-rotate-angle)'].join(', ')
-export const rotate = 'rotate(' + rotateValue + ')'
+const rotateValue = css('var', '--jumi-rotate-angle')
+export const rotate = css('rotate', rotateValue)
 
 const rotate3dValue = [
-  'var(--jumi-rotate-3x)',
-  'var(--jumi-rotate-3y)',
-  'var(--jumi-rotate-3z)',
-  'var(--jumi-rotate-angle)',
+  css('var', '--jumi-rotate-3x'),
+  css('var', '--jumi-rotate-3y'),
+  css('var', '--jumi-rotate-3z'),
+  css('var', '--jumi-rotate-angle'),
 ].join(', ')
-export const rotate3d = 'rotate3d(' + rotate3dValue + ')'
+export const rotate3d = css('rotate3d', rotate3dValue)
 
-const scaleValue = ['var(--jumi-scale-sx)', 'var(--jumi-scale-sy)'].join(', ')
-export const scale = 'scale(' + scaleValue + ')'
+const scaleValue = [
+  css('var', '--jumi-scale-sx'),
+  css('var', '--jumi-scale-sy'),
+].join(', ')
+export const scale = css('scale', scaleValue)
 
 const scale3dValue = [
-  'var(--jumi-scale-3x)',
-  'var(--jumi-scale-3y)',
-  'var(--jumi-scale-3z)',
+  css('var', '--jumi-scale-3x'),
+  css('var', '--jumi-scale-3y'),
+  css('var', '--jumi-scale-3z'),
 ].join(', ')
-export const scale3d = 'scale3d(' + scale3dValue + ')'
+export const scale3d = css('scale3d', scale3dValue)
 
-const skewValue = ['var(--jumi-skew-sx)', 'var(--jumi-skew-sy)'].join(', ')
-export const skew = 'skew(' + skewValue + ')'
+const skewValue = [
+  css('var', '--jumi-skew-sx'),
+  css('var', '--jumi-skew-sy'),
+].join(', ')
+export const skew = css('skew', skewValue)
 
 const translateValue = [
-  'var(--jumi-translate-sx)',
-  'var(--jumi-translate-sy)',
+  css('var', '--jumi-translate-sx'),
+  css('var', '--jumi-translate-sy'),
 ].join(', ')
-export const translate = 'translate(' + translateValue + ')'
+export const translate = css('translate', translateValue)
 
 const translate3dValue = [
-  'var(--jumi-translate-3x)',
-  'var(--jumi-translate-3y)',
-  'var(--jumi-translate-3z)',
+  css('var', '--jumi-translate-3x'),
+  css('var', '--jumi-translate-3y'),
+  css('var', '--jumi-translate-3z'),
 ].join(', ')
-export const translate3d = 'translate3d(' + translate3dValue + ')'
+export const translate3d = css('translate3d', translate3dValue)
 
 export const transform = [
-  'var(--jumi-matrix)',
-  'var(--jumi-matrix-3d)',
-  'var(--jumi-perspective)',
-  'var(--jumi-rotate)',
-  'var(--jumi-rotate-x)',
-  'var(--jumi-rotate-y)',
-  'var(--jumi-rotate-z)',
-  'var(--jumi-rotate-3d)',
-  'var(--jumi-scale)',
-  'var(--jumi-scale-x)',
-  'var(--jumi-scale-y)',
-  'var(--jumi-scale-z)',
-  'var(--jumi-scale-3d)',
-  'var(--jumi-skew)',
-  'var(--jumi-skew-x)',
-  'var(--jumi-skew-y)',
-  'var(--jumi-translate)',
-  'var(--jumi-translate-x)',
-  'var(--jumi-translate-y)',
-  'var(--jumi-translate-z)',
-  'var(--jumi-translate-3d)',
+  css('var', '--jumi-matrix'),
+  css('var', '--jumi-matrix-3d'),
+  css('var', '--jumi-perspective'),
+  css('var', '--jumi-rotate'),
+  css('var', '--jumi-rotate-x'),
+  css('var', '--jumi-rotate-y'),
+  css('var', '--jumi-rotate-z'),
+  css('var', '--jumi-rotate-3d'),
+  css('var', '--jumi-scale'),
+  css('var', '--jumi-scale-x'),
+  css('var', '--jumi-scale-y'),
+  css('var', '--jumi-scale-z'),
+  css('var', '--jumi-scale-3d'),
+  css('var', '--jumi-skew'),
+  css('var', '--jumi-skew-x'),
+  css('var', '--jumi-skew-y'),
+  css('var', '--jumi-translate'),
+  css('var', '--jumi-translate-x'),
+  css('var', '--jumi-translate-y'),
+  css('var', '--jumi-translate-z'),
+  css('var', '--jumi-translate-3d'),
 ].join(' ')

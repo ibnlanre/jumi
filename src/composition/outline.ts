@@ -1,5 +1,7 @@
+import { css } from '@/helpers/css'
+
 export const outline = [
-  'var(--jumi-outline-width)',
-  'var(--jumi-outline-style)',
-  'var(--jumi-outline-color)',
+  css('var', '--jumi-outline-width'),
+  css('var', '--jumi-outline-style'),
+  css('var', '--jumi-outline-color'),
 ].join(' ')

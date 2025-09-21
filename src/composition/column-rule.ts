@@ -1,5 +1,7 @@
+import { css } from '@/helpers/css'
+
 export const columnRule = [
-  'var(--jumi-column-rule-width)',
-  'var(--jumi-column-rule-style)',
-  'var(--jumi-column-rule-color)',
+  css('var', '--jumi-column-rule-width'),
+  css('var', '--jumi-column-rule-style'),
+  css('var', '--jumi-column-rule-color'),
 ].join(' ')

@@ -1,4 +1,6 @@
+import { css } from '@/helpers/css'
+
 export const columns = [
-  'var(--jumi-column-count)',
-  'var(--jumi-column-width)',
+  css('var', '--jumi-column-count'),
+  css('var', '--jumi-column-width'),
 ].join(' ')

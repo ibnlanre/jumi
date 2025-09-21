@@ -4,4 +4,4 @@ export const imageRendering = {
   'high-quality': 'high-quality',
   'pixelated': 'pixelated',
   'smooth': 'smooth',
-}
+} as const

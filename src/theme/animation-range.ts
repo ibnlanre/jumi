@@ -1,4 +1,4 @@
-export const animationRange = {
+export const animationRangeTimeline = {
   'contain': 'contain',
   'cover': 'cover',
   'entry': 'entry',
@@ -8,17 +8,6 @@ export const animationRange = {
   'normal': 'normal',
 } as const
 
-export const combinedAnimationRange = {
-  'contain-25%': 'contain 25%',
-  'contain-50%': 'contain 50%',
-  'contain-75%': 'contain 75%',
-  'cover-25%': 'cover 25%',
-  'cover-50%': 'cover 50%',
-  'cover-75%': 'cover 75%',
-  'entry-25%': 'entry 25%',
-  'entry-50%': 'entry 50%',
-  'entry-75%': 'entry 75%',
-  'exit-25%': 'exit 25%',
-  'exit-50%': 'exit 50%',
-  'exit-75%': 'exit 75%',
+export const animationRange = {
+  normal: 'normal',
 }

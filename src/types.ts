@@ -8,10 +8,6 @@ export type AddProperty = {
 
 export type AddPropertyKeys = 'animate'
 
-export type AnimationKeyframes = {
-  [K in AnimationName as `@keyframes ${K}`]?: Keyframes
-}
-
 export type AnimationProperty
   = | 'composition'
     | 'delay'
@@ -52,32 +48,148 @@ export type Attribute
     | 'backdrop-filter'
     | 'backface-visibility'
     | 'background'
+    | 'background-attachment'
     | 'background-blend-mode'
+    | 'background-clip'
+    | 'background-color'
+    | 'background-image'
+    | 'background-origin'
+    | 'background-position'
+    | 'background-repeat'
+    | 'background-size'
     | 'block-size'
     | 'border'
+    | 'border-block'
+    | 'border-block-color'
+    | 'border-block-end'
+    | 'border-block-end-color'
+    | 'border-block-end-style'
+    | 'border-block-end-width'
+    | 'border-block-start'
+    | 'border-block-start-color'
+    | 'border-block-start-style'
+    | 'border-block-start-width'
+    | 'border-block-style'
+    | 'border-block-width'
+    | 'border-bottom'
+    | 'border-bottom-color'
+    | 'border-bottom-left-radius'
+    | 'border-bottom-right-radius'
+    | 'border-bottom-style'
+    | 'border-bottom-width'
     | 'border-collapse'
+    | 'border-color'
+    | 'border-end-end-radius'
+    | 'border-end-start-radius'
     | 'border-image'
+    | 'border-image-outset'
+    | 'border-image-repeat'
+    | 'border-image-slice'
+    | 'border-image-source'
+    | 'border-image-width'
+    | 'border-inline'
+    | 'border-inline-color'
+    | 'border-inline-end'
+    | 'border-inline-end-color'
+    | 'border-inline-end-style'
+    | 'border-inline-end-width'
+    | 'border-inline-start'
+    | 'border-inline-start-color'
+    | 'border-inline-start-style'
+    | 'border-inline-start-width'
+    | 'border-inline-style'
+    | 'border-inline-width'
+    | 'border-left'
+    | 'border-left-color'
+    | 'border-left-style'
+    | 'border-left-width'
     | 'border-radius'
+    | 'border-right'
+    | 'border-right-color'
+    | 'border-right-style'
+    | 'border-right-width'
+    | 'border-spacing'
+    | 'border-start-end-radius'
+    | 'border-start-start-radius'
+    | 'border-style'
+    | 'border-top'
+    | 'border-top-color'
+    | 'border-top-left-radius'
+    | 'border-top-right-radius'
+    | 'border-top-style'
+    | 'border-top-width'
+    | 'border-width'
+    | 'bottom'
+    | 'box-decoration-break'
     | 'box-shadow'
+    | 'box-sizing'
+    | 'break-after'
+    | 'break-before'
+    | 'break-inside'
+    | 'caption-side'
+    | 'caret-color'
+    | 'clear'
+    | 'clip-path'
+    | 'clip-rule'
     | 'color'
+    | 'color-interpolation'
+    | 'color-interpolation-filters'
+    | 'color-scheme'
     | 'column-fill'
+    | 'column-gap'
     | 'column-gap'
     | 'column-rule'
     | 'column-span'
+    | 'column-width'
     | 'columns'
+    | 'contain'
+    | 'contain-intrinsic-block-size'
+    | 'contain-intrinsic-height'
+    | 'contain-intrinsic-inline-size'
+    | 'contain-intrinsic-size'
+    | 'contain-intrinsic-width'
+    | 'content'
+    | 'content-visibility'
+    | 'counter-increment'
+    | 'counter-reset'
+    | 'counter-set'
+    | 'cursor'
+    | 'cx'
+    | 'cy'
+    | 'd'
     | 'display'
+    | 'dominant-baseline'
+    | 'empty-cells'
     | 'fill'
+    | 'fill-opacity'
+    | 'fill-rule'
     | 'filter'
     | 'flex'
+    | 'flex-basis'
     | 'flex-direction'
+    | 'flex-flow'
+    | 'flex-grow'
+    | 'flex-shrink'
+    | 'flex-wrap'
+    | 'float'
+    | 'flood-color'
+    | 'flood-opacity'
+    | 'font'
     | 'font-family'
     | 'font-size'
+    | 'font-stretch'
+    | 'font-style'
+    | 'font-variant'
+    | 'font-variant-numeric'
     | 'font-weight'
     | 'gap'
     | 'height'
     | 'initial-letter'
     | 'inset'
     | 'justify-content'
+    | 'justify-items'
+    | 'justify-self'
+    | 'left'
     | 'letter-spacing'
     | 'line-height'
     | 'margin'
@@ -92,6 +204,7 @@ export type Attribute
     | 'overflow'
     | 'padding'
     | 'position'
+    | 'right'
     | 'stroke'
     | 'stroke-dasharray'
     | 'stroke-dashoffset'
@@ -103,11 +216,34 @@ export type Attribute
     | 'text-align'
     | 'text-align-last'
     | 'text-shadow'
+    | 'top'
     | 'transform'
     | 'width'
     | 'z-index'
 
 export type Collection<T = any> = Record<string, T>
+
+export type CSSFunction
+  = | AnchorFunction
+    | AnimationFunction
+    | ColorFunction
+    | ComparisonFunction
+    | CounterFunction
+    | ExponentialFunction
+    | FilterFunction
+    | FontFunction
+    | GradientFunction
+    | ImageFunction
+    | MatrixFunction
+    | ReferenceFunction
+    | RotationFunction
+    | ScalingFunction
+    | ShapeFunction
+    | SkewFunction
+    | SteppedValueFunction
+    | TranslationFunction
+    | TreeCountingFunction
+    | TrigonometricFunction
 
 export interface CssInJs extends Partial<KeyframeVariables>, Partial<PropertyVariables> {
   [key: string]: Collection | string | string[]
@@ -136,20 +272,25 @@ export type DataType
     | 'url'
     | 'vector'
 
+export type EffectKeyframes = {
+  [K in AnimationName as `@keyframes ${K}`]?: Keyframes
+}
+
 export type KeyframeDefinition = Collection<Collection<number | string>>
 
 export type Keyframes = Collection<PropertiesHyphen>
 
 export type KeyframeVariables = {
-  [key in Attribute as `--jumi-${key}-keyframes`]: string
+  [key in Attribute as `--jumi-${key}-keyframes`]: 'none' | `jumi-${key}`
 }
+
 export type MatchProperty = {
   [K in MatchPropertyKeys]: MatchPropertyValue
 }
 
 export type MatchPropertyFunction = (value: string, extra: { modifier: null | string }) => CSSRuleObject
 
-export type MatchPropertyKeys = 'animate' | `animate-${AnimationProperty}` | `animate-${Property}` | `animate-${RevealAnimation}`
+export type MatchPropertyKeys = 'animate' | `animate-${Property}` | `animate-${RevealAnimation}` | `animation-${AnimationProperty}`
 
 export interface MatchPropertyValue extends Partial<Options> {
   key?: TailwindTheme
@@ -272,6 +413,7 @@ export type Property
     | 'border-top-width'
     | 'border-width'
     | 'bottom'
+    | 'box-decoration-break'
     | 'box-shadow'
     | 'box-shadow-blur'
     | 'box-shadow-color'
@@ -280,14 +422,22 @@ export type Property
     | 'box-shadow-offset-y'
     | 'box-shadow-opacity'
     | 'box-shadow-spread'
+    | 'box-sizing'
+    | 'break-after'
+    | 'break-before'
+    | 'break-inside'
+    | 'caption-side'
     | 'caret-color'
+    | 'caret-color'
+    | 'clear'
     | 'clip-path'
-    | 'clip-path-geometry'
-    | 'clip-path-shape'
+    | 'clip-rule'
     | 'color'
+    | 'color-interpolation'
+    | 'color-interpolation-filters'
+    | 'color-scheme'
     | 'column-count'
     | 'column-fill'
-    | 'column-gap'
     | 'column-gap'
     | 'column-rule'
     | 'column-rule-color'
@@ -296,13 +446,29 @@ export type Property
     | 'column-span'
     | 'column-width'
     | 'columns'
+    | 'contain'
+    | 'contain-intrinsic-block-size'
+    | 'contain-intrinsic-height'
+    | 'contain-intrinsic-inline-size'
+    | 'contain-intrinsic-size'
+    | 'contain-intrinsic-width'
+    | 'content'
+    | 'content-visibility'
+    | 'counter-increment'
+    | 'counter-reset'
+    | 'counter-set'
     | 'cursor'
+    | 'cx'
+    | 'cy'
+    | 'd'
     | 'display'
     | 'display-inside'
     | 'display-outside'
-    | 'drop-shadow'
+    | 'dominant-baseline'
+    | 'empty-cells'
     | 'fill'
     | 'fill-opacity'
+    | 'fill-rule'
     | 'filter'
     | 'filter-blur'
     | 'filter-brightness'
@@ -323,10 +489,15 @@ export type Property
     | 'flex-grow'
     | 'flex-shrink'
     | 'flex-wrap'
+    | 'float'
+    | 'flood-color'
+    | 'flood-opacity'
+    | 'font'
     | 'font-family'
     | 'font-size'
-    | 'font-smoothing'
+    | 'font-stretch'
     | 'font-style'
+    | 'font-variant'
     | 'font-variant-numeric'
     | 'font-weight'
     | 'gap'
@@ -562,7 +733,7 @@ export type PropertyKeyframes = {
 }
 
 export type PropertyVariables = {
-  [key in Property as `--jumi-${key}`]: string
+  [key in Property as `--jumi-${key}`]?: string
 }
 
 export type RevealAnimation = 'reveal-bottom' | 'reveal-left' | 'reveal-right' | 'reveal-top'
@@ -699,3 +870,149 @@ export type Theme = {
 export interface Variables extends AnimationVariables, KeyframeVariables, PropertyVariables {
   [key: string]: string
 }
+
+type AnchorFunction
+  = | 'anchor'
+    | 'anchor-size'
+
+type AnimationFunction
+  = | 'scroll'
+    | 'view'
+
+type ColorFunction
+  = | 'color'
+    | 'color-mix'
+    | 'contrast-color'
+    | 'device-cmyk'
+    | 'hsl'
+    | 'hwb'
+    | 'lab'
+    | 'lch'
+    | 'light-dark'
+    | 'oklab'
+    | 'oklch'
+    | 'rgb'
+
+type ComparisonFunction
+  = | 'clamp'
+    | 'max'
+    | 'min'
+
+type CounterFunction
+  = | 'counter'
+    | 'counters'
+    | 'symbols'
+
+type ExponentialFunction
+  = | 'abs'
+    | 'exp'
+    | 'hypot'
+    | 'log'
+    | 'pow'
+    | 'sign'
+    | 'sqrt'
+
+type FilterFunction
+  = | 'blur'
+    | 'brightness'
+    | 'contrast'
+    | 'drop-shadow'
+    | 'grayscale'
+    | 'hue-rotate'
+    | 'invert'
+    | 'opacity'
+    | 'saturate'
+    | 'sepia'
+
+type FontFunction
+  = | 'annotation'
+    | 'character-variant'
+    | 'ornaments'
+    | 'styleset'
+    | 'stylistic'
+    | 'swash'
+
+type GradientFunction
+  = | 'conic-gradient'
+    | 'linear-gradient'
+    | 'radial-gradient'
+    | 'repeating-conic-gradient'
+    | 'repeating-linear-gradient'
+    | 'repeating-radial-gradient'
+
+type ImageFunction
+  = | 'cross-fade'
+    | 'element'
+    | 'image'
+    | 'image-set'
+    | 'paint'
+
+type MatrixFunction
+  = | 'calc'
+    | 'calc-size'
+    | 'matrix3d'
+    | 'matrix'
+    | 'perspective'
+
+type ReferenceFunction
+  = | 'attr'
+    | 'env'
+    | 'if'
+    | 'url'
+    | 'var'
+
+type RotationFunction
+  = | 'rotate3d'
+    | 'rotate'
+    | 'rotateX'
+    | 'rotateY'
+    | 'rotateZ'
+
+type ScalingFunction
+  = | 'scale3d'
+    | 'scale'
+    | 'scaleX'
+    | 'scaleY'
+    | 'scaleZ'
+
+type ShapeFunction
+  = | 'circle'
+    | 'ellipse'
+    | 'inset'
+    | 'path'
+    | 'polygon'
+    | 'ray'
+    | 'rect'
+    | 'shape'
+    | 'superellipse'
+    | 'xywh'
+
+type SkewFunction
+  = | 'skew'
+    | 'skewX'
+    | 'skewY'
+
+type SteppedValueFunction
+  = | 'mod'
+    | 'rem'
+    | 'round'
+
+type TranslationFunction
+  = | 'translate3d'
+    | 'translate'
+    | 'translateX'
+    | 'translateY'
+    | 'translateZ'
+
+type TreeCountingFunction
+  = | 'sibling-count'
+    | 'sibling-index'
+
+type TrigonometricFunction
+  = | 'acos'
+    | 'asin'
+    | 'atan2'
+    | 'atan'
+    | 'cos'
+    | 'sin'
+    | 'tan'

@@ -1,13 +1,9 @@
-export const borderImage = [
-  'var(--jumi-border-image-outset)',
-  'var(--jumi-border-image-repeat)',
-  'var(--jumi-border-image-slice)',
-  'var(--jumi-border-image-source)',
-  'var(--jumi-border-image-width)',
-].join(' ')
+import { css } from '@/helpers/css'
 
-// border-image-outset
-// border-image-repeat
-// border-image-slice
-// border-image-source
-// border-image-width
+export const borderImage = [
+  css('var', '--jumi-border-image-outset'),
+  css('var', '--jumi-border-image-repeat'),
+  css('var', '--jumi-border-image-slice'),
+  css('var', '--jumi-border-image-source'),
+  css('var', '--jumi-border-image-width'),
+].join(' ')

@@ -1,19 +1,21 @@
 import type { AddProperty } from '@/types'
 
+import { css } from '@/helpers/css'
+
 export const addProperties: AddProperty = {
   '.animate': {
-    'animation-composition': 'var(--jumi-animation-composition)',
-    'animation-delay': 'var(--jumi-animation-delay)',
-    'animation-direction': 'var(--jumi-animation-direction)',
-    'animation-duration': 'var(--jumi-animation-duration)',
-    'animation-fill-mode': 'var(--jumi-animation-fill-mode)',
-    'animation-iteration-count': 'var(--jumi-animation-iteration-count)',
-    'animation-name': 'var(--jumi-animation-name)',
-    'animation-play-state': 'var(--jumi-animation-play-state)',
-    'animation-range': 'var(--jumi-animation-range)',
-    'animation-range-end': 'var(--jumi-animation-range-end)',
-    'animation-range-start': 'var(--jumi-animation-range-start)',
-    'animation-timeline': 'var(--jumi-animation-timeline)',
-    'animation-timing-function': 'var(--jumi-animation-timing-function)',
+    'animation-composition': css('var', '--jumi-animation-composition'),
+    'animation-delay': css('var', '--jumi-animation-delay'),
+    'animation-direction': css('var', '--jumi-animation-direction'),
+    'animation-duration': css('var', '--jumi-animation-duration'),
+    'animation-fill-mode': css('var', '--jumi-animation-fill-mode'),
+    'animation-iteration-count': css('var', '--jumi-animation-iteration-count'),
+    'animation-name': css('var', '--jumi-animation-name'),
+    'animation-play-state': css('var', '--jumi-animation-play-state'),
+    'animation-range': css('var', '--jumi-animation-range'),
+    'animation-range-end': css('var', '--jumi-animation-range-end'),
+    'animation-range-start': css('var', '--jumi-animation-range-start'),
+    'animation-timeline': css('var', '--jumi-animation-timeline'),
+    'animation-timing-function': css('var', '--jumi-animation-timing-function'),
   },
 }

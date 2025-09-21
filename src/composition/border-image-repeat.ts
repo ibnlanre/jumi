@@ -1,4 +1,6 @@
+import { css } from '@/helpers/css'
+
 export const borderImageRepeat = [
-  'var(--jumi-border-image-repeat-x)',
-  'var(--jumi-border-image-repeat-y)',
+  css('var', '--jumi-border-image-repeat-x'),
+  css('var', '--jumi-border-image-repeat-y'),
 ].join(' ')

@@ -1,10 +1,10 @@
-import { toOklch } from '@/helpers/to-oklch'
+import { css } from '@/helpers/css'
 
 const backdropDropShadowValues = [
-  'var(--jumi-backdrop-drop-shadow-offset-x)',
-  'var(--jumi-backdrop-drop-shadow-offset-y)',
-  'var(--jumi-backdrop-drop-shadow-blur)',
-  toOklch('var(--jumi-backdrop-drop-shadow-color)', 'var(--jumi-backdrop-drop-shadow-opacity)'),
+  css('var', '--jumi-backdrop-drop-shadow-offset-x'),
+  css('var', '--jumi-backdrop-drop-shadow-offset-y'),
+  css('var', '--jumi-backdrop-drop-shadow-blur'),
+  css('var', '--jumi-backdrop-drop-shadow-color'),
 ].join(' ')
 
-export const backdropDropShadow = 'drop-shadow(' + backdropDropShadowValues + ')'
+export const backdropDropShadow = css('drop-shadow', backdropDropShadowValues)

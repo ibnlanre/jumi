@@ -1,4 +1,6 @@
+import { css } from '@/helpers/css'
+
 export const aspectRatio = [
-  'var(--jumi-aspect-ratio-width)',
-  'var(--jumi-aspect-ratio-height)',
+  css('var', '--jumi-aspect-ratio-width'),
+  css('var', '--jumi-aspect-ratio-height'),
 ].join(' ')

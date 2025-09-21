@@ -1,5 +1,7 @@
+import { css } from '@/helpers/css'
+
 export const flex = [
-  'var(--jumi-flex-grow)',
-  'var(--jumi-flex-shrink)',
-  'var(--jumi-flex-basis)',
+  css('var', '--jumi-flex-grow'),
+  css('var', '--jumi-flex-shrink'),
+  css('var', '--jumi-flex-basis'),
 ].join(' ')

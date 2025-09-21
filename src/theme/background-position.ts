@@ -4,4 +4,4 @@ export const backgroundPosition = {
   left: 'left',
   right: 'right',
   top: 'top',
-}
+} as const

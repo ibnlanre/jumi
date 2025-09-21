@@ -1,14 +1,16 @@
+import { css } from '@/helpers/css'
+
 export const backgroundPosition = [
-  'var(--jumi-background-position-x)',
-  'var(--jumi-background-position-y)',
+  css('var', '--jumi-background-position-x'),
+  css('var', '--jumi-background-position-y'),
 ].join(' ')
 
 export const backgroundPositionX = [
-  'var(--jumi-background-position-x-edge)',
-  'var(--jumi-background-position-x-offset)',
+  css('var', '--jumi-background-position-x-edge'),
+  css('var', '--jumi-background-position-x-offset'),
 ].join(' ')
 
 export const backgroundPositionY = [
-  'var(--jumi-background-position-y-edge)',
-  'var(--jumi-background-position-y-offset)',
+  css('var', '--jumi-background-position-y-edge'),
+  css('var', '--jumi-background-position-y-offset'),
 ].join(' ')

@@ -1,14 +1,16 @@
+import { css } from '@/helpers/css'
+
 export const animationRange = [
-  'var(--jumi-animation-range-start)',
-  'var(--jumi-animation-range-end)',
+  css('var', '--jumi-animation-range-start'),
+  css('var', '--jumi-animation-range-end'),
 ].join(' ')
 
 export const animationRangeStart = [
-  'var(--jumi-animation-range-start-name)',
-  'var(--jumi-animation-range-start-length)',
+  css('var', '--jumi-animation-range-start-name'),
+  css('var', '--jumi-animation-range-start-length'),
 ].join(' ')
 
 export const animationRangeEnd = [
-  'var(--jumi-animation-range-end-name)',
-  'var(--jumi-animation-range-end-length)',
+  css('var', '--jumi-animation-range-end-name'),
+  css('var', '--jumi-animation-range-end-length'),
 ].join(' ')

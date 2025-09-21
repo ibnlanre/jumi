@@ -1,4 +1,6 @@
+import { css } from '@/helpers/css'
+
 export const backgroundSize = [
-  'var(--jumi-background-size-width)',
-  'var(--jumi-background-size-height)',
+  css('var', '--jumi-background-size-width'),
+  css('var', '--jumi-background-size-height'),
 ].join(' ')

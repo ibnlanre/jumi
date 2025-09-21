@@ -1,4 +1,6 @@
+import { css } from '@/helpers/css'
+
 export const display = [
-  'var(--jumi-display-ouside)',
-  'var(--jumi-display-inside)',
+  css('var', '--jumi-display-ouside'),
+  css('var', '--jumi-display-inside'),
 ].join(', ')
