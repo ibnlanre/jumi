@@ -6,5 +6,4 @@ export const boxShadow = [
   css('var', '--jumi-box-shadow-blur'),
   css('var', '--jumi-box-shadow-spread'),
   css('var', '--jumi-box-shadow-color'),
-  css('var', '--jumi-box-shadow-inset'),
 ].join(' ')

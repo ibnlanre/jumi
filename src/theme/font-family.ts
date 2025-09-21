@@ -1,0 +1,15 @@
+export const fontFamily = {
+  'cursive': 'cursive',
+  'emoji': 'emoji',
+  'fangsong': 'fangsong',
+  'fantasy': 'fantasy',
+  'math': 'math',
+  'monospace': 'monospace',
+  'sans-serif': 'sans-serif',
+  'serif': 'serif',
+  'system-ui': 'system-ui',
+  'ui-monospace': 'ui-monospace',
+  'ui-rounded': 'ui-rounded',
+  'ui-sans-serif': 'ui-sans-serif',
+  'ui-serif': 'ui-serif',
+} as const

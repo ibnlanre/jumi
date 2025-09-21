@@ -66,7 +66,7 @@ module.exports = {
 </div>
 
 <!-- Bounce with custom timing -->
-<div class="animate-bounce-in animate-duration-500 animate-delay-200">
+<div class="animate-bounce-in animate-duration-500 animation-delay-200">
   I bounce on load!
 </div>
 
@@ -199,7 +199,7 @@ Control the timing of your animations with precision:
 <div class="animate-fade-in animate-duration-2">Slow fade</div>
 
 <!-- Delay -->
-<div class="animate-bounce-in animate-delay-1">Delayed bounce</div>
+<div class="animate-bounce-in animation-delay-1">Delayed bounce</div>
 
 <!-- Easing -->
 <div class="animate-slide-in-up animate-ease-ease-out-back">Bouncy slide</div>
@@ -420,7 +420,7 @@ Jumi maintains CSS custom properties for dynamic control:
 | Class                     | Description                                          |
 | ------------------------- | ---------------------------------------------------- |
 | `animate-duration-{time}` | Set animation duration (25ms-10s)                    |
-| `animate-delay-{time}`    | Set animation delay (0-5s)                           |
+| `animation-delay-{time}`    | Set animation delay (0-5s)                           |
 | `animate-ease-{easing}`   | Set timing function (linear, ease-in-out-back, etc.) |
 | `animate-repeat-{count}`  | Set iteration count (1-infinite)                     |
 | `animate-reverse`         | Reverse animation direction                          |

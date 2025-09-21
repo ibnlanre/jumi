@@ -1369,14 +1369,45 @@
   .normal-case {
     text-transform: none;
   }
+  .italic {
+    font-style: italic;
+  }
   .not-italic {
     font-style: normal;
   }
   .font-stretch-ultra-expanded {
     font-stretch: ultra-expanded;
   }
+  .diagonal-fractions {
+    --tw-numeric-fraction: diagonal-fractions;
+    font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,) var(--tw-numeric-spacing,) var(--tw-numeric-fraction,);
+  }
+  .lining-nums {
+    --tw-numeric-figure: lining-nums;
+    font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,) var(--tw-numeric-spacing,) var(--tw-numeric-fraction,);
+  }
+  .oldstyle-nums {
+    --tw-numeric-figure: oldstyle-nums;
+    font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,) var(--tw-numeric-spacing,) var(--tw-numeric-fraction,);
+  }
+  .ordinal {
+    --tw-ordinal: ordinal;
+    font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,) var(--tw-numeric-spacing,) var(--tw-numeric-fraction,);
+  }
+  .proportional-nums {
+    --tw-numeric-spacing: proportional-nums;
+    font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,) var(--tw-numeric-spacing,) var(--tw-numeric-fraction,);
+  }
+  .slashed-zero {
+    --tw-slashed-zero: slashed-zero;
+    font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,) var(--tw-numeric-spacing,) var(--tw-numeric-fraction,);
+  }
   .stacked-fractions {
     --tw-numeric-fraction: stacked-fractions;
+    font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,) var(--tw-numeric-spacing,) var(--tw-numeric-fraction,);
+  }
+  .tabular-nums {
+    --tw-numeric-spacing: tabular-nums;
     font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,) var(--tw-numeric-spacing,) var(--tw-numeric-fraction,);
   }
   .no-underline {
@@ -1626,63 +1657,63 @@
     animation-timing-function: var(--jumi-animation-timing-function);
   }
   .animate-border-block-end-radius {
+    --jumi-border-block-end-radius-keyframes: jumi-border-block-end-radius;
     --jumi-border-end-end-radius: 0.25rem;
     --jumi-border-end-start-radius: 0.25rem;
-    --jumi-border-radius-keyframes: jumi-border-radius;
   }
   .animate-border-block-start-radius {
-    --jumi-border-radius-keyframes: jumi-border-radius;
+    --jumi-border-block-start-radius-keyframes: jumi-border-block-start-radius;
     --jumi-border-start-end-radius: 0.25rem;
     --jumi-border-start-start-radius: 0.25rem;
   }
   .animate-border-block-width {
     --jumi-border-block-end-width: 1px;
     --jumi-border-block-start-width: 1px;
-    --jumi-border-keyframes: jumi-border;
+    --jumi-border-block-width-keyframes: jumi-border-block-width;
   }
   .animate-border-bottom-radius {
     --jumi-border-bottom-left-radius: 0.25rem;
+    --jumi-border-bottom-radius-keyframes: jumi-border-bottom-radius;
     --jumi-border-bottom-right-radius: 0.25rem;
-    --jumi-border-radius-keyframes: jumi-border-radius;
   }
   .animate-border-image-outset-x {
-    --jumi-border-image-keyframes: jumi-border-image;
+    --jumi-border-image-outset-keyframes: jumi-border-image-outset;
     --jumi-border-image-outset-left: 0;
     --jumi-border-image-outset-right: 0;
   }
   .animate-border-image-outset-y {
-    --jumi-border-image-keyframes: jumi-border-image;
     --jumi-border-image-outset-bottom: 0;
+    --jumi-border-image-outset-keyframes: jumi-border-image-outset;
     --jumi-border-image-outset-top: 0;
   }
   .animate-border-inline-end-radius {
     --jumi-border-end-end-radius: 0.25rem;
-    --jumi-border-radius-keyframes: jumi-border-radius;
+    --jumi-border-inline-end-radius-keyframes: jumi-border-inline-end-radius;
     --jumi-border-start-end-radius: 0.25rem;
   }
   .animate-border-inline-start-radius {
     --jumi-border-end-start-radius: 0.25rem;
-    --jumi-border-radius-keyframes: jumi-border-radius;
+    --jumi-border-inline-start-radius-keyframes: jumi-border-inline-start-radius;
     --jumi-border-start-start-radius: 0.25rem;
   }
   .animate-border-inline-width {
     --jumi-border-inline-end-width: 1px;
     --jumi-border-inline-start-width: 1px;
-    --jumi-border-keyframes: jumi-border;
+    --jumi-border-inline-width-keyframes: jumi-border-inline-width;
   }
   .animate-border-left-radius {
     --jumi-border-bottom-left-radius: 0.25rem;
-    --jumi-border-radius-keyframes: jumi-border-radius;
+    --jumi-border-left-radius-keyframes: jumi-border-left-radius;
     --jumi-border-top-left-radius: 0.25rem;
   }
   .animate-border-right-radius {
     --jumi-border-bottom-right-radius: 0.25rem;
-    --jumi-border-radius-keyframes: jumi-border-radius;
+    --jumi-border-right-radius-keyframes: jumi-border-right-radius;
     --jumi-border-top-right-radius: 0.25rem;
   }
   .animate-border-top-radius {
-    --jumi-border-radius-keyframes: jumi-border-radius;
     --jumi-border-top-left-radius: 0.25rem;
+    --jumi-border-top-radius-keyframes: jumi-border-top-radius;
     --jumi-border-top-right-radius: 0.25rem;
   }
   .animate-initial-letter {
@@ -1703,6 +1734,11 @@
   .animate-rotate-45 {
     --jumi-rotate: rotate(45deg);
     --jumi-rotate-angle: 45deg;
+    --jumi-transform-keyframes: jumi-transform;
+  }
+  .animate-rotate-46 {
+    --jumi-rotate: rotate(46deg);
+    --jumi-rotate-angle: 46deg;
     --jumi-transform-keyframes: jumi-transform;
   }
   .animate-rotate-90 {
@@ -1746,7 +1782,11 @@
     --jumi-backdrop-filter-keyframes: jumi-backdrop-filter;
   }
   .animate-backdrop-drop-shadow-blur {
-    --jumi-backdrop-drop-shadow-blur: ;
+    --jumi-backdrop-drop-shadow-blur: 0px;
+    --jumi-backdrop-filter-keyframes: jumi-backdrop-filter;
+  }
+  .animate-backdrop-drop-shadow-color-amber-100\/75 {
+    --jumi-backdrop-drop-shadow-color: color-mix(in oklab, oklch(96.2% 0.059 95.617) 75%, transparent);
     --jumi-backdrop-filter-keyframes: jumi-backdrop-filter;
   }
   .animate-backdrop-drop-shadow-offset-x {
@@ -1755,10 +1795,6 @@
   }
   .animate-backdrop-drop-shadow-offset-y {
     --jumi-backdrop-drop-shadow-offset-y: ;
-    --jumi-backdrop-filter-keyframes: jumi-backdrop-filter;
-  }
-  .animate-backdrop-drop-shadow-opacity {
-    --jumi-backdrop-drop-shadow-opacity: 0;
     --jumi-backdrop-filter-keyframes: jumi-backdrop-filter;
   }
   .animate-backdrop-filter {
@@ -1803,23 +1839,23 @@
   }
   .animate-border-block-end-width {
     --jumi-border-block-end-width: 1px;
-    --jumi-border-keyframes: jumi-border;
+    --jumi-border-block-end-width-keyframes: jumi-border-block-end-width;
   }
   .animate-border-block-start-width {
     --jumi-border-block-start-width: 1px;
-    --jumi-border-keyframes: jumi-border;
+    --jumi-border-block-start-width-keyframes: jumi-border-block-start-width;
   }
   .animate-border-bottom-left-radius {
     --jumi-border-bottom-left-radius: 0.25rem;
-    --jumi-border-radius-keyframes: jumi-border-radius;
+    --jumi-border-bottom-left-radius-keyframes: jumi-border-bottom-left-radius;
   }
   .animate-border-bottom-right-radius {
     --jumi-border-bottom-right-radius: 0.25rem;
-    --jumi-border-radius-keyframes: jumi-border-radius;
+    --jumi-border-bottom-right-radius-keyframes: jumi-border-bottom-right-radius;
   }
   .animate-border-bottom-width {
     --jumi-border-bottom-width: 1px;
-    --jumi-border-keyframes: jumi-border;
+    --jumi-border-bottom-width-keyframes: jumi-border-bottom-width;
   }
   .animate-border-color {
     --jumi-border-color: currentcolor;
@@ -1827,43 +1863,47 @@
   }
   .animate-border-end-end-radius {
     --jumi-border-end-end-radius: 0.25rem;
-    --jumi-border-radius-keyframes: jumi-border-radius;
+    --jumi-border-end-end-radius-keyframes: jumi-border-end-end-radius;
   }
   .animate-border-end-start-radius {
     --jumi-border-end-start-radius: 0.25rem;
-    --jumi-border-radius-keyframes: jumi-border-radius;
+    --jumi-border-end-start-radius-keyframes: jumi-border-end-start-radius;
+  }
+  .animate-border-image {
+    --jumi-border-image: none;
+    --jumi-border-image-keyframes: jumi-border-image;
   }
   .animate-border-image-outset {
-    --jumi-border-image-keyframes: jumi-border-image;
     --jumi-border-image-outset: 0;
+    --jumi-border-image-outset-keyframes: jumi-border-image-outset;
   }
   .animate-border-image-outset-bottom {
-    --jumi-border-image-keyframes: jumi-border-image;
     --jumi-border-image-outset-bottom: 0;
+    --jumi-border-image-outset-keyframes: jumi-border-image-outset;
   }
   .animate-border-image-outset-left {
-    --jumi-border-image-keyframes: jumi-border-image;
+    --jumi-border-image-outset-keyframes: jumi-border-image-outset;
     --jumi-border-image-outset-left: 0;
   }
   .animate-border-image-outset-right {
-    --jumi-border-image-keyframes: jumi-border-image;
+    --jumi-border-image-outset-keyframes: jumi-border-image-outset;
     --jumi-border-image-outset-right: 0;
   }
   .animate-border-image-outset-top {
-    --jumi-border-image-keyframes: jumi-border-image;
+    --jumi-border-image-outset-keyframes: jumi-border-image-outset;
     --jumi-border-image-outset-top: 0;
   }
   .animate-border-inline-end-width {
     --jumi-border-inline-end-width: 1px;
-    --jumi-border-keyframes: jumi-border;
+    --jumi-border-inline-end-width-keyframes: jumi-border-inline-end-width;
   }
   .animate-border-inline-start-width {
     --jumi-border-inline-start-width: 1px;
-    --jumi-border-keyframes: jumi-border;
+    --jumi-border-inline-start-width-keyframes: jumi-border-inline-start-width;
   }
   .animate-border-left-width {
-    --jumi-border-keyframes: jumi-border;
     --jumi-border-left-width: 1px;
+    --jumi-border-left-width-keyframes: jumi-border-left-width;
   }
   .animate-border-radius {
     --jumi-border-radius: 0.25rem;
@@ -1874,32 +1914,52 @@
     --jumi-border-radius-keyframes: jumi-border-radius;
   }
   .animate-border-right-width {
-    --jumi-border-keyframes: jumi-border;
     --jumi-border-right-width: 1px;
+    --jumi-border-right-width-keyframes: jumi-border-right-width;
   }
   .animate-border-start-end-radius {
-    --jumi-border-radius-keyframes: jumi-border-radius;
     --jumi-border-start-end-radius: 0.25rem;
+    --jumi-border-start-end-radius-keyframes: jumi-border-start-end-radius;
   }
   .animate-border-start-start-radius {
-    --jumi-border-radius-keyframes: jumi-border-radius;
     --jumi-border-start-start-radius: 0.25rem;
+    --jumi-border-start-start-radius-keyframes: jumi-border-start-start-radius;
   }
   .animate-border-top-left-radius {
-    --jumi-border-radius-keyframes: jumi-border-radius;
     --jumi-border-top-left-radius: 0.25rem;
+    --jumi-border-top-left-radius-keyframes: jumi-border-top-left-radius;
   }
   .animate-border-top-right-radius {
-    --jumi-border-radius-keyframes: jumi-border-radius;
     --jumi-border-top-right-radius: 0.25rem;
+    --jumi-border-top-right-radius-keyframes: jumi-border-top-right-radius;
   }
   .animate-border-top-width {
-    --jumi-border-keyframes: jumi-border;
     --jumi-border-top-width: 1px;
+    --jumi-border-top-width-keyframes: jumi-border-top-width;
   }
   .animate-border-width {
-    --jumi-border-keyframes: jumi-border;
     --jumi-border-width: 1px;
+    --jumi-border-width-keyframes: jumi-border-width;
+  }
+  .animate-box-shadow {
+    --jumi-box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --jumi-box-shadow-keyframes: jumi-box-shadow;
+  }
+  .animate-box-shadow-blur {
+    --jumi-box-shadow-blur: 8px;
+    --jumi-box-shadow-keyframes: jumi-box-shadow;
+  }
+  .animate-box-shadow-offset-x {
+    --jumi-box-shadow-keyframes: jumi-box-shadow;
+    --jumi-box-shadow-offset-x: 0;
+  }
+  .animate-box-shadow-offset-y {
+    --jumi-box-shadow-keyframes: jumi-box-shadow;
+    --jumi-box-shadow-offset-y: 0;
+  }
+  .animate-box-shadow-spread {
+    --jumi-box-shadow-keyframes: jumi-box-shadow;
+    --jumi-box-shadow-spread: 0;
   }
   .animate-color-blue-600 {
     --jumi-color: oklch(54.6% 0.245 262.881);
@@ -1913,9 +1973,53 @@
     --jumi-color: oklch(63.7% 0.237 25.331);
     --jumi-color-keyframes: jumi-color;
   }
+  .animate-column-count {
+    --jumi-column-count: auto;
+    --jumi-column-count-keyframes: jumi-column-count;
+  }
   .animate-column-gap {
     --jumi-column-gap: 0;
     --jumi-gap-keyframes: jumi-gap;
+  }
+  .animate-column-rule {
+    --jumi-column-rule: none;
+    --jumi-column-rule-keyframes: jumi-column-rule;
+  }
+  .animate-column-rule-color {
+    --jumi-column-rule-color: currentcolor;
+    --jumi-column-rule-color-keyframes: jumi-column-rule-color;
+  }
+  .animate-columns {
+    --jumi-columns: auto;
+    --jumi-columns-keyframes: jumi-columns;
+  }
+  .animate-contain-intrinsic-size {
+    --jumi-contain-intrinsic-size: none;
+    --jumi-contain-intrinsic-size-keyframes: jumi-contain-intrinsic-size;
+  }
+  .animate-counter-increment {
+    --jumi-counter-increment: none;
+    --jumi-counter-increment-keyframes: jumi-counter-increment;
+  }
+  .animate-counter-reset {
+    --jumi-counter-reset: none;
+    --jumi-counter-reset-keyframes: jumi-counter-reset;
+  }
+  .animate-counter-set {
+    --jumi-counter-set: none;
+    --jumi-counter-set-keyframes: jumi-counter-set;
+  }
+  .animate-cx {
+    --jumi-cx: 0;
+    --jumi-cx-keyframes: jumi-cx;
+  }
+  .animate-cy {
+    --jumi-cy: 0;
+    --jumi-cy-keyframes: jumi-cy;
+  }
+  .animate-d {
+    --jumi-d: none;
+    --jumi-d-keyframes: jumi-d;
   }
   .animate-filter {
     --jumi-filter: none;
@@ -1945,17 +2049,37 @@
     --jumi-filter-keyframes: jumi-filter;
     --jumi-filter-url: url();
   }
+  .animate-flex-flow {
+    --jumi-flex-flow: ;
+    --jumi-flex-flow-keyframes: jumi-flex-flow;
+  }
   .animate-flex-grow {
     --jumi-flex-grow: 1;
-    --jumi-flex-keyframes: jumi-flex;
+    --jumi-flex-grow-keyframes: jumi-flex-grow;
   }
   .animate-flex-shrink {
-    --jumi-flex-keyframes: jumi-flex;
     --jumi-flex-shrink: 1;
+    --jumi-flex-shrink-keyframes: jumi-flex-shrink;
+  }
+  .animate-font-synthesis {
+    --jumi-font-synthesis: none;
+    --jumi-font-synthesis-keyframes: jumi-font-synthesis;
+  }
+  .animate-font-variant {
+    --jumi-font-variant: ;
+    --jumi-font-variant-keyframes: jumi-font-variant;
+  }
+  .animate-font-variation-settings {
+    --jumi-font-variation-settings: ;
+    --jumi-font-variation-settings-keyframes: jumi-font-variation-settings;
   }
   .animate-height-20 {
     --jumi-height: 5rem;
     --jumi-height-keyframes: jumi-height;
+  }
+  .animate-justify-items-safe-center {
+    --jumi-justify-items: safe center;
+    --jumi-justify-items-keyframes: jumi-justify-items;
   }
   .animate-opacity-20 {
     --jumi-opacity: 0.2;
@@ -2011,10 +2135,6 @@
   }
   .animate-scale-x-150 {
     --jumi-scale-x: scaleX(1.5);
-    --jumi-transform-keyframes: jumi-transform;
-  }
-  .animate-skew-y-15 {
-    --jumi-skew-y: skewY(15deg);
     --jumi-transform-keyframes: jumi-transform;
   }
   .animate-text-shadow {
@@ -2105,51 +2225,6 @@
   .animate-bounce-out {
     animation-name: bounce-out;
   }
-  .animate-box-shadow {
-    --jumi-box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  }
-  .animate-box-shadow-blur {
-    --jumi-box-shadow-blur: ;
-  }
-  .animate-box-shadow-offset-x {
-    --jumi-box-shadow-offset-x: ;
-  }
-  .animate-box-shadow-offset-y {
-    --jumi-box-shadow-offset-y: ;
-  }
-  .animate-box-shadow-spread {
-    --jumi-box-shadow-spread: ;
-  }
-  .animate-delay-1 {
-    --jumi-animation-delay: 1s;
-  }
-  .animate-delay-200 {
-    --jumi-animation-delay: 200ms;
-  }
-  .animate-delay-500 {
-    --jumi-animation-delay: 500ms;
-  }
-  .animate-direction-alternate {
-    --jumi-animation-direction: alternate;
-  }
-  .animate-duration-1 {
-    --jumi-animation-duration: 1s;
-  }
-  .animate-duration-2 {
-    --jumi-animation-duration: 2s;
-  }
-  .animate-duration-3 {
-    --jumi-animation-duration: 3s;
-  }
-  .animate-duration-300 {
-    --jumi-animation-duration: 300ms;
-  }
-  .animate-duration-500 {
-    --jumi-animation-duration: 500ms;
-  }
-  .animate-duration-\[350ms\] {
-    --jumi-animation-duration: 350ms;
-  }
   .animate-fade-down {
     animation-name: fade-down;
   }
@@ -2183,20 +2258,8 @@
   .animate-flip-y {
     animation-name: flip-y;
   }
-  .animate-iteration-count-infinite {
-    --jumi-animation-iteration-count: infinite;
-  }
   .animate-pulsate {
     animation-name: pulsate;
-  }
-  .animate-range {
-    --jumi-animation-range: ;
-  }
-  .animate-range-end {
-    --jumi-animation-range-end: ;
-  }
-  .animate-range-start {
-    --jumi-animation-range-start: ;
   }
   .animate-reveal-bottom {
     animation-name: reveal-bottom;
@@ -2218,6 +2281,102 @@
   }
   .animate-zoom-out {
     animation-name: zoom-out;
+  }
+  .animation-delay-1 {
+    --jumi-animation-delay: 1s;
+  }
+  .animation-delay-200 {
+    --jumi-animation-delay: 200ms;
+  }
+  .animation-delay-500 {
+    --jumi-animation-delay: 500ms;
+  }
+  .animation-delay-\[0s\,_0\.2s\,_0\.8s\] {
+    --jumi-animation-delay: 0s, 0.2s, 0.8s;
+  }
+  .animation-delay-\[0s\,_0\.5s\,_1\.5s\] {
+    --jumi-animation-delay: 0s, 0.5s, 1.5s;
+  }
+  .animation-delay-\[0s\,_0\.5s\] {
+    --jumi-animation-delay: 0s, 0.5s;
+  }
+  .animation-direction-\[normal\,_alternate\] {
+    --jumi-animation-direction: normal, alternate;
+  }
+  .animation-direction-alternate {
+    --jumi-animation-direction: alternate;
+  }
+  .animation-direction-reverse {
+    --jumi-animation-direction: reverse;
+  }
+  .animation-duration-1 {
+    --jumi-animation-duration: 1s;
+  }
+  .animation-duration-2 {
+    --jumi-animation-duration: 2s;
+  }
+  .animation-duration-3 {
+    --jumi-animation-duration: 3s;
+  }
+  .animation-duration-500 {
+    --jumi-animation-duration: 500ms;
+  }
+  .animation-duration-\[1\.5s\] {
+    --jumi-animation-duration: 1.5s;
+  }
+  .animation-duration-\[1s\,_0\.5s\,_2s\] {
+    --jumi-animation-duration: 1s, 0.5s, 2s;
+  }
+  .animation-duration-\[1s\,_2s\,_0\.5s\] {
+    --jumi-animation-duration: 1s, 2s, 0.5s;
+  }
+  .animation-duration-\[1s\,_2s\] {
+    --jumi-animation-duration: 1s, 2s;
+  }
+  .animation-duration-\[2s\,_2s\] {
+    --jumi-animation-duration: 2s, 2s;
+  }
+  .animation-duration-\[2s\] {
+    --jumi-animation-duration: 2s;
+  }
+  .animation-fill-mode-\[forwards\,_none\,_forwards\] {
+    --jumi-animation-fill-mode: forwards, none, forwards;
+  }
+  .animation-fill-mode-both {
+    --jumi-animation-fill-mode: both;
+  }
+  .animation-fill-mode-forwards {
+    --jumi-animation-fill-mode: forwards;
+  }
+  .animation-iteration-count-2 {
+    --jumi-animation-iteration-count: 2;
+  }
+  .animation-iteration-count-infinite {
+    --jumi-animation-iteration-count: infinite;
+  }
+  .animation-play-state-\[paused\] {
+    --jumi-animation-play-state: paused;
+  }
+  .animation-play-state-\[running\] {
+    --jumi-animation-play-state: running;
+  }
+  .animation-play-state-paused {
+    --jumi-animation-play-state: paused;
+  }
+  .animation-play-state-running {
+    --jumi-animation-play-state: running;
+  }
+  .animation-timing-function-\[cubic-bezier\(0\.25\,_0\.46\,_0\.45\,_0\.94\)\] {
+    --jumi-animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  .animation-timing-function-\[cubic-bezier\(0\.68\,_-0\.55\,_0\.265\,_1\.55\)\] {
+    --jumi-animation-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  .animation-timing-function-ease-in {
+    --jumi-animation-timing-function: ease-in;
+  }
+  .animation-timing-function-ease-out {
+    --jumi-animation-timing-function: ease-out;
   }
   .perspective-distant {
     perspective: var(--perspective-distant);
@@ -2258,7 +2417,7 @@
       border-bottom-width: 2px;
     }
   }
-  .before\:animate-duration-1 {
+  .before\:animation-duration-1 {
     &::before {
       content: var(--tw-content);
       --jumi-animation-duration: 1s;
@@ -2352,21 +2511,21 @@
       }
     }
   }
-  .hover\:animate-duration-200 {
+  .hover\:animation-duration-200 {
     &:hover {
       @media (hover: hover) {
         --jumi-animation-duration: 200ms;
       }
     }
   }
-  .hover\:animate-duration-300 {
+  .hover\:animation-duration-300 {
     &:hover {
       @media (hover: hover) {
         --jumi-animation-duration: 300ms;
       }
     }
   }
-  .hover\:animate-duration-500 {
+  .hover\:animation-duration-500 {
     &:hover {
       @media (hover: hover) {
         --jumi-animation-duration: 500ms;
@@ -2456,11 +2615,6 @@
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
-  .md\:animate-duration-1 {
-    @media (width >= 48rem) {
-      --jumi-animation-duration: 1s;
-    }
-  }
   .md\:animate-slide-in-left {
     @media (width >= 48rem) {
       animation-name: slide-in-left;
@@ -2469,11 +2623,6 @@
   .lg\:grid-cols-3 {
     @media (width >= 64rem) {
       grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-  .lg\:animate-duration-2 {
-    @media (width >= 64rem) {
-      --jumi-animation-duration: 2s;
     }
   }
   .lg\:animate-fade-in {
@@ -3299,24 +3448,145 @@
     --jumi-background-repeat-keyframes: none;
     --jumi-background-size-keyframes: none;
     --jumi-block-size-keyframes: none;
+    --jumi-border-block-color-keyframes: none;
+    --jumi-border-block-end-color-keyframes: none;
+    --jumi-border-block-end-keyframes: none;
+    --jumi-border-block-end-style-keyframes: none;
+    --jumi-border-block-end-width-keyframes: none;
+    --jumi-border-block-keyframes: none;
+    --jumi-border-block-start-color-keyframes: none;
+    --jumi-border-block-start-keyframes: none;
+    --jumi-border-block-start-style-keyframes: none;
+    --jumi-border-block-start-width-keyframes: none;
+    --jumi-border-block-style-keyframes: none;
+    --jumi-border-block-width-keyframes: none;
+    --jumi-border-bottom-color-keyframes: none;
+    --jumi-border-bottom-keyframes: none;
+    --jumi-border-bottom-left-radius-keyframes: none;
+    --jumi-border-bottom-right-radius-keyframes: none;
+    --jumi-border-bottom-style-keyframes: none;
+    --jumi-border-bottom-width-keyframes: none;
     --jumi-border-collapse-keyframes: none;
+    --jumi-border-color-keyframes: none;
+    --jumi-border-end-end-radius-keyframes: none;
+    --jumi-border-end-start-radius-keyframes: none;
     --jumi-border-image-keyframes: none;
+    --jumi-border-image-outset-keyframes: none;
+    --jumi-border-image-repeat-keyframes: none;
+    --jumi-border-image-slice-keyframes: none;
+    --jumi-border-image-source-keyframes: none;
+    --jumi-border-image-width-keyframes: none;
+    --jumi-border-inline-color-keyframes: none;
+    --jumi-border-inline-end-color-keyframes: none;
+    --jumi-border-inline-end-keyframes: none;
+    --jumi-border-inline-end-style-keyframes: none;
+    --jumi-border-inline-end-width-keyframes: none;
+    --jumi-border-inline-keyframes: none;
+    --jumi-border-inline-start-color-keyframes: none;
+    --jumi-border-inline-start-keyframes: none;
+    --jumi-border-inline-start-style-keyframes: none;
+    --jumi-border-inline-start-width-keyframes: none;
+    --jumi-border-inline-style-keyframes: none;
+    --jumi-border-inline-width-keyframes: none;
     --jumi-border-keyframes: none;
+    --jumi-border-left-color-keyframes: none;
+    --jumi-border-left-keyframes: none;
+    --jumi-border-left-style-keyframes: none;
+    --jumi-border-left-width-keyframes: none;
     --jumi-border-radius-keyframes: none;
+    --jumi-border-right-color-keyframes: none;
+    --jumi-border-right-keyframes: none;
+    --jumi-border-right-style-keyframes: none;
+    --jumi-border-right-width-keyframes: none;
+    --jumi-border-spacing-keyframes: none;
+    --jumi-border-start-end-radius-keyframes: none;
+    --jumi-border-start-start-radius-keyframes: none;
+    --jumi-border-style-keyframes: none;
+    --jumi-border-top-color-keyframes: none;
+    --jumi-border-top-keyframes: none;
+    --jumi-border-top-left-radius-keyframes: none;
+    --jumi-border-top-right-radius-keyframes: none;
+    --jumi-border-top-style-keyframes: none;
+    --jumi-border-top-width-keyframes: none;
+    --jumi-border-width-keyframes: none;
+    --jumi-bottom-keyframes: none;
+    --jumi-box-decoration-break-keyframes: none;
     --jumi-box-shadow-keyframes: none;
+    --jumi-box-sizing-keyframes: none;
+    --jumi-break-after-keyframes: none;
+    --jumi-break-before-keyframes: none;
+    --jumi-break-inside-keyframes: none;
+    --jumi-caption-side-keyframes: none;
+    --jumi-caret-color-keyframes: none;
+    --jumi-clear-keyframes: none;
+    --jumi-clip-path-keyframes: none;
+    --jumi-clip-rule-keyframes: none;
+    --jumi-color-interpolation-filters-keyframes: none;
+    --jumi-color-interpolation-keyframes: none;
     --jumi-color-keyframes: none;
+    --jumi-color-scheme-keyframes: none;
     --jumi-column-fill-keyframes: none;
     --jumi-column-gap-keyframes: none;
     --jumi-column-rule-keyframes: none;
     --jumi-column-span-keyframes: none;
+    --jumi-column-width-keyframes: none;
     --jumi-columns-keyframes: none;
+    --jumi-contain-intrinsic-block-size-keyframes: none;
+    --jumi-contain-intrinsic-height-keyframes: none;
+    --jumi-contain-intrinsic-inline-size-keyframes: none;
+    --jumi-contain-intrinsic-size-keyframes: none;
+    --jumi-contain-intrinsic-width-keyframes: none;
+    --jumi-contain-keyframes: none;
+    --jumi-content-keyframes: none;
+    --jumi-content-visibility-keyframes: none;
+    --jumi-counter-increment-keyframes: none;
+    --jumi-counter-reset-keyframes: none;
+    --jumi-counter-set-keyframes: none;
+    --jumi-cursor-keyframes: none;
+    --jumi-cx-keyframes: none;
+    --jumi-cy-keyframes: none;
+    --jumi-d-keyframes: none;
     --jumi-display-keyframes: none;
+    --jumi-dominant-baseline-keyframes: none;
+    --jumi-empty-cells-keyframes: none;
     --jumi-fill-keyframes: none;
+    --jumi-fill-opacity-keyframes: none;
+    --jumi-fill-rule-keyframes: none;
     --jumi-filter-keyframes: none;
+    --jumi-flex-basis-keyframes: none;
     --jumi-flex-direction-keyframes: none;
+    --jumi-flex-flow-keyframes: none;
+    --jumi-flex-grow-keyframes: none;
     --jumi-flex-keyframes: none;
+    --jumi-flex-shrink-keyframes: none;
+    --jumi-flex-wrap-keyframes: none;
+    --jumi-float-keyframes: none;
+    --jumi-flood-color-keyframes: none;
+    --jumi-flood-opacity-keyframes: none;
     --jumi-font-family-keyframes: none;
+    --jumi-font-feature-settings-keyframes: none;
+    --jumi-font-kerning-keyframes: none;
+    --jumi-font-keyframes: none;
+    --jumi-font-language-override-keyframes: none;
+    --jumi-font-optical-sizing-keyframes: none;
+    --jumi-font-palette-keyframes: none;
+    --jumi-font-size-adjust-keyframes: none;
     --jumi-font-size-keyframes: none;
+    --jumi-font-style-keyframes: none;
+    --jumi-font-synthesis-keyframes: none;
+    --jumi-font-synthesis-position-keyframes: none;
+    --jumi-font-synthesis-small-caps-keyframes: none;
+    --jumi-font-synthesis-style-keyframes: none;
+    --jumi-font-synthesis-weight-keyframes: none;
+    --jumi-font-variant-alternates-keyframes: none;
+    --jumi-font-variant-caps-keyframes: none;
+    --jumi-font-variant-east-asian-keyframes: none;
+    --jumi-font-variant-emoji-keyframes: none;
+    --jumi-font-variant-keyframes: none;
+    --jumi-font-variant-ligatures-keyframes: none;
+    --jumi-font-variant-numeric-keyframes: none;
+    --jumi-font-variant-position-keyframes: none;
+    --jumi-font-variation-settings-keyframes: none;
     --jumi-font-weight-keyframes: none;
     --jumi-gap-keyframes: none;
     --jumi-height-keyframes: none;
@@ -3325,6 +3595,7 @@
     --jumi-justify-content-keyframes: none;
     --jumi-justify-items-keyframes: none;
     --jumi-justify-self-keyframes: none;
+    --jumi-left-keyframes: none;
     --jumi-letter-spacing-keyframes: none;
     --jumi-line-height-keyframes: none;
     --jumi-margin-keyframes: none;
@@ -3339,6 +3610,7 @@
     --jumi-overflow-keyframes: none;
     --jumi-padding-keyframes: none;
     --jumi-position-keyframes: none;
+    --jumi-right-keyframes: none;
     --jumi-stroke-dasharray-keyframes: none;
     --jumi-stroke-dashoffset-keyframes: none;
     --jumi-stroke-keyframes: none;
@@ -3350,6 +3622,7 @@
     --jumi-text-align-keyframes: none;
     --jumi-text-align-last-keyframes: none;
     --jumi-text-shadow-keyframes: none;
+    --jumi-top-keyframes: none;
     --jumi-transform-keyframes: none;
     --jumi-width-keyframes: none;
     --jumi-z-index-keyframes: none;
@@ -3747,7 +4020,7 @@
     --jumi-backdrop-blur: blur(0);
     --jumi-backdrop-brightness: brightness(1);
     --jumi-backdrop-contrast: contrast(1);
-    --jumi-backdrop-drop-shadow: drop-shadow(var(--jumi-backdrop-drop-shadow-offset-x) var(--jumi-backdrop-drop-shadow-offset-y) var(--jumi-backdrop-drop-shadow-blur) oklch(from var(--jumi-backdrop-drop-shadow-color) l c h / var(--jumi-backdrop-drop-shadow-opacity)));
+    --jumi-backdrop-drop-shadow: drop-shadow(var(--jumi-backdrop-drop-shadow-offset-x) var(--jumi-backdrop-drop-shadow-offset-y) var(--jumi-backdrop-drop-shadow-blur) var(--jumi-backdrop-drop-shadow-color));
     --jumi-backdrop-drop-shadow-blur: 0;
     --jumi-backdrop-drop-shadow-color: transparent;
     --jumi-backdrop-drop-shadow-offset-x: 0;
@@ -3804,16 +4077,27 @@
     --jumi-border-style: none;
     --jumi-border-width: medium;
     --jumi-bottom: auto;
-    --jumi-box-shadow: var(--jumi-box-shadow-offset-x) var(--jumi-box-shadow-offset-y) var(--jumi-box-shadow-blur) var(--jumi-box-shadow-spread) oklch(from var(--jumi-box-shadow-color) l c h / var(--jumi-box-shadow-opacity)) var(--jumi-box-shadow-inset);
+    --jumi-box-decoration-break: slice;
+    --jumi-box-shadow: var(--jumi-box-shadow-offset-x) var(--jumi-box-shadow-offset-y) var(--jumi-box-shadow-blur) var(--jumi-box-shadow-spread) var(--jumi-box-shadow-color) var(--jumi-box-shadow-inset);
     --jumi-box-shadow-blur: 0;
     --jumi-box-shadow-color: transparent;
     --jumi-box-shadow-offset-x: 0;
     --jumi-box-shadow-offset-y: 0;
     --jumi-box-shadow-opacity: 1;
     --jumi-box-shadow-spread: 0;
+    --jumi-box-sizing: content-box;
+    --jumi-break-after: auto;
+    --jumi-break-before: auto;
+    --jumi-break-inside: auto;
+    --jumi-caption-side: top;
     --jumi-caret-color: auto;
+    --jumi-clear: none;
     --jumi-clip-path: none;
-    --jumi-color: inherit;
+    --jumi-clip-rule: nonzero;
+    --jumi-color: canvastext;
+    --jumi-color-interpolation: auto;
+    --jumi-color-interpolation-filters: linearRGB;
+    --jumi-color-scheme: normal;
     --jumi-column-count: auto;
     --jumi-column-fill: balance;
     --jumi-column-gap: normal;
@@ -3824,12 +4108,29 @@
     --jumi-column-span: none;
     --jumi-column-width: auto;
     --jumi-columns: var(--jumi-column-count) var(--jumi-column-width);
+    --jumi-contain: none;
+    --jumi-contain-intrinsic-block-size: none;
+    --jumi-contain-intrinsic-height: none;
+    --jumi-contain-intrinsic-inline-size: none;
+    --jumi-contain-intrinsic-size: none;
+    --jumi-contain-intrinsic-width: none;
+    --jumi-content: normal;
+    --jumi-content-visibility: visible;
+    --jumi-counter-increment: none;
+    --jumi-counter-reset: none;
+    --jumi-counter-set: none;
     --jumi-cursor: auto;
-    --jumi-display: var(--jumi-display-ouside), var(--jumi-display-inside);
+    --jumi-cx: 0;
+    --jumi-cy: 0;
+    --jumi-d: none;
+    --jumi-display: inline;
     --jumi-display-inside: flow;
     --jumi-display-outside: block;
-    --jumi-fill: currentColor;
+    --jumi-dominant-baseline: auto;
+    --jumi-empty-cells: show;
+    --jumi-fill: black;
     --jumi-fill-opacity: 1;
+    --jumi-fill-rule: nonzero;
     --jumi-filter: var(--jumi-filter-blur) var(--jumi-filter-brightness) var(--jumi-filter-contrast) var(--jumi-filter-grayscale) var(--jumi-filter-hue-rotate) var(--jumi-filter-invert) var(--jumi-filter-saturate) var(--jumi-filter-sepia) var(--jumi-filter-opacity) var(--jumi-filter-drop-shadow);
     --jumi-filter-blur: blur(0);
     --jumi-filter-brightness: brightness(1);
@@ -3845,12 +4146,38 @@
     --jumi-flex: var(--jumi-flex-grow) var(--jumi-flex-shrink) var(--jumi-flex-basis);
     --jumi-flex-basis: auto;
     --jumi-flex-direction: row;
+    --jumi-flex-flow: var(--jumi-flex-direction) var(--jumi-flex-wrap);
     --jumi-flex-grow: 0;
     --jumi-flex-shrink: 1;
     --jumi-flex-wrap: nowrap;
+    --jumi-float: none;
+    --jumi-flood-color: black;
+    --jumi-flood-opacity: 1;
+    --jumi-font: var(--jumi-font-family) var(--jumi-font-size) var(--jumi-font-stretch) var(--jumi-font-style) var(--jumi-font-variant) var(--jumi-font-weight) var(--jumi-line-height);
     --jumi-font-family: inherit;
-    --jumi-font-size: 1rem;
-    --jumi-font-weight: 400;
+    --jumi-font-feature-settings: normal;
+    --jumi-font-kerning: auto;
+    --jumi-font-language-override: normal;
+    --jumi-font-optical-sizing: auto;
+    --jumi-font-palette: normal;
+    --jumi-font-size: medium;
+    --jumi-font-size-adjust: none;
+    --jumi-font-style: normal;
+    --jumi-font-synthesis: var(--jumi-font-synthesis-weight) var(--jumi-font-synthesis-style) var(--jumi-font-synthesis-small-caps) var(--jumi-font-synthesis-position);
+    --jumi-font-synthesis-position: none;
+    --jumi-font-synthesis-small-caps: auto;
+    --jumi-font-synthesis-style: auto;
+    --jumi-font-synthesis-weight: auto;
+    --jumi-font-variant: normal;
+    --jumi-font-variant-alternates: normal;
+    --jumi-font-variant-caps: normal;
+    --jumi-font-variant-east-asian: normal;
+    --jumi-font-variant-emoji: normal;
+    --jumi-font-variant-ligatures: normal;
+    --jumi-font-variant-numeric: normal;
+    --jumi-font-variant-position: normal;
+    --jumi-font-variation-settings: normal;
+    --jumi-font-weight: normal;
     --jumi-gap: 0;
     --jumi-grid-auto-columns: auto;
     --jumi-grid-auto-flow: row;

@@ -32,7 +32,6 @@ import { backgroundRepeat, backgroundRepeatAxis } from '@/theme/background-repea
 import { borderCollapse } from '@/theme/border-collapse'
 import { borderImageRepeat } from '@/theme/border-image-repeat'
 import { boxDecorationBreak } from '@/theme/box-decoration-break'
-import { boxShadowInset } from '@/theme/box-shadow-inset'
 import { boxSizing } from '@/theme/box-sizing'
 import { breakAfter } from '@/theme/break-after'
 import { breakBefore } from '@/theme/break-before'
@@ -62,6 +61,24 @@ import { fillRule } from '@/theme/fill-rule'
 import { flexDirection } from '@/theme/flex-direction'
 import { flexWrap } from '@/theme/flex-wrap'
 import { float } from '@/theme/float'
+import { fontFamily } from '@/theme/font-family'
+import { fontFeatureSettings } from '@/theme/font-feature-settings'
+import { fontKerning } from '@/theme/font-kerning'
+import { fontSize } from '@/theme/font-size'
+import { fontSizeAdjust, fontSizeAdjustMetric } from '@/theme/font-size-adjust'
+import { fontStyle } from '@/theme/font-style'
+import { fontSynthesisPosition } from '@/theme/font-synthesis-position'
+import { fontSynthesisSmallCaps } from '@/theme/font-synthesis-small-caps'
+import { fontSynthesisStyle } from '@/theme/font-synthesis-style'
+import { fontSynthesisWeight } from '@/theme/font-synthesis-weight'
+import { fontVariantAlternates } from '@/theme/font-variant-alternates'
+import { fontVariantCaps } from '@/theme/font-variant-caps'
+import { fontVariantEastAsian, fontVariantEastAsianWidth } from '@/theme/font-variant-east-asian'
+import { fontVariantLigatures } from '@/theme/font-variant-ligatures'
+import { fontVariantNumeric } from '@/theme/font-variant-numeric'
+import { fontVariantPosition } from '@/theme/font-variant-position'
+import { fontWeight } from '@/theme/font-weight'
+import { forcedColorAdjust } from '@/theme/forced-color-adjust'
 import { imageRendering } from '@/theme/image-rendering'
 import { justifyContent } from '@/theme/justify-content'
 import { justifyItems } from '@/theme/justify-items'
@@ -824,11 +841,52 @@ export const matchProperties: Partial<MatchProperty> = {
     type: 'color',
   },
   'animate-box-shadow-inset': {
+    key: 'boxShadow',
     property: value => ({
       '--jumi-box-shadow-inset': value,
-      '--jumi-box-shadow-keyframes': 'jumi-box-shadow',
+      '--jumi-box-shadow-inset-keyframes': 'jumi-box-shadow-inset',
     }),
-    values: boxShadowInset,
+    type: ['length', 'shadow', 'any'],
+  },
+  'animate-box-shadow-inset-blur': {
+    key: 'blur',
+    property: value => ({
+      '--jumi-box-shadow-inset-blur': value,
+      '--jumi-box-shadow-inset-keyframes': 'jumi-box-shadow-inset',
+    }),
+    type: ['length', 'percentage'],
+  },
+  'animate-box-shadow-inset-color': {
+    key: 'boxShadowColor',
+    property: value => ({
+      '--jumi-box-shadow-inset-color': value,
+      '--jumi-box-shadow-inset-keyframes': 'jumi-box-shadow-inset',
+    }),
+    type: 'color',
+  },
+  'animate-box-shadow-inset-offset-x': {
+    property: value => ({
+      '--jumi-box-shadow-inset-keyframes': 'jumi-box-shadow-inset',
+      '--jumi-box-shadow-inset-offset-x': value,
+    }),
+    type: ['length', 'percentage'],
+    values: empty.number,
+  },
+  'animate-box-shadow-inset-offset-y': {
+    property: value => ({
+      '--jumi-box-shadow-inset-keyframes': 'jumi-box-shadow-inset',
+      '--jumi-box-shadow-inset-offset-y': value,
+    }),
+    type: ['length', 'percentage'],
+    values: empty.number,
+  },
+  'animate-box-shadow-inset-spread': {
+    property: value => ({
+      '--jumi-box-shadow-inset-keyframes': 'jumi-box-shadow-inset',
+      '--jumi-box-shadow-inset-spread': value,
+    }),
+    type: ['length', 'percentage'],
+    values: empty.number,
   },
   'animate-box-shadow-offset-x': {
     property: value => ({
@@ -1149,16 +1207,18 @@ export const matchProperties: Partial<MatchProperty> = {
     values: display,
   },
   'animate-display-inside': {
-    property: value => ({
-      '--jumi-display-inside': value,
+    modifiers: displayOutside,
+    property: (value, { modifier }) => ({
+      '--jumi-display-inside': modifier === null ? value : `${modifier} ${value}`,
       '--jumi-display-keyframes': 'jumi-display',
     }),
     values: displayInside,
   },
   'animate-display-outside': {
-    property: value => ({
+    modifiers: displayInside,
+    property: (value, { modifier }) => ({
       '--jumi-display-keyframes': 'jumi-display',
-      '--jumi-display-outside': value,
+      '--jumi-display-outside': modifier === null ? value : `${value} ${modifier}`,
     }),
     values: displayOutside,
   },
@@ -1358,25 +1418,158 @@ export const matchProperties: Partial<MatchProperty> = {
     type: ['number', 'percentage'],
   },
   'animate-font-family': {
-    key: 'fontFamily',
     property: value => ({
       '--jumi-font-family': value,
       '--jumi-font-family-keyframes': 'jumi-font-family',
     }),
+    type: ['generic-name', 'family-name'],
+    values: fontFamily,
+  },
+  'animate-font-feature-settings': {
+    property: value => ({
+      '--jumi-font-feature-settings': value,
+      '--jumi-font-feature-settings-keyframes': 'jumi-font-feature-settings',
+    }),
+    type: ['integer', 'any'],
+    values: fontFeatureSettings,
+  },
+  'animate-font-kerning': {
+    property: value => ({
+      '--jumi-font-kerning': value,
+      '--jumi-font-kerning-keyframes': 'jumi-font-kerning',
+    }),
+    values: fontKerning,
   },
   'animate-font-size': {
-    key: 'fontSize',
     property: value => ({
       '--jumi-font-size': value,
       '--jumi-font-size-keyframes': 'jumi-font-size',
     }),
+    values: fontSize,
+  },
+  'animate-font-size-adjust': {
+    modifiers: fontSizeAdjustMetric,
+    property: (value, { modifier }) => ({
+      '--jumi-font-size-adjust': modifier === null ? value : `${value} ${modifier}`,
+      '--jumi-font-size-adjust-keyframes': 'jumi-font-size-adjust',
+    }),
+    type: ['number', 'any'],
+    values: fontSizeAdjust,
+  },
+  'animate-font-style': {
+    property: (value, { modifier }) => ({
+      '--jumi-font-style': modifier === null ? value : `${value} ${modifier}`,
+      '--jumi-font-style-keyframes': 'jumi-font-style',
+    }),
+    values: fontStyle,
+  },
+  'animate-font-synthesis': {
+    property: value => ({
+      '--jumi-font-synthesis': value,
+      '--jumi-font-synthesis-keyframes': 'jumi-font-synthesis',
+    }),
+    values: empty.none,
+  },
+  'animate-font-synthesis-position': {
+    property: value => ({
+      '--jumi-font-synthesis-position': value,
+      '--jumi-font-synthesis-position-keyframes': 'jumi-font-synthesis-position',
+    }),
+    values: fontSynthesisPosition,
+  },
+  'animate-font-synthesis-small-caps': {
+    property: value => ({
+      '--jumi-font-synthesis-small-caps': value,
+      '--jumi-font-synthesis-small-caps-keyframes': 'jumi-font-synthesis-small-caps',
+    }),
+    values: fontSynthesisSmallCaps,
+  },
+  'animate-font-synthesis-style': {
+    property: value => ({
+      '--jumi-font-synthesis-style': value,
+      '--jumi-font-synthesis-style-keyframes': 'jumi-font-synthesis-style',
+    }),
+    values: fontSynthesisStyle,
+  },
+  'animate-font-synthesis-weight': {
+    property: value => ({
+      '--jumi-font-synthesis-weight': value,
+      '--jumi-font-synthesis-weight-keyframes': 'jumi-font-synthesis-weight',
+    }),
+    values: fontSynthesisWeight,
+  },
+  'animate-font-variant': {
+    property: value => ({
+      '--jumi-font-variant': value,
+      '--jumi-font-variant-keyframes': 'jumi-font-variant',
+    }),
+    values: empty.string,
+  },
+  'animate-font-variant-alternates': {
+    property: value => ({
+      '--jumi-font-variant-alternates': value,
+      '--jumi-font-variant-alternates-keyframes': 'jumi-font-variant-alternates',
+    }),
+    values: fontVariantAlternates,
+  },
+  'animate-font-variant-caps': {
+    property: value => ({
+      '--jumi-font-variant-caps': value,
+      '--jumi-font-variant-caps-keyframes': 'jumi-font-variant-caps',
+    }),
+    values: fontVariantCaps,
+  },
+  'animate-font-variant-east-asian': {
+    modifiers: fontVariantEastAsianWidth,
+    property: (value, { modifier }) => ({
+      '--jumi-font-variant-east-asian': modifier === null ? value : `${value} ${modifier}`,
+      '--jumi-font-variant-east-asian-keyframes': 'jumi-font-variant-east-asian',
+    }),
+    values: fontVariantEastAsian,
+  },
+  'animate-font-variant-ligatures': {
+    property: value => ({
+      '--jumi-font-variant-ligatures': value,
+      '--jumi-font-variant-ligatures-keyframes': 'jumi-font-variant-ligatures',
+    }),
+    values: fontVariantLigatures,
+  },
+  'animate-font-variant-numeric': {
+    property: value => ({
+      '--jumi-font-variant-numeric': value,
+      '--jumi-font-variant-numeric-keyframes': 'jumi-font-variant-numeric',
+    }),
+    values: fontVariantNumeric,
+  },
+  'animate-font-variant-position': {
+    property: value => ({
+      '--jumi-font-variant-position': value,
+      '--jumi-font-variant-position-keyframes': 'jumi-font-variant-position',
+    }),
+    values: fontVariantPosition,
+  },
+  'animate-font-variation-settings': {
+    property: value => ({
+      '--jumi-font-variation-settings': value,
+      '--jumi-font-variation-settings-keyframes': 'jumi-font-variation-settings',
+    }),
+    type: ['number', 'any'],
+    values: empty.string,
   },
   'animate-font-weight': {
-    key: 'fontWeight',
     property: value => ({
       '--jumi-font-weight': value,
       '--jumi-font-weight-keyframes': 'jumi-font-weight',
     }),
+    type: 'number',
+    values: fontWeight,
+  },
+  'animate-forced-color-adjust': {
+    property: value => ({
+      '--jumi-forced-color-adjust': value,
+      '--jumi-forced-color-adjust-keyframes': 'jumi-forced-color-adjust',
+    }),
+    values: forcedColorAdjust,
   },
   'animate-gap': {
     key: 'gap',

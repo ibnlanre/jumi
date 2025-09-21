@@ -1,7 +1,10 @@
 import type { AnimationProperty, CSSFunction, Property } from '@/types'
 
-export function css(fn: 'var', value: `--jumi-${Property}`): string
-export function css(fn: 'var', value: `--jumi-animation-${AnimationProperty}`): string
+type AnimationVariables = `--jumi-animation-${AnimationProperty}`
+type PropertyVariables = `--jumi-${Property}`
+type Variables = AnimationVariables | PropertyVariables
+
+export function css(fn: 'var', value: Variables): string
 export function css(fn: CSSFunction, value: number | string): string
 
 export function css(fn: CSSFunction, value: number | string) {
