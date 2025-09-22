@@ -33,9 +33,8 @@ export type AnimationProperty
     | 'timing-function'
 
 export type AnimationVariables = {
-  [key in AnimationProperty as `--jumi-animation-${key}`]: string
+  [key in '--jumi-animation' | AnimationVariable]?: string
 }
-
 export type Attribute
   = 'accent-color'
     | 'align-content'
@@ -63,10 +62,12 @@ export type Attribute
     | 'border-block-color'
     | 'border-block-end'
     | 'border-block-end-color'
+    | 'border-block-end-radius'
     | 'border-block-end-style'
     | 'border-block-end-width'
     | 'border-block-start'
     | 'border-block-start-color'
+    | 'border-block-start-radius'
     | 'border-block-start-style'
     | 'border-block-start-width'
     | 'border-block-style'
@@ -74,6 +75,7 @@ export type Attribute
     | 'border-bottom'
     | 'border-bottom-color'
     | 'border-bottom-left-radius'
+    | 'border-bottom-radius'
     | 'border-bottom-right-radius'
     | 'border-bottom-style'
     | 'border-bottom-width'
@@ -91,21 +93,25 @@ export type Attribute
     | 'border-inline-color'
     | 'border-inline-end'
     | 'border-inline-end-color'
+    | 'border-inline-end-radius'
     | 'border-inline-end-style'
     | 'border-inline-end-width'
     | 'border-inline-start'
     | 'border-inline-start-color'
+    | 'border-inline-start-radius'
     | 'border-inline-start-style'
     | 'border-inline-start-width'
     | 'border-inline-style'
     | 'border-inline-width'
     | 'border-left'
     | 'border-left-color'
+    | 'border-left-radius'
     | 'border-left-style'
     | 'border-left-width'
     | 'border-radius'
     | 'border-right'
     | 'border-right-color'
+    | 'border-right-radius'
     | 'border-right-style'
     | 'border-right-width'
     | 'border-spacing'
@@ -115,6 +121,7 @@ export type Attribute
     | 'border-top'
     | 'border-top-color'
     | 'border-top-left-radius'
+    | 'border-top-radius'
     | 'border-top-right-radius'
     | 'border-top-style'
     | 'border-top-width'
@@ -136,10 +143,14 @@ export type Attribute
     | 'color-interpolation'
     | 'color-interpolation-filters'
     | 'color-scheme'
+    | 'column-count'
     | 'column-fill'
     | 'column-gap'
     | 'column-gap'
     | 'column-rule'
+    | 'column-rule-color'
+    | 'column-rule-style'
+    | 'column-rule-width'
     | 'column-span'
     | 'column-width'
     | 'columns'
@@ -244,7 +255,7 @@ export type Attribute
     | 'list-style-image'
     | 'list-style-position'
     | 'list-style-type'
- | 'margin'
+    | 'margin'
     | 'margin-block'
     | 'margin-block-end'
     | 'margin-block-start'
@@ -280,8 +291,13 @@ export type Attribute
     | 'text-shadow'
     | 'top'
     | 'transform'
+    | 'visibility'
     | 'width'
     | 'z-index'
+
+export type AttributeKeyframes = {
+  [K in Attribute as `@keyframes jumi-${K}`]: Keyframes
+}
 
 export type Collection<T = any> = Record<string, T>
 
@@ -340,10 +356,10 @@ export type EffectKeyframes = {
 
 export type KeyframeDefinition = Collection<Collection<number | string>>
 
-export type Keyframes = Collection<PropertiesHyphen>
+export type Keyframes = Collection<Collection<(string & {})> | PropertiesHyphen>
 
 export type KeyframeVariables = {
-  [key in Attribute as `--jumi-${key}-keyframes`]: 'none' | `jumi-${key}`
+  [key in Attribute as `--jumi-${key}-keyframes`]: 'none' | (string & {})
 }
 
 export type MatchProperty = {
@@ -810,10 +826,6 @@ export type Property
     | 'word-break'
     | 'z-index'
 
-export type PropertyKeyframes = {
-  [K in Attribute as `@keyframes jumi-${K}`]: Keyframes
-}
-
 export type PropertyVariables = {
   [key in Property as `--jumi-${key}`]?: string
 }
@@ -960,6 +972,8 @@ type AnchorFunction
 type AnimationFunction
   = | 'scroll'
     | 'view'
+
+type AnimationVariable = `--jumi-animation-${AnimationProperty}`
 
 type ColorFunction
   = | 'color'

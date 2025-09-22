@@ -1,10 +1,10 @@
 import type { CssInJs, MatchPropertyKeys } from '@/types'
 
 import { html } from '@/config/html'
-import { animationVariables, keyframeVariables, propertyVariables } from '@/config/variables'
+import { animationVariables, propertyVariables } from '@/config/variables'
 import { merge } from '@/helpers/merge'
 import { effectKeyframes } from '@/keyframes/effects'
-import { propertyKeyframes } from '@/keyframes/property'
+import { animationProperties, propertyKeyframes } from '@/keyframes/property'
 import { addProperties } from '@/properties/add'
 import { matchProperties } from '@/properties/match'
 
@@ -41,7 +41,7 @@ const variants: MatchVariant[] = [
 ]
 
 const keyframes: CssInJs[] = [effectKeyframes, propertyKeyframes]
-const variables: CssInJs[] = [animationVariables, keyframeVariables, propertyVariables]
+const variables: CssInJs[] = [animationVariables, propertyVariables]
 
 /**
  * Jumi - TailwindCSS Animation Plugin

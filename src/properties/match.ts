@@ -1,8 +1,8 @@
-import type { MatchProperty } from '@/types'
+import type { Attribute, MatchProperty } from '@/types'
 
 import { css } from '@/helpers/css'
 import { merge } from '@/helpers/merge'
-import { modifiers } from '@/keyframes/property'
+import { animationModifiers } from '@/keyframes/property'
 import { alignContent } from '@/theme/align-content'
 import { alignItems } from '@/theme/align-items'
 import { alignSelf } from '@/theme/align-self'
@@ -82,7 +82,6 @@ import { forcedColorAdjust } from '@/theme/forced-color-adjust'
 import { gridAutoFlow, gridAutoFlowPacking } from '@/theme/grid-auto-flow'
 import { gridSize } from '@/theme/grid-size'
 import { hangingPunctuation } from '@/theme/hanging-punctuation'
-import { height } from '@/theme/height'
 import { hyphens } from '@/theme/hyphens'
 import { imageOrientation } from '@/theme/image-orientation'
 import { imageRendering } from '@/theme/image-rendering'
@@ -104,55 +103,67 @@ import { textShadow } from '@/theme/text-shadow'
 import { transformStyle } from '@/theme/transform-style'
 import { visibility } from '@/theme/visibility'
 
+function createProperty(attribute: Attribute) {
+  const name = `jumi-${attribute}`
+
+  const duration = css('var', `--jumi-${attribute}-animation-duration`, css('var', '--jumi-animation-duration', '1s'))
+  const delay = css('var', `--jumi-${attribute}-animation-delay`, css('var', '--jumi-animation-delay', '0s'))
+  const fillMode = css('var', `--jumi-${attribute}-animation-fill-mode`, css('var', '--jumi-animation-fill-mode', 'forwards'))
+  const playState = css('var', `--jumi-${attribute}-animation-play-state`, css('var', '--jumi-animation-play-state', 'running'))
+  const easingFunction = css('var', `--jumi-${attribute}-animation-timing-function`, css('var', '--jumi-animation-timing-function', 'ease'))
+  const iterationCount = css('var', `--jumi-${attribute}-animation-iteration-count`, css('var', '--jumi-animation-iteration-count', '1'))
+  const direction = css('var', `--jumi-${attribute}-animation-direction`, css('var', '--jumi-animation-direction', 'normal'))
+
+  return [duration, easingFunction, delay, iterationCount, direction, fillMode, playState, name].join(' ')
+}
+
 export const matchProperties: Partial<MatchProperty> = {
   'animate': {
-    property: (value) => {
-      return {
-        'animation-name': value,
-      }
-    },
+    property: value => ({
+      'animation-name': value,
+    }),
     values: animationName,
   },
   'animate-accent-color': {
     key: 'accentColor',
     property: value => ({
       '--jumi-accent-color': value,
-      '--jumi-accent-color-keyframes': 'jumi-accent-color',
+      '--jumi-accent-color-keyframes': createProperty('accent-color'),
     }),
     type: 'color',
   },
   'animate-align-content': {
     property: value => ({
       '--jumi-align-content': value,
-      '--jumi-align-content-keyframes': 'jumi-align-content',
+      '--jumi-align-content-keyframes': createProperty('align-content'),
     }),
     values: alignContent,
   },
   'animate-align-items': {
     property: value => ({
       '--jumi-align-items': value,
-      '--jumi-align-items-keyframes': 'jumi-align-items',
+      '--jumi-align-items-keyframes': createProperty('align-items'),
     }),
     values: alignItems,
   },
   'animate-align-self': {
     property: value => ({
       '--jumi-align-self': value,
-      '--jumi-align-self-keyframes': 'jumi-align-self',
+      '--jumi-align-self-keyframes': createProperty('align-self'),
     }),
     values: alignSelf,
   },
   'animate-alignment-baseline': {
     property: value => ({
       '--jumi-alignment-baseline': value,
-      '--jumi-alignment-baseline-keyframes': 'jumi-alignment-baseline',
+      '--jumi-alignment-baseline-keyframes': createProperty('alignment-baseline'),
     }),
     values: alignmentBaseline,
   },
   'animate-all': {
     property: value => ({
       '--jumi-all': value,
-      '--jumi-all-keyframes': 'jumi-all',
+      '--jumi-all-keyframes': createProperty('all'),
     }),
     values: all,
   },
@@ -165,14 +176,14 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-appearance': {
     property: value => ({
       '--jumi-appearance': value,
-      '--jumi-appearance-keyframes': 'jumi-appearance',
+      '--jumi-appearance-keyframes': createProperty('appearance'),
     }),
     values: appearance,
   },
   'animate-aspect-ratio': {
     property: value => ({
       '--jumi-aspect-ratio': value,
-      '--jumi-aspect-ratio-keyframes': 'jumi-aspect-ratio',
+      '--jumi-aspect-ratio-keyframes': createProperty('aspect-ratio'),
     }),
     type: 'ratio',
     values: empty.auto,
@@ -180,14 +191,14 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-aspect-ratio-height': {
     property: value => ({
       '--jumi-aspect-ratio-height': value,
-      '--jumi-aspect-ratio-keyframes': 'jumi-aspect-ratio',
+      '--jumi-aspect-ratio-keyframes': createProperty('aspect-ratio'),
     }),
     type: 'ratio',
     values: empty.auto,
   },
   'animate-aspect-ratio-width': {
     property: value => ({
-      '--jumi-aspect-ratio-keyframes': 'jumi-aspect-ratio',
+      '--jumi-aspect-ratio-keyframes': createProperty('aspect-ratio'),
       '--jumi-aspect-ratio-width': value,
     }),
     type: 'ratio',
@@ -197,7 +208,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'backdropBlur',
     property: value => ({
       '--jumi-backdrop-blur': css('blur', value),
-      '--jumi-backdrop-filter-keyframes': 'jumi-backdrop-filter',
+      '--jumi-backdrop-filter-keyframes': createProperty('backdrop-filter'),
     }),
     type: 'length',
   },
@@ -205,7 +216,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'backdropBrightness',
     property: value => ({
       '--jumi-backdrop-brightness': css('brightness', value),
-      '--jumi-backdrop-filter-keyframes': 'jumi-backdrop-filter',
+      '--jumi-backdrop-filter-keyframes': createProperty('backdrop-filter'),
     }),
     type: ['number', 'percentage'],
   },
@@ -213,14 +224,14 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'backdropContrast',
     property: value => ({
       '--jumi-backdrop-contrast': css('contrast', value),
-      '--jumi-backdrop-filter-keyframes': 'jumi-backdrop-filter',
+      '--jumi-backdrop-filter-keyframes': createProperty('backdrop-filter'),
     }),
     type: ['number', 'percentage'],
   },
   'animate-backdrop-drop-shadow': {
     property: value => ({
       '--jumi-backdrop-drop-shadow': css('drop-shadow', value),
-      '--jumi-backdrop-filter-keyframes': 'jumi-backdrop-filter',
+      '--jumi-backdrop-filter-keyframes': createProperty('backdrop-filter'),
     }),
     type: ['length', 'shadow', 'any'],
     values: empty.none,
@@ -228,7 +239,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-backdrop-drop-shadow-blur': {
     property: value => ({
       '--jumi-backdrop-drop-shadow-blur': value,
-      '--jumi-backdrop-filter-keyframes': 'jumi-backdrop-filter',
+      '--jumi-backdrop-filter-keyframes': createProperty('backdrop-filter'),
     }),
     type: ['length', 'percentage'],
     values: empty.length,
@@ -237,14 +248,14 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'boxShadowColor',
     property: value => ({
       '--jumi-backdrop-drop-shadow-color': value,
-      '--jumi-backdrop-filter-keyframes': 'jumi-backdrop-filter',
+      '--jumi-backdrop-filter-keyframes': createProperty('backdrop-filter'),
     }),
     type: 'color',
   },
   'animate-backdrop-drop-shadow-offset-x': {
     property: value => ({
       '--jumi-backdrop-drop-shadow-offset-x': value,
-      '--jumi-backdrop-filter-keyframes': 'jumi-backdrop-filter',
+      '--jumi-backdrop-filter-keyframes': createProperty('backdrop-filter'),
     }),
     type: ['length', 'percentage'],
     values: empty.string,
@@ -252,7 +263,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-backdrop-drop-shadow-offset-y': {
     property: value => ({
       '--jumi-backdrop-drop-shadow-offset-y': value,
-      '--jumi-backdrop-filter-keyframes': 'jumi-backdrop-filter',
+      '--jumi-backdrop-filter-keyframes': createProperty('backdrop-filter'),
     }),
     type: ['length', 'percentage'],
     values: empty.string,
@@ -260,14 +271,14 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-backdrop-filter': {
     property: value => ({
       '--jumi-backdrop-filter': value,
-      '--jumi-backdrop-filter-keyframes': 'jumi-backdrop-filter',
+      '--jumi-backdrop-filter-keyframes': createProperty('backdrop-filter'),
     }),
     values: empty.none,
   },
   'animate-backdrop-grayscale': {
     key: 'backdropGrayscale',
     property: value => ({
-      '--jumi-backdrop-filter-keyframes': 'jumi-backdrop-filter',
+      '--jumi-backdrop-filter-keyframes': createProperty('backdrop-filter'),
       '--jumi-backdrop-grayscale': css('grayscale', value),
     }),
     type: ['number', 'percentage'],
@@ -275,7 +286,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-backdrop-hue-rotate': {
     key: 'backdropHueRotate',
     property: value => ({
-      '--jumi-backdrop-filter-keyframes': 'jumi-backdrop-filter',
+      '--jumi-backdrop-filter-keyframes': createProperty('backdrop-filter'),
       '--jumi-backdrop-hue-rotate': css('hue-rotate', value),
     }),
     type: 'angle',
@@ -283,7 +294,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-backdrop-invert': {
     key: 'backdropInvert',
     property: value => ({
-      '--jumi-backdrop-filter-keyframes': 'jumi-backdrop-filter',
+      '--jumi-backdrop-filter-keyframes': createProperty('backdrop-filter'),
       '--jumi-backdrop-invert': css('invert', value),
     }),
     type: ['number', 'percentage'],
@@ -291,7 +302,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-backdrop-opacity': {
     key: 'backdropOpacity',
     property: value => ({
-      '--jumi-backdrop-filter-keyframes': 'jumi-backdrop-filter',
+      '--jumi-backdrop-filter-keyframes': createProperty('backdrop-filter'),
       '--jumi-backdrop-opacity': css('opacity', value),
     }),
     type: ['number', 'percentage'],
@@ -299,7 +310,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-backdrop-saturate': {
     key: 'backdropSaturate',
     property: value => ({
-      '--jumi-backdrop-filter-keyframes': 'jumi-backdrop-filter',
+      '--jumi-backdrop-filter-keyframes': createProperty('backdrop-filter'),
       '--jumi-backdrop-saturate': css('saturate', value),
     }),
     type: ['number', 'percentage'],
@@ -307,14 +318,14 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-backdrop-sepia': {
     key: 'backdropSepia',
     property: value => ({
-      '--jumi-backdrop-filter-keyframes': 'jumi-backdrop-filter',
+      '--jumi-backdrop-filter-keyframes': createProperty('backdrop-filter'),
       '--jumi-backdrop-sepia': css('sepia', value),
     }),
     type: ['number', 'percentage'],
   },
   'animate-backdrop-url': {
     property: value => ({
-      '--jumi-backdrop-filter-keyframes': 'jumi-backdrop-filter',
+      '--jumi-backdrop-filter-keyframes': createProperty('backdrop-filter'),
       '--jumi-backdrop-url': css('url', value),
     }),
     type: 'url',
@@ -323,14 +334,14 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-backface-visibility': {
     property: value => ({
       '--jumi-backface-visibility': value,
-      '--jumi-backface-visibility-keyframes': 'jumi-backface-visibility',
+      '--jumi-backface-visibility-keyframes': createProperty('backface-visibility'),
     }),
     values: backfaceVisibility,
   },
   'animate-background': {
     property: value => ({
       '--jumi-background': value,
-      '--jumi-background-keyframes': 'jumi-background',
+      '--jumi-background-keyframes': createProperty('background'),
     }),
     type: ['color', 'image', 'position', 'url', 'any'],
     values: empty.none,
@@ -338,21 +349,21 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-background-attachment': {
     property: value => ({
       '--jumi-background-attachment': value,
-      '--jumi-background-attachment-keyframes': 'jumi-background-attachment',
+      '--jumi-background-attachment-keyframes': createProperty('background-attachment'),
     }),
     values: backgroundAttachment,
   },
   'animate-background-blend-mode': {
     property: value => ({
       '--jumi-background-blend-mode': value,
-      '--jumi-background-blend-mode-keyframes': 'jumi-background-blend-mode',
+      '--jumi-background-blend-mode-keyframes': createProperty('background-blend-mode'),
     }),
     values: mixBlendMode,
   },
   'animate-background-clip': {
     property: value => ({
       '--jumi-background-clip': value,
-      '--jumi-background-clip-keyframes': 'jumi-background-clip',
+      '--jumi-background-clip-keyframes': createProperty('background-clip'),
     }),
     values: backgroundClip,
   },
@@ -360,7 +371,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'backgroundColor',
     property: value => ({
       '--jumi-background-color': value,
-      '--jumi-background-color-keyframes': 'jumi-background-color',
+      '--jumi-background-color-keyframes': createProperty('background-color'),
     }),
     type: 'color',
   },
@@ -368,14 +379,14 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'backgroundImage',
     property: value => ({
       '--jumi-background-image': value,
-      '--jumi-background-image-keyframes': 'jumi-background-image',
+      '--jumi-background-image-keyframes': createProperty('background-image'),
     }),
     type: 'image',
   },
   'animate-background-origin': {
     property: value => ({
       '--jumi-background-origin': value,
-      '--jumi-background-origin-keyframes': 'jumi-background-origin',
+      '--jumi-background-origin-keyframes': createProperty('background-origin'),
     }),
     values: backgroundOrigin,
   },
@@ -383,13 +394,13 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'backgroundPosition',
     property: value => ({
       '--jumi-background-position': value,
-      '--jumi-background-position-keyframes': 'jumi-background-position',
+      '--jumi-background-position-keyframes': createProperty('background-position'),
     }),
     type: ['position', 'percentage', 'length', 'any'],
   },
   'animate-background-position-x': {
     property: value => ({
-      '--jumi-background-position-keyframes': 'jumi-background-position',
+      '--jumi-background-position-keyframes': createProperty('background-position'),
       '--jumi-background-position-x': value,
     }),
     type: ['position', 'percentage', 'length', 'any'],
@@ -397,14 +408,14 @@ export const matchProperties: Partial<MatchProperty> = {
   },
   'animate-background-position-x-edge': {
     property: value => ({
-      '--jumi-background-position-keyframes': 'jumi-background-position',
+      '--jumi-background-position-keyframes': createProperty('background-position'),
       '--jumi-background-position-x-edge': value,
     }),
     values: backgroundPosition,
   },
   'animate-background-position-x-offset': {
     property: value => ({
-      '--jumi-background-position-keyframes': 'jumi-background-position',
+      '--jumi-background-position-keyframes': createProperty('background-position'),
       '--jumi-background-position-x-offset': value,
     }),
     type: ['percentage', 'length'],
@@ -412,7 +423,7 @@ export const matchProperties: Partial<MatchProperty> = {
   },
   'animate-background-position-y': {
     property: value => ({
-      '--jumi-background-position-keyframes': 'jumi-background-position',
+      '--jumi-background-position-keyframes': createProperty('background-position'),
       '--jumi-background-position-y': value,
     }),
     type: ['position', 'percentage', 'length', 'any'],
@@ -420,14 +431,14 @@ export const matchProperties: Partial<MatchProperty> = {
   },
   'animate-background-position-y-edge': {
     property: value => ({
-      '--jumi-background-position-keyframes': 'jumi-background-position',
+      '--jumi-background-position-keyframes': createProperty('background-position'),
       '--jumi-background-position-y-edge': value,
     }),
     values: backgroundPosition,
   },
   'animate-background-position-y-offset': {
     property: value => ({
-      '--jumi-background-position-keyframes': 'jumi-background-position',
+      '--jumi-background-position-keyframes': createProperty('background-position'),
       '--jumi-background-position-y-offset': value,
     }),
     type: ['percentage', 'length'],
@@ -436,20 +447,20 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-background-repeat': {
     property: value => ({
       '--jumi-background-repeat': value,
-      '--jumi-background-repeat-keyframes': 'jumi-background-repeat',
+      '--jumi-background-repeat-keyframes': createProperty('background-repeat'),
     }),
     values: backgroundRepeat,
   },
   'animate-background-repeat-x': {
     property: value => ({
-      '--jumi-background-repeat-keyframes': 'jumi-background-repeat',
+      '--jumi-background-repeat-keyframes': createProperty('background-repeat'),
       '--jumi-background-repeat-x': value,
     }),
     values: backgroundRepeatAxis,
   },
   'animate-background-repeat-y': {
     property: value => ({
-      '--jumi-background-repeat-keyframes': 'jumi-background-repeat',
+      '--jumi-background-repeat-keyframes': createProperty('background-repeat'),
       '--jumi-background-repeat-y': value,
     }),
     values: backgroundRepeatAxis,
@@ -458,21 +469,21 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'backgroundSize',
     property: value => ({
       '--jumi-background-size': value,
-      '--jumi-background-size-keyframes': 'jumi-background-size',
+      '--jumi-background-size-keyframes': createProperty('background-size'),
     }),
   },
   'animate-background-size-height': {
     key: 'backgroundSize',
     property: value => ({
       '--jumi-background-size-height': value,
-      '--jumi-background-size-keyframes': 'jumi-background-size',
+      '--jumi-background-size-keyframes': createProperty('background-size'),
     }),
     type: ['length', 'percentage'],
   },
   'animate-background-size-width': {
     key: 'backgroundSize',
     property: value => ({
-      '--jumi-background-size-keyframes': 'jumi-background-size',
+      '--jumi-background-size-keyframes': createProperty('background-size'),
       '--jumi-background-size-width': value,
     }),
     type: ['length', 'percentage'],
@@ -480,7 +491,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-block-size': {
     property: value => ({
       '--jumi-block-size': value,
-      '--jumi-block-size-keyframes': 'jumi-block-size',
+      '--jumi-block-size-keyframes': createProperty('block-size'),
     }),
     type: ['length', 'percentage', 'any'],
     values: empty.auto,
@@ -488,7 +499,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-border': {
     property: value => ({
       '--jumi-border': value,
-      '--jumi-border-keyframes': 'jumi-border',
+      '--jumi-border-keyframes': createProperty('border'),
     }),
     type: ['line-width', 'length'],
     values: empty.none,
@@ -496,7 +507,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-border-block-end-radius': {
     key: 'borderRadius',
     property: value => ({
-      '--jumi-border-block-end-radius-keyframes': 'jumi-border-block-end-radius',
+      '--jumi-border-block-end-radius-keyframes': createProperty('border-block-end-radius'),
       '--jumi-border-end-end-radius': value,
       '--jumi-border-end-start-radius': value,
     }),
@@ -505,14 +516,14 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'borderWidth',
     property: value => ({
       '--jumi-border-block-end-width': value,
-      '--jumi-border-block-end-width-keyframes': 'jumi-border-block-end-width',
+      '--jumi-border-block-end-width-keyframes': createProperty('border-block-end-width'),
     }),
     type: ['line-width', 'length'],
   },
   'animate-border-block-start-radius': {
     key: 'borderRadius',
     property: value => ({
-      '--jumi-border-block-start-radius-keyframes': 'jumi-border-block-start-radius',
+      '--jumi-border-block-start-radius-keyframes': createProperty('border-block-start-radius'),
       '--jumi-border-start-end-radius': value,
       '--jumi-border-start-start-radius': value,
     }),
@@ -521,7 +532,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'borderWidth',
     property: value => ({
       '--jumi-border-block-start-width': value,
-      '--jumi-border-block-start-width-keyframes': 'jumi-border-block-start-width',
+      '--jumi-border-block-start-width-keyframes': createProperty('border-block-start-width'),
     }),
     type: ['line-width', 'length'],
   },
@@ -530,7 +541,7 @@ export const matchProperties: Partial<MatchProperty> = {
     property: value => ({
       '--jumi-border-block-end-width': value,
       '--jumi-border-block-start-width': value,
-      '--jumi-border-block-width-keyframes': 'jumi-border-block-width',
+      '--jumi-border-block-width-keyframes': createProperty('border-block-width'),
     }),
     type: ['line-width', 'length'],
   },
@@ -538,14 +549,14 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'borderRadius',
     property: value => ({
       '--jumi-border-bottom-left-radius': value,
-      '--jumi-border-bottom-left-radius-keyframes': 'jumi-border-bottom-left-radius',
+      '--jumi-border-bottom-left-radius-keyframes': createProperty('border-bottom-left-radius'),
     }),
   },
   'animate-border-bottom-radius': {
     key: 'borderRadius',
     property: value => ({
       '--jumi-border-bottom-left-radius': value,
-      '--jumi-border-bottom-radius-keyframes': 'jumi-border-bottom-radius',
+      '--jumi-border-bottom-radius-keyframes': createProperty('border-bottom-radius'),
       '--jumi-border-bottom-right-radius': value,
     }),
   },
@@ -553,21 +564,21 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'borderRadius',
     property: value => ({
       '--jumi-border-bottom-right-radius': value,
-      '--jumi-border-bottom-right-radius-keyframes': 'jumi-border-bottom-right-radius',
+      '--jumi-border-bottom-right-radius-keyframes': createProperty('border-bottom-right-radius'),
     }),
   },
   'animate-border-bottom-width': {
     key: 'borderWidth',
     property: value => ({
       '--jumi-border-bottom-width': value,
-      '--jumi-border-bottom-width-keyframes': 'jumi-border-bottom-width',
+      '--jumi-border-bottom-width-keyframes': createProperty('border-bottom-width'),
     }),
     type: ['line-width', 'length'],
   },
   'animate-border-collapse': {
     property: value => ({
       '--jumi-border-collapse': value,
-      '--jumi-border-collapse-keyframes': 'jumi-border-collapse',
+      '--jumi-border-collapse-keyframes': createProperty('border-collapse'),
     }),
     values: borderCollapse,
   },
@@ -575,7 +586,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'borderColor',
     property: value => ({
       '--jumi-border-color': value,
-      '--jumi-border-color-keyframes': 'jumi-border-color',
+      '--jumi-border-color-keyframes': createProperty('border-color'),
     }),
     type: 'color',
   },
@@ -583,20 +594,20 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'borderRadius',
     property: value => ({
       '--jumi-border-end-end-radius': value,
-      '--jumi-border-end-end-radius-keyframes': 'jumi-border-end-end-radius',
+      '--jumi-border-end-end-radius-keyframes': createProperty('border-end-end-radius'),
     }),
   },
   'animate-border-end-start-radius': {
     key: 'borderRadius',
     property: value => ({
       '--jumi-border-end-start-radius': value,
-      '--jumi-border-end-start-radius-keyframes': 'jumi-border-end-start-radius',
+      '--jumi-border-end-start-radius-keyframes': createProperty('border-end-start-radius'),
     }),
   },
   'animate-border-image': {
     property: value => ({
       '--jumi-border-image': value,
-      '--jumi-border-image-keyframes': 'jumi-border-image',
+      '--jumi-border-image-keyframes': createProperty('border-image'),
     }),
     type: 'image',
     values: empty.none,
@@ -604,7 +615,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-border-image-outset': {
     property: value => ({
       '--jumi-border-image-outset': value,
-      '--jumi-border-image-outset-keyframes': 'jumi-border-image-outset',
+      '--jumi-border-image-outset-keyframes': createProperty('border-image-outset'),
     }),
     type: ['number', 'length'],
     values: empty.number,
@@ -612,14 +623,14 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-border-image-outset-bottom': {
     property: value => ({
       '--jumi-border-image-outset-bottom': value,
-      '--jumi-border-image-outset-keyframes': 'jumi-border-image-outset',
+      '--jumi-border-image-outset-keyframes': createProperty('border-image-outset'),
     }),
     type: ['number', 'length'],
     values: empty.number,
   },
   'animate-border-image-outset-left': {
     property: value => ({
-      '--jumi-border-image-outset-keyframes': 'jumi-border-image-outset',
+      '--jumi-border-image-outset-keyframes': createProperty('border-image-outset'),
       '--jumi-border-image-outset-left': value,
     }),
     type: ['number', 'length'],
@@ -627,7 +638,7 @@ export const matchProperties: Partial<MatchProperty> = {
   },
   'animate-border-image-outset-right': {
     property: value => ({
-      '--jumi-border-image-outset-keyframes': 'jumi-border-image-outset',
+      '--jumi-border-image-outset-keyframes': createProperty('border-image-outset'),
       '--jumi-border-image-outset-right': value,
     }),
     type: ['number', 'length'],
@@ -635,7 +646,7 @@ export const matchProperties: Partial<MatchProperty> = {
   },
   'animate-border-image-outset-top': {
     property: value => ({
-      '--jumi-border-image-outset-keyframes': 'jumi-border-image-outset',
+      '--jumi-border-image-outset-keyframes': createProperty('border-image-outset'),
       '--jumi-border-image-outset-top': value,
     }),
     type: ['number', 'length'],
@@ -643,7 +654,7 @@ export const matchProperties: Partial<MatchProperty> = {
   },
   'animate-border-image-outset-x': {
     property: value => ({
-      '--jumi-border-image-outset-keyframes': 'jumi-border-image-outset',
+      '--jumi-border-image-outset-keyframes': createProperty('border-image-outset'),
       '--jumi-border-image-outset-left': value,
       '--jumi-border-image-outset-right': value,
     }),
@@ -653,7 +664,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-border-image-outset-y': {
     property: value => ({
       '--jumi-border-image-outset-bottom': value,
-      '--jumi-border-image-outset-keyframes': 'jumi-border-image-outset',
+      '--jumi-border-image-outset-keyframes': createProperty('border-image-outset'),
       '--jumi-border-image-outset-top': value,
     }),
     type: ['number', 'length'],
@@ -662,20 +673,20 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-border-image-repeat': {
     property: value => ({
       '--jumi-border-image-repeat': value,
-      '--jumi-border-image-repeat-keyframes': 'jumi-border-image-repeat',
+      '--jumi-border-image-repeat-keyframes': createProperty('border-image-repeat'),
     }),
     values: borderImageRepeat,
   },
   'animate-border-image-repeat-x': {
     property: value => ({
-      '--jumi-border-image-repeat-keyframes': 'jumi-border-image-repeat',
+      '--jumi-border-image-repeat-keyframes': createProperty('border-image-repeat'),
       '--jumi-border-image-repeat-x': value,
     }),
     values: borderImageRepeat,
   },
   'animate-border-image-repeat-y': {
     property: value => ({
-      '--jumi-border-image-repeat-keyframes': 'jumi-border-image-repeat',
+      '--jumi-border-image-repeat-keyframes': createProperty('border-image-repeat'),
       '--jumi-border-image-repeat-y': value,
     }),
     values: borderImageRepeat,
@@ -684,7 +695,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'borderRadius',
     property: value => ({
       '--jumi-border-end-end-radius': value,
-      '--jumi-border-inline-end-radius-keyframes': 'jumi-border-inline-end-radius',
+      '--jumi-border-inline-end-radius-keyframes': createProperty('border-inline-end-radius'),
       '--jumi-border-start-end-radius': value,
     }),
   },
@@ -692,7 +703,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'borderWidth',
     property: value => ({
       '--jumi-border-inline-end-width': value,
-      '--jumi-border-inline-end-width-keyframes': 'jumi-border-inline-end-width',
+      '--jumi-border-inline-end-width-keyframes': createProperty('border-inline-end-width'),
     }),
     type: ['line-width', 'length'],
   },
@@ -700,7 +711,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'borderRadius',
     property: value => ({
       '--jumi-border-end-start-radius': value,
-      '--jumi-border-inline-start-radius-keyframes': 'jumi-border-inline-start-radius',
+      '--jumi-border-inline-start-radius-keyframes': createProperty('border-inline-start-radius'),
       '--jumi-border-start-start-radius': value,
     }),
   },
@@ -708,7 +719,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'borderWidth',
     property: value => ({
       '--jumi-border-inline-start-width': value,
-      '--jumi-border-inline-start-width-keyframes': 'jumi-border-inline-start-width',
+      '--jumi-border-inline-start-width-keyframes': createProperty('border-inline-start-width'),
     }),
     type: ['line-width', 'length'],
   },
@@ -717,7 +728,7 @@ export const matchProperties: Partial<MatchProperty> = {
     property: value => ({
       '--jumi-border-inline-end-width': value,
       '--jumi-border-inline-start-width': value,
-      '--jumi-border-inline-width-keyframes': 'jumi-border-inline-width',
+      '--jumi-border-inline-width-keyframes': createProperty('border-inline-width'),
     }),
     type: ['line-width', 'length'],
   },
@@ -725,7 +736,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'borderRadius',
     property: value => ({
       '--jumi-border-bottom-left-radius': value,
-      '--jumi-border-left-radius-keyframes': 'jumi-border-left-radius',
+      '--jumi-border-left-radius-keyframes': createProperty('border-left-radius'),
       '--jumi-border-top-left-radius': value,
     }),
   },
@@ -733,7 +744,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'borderWidth',
     property: value => ({
       '--jumi-border-left-width': value,
-      '--jumi-border-left-width-keyframes': 'jumi-border-left-width',
+      '--jumi-border-left-width-keyframes': createProperty('border-left-width'),
     }),
     type: ['line-width', 'length'],
   },
@@ -741,14 +752,14 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'borderRadius',
     property: value => ({
       '--jumi-border-radius': value,
-      '--jumi-border-radius-keyframes': 'jumi-border-radius',
+      '--jumi-border-radius-keyframes': createProperty('border-radius'),
     }),
   },
   'animate-border-right-radius': {
     key: 'borderRadius',
     property: value => ({
       '--jumi-border-bottom-right-radius': value,
-      '--jumi-border-right-radius-keyframes': 'jumi-border-right-radius',
+      '--jumi-border-right-radius-keyframes': createProperty('border-right-radius'),
       '--jumi-border-top-right-radius': value,
     }),
   },
@@ -756,7 +767,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'borderWidth',
     property: value => ({
       '--jumi-border-right-width': value,
-      '--jumi-border-right-width-keyframes': 'jumi-border-right-width',
+      '--jumi-border-right-width-keyframes': createProperty('border-right-width'),
     }),
     type: ['line-width', 'length'],
   },
@@ -764,28 +775,28 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'borderRadius',
     property: value => ({
       '--jumi-border-start-end-radius': value,
-      '--jumi-border-start-end-radius-keyframes': 'jumi-border-start-end-radius',
+      '--jumi-border-start-end-radius-keyframes': createProperty('border-start-end-radius'),
     }),
   },
   'animate-border-start-start-radius': {
     key: 'borderRadius',
     property: value => ({
       '--jumi-border-start-start-radius': value,
-      '--jumi-border-start-start-radius-keyframes': 'jumi-border-start-start-radius',
+      '--jumi-border-start-start-radius-keyframes': createProperty('border-start-start-radius'),
     }),
   },
   'animate-border-top-left-radius': {
     key: 'borderRadius',
     property: value => ({
       '--jumi-border-top-left-radius': value,
-      '--jumi-border-top-left-radius-keyframes': 'jumi-border-top-left-radius',
+      '--jumi-border-top-left-radius-keyframes': createProperty('border-top-left-radius'),
     }),
   },
   'animate-border-top-radius': {
     key: 'borderRadius',
     property: value => ({
       '--jumi-border-top-left-radius': value,
-      '--jumi-border-top-radius-keyframes': 'jumi-border-top-radius',
+      '--jumi-border-top-radius-keyframes': createProperty('border-top-radius'),
       '--jumi-border-top-right-radius': value,
     }),
   },
@@ -793,14 +804,14 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'borderRadius',
     property: value => ({
       '--jumi-border-top-right-radius': value,
-      '--jumi-border-top-right-radius-keyframes': 'jumi-border-top-right-radius',
+      '--jumi-border-top-right-radius-keyframes': createProperty('border-top-right-radius'),
     }),
   },
   'animate-border-top-width': {
     key: 'borderWidth',
     property: value => ({
       '--jumi-border-top-width': value,
-      '--jumi-border-top-width-keyframes': 'jumi-border-top-width',
+      '--jumi-border-top-width-keyframes': createProperty('border-top-width'),
     }),
     type: ['line-width', 'length'],
   },
@@ -808,7 +819,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'borderWidth',
     property: value => ({
       '--jumi-border-width': value,
-      '--jumi-border-width-keyframes': 'jumi-border-width',
+      '--jumi-border-width-keyframes': createProperty('border-width'),
     }),
     type: ['line-width', 'length'],
   },
@@ -816,7 +827,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'inset',
     property: value => ({
       '--jumi-bottom': value,
-      '--jumi-bottom-keyframes': 'jumi-bottom',
+      '--jumi-bottom-keyframes': createProperty('bottom'),
     }),
     supportsNegativeValues: true,
     type: ['number', 'length', 'percentage'],
@@ -825,7 +836,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-box-decoration-break': {
     property: value => ({
       '--jumi-box-decoration-break': value,
-      '--jumi-box-decoration-break-keyframes': 'jumi-box-decoration-break',
+      '--jumi-box-decoration-break-keyframes': createProperty('box-decoration-break'),
     }),
     values: boxDecorationBreak,
   },
@@ -833,7 +844,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'boxShadow',
     property: value => ({
       '--jumi-box-shadow': value,
-      '--jumi-box-shadow-keyframes': 'jumi-box-shadow',
+      '--jumi-box-shadow-keyframes': createProperty('box-shadow'),
     }),
     type: ['length', 'shadow', 'any'],
   },
@@ -841,7 +852,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'blur',
     property: value => ({
       '--jumi-box-shadow-blur': value,
-      '--jumi-box-shadow-keyframes': 'jumi-box-shadow',
+      '--jumi-box-shadow-keyframes': createProperty('box-shadow'),
     }),
     type: ['length', 'percentage'],
   },
@@ -849,7 +860,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'boxShadowColor',
     property: value => ({
       '--jumi-box-shadow-color': value,
-      '--jumi-box-shadow-keyframes': 'jumi-box-shadow',
+      '--jumi-box-shadow-keyframes': createProperty('box-shadow'),
     }),
     type: 'color',
   },
@@ -857,7 +868,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'boxShadow',
     property: value => ({
       '--jumi-box-shadow-inset': value,
-      '--jumi-box-shadow-inset-keyframes': 'jumi-box-shadow-inset',
+      '--jumi-box-shadow-inset-keyframes': createProperty('box-shadow-inset'),
     }),
     type: ['length', 'shadow', 'any'],
   },
@@ -865,7 +876,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'blur',
     property: value => ({
       '--jumi-box-shadow-inset-blur': value,
-      '--jumi-box-shadow-inset-keyframes': 'jumi-box-shadow-inset',
+      '--jumi-box-shadow-inset-keyframes': createProperty('box-shadow-inset'),
     }),
     type: ['length', 'percentage'],
   },
@@ -873,13 +884,13 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'boxShadowColor',
     property: value => ({
       '--jumi-box-shadow-inset-color': value,
-      '--jumi-box-shadow-inset-keyframes': 'jumi-box-shadow-inset',
+      '--jumi-box-shadow-inset-keyframes': createProperty('box-shadow-inset'),
     }),
     type: 'color',
   },
   'animate-box-shadow-inset-offset-x': {
     property: value => ({
-      '--jumi-box-shadow-inset-keyframes': 'jumi-box-shadow-inset',
+      '--jumi-box-shadow-inset-keyframes': createProperty('box-shadow-inset'),
       '--jumi-box-shadow-inset-offset-x': value,
     }),
     type: ['length', 'percentage'],
@@ -887,7 +898,7 @@ export const matchProperties: Partial<MatchProperty> = {
   },
   'animate-box-shadow-inset-offset-y': {
     property: value => ({
-      '--jumi-box-shadow-inset-keyframes': 'jumi-box-shadow-inset',
+      '--jumi-box-shadow-inset-keyframes': createProperty('box-shadow-inset'),
       '--jumi-box-shadow-inset-offset-y': value,
     }),
     type: ['length', 'percentage'],
@@ -895,7 +906,7 @@ export const matchProperties: Partial<MatchProperty> = {
   },
   'animate-box-shadow-inset-spread': {
     property: value => ({
-      '--jumi-box-shadow-inset-keyframes': 'jumi-box-shadow-inset',
+      '--jumi-box-shadow-inset-keyframes': createProperty('box-shadow-inset'),
       '--jumi-box-shadow-inset-spread': value,
     }),
     type: ['length', 'percentage'],
@@ -903,7 +914,7 @@ export const matchProperties: Partial<MatchProperty> = {
   },
   'animate-box-shadow-offset-x': {
     property: value => ({
-      '--jumi-box-shadow-keyframes': 'jumi-box-shadow',
+      '--jumi-box-shadow-keyframes': createProperty('box-shadow'),
       '--jumi-box-shadow-offset-x': value,
     }),
     type: ['length', 'percentage'],
@@ -911,7 +922,7 @@ export const matchProperties: Partial<MatchProperty> = {
   },
   'animate-box-shadow-offset-y': {
     property: value => ({
-      '--jumi-box-shadow-keyframes': 'jumi-box-shadow',
+      '--jumi-box-shadow-keyframes': createProperty('box-shadow'),
       '--jumi-box-shadow-offset-y': value,
     }),
     type: ['length', 'percentage'],
@@ -919,7 +930,7 @@ export const matchProperties: Partial<MatchProperty> = {
   },
   'animate-box-shadow-spread': {
     property: value => ({
-      '--jumi-box-shadow-keyframes': 'jumi-box-shadow',
+      '--jumi-box-shadow-keyframes': createProperty('box-shadow'),
       '--jumi-box-shadow-spread': value,
     }),
     type: ['length', 'percentage'],
@@ -928,35 +939,35 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-box-sizing': {
     property: value => ({
       '--jumi-box-sizing': value,
-      '--jumi-box-sizing-keyframes': 'jumi-box-sizing',
+      '--jumi-box-sizing-keyframes': createProperty('box-sizing'),
     }),
     values: boxSizing,
   },
   'animate-break-after': {
     property: value => ({
       '--jumi-break-after': value,
-      '--jumi-break-after-keyframes': 'jumi-break-after',
+      '--jumi-break-after-keyframes': createProperty('break-after'),
     }),
     values: breakAfter,
   },
   'animate-break-before': {
     property: value => ({
       '--jumi-break-before': value,
-      '--jumi-break-before-keyframes': 'jumi-break-before',
+      '--jumi-break-before-keyframes': createProperty('break-before'),
     }),
     values: breakBefore,
   },
   'animate-break-inside': {
     property: value => ({
       '--jumi-break-inside': value,
-      '--jumi-break-inside-keyframes': 'jumi-break-inside',
+      '--jumi-break-inside-keyframes': createProperty('break-inside'),
     }),
     values: breakInside,
   },
   'animate-caption-side': {
     property: value => ({
       '--jumi-caption-side': value,
-      '--jumi-caption-side-keyframes': 'jumi-caption-side',
+      '--jumi-caption-side-keyframes': createProperty('caption-side'),
     }),
     values: captionSide,
   },
@@ -964,28 +975,28 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'caretColor',
     property: value => ({
       '--jumi-caret-color': value,
-      '--jumi-caret-color-keyframes': 'jumi-caret-color',
+      '--jumi-caret-color-keyframes': createProperty('caret-color'),
     }),
     type: 'color',
   },
   'animate-clear': {
     property: value => ({
       '--jumi-clear': value,
-      '--jumi-clear-keyframes': 'jumi-clear',
+      '--jumi-clear-keyframes': createProperty('clear'),
     }),
     values: clear,
   },
   'animate-clip-path': {
     property: value => ({
       '--jumi-clip-path': value,
-      '--jumi-clip-path-keyframes': 'jumi-clip-path',
+      '--jumi-clip-path-keyframes': createProperty('clip-path'),
     }),
     values: clipPath,
   },
   'animate-clip-rule': {
     property: value => ({
       '--jumi-clip-rule': value,
-      '--jumi-clip-rule-keyframes': 'jumi-clip-rule',
+      '--jumi-clip-rule-keyframes': createProperty('clip-rule'),
     }),
     values: clipRule,
   },
@@ -993,35 +1004,35 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'colors',
     property: value => ({
       '--jumi-color': value,
-      '--jumi-color-keyframes': 'jumi-color',
+      '--jumi-color-keyframes': createProperty('color'),
     }),
     type: 'color',
   },
   'animate-color-interpolation': {
     property: value => ({
       '--jumi-color-interpolation': value,
-      '--jumi-color-interpolation-keyframes': 'jumi-color-interpolation',
+      '--jumi-color-interpolation-keyframes': createProperty('color-interpolation'),
     }),
     values: colorInterpolation,
   },
   'animate-color-interpolation-filters': {
     property: value => ({
       '--jumi-color-interpolation-filters': value,
-      '--jumi-color-interpolation-filters-keyframes': 'jumi-color-interpolation-filters',
+      '--jumi-color-interpolation-filters-keyframes': createProperty('color-interpolation-filters'),
     }),
     values: colorInterpolation,
   },
   'animate-color-scheme': {
     property: value => ({
       '--jumi-color-scheme': value,
-      '--jumi-color-scheme-keyframes': 'jumi-color-scheme',
+      '--jumi-color-scheme-keyframes': createProperty('color-scheme'),
     }),
     values: colorScheme,
   },
   'animate-column-count': {
     property: value => ({
       '--jumi-column-count': value,
-      '--jumi-column-count-keyframes': 'jumi-column-count',
+      '--jumi-column-count-keyframes': createProperty('column-count'),
     }),
     type: 'integer',
     values: empty.auto,
@@ -1029,14 +1040,14 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-column-fill': {
     property: value => ({
       '--jumi-column-fill': value,
-      '--jumi-column-fill-keyframes': 'jumi-column-fill',
+      '--jumi-column-fill-keyframes': createProperty('column-fill'),
     }),
     values: columnFill,
   },
   'animate-column-gap': {
     property: value => ({
       '--jumi-column-gap': value,
-      '--jumi-gap-keyframes': 'jumi-gap',
+      '--jumi-gap-keyframes': createProperty('gap'),
     }),
     type: ['length', 'percentage'],
     values: empty.number,
@@ -1044,7 +1055,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-column-rule': {
     property: value => ({
       '--jumi-column-rule': value,
-      '--jumi-column-rule-keyframes': 'jumi-column-rule',
+      '--jumi-column-rule-keyframes': createProperty('column-rule'),
     }),
     type: ['line-width', 'length'],
     values: empty.none,
@@ -1053,21 +1064,21 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'borderColor',
     property: value => ({
       '--jumi-column-rule-color': value,
-      '--jumi-column-rule-color-keyframes': 'jumi-column-rule-color',
+      '--jumi-column-rule-color-keyframes': createProperty('column-rule-color'),
     }),
     type: 'color',
   },
   'animate-column-rule-style': {
     property: value => ({
       '--jumi-column-rule-style': value,
-      '--jumi-column-rule-style-keyframes': 'jumi-column-rule-style',
+      '--jumi-column-rule-style-keyframes': createProperty('column-rule-style'),
     }),
     values: columnRuleStyle,
   },
   'animate-column-rule-width': {
     property: value => ({
       '--jumi-column-rule-width': value,
-      '--jumi-column-rule-width-keyframes': 'jumi-column-rule-width',
+      '--jumi-column-rule-width-keyframes': createProperty('column-rule-width'),
     }),
     type: ['line-width', 'length'],
     values: columnRuleWidth,
@@ -1075,7 +1086,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-column-span': {
     property: value => ({
       '--jumi-column-span': value,
-      '--jumi-column-span-keyframes': 'jumi-column-span',
+      '--jumi-column-span-keyframes': createProperty('column-span'),
     }),
     type: 'integer',
     values: columnSpan,
@@ -1083,7 +1094,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-column-width': {
     property: value => ({
       '--jumi-column-width': value,
-      '--jumi-column-width-keyframes': 'jumi-column-width',
+      '--jumi-column-width-keyframes': createProperty('column-width'),
     }),
     type: ['length', 'percentage'],
     values: columnWidth,
@@ -1091,7 +1102,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-columns': {
     property: value => ({
       '--jumi-columns': value,
-      '--jumi-columns-keyframes': 'jumi-columns',
+      '--jumi-columns-keyframes': createProperty('columns'),
     }),
     type: ['line-width', 'length', 'integer'],
     values: empty.auto,
@@ -1099,14 +1110,14 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-contain': {
     property: value => ({
       '--jumi-contain': value,
-      '--jumi-contain-keyframes': 'jumi-contain',
+      '--jumi-contain-keyframes': createProperty('contain'),
     }),
     values: contain,
   },
   'animate-contain-intrinsic-block-size': {
     property: value => ({
       '--jumi-contain-intrinsic-block-size': value,
-      '--jumi-contain-intrinsic-block-size-keyframes': 'jumi-contain-intrinsic-block-size',
+      '--jumi-contain-intrinsic-block-size-keyframes': createProperty('contain-intrinsic-block-size'),
     }),
     type: 'length',
     values: containIntrinsic,
@@ -1114,7 +1125,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-contain-intrinsic-height': {
     property: value => ({
       '--jumi-contain-intrinsic-height': value,
-      '--jumi-contain-intrinsic-height-keyframes': 'jumi-contain-intrinsic-height',
+      '--jumi-contain-intrinsic-height-keyframes': createProperty('contain-intrinsic-height'),
     }),
     type: 'length',
     values: containIntrinsic,
@@ -1122,7 +1133,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-contain-intrinsic-inline-size': {
     property: value => ({
       '--jumi-contain-intrinsic-inline-size': value,
-      '--jumi-contain-intrinsic-inline-size-keyframes': 'jumi-contain-intrinsic-inline-size',
+      '--jumi-contain-intrinsic-inline-size-keyframes': createProperty('contain-intrinsic-inline-size'),
     }),
     type: 'length',
     values: containIntrinsic,
@@ -1130,7 +1141,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-contain-intrinsic-size': {
     property: value => ({
       '--jumi-contain-intrinsic-size': value,
-      '--jumi-contain-intrinsic-size-keyframes': 'jumi-contain-intrinsic-size',
+      '--jumi-contain-intrinsic-size-keyframes': createProperty('contain-intrinsic-size'),
     }),
     type: 'length',
     values: empty.none,
@@ -1138,7 +1149,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-contain-intrinsic-width': {
     property: value => ({
       '--jumi-contain-intrinsic-width': value,
-      '--jumi-contain-intrinsic-width-keyframes': 'jumi-contain-intrinsic-width',
+      '--jumi-contain-intrinsic-width-keyframes': createProperty('contain-intrinsic-width'),
     }),
     type: 'length',
     values: containIntrinsic,
@@ -1146,7 +1157,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-content': {
     property: value => ({
       '--jumi-content': value,
-      '--jumi-content-keyframes': 'jumi-content',
+      '--jumi-content-keyframes': createProperty('content'),
     }),
     type: ['image', 'any'],
     values: content,
@@ -1154,14 +1165,14 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-content-visibility': {
     property: value => ({
       '--jumi-content-visibility': value,
-      '--jumi-content-visibility-keyframes': 'jumi-content-visibility',
+      '--jumi-content-visibility-keyframes': createProperty('content-visibility'),
     }),
     values: contentVisibility,
   },
   'animate-counter-increment': {
     property: value => ({
       '--jumi-counter-increment': value,
-      '--jumi-counter-increment-keyframes': 'jumi-counter-increment',
+      '--jumi-counter-increment-keyframes': createProperty('counter-increment'),
     }),
     type: ['integer', 'any'],
     values: empty.none,
@@ -1169,7 +1180,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-counter-reset': {
     property: value => ({
       '--jumi-counter-reset': value,
-      '--jumi-counter-reset-keyframes': 'jumi-counter-reset',
+      '--jumi-counter-reset-keyframes': createProperty('counter-reset'),
     }),
     type: ['integer', 'any'],
     values: empty.none,
@@ -1177,7 +1188,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-counter-set': {
     property: value => ({
       '--jumi-counter-set': value,
-      '--jumi-counter-set-keyframes': 'jumi-counter-set',
+      '--jumi-counter-set-keyframes': createProperty('counter-set'),
     }),
     type: ['integer', 'any'],
     values: empty.none,
@@ -1185,14 +1196,14 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-cursor': {
     property: value => ({
       '--jumi-cursor': value,
-      '--jumi-cursor-keyframes': 'jumi-cursor',
+      '--jumi-cursor-keyframes': createProperty('cursor'),
     }),
     values: cursor,
   },
   'animate-cx': {
     property: value => ({
       '--jumi-cx': value,
-      '--jumi-cx-keyframes': 'jumi-cx',
+      '--jumi-cx-keyframes': createProperty('cx'),
     }),
     type: ['length', 'percentage'],
     values: empty.number,
@@ -1200,7 +1211,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-cy': {
     property: value => ({
       '--jumi-cy': value,
-      '--jumi-cy-keyframes': 'jumi-cy',
+      '--jumi-cy-keyframes': createProperty('cy'),
     }),
     type: ['length', 'percentage'],
     values: empty.number,
@@ -1208,14 +1219,14 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-d': {
     property: value => ({
       '--jumi-d': value,
-      '--jumi-d-keyframes': 'jumi-d',
+      '--jumi-d-keyframes': createProperty('d'),
     }),
     values: empty.none,
   },
   'animate-display': {
     property: value => ({
       '--jumi-display': value,
-      '--jumi-display-keyframes': 'jumi-display',
+      '--jumi-display-keyframes': createProperty('display'),
     }),
     values: display,
   },
@@ -1223,14 +1234,14 @@ export const matchProperties: Partial<MatchProperty> = {
     modifiers: displayOutside,
     property: (value, { modifier }) => ({
       '--jumi-display-inside': modifier === null ? value : `${modifier} ${value}`,
-      '--jumi-display-keyframes': 'jumi-display',
+      '--jumi-display-keyframes': createProperty('display'),
     }),
     values: displayInside,
   },
   'animate-display-outside': {
     modifiers: displayInside,
     property: (value, { modifier }) => ({
-      '--jumi-display-keyframes': 'jumi-display',
+      '--jumi-display-keyframes': createProperty('display'),
       '--jumi-display-outside': modifier === null ? value : `${value} ${modifier}`,
     }),
     values: displayOutside,
@@ -1238,14 +1249,14 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-dominant-baseline': {
     property: value => ({
       '--jumi-dominant-baseline': value,
-      '--jumi-dominant-baseline-keyframes': 'jumi-dominant-baseline',
+      '--jumi-dominant-baseline-keyframes': createProperty('dominant-baseline'),
     }),
     values: dominantBaseline,
   },
   'animate-empty-cells': {
     property: value => ({
       '--jumi-empty-cells': value,
-      '--jumi-empty-cells-keyframes': 'jumi-empty-cells',
+      '--jumi-empty-cells-keyframes': createProperty('empty-cells'),
     }),
     values: emptyCells,
   },
@@ -1267,14 +1278,14 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-fill-rule': {
     property: value => ({
       '--jumi-fill-rule': value,
-      '--jumi-fill-rule-keyframes': 'jumi-fill-rule',
+      '--jumi-fill-rule-keyframes': createProperty('fill-rule'),
     }),
     values: fillRule,
   },
   'animate-filter': {
     property: value => ({
       '--jumi-filter': value,
-      '--jumi-filter-keyframes': 'jumi-filter',
+      '--jumi-filter-keyframes': createProperty('filter'),
     }),
     values: empty.none,
   },
@@ -1282,7 +1293,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'blur',
     property: value => ({
       '--jumi-filter-blur': css('blur', value),
-      '--jumi-filter-keyframes': 'jumi-filter',
+      '--jumi-filter-keyframes': createProperty('filter'),
     }),
     type: 'length',
   },
@@ -1290,7 +1301,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'brightness',
     property: value => ({
       '--jumi-filter-brightness': css('brightness', value),
-      '--jumi-filter-keyframes': 'jumi-filter',
+      '--jumi-filter-keyframes': createProperty('filter'),
     }),
     type: ['number', 'percentage'],
   },
@@ -1298,7 +1309,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'contrast',
     property: value => ({
       '--jumi-filter-contrast': css('contrast', value),
-      '--jumi-filter-keyframes': 'jumi-filter',
+      '--jumi-filter-keyframes': createProperty('filter'),
     }),
     type: ['number', 'percentage'],
   },
@@ -1306,7 +1317,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'grayscale',
     property: value => ({
       '--jumi-filter-grayscale': css('grayscale', value),
-      '--jumi-filter-keyframes': 'jumi-filter',
+      '--jumi-filter-keyframes': createProperty('filter'),
     }),
     type: ['number', 'percentage'],
   },
@@ -1314,7 +1325,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'hueRotate',
     property: value => ({
       '--jumi-filter-hue-rotate': 'hue-rotate(' + value + ')',
-      '--jumi-filter-keyframes': 'jumi-filter',
+      '--jumi-filter-keyframes': createProperty('filter'),
     }),
     type: 'angle',
   },
@@ -1322,14 +1333,14 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'invert',
     property: value => ({
       '--jumi-filter-invert': css('invert', value),
-      '--jumi-filter-keyframes': 'jumi-filter',
+      '--jumi-filter-keyframes': createProperty('filter'),
     }),
     type: ['number', 'percentage'],
   },
   'animate-filter-opacity': {
     key: 'opacity',
     property: value => ({
-      '--jumi-filter-keyframes': 'jumi-filter',
+      '--jumi-filter-keyframes': createProperty('filter'),
       '--jumi-filter-opacity': css('opacity', value),
     }),
     type: ['number', 'percentage'],
@@ -1337,7 +1348,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-filter-saturate': {
     key: 'saturate',
     property: value => ({
-      '--jumi-filter-keyframes': 'jumi-filter',
+      '--jumi-filter-keyframes': createProperty('filter'),
       '--jumi-filter-saturate': css('saturate', value),
     }),
     type: ['number', 'percentage'],
@@ -1345,14 +1356,14 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-filter-sepia': {
     key: 'sepia',
     property: value => ({
-      '--jumi-filter-keyframes': 'jumi-filter',
+      '--jumi-filter-keyframes': createProperty('filter'),
       '--jumi-filter-sepia': css('sepia', value),
     }),
     type: ['number', 'percentage'],
   },
   'animate-filter-url': {
     property: value => ({
-      '--jumi-filter-keyframes': 'jumi-filter',
+      '--jumi-filter-keyframes': createProperty('filter'),
       '--jumi-filter-url': `url(${value})`,
     }),
     type: 'url',
@@ -1362,27 +1373,27 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'flex',
     property: value => ({
       '--jumi-flex': value,
-      '--jumi-flex-keyframes': 'jumi-flex',
+      '--jumi-flex-keyframes': createProperty('flex'),
     }),
   },
   'animate-flex-basis': {
     key: 'flexBasis',
     property: value => ({
       '--jumi-flex-basis': value,
-      '--jumi-flex-basis-keyframes': 'jumi-flex-basis',
+      '--jumi-flex-basis-keyframes': createProperty('flex-basis'),
     }),
   },
   'animate-flex-direction': {
     property: value => ({
       '--jumi-flex-direction': value,
-      '--jumi-flex-direction-keyframes': 'jumi-flex-direction',
+      '--jumi-flex-direction-keyframes': createProperty('flex-direction'),
     }),
     values: flexDirection,
   },
   'animate-flex-flow': {
     property: value => ({
       '--jumi-flex-flow': value,
-      '--jumi-flex-flow-keyframes': 'jumi-flex-flow',
+      '--jumi-flex-flow-keyframes': createProperty('flex-flow'),
     }),
     values: empty.string,
   },
@@ -1390,27 +1401,27 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'flexGrow',
     property: value => ({
       '--jumi-flex-grow': value,
-      '--jumi-flex-grow-keyframes': 'jumi-flex-grow',
+      '--jumi-flex-grow-keyframes': createProperty('flex-grow'),
     }),
   },
   'animate-flex-shrink': {
     key: 'flexShrink',
     property: value => ({
       '--jumi-flex-shrink': value,
-      '--jumi-flex-shrink-keyframes': 'jumi-flex-shrink',
+      '--jumi-flex-shrink-keyframes': createProperty('flex-shrink'),
     }),
   },
   'animate-flex-wrap': {
     property: value => ({
       '--jumi-flex-wrap': value,
-      '--jumi-flex-wrap-keyframes': 'jumi-flex-wrap',
+      '--jumi-flex-wrap-keyframes': createProperty('flex-wrap'),
     }),
     values: flexWrap,
   },
   'animate-float': {
     property: value => ({
       '--jumi-float': value,
-      '--jumi-float-keyframes': 'jumi-float',
+      '--jumi-float-keyframes': createProperty('float'),
     }),
     values: float,
   },
@@ -1418,7 +1429,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'colors',
     property: value => ({
       '--jumi-flood-color': value,
-      '--jumi-flood-color-keyframes': 'jumi-flood-color',
+      '--jumi-flood-color-keyframes': createProperty('flood-color'),
     }),
     type: 'color',
   },
@@ -1426,14 +1437,14 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'opacity',
     property: value => ({
       '--jumi-flood-opacity': value,
-      '--jumi-flood-opacity-keyframes': 'jumi-flood-opacity',
+      '--jumi-flood-opacity-keyframes': createProperty('flood-opacity'),
     }),
     type: ['number', 'percentage'],
   },
   'animate-font-family': {
     property: value => ({
       '--jumi-font-family': value,
-      '--jumi-font-family-keyframes': 'jumi-font-family',
+      '--jumi-font-family-keyframes': createProperty('font-family'),
     }),
     type: ['generic-name', 'family-name'],
     values: fontFamily,
@@ -1441,7 +1452,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-font-feature-settings': {
     property: value => ({
       '--jumi-font-feature-settings': value,
-      '--jumi-font-feature-settings-keyframes': 'jumi-font-feature-settings',
+      '--jumi-font-feature-settings-keyframes': createProperty('font-feature-settings'),
     }),
     type: ['integer', 'any'],
     values: fontFeatureSettings,
@@ -1449,14 +1460,14 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-font-kerning': {
     property: value => ({
       '--jumi-font-kerning': value,
-      '--jumi-font-kerning-keyframes': 'jumi-font-kerning',
+      '--jumi-font-kerning-keyframes': createProperty('font-kerning'),
     }),
     values: fontKerning,
   },
   'animate-font-size': {
     property: value => ({
       '--jumi-font-size': value,
-      '--jumi-font-size-keyframes': 'jumi-font-size',
+      '--jumi-font-size-keyframes': createProperty('font-size'),
     }),
     values: fontSize,
   },
@@ -1464,7 +1475,7 @@ export const matchProperties: Partial<MatchProperty> = {
     modifiers: fontSizeAdjustMetric,
     property: (value, { modifier }) => ({
       '--jumi-font-size-adjust': modifier === null ? value : `${value} ${modifier}`,
-      '--jumi-font-size-adjust-keyframes': 'jumi-font-size-adjust',
+      '--jumi-font-size-adjust-keyframes': createProperty('font-size-adjust'),
     }),
     type: ['number', 'any'],
     values: fontSizeAdjust,
@@ -1472,63 +1483,63 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-font-style': {
     property: (value, { modifier }) => ({
       '--jumi-font-style': modifier === null ? value : `${value} ${modifier}`,
-      '--jumi-font-style-keyframes': 'jumi-font-style',
+      '--jumi-font-style-keyframes': createProperty('font-style'),
     }),
     values: fontStyle,
   },
   'animate-font-synthesis': {
     property: value => ({
       '--jumi-font-synthesis': value,
-      '--jumi-font-synthesis-keyframes': 'jumi-font-synthesis',
+      '--jumi-font-synthesis-keyframes': createProperty('font-synthesis'),
     }),
     values: empty.none,
   },
   'animate-font-synthesis-position': {
     property: value => ({
       '--jumi-font-synthesis-position': value,
-      '--jumi-font-synthesis-position-keyframes': 'jumi-font-synthesis-position',
+      '--jumi-font-synthesis-position-keyframes': createProperty('font-synthesis-position'),
     }),
     values: fontSynthesisPosition,
   },
   'animate-font-synthesis-small-caps': {
     property: value => ({
       '--jumi-font-synthesis-small-caps': value,
-      '--jumi-font-synthesis-small-caps-keyframes': 'jumi-font-synthesis-small-caps',
+      '--jumi-font-synthesis-small-caps-keyframes': createProperty('font-synthesis-small-caps'),
     }),
     values: fontSynthesisSmallCaps,
   },
   'animate-font-synthesis-style': {
     property: value => ({
       '--jumi-font-synthesis-style': value,
-      '--jumi-font-synthesis-style-keyframes': 'jumi-font-synthesis-style',
+      '--jumi-font-synthesis-style-keyframes': createProperty('font-synthesis-style'),
     }),
     values: fontSynthesisStyle,
   },
   'animate-font-synthesis-weight': {
     property: value => ({
       '--jumi-font-synthesis-weight': value,
-      '--jumi-font-synthesis-weight-keyframes': 'jumi-font-synthesis-weight',
+      '--jumi-font-synthesis-weight-keyframes': createProperty('font-synthesis-weight'),
     }),
     values: fontSynthesisWeight,
   },
   'animate-font-variant': {
     property: value => ({
       '--jumi-font-variant': value,
-      '--jumi-font-variant-keyframes': 'jumi-font-variant',
+      '--jumi-font-variant-keyframes': createProperty('font-variant'),
     }),
     values: empty.string,
   },
   'animate-font-variant-alternates': {
     property: value => ({
       '--jumi-font-variant-alternates': value,
-      '--jumi-font-variant-alternates-keyframes': 'jumi-font-variant-alternates',
+      '--jumi-font-variant-alternates-keyframes': createProperty('font-variant-alternates'),
     }),
     values: fontVariantAlternates,
   },
   'animate-font-variant-caps': {
     property: value => ({
       '--jumi-font-variant-caps': value,
-      '--jumi-font-variant-caps-keyframes': 'jumi-font-variant-caps',
+      '--jumi-font-variant-caps-keyframes': createProperty('font-variant-caps'),
     }),
     values: fontVariantCaps,
   },
@@ -1536,35 +1547,35 @@ export const matchProperties: Partial<MatchProperty> = {
     modifiers: fontVariantEastAsianWidth,
     property: (value, { modifier }) => ({
       '--jumi-font-variant-east-asian': modifier === null ? value : `${value} ${modifier}`,
-      '--jumi-font-variant-east-asian-keyframes': 'jumi-font-variant-east-asian',
+      '--jumi-font-variant-east-asian-keyframes': createProperty('font-variant-east-asian'),
     }),
     values: fontVariantEastAsian,
   },
   'animate-font-variant-ligatures': {
     property: value => ({
       '--jumi-font-variant-ligatures': value,
-      '--jumi-font-variant-ligatures-keyframes': 'jumi-font-variant-ligatures',
+      '--jumi-font-variant-ligatures-keyframes': createProperty('font-variant-ligatures'),
     }),
     values: fontVariantLigatures,
   },
   'animate-font-variant-numeric': {
     property: value => ({
       '--jumi-font-variant-numeric': value,
-      '--jumi-font-variant-numeric-keyframes': 'jumi-font-variant-numeric',
+      '--jumi-font-variant-numeric-keyframes': createProperty('font-variant-numeric'),
     }),
     values: fontVariantNumeric,
   },
   'animate-font-variant-position': {
     property: value => ({
       '--jumi-font-variant-position': value,
-      '--jumi-font-variant-position-keyframes': 'jumi-font-variant-position',
+      '--jumi-font-variant-position-keyframes': createProperty('font-variant-position'),
     }),
     values: fontVariantPosition,
   },
   'animate-font-variation-settings': {
     property: value => ({
       '--jumi-font-variation-settings': value,
-      '--jumi-font-variation-settings-keyframes': 'jumi-font-variation-settings',
+      '--jumi-font-variation-settings-keyframes': createProperty('font-variation-settings'),
     }),
     type: ['number', 'any'],
     values: empty.string,
@@ -1572,7 +1583,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-font-weight': {
     property: value => ({
       '--jumi-font-weight': value,
-      '--jumi-font-weight-keyframes': 'jumi-font-weight',
+      '--jumi-font-weight-keyframes': createProperty('font-weight'),
     }),
     type: 'number',
     values: fontWeight,
@@ -1580,7 +1591,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-forced-color-adjust': {
     property: value => ({
       '--jumi-forced-color-adjust': value,
-      '--jumi-forced-color-adjust-keyframes': 'jumi-forced-color-adjust',
+      '--jumi-forced-color-adjust-keyframes': createProperty('forced-color-adjust'),
     }),
     values: forcedColorAdjust,
   },
@@ -1588,13 +1599,13 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'gap',
     property: value => ({
       '--jumi-gap': value,
-      '--jumi-gap-keyframes': 'jumi-gap',
+      '--jumi-gap-keyframes': createProperty('gap'),
     }),
   },
   'animate-grid': {
     property: value => ({
       '--jumi-grid': value,
-      '--jumi-grid-keyframes': 'jumi-grid',
+      '--jumi-grid-keyframes': createProperty('grid'),
     }),
     values: empty.string,
   },
@@ -1602,14 +1613,14 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'gridAutoColumns',
     property: value => ({
       '--jumi-grid-auto-columns': value,
-      '--jumi-grid-auto-columns-keyframes': 'jumi-grid-auto-columns',
+      '--jumi-grid-auto-columns-keyframes': createProperty('grid-auto-columns'),
     }),
   },
   'animate-grid-auto-flow': {
     modifiers: gridAutoFlowPacking,
     property: (value, { modifier }) => ({
       '--jumi-grid-auto-flow': modifier === null ? value : `${value} ${modifier}`,
-      '--jumi-grid-auto-flow-keyframes': 'jumi-grid-auto-flow',
+      '--jumi-grid-auto-flow-keyframes': createProperty('grid-auto-flow'),
     }),
     values: gridAutoFlow,
   },
@@ -1617,35 +1628,35 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'gridAutoRows',
     property: value => ({
       '--jumi-grid-auto-rows': value,
-      '--jumi-grid-auto-rows-keyframes': 'jumi-grid-auto-rows',
+      '--jumi-grid-auto-rows-keyframes': createProperty('grid-auto-rows'),
     }),
   },
   'animate-grid-column': {
     key: 'gridColumn',
     property: value => ({
       '--jumi-grid-column': value,
-      '--jumi-grid-column-keyframes': 'jumi-grid-column',
+      '--jumi-grid-column-keyframes': createProperty('grid-column'),
     }),
   },
   'animate-grid-column-end': {
     key: 'gridColumnEnd',
     property: (value, { modifier }) => ({
       '--jumi-grid-column-end': modifier === null ? value : `${modifier} value`,
-      '--jumi-grid-column-end-keyframes': 'jumi-grid-column-end',
+      '--jumi-grid-column-end-keyframes': createProperty('grid-column-end'),
     }),
   },
   'animate-grid-column-start': {
     key: 'gridColumnStart',
     property: (value, { modifier }) => ({
       '--jumi-grid-column-start': modifier === null ? value : `${modifier} value`,
-      '--jumi-grid-column-start-keyframes': 'jumi-grid-column-start',
+      '--jumi-grid-column-start-keyframes': createProperty('grid-column-start'),
     }),
   },
   'animate-grid-row': {
     key: 'gridRow',
     property: value => ({
       '--jumi-grid-row': value,
-      '--jumi-grid-row-keyframes': 'jumi-grid-row',
+      '--jumi-grid-row-keyframes': createProperty('grid-row'),
     }),
   },
   'animate-grid-row-end': {
@@ -1653,7 +1664,7 @@ export const matchProperties: Partial<MatchProperty> = {
     modifiers: gridSize,
     property: (value, { modifier }) => ({
       '--jumi-grid-row-end': modifier === null ? value : `${modifier} value`,
-      '--jumi-grid-row-end-keyframes': 'jumi-grid-row-end',
+      '--jumi-grid-row-end-keyframes': createProperty('grid-row-end'),
     }),
   },
   'animate-grid-row-start': {
@@ -1661,13 +1672,13 @@ export const matchProperties: Partial<MatchProperty> = {
     modifiers: gridSize,
     property: (value, { modifier }) => ({
       '--jumi-grid-row-start': modifier === null ? value : `${modifier} value`,
-      '--jumi-grid-row-start-keyframes': 'jumi-grid-row-start',
+      '--jumi-grid-row-start-keyframes': createProperty('grid-row-start'),
     }),
   },
   'animate-grid-template-areas': {
     property: value => ({
       '--jumi-grid-template-areas': value,
-      '--jumi-grid-template-areas-keyframes': 'jumi-grid-template-areas',
+      '--jumi-grid-template-areas-keyframes': createProperty('grid-template-areas'),
     }),
     values: empty.none,
   },
@@ -1675,50 +1686,50 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'gridTemplateColumns',
     property: value => ({
       '--jumi-grid-template-columns': value,
-      '--jumi-grid-template-columns-keyframes': 'jumi-grid-template-columns',
+      '--jumi-grid-template-columns-keyframes': createProperty('grid-template-columns'),
     }),
   },
   'animate-grid-template-rows': {
     key: 'gridTemplateRows',
     property: value => ({
       '--jumi-grid-template-rows': value,
-      '--jumi-grid-template-rows-keyframes': 'jumi-grid-template-rows',
+      '--jumi-grid-template-rows-keyframes': createProperty('grid-template-rows'),
     }),
   },
   'animate-hanging-punctuation': {
     property: value => ({
       '--jumi-hanging-punctuation': value,
-      '--jumi-hanging-punctuation-keyframes': 'jumi-hanging-punctuation',
+      '--jumi-hanging-punctuation-keyframes': createProperty('hanging-punctuation'),
     }),
     values: hangingPunctuation,
   },
   'animate-height': {
+    key: 'height',
     property: value => ({
       '--jumi-height': value,
-      '--jumi-height-keyframes': 'jumi-height',
+      '--jumi-height-keyframes': createProperty('height'),
     }),
     supportsNegativeValues: true,
     type: ['length', 'percentage', 'any'],
-    values: height,
   },
   'animate-hyphenate-character': {
     property: value => ({
       '--jumi-hyphenate-character': value,
-      '--jumi-hyphenate-character-keyframes': 'jumi-hyphenate-character',
+      '--jumi-hyphenate-character-keyframes': createProperty('hyphenate-character'),
     }),
     values: empty.auto,
   },
   'animate-hyphenate-limit-chars': {
     property: value => ({
       '--jumi-hyphenate-limit-chars': value,
-      '--jumi-hyphenate-limit-chars-keyframes': 'jumi-hyphenate-limit-chars',
+      '--jumi-hyphenate-limit-chars-keyframes': createProperty('hyphenate-limit-chars'),
     }),
     type: ['number', 'any'],
     values: empty.none,
   },
   'animate-hyphenate-limit-minimum-characters-after': {
     property: value => ({
-      '--jumi-hyphenate-limit-chars-keyframes': 'jumi-hyphenate-limit-chars',
+      '--jumi-hyphenate-limit-chars-keyframes': createProperty('hyphenate-limit-chars'),
       '--jumi-hyphenate-limit-minimum-characters-after': value,
     }),
     type: 'number',
@@ -1726,7 +1737,7 @@ export const matchProperties: Partial<MatchProperty> = {
   },
   'animate-hyphenate-limit-minimum-characters-before': {
     property: value => ({
-      '--jumi-hyphenate-limit-chars-keyframes': 'jumi-hyphenate-limit-chars',
+      '--jumi-hyphenate-limit-chars-keyframes': createProperty('hyphenate-limit-chars'),
       '--jumi-hyphenate-limit-minimum-characters-before': value,
     }),
     type: 'number',
@@ -1734,7 +1745,7 @@ export const matchProperties: Partial<MatchProperty> = {
   },
   'animate-hyphenate-limit-minimum-word-length': {
     property: value => ({
-      '--jumi-hyphenate-limit-chars-keyframes': 'jumi-hyphenate-limit-chars',
+      '--jumi-hyphenate-limit-chars-keyframes': createProperty('hyphenate-limit-chars'),
       '--jumi-hyphenate-limit-minimum-word-length': value,
     }),
     type: 'number',
@@ -1743,14 +1754,14 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-hyphens': {
     property: value => ({
       '--jumi-hyphens': value,
-      '--jumi-hyphens-keyframes': 'jumi-hyphens',
+      '--jumi-hyphens-keyframes': createProperty('hyphens'),
     }),
     values: hyphens,
   },
   'animate-image-orientation': {
     property: value => ({
       '--jumi-image-orientation': value,
-      '--jumi-image-orientation-keyframes': 'jumi-image-orientation',
+      '--jumi-image-orientation-keyframes': createProperty('image-orientation'),
     }),
     type: ['angle', 'any'],
     values: imageOrientation,
@@ -1758,7 +1769,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-image-rendering': {
     property: value => ({
       '--jumi-image-rendering': value,
-      '--jumi-image-rendering-keyframes': 'jumi-image-rendering',
+      '--jumi-image-rendering-keyframes': createProperty('image-rendering'),
     }),
     values: imageRendering,
   },
@@ -1766,7 +1777,7 @@ export const matchProperties: Partial<MatchProperty> = {
     modifiers: initialLetterPosition,
     property: (value, { modifier }) => ({
       '--jumi-initial-letter': modifier === null ? value : `${value} ${modifier}`,
-      '--jumi-initial-letter-keyframes': 'jumi-initial-letter',
+      '--jumi-initial-letter-keyframes': createProperty('initial-letter'),
     }),
     type: ['number', 'integer', 'any'],
     values: initialLetter,
@@ -1774,7 +1785,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-inline-size': {
     property: value => ({
       '--jumi-inline-size': value,
-      '--jumi-inline-size-keyframes': 'jumi-inline-size',
+      '--jumi-inline-size-keyframes': createProperty('inline-size'),
     }),
     supportsNegativeValues: true,
     type: ['length', 'percentage', 'any'],
@@ -1784,7 +1795,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'inset',
     property: value => ({
       '--jumi-inset': value,
-      '--jumi-inset-keyframes': 'jumi-inset',
+      '--jumi-inset-keyframes': createProperty('inset'),
     }),
     supportsNegativeValues: true,
     type: ['length', 'percentage', 'any'],
@@ -1794,7 +1805,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'inset',
     property: value => ({
       '--jumi-inset-block': value,
-      '--jumi-inset-block-keyframes': 'jumi-inset-block',
+      '--jumi-inset-block-keyframes': createProperty('inset-block'),
     }),
     supportsNegativeValues: true,
     type: ['length', 'percentage', 'any'],
@@ -1804,7 +1815,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'inset',
     property: value => ({
       '--jumi-inset-block-end': value,
-      '--jumi-inset-block-end-keyframes': 'jumi-inset-block-end',
+      '--jumi-inset-block-end-keyframes': createProperty('inset-block-end'),
     }),
     supportsNegativeValues: true,
     type: ['length', 'percentage', 'any'],
@@ -1814,7 +1825,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'inset',
     property: value => ({
       '--jumi-inset-block-start': value,
-      '--jumi-inset-block-start-keyframes': 'jumi-inset-block-start',
+      '--jumi-inset-block-start-keyframes': createProperty('inset-block-start'),
     }),
     supportsNegativeValues: true,
     type: ['length', 'percentage', 'any'],
@@ -1824,7 +1835,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'inset',
     property: value => ({
       '--jumi-inset-inline': value,
-      '--jumi-inset-inline-keyframes': 'jumi-inset-inline',
+      '--jumi-inset-inline-keyframes': createProperty('inset-inline'),
     }),
     supportsNegativeValues: true,
     type: ['length', 'percentage', 'any'],
@@ -1834,7 +1845,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'inset',
     property: value => ({
       '--jumi-inset-inline-end': value,
-      '--jumi-inset-inline-end-keyframes': 'jumi-inset-inline-end',
+      '--jumi-inset-inline-end-keyframes': createProperty('inset-inline-end'),
     }),
     supportsNegativeValues: true,
     type: ['length', 'percentage', 'any'],
@@ -1844,7 +1855,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'inset',
     property: value => ({
       '--jumi-inset-inline-start': value,
-      '--jumi-inset-inline-start-keyframes': 'jumi-inset-inline-start',
+      '--jumi-inset-inline-start-keyframes': createProperty('inset-inline-start'),
     }),
     supportsNegativeValues: true,
     type: ['length', 'percentage', 'any'],
@@ -1853,21 +1864,21 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-justify-content': {
     property: value => ({
       '--jumi-justify-content': value,
-      '--jumi-justify-content-keyframes': 'jumi-justify-content',
+      '--jumi-justify-content-keyframes': createProperty('justify-content'),
     }),
     values: justifyContent,
   },
   'animate-justify-items': {
     property: value => ({
       '--jumi-justify-items': value,
-      '--jumi-justify-items-keyframes': 'jumi-justify-items',
+      '--jumi-justify-items-keyframes': createProperty('justify-items'),
     }),
     values: justifyItems,
   },
   'animate-justify-self': {
     property: value => ({
       '--jumi-justify-self': value,
-      '--jumi-justify-self-keyframes': 'jumi-justify-self',
+      '--jumi-justify-self-keyframes': createProperty('justify-self'),
     }),
     values: justifySelf,
   },
@@ -1875,7 +1886,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'inset',
     property: value => ({
       '--jumi-left': value,
-      '--jumi-left-keyframes': 'jumi-left',
+      '--jumi-left-keyframes': createProperty('left'),
     }),
     supportsNegativeValues: true,
     type: ['length', 'percentage', 'any'],
@@ -1885,7 +1896,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'letterSpacing',
     property: value => ({
       '--jumi-letter-spacing': value,
-      '--jumi-letter-spacing-keyframes': 'jumi-letter-spacing',
+      '--jumi-letter-spacing-keyframes': createProperty('letter-spacing'),
     }),
     type: ['length', 'percentage'],
   },
@@ -1893,21 +1904,21 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'colors',
     property: value => ({
       '--jumi-lighting-color': value,
-      '--jumi-lighting-color-keyframes': 'jumi-lighting-color',
+      '--jumi-lighting-color-keyframes': createProperty('lighting-color'),
     }),
     type: 'color',
   },
   'animate-line-break': {
     property: value => ({
       '--jumi-line-break': value,
-      '--jumi-line-break-keyframes': 'jumi-line-break',
+      '--jumi-line-break-keyframes': createProperty('line-break'),
     }),
     values: lineBreak,
   },
   'animate-line-clamp': {
     property: value => ({
       '--jumi-line-clamp': value,
-      '--jumi-line-clamp-keyframes': 'jumi-line-clamp',
+      '--jumi-line-clamp-keyframes': createProperty('line-clamp'),
     }),
     type: ['number', 'any'],
     values: empty.none,
@@ -1916,21 +1927,21 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'lineHeight',
     property: value => ({
       '--jumi-line-height': value,
-      '--jumi-line-height-keyframes': 'jumi-line-height',
+      '--jumi-line-height-keyframes': createProperty('line-height'),
     }),
     type: ['number', 'length', 'percentage'],
   },
   'animate-list-style': {
     property: value => ({
       '--jumi-list-style': value,
-      '--jumi-list-style-keyframes': 'jumi-list-style',
+      '--jumi-list-style-keyframes': createProperty('list-style'),
     }),
     values: empty.none,
   },
   'animate-list-style-image': {
     property: value => ({
       '--jumi-list-style-image': value,
-      '--jumi-list-style-image-keyframes': 'jumi-list-style-image',
+      '--jumi-list-style-image-keyframes': createProperty('list-style-image'),
     }),
     type: ['url', 'image', 'any'],
     values: empty.none,
@@ -1938,14 +1949,14 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-list-style-position': {
     property: value => ({
       '--jumi-list-style-position': value,
-      '--jumi-list-style-position-keyframes': 'jumi-list-style-position',
+      '--jumi-list-style-position-keyframes': createProperty('list-style-position'),
     }),
     values: listStylePosition,
   },
   'animate-list-style-type': {
     property: value => ({
       '--jumi-list-style-type': value,
-      '--jumi-list-style-type-keyframes': 'jumi-list-style-type',
+      '--jumi-list-style-type-keyframes': createProperty('list-style-type'),
     }),
     values: listStyleType,
   },
@@ -1953,7 +1964,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'margin',
     property: value => ({
       '--jumi-margin': value,
-      '--jumi-margin-keyframes': 'jumi-margin',
+      '--jumi-margin-keyframes': createProperty('margin'),
     }),
     supportsNegativeValues: true,
   },
@@ -1961,7 +1972,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'margin',
     property: value => ({
       '--jumi-margin-block': value,
-      '--jumi-margin-block-keyframes': 'jumi-margin-block',
+      '--jumi-margin-block-keyframes': createProperty('margin-block'),
     }),
     supportsNegativeValues: true,
   },
@@ -1969,7 +1980,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'margin',
     property: value => ({
       '--jumi-margin-block-end': value,
-      '--jumi-margin-block-end-keyframes': 'jumi-margin-block-end',
+      '--jumi-margin-block-end-keyframes': createProperty('margin-block-end'),
     }),
     supportsNegativeValues: true,
   },
@@ -1977,7 +1988,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'margin',
     property: value => ({
       '--jumi-margin-block-start': value,
-      '--jumi-margin-block-start-keyframes': 'jumi-margin-block-start',
+      '--jumi-margin-block-start-keyframes': createProperty('margin-block-start'),
     }),
     supportsNegativeValues: true,
   },
@@ -1985,7 +1996,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'margin',
     property: value => ({
       '--jumi-margin-bottom': value,
-      '--jumi-margin-bottom-keyframes': 'jumi-margin-bottom',
+      '--jumi-margin-bottom-keyframes': createProperty('margin-bottom'),
     }),
     supportsNegativeValues: true,
   },
@@ -1993,7 +2004,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'margin',
     property: value => ({
       '--jumi-margin-inline': value,
-      '--jumi-margin-inline-keyframes': 'jumi-margin-inline',
+      '--jumi-margin-inline-keyframes': createProperty('margin-inline'),
     }),
     supportsNegativeValues: true,
   },
@@ -2001,7 +2012,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'margin',
     property: value => ({
       '--jumi-margin-inline-end': value,
-      '--jumi-margin-inline-end-keyframes': 'jumi-margin-inline-end',
+      '--jumi-margin-inline-end-keyframes': createProperty('margin-inline-end'),
     }),
     supportsNegativeValues: true,
   },
@@ -2009,7 +2020,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'margin',
     property: value => ({
       '--jumi-margin-inline-start': value,
-      '--jumi-margin-inline-start-keyframes': 'jumi-margin-inline-start',
+      '--jumi-margin-inline-start-keyframes': createProperty('margin-inline-start'),
     }),
     supportsNegativeValues: true,
   },
@@ -2017,7 +2028,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'margin',
     property: value => ({
       '--jumi-margin-left': value,
-      '--jumi-margin-left-keyframes': 'jumi-margin-left',
+      '--jumi-margin-left-keyframes': createProperty('margin-left'),
     }),
     supportsNegativeValues: true,
   },
@@ -2025,7 +2036,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'margin',
     property: value => ({
       '--jumi-margin-right': value,
-      '--jumi-margin-right-keyframes': 'jumi-margin-right',
+      '--jumi-margin-right-keyframes': createProperty('margin-right'),
     }),
     supportsNegativeValues: true,
   },
@@ -2033,7 +2044,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'margin',
     property: value => ({
       '--jumi-margin-top': value,
-      '--jumi-margin-top-keyframes': 'jumi-margin-top',
+      '--jumi-margin-top-keyframes': createProperty('margin-top'),
     }),
     supportsNegativeValues: true,
   },
@@ -2041,52 +2052,56 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'maxHeight',
     property: value => ({
       '--jumi-max-height': value,
-      '--jumi-max-height-keyframes': 'jumi-max-height',
+      '--jumi-max-height-keyframes': createProperty('max-height'),
     }),
     supportsNegativeValues: true,
+    type: ['length', 'percentage', 'any'],
   },
   'animate-max-width': {
     key: 'maxWidth',
     property: value => ({
       '--jumi-max-width': value,
-      '--jumi-max-width-keyframes': 'jumi-max-width',
+      '--jumi-max-width-keyframes': createProperty('max-width'),
     }),
     supportsNegativeValues: true,
+    type: ['length', 'percentage', 'any'],
   },
   'animate-min-height': {
     key: 'minHeight',
     property: value => ({
       '--jumi-min-height': value,
-      '--jumi-min-height-keyframes': 'jumi-min-height',
+      '--jumi-min-height-keyframes': createProperty('min-height'),
     }),
     supportsNegativeValues: true,
+    type: ['length', 'percentage', 'any'],
   },
   'animate-min-width': {
     key: 'minWidth',
     property: value => ({
       '--jumi-min-width': value,
-      '--jumi-min-width-keyframes': 'jumi-min-width',
+      '--jumi-min-width-keyframes': createProperty('min-width'),
     }),
     supportsNegativeValues: true,
+    type: ['length', 'percentage', 'any'],
   },
   'animate-opacity': {
     key: 'opacity',
     property: value => ({
       '--jumi-opacity': value,
-      '--jumi-opacity-keyframes': 'jumi-opacity',
+      '--jumi-opacity-keyframes': createProperty('opacity'),
     }),
   },
   'animate-order': {
     key: 'order',
     property: value => ({
       '--jumi-order': value,
-      '--jumi-order-keyframes': 'jumi-order',
+      '--jumi-order-keyframes': createProperty('order'),
     }),
   },
   'animate-outline': {
     key: 'outlineWidth',
     property: value => ({
-      '--jumi-outline-keyframes': 'jumi-outline',
+      '--jumi-outline-keyframes': createProperty('outline'),
       '--jumi-outline-width': value,
     }),
   },
@@ -2094,33 +2109,33 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'colors',
     property: value => ({
       '--jumi-outline-color': value,
-      '--jumi-outline-keyframes': 'jumi-outline',
+      '--jumi-outline-keyframes': createProperty('outline'),
     }),
   },
   'animate-outline-offset': {
     key: 'outlineOffset',
     property: value => ({
-      '--jumi-outline-keyframes': 'jumi-outline',
+      '--jumi-outline-keyframes': createProperty('outline'),
       '--jumi-outline-offset': value,
     }),
   },
   'animate-overflow': {
     property: value => ({
       '--jumi-overflow': value,
-      '--jumi-overflow-keyframes': 'jumi-overflow',
+      '--jumi-overflow-keyframes': createProperty('overflow'),
     }),
     values: overflow,
   },
   'animate-overflow-x': {
     property: value => ({
-      '--jumi-overflow-keyframes': 'jumi-overflow',
+      '--jumi-overflow-keyframes': createProperty('overflow'),
       '--jumi-overflow-x': value,
     }),
     values: overflow,
   },
   'animate-overflow-y': {
     property: value => ({
-      '--jumi-overflow-keyframes': 'jumi-overflow',
+      '--jumi-overflow-keyframes': createProperty('overflow'),
       '--jumi-overflow-y': value,
     }),
     values: overflow,
@@ -2129,7 +2144,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'padding',
     property: value => ({
       '--jumi-padding': value,
-      '--jumi-padding-keyframes': 'jumi-padding',
+      '--jumi-padding-keyframes': createProperty('padding'),
     }),
     supportsNegativeValues: true,
   },
@@ -2137,7 +2152,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'padding',
     property: value => ({
       '--jumi-padding-block': value,
-      '--jumi-padding-keyframes': 'jumi-padding',
+      '--jumi-padding-keyframes': createProperty('padding'),
     }),
     supportsNegativeValues: true,
   },
@@ -2145,7 +2160,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'padding',
     property: value => ({
       '--jumi-padding-bottom': value,
-      '--jumi-padding-keyframes': 'jumi-padding',
+      '--jumi-padding-keyframes': createProperty('padding'),
     }),
     supportsNegativeValues: true,
   },
@@ -2153,14 +2168,14 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'padding',
     property: value => ({
       '--jumi-padding-inline': value,
-      '--jumi-padding-keyframes': 'jumi-padding',
+      '--jumi-padding-keyframes': createProperty('padding'),
     }),
     supportsNegativeValues: true,
   },
   'animate-padding-left': {
     key: 'padding',
     property: value => ({
-      '--jumi-padding-keyframes': 'jumi-padding',
+      '--jumi-padding-keyframes': createProperty('padding'),
       '--jumi-padding-left': value,
     }),
     supportsNegativeValues: true,
@@ -2168,7 +2183,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-padding-right': {
     key: 'padding',
     property: value => ({
-      '--jumi-padding-keyframes': 'jumi-padding',
+      '--jumi-padding-keyframes': createProperty('padding'),
       '--jumi-padding-right': value,
     }),
     supportsNegativeValues: true,
@@ -2176,7 +2191,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-padding-top': {
     key: 'padding',
     property: value => ({
-      '--jumi-padding-keyframes': 'jumi-padding',
+      '--jumi-padding-keyframes': createProperty('padding'),
       '--jumi-padding-top': value,
     }),
     supportsNegativeValues: true,
@@ -2184,7 +2199,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-position': {
     property: value => ({
       '--jumi-position': value,
-      '--jumi-position-keyframes': 'jumi-position',
+      '--jumi-position-keyframes': createProperty('position'),
     }),
     values: position,
   },
@@ -2206,7 +2221,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'inset',
     property: value => ({
       '--jumi-right': value,
-      '--jumi-right-keyframes': 'jumi-right',
+      '--jumi-right-keyframes': createProperty('right'),
     }),
     supportsNegativeValues: true,
     type: ['length', 'percentage', 'any'],
@@ -2216,7 +2231,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'rotate',
     property: value => ({
       '--jumi-rotate': value,
-      '--jumi-transform-keyframes': 'jumi-transform',
+      '--jumi-transform-keyframes': createProperty('transform'),
     }),
     supportsNegativeValues: true,
     type: 'angle',
@@ -2224,7 +2239,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-rotate-3d': {
     property: value => ({
       '--jumi-rotate-3d': css('rotate3d', value),
-      '--jumi-transform-keyframes': 'jumi-transform',
+      '--jumi-transform-keyframes': createProperty('transform'),
     }),
     values: empty.string,
   },
@@ -2233,7 +2248,7 @@ export const matchProperties: Partial<MatchProperty> = {
     property: value => ({
       '--jumi-rotate': value,
       '--jumi-rotate-x': '1',
-      '--jumi-transform-keyframes': 'jumi-transform',
+      '--jumi-transform-keyframes': createProperty('transform'),
     }),
     supportsNegativeValues: true,
     type: 'angle',
@@ -2243,14 +2258,14 @@ export const matchProperties: Partial<MatchProperty> = {
     property: value => ({
       '--jumi-rotate': value,
       '--jumi-rotate-y': '1',
-      '--jumi-transform-keyframes': 'jumi-transform',
+      '--jumi-transform-keyframes': createProperty('transform'),
     }),
     supportsNegativeValues: true,
     type: 'angle',
   },
   'animate-row-gap': {
     property: value => ({
-      '--jumi-gap-keyframes': 'jumi-gap',
+      '--jumi-gap-keyframes': createProperty('gap'),
       '--jumi-row-gap': value,
     }),
     values: empty.number,
@@ -2262,7 +2277,7 @@ export const matchProperties: Partial<MatchProperty> = {
       return {
         '--jumi-scale-x': x ?? value,
         '--jumi-scale-y': y ?? x ?? value,
-        '--jumi-transform-keyframes': 'jumi-transform',
+        '--jumi-transform-keyframes': createProperty('transform'),
       }
     },
     supportsNegativeValues: true,
@@ -2271,7 +2286,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'scale',
     property: value => ({
       '--jumi-scale-x': value,
-      '--jumi-transform-keyframes': 'jumi-transform',
+      '--jumi-transform-keyframes': createProperty('transform'),
     }),
     supportsNegativeValues: true,
     type: 'number',
@@ -2280,7 +2295,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'scale',
     property: value => ({
       '--jumi-scale-y': value,
-      '--jumi-transform-keyframes': 'jumi-transform',
+      '--jumi-transform-keyframes': createProperty('transform'),
     }),
     supportsNegativeValues: true,
     type: 'number',
@@ -2289,7 +2304,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'scale',
     property: value => ({
       '--jumi-scale-z': value,
-      '--jumi-transform-keyframes': 'jumi-transform',
+      '--jumi-transform-keyframes': createProperty('transform'),
     }),
     supportsNegativeValues: true,
     type: 'number',
@@ -2301,7 +2316,7 @@ export const matchProperties: Partial<MatchProperty> = {
       return {
         '--jumi-skew-x': x ?? value,
         '--jumi-skew-y': y ?? x ?? value,
-        '--jumi-transform-keyframes': 'jumi-transform',
+        '--jumi-transform-keyframes': createProperty('transform'),
       }
     },
     supportsNegativeValues: true,
@@ -2310,7 +2325,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'skew',
     property: value => ({
       '--jumi-skew-x': value,
-      '--jumi-transform-keyframes': 'jumi-transform',
+      '--jumi-transform-keyframes': createProperty('transform'),
     }),
     supportsNegativeValues: true,
   },
@@ -2318,7 +2333,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'skew',
     property: value => ({
       '--jumi-skew-y': value,
-      '--jumi-transform-keyframes': 'jumi-transform',
+      '--jumi-transform-keyframes': createProperty('transform'),
     }),
     supportsNegativeValues: true,
   },
@@ -2337,14 +2352,14 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-text-align': {
     property: value => ({
       '--jumi-text-align': value,
-      '--jumi-text-align-keyframes': 'jumi-text-align',
+      '--jumi-text-align-keyframes': createProperty('text-align'),
     }),
     values: textAlign,
   },
   'animate-text-shadow': {
     property: value => ({
       '--jumi-text-shadow': value,
-      '--jumi-text-shadow-keyframes': 'jumi-text-shadow',
+      '--jumi-text-shadow-keyframes': createProperty('text-shadow'),
     }),
     values: textShadow,
   },
@@ -2352,7 +2367,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'inset',
     property: value => ({
       '--jumi-top': value,
-      '--jumi-top-keyframes': 'jumi-top',
+      '--jumi-top-keyframes': createProperty('top'),
     }),
     supportsNegativeValues: true,
     type: ['length', 'percentage', 'any'],
@@ -2361,20 +2376,20 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-transform': {
     property: value => ({
       '--jumi-transform': value,
-      '--jumi-transform-keyframes': 'jumi-transform',
+      '--jumi-transform-keyframes': createProperty('transform'),
     }),
     values: empty.none,
   },
   'animate-transform-style': {
     property: value => ({
-      '--jumi-transform-keyframes': 'jumi-transform',
+      '--jumi-transform-keyframes': createProperty('transform'),
       '--jumi-transform-style': value,
     }),
     values: transformStyle,
   },
   'animate-translate-3d': {
     property: value => ({
-      '--jumi-transform-keyframes': 'jumi-transform',
+      '--jumi-transform-keyframes': createProperty('transform'),
       '--jumi-translate-3d': css('translate3d', value),
     }),
     type: ['length', 'percentage', 'any'],
@@ -2382,7 +2397,7 @@ export const matchProperties: Partial<MatchProperty> = {
   },
   'animate-translate-x': {
     property: value => ({
-      '--jumi-transform-keyframes': 'jumi-transform',
+      '--jumi-transform-keyframes': createProperty('transform'),
       '--jumi-translate-x': value,
     }),
     supportsNegativeValues: true,
@@ -2391,7 +2406,7 @@ export const matchProperties: Partial<MatchProperty> = {
   },
   'animate-translate-y': {
     property: value => ({
-      '--jumi-transform-keyframes': 'jumi-transform',
+      '--jumi-transform-keyframes': createProperty('transform'),
       '--jumi-translate-y': value,
     }),
     supportsNegativeValues: true,
@@ -2400,7 +2415,7 @@ export const matchProperties: Partial<MatchProperty> = {
   },
   'animate-translate-z': {
     property: value => ({
-      '--jumi-transform-keyframes': 'jumi-transform',
+      '--jumi-transform-keyframes': createProperty('transform'),
       '--jumi-translate-z': value,
     }),
     supportsNegativeValues: true,
@@ -2410,7 +2425,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-visibility': {
     property: value => ({
       '--jumi-visibility': value,
-      '--jumi-visibility-keyframes': 'jumi-visibility',
+      '--jumi-visibility-keyframes': createProperty('visibility'),
     }),
     values: visibility,
   },
@@ -2418,14 +2433,16 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'width',
     property: value => ({
       '--jumi-width': value,
-      '--jumi-width-keyframes': 'jumi-width',
+      '--jumi-width-keyframes': createProperty('width'),
     }),
+    supportsNegativeValues: true,
+    type: ['length', 'percentage', 'any'],
   },
   'animate-z-index': {
     key: 'zIndex',
     property: value => ({
       '--jumi-z-index': value,
-      '--jumi-z-index-keyframes': 'jumi-z-index',
+      '--jumi-z-index-keyframes': createProperty('z-index'),
     }),
   },
   'animation-composition': {
@@ -2435,41 +2452,52 @@ export const matchProperties: Partial<MatchProperty> = {
     values: animationComposition,
   },
   'animation-delay': {
-    property: value => ({
-      '--jumi-animation-delay': value,
-    }),
+    modifiers: animationModifiers,
+    property: (value, { modifier }) => {
+      if (modifier === null) return { '--jumi-animation-delay': value }
+      return { [`--jumi-${modifier}-animation-delay`]: value }
+    },
     values: animationDelay,
   },
   'animation-direction': {
-    property: value => ({
-      '--jumi-animation-direction': value,
-    }),
+    modifiers: animationModifiers,
+    property: (value, { modifier }) => {
+      if (modifier === null) return { '--jumi-animation-direction': value }
+      return { [`--jumi-${modifier}-animation-direction`]: value }
+    },
     values: animationDirection,
   },
   'animation-duration': {
-    modifiers,
-    property: value => ({
-      '--jumi-animation-duration': value,
-    }),
+    modifiers: animationModifiers,
+    property: (value, { modifier }) => {
+      if (modifier === null) return { '--jumi-animation-duration': value }
+      return { [`--jumi-${modifier}-animation-duration`]: value }
+    },
     values: animationDuration,
   },
   'animation-fill-mode': {
-    property: value => ({
-      '--jumi-animation-fill-mode': value,
-    }),
+    modifiers: animationModifiers,
+    property: (value, { modifier }) => {
+      if (modifier === null) return { '--jumi-animation-fill-mode': value }
+      return { [`--jumi-${modifier}-animation-fill-mode`]: value }
+    },
     values: animationFillMode,
   },
   'animation-iteration-count': {
-    property: value => ({
-      '--jumi-animation-iteration-count': value,
-    }),
+    modifiers: animationModifiers,
+    property: (value, { modifier }) => {
+      if (modifier === null) return { '--jumi-animation-iteration-count': value }
+      return { [`--jumi-${modifier}-animation-iteration-count`]: value }
+    },
     type: 'number',
     values: animationIterationCount,
   },
   'animation-play-state': {
-    property: value => ({
-      '--jumi-animation-play-state': value,
-    }),
+    modifiers: animationModifiers,
+    property: (value, { modifier }) => {
+      if (modifier === null) return { '--jumi-animation-play-state': value }
+      return { [`--jumi-${modifier}-animation-play-state`]: value }
+    },
     values: animationPlayState,
   },
   'animation-range': {
@@ -2552,6 +2580,7 @@ export const matchProperties: Partial<MatchProperty> = {
     values: animationTimelineScroller,
   },
   'animation-timing-function': {
+    modifiers: animationModifiers,
     property: value => ({
       '--jumi-animation-timing-function': value,
     }),
