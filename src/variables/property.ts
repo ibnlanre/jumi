@@ -1,8 +1,8 @@
 import type { PropertyVariables } from '@/types'
 
 import { aspectRatio } from '@/composition/aspect-ratio'
-import { backdropDropShadow } from '@/composition/backdrop-drop-shadow'
 import { backdropFilter } from '@/composition/backdrop-filter'
+import { backdropFilterDropShadow } from '@/composition/backdrop-filter-drop-shadow'
 import { background } from '@/composition/background'
 import { backgroundPosition, backgroundPositionX, backgroundPositionY } from '@/composition/background-position'
 import { backgroundRepeat } from '@/composition/background-repeat'
@@ -16,6 +16,7 @@ import { boxShadowInset } from '@/composition/box-shadow-inset'
 import { columnRule } from '@/composition/column-rule'
 import { columns } from '@/composition/columns'
 import { filter } from '@/composition/filter'
+import { filterDropShadow } from '@/composition/filter-drop-shadow'
 import { flex } from '@/composition/flex'
 import { flexFlow } from '@/composition/flex-flow'
 import { font } from '@/composition/font'
@@ -46,6 +47,7 @@ import {
   translate,
   translate3d,
 } from '@/composition/transform'
+import { css } from '@/helpers/css'
 
 export const propertyVariables: Record<string, PropertyVariables> = {
   '.animate': {
@@ -62,12 +64,11 @@ export const propertyVariables: Record<string, PropertyVariables> = {
     '--jumi-backdrop-blur': 'blur(0)',
     '--jumi-backdrop-brightness': 'brightness(1)',
     '--jumi-backdrop-contrast': 'contrast(1)',
-    '--jumi-backdrop-drop-shadow': backdropDropShadow,
+    '--jumi-backdrop-drop-shadow': backdropFilterDropShadow,
     '--jumi-backdrop-drop-shadow-blur': '0',
     '--jumi-backdrop-drop-shadow-color': 'transparent',
     '--jumi-backdrop-drop-shadow-offset-x': '0',
     '--jumi-backdrop-drop-shadow-offset-y': '0',
-    '--jumi-backdrop-drop-shadow-opacity': '1',
     '--jumi-backdrop-filter': backdropFilter,
     '--jumi-backdrop-grayscale': 'grayscale(0)',
     '--jumi-backdrop-hue-rotate': 'hue-rotate(0deg)',
@@ -181,17 +182,22 @@ export const propertyVariables: Record<string, PropertyVariables> = {
     '--jumi-fill-opacity': '1',
     '--jumi-fill-rule': 'nonzero',
     '--jumi-filter': filter,
-    '--jumi-filter-blur': 'blur(0)',
-    '--jumi-filter-brightness': 'brightness(1)',
-    '--jumi-filter-contrast': 'contrast(1)',
-    '--jumi-filter-drop-shadow': 'drop-shadow(0 0 0 transparent)',
-    '--jumi-filter-grayscale': 'grayscale(0)',
-    '--jumi-filter-hue-rotate': 'hue-rotate(0deg)',
-    '--jumi-filter-invert': 'invert(0)',
-    '--jumi-filter-opacity': '1',
-    '--jumi-filter-saturate': 'saturate(1)',
-    '--jumi-filter-sepia': 'sepia(0)',
-    '--jumi-filter-url': 'url()',
+    '--jumi-filter-blur': css('blur', '0'),
+    '--jumi-filter-brightness': css('brightness', '1'),
+    '--jumi-filter-contrast': css('contrast', '1'),
+    '--jumi-filter-drop-shadow': filterDropShadow,
+    '--jumi-filter-drop-shadow-blur': '0',
+    '--jumi-filter-drop-shadow-color': 'transparent',
+    '--jumi-filter-drop-shadow-offset-x': '0',
+    '--jumi-filter-drop-shadow-offset-y': '0',
+    '--jumi-filter-drop-shadow-opacity': '1',
+    '--jumi-filter-grayscale': css('grayscale', '0'),
+    '--jumi-filter-hue-rotate': css('hue-rotate', '0deg'),
+    '--jumi-filter-invert': css('invert', '0'),
+    '--jumi-filter-opacity': css('opacity', '1'),
+    '--jumi-filter-saturate': css('saturate', '1'),
+    '--jumi-filter-sepia': css('sepia', '0'),
+    '--jumi-filter-url': css('url'),
     '--jumi-flex': flex,
     '--jumi-flex-basis': 'auto',
     '--jumi-flex-direction': 'row',

@@ -54,4 +54,4 @@ export const animationName = {
   'zoom-out-up': 'zoom-out-up',
 } as const
 
-export type AnimationName = keyof typeof animationName
+export type Effect = keyof typeof animationName

@@ -4,7 +4,6 @@ import { merge } from '@/helpers/merge'
 import { effectKeyframes } from '@/keyframes/effects'
 import { propertyKeyframes } from '@/keyframes/property'
 import { addProperties } from '@/properties/add'
-import { defaultProperties } from '@/properties/default'
 import { matchProperties } from '@/properties/match'
 import { animationVariables } from '@/variables/animation'
 import { propertyVariables } from '@/variables/property'
@@ -19,7 +18,6 @@ const utilities: Array<Collection<CssInJs>> = [addProperties]
 
 const jumi = createPlugin(({ addBase, addUtilities, matchUtilities, matchVariant, theme }) => {
   keyframes.concat(variables).forEach(addBase)
-  addBase(defaultProperties)
 
   variants.forEach((variant) => {
     matchVariant(variant.name, variant.generator, {

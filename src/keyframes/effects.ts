@@ -1,7 +1,7 @@
 import type { EffectKeyframes } from '@/types'
 
 export const effectKeyframes: EffectKeyframes = {
-  '@keyframes back-in': {
+  '@keyframes jumi-back-in': {
     '0%': {
       transform: 'scale(0) rotateZ(-360deg)',
     },
@@ -9,7 +9,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale(1) rotateZ(0deg)',
     },
   },
-  '@keyframes back-in-down': {
+  '@keyframes jumi-back-in-down': {
     '0%': {
       transform: 'scale(0) translateY(-2000px) rotateZ(-360deg)',
     },
@@ -17,7 +17,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale(1) translateY(0) rotateZ(0deg)',
     },
   },
-  '@keyframes back-in-left': {
+  '@keyframes jumi-back-in-left': {
     '0%': {
       transform: 'scale(0) translateX(-2000px) rotateZ(-360deg)',
     },
@@ -25,7 +25,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale(1) translateX(0) rotateZ(0deg)',
     },
   },
-  '@keyframes back-in-right': {
+  '@keyframes jumi-back-in-right': {
     '0%': {
       transform: 'scale(0) translateX(2000px) rotateZ(360deg)',
     },
@@ -33,7 +33,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale(1) translateX(0) rotateZ(0deg)',
     },
   },
-  '@keyframes back-in-up': {
+  '@keyframes jumi-back-in-up': {
     '0%': {
       transform: 'scale(0) translateY(2000px) rotateZ(360deg)',
     },
@@ -41,7 +41,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale(1) translateY(0) rotateZ(0deg)',
     },
   },
-  '@keyframes back-out': {
+  '@keyframes jumi-back-out': {
     '0%': {
       transform: 'scale(1) rotateZ(0deg)',
     },
@@ -49,7 +49,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale(0) rotateZ(360deg)',
     },
   },
-  '@keyframes back-out-down': {
+  '@keyframes jumi-back-out-down': {
     '0%': {
       transform: 'scale(1) translateY(0) rotateZ(0deg)',
     },
@@ -57,7 +57,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale(0) translateY(2000px) rotateZ(360deg)',
     },
   },
-  '@keyframes back-out-left': {
+  '@keyframes jumi-back-out-left': {
     '0%': {
       transform: 'scale(1) translateX(0) rotateZ(0deg)',
     },
@@ -65,7 +65,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale(0) translateX(-2000px) rotateZ(-360deg)',
     },
   },
-  '@keyframes back-out-right': {
+  '@keyframes jumi-back-out-right': {
     '0%': {
       transform: 'scale(1) translateX(0) rotateZ(0deg)',
     },
@@ -73,7 +73,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale(0) translateX(2000px) rotateZ(360deg)',
     },
   },
-  '@keyframes back-out-up': {
+  '@keyframes jumi-back-out-up': {
     '0%': {
       transform: 'scale(1) translateY(0) rotateZ(0deg)',
     },
@@ -81,7 +81,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale(0) translateY(-2000px) rotateZ(-360deg)',
     },
   },
-  '@keyframes bounce-in': {
+  '@keyframes jumi-bounce-in': {
     '0%': {
       transform: 'scale3d(0.3, 0.3, 0.3)',
     },
@@ -104,7 +104,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale3d(1, 1, 1)',
     },
   },
-  '@keyframes bounce-out': {
+  '@keyframes jumi-bounce-out': {
     '20%': {
       transform: 'scale3d(0.9, 0.9, 0.9)',
     },
@@ -115,7 +115,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale3d(0.3, 0.3, 0.3)',
     },
   },
-  '@keyframes fade-down': {
+  '@keyframes jumi-fade-down': {
     from: {
       opacity: '0',
       transform: 'translate3d(0, -40px, 0)',
@@ -125,7 +125,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'translate3d(0, 0, 0)',
     },
   },
-  '@keyframes fade-down-left': {
+  '@keyframes jumi-fade-down-left': {
     from: {
       opacity: '0',
       transform: 'translate3d(-40px, -40px, 0)',
@@ -135,7 +135,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'translate3d(0, 0, 0)',
     },
   },
-  '@keyframes fade-down-right': {
+  '@keyframes jumi-fade-down-right': {
     from: {
       opacity: '0',
       transform: 'translate3d(40px, -40px, 0)',
@@ -145,7 +145,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'translate3d(0, 0, 0)',
     },
   },
-  '@keyframes fade-in': {
+  '@keyframes jumi-fade-in': {
     from: {
       opacity: '0',
     },
@@ -153,7 +153,7 @@ export const effectKeyframes: EffectKeyframes = {
       opacity: '1',
     },
   },
-  '@keyframes fade-left': {
+  '@keyframes jumi-fade-left': {
     from: {
       opacity: '0',
       transform: 'translate3d(-40px, 0, 0)',
@@ -163,7 +163,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'translate3d(0, 0, 0)',
     },
   },
-  '@keyframes fade-out': {
+  '@keyframes jumi-fade-out': {
     from: {
       opacity: '1',
     },
@@ -171,7 +171,7 @@ export const effectKeyframes: EffectKeyframes = {
       opacity: '0',
     },
   },
-  '@keyframes fade-right': {
+  '@keyframes jumi-fade-right': {
     from: {
       opacity: '0',
       transform: 'translate3d(40px, 0, 0)',
@@ -181,7 +181,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'translate3d(0, 0, 0)',
     },
   },
-  '@keyframes fade-up': {
+  '@keyframes jumi-fade-up': {
     from: {
       opacity: '0',
       transform: 'translate3d(0, 40px, 0)',
@@ -191,7 +191,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'translate3d(0, 0, 0)',
     },
   },
-  '@keyframes fade-up-left': {
+  '@keyframes jumi-fade-up-left': {
     from: {
       opacity: '0',
       transform: 'translate3d(-40px, 40px, 0)',
@@ -201,7 +201,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'translate3d(0, 0, 0)',
     },
   },
-  '@keyframes fade-up-right': {
+  '@keyframes jumi-fade-up-right': {
     from: {
       opacity: '0',
       transform: 'translate3d(40px, 40px, 0)',
@@ -211,7 +211,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'translate3d(0, 0, 0)',
     },
   },
-  '@keyframes flip-down': {
+  '@keyframes jumi-flip-down': {
     '40%': {
       'animation-timing-function': 'ease-in',
       'transform': 'perspective(400px) rotateX(20deg)',
@@ -232,7 +232,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'perspective(400px)',
     },
   },
-  '@keyframes flip-left': {
+  '@keyframes jumi-flip-left': {
     '40%': {
       'animation-timing-function': 'ease-in',
       'transform': 'perspective(400px) rotateY(20deg)',
@@ -253,7 +253,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'perspective(400px)',
     },
   },
-  '@keyframes flip-right': {
+  '@keyframes jumi-flip-right': {
     '40%': {
       'animation-timing-function': 'ease-in',
       'transform': 'perspective(400px) rotateY(-20deg)',
@@ -274,7 +274,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'perspective(400px)',
     },
   },
-  '@keyframes flip-up': {
+  '@keyframes jumi-flip-up': {
     '40%': {
       'animation-timing-function': 'ease-in',
       'transform': 'perspective(400px) rotateX(-20deg)',
@@ -295,7 +295,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'perspective(400px)',
     },
   },
-  '@keyframes flip-x': {
+  '@keyframes jumi-flip-x': {
     '40%': {
       'animation-timing-function': 'ease-in',
       'transform': 'perspective(400px) rotateX(-20deg)',
@@ -314,7 +314,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'perspective(400px) rotateX(0deg)',
     },
   },
-  '@keyframes flip-y': {
+  '@keyframes jumi-flip-y': {
     '40%': {
       'animation-timing-function': 'ease-in',
       'transform': 'perspective(400px) rotateY(-20deg)',
@@ -333,7 +333,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'perspective(400px) rotateY(0deg)',
     },
   },
-  '@keyframes heart-beat': {
+  '@keyframes jumi-heart-beat': {
     '14%': {
       transform: 'scale3d(1.3, 1.3, 1.3)',
     },
@@ -350,7 +350,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale3d(1, 1, 1)',
     },
   },
-  '@keyframes jello': {
+  '@keyframes jumi-jello': {
     '11.1%': {
       transform: 'skewX(-12.5deg) skewY(-12.5deg)',
     },
@@ -382,7 +382,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'none',
     },
   },
-  '@keyframes pulsate': {
+  '@keyframes jumi-pulsate': {
     '50%': {
       transform: 'scale3d(1.05, 1.05, 1.05)',
     },
@@ -393,7 +393,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale3d(1, 1, 1)',
     },
   },
-  '@keyframes reveal-bottom': {
+  '@keyframes jumi-reveal-bottom': {
     from: {
       'bottom': 0,
       'inset-inline': 0,
@@ -403,7 +403,7 @@ export const effectKeyframes: EffectKeyframes = {
       width: '0%',
     },
   },
-  '@keyframes reveal-left': {
+  '@keyframes jumi-reveal-left': {
     from: {
       'inset-block': 0,
       'left': 0,
@@ -413,7 +413,7 @@ export const effectKeyframes: EffectKeyframes = {
       width: '100%',
     },
   },
-  '@keyframes reveal-right': {
+  '@keyframes jumi-reveal-right': {
     from: {
       'inset-block': 0,
       'right': 0,
@@ -423,7 +423,7 @@ export const effectKeyframes: EffectKeyframes = {
       width: '100%',
     },
   },
-  '@keyframes reveal-top': {
+  '@keyframes jumi-reveal-top': {
     from: {
       'height': '0%',
       'inset-inline': 0,
@@ -433,7 +433,7 @@ export const effectKeyframes: EffectKeyframes = {
       height: '100%',
     },
   },
-  '@keyframes shake': {
+  '@keyframes jumi-shake': {
     '10%, 30%, 50%, 70%, 90%': {
       transform: 'translate3d(-10px, 0, 0)',
     },
@@ -444,7 +444,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'translate3d(0, 0, 0)',
     },
   },
-  '@keyframes slide-in-down': {
+  '@keyframes jumi-slide-in-down': {
     from: {
       transform: 'translate3d(0, -100%, 0)',
       visibility: 'visible',
@@ -453,7 +453,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'translate3d(0, 0, 0)',
     },
   },
-  '@keyframes slide-in-left': {
+  '@keyframes jumi-slide-in-left': {
     from: {
       transform: 'translate3d(-100%, 0, 0)',
       visibility: 'visible',
@@ -462,7 +462,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'translate3d(0, 0, 0)',
     },
   },
-  '@keyframes slide-in-right': {
+  '@keyframes jumi-slide-in-right': {
     from: {
       transform: 'translate3d(100%, 0, 0)',
       visibility: 'visible',
@@ -471,7 +471,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'translate3d(0, 0, 0)',
     },
   },
-  '@keyframes slide-in-up': {
+  '@keyframes jumi-slide-in-up': {
     from: {
       transform: 'translate3d(0, 100%, 0)',
       visibility: 'visible',
@@ -480,7 +480,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'translate3d(0, 0, 0)',
     },
   },
-  '@keyframes swing': {
+  '@keyframes jumi-swing': {
     '20%': {
       transform: 'rotateZ(15deg)',
     },
@@ -497,7 +497,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'rotateZ(0deg)',
     },
   },
-  '@keyframes tada': {
+  '@keyframes jumi-tada': {
     '10%, 20%': {
       transform: 'scale3d(0.9, 0.9, 0.9) rotateZ(-3deg)',
     },
@@ -514,7 +514,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale3d(1, 1, 1)',
     },
   },
-  '@keyframes wobble': {
+  '@keyframes jumi-wobble': {
     '15%': {
       transform: 'translate3d(-25%, 0, 0) rotateZ(-5deg)',
     },
@@ -537,7 +537,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'translate3d(0, 0, 0)',
     },
   },
-  '@keyframes zoom-in': {
+  '@keyframes jumi-zoom-in': {
     '50%': {
       transform: 'scale3d(1.05, 1.05, 1.05)',
     },
@@ -548,7 +548,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale3d(1, 1, 1)',
     },
   },
-  '@keyframes zoom-in-down': {
+  '@keyframes jumi-zoom-in-down': {
     '50%': {
       transform: 'scale3d(1.05, 1.05, 1.05) translate3d(0, 60%, 0)',
     },
@@ -559,7 +559,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale3d(1, 1, 1) translate3d(0, 0, 0)',
     },
   },
-  '@keyframes zoom-in-left': {
+  '@keyframes jumi-zoom-in-left': {
     '50%': {
       transform: 'scale3d(1.05, 1.05, 1.05) translate3d(60%, 0, 0)',
     },
@@ -570,7 +570,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale3d(1, 1, 1) translate3d(0, 0, 0)',
     },
   },
-  '@keyframes zoom-in-right': {
+  '@keyframes jumi-zoom-in-right': {
     '50%': {
       transform: 'scale3d(1.05, 1.05, 1.05) translate3d(-60%, 0, 0)',
     },
@@ -581,7 +581,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale3d(1, 1, 1) translate3d(0, 0, 0)',
     },
   },
-  '@keyframes zoom-in-up': {
+  '@keyframes jumi-zoom-in-up': {
     '50%': {
       transform: 'scale3d(1.05, 1.05, 1.05) translate3d(0, -60%, 0)',
     },
@@ -592,7 +592,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale3d(1, 1, 1) translate3d(0, 0, 0)',
     },
   },
-  '@keyframes zoom-out': {
+  '@keyframes jumi-zoom-out': {
     '50%': {
       transform: 'scale3d(0.95, 0.95, 0.95)',
     },
@@ -603,7 +603,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale3d(0.3, 0.3, 0.3)',
     },
   },
-  '@keyframes zoom-out-down': {
+  '@keyframes jumi-zoom-out-down': {
     '50%': {
       transform: 'scale3d(0.95, 0.95, 0.95) translate3d(0, 60%, 0)',
     },
@@ -614,7 +614,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale3d(0.3, 0.3, 0.3) translate3d(0, 100%, 0)',
     },
   },
-  '@keyframes zoom-out-left': {
+  '@keyframes jumi-zoom-out-left': {
     '50%': {
       transform: 'scale3d(0.95, 0.95, 0.95) translate3d(-60%, 0, 0)',
     },
@@ -625,7 +625,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale3d(0.3, 0.3, 0.3) translate3d(-100%, 0, 0)',
     },
   },
-  '@keyframes zoom-out-right': {
+  '@keyframes jumi-zoom-out-right': {
     '50%': {
       transform: 'scale3d(0.95, 0.95, 0.95) translate3d(60%, 0, 0)',
     },
@@ -636,7 +636,7 @@ export const effectKeyframes: EffectKeyframes = {
       transform: 'scale3d(0.3, 0.3, 0.3) translate3d(100%, 0, 0)',
     },
   },
-  '@keyframes zoom-out-up': {
+  '@keyframes jumi-zoom-out-up': {
     '50%': {
       transform: 'scale3d(0.95, 0.95, 0.95) translate3d(0, -60%, 0)',
     },

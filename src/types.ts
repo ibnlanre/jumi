@@ -1,6 +1,6 @@
 import type { PropertiesHyphen } from 'csstype'
 
-import type { AnimationName } from '@/theme/animation-name'
+import type { Effect } from '@/theme/animation-name'
 
 export type AddProperty = {
   [K in AddPropertyKeys as `.${K}`]?: CssInJs
@@ -351,7 +351,7 @@ export type DataType
     | 'vector'
 
 export type EffectKeyframes = {
-  [K in AnimationName as `@keyframes ${K}`]?: Keyframes
+  [K in Effect as `@keyframes jumi-${K}`]?: Keyframes
 }
 
 export type KeyframeDefinition = Collection<Collection<number | string>>
@@ -408,7 +408,6 @@ export type Property
     | 'backdrop-drop-shadow-color'
     | 'backdrop-drop-shadow-offset-x'
     | 'backdrop-drop-shadow-offset-y'
-    | 'backdrop-drop-shadow-opacity'
     | 'backdrop-filter'
     | 'backdrop-grayscale'
     | 'backdrop-hue-rotate'
@@ -563,8 +562,12 @@ export type Property
     | 'filter-blur'
     | 'filter-brightness'
     | 'filter-contrast'
-    | 'filter-contrast'
     | 'filter-drop-shadow'
+    | 'filter-drop-shadow-blur'
+    | 'filter-drop-shadow-color'
+    | 'filter-drop-shadow-offset-x'
+    | 'filter-drop-shadow-offset-y'
+    | 'filter-drop-shadow-opacity'
     | 'filter-grayscale'
     | 'filter-hue-rotate'
     | 'filter-invert'

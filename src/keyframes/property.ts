@@ -1311,24 +1311,6 @@ const keyframes: KeyframesCollection = Object.keys(propertyKeyframes).reduce(
     acc.names.push(css('var', `--${variable}`, 'none'))
     acc.attributes[property] = property
 
-    acc.properties[`@property --${name}-animation-name`] = {
-      'inherits': 'false',
-      'initial-value': 'none',
-      'syntax': '"<custom-ident> | <string>"',
-    }
-
-    acc.properties[`@property --${name}-animation-duration`] = {
-      'inherits': 'false',
-      'initial-value': '1s',
-      'syntax': '"<time [0s,∞]>"',
-    }
-
-    acc.properties[`@property --${name}-animation-delay`] = {
-      'inherits': 'false',
-      'initial-value': '0s',
-      'syntax': '"<time>"',
-    }
-
     return acc
   },
   {

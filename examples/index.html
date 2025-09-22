@@ -162,7 +162,7 @@
           <div class="p-4 text-center bg-gray-100 rounded">
             <h3 class="mb-2 font-medium">Blur</h3>
             <div
-              class="w-16 h-16 mx-auto rounded animate bg-gradient-to-r from-pink-500 to-yellow-500 animate-filter-blur-md animation-duration-2 animation-iteration-count-infinite animation-direction-alternate supports-[backdrop-filter:_blur(0)]:bg-white/75"
+              class="w-16 h-16 mx-auto rounded animate bg-gradient-to-r from-pink-500 to-yellow-500 blur-[1px] animate-filter-blur-md animation-duration-6 animation-iteration-count-2 animation-direction-normal"
             ></div>
           </div>
 
@@ -170,11 +170,12 @@
           <div class="p-4 text-center bg-yellow-100 rounded">
             <h3 class="mb-2 font-medium">SVG Fill</h3>
             <svg
-              class="w-16 h-16 mx-auto animate animate-fill-purple-500 animation-duration-3 animation-iteration-count-infinite animation-direction-alternate"
+              class="w-16 h-16 mx-auto"
               viewBox="0 0 24 24"
               fill="currentColor"
             >
               <path
+              class="animate animate-fill-purple-500 animation-duration-3 animation-iteration-count-infinite animation-direction-alternate"
                 d="M12 2L3.09 8.26L4 21L12 17L20 21L20.91 8.26L12 2Z"
                 fill="#3B82F6"
               />
