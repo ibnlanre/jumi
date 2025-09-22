@@ -1,6 +1,7 @@
-export const gridAutoColumns = {
-  '1fr': 'minmax(0, 1fr)',
+export const height = {
   'auto': 'auto',
+  'fit-content': 'fit-content',
   'max-content': 'max-content',
   'min-content': 'min-content',
+  'stretch': 'stretch',
 } as const

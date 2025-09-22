@@ -40,13 +40,8 @@ const variants: MatchVariant[] = [
   },
 ]
 
-const baseVariables: CssInJs[] = [
-  effectKeyframes,
-  animationVariables,
-  keyframeVariables,
-  propertyKeyframes,
-  propertyVariables,
-]
+const keyframes: CssInJs[] = [effectKeyframes, propertyKeyframes]
+const variables: CssInJs[] = [animationVariables, keyframeVariables, propertyVariables]
 
 /**
  * Jumi - TailwindCSS Animation Plugin
@@ -54,7 +49,8 @@ const baseVariables: CssInJs[] = [
  * @param options Configuration options for the plugin
  */
 const jumi = createPlugin(({ addBase, addUtilities, matchUtilities, matchVariant, theme }) => {
-  baseVariables.forEach(item => addBase(item))
+  keyframes.forEach(addBase)
+  variables.forEach(addBase)
 
   variants.forEach((variant) => {
     matchVariant(variant.name, variant.generator, {

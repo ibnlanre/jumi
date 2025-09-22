@@ -79,10 +79,22 @@ import { fontVariantNumeric } from '@/theme/font-variant-numeric'
 import { fontVariantPosition } from '@/theme/font-variant-position'
 import { fontWeight } from '@/theme/font-weight'
 import { forcedColorAdjust } from '@/theme/forced-color-adjust'
+import { gridAutoFlow, gridAutoFlowPacking } from '@/theme/grid-auto-flow'
+import { gridSize } from '@/theme/grid-size'
+import { hangingPunctuation } from '@/theme/hanging-punctuation'
+import { height } from '@/theme/height'
+import { hyphens } from '@/theme/hyphens'
+import { imageOrientation } from '@/theme/image-orientation'
 import { imageRendering } from '@/theme/image-rendering'
+import { initialLetter, initialLetterPosition } from '@/theme/initial-letter'
+import { inlineSize } from '@/theme/inline-size'
+import { inset } from '@/theme/inset'
 import { justifyContent } from '@/theme/justify-content'
 import { justifyItems } from '@/theme/justify-items'
 import { justifySelf } from '@/theme/justify-self'
+import { lineBreak } from '@/theme/line-break'
+import { listStylePosition } from '@/theme/list-style-position'
+import { listStyleType } from '@/theme/list-style-type'
 import { mixBlendMode } from '@/theme/mix-blend-mode'
 import { overflow } from '@/theme/overflow'
 import { percentage } from '@/theme/percentage'
@@ -808,6 +820,7 @@ export const matchProperties: Partial<MatchProperty> = {
     }),
     supportsNegativeValues: true,
     type: ['number', 'length', 'percentage'],
+    values: inset,
   },
   'animate-box-decoration-break': {
     property: value => ({
@@ -1578,14 +1591,169 @@ export const matchProperties: Partial<MatchProperty> = {
       '--jumi-gap-keyframes': 'jumi-gap',
     }),
   },
+  'animate-grid': {
+    property: value => ({
+      '--jumi-grid': value,
+      '--jumi-grid-keyframes': 'jumi-grid',
+    }),
+    values: empty.string,
+  },
+  'animate-grid-auto-columns': {
+    key: 'gridAutoColumns',
+    property: value => ({
+      '--jumi-grid-auto-columns': value,
+      '--jumi-grid-auto-columns-keyframes': 'jumi-grid-auto-columns',
+    }),
+  },
+  'animate-grid-auto-flow': {
+    modifiers: gridAutoFlowPacking,
+    property: (value, { modifier }) => ({
+      '--jumi-grid-auto-flow': modifier === null ? value : `${value} ${modifier}`,
+      '--jumi-grid-auto-flow-keyframes': 'jumi-grid-auto-flow',
+    }),
+    values: gridAutoFlow,
+  },
+  'animate-grid-auto-rows': {
+    key: 'gridAutoRows',
+    property: value => ({
+      '--jumi-grid-auto-rows': value,
+      '--jumi-grid-auto-rows-keyframes': 'jumi-grid-auto-rows',
+    }),
+  },
+  'animate-grid-column': {
+    key: 'gridColumn',
+    property: value => ({
+      '--jumi-grid-column': value,
+      '--jumi-grid-column-keyframes': 'jumi-grid-column',
+    }),
+  },
+  'animate-grid-column-end': {
+    key: 'gridColumnEnd',
+    property: (value, { modifier }) => ({
+      '--jumi-grid-column-end': modifier === null ? value : `${modifier} value`,
+      '--jumi-grid-column-end-keyframes': 'jumi-grid-column-end',
+    }),
+  },
+  'animate-grid-column-start': {
+    key: 'gridColumnStart',
+    property: (value, { modifier }) => ({
+      '--jumi-grid-column-start': modifier === null ? value : `${modifier} value`,
+      '--jumi-grid-column-start-keyframes': 'jumi-grid-column-start',
+    }),
+  },
+  'animate-grid-row': {
+    key: 'gridRow',
+    property: value => ({
+      '--jumi-grid-row': value,
+      '--jumi-grid-row-keyframes': 'jumi-grid-row',
+    }),
+  },
+  'animate-grid-row-end': {
+    key: 'gridRowEnd',
+    modifiers: gridSize,
+    property: (value, { modifier }) => ({
+      '--jumi-grid-row-end': modifier === null ? value : `${modifier} value`,
+      '--jumi-grid-row-end-keyframes': 'jumi-grid-row-end',
+    }),
+  },
+  'animate-grid-row-start': {
+    key: 'gridRowStart',
+    modifiers: gridSize,
+    property: (value, { modifier }) => ({
+      '--jumi-grid-row-start': modifier === null ? value : `${modifier} value`,
+      '--jumi-grid-row-start-keyframes': 'jumi-grid-row-start',
+    }),
+  },
+  'animate-grid-template-areas': {
+    property: value => ({
+      '--jumi-grid-template-areas': value,
+      '--jumi-grid-template-areas-keyframes': 'jumi-grid-template-areas',
+    }),
+    values: empty.none,
+  },
+  'animate-grid-template-columns': {
+    key: 'gridTemplateColumns',
+    property: value => ({
+      '--jumi-grid-template-columns': value,
+      '--jumi-grid-template-columns-keyframes': 'jumi-grid-template-columns',
+    }),
+  },
+  'animate-grid-template-rows': {
+    key: 'gridTemplateRows',
+    property: value => ({
+      '--jumi-grid-template-rows': value,
+      '--jumi-grid-template-rows-keyframes': 'jumi-grid-template-rows',
+    }),
+  },
+  'animate-hanging-punctuation': {
+    property: value => ({
+      '--jumi-hanging-punctuation': value,
+      '--jumi-hanging-punctuation-keyframes': 'jumi-hanging-punctuation',
+    }),
+    values: hangingPunctuation,
+  },
   'animate-height': {
-    key: 'height',
     property: value => ({
       '--jumi-height': value,
       '--jumi-height-keyframes': 'jumi-height',
     }),
     supportsNegativeValues: true,
     type: ['length', 'percentage', 'any'],
+    values: height,
+  },
+  'animate-hyphenate-character': {
+    property: value => ({
+      '--jumi-hyphenate-character': value,
+      '--jumi-hyphenate-character-keyframes': 'jumi-hyphenate-character',
+    }),
+    values: empty.auto,
+  },
+  'animate-hyphenate-limit-chars': {
+    property: value => ({
+      '--jumi-hyphenate-limit-chars': value,
+      '--jumi-hyphenate-limit-chars-keyframes': 'jumi-hyphenate-limit-chars',
+    }),
+    type: ['number', 'any'],
+    values: empty.none,
+  },
+  'animate-hyphenate-limit-minimum-characters-after': {
+    property: value => ({
+      '--jumi-hyphenate-limit-chars-keyframes': 'jumi-hyphenate-limit-chars',
+      '--jumi-hyphenate-limit-minimum-characters-after': value,
+    }),
+    type: 'number',
+    values: empty.number,
+  },
+  'animate-hyphenate-limit-minimum-characters-before': {
+    property: value => ({
+      '--jumi-hyphenate-limit-chars-keyframes': 'jumi-hyphenate-limit-chars',
+      '--jumi-hyphenate-limit-minimum-characters-before': value,
+    }),
+    type: 'number',
+    values: empty.number,
+  },
+  'animate-hyphenate-limit-minimum-word-length': {
+    property: value => ({
+      '--jumi-hyphenate-limit-chars-keyframes': 'jumi-hyphenate-limit-chars',
+      '--jumi-hyphenate-limit-minimum-word-length': value,
+    }),
+    type: 'number',
+    values: empty.number,
+  },
+  'animate-hyphens': {
+    property: value => ({
+      '--jumi-hyphens': value,
+      '--jumi-hyphens-keyframes': 'jumi-hyphens',
+    }),
+    values: hyphens,
+  },
+  'animate-image-orientation': {
+    property: value => ({
+      '--jumi-image-orientation': value,
+      '--jumi-image-orientation-keyframes': 'jumi-image-orientation',
+    }),
+    type: ['angle', 'any'],
+    values: imageOrientation,
   },
   'animate-image-rendering': {
     property: value => ({
@@ -1595,12 +1763,22 @@ export const matchProperties: Partial<MatchProperty> = {
     values: imageRendering,
   },
   'animate-initial-letter': {
-    property: value => ({
-      '--jumi-initial-letter': value,
+    modifiers: initialLetterPosition,
+    property: (value, { modifier }) => ({
+      '--jumi-initial-letter': modifier === null ? value : `${value} ${modifier}`,
       '--jumi-initial-letter-keyframes': 'jumi-initial-letter',
-      '-webkit-initial-letter': 'normal',
     }),
-    values: empty.string,
+    type: ['number', 'integer', 'any'],
+    values: initialLetter,
+  },
+  'animate-inline-size': {
+    property: value => ({
+      '--jumi-inline-size': value,
+      '--jumi-inline-size-keyframes': 'jumi-inline-size',
+    }),
+    supportsNegativeValues: true,
+    type: ['length', 'percentage', 'any'],
+    values: inlineSize,
   },
   'animate-inset': {
     key: 'inset',
@@ -1610,6 +1788,67 @@ export const matchProperties: Partial<MatchProperty> = {
     }),
     supportsNegativeValues: true,
     type: ['length', 'percentage', 'any'],
+    values: inset,
+  },
+  'animate-inset-block': {
+    key: 'inset',
+    property: value => ({
+      '--jumi-inset-block': value,
+      '--jumi-inset-block-keyframes': 'jumi-inset-block',
+    }),
+    supportsNegativeValues: true,
+    type: ['length', 'percentage', 'any'],
+    values: inset,
+  },
+  'animate-inset-block-end': {
+    key: 'inset',
+    property: value => ({
+      '--jumi-inset-block-end': value,
+      '--jumi-inset-block-end-keyframes': 'jumi-inset-block-end',
+    }),
+    supportsNegativeValues: true,
+    type: ['length', 'percentage', 'any'],
+    values: inset,
+  },
+  'animate-inset-block-start': {
+    key: 'inset',
+    property: value => ({
+      '--jumi-inset-block-start': value,
+      '--jumi-inset-block-start-keyframes': 'jumi-inset-block-start',
+    }),
+    supportsNegativeValues: true,
+    type: ['length', 'percentage', 'any'],
+    values: inset,
+  },
+  'animate-inset-inline': {
+    key: 'inset',
+    property: value => ({
+      '--jumi-inset-inline': value,
+      '--jumi-inset-inline-keyframes': 'jumi-inset-inline',
+    }),
+    supportsNegativeValues: true,
+    type: ['length', 'percentage', 'any'],
+    values: inset,
+  },
+  'animate-inset-inline-end': {
+    key: 'inset',
+    property: value => ({
+      '--jumi-inset-inline-end': value,
+      '--jumi-inset-inline-end-keyframes': 'jumi-inset-inline-end',
+    }),
+    supportsNegativeValues: true,
+    type: ['length', 'percentage', 'any'],
+    values: inset,
+  },
+  'animate-inset-inline-start': {
+    key: 'inset',
+    property: value => ({
+      '--jumi-inset-inline-start': value,
+      '--jumi-inset-inline-start-keyframes': 'jumi-inset-inline-start',
+    }),
+    supportsNegativeValues: true,
+    type: ['length', 'percentage', 'any'],
+    values: inset,
   },
   'animate-justify-content': {
     property: value => ({
@@ -1640,6 +1879,7 @@ export const matchProperties: Partial<MatchProperty> = {
     }),
     supportsNegativeValues: true,
     type: ['length', 'percentage', 'any'],
+    values: inset,
   },
   'animate-letter-spacing': {
     key: 'letterSpacing',
@@ -1649,6 +1889,29 @@ export const matchProperties: Partial<MatchProperty> = {
     }),
     type: ['length', 'percentage'],
   },
+  'animate-lighting-color': {
+    key: 'colors',
+    property: value => ({
+      '--jumi-lighting-color': value,
+      '--jumi-lighting-color-keyframes': 'jumi-lighting-color',
+    }),
+    type: 'color',
+  },
+  'animate-line-break': {
+    property: value => ({
+      '--jumi-line-break': value,
+      '--jumi-line-break-keyframes': 'jumi-line-break',
+    }),
+    values: lineBreak,
+  },
+  'animate-line-clamp': {
+    property: value => ({
+      '--jumi-line-clamp': value,
+      '--jumi-line-clamp-keyframes': 'jumi-line-clamp',
+    }),
+    type: ['number', 'any'],
+    values: empty.none,
+  },
   'animate-line-height': {
     key: 'lineHeight',
     property: value => ({
@@ -1656,6 +1919,35 @@ export const matchProperties: Partial<MatchProperty> = {
       '--jumi-line-height-keyframes': 'jumi-line-height',
     }),
     type: ['number', 'length', 'percentage'],
+  },
+  'animate-list-style': {
+    property: value => ({
+      '--jumi-list-style': value,
+      '--jumi-list-style-keyframes': 'jumi-list-style',
+    }),
+    values: empty.none,
+  },
+  'animate-list-style-image': {
+    property: value => ({
+      '--jumi-list-style-image': value,
+      '--jumi-list-style-image-keyframes': 'jumi-list-style-image',
+    }),
+    type: ['url', 'image', 'any'],
+    values: empty.none,
+  },
+  'animate-list-style-position': {
+    property: value => ({
+      '--jumi-list-style-position': value,
+      '--jumi-list-style-position-keyframes': 'jumi-list-style-position',
+    }),
+    values: listStylePosition,
+  },
+  'animate-list-style-type': {
+    property: value => ({
+      '--jumi-list-style-type': value,
+      '--jumi-list-style-type-keyframes': 'jumi-list-style-type',
+    }),
+    values: listStyleType,
   },
   'animate-margin': {
     key: 'margin',
@@ -1669,7 +1961,23 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'margin',
     property: value => ({
       '--jumi-margin-block': value,
-      '--jumi-margin-keyframes': 'jumi-margin',
+      '--jumi-margin-block-keyframes': 'jumi-margin-block',
+    }),
+    supportsNegativeValues: true,
+  },
+  'animate-margin-block-end': {
+    key: 'margin',
+    property: value => ({
+      '--jumi-margin-block-end': value,
+      '--jumi-margin-block-end-keyframes': 'jumi-margin-block-end',
+    }),
+    supportsNegativeValues: true,
+  },
+  'animate-margin-block-start': {
+    key: 'margin',
+    property: value => ({
+      '--jumi-margin-block-start': value,
+      '--jumi-margin-block-start-keyframes': 'jumi-margin-block-start',
     }),
     supportsNegativeValues: true,
   },
@@ -1677,7 +1985,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'margin',
     property: value => ({
       '--jumi-margin-bottom': value,
-      '--jumi-margin-keyframes': 'jumi-margin',
+      '--jumi-margin-bottom-keyframes': 'jumi-margin-bottom',
     }),
     supportsNegativeValues: true,
   },
@@ -1685,31 +1993,47 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'margin',
     property: value => ({
       '--jumi-margin-inline': value,
-      '--jumi-margin-keyframes': 'jumi-margin',
+      '--jumi-margin-inline-keyframes': 'jumi-margin-inline',
+    }),
+    supportsNegativeValues: true,
+  },
+  'animate-margin-inline-end': {
+    key: 'margin',
+    property: value => ({
+      '--jumi-margin-inline-end': value,
+      '--jumi-margin-inline-end-keyframes': 'jumi-margin-inline-end',
+    }),
+    supportsNegativeValues: true,
+  },
+  'animate-margin-inline-start': {
+    key: 'margin',
+    property: value => ({
+      '--jumi-margin-inline-start': value,
+      '--jumi-margin-inline-start-keyframes': 'jumi-margin-inline-start',
     }),
     supportsNegativeValues: true,
   },
   'animate-margin-left': {
     key: 'margin',
     property: value => ({
-      '--jumi-margin-keyframes': 'jumi-margin',
       '--jumi-margin-left': value,
+      '--jumi-margin-left-keyframes': 'jumi-margin-left',
     }),
     supportsNegativeValues: true,
   },
   'animate-margin-right': {
     key: 'margin',
     property: value => ({
-      '--jumi-margin-keyframes': 'jumi-margin',
       '--jumi-margin-right': value,
+      '--jumi-margin-right-keyframes': 'jumi-margin-right',
     }),
     supportsNegativeValues: true,
   },
   'animate-margin-top': {
     key: 'margin',
     property: value => ({
-      '--jumi-margin-keyframes': 'jumi-margin',
       '--jumi-margin-top': value,
+      '--jumi-margin-top-keyframes': 'jumi-margin-top',
     }),
     supportsNegativeValues: true,
   },
@@ -1886,6 +2210,7 @@ export const matchProperties: Partial<MatchProperty> = {
     }),
     supportsNegativeValues: true,
     type: ['length', 'percentage', 'any'],
+    values: inset,
   },
   'animate-rotate': {
     key: 'rotate',
@@ -2031,6 +2356,7 @@ export const matchProperties: Partial<MatchProperty> = {
     }),
     supportsNegativeValues: true,
     type: ['length', 'percentage', 'any'],
+    values: inset,
   },
   'animate-transform': {
     property: value => ({

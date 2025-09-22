@@ -391,6 +391,24 @@ export const keyframes = Object.keys(propertyKeyframes).map((key) => {
   return css('var', `--${variable}`)
 }).join(', ')
 
+export const keyframesDuration = Object.keys(propertyKeyframes).map((key) => {
+  const [rule, animation] = key.split(' ')
+  const variable = [animation, rule.slice(1)].join('-')
+  return css('var', `--${variable}-duration`)
+}).join(', ')
+
+export const keyframesTimingFunction = Object.keys(propertyKeyframes).map((key) => {
+  const [rule, animation] = key.split(' ')
+  const variable = [animation, rule.slice(1)].join('-')
+  return css('var', `--${variable}-timing-function`)
+}).join(', ')
+
+export const keyframesDelay = Object.keys(propertyKeyframes).map((key) => {
+  const [rule, animation] = key.split(' ')
+  const variable = [animation, rule.slice(1)].join('-')
+  return css('var', `--${variable}-delay`)
+}).join(', ')
+
 export const modifiers = Object.keys(propertyKeyframes).reduce((acc, key) => {
   const [, animation] = key.split(' ')
   const property = animation.replace('jumi-', '')
