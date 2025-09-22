@@ -35,6 +35,7 @@ export type AnimationProperty
 export type AnimationVariables = {
   [key in '--jumi-animation' | AnimationVariable]?: string
 }
+
 export type Attribute
   = 'accent-color'
     | 'align-content'
@@ -294,7 +295,6 @@ export type Attribute
     | 'visibility'
     | 'width'
     | 'z-index'
-
 export type AttributeKeyframes = {
   [K in Attribute as `@keyframes jumi-${K}`]: Keyframes
 }
@@ -373,6 +373,12 @@ export type MatchPropertyKeys = 'animate' | `animate-${Property}` | `animate-${R
 export interface MatchPropertyValue extends Partial<Options> {
   key?: TailwindTheme
   property: MatchPropertyFunction
+}
+
+export interface MatchVariant {
+  generator: (value: string) => string
+  name: string
+  values: Record<string, string>
 }
 
 export interface Options {

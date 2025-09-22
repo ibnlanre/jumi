@@ -1,56 +1,25 @@
-import type { CssInJs, MatchPropertyKeys } from '@/types'
+import type { Collection, CssInJs, MatchPropertyKeys } from '@/types'
 
-import { html } from '@/config/html'
-import { animationVariables, propertyVariables } from '@/config/variables'
 import { merge } from '@/helpers/merge'
 import { effectKeyframes } from '@/keyframes/effects'
-import { animationProperties, propertyKeyframes } from '@/keyframes/property'
+import { propertyKeyframes } from '@/keyframes/property'
 import { addProperties } from '@/properties/add'
+import { defaultProperties } from '@/properties/default'
 import { matchProperties } from '@/properties/match'
+import { animationVariables } from '@/variables/animation'
+import { propertyVariables } from '@/variables/property'
+import { variants } from '@/variants'
 
 import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette'
 import createPlugin from 'tailwindcss/plugin'
 
-export interface MatchVariant {
-  generator: (value: string) => string
-  name: string
-  values: Record<string, string>
-}
+const keyframes: Array<CssInJs> = [effectKeyframes, propertyKeyframes]
+const variables: Array<CssInJs> = [animationVariables, propertyVariables]
+const utilities: Array<Collection<CssInJs>> = [addProperties]
 
-const variants: MatchVariant[] = [
-  {
-    generator: value => `& ${value}`,
-    name: 'if-child-is',
-    values: html,
-  },
-  {
-    generator: value => `& > ${value}`,
-    name: 'if-direct-child-is',
-    values: html,
-  },
-  {
-    generator: value => `& + ${value}`,
-    name: 'if-next-sibling-is',
-    values: html,
-  },
-  {
-    generator: value => `& ~ ${value}`,
-    name: 'if-sibling-is',
-    values: html,
-  },
-]
-
-const keyframes: CssInJs[] = [effectKeyframes, propertyKeyframes]
-const variables: CssInJs[] = [animationVariables, propertyVariables]
-
-/**
- * Jumi - TailwindCSS Animation Plugin
- *
- * @param options Configuration options for the plugin
- */
 const jumi = createPlugin(({ addBase, addUtilities, matchUtilities, matchVariant, theme }) => {
-  keyframes.forEach(addBase)
-  variables.forEach(addBase)
+  keyframes.concat(variables).forEach(addBase)
+  addBase(defaultProperties)
 
   variants.forEach((variant) => {
     matchVariant(variant.name, variant.generator, {
@@ -58,7 +27,7 @@ const jumi = createPlugin(({ addBase, addUtilities, matchUtilities, matchVariant
     })
   })
 
-  addUtilities(addProperties)
+  utilities.forEach(addUtilities)
 
   for (const name in matchProperties) {
     const item = matchProperties[name as MatchPropertyKeys]!

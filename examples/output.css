@@ -654,11 +654,6 @@
   }
   .animate {
     animation: var(--jumi-animation);
-    animation-composition: var(--jumi-animation-composition);
-    animation-range: var(--jumi-animation-range);
-    animation-range-end: var(--jumi-animation-range-end);
-    animation-range-start: var(--jumi-animation-range-start);
-    animation-timeline: var(--jumi-animation-timeline);
   }
   .cursor-pointer {
     cursor: pointer;
@@ -2344,6 +2339,9 @@
   }
   .animation-duration-3 {
     --jumi-animation-duration: 3s;
+  }
+  .animation-duration-5\/transform {
+    --jumi-transform-animation-duration: 5s;
   }
   .animation-duration-500 {
     --jumi-animation-duration: 500ms;
@@ -5082,6 +5080,22 @@
     --jumi-translate-z: 0px;
     --jumi-width: auto;
     --jumi-z-index: auto;
+  }
+}
+@layer base {
+  .animate {
+    animation-composition: var(--jumi-animation-composition);
+    animation-delay: var(--jumi-animation-delay);
+    animation-direction: var(--jumi-animation-direction);
+    animation-duration: var(--jumi-animation-duration);
+    animation-fill-mode: var(--jumi-animation-fill-mode);
+    animation-iteration-count: var(--jumi-animation-iteration-count);
+    animation-play-state: var(--jumi-animation-play-state);
+    animation-range: var(--jumi-animation-range);
+    animation-range-end: var(--jumi-animation-range-end);
+    animation-range-start: var(--jumi-animation-range-start);
+    animation-timeline: var(--jumi-animation-timeline);
+    animation-timing-function: var(--jumi-animation-timing-function);
   }
 }
 @property --tw-border-spacing-x {
