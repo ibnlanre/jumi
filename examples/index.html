@@ -162,7 +162,7 @@
           <div class="p-4 text-center bg-gray-100 rounded">
             <h3 class="mb-2 font-medium">Blur</h3>
             <div
-              class="w-16 h-16 mx-auto rounded animate bg-gradient-to-r from-pink-500 to-yellow-500 blur-[1px] animate-filter-blur-md animation-duration-6 animation-iteration-count-2 animation-direction-normal"
+              class="w-16 h-16 mx-auto rounded animate bg-gradient-to-r from-pink-500 to-yellow-500 blur-[1px] animate-filter-blur-md animation-duration-6 animation-iteration-count-infinite animation-direction-alternate"
             ></div>
           </div>
 
@@ -184,18 +184,18 @@
         </div>
       </section>
 
-      <!-- Border Reveal Animations (New Border Length Feature) -->
+      <!-- Border Reveal Animations -->
       <section class="p-6 bg-white rounded-lg shadow-lg">
         <h2 class="mb-4 text-2xl font-semibold">Border Reveal Animations</h2>
         <p class="mb-4 text-gray-600">
-          Animated border drawing effects using pseudo-elements
+          Animated border effects using pseudo-elements and existing border utilities
         </p>
         <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
           <!-- Top Border Reveal -->
           <div class="p-4 text-center bg-blue-100 rounded">
             <h3 class="mb-2 font-medium">Top Border</h3>
             <div
-              class="w-16 h-16 mx-auto bg-blue-500 rounded animate animate-border-reveal-top-2 animation-duration-3 animation-iteration-count-infinite"
+              class="relative w-16 h-16 mx-auto bg-blue-500 rounded before:absolute before:top-0 before:left-0 before:w-0 before:h-0 before:border-t-4 before:border-white before:animate before:animate-width-full before:animation-duration-3 before:animation-iteration-count-infinite"
             ></div>
           </div>
 
@@ -203,7 +203,7 @@
           <div class="p-4 text-center bg-green-100 rounded">
             <h3 class="mb-2 font-medium">Right Border</h3>
             <div
-              class="w-16 h-16 mx-auto bg-green-500 rounded animate animate-border-reveal-right-2 animation-duration-3 animation-iteration-count-infinite animation-delay-500"
+              class="relative w-16 h-16 mx-auto bg-green-500 rounded before:absolute before:top-0 before:right-0 before:w-0 before:h-0 before:border-r-4 before:border-white before:animate before:animate-height-full before:animation-duration-3 before:animation-iteration-count-infinite before:animation-delay-500"
             ></div>
           </div>
 
@@ -211,7 +211,7 @@
           <div class="p-4 text-center bg-purple-100 rounded">
             <h3 class="mb-2 font-medium">Bottom Border</h3>
             <div
-              class="w-16 h-16 mx-auto bg-purple-500 rounded animate animate-border-reveal-bottom-2 animation-duration-3 animation-iteration-count-infinite animation-delay-1"
+              class="relative w-16 h-16 mx-auto bg-purple-500 rounded before:absolute before:bottom-0 before:left-0 before:w-0 before:h-0 before:border-b-4 before:border-white before:animate before:animate-width-full before:animation-duration-3 before:animation-iteration-count-infinite before:animation-delay-1"
             ></div>
           </div>
 
@@ -219,7 +219,7 @@
           <div class="p-4 text-center bg-red-100 rounded">
             <h3 class="mb-2 font-medium">Left Border</h3>
             <div
-              class="w-16 h-16 mx-auto bg-red-500 rounded animate animate-border-reveal-left-2 animation-duration-3 animation-iteration-count-infinite animation-delay-1500"
+              class="relative w-16 h-16 mx-auto bg-red-500 rounded before:absolute before:top-0 before:left-0 before:w-0 before:h-0 before:border-l-4 before:border-white before:animate before:animate-height-full before:animation-duration-3 before:animation-iteration-count-infinite before:animation-delay-1.5"
             ></div>
           </div>
         </div>
@@ -227,16 +227,16 @@
         <!-- Demonstration with different border widths -->
         <div class="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2">
           <div class="p-4 text-center bg-gray-100 rounded">
-            <h3 class="mb-2 font-medium">Thick Border (4px)</h3>
+            <h3 class="mb-2 font-medium">Thick Border (8px)</h3>
             <div
-              class="w-32 h-32 mx-auto bg-indigo-500 rounded animate animate-border-reveal-top-4 animation-duration-2 animation-iteration-count-infinite animation-direction-alternate"
+              class="relative w-32 h-32 mx-auto bg-indigo-500 rounded before:absolute before:top-0 before:left-0 before:w-0 before:h-0 before:border-t-8 before:border-white before:animate before:animate-width-full before:animation-duration-2 before:animation-iteration-count-infinite before:animation-direction-alternate"
             ></div>
           </div>
 
           <div class="p-4 text-center bg-gray-100 rounded">
-            <h3 class="mb-2 font-medium">Thin Border (1px)</h3>
+            <h3 class="mb-2 font-medium">Thin Border (2px)</h3>
             <div
-              class="w-32 h-32 mx-auto bg-orange-500 rounded animate animate-border-reveal-bottom-1 animation-duration-2 animation-iteration-count-infinite animation-direction-alternate"
+              class="relative w-32 h-32 mx-auto bg-orange-500 rounded before:absolute before:bottom-0 before:left-0 before:w-0 before:h-0 before:border-b-2 before:border-white before:animate before:animate-width-full before:animation-duration-2 before:animation-iteration-count-infinite before:animation-direction-alternate"
             ></div>
           </div>
         </div>
@@ -246,10 +246,8 @@
       <section class="p-6 bg-white rounded-lg shadow-lg">
         <h2 class="mb-4 text-2xl font-semibold">Hover Effects</h2>
         <div class="grid grid-cols-2 gap-4 md:grid-cols-3">
-          <div class="p-6 text-center bg-gray-200 rounded-lg cursor-pointer">
-            <div class="animate hover:animate-bounce-in hover:animation-duration-500">
+          <div class="p-6 text-center bg-gray-200 rounded-lg cursor-pointer animate hover:animate-bounce-in hover:animation-duration-500">
               Hover to Bounce
-            </div>
           </div>
 
           <div

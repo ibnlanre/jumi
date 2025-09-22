@@ -1,4 +1,4 @@
-import type { AnimationVariables } from '@/types'
+import type { AnimationVariables, Collection } from '@/types'
 
 import {
   animationRange,
@@ -8,7 +8,7 @@ import {
 import { animationTimelineInset } from '@/composition/animation-timeline'
 import { animationName } from '@/keyframes/property'
 
-export const animationVariables: Record<string, AnimationVariables> = {
+export const animationVariables: Collection<AnimationVariables> = {
   '.animate': {
     '--jumi-animation': animationName,
     '--jumi-animation-composition': 'replace',

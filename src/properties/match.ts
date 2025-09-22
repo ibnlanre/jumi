@@ -2232,20 +2232,6 @@ export const matchProperties: Partial<MatchProperty> = {
     }),
     values: position,
   },
-  'animate-reveal-bottom': {
-    key: 'borderWidth',
-    property: value => ({
-      '&::before': {
-        '--jumi-width': value,
-        'animation-name': 'reveal-bottom',
-        'background-color': css('var', '--jumi-border-color'),
-        'content': '""',
-        'position': 'absolute',
-      },
-      'position': 'relative',
-    }),
-    type: ['line-width', 'length'],
-  },
   'animate-right': {
     key: 'inset',
     property: value => ({

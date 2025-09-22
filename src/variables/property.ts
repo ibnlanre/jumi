@@ -1,4 +1,4 @@
-import type { PropertyVariables } from '@/types'
+import type { Collection, PropertyVariables } from '@/types'
 
 import { aspectRatio } from '@/composition/aspect-ratio'
 import { backdropFilter } from '@/composition/backdrop-filter'
@@ -49,7 +49,7 @@ import {
 } from '@/composition/transform'
 import { css } from '@/helpers/css'
 
-export const propertyVariables: Record<string, PropertyVariables> = {
+export const propertyVariables: Collection<PropertyVariables> = {
   '.animate': {
     '--jumi-accent-color': 'auto',
     '--jumi-align-content': 'normal',

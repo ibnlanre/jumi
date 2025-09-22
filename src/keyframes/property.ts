@@ -1299,6 +1299,7 @@ type KeyframesCollection = {
   attributes: Record<string, string>
   names: string[]
   properties: Record<`@property ${string}`, AtRule.PropertyHyphen>
+  variables: Record<string, string>
 }
 
 const keyframes: KeyframesCollection = Object.keys(propertyKeyframes).reduce(
@@ -1308,8 +1309,9 @@ const keyframes: KeyframesCollection = Object.keys(propertyKeyframes).reduce(
     const variable = [name, 'keyframes'].join('-') as `jumi-${Attribute}-keyframes`
     const property = name.slice('jumi-'.length) as Attribute
 
-    acc.names.push(css('var', `--${variable}`, 'none'))
+    acc.names.push(css('var', `--${variable}`))
     acc.attributes[property] = property
+    acc.variables[`--${variable}`] = 'none'
 
     return acc
   },
@@ -1317,9 +1319,11 @@ const keyframes: KeyframesCollection = Object.keys(propertyKeyframes).reduce(
     attributes: {},
     names: [],
     properties: {},
+    variables: {},
   } as KeyframesCollection,
 )
 
 export const animationName = keyframes.names.join(', ')
 export const animationModifiers = keyframes.attributes
 export const animationProperties = keyframes.properties
+export const animationKeyframes = { '.animate': keyframes.variables }
