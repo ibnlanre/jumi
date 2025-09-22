@@ -7,4 +7,5 @@ export const empty = {
   number: { DEFAULT: '0' },
   percentage: { DEFAULT: '0%' },
   string: { DEFAULT: '' },
+  time: { DEFAULT: '0s' },
 } as const

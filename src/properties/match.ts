@@ -1890,8 +1890,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-rotate': {
     key: 'rotate',
     property: value => ({
-      '--jumi-rotate': css('rotate', value),
-      '--jumi-rotate-angle': value,
+      '--jumi-rotate': value,
       '--jumi-transform-keyframes': 'jumi-transform',
     }),
     supportsNegativeValues: true,
@@ -1904,52 +1903,24 @@ export const matchProperties: Partial<MatchProperty> = {
     }),
     values: empty.string,
   },
-  'animate-rotate-3x': {
-    property: value => ({
-      '--jumi-rotate-3x': value,
-      '--jumi-transform-keyframes': 'jumi-transform',
-    }),
-    type: 'number',
-    values: empty.string,
-  },
-  'animate-rotate-3y': {
-    property: value => ({
-      '--jumi-rotate-3y': value,
-      '--jumi-transform-keyframes': 'jumi-transform',
-    }),
-    type: 'number',
-    values: empty.string,
-  },
-  'animate-rotate-3z': {
-    property: value => ({
-      '--jumi-rotate-3z': value,
-      '--jumi-transform-keyframes': 'jumi-transform',
-    }),
-    type: 'number',
-    values: empty.string,
-  },
   'animate-rotate-x': {
     key: 'rotate',
     property: value => ({
-      '--jumi-rotate-x': css('rotateX', value),
+      '--jumi-rotate': value,
+      '--jumi-rotate-x': '1',
       '--jumi-transform-keyframes': 'jumi-transform',
     }),
+    supportsNegativeValues: true,
     type: 'angle',
   },
   'animate-rotate-y': {
     key: 'rotate',
     property: value => ({
-      '--jumi-rotate-y': css('rotateY', value),
+      '--jumi-rotate': value,
+      '--jumi-rotate-y': '1',
       '--jumi-transform-keyframes': 'jumi-transform',
     }),
-    type: 'angle',
-  },
-  'animate-rotate-z': {
-    key: 'rotate',
-    property: value => ({
-      '--jumi-rotate-z': css('rotateZ', value),
-      '--jumi-transform-keyframes': 'jumi-transform',
-    }),
+    supportsNegativeValues: true,
     type: 'angle',
   },
   'animate-row-gap': {
@@ -1961,43 +1932,20 @@ export const matchProperties: Partial<MatchProperty> = {
   },
   'animate-scale': {
     key: 'scale',
-    property: value => ({
-      '--jumi-scale': css('scale', value),
-      '--jumi-transform-keyframes': 'jumi-transform',
-    }),
+    property: (value) => {
+      const [x, y] = value.split(/\s+/)
+      return {
+        '--jumi-scale-x': x ?? value,
+        '--jumi-scale-y': y ?? x ?? value,
+        '--jumi-transform-keyframes': 'jumi-transform',
+      }
+    },
     supportsNegativeValues: true,
-  },
-  'animate-scale-3x': {
-    key: 'scale',
-    property: value => ({
-      '--jumi-scale-3x': value,
-      '--jumi-transform-keyframes': 'jumi-transform',
-    }),
-    supportsNegativeValues: true,
-    type: 'number',
-  },
-  'animate-scale-3y': {
-    key: 'scale',
-    property: value => ({
-      '--jumi-scale-3y': value,
-      '--jumi-transform-keyframes': 'jumi-transform',
-    }),
-    supportsNegativeValues: true,
-    type: 'number',
-  },
-  'animate-scale-3z': {
-    key: 'scale',
-    property: value => ({
-      '--jumi-scale-3z': value,
-      '--jumi-transform-keyframes': 'jumi-transform',
-    }),
-    supportsNegativeValues: true,
-    type: 'number',
   },
   'animate-scale-x': {
     key: 'scale',
     property: value => ({
-      '--jumi-scale-x': css('scaleX', value),
+      '--jumi-scale-x': value,
       '--jumi-transform-keyframes': 'jumi-transform',
     }),
     supportsNegativeValues: true,
@@ -2006,7 +1954,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-scale-y': {
     key: 'scale',
     property: value => ({
-      '--jumi-scale-y': css('scaleY', value),
+      '--jumi-scale-y': value,
       '--jumi-transform-keyframes': 'jumi-transform',
     }),
     supportsNegativeValues: true,
@@ -2015,7 +1963,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-scale-z': {
     key: 'scale',
     property: value => ({
-      '--jumi-scale-z': css('scaleZ', value),
+      '--jumi-scale-z': value,
       '--jumi-transform-keyframes': 'jumi-transform',
     }),
     supportsNegativeValues: true,
@@ -2023,32 +1971,20 @@ export const matchProperties: Partial<MatchProperty> = {
   },
   'animate-skew': {
     key: 'skew',
-    property: value => ({
-      '--jumi-skew': css('skew', value),
-      '--jumi-transform-keyframes': 'jumi-transform',
-    }),
-    supportsNegativeValues: true,
-  },
-  'animate-skew-sx': {
-    key: 'skew',
-    property: value => ({
-      '--jumi-skew-sx': value,
-      '--jumi-transform-keyframes': 'jumi-transform',
-    }),
-    supportsNegativeValues: true,
-  },
-  'animate-skew-sy': {
-    key: 'skew',
-    property: value => ({
-      '--jumi-skew-sy': value,
-      '--jumi-transform-keyframes': 'jumi-transform',
-    }),
+    property: (value) => {
+      const [x, y] = value.split(/\s+/)
+      return {
+        '--jumi-skew-x': x ?? value,
+        '--jumi-skew-y': y ?? x ?? value,
+        '--jumi-transform-keyframes': 'jumi-transform',
+      }
+    },
     supportsNegativeValues: true,
   },
   'animate-skew-x': {
     key: 'skew',
     property: value => ({
-      '--jumi-skew-x': css('skewX', value),
+      '--jumi-skew-x': value,
       '--jumi-transform-keyframes': 'jumi-transform',
     }),
     supportsNegativeValues: true,
@@ -2056,7 +1992,7 @@ export const matchProperties: Partial<MatchProperty> = {
   'animate-skew-y': {
     key: 'skew',
     property: value => ({
-      '--jumi-skew-y': css('skewY', value),
+      '--jumi-skew-y': value,
       '--jumi-transform-keyframes': 'jumi-transform',
     }),
     supportsNegativeValues: true,
@@ -2118,55 +2054,31 @@ export const matchProperties: Partial<MatchProperty> = {
     type: ['length', 'percentage', 'any'],
     values: empty.string,
   },
-  'animate-translate-3x': {
-    property: value => ({
-      '--jumi-transform-keyframes': 'jumi-transform',
-      '--jumi-translate-3x': value,
-    }),
-    supportsNegativeValues: true,
-    type: ['length', 'percentage'],
-    values: empty.string,
-  },
-  'animate-translate-3y': {
-    property: value => ({
-      '--jumi-transform-keyframes': 'jumi-transform',
-      '--jumi-translate-3y': value,
-    }),
-    supportsNegativeValues: true,
-    type: ['length', 'percentage'],
-    values: empty.string,
-  },
-  'animate-translate-3z': {
-    property: value => ({
-      '--jumi-transform-keyframes': 'jumi-transform',
-      '--jumi-translate-3z': value,
-    }),
-    supportsNegativeValues: true,
-    type: ['length', 'percentage'],
-    values: empty.string,
-  },
   'animate-translate-x': {
     property: value => ({
       '--jumi-transform-keyframes': 'jumi-transform',
-      '--jumi-translate-x': css('translateX', value),
+      '--jumi-translate-x': value,
     }),
     supportsNegativeValues: true,
+    type: ['length', 'percentage'],
     values: empty.string,
   },
   'animate-translate-y': {
     property: value => ({
       '--jumi-transform-keyframes': 'jumi-transform',
-      '--jumi-translate-y': css('translateY', value),
+      '--jumi-translate-y': value,
     }),
     supportsNegativeValues: true,
+    type: ['length', 'percentage'],
     values: empty.string,
   },
   'animate-translate-z': {
     property: value => ({
       '--jumi-transform-keyframes': 'jumi-transform',
-      '--jumi-translate-z': css('translateZ', value),
+      '--jumi-translate-z': value,
     }),
     supportsNegativeValues: true,
+    type: ['length', 'percentage'],
     values: empty.string,
   },
   'animate-visibility': {
