@@ -1,9 +1,9 @@
-import type { Effect } from '@/theme/animation-name'
+import type { Effect } from '@/theme/effects'
 import type { Attribute } from '@/types'
 
 import { css } from '@/helpers/css'
 
-export function animation(attribute: Attribute | Effect): string {
+export function animation(attribute: Attribute): string {
   const name = `jumi-${attribute}`
 
   const duration = css('var', `--jumi-${attribute}-animation-duration`, css('var', '--jumi-animation-duration'))

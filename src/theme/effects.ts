@@ -1,4 +1,4 @@
-export const animationName = {
+export const effects = {
   'back-in': 'back-in',
   'back-in-down': 'back-in-down',
   'back-in-left': 'back-in-left',
@@ -54,4 +54,4 @@ export const animationName = {
   'zoom-out-up': 'zoom-out-up',
 } as const
 
-export type Effect = keyof typeof animationName
+export type Effect = keyof typeof effects

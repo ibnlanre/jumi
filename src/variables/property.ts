@@ -32,9 +32,15 @@ import { listStyle } from '@/composition/list-style'
 import { margin } from '@/composition/margin'
 import { marginBlock } from '@/composition/margin-block'
 import { marginInline } from '@/composition/margin-inline'
+import { marker } from '@/composition/marker'
+import { maskBorderOutset, maskBorderOutsetX, maskBorderOutsetY } from '@/composition/mask-border-outset'
+import { maskBorderRepeat } from '@/composition/mask-border-repeat'
+import { maskBorderSlice, maskBorderSliceX, maskBorderSliceY } from '@/composition/mask-border-slice'
 import { outline } from '@/composition/outline'
 import { overflow } from '@/composition/overflow'
-import { padding, paddingBlock, paddingInline } from '@/composition/padding'
+import { padding } from '@/composition/padding'
+import { paddingBlock } from '@/composition/padding-block'
+import { paddingInline } from '@/composition/padding-inline'
 import { textShadow } from '@/composition/text-shadow'
 import {
   matrix,
@@ -291,6 +297,45 @@ export const propertyVariables: Collection<PropertyVariables> = {
     '--jumi-margin-left': '0',
     '--jumi-margin-right': '0',
     '--jumi-margin-top': '0',
+    '--jumi-marker': marker,
+    '--jumi-marker-end': 'none',
+    '--jumi-marker-mid': 'none',
+    '--jumi-marker-start': 'none',
+    '--jumi-mask': 'none',
+    '--jumi-mask-border': 'none',
+    '--jumi-mask-border-mode': 'alpha',
+    '--jumi-mask-border-outset': maskBorderOutset,
+    '--jumi-mask-border-outset-bottom': '0',
+    '--jumi-mask-border-outset-left': '0',
+    '--jumi-mask-border-outset-right': '0',
+    '--jumi-mask-border-outset-top': '0',
+    '--jumi-mask-border-outset-x': maskBorderOutsetX,
+    '--jumi-mask-border-outset-y': maskBorderOutsetY,
+    '--jumi-mask-border-repeat': maskBorderRepeat,
+    '--jumi-mask-border-repeat-x': 'stretch',
+    '--jumi-mask-border-repeat-y': 'stretch',
+    '--jumi-mask-border-slice': maskBorderSlice,
+    '--jumi-mask-border-slice-bottom': '0',
+    '--jumi-mask-border-slice-left': '0',
+    '--jumi-mask-border-slice-right': '0',
+    '--jumi-mask-border-slice-top': '0',
+    '--jumi-mask-border-slice-x': maskBorderSliceX,
+    '--jumi-mask-border-slice-y': maskBorderSliceY,
+    '--jumi-mask-border-source': 'none',
+    '--jumi-mask-border-width': 'auto',
+    '--jumi-mask-clip': 'border-box',
+    '--jumi-mask-composite': 'add',
+    '--jumi-mask-image': 'none',
+    '--jumi-mask-mode': 'match-source',
+    '--jumi-mask-origin': 'border-box',
+    '--jumi-mask-position': '0% 0%',
+    '--jumi-mask-position-x': '0%',
+    '--jumi-mask-position-y': '0%',
+    '--jumi-mask-repeat': 'repeat',
+    '--jumi-mask-size': 'auto',
+    '--jumi-mask-type': 'luminance',
+    '--jumi-math-depth': '0',
+    '--jumi-math-style': 'normal',
     '--jumi-matrix': matrix,
     '--jumi-matrix-3d': matrix3d,
     '--jumi-matrix-a': '1',
@@ -315,9 +360,13 @@ export const propertyVariables: Collection<PropertyVariables> = {
     '--jumi-matrix-d4': '1',
     '--jumi-matrix-tx': '0',
     '--jumi-matrix-ty': '0',
+    '--jumi-max-block-size': 'none',
     '--jumi-max-height': 'none',
+    '--jumi-max-inline-size': 'none',
     '--jumi-max-width': 'none',
+    '--jumi-min-block-size': '0',
     '--jumi-min-height': 'auto',
+    '--jumi-min-inline-size': '0',
     '--jumi-min-width': 'auto',
     '--jumi-opacity': '1',
     '--jumi-order': '0',

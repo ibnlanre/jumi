@@ -9,5 +9,5 @@ export const animationRangeTimeline = {
 } as const
 
 export const animationRange = {
-  normal: 'normal',
-}
+  DEFAULT: 'normal',
+} as const

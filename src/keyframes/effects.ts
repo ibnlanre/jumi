@@ -83,7 +83,7 @@ export const effectKeyframes: EffectKeyframes = {
   },
   '@keyframes jumi-bounce-in': {
     '0%': {
-      transform: 'scale3d(0.3, 0.3, 0.3)',
+      transform: 'scale3d(0.6, 0.6, 0.6)',
     },
     '20%': {
       transform: 'scale3d(1.1, 1.1, 1.1)',

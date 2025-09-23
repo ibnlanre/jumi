@@ -1153,9 +1153,134 @@ export const propertyKeyframes: AttributeKeyframes = {
       'margin-top': css('var', '--jumi-margin-top'),
     },
   },
+  '@keyframes jumi-marker': {
+    to: {
+      marker: css('var', '--jumi-marker'),
+    },
+  },
+  '@keyframes jumi-marker-end': {
+    to: {
+      'marker-end': css('var', '--jumi-marker-end'),
+    },
+  },
+  '@keyframes jumi-marker-mid': {
+    to: {
+      'marker-mid': css('var', '--jumi-marker-mid'),
+    },
+  },
+  '@keyframes jumi-marker-start': {
+    to: {
+      'marker-start': css('var', '--jumi-marker-start'),
+    },
+  },
+  '@keyframes jumi-mask': {
+    to: {
+      mask: css('var', '--jumi-mask'),
+    },
+  },
+  '@keyframes jumi-mask-border': {
+    to: {
+      'mask-border': css('var', '--jumi-mask-border'),
+    },
+  },
+  '@keyframes jumi-mask-border-mode': {
+    to: {
+      'mask-border-mode': css('var', '--jumi-mask-border-mode') as Property.MaskBorderMode,
+    },
+  },
+  '@keyframes jumi-mask-border-outset': {
+    to: {
+      'mask-border-outset': css('var', '--jumi-mask-border-outset'),
+    },
+  },
+  '@keyframes jumi-mask-border-repeat': {
+    to: {
+      'mask-border-repeat': css('var', '--jumi-mask-border-repeat'),
+    },
+  },
+  '@keyframes jumi-mask-border-slice': {
+    to: {
+      'mask-border-slice': css('var', '--jumi-mask-border-slice'),
+    },
+  },
+  '@keyframes jumi-mask-border-source': {
+    to: {
+      'mask-border-source': css('var', '--jumi-mask-border-source'),
+    },
+  },
+  '@keyframes jumi-mask-border-width': {
+    to: {
+      'mask-border-width': css('var', '--jumi-mask-border-width'),
+    },
+  },
+  '@keyframes jumi-mask-clip': {
+    to: {
+      'mask-clip': css('var', '--jumi-mask-clip'),
+    },
+  },
+  '@keyframes jumi-mask-composite': {
+    to: {
+      'mask-composite': css('var', '--jumi-mask-composite') as Property.MaskComposite,
+    },
+  },
+  '@keyframes jumi-mask-image': {
+    to: {
+      'mask-image': css('var', '--jumi-mask-image'),
+    },
+  },
+  '@keyframes jumi-mask-mode': {
+    to: {
+      'mask-mode': css('var', '--jumi-mask-mode') as Property.MaskMode,
+    },
+  },
+  '@keyframes jumi-mask-origin': {
+    to: {
+      'mask-origin': css('var', '--jumi-mask-origin') as Property.MaskOrigin,
+    },
+  },
+  '@keyframes jumi-mask-position': {
+    to: {
+      'mask-position': css('var', '--jumi-mask-position'),
+    },
+  },
+  '@keyframes jumi-mask-repeat': {
+    to: {
+      'mask-repeat': css('var', '--jumi-mask-repeat'),
+    },
+  },
+  '@keyframes jumi-mask-size': {
+    to: {
+      'mask-size': css('var', '--jumi-mask-size'),
+    },
+  },
+  '@keyframes jumi-mask-type': {
+    to: {
+      'mask-type': css('var', '--jumi-mask-type') as Property.MaskType,
+    },
+  },
+  '@keyframes jumi-math-depth': {
+    to: {
+      'math-depth': css('var', '--jumi-math-depth'),
+    },
+  },
+  '@keyframes jumi-math-style': {
+    to: {
+      'math-style': css('var', '--jumi-math-style') as Property.MathStyle,
+    },
+  },
+  '@keyframes jumi-max-block-size': {
+    to: {
+      'max-block-size': css('var', '--jumi-max-block-size'),
+    },
+  },
   '@keyframes jumi-max-height': {
     to: {
       'max-height': css('var', '--jumi-max-height'),
+    },
+  },
+  '@keyframes jumi-max-inline-size': {
+    to: {
+      'max-inline-size': css('var', '--jumi-max-inline-size'),
     },
   },
   '@keyframes jumi-max-width': {
@@ -1163,9 +1288,19 @@ export const propertyKeyframes: AttributeKeyframes = {
       'max-width': css('var', '--jumi-max-width'),
     },
   },
+  '@keyframes jumi-min-block-size': {
+    to: {
+      'min-block-size': css('var', '--jumi-min-block-size'),
+    },
+  },
   '@keyframes jumi-min-height': {
     to: {
       'min-height': css('var', '--jumi-min-height'),
+    },
+  },
+  '@keyframes jumi-min-inline-size': {
+    to: {
+      'min-inline-size': css('var', '--jumi-min-inline-size'),
     },
   },
   '@keyframes jumi-min-width': {
@@ -1201,6 +1336,56 @@ export const propertyKeyframes: AttributeKeyframes = {
   '@keyframes jumi-padding': {
     to: {
       padding: css('var', '--jumi-padding'),
+    },
+  },
+  '@keyframes jumi-padding-block': {
+    to: {
+      'padding-block': css('var', '--jumi-padding-block'),
+    },
+  },
+  '@keyframes jumi-padding-block-end': {
+    to: {
+      'padding-block-end': css('var', '--jumi-padding-block-end'),
+    },
+  },
+  '@keyframes jumi-padding-block-start': {
+    to: {
+      'padding-block-start': css('var', '--jumi-padding-block-start'),
+    },
+  },
+  '@keyframes jumi-padding-bottom': {
+    to: {
+      'padding-bottom': css('var', '--jumi-padding-bottom'),
+    },
+  },
+  '@keyframes jumi-padding-inline': {
+    to: {
+      'padding-inline': css('var', '--jumi-padding-inline'),
+    },
+  },
+  '@keyframes jumi-padding-inline-end': {
+    to: {
+      'padding-inline-end': css('var', '--jumi-padding-inline-end'),
+    },
+  },
+  '@keyframes jumi-padding-inline-start': {
+    to: {
+      'padding-inline-start': css('var', '--jumi-padding-inline-start'),
+    },
+  },
+  '@keyframes jumi-padding-left': {
+    to: {
+      'padding-left': css('var', '--jumi-padding-left'),
+    },
+  },
+  '@keyframes jumi-padding-right': {
+    to: {
+      'padding-right': css('var', '--jumi-padding-right'),
+    },
+  },
+  '@keyframes jumi-padding-top': {
+    to: {
+      'padding-top': css('var', '--jumi-padding-top'),
     },
   },
   '@keyframes jumi-position': {

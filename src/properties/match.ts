@@ -1,4 +1,4 @@
-import type { MatchProperty } from '@/types'
+import type { Collection, MatchProperty } from '@/types'
 
 import { create } from '@/helpers/create'
 import { css } from '@/helpers/css'
@@ -15,7 +15,6 @@ import { animationDirection } from '@/theme/animation-direction'
 import { animationDuration } from '@/theme/animation-duration'
 import { animationFillMode } from '@/theme/animation-fill-mode'
 import { animationIterationCount } from '@/theme/animation-iteration-count'
-import { animationName } from '@/theme/animation-name'
 import { animationPlayState } from '@/theme/animation-play-state'
 import { animationRange, animationRangeTimeline } from '@/theme/animation-range'
 import { animationTimeline } from '@/theme/animation-timeline'
@@ -55,6 +54,7 @@ import { contentVisibility } from '@/theme/content-visibility'
 import { cursor } from '@/theme/cursor'
 import { display, displayInside, displayOutside } from '@/theme/display'
 import { dominantBaseline } from '@/theme/dominant-baseline'
+import { effects } from '@/theme/effects'
 import { empty } from '@/theme/empty'
 import { emptyCells } from '@/theme/empty-cell'
 import { fill } from '@/theme/fill'
@@ -83,6 +83,7 @@ import { forcedColorAdjust } from '@/theme/forced-color-adjust'
 import { gridAutoFlow, gridAutoFlowPacking } from '@/theme/grid-auto-flow'
 import { gridSize } from '@/theme/grid-size'
 import { hangingPunctuation } from '@/theme/hanging-punctuation'
+import { hyphenateLimitChars, hyphenateLimitCharsProperties } from '@/theme/hyphenate-limit-chars'
 import { hyphens } from '@/theme/hyphens'
 import { imageOrientation } from '@/theme/image-orientation'
 import { imageRendering } from '@/theme/image-rendering'
@@ -95,6 +96,15 @@ import { justifySelf } from '@/theme/justify-self'
 import { lineBreak } from '@/theme/line-break'
 import { listStylePosition } from '@/theme/list-style-position'
 import { listStyleType } from '@/theme/list-style-type'
+import { maskBorderRepeat } from '@/theme/mask-border-repeat'
+import { maskClip } from '@/theme/mask-clip'
+import { maskComposite } from '@/theme/mask-composite'
+import { maskMode } from '@/theme/mask-mode'
+import { maskOrigin } from '@/theme/mask-origin'
+import { maskType } from '@/theme/mask-type'
+import { maskBorderSlice } from '@/theme/maskBorderSlice'
+import { mathDepth } from '@/theme/math-depth'
+import { mathStyle } from '@/theme/math-style'
 import { mixBlendMode } from '@/theme/mix-blend-mode'
 import { overflow } from '@/theme/overflow'
 import { percentage } from '@/theme/percentage'
@@ -109,7 +119,7 @@ export const matchProperties: Partial<MatchProperty> = {
     property: value => ({
       '--jumi-animation': create.effect(value),
     }),
-    values: animationName,
+    values: effects,
   },
   'animate-accent-color': {
     key: 'accentColor',
@@ -1739,7 +1749,7 @@ export const matchProperties: Partial<MatchProperty> = {
       '--jumi-height-keyframes': create.animation('height'),
     }),
     supportsNegativeValues: true,
-    type: ['length', 'percentage', 'any'],
+    type: ['length', 'percentage'],
   },
   'animate-hyphenate-character': {
     property: value => ({
@@ -1749,36 +1759,37 @@ export const matchProperties: Partial<MatchProperty> = {
     values: empty.auto,
   },
   'animate-hyphenate-limit-chars': {
-    property: value => ({
-      '--jumi-hyphenate-limit-chars': value,
-      '--jumi-hyphenate-limit-chars-keyframes': create.animation('hyphenate-limit-chars'),
-    }),
+    modifiers: hyphenateLimitCharsProperties,
+    property: (value) => {
+      const hyphenateLimitChars: Collection<string> = {
+        '--jumi-hyphenate-limit-chars-keyframes': create.animation('hyphenate-limit-chars'),
+      }
+
+      switch (value) {
+        case 'minimum-characters-after': {
+          return merge(hyphenateLimitChars, {
+            '--jumi-hyphenate-limit-minimum-characters-after': value,
+          })
+        }
+        case 'minimum-characters-before': {
+          return merge(hyphenateLimitChars, {
+            '--jumi-hyphenate-limit-minimum-characters-before': value,
+          })
+        }
+        case 'minimum-word-length': {
+          return merge(hyphenateLimitChars, {
+            '--jumi-hyphenate-limit-minimum-word-length': value,
+          })
+        }
+        default: {
+          return merge(hyphenateLimitChars, {
+            '--jumi-hyphenate-limit-chars': value,
+          })
+        }
+      }
+    },
     type: ['number', 'any'],
-    values: empty.none,
-  },
-  'animate-hyphenate-limit-minimum-characters-after': {
-    property: value => ({
-      '--jumi-hyphenate-limit-chars-keyframes': create.animation('hyphenate-limit-chars'),
-      '--jumi-hyphenate-limit-minimum-characters-after': value,
-    }),
-    type: 'number',
-    values: empty.number,
-  },
-  'animate-hyphenate-limit-minimum-characters-before': {
-    property: value => ({
-      '--jumi-hyphenate-limit-chars-keyframes': create.animation('hyphenate-limit-chars'),
-      '--jumi-hyphenate-limit-minimum-characters-before': value,
-    }),
-    type: 'number',
-    values: empty.number,
-  },
-  'animate-hyphenate-limit-minimum-word-length': {
-    property: value => ({
-      '--jumi-hyphenate-limit-chars-keyframes': create.animation('hyphenate-limit-chars'),
-      '--jumi-hyphenate-limit-minimum-word-length': value,
-    }),
-    type: 'number',
-    values: empty.number,
+    values: hyphenateLimitChars,
   },
   'animate-hyphens': {
     property: value => ({
@@ -2077,11 +2088,324 @@ export const matchProperties: Partial<MatchProperty> = {
     }),
     supportsNegativeValues: true,
   },
+  'animate-marker': {
+    property: value => ({
+      '--jumi-marker': value,
+      '--jumi-marker-keyframes': create.animation('marker'),
+    }),
+    values: empty.none,
+  },
+  'animate-marker-end': {
+    property: value => ({
+      '--jumi-marker-end': value,
+      '--jumi-marker-end-keyframes': create.animation('marker-end'),
+    }),
+    values: empty.none,
+  },
+  'animate-marker-mid': {
+    property: value => ({
+      '--jumi-marker-mid': value,
+      '--jumi-marker-mid-keyframes': create.animation('marker-mid'),
+    }),
+    values: empty.none,
+  },
+  'animate-marker-start': {
+    property: value => ({
+      '--jumi-marker-start': value,
+      '--jumi-marker-start-keyframes': create.animation('marker-start'),
+    }),
+    values: empty.none,
+  },
+  'animate-mask': {
+    property: value => ({
+      '--jumi-mask': value,
+      '--jumi-mask-keyframes': create.animation('mask'),
+    }),
+    values: empty.none,
+  },
+  'animate-mask-border': {
+    property: value => ({
+      '--jumi-mask-border': value,
+      '--jumi-mask-border-keyframes': create.animation('mask-border'),
+    }),
+    values: empty.none,
+  },
+  'animate-mask-border-mode': {
+    property: value => ({
+      '--jumi-mask-border-mode': value,
+      '--jumi-mask-border-mode-keyframes': create.animation('mask-border-mode'),
+    }),
+    values: maskType,
+  },
+  'animate-mask-border-outset': {
+    key: 'inset',
+    property: value => ({
+      '--jumi-mask-border-outset': value,
+      '--jumi-mask-border-outset-keyframes': create.animation('mask-border-outset'),
+    }),
+    supportsNegativeValues: true,
+    type: 'length',
+  },
+  'animate-mask-border-outset-bottom': {
+    key: 'inset',
+    property: value => ({
+      '--jumi-mask-border-outset-bottom': value,
+      '--jumi-mask-border-outset-keyframes': create.animation('mask-border-outset'),
+    }),
+    supportsNegativeValues: true,
+    type: 'length',
+  },
+  'animate-mask-border-outset-left': {
+    key: 'inset',
+    property: value => ({
+      '--jumi-mask-border-outset-keyframes': create.animation('mask-border-outset'),
+      '--jumi-mask-border-outset-left': value,
+    }),
+    supportsNegativeValues: true,
+    type: 'length',
+  },
+  'animate-mask-border-outset-right': {
+    key: 'inset',
+    property: value => ({
+      '--jumi-mask-border-outset-keyframes': create.animation('mask-border-outset'),
+      '--jumi-mask-border-outset-right': value,
+    }),
+    supportsNegativeValues: true,
+    type: 'length',
+  },
+  'animate-mask-border-outset-top': {
+    key: 'inset',
+    property: value => ({
+      '--jumi-mask-border-outset-keyframes': create.animation('mask-border-outset'),
+      '--jumi-mask-border-outset-top': value,
+    }),
+    supportsNegativeValues: true,
+    type: 'length',
+  },
+  'animate-mask-border-outset-x': {
+    key: 'inset',
+    property: value => ({
+      '--jumi-mask-border-outset-keyframes': create.animation('mask-border-outset'),
+      '--jumi-mask-border-outset-left': value,
+      '--jumi-mask-border-outset-right': value,
+    }),
+    supportsNegativeValues: true,
+    type: 'length',
+  },
+  'animate-mask-border-outset-y': {
+    key: 'inset',
+    property: value => ({
+      '--jumi-mask-border-outset-bottom': value,
+      '--jumi-mask-border-outset-keyframes': create.animation('mask-border-outset'),
+      '--jumi-mask-border-outset-top': value,
+    }),
+    supportsNegativeValues: true,
+    type: 'length',
+  },
+  'animate-mask-border-repeat': {
+    property: value => ({
+      '--jumi-mask-border-repeat': value,
+      '--jumi-mask-border-repeat-keyframes': create.animation('mask-border-repeat'),
+    }),
+    values: maskBorderRepeat,
+  },
+  'animate-mask-border-slice': {
+    key: 'inset',
+    property: value => ({
+      '--jumi-mask-border-slice': value,
+      '--jumi-mask-border-slice-keyframes': create.animation('mask-border-slice'),
+    }),
+    type: ['number', 'percentage', 'any'],
+    values: maskBorderSlice,
+  },
+  'animate-mask-border-slice-bottom': {
+    key: 'inset',
+    property: value => ({
+      '--jumi-mask-border-slice-bottom': value,
+      '--jumi-mask-border-slice-keyframes': create.animation('mask-border-slice'),
+    }),
+    type: ['number', 'percentage', 'any'],
+    values: maskBorderSlice,
+  },
+  'animate-mask-border-slice-left': {
+    key: 'inset',
+    property: value => ({
+      '--jumi-mask-border-slice-keyframes': create.animation('mask-border-slice'),
+      '--jumi-mask-border-slice-left': value,
+    }),
+    type: ['number', 'percentage', 'any'],
+    values: maskBorderSlice,
+  },
+  'animate-mask-border-slice-right': {
+    key: 'inset',
+    property: value => ({
+      '--jumi-mask-border-slice-keyframes': create.animation('mask-border-slice'),
+      '--jumi-mask-border-slice-right': value,
+    }),
+    type: ['number', 'percentage', 'any'],
+    values: maskBorderSlice,
+  },
+  'animate-mask-border-slice-top': {
+    key: 'inset',
+    property: value => ({
+      '--jumi-mask-border-slice-keyframes': create.animation('mask-border-slice'),
+      '--jumi-mask-border-slice-top': value,
+    }),
+    type: ['number', 'percentage', 'any'],
+    values: maskBorderSlice,
+  },
+  'animate-mask-border-slice-x': {
+    key: 'inset',
+    property: value => ({
+      '--jumi-mask-border-slice-keyframes': create.animation('mask-border-slice'),
+      '--jumi-mask-border-slice-left': value,
+      '--jumi-mask-border-slice-right': value,
+    }),
+    type: ['number', 'percentage', 'any'],
+    values: maskBorderSlice,
+  },
+  'animate-mask-border-slice-y': {
+    key: 'inset',
+    property: value => ({
+      '--jumi-mask-border-slice-bottom': value,
+      '--jumi-mask-border-slice-keyframes': create.animation('mask-border-slice'),
+      '--jumi-mask-border-slice-top': value,
+    }),
+    type: ['number', 'percentage', 'any'],
+    values: maskBorderSlice,
+  },
+  'animate-mask-border-source': {
+    property: value => ({
+      '--jumi-mask-border-source': value,
+      '--jumi-mask-border-source-keyframes': create.animation('mask-border-source'),
+    }),
+    type: ['url', 'image', 'any'],
+    values: empty.none,
+  },
+  'animate-mask-border-width': {
+    key: 'borderWidth',
+    property: value => ({
+      '--jumi-mask-border-width': value,
+      '--jumi-mask-border-width-keyframes': create.animation('mask-border-width'),
+    }),
+    supportsNegativeValues: true,
+    type: ['length', 'percentage', 'any'],
+  },
+  'animate-mask-clip': {
+    property: value => ({
+      '--jumi-mask-clip': value,
+      '--jumi-mask-clip-keyframes': create.animation('mask-clip'),
+    }),
+    values: maskClip,
+  },
+  'animate-mask-composite': {
+    property: value => ({
+      '--jumi-mask-composite': value,
+      '--jumi-mask-composite-keyframes': create.animation('mask-composite'),
+    }),
+    values: maskComposite,
+  },
+  'animate-mask-image': {
+    property: value => ({
+      '--jumi-mask-image': value,
+      '--jumi-mask-image-keyframes': create.animation('mask-image'),
+    }),
+    type: ['url', 'image', 'any'],
+    values: empty.none,
+  },
+  'animate-mask-mode': {
+    property: value => ({
+      '--jumi-mask-mode': value,
+      '--jumi-mask-mode-keyframes': create.animation('mask-mode'),
+    }),
+    values: maskMode,
+  },
+  'animate-mask-origin': {
+    property: value => ({
+      '--jumi-mask-origin': value,
+      '--jumi-mask-origin-keyframes': create.animation('mask-origin'),
+    }),
+    values: maskOrigin,
+  },
+  'animate-mask-position': {
+    key: 'backgroundPosition',
+    property: value => ({
+      '--jumi-mask-position': value,
+      '--jumi-mask-position-keyframes': create.animation('mask-position'),
+    }),
+    type: ['length', 'percentage', 'position'],
+    values: backgroundPosition,
+  },
+  'animate-mask-repeat': {
+    property: value => ({
+      '--jumi-mask-repeat': value,
+      '--jumi-mask-repeat-keyframes': create.animation('mask-repeat'),
+    }),
+    values: backgroundRepeat,
+  },
+  'animate-mask-size': {
+    key: 'backgroundSize',
+    property: value => ({
+      '--jumi-mask-size': value,
+      '--jumi-mask-size-keyframes': create.animation('mask-size'),
+    }),
+    type: ['length', 'percentage'],
+  },
+  'animate-mask-type': {
+    property: value => ({
+      '--jumi-mask-type': value,
+      '--jumi-mask-type-keyframes': create.animation('mask-type'),
+    }),
+    values: maskType,
+  },
+  'animate-math-depth': {
+    property: value => ({
+      '--jumi-math-depth': value,
+      '--jumi-math-depth-keyframes': create.animation('math-depth'),
+    }),
+    supportsNegativeValues: true,
+    type: 'integer',
+    values: mathDepth,
+  },
+  'animate-math-depth-add': {
+    property: value => ({
+      '--jumi-math-depth': `add(${value})`,
+      '--jumi-math-depth-keyframes': create.animation('math-depth'),
+    }),
+    supportsNegativeValues: true,
+    type: 'integer',
+    values: empty.number,
+  },
+  'animate-math-style': {
+    property: value => ({
+      '--jumi-math-style': value,
+      '--jumi-math-style-keyframes': create.animation('math-style'),
+    }),
+    values: mathStyle,
+  },
+  'animate-max-block-size': {
+    key: 'maxHeight',
+    property: value => ({
+      '--jumi-max-block-size': value,
+      '--jumi-max-block-size-keyframes': create.animation('max-block-size'),
+    }),
+    supportsNegativeValues: true,
+    type: ['length', 'percentage', 'any'],
+  },
   'animate-max-height': {
     key: 'maxHeight',
     property: value => ({
       '--jumi-max-height': value,
       '--jumi-max-height-keyframes': create.animation('max-height'),
+    }),
+    supportsNegativeValues: true,
+    type: ['length', 'percentage', 'any'],
+  },
+  'animate-max-inline-size': {
+    key: 'maxWidth',
+    property: value => ({
+      '--jumi-max-inline-size': value,
+      '--jumi-max-inline-size-keyframes': create.animation('max-inline-size'),
     }),
     supportsNegativeValues: true,
     type: ['length', 'percentage', 'any'],
@@ -2095,11 +2419,29 @@ export const matchProperties: Partial<MatchProperty> = {
     supportsNegativeValues: true,
     type: ['length', 'percentage', 'any'],
   },
+  'animate-min-block-size': {
+    key: 'minHeight',
+    property: value => ({
+      '--jumi-min-block-size': value,
+      '--jumi-min-block-size-keyframes': create.animation('min-block-size'),
+    }),
+    supportsNegativeValues: true,
+    type: ['length', 'percentage', 'any'],
+  },
   'animate-min-height': {
     key: 'minHeight',
     property: value => ({
       '--jumi-min-height': value,
       '--jumi-min-height-keyframes': create.animation('min-height'),
+    }),
+    supportsNegativeValues: true,
+    type: ['length', 'percentage', 'any'],
+  },
+  'animate-min-inline-size': {
+    key: 'minWidth',
+    property: value => ({
+      '--jumi-min-inline-size': value,
+      '--jumi-min-inline-size-keyframes': create.animation('min-inline-size'),
     }),
     supportsNegativeValues: true,
     type: ['length', 'percentage', 'any'],
@@ -2181,7 +2523,23 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'padding',
     property: value => ({
       '--jumi-padding-block': value,
-      '--jumi-padding-keyframes': create.animation('padding'),
+      '--jumi-padding-block-keyframes': create.animation('padding-block'),
+    }),
+    supportsNegativeValues: true,
+  },
+  'animate-padding-block-end': {
+    key: 'padding',
+    property: value => ({
+      '--jumi-padding-block-end': value,
+      '--jumi-padding-block-end-keyframes': create.animation('padding-block-end'),
+    }),
+    supportsNegativeValues: true,
+  },
+  'animate-padding-block-start': {
+    key: 'padding',
+    property: value => ({
+      '--jumi-padding-block-start': value,
+      '--jumi-padding-block-start-keyframes': create.animation('padding-block-start'),
     }),
     supportsNegativeValues: true,
   },
@@ -2189,7 +2547,7 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'padding',
     property: value => ({
       '--jumi-padding-bottom': value,
-      '--jumi-padding-keyframes': create.animation('padding'),
+      '--jumi-padding-bottom-keyframes': create.animation('padding-bottom'),
     }),
     supportsNegativeValues: true,
   },
@@ -2197,31 +2555,47 @@ export const matchProperties: Partial<MatchProperty> = {
     key: 'padding',
     property: value => ({
       '--jumi-padding-inline': value,
-      '--jumi-padding-keyframes': create.animation('padding'),
+      '--jumi-padding-inline-keyframes': create.animation('padding-inline'),
+    }),
+    supportsNegativeValues: true,
+  },
+  'animate-padding-inline-end': {
+    key: 'padding',
+    property: value => ({
+      '--jumi-padding-inline-end': value,
+      '--jumi-padding-inline-end-keyframes': create.animation('padding-inline-end'),
+    }),
+    supportsNegativeValues: true,
+  },
+  'animate-padding-inline-start': {
+    key: 'padding',
+    property: value => ({
+      '--jumi-padding-inline-start': value,
+      '--jumi-padding-inline-start-keyframes': create.animation('padding-inline-start'),
     }),
     supportsNegativeValues: true,
   },
   'animate-padding-left': {
     key: 'padding',
     property: value => ({
-      '--jumi-padding-keyframes': create.animation('padding'),
       '--jumi-padding-left': value,
+      '--jumi-padding-left-keyframes': create.animation('padding-left'),
     }),
     supportsNegativeValues: true,
   },
   'animate-padding-right': {
     key: 'padding',
     property: value => ({
-      '--jumi-padding-keyframes': create.animation('padding'),
       '--jumi-padding-right': value,
+      '--jumi-padding-right-keyframes': create.animation('padding-right'),
     }),
     supportsNegativeValues: true,
   },
   'animate-padding-top': {
     key: 'padding',
     property: value => ({
-      '--jumi-padding-keyframes': create.animation('padding'),
       '--jumi-padding-top': value,
+      '--jumi-padding-top-keyframes': create.animation('padding-top'),
     }),
     supportsNegativeValues: true,
   },
@@ -2530,16 +2904,16 @@ export const matchProperties: Partial<MatchProperty> = {
     type: ['length', 'percentage', 'any'],
     values: animationRange,
   },
-  'animation-range-end-length': {
+  'animation-range-end-offset': {
     property: value => ({
-      '--jumi-animation-range-end-length': value,
+      '--jumi-animation-range-end-offset': value,
     }),
     type: ['length', 'percentage'],
     values: percentage,
   },
-  'animation-range-end-name': {
+  'animation-range-end-timeline': {
     property: value => ({
-      '--jumi-animation-range-end-name': value,
+      '--jumi-animation-range-end-timeline': value,
     }),
     values: animationRangeTimeline,
   },
@@ -2550,16 +2924,16 @@ export const matchProperties: Partial<MatchProperty> = {
     type: ['length', 'percentage', 'any'],
     values: animationRange,
   },
-  'animation-range-start-length': {
+  'animation-range-start-offset': {
     property: value => ({
-      '--jumi-animation-range-start-length': value,
+      '--jumi-animation-range-start-offset': value,
     }),
     type: ['length', 'percentage'],
     values: percentage,
   },
-  'animation-range-start-name': {
+  'animation-range-start-timeline': {
     property: value => ({
-      '--jumi-animation-range-start-name': value,
+      '--jumi-animation-range-start-timeline': value,
     }),
     values: animationRangeTimeline,
   },

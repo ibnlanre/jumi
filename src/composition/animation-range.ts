@@ -6,11 +6,11 @@ export const animationRange = [
 ].join(' ')
 
 export const animationRangeStart = [
-  css('var', '--jumi-animation-range-start-name'),
-  css('var', '--jumi-animation-range-start-length'),
+  css('var', '--jumi-animation-range-start-timeline'),
+  css('var', '--jumi-animation-range-start-offset'),
 ].join(' ')
 
 export const animationRangeEnd = [
-  css('var', '--jumi-animation-range-end-name'),
-  css('var', '--jumi-animation-range-end-length'),
+  css('var', '--jumi-animation-range-end-timeline'),
+  css('var', '--jumi-animation-range-end-offset'),
 ].join(' ')
