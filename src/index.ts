@@ -60,7 +60,7 @@ const jumi = createPlugin(({ addBase, addUtilities, matchUtilities, matchVariant
     const { key, property, values, ...options } = item
 
     const resolved = key ? theme(key) : undefined
-    const result = flattenColorPalette(merge(resolved, values))
+    const result = flattenColorPalette(merge(values, resolved))
 
     matchUtilities({ [name]: property }, merge(options, { values: result }))
   }

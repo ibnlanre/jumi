@@ -1,0 +1,18 @@
+export const paintOrder = {
+  'fill': 'fill',
+  'fill-markers': 'fill markers',
+  'fill-markers-stroke': 'fill markers stroke',
+  'fill-stroke': 'fill stroke',
+  'fill-stroke-markers': 'fill stroke markers',
+  'markers': 'markers',
+  'markers-fill': 'markers fill',
+  'markers-fill-stroke': 'markers fill stroke',
+  'markers-stroke': 'markers stroke',
+  'markers-stroke-fill': 'markers stroke fill',
+  'normal': 'normal',
+  'stroke': 'stroke',
+  'stroke-fill': 'stroke fill',
+  'stroke-fill-markers': 'stroke fill markers',
+  'stroke-markers': 'stroke markers',
+  'stroke-markers-fill': 'stroke markers fill',
+} as const

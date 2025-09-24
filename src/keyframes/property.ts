@@ -137,11 +137,6 @@ export const propertyKeyframes: AttributeKeyframes = {
       'border-block-end-color': css('var', '--jumi-border-block-end-color'),
     },
   },
-  '@keyframes jumi-border-block-end-radius': {
-    to: {
-      'border-block-end-radius': css('var', '--jumi-border-block-end-radius'),
-    },
-  },
   '@keyframes jumi-border-block-end-style': {
     to: {
       'border-block-end-style': css('var', '--jumi-border-block-end-style') as Property.BorderBlockEndStyle,
@@ -160,11 +155,6 @@ export const propertyKeyframes: AttributeKeyframes = {
   '@keyframes jumi-border-block-start-color': {
     to: {
       'border-block-start-color': css('var', '--jumi-border-block-start-color'),
-    },
-  },
-  '@keyframes jumi-border-block-start-radius': {
-    to: {
-      'border-block-start-radius': css('var', '--jumi-border-block-start-radius'),
     },
   },
   '@keyframes jumi-border-block-start-style': {
@@ -200,11 +190,6 @@ export const propertyKeyframes: AttributeKeyframes = {
   '@keyframes jumi-border-bottom-left-radius': {
     to: {
       'border-bottom-left-radius': css('var', '--jumi-border-bottom-left-radius'),
-    },
-  },
-  '@keyframes jumi-border-bottom-radius': {
-    to: {
-      'border-bottom-radius': css('var', '--jumi-border-bottom-radius'),
     },
   },
   '@keyframes jumi-border-bottom-right-radius': {
@@ -292,11 +277,6 @@ export const propertyKeyframes: AttributeKeyframes = {
       'border-inline-end-color': css('var', '--jumi-border-inline-end-color'),
     },
   },
-  '@keyframes jumi-border-inline-end-radius': {
-    to: {
-      'border-inline-end-radius': css('var', '--jumi-border-inline-end-radius'),
-    },
-  },
   '@keyframes jumi-border-inline-end-style': {
     to: {
       'border-inline-end-style': css('var', '--jumi-border-inline-end-style') as Property.BorderInlineEndStyle,
@@ -315,11 +295,6 @@ export const propertyKeyframes: AttributeKeyframes = {
   '@keyframes jumi-border-inline-start-color': {
     to: {
       'border-inline-start-color': css('var', '--jumi-border-inline-start-color'),
-    },
-  },
-  '@keyframes jumi-border-inline-start-radius': {
-    to: {
-      'border-inline-start-radius': css('var', '--jumi-border-inline-start-radius'),
     },
   },
   '@keyframes jumi-border-inline-start-style': {
@@ -352,11 +327,6 @@ export const propertyKeyframes: AttributeKeyframes = {
       'border-left-color': css('var', '--jumi-border-left-color'),
     },
   },
-  '@keyframes jumi-border-left-radius': {
-    to: {
-      'border-left-radius': css('var', '--jumi-border-left-radius'),
-    },
-  },
   '@keyframes jumi-border-left-style': {
     to: {
       'border-left-style': css('var', '--jumi-border-left-style') as Property.BorderLeftStyle,
@@ -380,11 +350,6 @@ export const propertyKeyframes: AttributeKeyframes = {
   '@keyframes jumi-border-right-color': {
     to: {
       'border-right-color': css('var', '--jumi-border-right-color'),
-    },
-  },
-  '@keyframes jumi-border-right-radius': {
-    to: {
-      'border-right-radius': css('var', '--jumi-border-right-radius'),
     },
   },
   '@keyframes jumi-border-right-style': {
@@ -430,11 +395,6 @@ export const propertyKeyframes: AttributeKeyframes = {
   '@keyframes jumi-border-top-left-radius': {
     to: {
       'border-top-left-radius': css('var', '--jumi-border-top-left-radius'),
-    },
-  },
-  '@keyframes jumi-border-top-radius': {
-    to: {
-      'border-top-radius': css('var', '--jumi-border-top-radius'),
     },
   },
   '@keyframes jumi-border-top-right-radius': {
@@ -1308,6 +1268,51 @@ export const propertyKeyframes: AttributeKeyframes = {
       'min-width': css('var', '--jumi-min-width'),
     },
   },
+  '@keyframes jumi-mix-blend-mode': {
+    to: {
+      'mix-blend-mode': css('var', '--jumi-mix-blend-mode') as Property.MixBlendMode,
+    },
+  },
+  '@keyframes jumi-object-fit': {
+    to: {
+      'object-fit': css('var', '--jumi-object-fit') as Property.ObjectFit,
+    },
+  },
+  '@keyframes jumi-object-position': {
+    to: {
+      'object-position': css('var', '--jumi-object-position'),
+    },
+  },
+  '@keyframes jumi-offset': {
+    to: {
+      offset: css('var', '--jumi-offset'),
+    },
+  },
+  '@keyframes jumi-offset-anchor': {
+    to: {
+      'offset-anchor': css('var', '--jumi-offset-anchor'),
+    },
+  },
+  '@keyframes jumi-offset-distance': {
+    to: {
+      'offset-distance': css('var', '--jumi-offset-distance'),
+    },
+  },
+  '@keyframes jumi-offset-path': {
+    to: {
+      'offset-path': css('var', '--jumi-offset-path'),
+    },
+  },
+  '@keyframes jumi-offset-position': {
+    to: {
+      'offset-position': css('var', '--jumi-offset-position'),
+    },
+  },
+  '@keyframes jumi-offset-rotate': {
+    to: {
+      'offset-rotate': css('var', '--jumi-offset-rotate'),
+    },
+  },
   '@keyframes jumi-opacity': {
     to: {
       opacity: css('var', '--jumi-opacity'),
@@ -1316,6 +1321,11 @@ export const propertyKeyframes: AttributeKeyframes = {
   '@keyframes jumi-order': {
     to: {
       order: css('var', '--jumi-order'),
+    },
+  },
+  '@keyframes jumi-orphans': {
+    to: {
+      orphans: css('var', '--jumi-orphans'),
     },
   },
   '@keyframes jumi-outline': {
@@ -1331,6 +1341,56 @@ export const propertyKeyframes: AttributeKeyframes = {
   '@keyframes jumi-overflow': {
     to: {
       overflow: css('var', '--jumi-overflow'),
+    },
+  },
+  '@keyframes jumi-overflow-anchor': {
+    to: {
+      'overflow-anchor': css('var', '--jumi-overflow-anchor') as Property.OverflowAnchor,
+    },
+  },
+  '@keyframes jumi-overflow-block': {
+    to: {
+      'overflow-block': css('var', '--jumi-overflow-block') as Property.OverflowBlock,
+    },
+  },
+  '@keyframes jumi-overflow-clip-margin': {
+    to: {
+      'overflow-clip-margin': css('var', '--jumi-overflow-clip-margin'),
+    },
+  },
+  '@keyframes jumi-overflow-inline': {
+    to: {
+      'overflow-inline': css('var', '--jumi-overflow-inline') as Property.OverflowInline,
+    },
+  },
+  '@keyframes jumi-overflow-wrap': {
+    to: {
+      'overflow-wrap': css('var', '--jumi-overflow-wrap') as Property.OverflowWrap,
+    },
+  },
+  '@keyframes jumi-overscroll-behavior': {
+    to: {
+      'overscroll-behavior': css('var', '--jumi-overscroll-behavior'),
+    },
+  },
+  '@keyframes jumi-overscroll-behavior-block': {
+    to: {
+      'overscroll-behavior-block': css('var', '--jumi-overscroll-behavior-block') as Property.OverscrollBehaviorBlock,
+    },
+  },
+  '@keyframes jumi-overscroll-behavior-inline': {
+    to: {
+      'overscroll-behavior-inline': css('var', '--jumi-overscroll-behavior-inline') as Property.OverscrollBehaviorInline,
+    },
+  },
+  '@keyframes jumi-overscroll-behavior-x': {
+    to: {
+      'overscroll-behavior-x': css('var', '--jumi-overscroll-behavior-x') as Property.OverscrollBehaviorX,
+    },
+  },
+  '@keyframes jumi-overscroll-behavior-y': {
+    to: {
+      'overscroll-behavior-y': css('var', '--jumi-overscroll-behavior-y') as Property.OverscrollBehaviorY,
     },
   },
   '@keyframes jumi-padding': {
@@ -1388,6 +1448,21 @@ export const propertyKeyframes: AttributeKeyframes = {
       'padding-top': css('var', '--jumi-padding-top'),
     },
   },
+  '@keyframes jumi-page': {
+    to: {
+      page: css('var', '--jumi-page'),
+    },
+  },
+  '@keyframes jumi-paint-order': {
+    to: {
+      'paint-order': css('var', '--jumi-paint-order') as Property.PaintOrder,
+    },
+  },
+  '@keyframes jumi-perspective-origin': {
+    to: {
+      'perspective-origin': css('var', '--jumi-perspective-origin'),
+    },
+  },
   '@keyframes jumi-position': {
     to: {
       position: css('var', '--jumi-position') as Property.Position,
@@ -1425,7 +1500,7 @@ export const propertyKeyframes: AttributeKeyframes = {
   },
   '@keyframes jumi-stroke-miterlimit': {
     to: {
-      'stroke-miterlimit': css('var', '--jumi-stroke-miterlimit') as Property.StrokeMiterlimit,
+      'stroke-miterlimit': css('var', '--jumi-stroke-miterlimit'),
     },
   },
   '@keyframes jumi-stroke-opacity': {

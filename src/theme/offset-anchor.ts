@@ -1,4 +1,5 @@
-export const backgroundPosition = {
+export const offsetAnchor = {
+  auto: 'auto',
   bottom: 'bottom',
   center: 'center',
   left: 'left',
