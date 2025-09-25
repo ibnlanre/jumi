@@ -483,7 +483,6 @@ export type MatchPropertyKeys = 'animate' | `animate-${Property}` | `animation-$
 
 export interface MatchPropertyValue extends Partial<Options> {
   property: MatchPropertyFunction
-  variables?: Partial<Collection<string, PropertyVariable>>
 }
 
 export interface MatchVariant {
@@ -553,17 +552,18 @@ export type Property
     | 'border-block'
     | 'border-block-color'
     | 'border-block-end'
-    | 'border-block-end-color' // bottom
-    | 'border-block-end-radius' // bottom
-    | 'border-block-end-style' // bottom
-    | 'border-block-end-width' // bottom
+    | 'border-block-end-color'
+    | 'border-block-end-radius'
+    | 'border-block-end-style'
+    | 'border-block-end-width'
+    | 'border-block-radius'
     | 'border-block-start'
-    | 'border-block-start-color' // top
-    | 'border-block-start-radius' // top
-    | 'border-block-start-style' // top
-    | 'border-block-start-width' // top
-    | 'border-block-style' // top-bottom
-    | 'border-block-width' // top-bottom
+    | 'border-block-start-color'
+    | 'border-block-start-radius'
+    | 'border-block-start-style'
+    | 'border-block-start-width'
+    | 'border-block-style'
+    | 'border-block-width'
     | 'border-bottom'
     | 'border-bottom-color'
     | 'border-bottom-left-radius'
@@ -573,8 +573,8 @@ export type Property
     | 'border-bottom-width'
     | 'border-collapse'
     | 'border-color'
-    | 'border-end-end-radius' // bottom-right
-    | 'border-end-start-radius' // bottom-left
+    | 'border-end-end-radius'
+    | 'border-end-start-radius'
     | 'border-image'
     | 'border-image-outset'
     | 'border-image-outset-bottom'
@@ -589,19 +589,21 @@ export type Property
     | 'border-image-slice'
     | 'border-image-source'
     | 'border-image-width'
+    | 'border-inline'
     | 'border-inline-color'
     | 'border-inline-end'
     | 'border-inline-end-color'
-    | 'border-inline-end-radius' // right
+    | 'border-inline-end-radius'
     | 'border-inline-end-style'
-    | 'border-inline-end-width' // right
+    | 'border-inline-end-width'
+    | 'border-inline-radius'
     | 'border-inline-start'
     | 'border-inline-start-color'
-    | 'border-inline-start-radius' // left
+    | 'border-inline-start-radius'
     | 'border-inline-start-style'
-    | 'border-inline-start-width' // left
+    | 'border-inline-start-width'
     | 'border-inline-style'
-    | 'border-inline-width' // left-right
+    | 'border-inline-width'
     | 'border-left'
     | 'border-left-color'
     | 'border-left-radius'
@@ -614,8 +616,8 @@ export type Property
     | 'border-right-style'
     | 'border-right-width'
     | 'border-spacing'
-    | 'border-start-end-radius' // top-right
-    | 'border-start-start-radius' // top-left
+    | 'border-start-end-radius'
+    | 'border-start-start-radius'
     | 'border-style'
     | 'border-top'
     | 'border-top-color'

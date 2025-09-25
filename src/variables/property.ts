@@ -1,4 +1,4 @@
-import type { Attribute, Collection, PropertyVariables } from '@/types'
+import type { Collection, PropertyVariables } from '@/types'
 
 import { aspectRatio } from '@/composition/aspect-ratio'
 import { backdropFilter } from '@/composition/backdrop-filter'
@@ -125,13 +125,14 @@ export const propertyVariables: Collection<PropertyVariables> = {
     '--jumi-background-size-width': 'auto',
     '--jumi-block-size': 'auto',
     '--jumi-border': border,
-    '--jumi-border-block': 'none',
+    '--jumi-border-block': borderBlock,
     '--jumi-border-block-color': 'currentColor',
     '--jumi-border-block-end': borderBlockEnd,
     '--jumi-border-block-end-color': 'currentColor',
     '--jumi-border-block-end-radius': '0',
     '--jumi-border-block-end-style': 'none',
     '--jumi-border-block-end-width': 'medium',
+    '--jumi-border-block-radius': borderBlockRadius,
     '--jumi-border-block-start': borderBlockStart,
     '--jumi-border-block-start-color': 'currentColor',
     '--jumi-border-block-start-radius': '0',
@@ -164,12 +165,14 @@ export const propertyVariables: Collection<PropertyVariables> = {
     '--jumi-border-image-slice': '100%',
     '--jumi-border-image-source': 'none',
     '--jumi-border-image-width': '1',
+    '--jumi-border-inline': borderInline,
     '--jumi-border-inline-color': 'currentColor',
     '--jumi-border-inline-end': borderInlineEnd,
     '--jumi-border-inline-end-color': 'currentColor',
     '--jumi-border-inline-end-radius': '0',
     '--jumi-border-inline-end-style': 'none',
     '--jumi-border-inline-end-width': 'medium',
+    '--jumi-border-inline-radius': borderInlineRadius,
     '--jumi-border-inline-start': borderInlineStart,
     '--jumi-border-inline-start-color': 'currentColor',
     '--jumi-border-inline-start-radius': '0',
@@ -182,7 +185,7 @@ export const propertyVariables: Collection<PropertyVariables> = {
     '--jumi-border-left-radius': '0',
     '--jumi-border-left-style': 'none',
     '--jumi-border-left-width': 'medium',
-    '--jumi-border-radius': '0',
+    '--jumi-border-radius': borderRadius,
     '--jumi-border-right': borderRight,
     '--jumi-border-right-color': 'currentColor',
     '--jumi-border-right-radius': '0',

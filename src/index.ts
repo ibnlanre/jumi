@@ -57,7 +57,7 @@ const jumi = createPlugin((api) => {
 
   const matchProperties = getMatchProperties(api)
   for (const name in matchProperties) {
-    const { property, variables, ...options } = matchProperties[name]
+    const { property, ...options } = matchProperties[name]
     matchUtilities({ [name]: property }, options)
   }
 })

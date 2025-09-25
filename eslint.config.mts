@@ -57,6 +57,7 @@ const ignoresConfig = defineConfig({
     '**/lerna.json',
     '**/tsconfig*.tsbuildinfo',
     '**/*.d.ts',
+    "**/output.css",
   ],
 })
 

@@ -2,7 +2,7 @@ import type { Config } from 'tailwindcss'
 
 import jumi from './dist/index.js'
 
-export default {
+const config = {
   content: [
     './stories/**/*.{js,jsx,ts,tsx}',
     './.storybook/**/*.{js,jsx,ts,tsx}',
@@ -11,3 +11,5 @@ export default {
     jumi,
   ],
 } satisfies Config
+
+export default config as Config
