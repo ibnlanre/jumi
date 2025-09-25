@@ -1,12 +1,11 @@
 import type { PropertiesHyphen, SvgAttributes } from 'csstype'
+import type { PluginCreator } from 'tailwindcss/plugin'
 
 import type { Effect } from '@/theme/effects'
 
-export type AddProperty = {
-  [K in AddPropertyKeys as `.${K}`]?: CssInJs
-}
+export type AddProperty = Collection<CssInJs, AddPropertyKey>
 
-export type AddPropertyKeys = 'animate'
+export type AddPropertyKey = `.animate`
 
 export type AnimationProperty
   = | 'composition'
@@ -35,6 +34,8 @@ export type AnimationProperty
 export type AnimationVariables = {
   [key in '--jumi-animation' | AnimationVariable]?: string
 }
+
+export type Api = Parameters<PluginCreator> extends [infer U] ? U : never
 
 export type Attribute
   = 'accent-color'
@@ -329,8 +330,36 @@ export type Attribute
     | 'page'
     | 'paint-order'
     | 'perspective-origin'
+    | 'place-content'
+    | 'place-items'
+    | 'place-self'
     | 'position'
+    | 'resize'
     | 'right'
+    | 'row-gap'
+    | 'scroll-margin'
+    | 'scroll-margin-block'
+    | 'scroll-margin-block-end'
+    | 'scroll-margin-block-start'
+    | 'scroll-margin-bottom'
+    | 'scroll-margin-inline'
+    | 'scroll-margin-inline-end'
+    | 'scroll-margin-inline-start'
+    | 'scroll-margin-left'
+    | 'scroll-margin-right'
+    | 'scroll-margin-top'
+    | 'scroll-padding'
+    | 'scroll-padding-block'
+    | 'scroll-padding-block-end'
+    | 'scroll-padding-block-start'
+    | 'scroll-padding-bottom'
+    | 'scroll-padding-inline'
+    | 'scroll-padding-inline-end'
+    | 'scroll-padding-inline-start'
+    | 'scroll-padding-left'
+    | 'scroll-padding-right'
+    | 'scroll-padding-top'
+    | 'shape-outside'
     | 'stroke'
     | 'stroke-dasharray'
     | 'stroke-dashoffset'
@@ -339,20 +368,57 @@ export type Attribute
     | 'stroke-miterlimit'
     | 'stroke-opacity'
     | 'stroke-width'
+    | 'table-layout'
     | 'text-align'
     | 'text-align-last'
+    | 'text-anchor'
+    | 'text-autospace'
+    | 'text-box'
+    | 'text-box-edge'
+    | 'text-box-trim'
+    | 'text-combine-upright'
+    | 'text-decoration'
+    | 'text-decoration-color'
+    | 'text-decoration-line'
+    | 'text-decoration-skip-ink'
+    | 'text-decoration-style'
+    | 'text-decoration-thickness'
+    | 'text-emphasis'
+    | 'text-emphasis-color'
+    | 'text-emphasis-position'
+    | 'text-emphasis-style'
+    | 'text-indent'
+    | 'text-justify'
+    | 'text-orientation'
+    | 'text-overflow'
+    | 'text-rendering'
     | 'text-shadow'
+    | 'text-transform'
+    | 'text-underline-offset'
+    | 'text-underline-position'
+    | 'text-wrap'
+    | 'text-wrap-mode'
+    | 'text-wrap-style'
     | 'top'
     | 'transform'
+    | 'transform-box'
+    | 'transform-origin'
+    | 'transform-origin-x'
+    | 'transform-origin-y'
+    | 'transform-origin-z'
+    | 'transform-style'
+    | 'user-drag'
+    | 'user-select'
+    | 'vertical-align'
     | 'visibility'
+    | 'white-space'
     | 'width'
+    | 'word-break'
     | 'z-index'
 
-export type AttributeKeyframes = {
-  [K in Attribute as `@keyframes jumi-${K}`]: Keyframes
-}
+export type AttributeKeyframes = Collection<Keyframes, `@keyframes jumi-${Attribute}`>
 
-export type Collection<T = any> = Record<string, T>
+export type Collection<Values = any, Key extends PropertyKey = string> = Record<Key, Values>
 
 export type CSSFunction
   = | AnchorFunction
@@ -403,42 +469,36 @@ export type DataType
     | 'url'
     | 'vector'
 
-export type EffectKeyframes = {
-  [K in Effect as `@keyframes jumi-${K}`]?: Keyframes
-}
+export type EffectKeyframes = Collection<Keyframes, `@keyframes jumi-${Effect}`>
 
 export type KeyframeDefinition = Collection<Collection<number | string>>
 
 export type Keyframes = Collection<Partial<Record<SvgAttribute, string>> | PropertiesHyphen>
 
-export type KeyframeVariables = {
-  [key in Attribute as `--jumi-${key}-keyframes`]: 'none' | (string & {})
-}
+export type KeyframeVariables = Collection<'none' | (string & {}), PropertyKeyframes>
 
-export type MatchProperty = {
-  [K in MatchPropertyKeys]: MatchPropertyValue
-}
+export type MatchProperty = Collection<MatchPropertyValue, MatchPropertyKeys>
 
 export type MatchPropertyFunction = (value: string, extra: { modifier: null | string }) => CSSRuleObject
 
-export type MatchPropertyKeys = 'animate' | `animate-${Property}` | `animate-${RevealAnimation}` | `animation-${AnimationProperty}`
+export type MatchPropertyKeys = 'animate' | `animate-${Property}` | `animation-${AnimationProperty}`
 
 export interface MatchPropertyValue extends Partial<Options> {
-  key?: TailwindTheme
   property: MatchPropertyFunction
+  variables?: Partial<Collection<string, PropertyVariable>>
 }
 
 export interface MatchVariant {
   generator: (value: string) => string
   name: string
-  values: Record<string, string>
+  values: Collection<string>
 }
 
 export interface Options {
   modifiers: Collection<string>
   supportsNegativeValues: boolean
-  type: DataType | DataType[]
-  values: Theme
+  type: Array<DataType> | DataType
+  values: Collection
 }
 
 export type Property
@@ -494,10 +554,12 @@ export type Property
     | 'border'
     | 'border-block'
     | 'border-block-color'
+    | 'border-block-end'
     | 'border-block-end-color' // bottom
     | 'border-block-end-radius' // bottom
     | 'border-block-end-style' // bottom
     | 'border-block-end-width' // bottom
+    | 'border-block-start'
     | 'border-block-start-color' // top
     | 'border-block-start-radius' // top
     | 'border-block-start-style' // top
@@ -529,24 +591,36 @@ export type Property
     | 'border-image-slice'
     | 'border-image-source'
     | 'border-image-width'
+    | 'border-inline-color'
+    | 'border-inline-end'
+    | 'border-inline-end-color'
     | 'border-inline-end-radius' // right
+    | 'border-inline-end-style'
     | 'border-inline-end-width' // right
+    | 'border-inline-start'
+    | 'border-inline-start-color'
     | 'border-inline-start-radius' // left
+    | 'border-inline-start-style'
     | 'border-inline-start-width' // left
+    | 'border-inline-style'
     | 'border-inline-width' // left-right
     | 'border-left'
+    | 'border-left-color'
     | 'border-left-radius'
     | 'border-left-style'
     | 'border-left-width'
     | 'border-radius'
     | 'border-right'
+    | 'border-right-color'
     | 'border-right-radius'
     | 'border-right-style'
     | 'border-right-width'
+    | 'border-spacing'
     | 'border-start-end-radius' // top-right
     | 'border-start-start-radius' // top-left
     | 'border-style'
     | 'border-top'
+    | 'border-top-color'
     | 'border-top-left-radius'
     | 'border-top-radius'
     | 'border-top-right-radius'
@@ -971,11 +1045,11 @@ export type Property
     | 'word-break'
     | 'z-index'
 
-export type PropertyVariables = {
-  [key in Property as `--jumi-${key}`]: string
-}
+export type PropertyKeyframes = `--jumi-${Attribute}-keyframes`
 
-export type RevealAnimation = 'reveal-bottom' | 'reveal-left' | 'reveal-right' | 'reveal-top'
+export type PropertyVariable = `--jumi-${Property}`
+
+export type PropertyVariables = Collection<string, PropertyVariable>
 
 export type SvgAttribute = SvgAttributes extends `[${infer U}]` ? U : never
 
@@ -1102,10 +1176,6 @@ export type TailwindTheme
     | 'width'
     | 'willChange'
     | 'zIndex'
-
-export type Theme = {
-  [key: number | string]: string | Theme
-}
 
 export interface Variables extends AnimationVariables, KeyframeVariables, PropertyVariables {
   [key: string]: string

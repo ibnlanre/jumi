@@ -9,8 +9,7 @@
     "source.addMissingImports.ts": "always",
     "source.fixAll.eslint": "always",
     "source.fixAll.ts": "always",
-    "source.removeUnused.ts": "always",
-    "source.removeUnusedImports": "always"
+    "source.removeUnusedImports": "never"
   },
   "prettier.enable": false,
   "css.customData": [".vscode/tailwind.json"],

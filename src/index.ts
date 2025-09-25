@@ -1,15 +1,14 @@
-import type { Collection, CssInJs, MatchPropertyKeys } from '@/types'
+import type { Collection, CssInJs } from '@/types'
 
-import { merge } from '@/helpers/merge'
-import { effectKeyframes } from '@/keyframes/effects'
-import { animationKeyframes, propertyKeyframes } from '@/keyframes/property'
-import { addProperties } from '@/properties/add'
-import { matchProperties } from '@/properties/match'
+import { getMatchProperties } from '@/properties/match'
 import { animationVariables } from '@/variables/animation'
 import { propertyVariables } from '@/variables/property'
 import { variants } from '@/variants'
 
-import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette'
+import { effectKeyframes } from './keyframes/effects'
+import { animationKeyframes, animationProperties, propertyKeyframes } from './keyframes/property'
+import { addProperties } from './properties/add'
+
 import createPlugin from 'tailwindcss/plugin'
 
 /**
@@ -24,6 +23,16 @@ import createPlugin from 'tailwindcss/plugin'
 const keyframes: Array<CssInJs> = [effectKeyframes, propertyKeyframes]
 
 /**
+ * CSS @property declarations for custom properties.
+ *
+ * These are placed in the @base layer because:
+ * - @property rules must be defined globally like @keyframes
+ * - They register CSS custom properties with type information
+ * - They need to be available before any CSS that uses the properties
+ */
+const properties: Array<CssInJs> = [animationProperties]
+
+/**
  * CSS custom properties (variables) that provide default values.
  *
  * These are placed in the @utilities layer because:
@@ -32,7 +41,7 @@ const keyframes: Array<CssInJs> = [effectKeyframes, propertyKeyframes]
  * - This can lead to unforeseen problems where pseudo-elements inherit unwanted values
  * - @utilities layer provides the right specificity without forced inheritance
  */
-const variables: Array<Collection<CssInJs>> = [propertyVariables, animationVariables]
+const variables: Array<Collection<CssInJs>> = [ animationVariables]
 
 /**
  * Utility classes and animation properties.
@@ -42,27 +51,24 @@ const variables: Array<Collection<CssInJs>> = [propertyVariables, animationVaria
  * - They should have appropriate specificity for overriding defaults
  * - They work alongside the variables to create the complete animation system
  */
-const utilities: Array<Collection<CssInJs>> = [animationKeyframes, addProperties]
+const utilities: Array<Collection<CssInJs>> = [addProperties] // animationKeyframes
 
-const jumi = createPlugin(({ addBase, addUtilities, matchUtilities, matchVariant, theme }) => {
+const jumi = createPlugin((api) => {
+  const { addBase, addUtilities, matchUtilities, matchVariant } = api
+
   variables.concat(utilities).forEach(addUtilities)
-  keyframes.forEach(addBase)
+  properties.forEach(addBase)
 
-  variants.forEach((variant) => {
+  for (const variant of variants) {
     matchVariant(variant.name, variant.generator, {
       values: variant.values,
     })
-  })
+  }
 
+  const matchProperties = getMatchProperties(api)
   for (const name in matchProperties) {
-    const item = matchProperties[name as MatchPropertyKeys]!
-
-    const { key, property, values, ...options } = item
-
-    const resolved = key ? theme(key) : undefined
-    const result = flattenColorPalette(merge(values, resolved))
-
-    matchUtilities({ [name]: property }, merge(options, { values: result }))
+    const { property, variables, ...options } = matchProperties[name]
+    matchUtilities({ [name]: property }, options)
   }
 })
 

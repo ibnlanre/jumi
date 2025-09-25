@@ -81,5 +81,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/ibnlanre/jumi"
+  },
+  "dependencies": {
+    "glob": "^11.0.3"
   }
 }

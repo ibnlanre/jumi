@@ -4,7 +4,7 @@ import type { Attribute, AttributeKeyframes } from '@/types'
 
 import { css } from '@/helpers/css'
 
-export const propertyKeyframes: AttributeKeyframes = {
+export const propertyKeyframes: Partial<AttributeKeyframes> = {
   '@keyframes jumi-accent-color': {
     to: {
       'accent-color': css('var', '--jumi-accent-color'),
@@ -1569,9 +1569,14 @@ const keyframes: KeyframesCollection = Object.keys(propertyKeyframes).reduce(
     const variable = [name, 'keyframes'].join('-') as `jumi-${Attribute}-keyframes`
     const property = name.slice('jumi-'.length) as Attribute
 
-    acc.names.push(css('var', `--${variable}`))
+    acc.names.push(css('var', `--${variable}`, 'none'))
     acc.attributes[property] = property
     acc.variables[`--${variable}`] = 'none'
+    // acc.properties[`@property --${variable}`] = {
+    //   'inherits': 'false',
+    //   'initial-value': 'none',
+    //   'syntax': '"*"',
+    // }
 
     return acc
   },
