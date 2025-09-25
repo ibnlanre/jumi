@@ -1646,6 +1646,545 @@
     forced-color-adjust: none;
   }
   .animate {
+    --jumi-accent-color: auto;
+    --jumi-align-content: normal;
+    --jumi-align-items: normal;
+    --jumi-align-self: auto;
+    --jumi-alignment-baseline: baseline;
+    --jumi-all: initial;
+    --jumi-anchor-name: none;
+    --jumi-appearance: none;
+    --jumi-aspect-ratio: var(--jumi-aspect-ratio-width) var(--jumi-aspect-ratio-height);
+    --jumi-aspect-ratio-height: auto;
+    --jumi-aspect-ratio-width: auto;
+    --jumi-backdrop-blur: blur(0);
+    --jumi-backdrop-brightness: brightness(1);
+    --jumi-backdrop-contrast: contrast(1);
+    --jumi-backdrop-drop-shadow: drop-shadow(var(--jumi-backdrop-drop-shadow-offset-x) var(--jumi-backdrop-drop-shadow-offset-y) var(--jumi-backdrop-drop-shadow-blur) var(--jumi-backdrop-drop-shadow-color));
+    --jumi-backdrop-drop-shadow-blur: 0;
+    --jumi-backdrop-drop-shadow-color: transparent;
+    --jumi-backdrop-drop-shadow-offset-x: 0;
+    --jumi-backdrop-drop-shadow-offset-y: 0;
+    --jumi-backdrop-filter: var(--jumi-backdrop-blur) var(--jumi-backdrop-brightness) var(--jumi-backdrop-contrast) var(--jumi-backdrop-drop-shadow) var(--jumi-backdrop-grayscale) var(--jumi-backdrop-hue-rotate) var(--jumi-backdrop-invert) var(--jumi-backdrop-opacity) var(--jumi-backdrop-saturate) var(--jumi-backdrop-sepia);
+    --jumi-backdrop-grayscale: grayscale(0);
+    --jumi-backdrop-hue-rotate: hue-rotate(0deg);
+    --jumi-backdrop-invert: invert(0);
+    --jumi-backdrop-opacity: opacity(1);
+    --jumi-backdrop-saturate: saturate(1);
+    --jumi-backdrop-sepia: sepia(0);
+    --jumi-backdrop-url: url();
+    --jumi-backface-visibility: visible;
+    --jumi-background: var(--jumi-background-attachment) var(--jumi-background-clip) var(--jumi-background-color) var(--jumi-background-image) var(--jumi-background-origin) var(--jumi-background-position) var(--jumi-background-repeat) var(--jumi-background-size);
+    --jumi-background-attachment: scroll;
+    --jumi-background-blend-mode: normal;
+    --jumi-background-clip: border-box;
+    --jumi-background-color: transparent;
+    --jumi-background-image: none;
+    --jumi-background-origin: padding-box;
+    --jumi-background-position: var(--jumi-background-position-x) var(--jumi-background-position-y);
+    --jumi-background-position-x: var(--jumi-background-position-x-edge) var(--jumi-background-position-x-offset);
+    --jumi-background-position-x-edge: left;
+    --jumi-background-position-x-offset: 0%;
+    --jumi-background-position-y: var(--jumi-background-position-y-edge) var(--jumi-background-position-y-offset);
+    --jumi-background-position-y-edge: top;
+    --jumi-background-position-y-offset: 0%;
+    --jumi-background-repeat: var(--jumi-background-repeat-x) var(--jumi-background-repeat-y);
+    --jumi-background-repeat-x: repeat;
+    --jumi-background-repeat-y: repeat;
+    --jumi-background-size: var(--jumi-background-size-width) var(--jumi-background-size-height);
+    --jumi-background-size-height: auto;
+    --jumi-background-size-width: auto;
+    --jumi-block-size: auto;
+    --jumi-border: var(--jumi-border-width) var(--jumi-border-style) var(--jumi-border-color);
+    --jumi-border-block: none;
+    --jumi-border-block-color: currentColor;
+    --jumi-border-block-end: var(--jumi-border-block-end-width) var(--jumi-border-block-end-style) var(--jumi-border-block-end-color);
+    --jumi-border-block-end-color: currentColor;
+    --jumi-border-block-end-radius: 0;
+    --jumi-border-block-end-style: none;
+    --jumi-border-block-end-width: medium;
+    --jumi-border-block-start: var(--jumi-border-block-start-width) var(--jumi-border-block-start-style) var(--jumi-border-block-start-color);
+    --jumi-border-block-start-color: currentColor;
+    --jumi-border-block-start-radius: 0;
+    --jumi-border-block-start-style: none;
+    --jumi-border-block-start-width: medium;
+    --jumi-border-block-style: none;
+    --jumi-border-block-width: medium;
+    --jumi-border-bottom: var(--jumi-border-bottom-width) var(--jumi-border-bottom-style) var(--jumi-border-bottom-color);
+    --jumi-border-bottom-color: currentColor;
+    --jumi-border-bottom-left-radius: 0;
+    --jumi-border-bottom-radius: 0;
+    --jumi-border-bottom-right-radius: 0;
+    --jumi-border-bottom-style: none;
+    --jumi-border-bottom-width: medium;
+    --jumi-border-collapse: separate;
+    --jumi-border-color: currentColor;
+    --jumi-border-end-end-radius: 0;
+    --jumi-border-end-start-radius: 0;
+    --jumi-border-image: var(--jumi-border-image-outset) var(--jumi-border-image-repeat) var(--jumi-border-image-slice) var(--jumi-border-image-source) var(--jumi-border-image-width);
+    --jumi-border-image-outset: var(--jumi-border-image-outset-top) var(--jumi-border-image-outset-right) var(--jumi-border-image-outset-bottom) var(--jumi-border-image-outset-left);
+    --jumi-border-image-outset-bottom: 0;
+    --jumi-border-image-outset-left: 0;
+    --jumi-border-image-outset-right: 0;
+    --jumi-border-image-outset-top: 0;
+    --jumi-border-image-outset-x: var(--jumi-border-image-outset-right) var(--jumi-border-image-outset-left);
+    --jumi-border-image-outset-y: var(--jumi-border-image-outset-top) var(--jumi-border-image-outset-bottom);
+    --jumi-border-image-repeat: var(--jumi-border-image-repeat-x) var(--jumi-border-image-repeat-y);
+    --jumi-border-image-repeat-x: stretch;
+    --jumi-border-image-repeat-y: stretch;
+    --jumi-border-image-slice: 100%;
+    --jumi-border-image-source: none;
+    --jumi-border-image-width: 1;
+    --jumi-border-inline-color: currentColor;
+    --jumi-border-inline-end: var(--jumi-border-inline-end-width) var(--jumi-border-inline-end-style) var(--jumi-border-inline-end-color);
+    --jumi-border-inline-end-color: currentColor;
+    --jumi-border-inline-end-radius: 0;
+    --jumi-border-inline-end-style: none;
+    --jumi-border-inline-end-width: medium;
+    --jumi-border-inline-start: var(--jumi-border-inline-start-width) var(--jumi-border-inline-start-style) var(--jumi-border-inline-start-color);
+    --jumi-border-inline-start-color: currentColor;
+    --jumi-border-inline-start-radius: 0;
+    --jumi-border-inline-start-style: none;
+    --jumi-border-inline-start-width: medium;
+    --jumi-border-inline-style: none;
+    --jumi-border-inline-width: medium;
+    --jumi-border-left: var(--jumi-border-left-width) var(--jumi-border-left-style) var(--jumi-border-left-color);
+    --jumi-border-left-color: currentColor;
+    --jumi-border-left-radius: 0;
+    --jumi-border-left-style: none;
+    --jumi-border-left-width: medium;
+    --jumi-border-radius: 0;
+    --jumi-border-right: var(--jumi-border-right-width) var(--jumi-border-right-style) var(--jumi-border-right-color);
+    --jumi-border-right-color: currentColor;
+    --jumi-border-right-radius: 0;
+    --jumi-border-right-style: none;
+    --jumi-border-right-width: medium;
+    --jumi-border-spacing: 0;
+    --jumi-border-start-end-radius: 0;
+    --jumi-border-start-start-radius: 0;
+    --jumi-border-style: none;
+    --jumi-border-top: var(--jumi-border-top-width) var(--jumi-border-top-style) var(--jumi-border-top-color);
+    --jumi-border-top-color: currentColor;
+    --jumi-border-top-left-radius: 0;
+    --jumi-border-top-radius: 0;
+    --jumi-border-top-right-radius: 0;
+    --jumi-border-top-style: none;
+    --jumi-border-top-width: medium;
+    --jumi-border-width: medium;
+    --jumi-bottom: auto;
+    --jumi-box-decoration-break: slice;
+    --jumi-box-shadow: var(--jumi-box-shadow-offset-x) var(--jumi-box-shadow-offset-y) var(--jumi-box-shadow-blur) var(--jumi-box-shadow-spread) var(--jumi-box-shadow-color);
+    --jumi-box-shadow-blur: 0;
+    --jumi-box-shadow-color: transparent;
+    --jumi-box-shadow-inset: inset var(--jumi-box-shadow-inset-offset-x) var(--jumi-box-shadow-inset-offset-y) var(--jumi-box-shadow-inset-blur) var(--jumi-box-shadow-inset-spread) var(--jumi-box-shadow-inset-color);
+    --jumi-box-shadow-inset-blur: 0;
+    --jumi-box-shadow-inset-color: transparent;
+    --jumi-box-shadow-inset-offset-x: 0;
+    --jumi-box-shadow-inset-offset-y: 0;
+    --jumi-box-shadow-inset-spread: 0;
+    --jumi-box-shadow-offset-x: 0;
+    --jumi-box-shadow-offset-y: 0;
+    --jumi-box-shadow-spread: 0;
+    --jumi-box-sizing: content-box;
+    --jumi-break-after: auto;
+    --jumi-break-before: auto;
+    --jumi-break-inside: auto;
+    --jumi-caption-side: top;
+    --jumi-caret-color: auto;
+    --jumi-clear: none;
+    --jumi-clip-path: none;
+    --jumi-clip-rule: nonzero;
+    --jumi-color: canvastext;
+    --jumi-color-interpolation: auto;
+    --jumi-color-interpolation-filters: linearRGB;
+    --jumi-color-scheme: normal;
+    --jumi-column-count: auto;
+    --jumi-column-fill: balance;
+    --jumi-column-gap: normal;
+    --jumi-column-rule: var(--jumi-column-rule-width) var(--jumi-column-rule-style) var(--jumi-column-rule-color);
+    --jumi-column-rule-color: medium;
+    --jumi-column-rule-style: none;
+    --jumi-column-rule-width: currentColor;
+    --jumi-column-span: none;
+    --jumi-column-width: auto;
+    --jumi-columns: var(--jumi-column-count) var(--jumi-column-width);
+    --jumi-contain: none;
+    --jumi-contain-intrinsic-block-size: none;
+    --jumi-contain-intrinsic-height: none;
+    --jumi-contain-intrinsic-inline-size: none;
+    --jumi-contain-intrinsic-size: none;
+    --jumi-contain-intrinsic-width: none;
+    --jumi-content: normal;
+    --jumi-content-visibility: visible;
+    --jumi-counter-increment: none;
+    --jumi-counter-reset: none;
+    --jumi-counter-set: none;
+    --jumi-cursor: auto;
+    --jumi-cx: 0;
+    --jumi-cy: 0;
+    --jumi-d: none;
+    --jumi-display: inline;
+    --jumi-display-inside: flow;
+    --jumi-display-outside: block;
+    --jumi-dominant-baseline: auto;
+    --jumi-empty-cells: show;
+    --jumi-fill: black;
+    --jumi-fill-opacity: 1;
+    --jumi-fill-rule: nonzero;
+    --jumi-filter: var(--jumi-filter-blur) var(--jumi-filter-brightness) var(--jumi-filter-contrast) var(--jumi-filter-grayscale) var(--jumi-filter-hue-rotate) var(--jumi-filter-invert) var(--jumi-filter-saturate) var(--jumi-filter-sepia) var(--jumi-filter-opacity) var(--jumi-filter-drop-shadow);
+    --jumi-filter-blur: blur(0);
+    --jumi-filter-brightness: brightness(1);
+    --jumi-filter-contrast: contrast(1);
+    --jumi-filter-drop-shadow: drop-shadow(var(--jumi-filter-drop-shadow-offset-x) var(--jumi-filter-drop-shadow-offset-y) var(--jumi-filter-drop-shadow-blur) var(--jumi-filter-drop-shadow-color));
+    --jumi-filter-drop-shadow-blur: 0;
+    --jumi-filter-drop-shadow-color: transparent;
+    --jumi-filter-drop-shadow-offset-x: 0;
+    --jumi-filter-drop-shadow-offset-y: 0;
+    --jumi-filter-drop-shadow-opacity: 1;
+    --jumi-filter-grayscale: grayscale(0);
+    --jumi-filter-hue-rotate: hue-rotate(0deg);
+    --jumi-filter-invert: invert(0);
+    --jumi-filter-opacity: opacity(1);
+    --jumi-filter-saturate: saturate(1);
+    --jumi-filter-sepia: sepia(0);
+    --jumi-filter-url: url();
+    --jumi-flex: var(--jumi-flex-grow) var(--jumi-flex-shrink) var(--jumi-flex-basis);
+    --jumi-flex-basis: auto;
+    --jumi-flex-direction: row;
+    --jumi-flex-flow: var(--jumi-flex-direction) var(--jumi-flex-wrap);
+    --jumi-flex-grow: 0;
+    --jumi-flex-shrink: 1;
+    --jumi-flex-wrap: nowrap;
+    --jumi-float: none;
+    --jumi-flood-color: black;
+    --jumi-flood-opacity: 1;
+    --jumi-font: var(--jumi-font-family) var(--jumi-font-size) var(--jumi-font-stretch) var(--jumi-font-style) var(--jumi-font-variant) var(--jumi-font-weight) var(--jumi-line-height);
+    --jumi-font-family: inherit;
+    --jumi-font-feature-settings: normal;
+    --jumi-font-kerning: auto;
+    --jumi-font-language-override: normal;
+    --jumi-font-optical-sizing: auto;
+    --jumi-font-palette: normal;
+    --jumi-font-size: medium;
+    --jumi-font-size-adjust: none;
+    --jumi-font-style: normal;
+    --jumi-font-synthesis: var(--jumi-font-synthesis-weight) var(--jumi-font-synthesis-style) var(--jumi-font-synthesis-small-caps) var(--jumi-font-synthesis-position);
+    --jumi-font-synthesis-position: none;
+    --jumi-font-synthesis-small-caps: auto;
+    --jumi-font-synthesis-style: auto;
+    --jumi-font-synthesis-weight: auto;
+    --jumi-font-variant: normal;
+    --jumi-font-variant-alternates: normal;
+    --jumi-font-variant-caps: normal;
+    --jumi-font-variant-east-asian: normal;
+    --jumi-font-variant-emoji: normal;
+    --jumi-font-variant-ligatures: normal;
+    --jumi-font-variant-numeric: normal;
+    --jumi-font-variant-position: normal;
+    --jumi-font-variation-settings: normal;
+    --jumi-font-weight: normal;
+    --jumi-forced-color-adjust: auto;
+    --jumi-gap: 0;
+    --jumi-grid: var(--jumi-grid-template-areas) var(--jumi-grid-template-columns) var(--jumi-grid-template-rows) var(--jumi-grid-auto-columns) var(--jumi-grid-auto-rows) var(--jumi-grid-auto-flow);
+    --jumi-grid-auto-columns: auto;
+    --jumi-grid-auto-flow: row;
+    --jumi-grid-auto-rows: auto;
+    --jumi-grid-column: var(--jumi-grid-column-start) / var(--jumi-grid-column-end);
+    --jumi-grid-column-end: auto;
+    --jumi-grid-column-start: auto;
+    --jumi-grid-row: var(--jumi-grid-row-start) / var(--jumi-grid-row-end);
+    --jumi-grid-row-end: auto;
+    --jumi-grid-row-start: auto;
+    --jumi-grid-template-areas: none;
+    --jumi-grid-template-columns: none;
+    --jumi-grid-template-rows: none;
+    --jumi-hanging-punctuation: none;
+    --jumi-height: auto;
+    --jumi-hyphenate-character: auto;
+    --jumi-hyphenate-limit-chars: var(--jumi-hyphenate-limit-minimum-word-length) var(--jumi-hyphenate-limit-minimum-characters-before) var(--jumi-hyphenate-limit-minimum-characters-after);
+    --jumi-hyphenate-limit-minimum-characters-after: auto;
+    --jumi-hyphenate-limit-minimum-characters-before: auto;
+    --jumi-hyphenate-limit-minimum-word-length: auto;
+    --jumi-hyphens: manual;
+    --jumi-image-orientation: from-image;
+    --jumi-image-rendering: auto;
+    --jumi-initial-letter: normal;
+    --jumi-inline-size: auto;
+    --jumi-inset: var(--jumi-top) var(--jumi-right) var(--jumi-bottom) var(--jumi-left);
+    --jumi-inset-block: var(--jumi-inset-block-start) var(--jumi-inset-block-end);
+    --jumi-inset-block-end: auto;
+    --jumi-inset-block-start: auto;
+    --jumi-inset-inline: var(--jumi-inset-inline-start) var(--jumi-inset-inline-end);
+    --jumi-inset-inline-end: auto;
+    --jumi-inset-inline-start: auto;
+    --jumi-justify-content: normal;
+    --jumi-justify-items: legacy;
+    --jumi-justify-self: auto;
+    --jumi-left: auto;
+    --jumi-letter-spacing: normal;
+    --jumi-lighting-color: white;
+    --jumi-line-break: auto;
+    --jumi-line-clamp: none;
+    --jumi-line-height: normal;
+    --jumi-list-style: var(--jumi-list-style-type) var(--jumi-list-style-position) var(--jumi-list-style-image);
+    --jumi-list-style-image: none;
+    --jumi-list-style-position: outside;
+    --jumi-list-style-type: disc;
+    --jumi-margin: var(--jumi-margin-top) var(--jumi-margin-right) var(--jumi-margin-bottom) var(--jumi-margin-left);
+    --jumi-margin-block: var(--jumi-margin-block-start) var(--jumi-margin-block-end);
+    --jumi-margin-block-end: 0;
+    --jumi-margin-block-start: 0;
+    --jumi-margin-bottom: 0;
+    --jumi-margin-inline: var(--jumi-margin-inline-start) var(--jumi-margin-inline-end);
+    --jumi-margin-inline-end: 0;
+    --jumi-margin-inline-start: 0;
+    --jumi-margin-left: 0;
+    --jumi-margin-right: 0;
+    --jumi-margin-top: 0;
+    --jumi-marker: var(--jumi-marker-start) var(--jumi-marker-mid) var(--jumi-marker-end);
+    --jumi-marker-end: none;
+    --jumi-marker-mid: none;
+    --jumi-marker-start: none;
+    --jumi-mask: none;
+    --jumi-mask-border: none;
+    --jumi-mask-border-mode: alpha;
+    --jumi-mask-border-outset: var(--jumi-mask-border-outset-top) var(--jumi-mask-border-outset-right) var(--jumi-mask-border-outset-bottom) var(--jumi-mask-border-outset-left);
+    --jumi-mask-border-outset-bottom: 0;
+    --jumi-mask-border-outset-left: 0;
+    --jumi-mask-border-outset-right: 0;
+    --jumi-mask-border-outset-top: 0;
+    --jumi-mask-border-outset-x: var(--jumi-mask-border-outset-left) var(--jumi-mask-border-outset-right);
+    --jumi-mask-border-outset-y: var(--jumi-mask-border-outset-top) var(--jumi-mask-border-outset-bottom);
+    --jumi-mask-border-repeat: var(--jumi-mask-border-repeat-y) var(--jumi-mask-border-repeat-x);
+    --jumi-mask-border-repeat-x: stretch;
+    --jumi-mask-border-repeat-y: stretch;
+    --jumi-mask-border-slice: var(--jumi-mask-border-slice-top) var(--jumi-mask-border-slice-right) var(--jumi-mask-border-slice-bottom) var(--jumi-mask-border-slice-left);
+    --jumi-mask-border-slice-bottom: 0;
+    --jumi-mask-border-slice-left: 0;
+    --jumi-mask-border-slice-right: 0;
+    --jumi-mask-border-slice-top: 0;
+    --jumi-mask-border-slice-x: var(--jumi-mask-border-slice-left) var(--jumi-mask-border-slice-right);
+    --jumi-mask-border-slice-y: var(--jumi-mask-border-slice-top) var(--jumi-mask-border-slice-bottom);
+    --jumi-mask-border-source: none;
+    --jumi-mask-border-width: auto;
+    --jumi-mask-clip: border-box;
+    --jumi-mask-composite: add;
+    --jumi-mask-image: none;
+    --jumi-mask-mode: match-source;
+    --jumi-mask-origin: border-box;
+    --jumi-mask-position: var(--jumi-mask-position-x) var(--jumi-mask-position-y);
+    --jumi-mask-position-x: 0%;
+    --jumi-mask-position-y: 0%;
+    --jumi-mask-repeat: repeat;
+    --jumi-mask-size: auto;
+    --jumi-mask-type: luminance;
+    --jumi-math-depth: 0;
+    --jumi-math-depth-add: 0;
+    --jumi-math-style: normal;
+    --jumi-matrix: matrix(var(--jumi-matrix-a), var(--jumi-matrix-b), var(--jumi-matrix-c), var(--jumi-matrix-d), var(--jumi-matrix-tx), var(--jumi-matrix-ty));
+    --jumi-matrix-3d: matrix3d(var(--jumi-matrix-a1), var(--jumi-matrix-b1), var(--jumi-matrix-c1), var(--jumi-matrix-d1), var(--jumi-matrix-a2), var(--jumi-matrix-b2), var(--jumi-matrix-c2), var(--jumi-matrix-d2), var(--jumi-matrix-a3), var(--jumi-matrix-b3), var(--jumi-matrix-c3), var(--jumi-matrix-d3), var(--jumi-matrix-a4), var(--jumi-matrix-b4), var(--jumi-matrix-c4), var(--jumi-matrix-d4));
+    --jumi-matrix-a: 1;
+    --jumi-matrix-a1: 1;
+    --jumi-matrix-a2: 0;
+    --jumi-matrix-a3: 0;
+    --jumi-matrix-a4: 0;
+    --jumi-matrix-b: 0;
+    --jumi-matrix-b1: 0;
+    --jumi-matrix-b2: 1;
+    --jumi-matrix-b3: 0;
+    --jumi-matrix-b4: 0;
+    --jumi-matrix-c: 0;
+    --jumi-matrix-c1: 0;
+    --jumi-matrix-c2: 0;
+    --jumi-matrix-c3: 1;
+    --jumi-matrix-c4: 0;
+    --jumi-matrix-d: 1;
+    --jumi-matrix-d1: 0;
+    --jumi-matrix-d2: 0;
+    --jumi-matrix-d3: 0;
+    --jumi-matrix-d4: 1;
+    --jumi-matrix-tx: 0;
+    --jumi-matrix-ty: 0;
+    --jumi-max-block-size: none;
+    --jumi-max-height: none;
+    --jumi-max-inline-size: none;
+    --jumi-max-width: none;
+    --jumi-min-block-size: 0;
+    --jumi-min-height: auto;
+    --jumi-min-inline-size: 0;
+    --jumi-min-width: auto;
+    --jumi-mix-blend-mode: normal;
+    --jumi-object-fit: fill;
+    --jumi-object-position: var(--jumi-object-position-x) var(--jumi-object-position-y);
+    --jumi-object-position-x: var(--jumi-object-position-x-edge) var(--jumi-object-position-x-offset);
+    --jumi-object-position-x-edge: left;
+    --jumi-object-position-x-offset: 50%;
+    --jumi-object-position-y: var(--jumi-object-position-y-edge) var(--jumi-object-position-y-offset);
+    --jumi-object-position-y-edge: top;
+    --jumi-object-position-y-offset: 50%;
+    --jumi-offset: none;
+    --jumi-offset-anchor: var(--jumi-offset-anchor-x) var(--jumi-offset-anchor-y);
+    --jumi-offset-anchor-x: var(--jumi-offset-anchor-x-edge) var(--jumi-offset-anchor-x-offset);
+    --jumi-offset-anchor-x-edge: center;
+    --jumi-offset-anchor-x-offset: 0;
+    --jumi-offset-anchor-y: var(--jumi-offset-anchor-y-edge) var(--jumi-offset-anchor-y-offset);
+    --jumi-offset-anchor-y-edge: center;
+    --jumi-offset-anchor-y-offset: 0;
+    --jumi-offset-distance: 0;
+    --jumi-offset-path: none;
+    --jumi-offset-position: normal;
+    --jumi-offset-position-x: var(--jumi-offset-position-x-edge) var(--jumi-offset-position-x-offset);
+    --jumi-offset-position-x-edge: left;
+    --jumi-offset-position-x-offset: 50%;
+    --jumi-offset-position-y: var(--jumi-offset-position-y-edge) var(--jumi-offset-position-y-offset);
+    --jumi-offset-position-y-edge: top;
+    --jumi-offset-position-y-offset: 50%;
+    --jumi-offset-rotate: auto;
+    --jumi-opacity: 1;
+    --jumi-order: 0;
+    --jumi-orphans: 2;
+    --jumi-outline: var(--jumi-outline-width) var(--jumi-outline-style) var(--jumi-outline-color);
+    --jumi-outline-color: currentColor;
+    --jumi-outline-offset: 0;
+    --jumi-outline-style: none;
+    --jumi-outline-width: medium;
+    --jumi-overflow: var(--jumi-overflow-x) var(--jumi-overflow-y);
+    --jumi-overflow-anchor: auto;
+    --jumi-overflow-block: auto;
+    --jumi-overflow-clip-margin: 0px;
+    --jumi-overflow-inline: auto;
+    --jumi-overflow-wrap: normal;
+    --jumi-overflow-x: visible;
+    --jumi-overflow-y: visible;
+    --jumi-overscroll-behavior: var(--jumi-overscroll-behavior-x) var(--jumi-overscroll-behavior-y);
+    --jumi-overscroll-behavior-block: auto;
+    --jumi-overscroll-behavior-inline: auto;
+    --jumi-overscroll-behavior-x: auto;
+    --jumi-overscroll-behavior-y: auto;
+    --jumi-padding: var(--jumi-padding-top) var(--jumi-padding-right) var(--jumi-padding-bottom) var(--jumi-padding-left);
+    --jumi-padding-block: var(--jumi-padding-block-start) var(--jumi-padding-block-end);
+    --jumi-padding-block-end: 0;
+    --jumi-padding-block-start: 0;
+    --jumi-padding-bottom: 0;
+    --jumi-padding-inline: var(--jumi-padding-inline-start) var(--jumi-padding-inline-end);
+    --jumi-padding-inline-end: 0;
+    --jumi-padding-inline-start: 0;
+    --jumi-padding-left: 0;
+    --jumi-padding-right: 0;
+    --jumi-padding-top: 0;
+    --jumi-page: auto;
+    --jumi-paint-order: normal;
+    --jumi-perspective: perspective(none);
+    --jumi-perspective-origin: center;
+    --jumi-place-content: normal;
+    --jumi-place-items: normal;
+    --jumi-place-self: auto;
+    --jumi-position: static;
+    --jumi-resize: none;
+    --jumi-right: auto;
+    --jumi-rotate: 0deg;
+    --jumi-rotate-3d: rotate3d(var(--jumi-rotate-x), var(--jumi-rotate-y), var(--jumi-rotate-z), var(--jumi-rotate));
+    --jumi-rotate-x: 0;
+    --jumi-rotate-y: 0;
+    --jumi-rotate-z: 1;
+    --jumi-row-gap: 0;
+    --jumi-scale: 1;
+    --jumi-scale-3d: scale3d(var(--jumi-scale-x), var(--jumi-scale-y), var(--jumi-scale-z));
+    --jumi-scale-x: 1;
+    --jumi-scale-y: 1;
+    --jumi-scale-z: 1;
+    --jumi-scroll-margin: 0;
+    --jumi-scroll-margin-block: 0;
+    --jumi-scroll-margin-block-end: 0;
+    --jumi-scroll-margin-block-start: 0;
+    --jumi-scroll-margin-bottom: 0;
+    --jumi-scroll-margin-inline: 0;
+    --jumi-scroll-margin-inline-end: 0;
+    --jumi-scroll-margin-inline-start: 0;
+    --jumi-scroll-margin-left: 0;
+    --jumi-scroll-margin-right: 0;
+    --jumi-scroll-margin-top: 0;
+    --jumi-scroll-padding: 0;
+    --jumi-scroll-padding-block: 0;
+    --jumi-scroll-padding-block-end: 0;
+    --jumi-scroll-padding-block-start: 0;
+    --jumi-scroll-padding-bottom: 0;
+    --jumi-scroll-padding-inline: 0;
+    --jumi-scroll-padding-inline-end: 0;
+    --jumi-scroll-padding-inline-start: 0;
+    --jumi-scroll-padding-left: 0;
+    --jumi-scroll-padding-right: 0;
+    --jumi-scroll-padding-top: 0;
+    --jumi-shape-outside: none;
+    --jumi-skew: skew(var(--jumi-skew-x), var(--jumi-skew-y));
+    --jumi-skew-x: 0deg;
+    --jumi-skew-y: 0deg;
+    --jumi-stroke: none;
+    --jumi-stroke-dasharray: none;
+    --jumi-stroke-dashoffset: 0;
+    --jumi-stroke-linecap: butt;
+    --jumi-stroke-linejoin: miter;
+    --jumi-stroke-miterlimit: 4;
+    --jumi-stroke-opacity: 1;
+    --jumi-stroke-width: 1px;
+    --jumi-table-layout: auto;
+    --jumi-text-align: baseline;
+    --jumi-text-align-last: auto;
+    --jumi-text-anchor: start;
+    --jumi-text-autospace: normal;
+    --jumi-text-box: normal;
+    --jumi-text-box-edge: leading;
+    --jumi-text-box-trim: none;
+    --jumi-text-combine-upright: none;
+    --jumi-text-decoration: none;
+    --jumi-text-decoration-color: currentColor;
+    --jumi-text-decoration-line: none;
+    --jumi-text-decoration-skip-ink: auto;
+    --jumi-text-decoration-style: solid;
+    --jumi-text-decoration-thickness: auto;
+    --jumi-text-emphasis: none;
+    --jumi-text-emphasis-color: currentColor;
+    --jumi-text-emphasis-position: over right;
+    --jumi-text-emphasis-style: none;
+    --jumi-text-indent: 0;
+    --jumi-text-justify: auto;
+    --jumi-text-orientation: mixed;
+    --jumi-text-overflow: clip;
+    --jumi-text-rendering: auto;
+    --jumi-text-shadow: var(--jumi-text-shadow-offset-x) var(--jumi-text-shadow-offset-y) var(--jumi-text-shadow-blur-radius) var(--jumi-text-shadow-color);
+    --jumi-text-shadow-blur-radius: 0;
+    --jumi-text-shadow-color: currentColor;
+    --jumi-text-shadow-offset-x: 0;
+    --jumi-text-shadow-offset-y: 0px;
+    --jumi-text-transform: none;
+    --jumi-text-underline-offset: auto;
+    --jumi-text-underline-position: auto;
+    --jumi-text-wrap: wrap;
+    --jumi-text-wrap-mode: wrap;
+    --jumi-text-wrap-style: auto;
+    --jumi-top: auto;
+    --jumi-transform: var(--jumi-perspective) var(--jumi-matrix) var(--jumi-matrix-3d) var(--jumi-rotate-3d) var(--jumi-scale-3d) var(--jumi-skew) var(--jumi-translate-3d);
+    --jumi-transform-box: view-box;
+    --jumi-transform-origin: center;
+    --jumi-transform-origin-x: 50%;
+    --jumi-transform-origin-y: 50%;
+    --jumi-transform-origin-z: 0px;
+    --jumi-transform-style: flat;
+    --jumi-translate: 0px;
+    --jumi-translate-3d: translate3d(var(--jumi-translate-x), var(--jumi-translate-y), var(--jumi-translate-z));
+    --jumi-translate-x: var(--jumi-translate);
+    --jumi-translate-y: var(--jumi-translate);
+    --jumi-translate-z: 0px;
+    --jumi-user-drag: auto;
+    --jumi-user-select: auto;
+    --jumi-vertical-align: baseline;
+    --jumi-visibility: visible;
+    --jumi-white-space: normal;
+    --jumi-width: auto;
+    --jumi-word-break: normal;
+    --jumi-z-index: auto;
+  }
+  .animate {
     --jumi-animation-composition: replace;
     --jumi-animation-delay: 0s;
     --jumi-animation-direction: normal;
@@ -2659,6 +3198,548 @@
   .before\:animate {
     &::before {
       content: var(--tw-content);
+      --jumi-accent-color: auto;
+      --jumi-align-content: normal;
+      --jumi-align-items: normal;
+      --jumi-align-self: auto;
+      --jumi-alignment-baseline: baseline;
+      --jumi-all: initial;
+      --jumi-anchor-name: none;
+      --jumi-appearance: none;
+      --jumi-aspect-ratio: var(--jumi-aspect-ratio-width) var(--jumi-aspect-ratio-height);
+      --jumi-aspect-ratio-height: auto;
+      --jumi-aspect-ratio-width: auto;
+      --jumi-backdrop-blur: blur(0);
+      --jumi-backdrop-brightness: brightness(1);
+      --jumi-backdrop-contrast: contrast(1);
+      --jumi-backdrop-drop-shadow: drop-shadow(var(--jumi-backdrop-drop-shadow-offset-x) var(--jumi-backdrop-drop-shadow-offset-y) var(--jumi-backdrop-drop-shadow-blur) var(--jumi-backdrop-drop-shadow-color));
+      --jumi-backdrop-drop-shadow-blur: 0;
+      --jumi-backdrop-drop-shadow-color: transparent;
+      --jumi-backdrop-drop-shadow-offset-x: 0;
+      --jumi-backdrop-drop-shadow-offset-y: 0;
+      --jumi-backdrop-filter: var(--jumi-backdrop-blur) var(--jumi-backdrop-brightness) var(--jumi-backdrop-contrast) var(--jumi-backdrop-drop-shadow) var(--jumi-backdrop-grayscale) var(--jumi-backdrop-hue-rotate) var(--jumi-backdrop-invert) var(--jumi-backdrop-opacity) var(--jumi-backdrop-saturate) var(--jumi-backdrop-sepia);
+      --jumi-backdrop-grayscale: grayscale(0);
+      --jumi-backdrop-hue-rotate: hue-rotate(0deg);
+      --jumi-backdrop-invert: invert(0);
+      --jumi-backdrop-opacity: opacity(1);
+      --jumi-backdrop-saturate: saturate(1);
+      --jumi-backdrop-sepia: sepia(0);
+      --jumi-backdrop-url: url();
+      --jumi-backface-visibility: visible;
+      --jumi-background: var(--jumi-background-attachment) var(--jumi-background-clip) var(--jumi-background-color) var(--jumi-background-image) var(--jumi-background-origin) var(--jumi-background-position) var(--jumi-background-repeat) var(--jumi-background-size);
+      --jumi-background-attachment: scroll;
+      --jumi-background-blend-mode: normal;
+      --jumi-background-clip: border-box;
+      --jumi-background-color: transparent;
+      --jumi-background-image: none;
+      --jumi-background-origin: padding-box;
+      --jumi-background-position: var(--jumi-background-position-x) var(--jumi-background-position-y);
+      --jumi-background-position-x: var(--jumi-background-position-x-edge) var(--jumi-background-position-x-offset);
+      --jumi-background-position-x-edge: left;
+      --jumi-background-position-x-offset: 0%;
+      --jumi-background-position-y: var(--jumi-background-position-y-edge) var(--jumi-background-position-y-offset);
+      --jumi-background-position-y-edge: top;
+      --jumi-background-position-y-offset: 0%;
+      --jumi-background-repeat: var(--jumi-background-repeat-x) var(--jumi-background-repeat-y);
+      --jumi-background-repeat-x: repeat;
+      --jumi-background-repeat-y: repeat;
+      --jumi-background-size: var(--jumi-background-size-width) var(--jumi-background-size-height);
+      --jumi-background-size-height: auto;
+      --jumi-background-size-width: auto;
+      --jumi-block-size: auto;
+      --jumi-border: var(--jumi-border-width) var(--jumi-border-style) var(--jumi-border-color);
+      --jumi-border-block: none;
+      --jumi-border-block-color: currentColor;
+      --jumi-border-block-end: var(--jumi-border-block-end-width) var(--jumi-border-block-end-style) var(--jumi-border-block-end-color);
+      --jumi-border-block-end-color: currentColor;
+      --jumi-border-block-end-radius: 0;
+      --jumi-border-block-end-style: none;
+      --jumi-border-block-end-width: medium;
+      --jumi-border-block-start: var(--jumi-border-block-start-width) var(--jumi-border-block-start-style) var(--jumi-border-block-start-color);
+      --jumi-border-block-start-color: currentColor;
+      --jumi-border-block-start-radius: 0;
+      --jumi-border-block-start-style: none;
+      --jumi-border-block-start-width: medium;
+      --jumi-border-block-style: none;
+      --jumi-border-block-width: medium;
+      --jumi-border-bottom: var(--jumi-border-bottom-width) var(--jumi-border-bottom-style) var(--jumi-border-bottom-color);
+      --jumi-border-bottom-color: currentColor;
+      --jumi-border-bottom-left-radius: 0;
+      --jumi-border-bottom-radius: 0;
+      --jumi-border-bottom-right-radius: 0;
+      --jumi-border-bottom-style: none;
+      --jumi-border-bottom-width: medium;
+      --jumi-border-collapse: separate;
+      --jumi-border-color: currentColor;
+      --jumi-border-end-end-radius: 0;
+      --jumi-border-end-start-radius: 0;
+      --jumi-border-image: var(--jumi-border-image-outset) var(--jumi-border-image-repeat) var(--jumi-border-image-slice) var(--jumi-border-image-source) var(--jumi-border-image-width);
+      --jumi-border-image-outset: var(--jumi-border-image-outset-top) var(--jumi-border-image-outset-right) var(--jumi-border-image-outset-bottom) var(--jumi-border-image-outset-left);
+      --jumi-border-image-outset-bottom: 0;
+      --jumi-border-image-outset-left: 0;
+      --jumi-border-image-outset-right: 0;
+      --jumi-border-image-outset-top: 0;
+      --jumi-border-image-outset-x: var(--jumi-border-image-outset-right) var(--jumi-border-image-outset-left);
+      --jumi-border-image-outset-y: var(--jumi-border-image-outset-top) var(--jumi-border-image-outset-bottom);
+      --jumi-border-image-repeat: var(--jumi-border-image-repeat-x) var(--jumi-border-image-repeat-y);
+      --jumi-border-image-repeat-x: stretch;
+      --jumi-border-image-repeat-y: stretch;
+      --jumi-border-image-slice: 100%;
+      --jumi-border-image-source: none;
+      --jumi-border-image-width: 1;
+      --jumi-border-inline-color: currentColor;
+      --jumi-border-inline-end: var(--jumi-border-inline-end-width) var(--jumi-border-inline-end-style) var(--jumi-border-inline-end-color);
+      --jumi-border-inline-end-color: currentColor;
+      --jumi-border-inline-end-radius: 0;
+      --jumi-border-inline-end-style: none;
+      --jumi-border-inline-end-width: medium;
+      --jumi-border-inline-start: var(--jumi-border-inline-start-width) var(--jumi-border-inline-start-style) var(--jumi-border-inline-start-color);
+      --jumi-border-inline-start-color: currentColor;
+      --jumi-border-inline-start-radius: 0;
+      --jumi-border-inline-start-style: none;
+      --jumi-border-inline-start-width: medium;
+      --jumi-border-inline-style: none;
+      --jumi-border-inline-width: medium;
+      --jumi-border-left: var(--jumi-border-left-width) var(--jumi-border-left-style) var(--jumi-border-left-color);
+      --jumi-border-left-color: currentColor;
+      --jumi-border-left-radius: 0;
+      --jumi-border-left-style: none;
+      --jumi-border-left-width: medium;
+      --jumi-border-radius: 0;
+      --jumi-border-right: var(--jumi-border-right-width) var(--jumi-border-right-style) var(--jumi-border-right-color);
+      --jumi-border-right-color: currentColor;
+      --jumi-border-right-radius: 0;
+      --jumi-border-right-style: none;
+      --jumi-border-right-width: medium;
+      --jumi-border-spacing: 0;
+      --jumi-border-start-end-radius: 0;
+      --jumi-border-start-start-radius: 0;
+      --jumi-border-style: none;
+      --jumi-border-top: var(--jumi-border-top-width) var(--jumi-border-top-style) var(--jumi-border-top-color);
+      --jumi-border-top-color: currentColor;
+      --jumi-border-top-left-radius: 0;
+      --jumi-border-top-radius: 0;
+      --jumi-border-top-right-radius: 0;
+      --jumi-border-top-style: none;
+      --jumi-border-top-width: medium;
+      --jumi-border-width: medium;
+      --jumi-bottom: auto;
+      --jumi-box-decoration-break: slice;
+      --jumi-box-shadow: var(--jumi-box-shadow-offset-x) var(--jumi-box-shadow-offset-y) var(--jumi-box-shadow-blur) var(--jumi-box-shadow-spread) var(--jumi-box-shadow-color);
+      --jumi-box-shadow-blur: 0;
+      --jumi-box-shadow-color: transparent;
+      --jumi-box-shadow-inset: inset var(--jumi-box-shadow-inset-offset-x) var(--jumi-box-shadow-inset-offset-y) var(--jumi-box-shadow-inset-blur) var(--jumi-box-shadow-inset-spread) var(--jumi-box-shadow-inset-color);
+      --jumi-box-shadow-inset-blur: 0;
+      --jumi-box-shadow-inset-color: transparent;
+      --jumi-box-shadow-inset-offset-x: 0;
+      --jumi-box-shadow-inset-offset-y: 0;
+      --jumi-box-shadow-inset-spread: 0;
+      --jumi-box-shadow-offset-x: 0;
+      --jumi-box-shadow-offset-y: 0;
+      --jumi-box-shadow-spread: 0;
+      --jumi-box-sizing: content-box;
+      --jumi-break-after: auto;
+      --jumi-break-before: auto;
+      --jumi-break-inside: auto;
+      --jumi-caption-side: top;
+      --jumi-caret-color: auto;
+      --jumi-clear: none;
+      --jumi-clip-path: none;
+      --jumi-clip-rule: nonzero;
+      --jumi-color: canvastext;
+      --jumi-color-interpolation: auto;
+      --jumi-color-interpolation-filters: linearRGB;
+      --jumi-color-scheme: normal;
+      --jumi-column-count: auto;
+      --jumi-column-fill: balance;
+      --jumi-column-gap: normal;
+      --jumi-column-rule: var(--jumi-column-rule-width) var(--jumi-column-rule-style) var(--jumi-column-rule-color);
+      --jumi-column-rule-color: medium;
+      --jumi-column-rule-style: none;
+      --jumi-column-rule-width: currentColor;
+      --jumi-column-span: none;
+      --jumi-column-width: auto;
+      --jumi-columns: var(--jumi-column-count) var(--jumi-column-width);
+      --jumi-contain: none;
+      --jumi-contain-intrinsic-block-size: none;
+      --jumi-contain-intrinsic-height: none;
+      --jumi-contain-intrinsic-inline-size: none;
+      --jumi-contain-intrinsic-size: none;
+      --jumi-contain-intrinsic-width: none;
+      --jumi-content: normal;
+      --jumi-content-visibility: visible;
+      --jumi-counter-increment: none;
+      --jumi-counter-reset: none;
+      --jumi-counter-set: none;
+      --jumi-cursor: auto;
+      --jumi-cx: 0;
+      --jumi-cy: 0;
+      --jumi-d: none;
+      --jumi-display: inline;
+      --jumi-display-inside: flow;
+      --jumi-display-outside: block;
+      --jumi-dominant-baseline: auto;
+      --jumi-empty-cells: show;
+      --jumi-fill: black;
+      --jumi-fill-opacity: 1;
+      --jumi-fill-rule: nonzero;
+      --jumi-filter: var(--jumi-filter-blur) var(--jumi-filter-brightness) var(--jumi-filter-contrast) var(--jumi-filter-grayscale) var(--jumi-filter-hue-rotate) var(--jumi-filter-invert) var(--jumi-filter-saturate) var(--jumi-filter-sepia) var(--jumi-filter-opacity) var(--jumi-filter-drop-shadow);
+      --jumi-filter-blur: blur(0);
+      --jumi-filter-brightness: brightness(1);
+      --jumi-filter-contrast: contrast(1);
+      --jumi-filter-drop-shadow: drop-shadow(var(--jumi-filter-drop-shadow-offset-x) var(--jumi-filter-drop-shadow-offset-y) var(--jumi-filter-drop-shadow-blur) var(--jumi-filter-drop-shadow-color));
+      --jumi-filter-drop-shadow-blur: 0;
+      --jumi-filter-drop-shadow-color: transparent;
+      --jumi-filter-drop-shadow-offset-x: 0;
+      --jumi-filter-drop-shadow-offset-y: 0;
+      --jumi-filter-drop-shadow-opacity: 1;
+      --jumi-filter-grayscale: grayscale(0);
+      --jumi-filter-hue-rotate: hue-rotate(0deg);
+      --jumi-filter-invert: invert(0);
+      --jumi-filter-opacity: opacity(1);
+      --jumi-filter-saturate: saturate(1);
+      --jumi-filter-sepia: sepia(0);
+      --jumi-filter-url: url();
+      --jumi-flex: var(--jumi-flex-grow) var(--jumi-flex-shrink) var(--jumi-flex-basis);
+      --jumi-flex-basis: auto;
+      --jumi-flex-direction: row;
+      --jumi-flex-flow: var(--jumi-flex-direction) var(--jumi-flex-wrap);
+      --jumi-flex-grow: 0;
+      --jumi-flex-shrink: 1;
+      --jumi-flex-wrap: nowrap;
+      --jumi-float: none;
+      --jumi-flood-color: black;
+      --jumi-flood-opacity: 1;
+      --jumi-font: var(--jumi-font-family) var(--jumi-font-size) var(--jumi-font-stretch) var(--jumi-font-style) var(--jumi-font-variant) var(--jumi-font-weight) var(--jumi-line-height);
+      --jumi-font-family: inherit;
+      --jumi-font-feature-settings: normal;
+      --jumi-font-kerning: auto;
+      --jumi-font-language-override: normal;
+      --jumi-font-optical-sizing: auto;
+      --jumi-font-palette: normal;
+      --jumi-font-size: medium;
+      --jumi-font-size-adjust: none;
+      --jumi-font-style: normal;
+      --jumi-font-synthesis: var(--jumi-font-synthesis-weight) var(--jumi-font-synthesis-style) var(--jumi-font-synthesis-small-caps) var(--jumi-font-synthesis-position);
+      --jumi-font-synthesis-position: none;
+      --jumi-font-synthesis-small-caps: auto;
+      --jumi-font-synthesis-style: auto;
+      --jumi-font-synthesis-weight: auto;
+      --jumi-font-variant: normal;
+      --jumi-font-variant-alternates: normal;
+      --jumi-font-variant-caps: normal;
+      --jumi-font-variant-east-asian: normal;
+      --jumi-font-variant-emoji: normal;
+      --jumi-font-variant-ligatures: normal;
+      --jumi-font-variant-numeric: normal;
+      --jumi-font-variant-position: normal;
+      --jumi-font-variation-settings: normal;
+      --jumi-font-weight: normal;
+      --jumi-forced-color-adjust: auto;
+      --jumi-gap: 0;
+      --jumi-grid: var(--jumi-grid-template-areas) var(--jumi-grid-template-columns) var(--jumi-grid-template-rows) var(--jumi-grid-auto-columns) var(--jumi-grid-auto-rows) var(--jumi-grid-auto-flow);
+      --jumi-grid-auto-columns: auto;
+      --jumi-grid-auto-flow: row;
+      --jumi-grid-auto-rows: auto;
+      --jumi-grid-column: var(--jumi-grid-column-start) / var(--jumi-grid-column-end);
+      --jumi-grid-column-end: auto;
+      --jumi-grid-column-start: auto;
+      --jumi-grid-row: var(--jumi-grid-row-start) / var(--jumi-grid-row-end);
+      --jumi-grid-row-end: auto;
+      --jumi-grid-row-start: auto;
+      --jumi-grid-template-areas: none;
+      --jumi-grid-template-columns: none;
+      --jumi-grid-template-rows: none;
+      --jumi-hanging-punctuation: none;
+      --jumi-height: auto;
+      --jumi-hyphenate-character: auto;
+      --jumi-hyphenate-limit-chars: var(--jumi-hyphenate-limit-minimum-word-length) var(--jumi-hyphenate-limit-minimum-characters-before) var(--jumi-hyphenate-limit-minimum-characters-after);
+      --jumi-hyphenate-limit-minimum-characters-after: auto;
+      --jumi-hyphenate-limit-minimum-characters-before: auto;
+      --jumi-hyphenate-limit-minimum-word-length: auto;
+      --jumi-hyphens: manual;
+      --jumi-image-orientation: from-image;
+      --jumi-image-rendering: auto;
+      --jumi-initial-letter: normal;
+      --jumi-inline-size: auto;
+      --jumi-inset: var(--jumi-top) var(--jumi-right) var(--jumi-bottom) var(--jumi-left);
+      --jumi-inset-block: var(--jumi-inset-block-start) var(--jumi-inset-block-end);
+      --jumi-inset-block-end: auto;
+      --jumi-inset-block-start: auto;
+      --jumi-inset-inline: var(--jumi-inset-inline-start) var(--jumi-inset-inline-end);
+      --jumi-inset-inline-end: auto;
+      --jumi-inset-inline-start: auto;
+      --jumi-justify-content: normal;
+      --jumi-justify-items: legacy;
+      --jumi-justify-self: auto;
+      --jumi-left: auto;
+      --jumi-letter-spacing: normal;
+      --jumi-lighting-color: white;
+      --jumi-line-break: auto;
+      --jumi-line-clamp: none;
+      --jumi-line-height: normal;
+      --jumi-list-style: var(--jumi-list-style-type) var(--jumi-list-style-position) var(--jumi-list-style-image);
+      --jumi-list-style-image: none;
+      --jumi-list-style-position: outside;
+      --jumi-list-style-type: disc;
+      --jumi-margin: var(--jumi-margin-top) var(--jumi-margin-right) var(--jumi-margin-bottom) var(--jumi-margin-left);
+      --jumi-margin-block: var(--jumi-margin-block-start) var(--jumi-margin-block-end);
+      --jumi-margin-block-end: 0;
+      --jumi-margin-block-start: 0;
+      --jumi-margin-bottom: 0;
+      --jumi-margin-inline: var(--jumi-margin-inline-start) var(--jumi-margin-inline-end);
+      --jumi-margin-inline-end: 0;
+      --jumi-margin-inline-start: 0;
+      --jumi-margin-left: 0;
+      --jumi-margin-right: 0;
+      --jumi-margin-top: 0;
+      --jumi-marker: var(--jumi-marker-start) var(--jumi-marker-mid) var(--jumi-marker-end);
+      --jumi-marker-end: none;
+      --jumi-marker-mid: none;
+      --jumi-marker-start: none;
+      --jumi-mask: none;
+      --jumi-mask-border: none;
+      --jumi-mask-border-mode: alpha;
+      --jumi-mask-border-outset: var(--jumi-mask-border-outset-top) var(--jumi-mask-border-outset-right) var(--jumi-mask-border-outset-bottom) var(--jumi-mask-border-outset-left);
+      --jumi-mask-border-outset-bottom: 0;
+      --jumi-mask-border-outset-left: 0;
+      --jumi-mask-border-outset-right: 0;
+      --jumi-mask-border-outset-top: 0;
+      --jumi-mask-border-outset-x: var(--jumi-mask-border-outset-left) var(--jumi-mask-border-outset-right);
+      --jumi-mask-border-outset-y: var(--jumi-mask-border-outset-top) var(--jumi-mask-border-outset-bottom);
+      --jumi-mask-border-repeat: var(--jumi-mask-border-repeat-y) var(--jumi-mask-border-repeat-x);
+      --jumi-mask-border-repeat-x: stretch;
+      --jumi-mask-border-repeat-y: stretch;
+      --jumi-mask-border-slice: var(--jumi-mask-border-slice-top) var(--jumi-mask-border-slice-right) var(--jumi-mask-border-slice-bottom) var(--jumi-mask-border-slice-left);
+      --jumi-mask-border-slice-bottom: 0;
+      --jumi-mask-border-slice-left: 0;
+      --jumi-mask-border-slice-right: 0;
+      --jumi-mask-border-slice-top: 0;
+      --jumi-mask-border-slice-x: var(--jumi-mask-border-slice-left) var(--jumi-mask-border-slice-right);
+      --jumi-mask-border-slice-y: var(--jumi-mask-border-slice-top) var(--jumi-mask-border-slice-bottom);
+      --jumi-mask-border-source: none;
+      --jumi-mask-border-width: auto;
+      --jumi-mask-clip: border-box;
+      --jumi-mask-composite: add;
+      --jumi-mask-image: none;
+      --jumi-mask-mode: match-source;
+      --jumi-mask-origin: border-box;
+      --jumi-mask-position: var(--jumi-mask-position-x) var(--jumi-mask-position-y);
+      --jumi-mask-position-x: 0%;
+      --jumi-mask-position-y: 0%;
+      --jumi-mask-repeat: repeat;
+      --jumi-mask-size: auto;
+      --jumi-mask-type: luminance;
+      --jumi-math-depth: 0;
+      --jumi-math-depth-add: 0;
+      --jumi-math-style: normal;
+      --jumi-matrix: matrix(var(--jumi-matrix-a), var(--jumi-matrix-b), var(--jumi-matrix-c), var(--jumi-matrix-d), var(--jumi-matrix-tx), var(--jumi-matrix-ty));
+      --jumi-matrix-3d: matrix3d(var(--jumi-matrix-a1), var(--jumi-matrix-b1), var(--jumi-matrix-c1), var(--jumi-matrix-d1), var(--jumi-matrix-a2), var(--jumi-matrix-b2), var(--jumi-matrix-c2), var(--jumi-matrix-d2), var(--jumi-matrix-a3), var(--jumi-matrix-b3), var(--jumi-matrix-c3), var(--jumi-matrix-d3), var(--jumi-matrix-a4), var(--jumi-matrix-b4), var(--jumi-matrix-c4), var(--jumi-matrix-d4));
+      --jumi-matrix-a: 1;
+      --jumi-matrix-a1: 1;
+      --jumi-matrix-a2: 0;
+      --jumi-matrix-a3: 0;
+      --jumi-matrix-a4: 0;
+      --jumi-matrix-b: 0;
+      --jumi-matrix-b1: 0;
+      --jumi-matrix-b2: 1;
+      --jumi-matrix-b3: 0;
+      --jumi-matrix-b4: 0;
+      --jumi-matrix-c: 0;
+      --jumi-matrix-c1: 0;
+      --jumi-matrix-c2: 0;
+      --jumi-matrix-c3: 1;
+      --jumi-matrix-c4: 0;
+      --jumi-matrix-d: 1;
+      --jumi-matrix-d1: 0;
+      --jumi-matrix-d2: 0;
+      --jumi-matrix-d3: 0;
+      --jumi-matrix-d4: 1;
+      --jumi-matrix-tx: 0;
+      --jumi-matrix-ty: 0;
+      --jumi-max-block-size: none;
+      --jumi-max-height: none;
+      --jumi-max-inline-size: none;
+      --jumi-max-width: none;
+      --jumi-min-block-size: 0;
+      --jumi-min-height: auto;
+      --jumi-min-inline-size: 0;
+      --jumi-min-width: auto;
+      --jumi-mix-blend-mode: normal;
+      --jumi-object-fit: fill;
+      --jumi-object-position: var(--jumi-object-position-x) var(--jumi-object-position-y);
+      --jumi-object-position-x: var(--jumi-object-position-x-edge) var(--jumi-object-position-x-offset);
+      --jumi-object-position-x-edge: left;
+      --jumi-object-position-x-offset: 50%;
+      --jumi-object-position-y: var(--jumi-object-position-y-edge) var(--jumi-object-position-y-offset);
+      --jumi-object-position-y-edge: top;
+      --jumi-object-position-y-offset: 50%;
+      --jumi-offset: none;
+      --jumi-offset-anchor: var(--jumi-offset-anchor-x) var(--jumi-offset-anchor-y);
+      --jumi-offset-anchor-x: var(--jumi-offset-anchor-x-edge) var(--jumi-offset-anchor-x-offset);
+      --jumi-offset-anchor-x-edge: center;
+      --jumi-offset-anchor-x-offset: 0;
+      --jumi-offset-anchor-y: var(--jumi-offset-anchor-y-edge) var(--jumi-offset-anchor-y-offset);
+      --jumi-offset-anchor-y-edge: center;
+      --jumi-offset-anchor-y-offset: 0;
+      --jumi-offset-distance: 0;
+      --jumi-offset-path: none;
+      --jumi-offset-position: normal;
+      --jumi-offset-position-x: var(--jumi-offset-position-x-edge) var(--jumi-offset-position-x-offset);
+      --jumi-offset-position-x-edge: left;
+      --jumi-offset-position-x-offset: 50%;
+      --jumi-offset-position-y: var(--jumi-offset-position-y-edge) var(--jumi-offset-position-y-offset);
+      --jumi-offset-position-y-edge: top;
+      --jumi-offset-position-y-offset: 50%;
+      --jumi-offset-rotate: auto;
+      --jumi-opacity: 1;
+      --jumi-order: 0;
+      --jumi-orphans: 2;
+      --jumi-outline: var(--jumi-outline-width) var(--jumi-outline-style) var(--jumi-outline-color);
+      --jumi-outline-color: currentColor;
+      --jumi-outline-offset: 0;
+      --jumi-outline-style: none;
+      --jumi-outline-width: medium;
+      --jumi-overflow: var(--jumi-overflow-x) var(--jumi-overflow-y);
+      --jumi-overflow-anchor: auto;
+      --jumi-overflow-block: auto;
+      --jumi-overflow-clip-margin: 0px;
+      --jumi-overflow-inline: auto;
+      --jumi-overflow-wrap: normal;
+      --jumi-overflow-x: visible;
+      --jumi-overflow-y: visible;
+      --jumi-overscroll-behavior: var(--jumi-overscroll-behavior-x) var(--jumi-overscroll-behavior-y);
+      --jumi-overscroll-behavior-block: auto;
+      --jumi-overscroll-behavior-inline: auto;
+      --jumi-overscroll-behavior-x: auto;
+      --jumi-overscroll-behavior-y: auto;
+      --jumi-padding: var(--jumi-padding-top) var(--jumi-padding-right) var(--jumi-padding-bottom) var(--jumi-padding-left);
+      --jumi-padding-block: var(--jumi-padding-block-start) var(--jumi-padding-block-end);
+      --jumi-padding-block-end: 0;
+      --jumi-padding-block-start: 0;
+      --jumi-padding-bottom: 0;
+      --jumi-padding-inline: var(--jumi-padding-inline-start) var(--jumi-padding-inline-end);
+      --jumi-padding-inline-end: 0;
+      --jumi-padding-inline-start: 0;
+      --jumi-padding-left: 0;
+      --jumi-padding-right: 0;
+      --jumi-padding-top: 0;
+      --jumi-page: auto;
+      --jumi-paint-order: normal;
+      --jumi-perspective: perspective(none);
+      --jumi-perspective-origin: center;
+      --jumi-place-content: normal;
+      --jumi-place-items: normal;
+      --jumi-place-self: auto;
+      --jumi-position: static;
+      --jumi-resize: none;
+      --jumi-right: auto;
+      --jumi-rotate: 0deg;
+      --jumi-rotate-3d: rotate3d(var(--jumi-rotate-x), var(--jumi-rotate-y), var(--jumi-rotate-z), var(--jumi-rotate));
+      --jumi-rotate-x: 0;
+      --jumi-rotate-y: 0;
+      --jumi-rotate-z: 1;
+      --jumi-row-gap: 0;
+      --jumi-scale: 1;
+      --jumi-scale-3d: scale3d(var(--jumi-scale-x), var(--jumi-scale-y), var(--jumi-scale-z));
+      --jumi-scale-x: 1;
+      --jumi-scale-y: 1;
+      --jumi-scale-z: 1;
+      --jumi-scroll-margin: 0;
+      --jumi-scroll-margin-block: 0;
+      --jumi-scroll-margin-block-end: 0;
+      --jumi-scroll-margin-block-start: 0;
+      --jumi-scroll-margin-bottom: 0;
+      --jumi-scroll-margin-inline: 0;
+      --jumi-scroll-margin-inline-end: 0;
+      --jumi-scroll-margin-inline-start: 0;
+      --jumi-scroll-margin-left: 0;
+      --jumi-scroll-margin-right: 0;
+      --jumi-scroll-margin-top: 0;
+      --jumi-scroll-padding: 0;
+      --jumi-scroll-padding-block: 0;
+      --jumi-scroll-padding-block-end: 0;
+      --jumi-scroll-padding-block-start: 0;
+      --jumi-scroll-padding-bottom: 0;
+      --jumi-scroll-padding-inline: 0;
+      --jumi-scroll-padding-inline-end: 0;
+      --jumi-scroll-padding-inline-start: 0;
+      --jumi-scroll-padding-left: 0;
+      --jumi-scroll-padding-right: 0;
+      --jumi-scroll-padding-top: 0;
+      --jumi-shape-outside: none;
+      --jumi-skew: skew(var(--jumi-skew-x), var(--jumi-skew-y));
+      --jumi-skew-x: 0deg;
+      --jumi-skew-y: 0deg;
+      --jumi-stroke: none;
+      --jumi-stroke-dasharray: none;
+      --jumi-stroke-dashoffset: 0;
+      --jumi-stroke-linecap: butt;
+      --jumi-stroke-linejoin: miter;
+      --jumi-stroke-miterlimit: 4;
+      --jumi-stroke-opacity: 1;
+      --jumi-stroke-width: 1px;
+      --jumi-table-layout: auto;
+      --jumi-text-align: baseline;
+      --jumi-text-align-last: auto;
+      --jumi-text-anchor: start;
+      --jumi-text-autospace: normal;
+      --jumi-text-box: normal;
+      --jumi-text-box-edge: leading;
+      --jumi-text-box-trim: none;
+      --jumi-text-combine-upright: none;
+      --jumi-text-decoration: none;
+      --jumi-text-decoration-color: currentColor;
+      --jumi-text-decoration-line: none;
+      --jumi-text-decoration-skip-ink: auto;
+      --jumi-text-decoration-style: solid;
+      --jumi-text-decoration-thickness: auto;
+      --jumi-text-emphasis: none;
+      --jumi-text-emphasis-color: currentColor;
+      --jumi-text-emphasis-position: over right;
+      --jumi-text-emphasis-style: none;
+      --jumi-text-indent: 0;
+      --jumi-text-justify: auto;
+      --jumi-text-orientation: mixed;
+      --jumi-text-overflow: clip;
+      --jumi-text-rendering: auto;
+      --jumi-text-shadow: var(--jumi-text-shadow-offset-x) var(--jumi-text-shadow-offset-y) var(--jumi-text-shadow-blur-radius) var(--jumi-text-shadow-color);
+      --jumi-text-shadow-blur-radius: 0;
+      --jumi-text-shadow-color: currentColor;
+      --jumi-text-shadow-offset-x: 0;
+      --jumi-text-shadow-offset-y: 0px;
+      --jumi-text-transform: none;
+      --jumi-text-underline-offset: auto;
+      --jumi-text-underline-position: auto;
+      --jumi-text-wrap: wrap;
+      --jumi-text-wrap-mode: wrap;
+      --jumi-text-wrap-style: auto;
+      --jumi-top: auto;
+      --jumi-transform: var(--jumi-perspective) var(--jumi-matrix) var(--jumi-matrix-3d) var(--jumi-rotate-3d) var(--jumi-scale-3d) var(--jumi-skew) var(--jumi-translate-3d);
+      --jumi-transform-box: view-box;
+      --jumi-transform-origin: center;
+      --jumi-transform-origin-x: 50%;
+      --jumi-transform-origin-y: 50%;
+      --jumi-transform-origin-z: 0px;
+      --jumi-transform-style: flat;
+      --jumi-translate: 0px;
+      --jumi-translate-3d: translate3d(var(--jumi-translate-x), var(--jumi-translate-y), var(--jumi-translate-z));
+      --jumi-translate-x: var(--jumi-translate);
+      --jumi-translate-y: var(--jumi-translate);
+      --jumi-translate-z: 0px;
+      --jumi-user-drag: auto;
+      --jumi-user-select: auto;
+      --jumi-vertical-align: baseline;
+      --jumi-visibility: visible;
+      --jumi-white-space: normal;
+      --jumi-width: auto;
+      --jumi-word-break: normal;
+      --jumi-z-index: auto;
+    }
+  }
+  .before\:animate {
+    &::before {
+      content: var(--tw-content);
       --jumi-animation-composition: replace;
       --jumi-animation-delay: 0s;
       --jumi-animation-direction: normal;
@@ -3064,67 +4145,6 @@
     }
   }
 }
-@layer base;
-@layer base {
-  --jumi-accent-color: auto;
-}
-@layer base {
-  --jumi-align-content: normal;
-}
-@layer base {
-  --jumi-align-items: normal;
-}
-@layer base {
-  --jumi-align-self: auto;
-}
-@layer base {
-  --jumi-alignment-baseline: baseline;
-}
-@layer base {
-  --jumi-all: initial;
-}
-@layer base {
-  --jumi-anchor-name: none;
-}
-@layer base {
-  --jumi-appearance: none;
-}
-@layer base {
-  --jumi-aspect-ratio: var(--jumi-aspect-ratio-width) var(--jumi-aspect-ratio-height);
-  --jumi-aspect-ratio-height: auto;
-  --jumi-aspect-ratio-width: auto;
-}
-@layer base {
-  --jumi-aspect-ratio: var(--jumi-aspect-ratio-width) var(--jumi-aspect-ratio-height);
-  --jumi-aspect-ratio-height: auto;
-  --jumi-aspect-ratio-width: auto;
-}
-@layer base {
-  --jumi-aspect-ratio: var(--jumi-aspect-ratio-width) var(--jumi-aspect-ratio-height);
-  --jumi-aspect-ratio-height: auto;
-  --jumi-aspect-ratio-width: auto;
-}
-@layer base {
-  @keyframes jumi-aspect-ratio {
-    to {
-      aspect-ratio: var(--jumi-aspect-ratio);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-aspect-ratio {
-    to {
-      aspect-ratio: var(--jumi-aspect-ratio);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-aspect-ratio {
-    to {
-      aspect-ratio: var(--jumi-aspect-ratio);
-    }
-  }
-}
 @layer base {
   @keyframes jumi-back-in {
     0% {
@@ -3134,8 +4154,6 @@
       transform: scale(1) rotateZ(0deg);
     }
   }
-}
-@layer base {
   @keyframes jumi-back-in-down {
     0% {
       transform: scale(0) translateY(-2000px) rotateZ(-360deg);
@@ -3144,8 +4162,6 @@
       transform: scale(1) translateY(0) rotateZ(0deg);
     }
   }
-}
-@layer base {
   @keyframes jumi-back-in-left {
     0% {
       transform: scale(0) translateX(-2000px) rotateZ(-360deg);
@@ -3154,8 +4170,6 @@
       transform: scale(1) translateX(0) rotateZ(0deg);
     }
   }
-}
-@layer base {
   @keyframes jumi-back-in-right {
     0% {
       transform: scale(0) translateX(2000px) rotateZ(360deg);
@@ -3164,8 +4178,6 @@
       transform: scale(1) translateX(0) rotateZ(0deg);
     }
   }
-}
-@layer base {
   @keyframes jumi-back-in-up {
     0% {
       transform: scale(0) translateY(2000px) rotateZ(360deg);
@@ -3174,400 +4186,46 @@
       transform: scale(1) translateY(0) rotateZ(0deg);
     }
   }
-}
-@layer base {
-  @keyframes jumi-backdrop-filter {
-    to {
-      backdrop-filter: var(--jumi-backdrop-filter);
+  @keyframes jumi-back-out {
+    0% {
+      transform: scale(1) rotateZ(0deg);
+    }
+    100% {
+      transform: scale(0) rotateZ(360deg);
     }
   }
-}
-@layer base {
-  @keyframes jumi-backdrop-filter {
-    to {
-      backdrop-filter: var(--jumi-backdrop-filter);
+  @keyframes jumi-back-out-down {
+    0% {
+      transform: scale(1) translateY(0) rotateZ(0deg);
+    }
+    100% {
+      transform: scale(0) translateY(2000px) rotateZ(360deg);
     }
   }
-}
-@layer base {
-  @keyframes jumi-backdrop-filter {
-    to {
-      backdrop-filter: var(--jumi-backdrop-filter);
+  @keyframes jumi-back-out-left {
+    0% {
+      transform: scale(1) translateX(0) rotateZ(0deg);
+    }
+    100% {
+      transform: scale(0) translateX(-2000px) rotateZ(-360deg);
     }
   }
-}
-@layer base {
-  @keyframes jumi-backdrop-filter {
-    to {
-      backdrop-filter: var(--jumi-backdrop-filter);
+  @keyframes jumi-back-out-right {
+    0% {
+      transform: scale(1) translateX(0) rotateZ(0deg);
+    }
+    100% {
+      transform: scale(0) translateX(2000px) rotateZ(360deg);
     }
   }
-}
-@layer base {
-  @keyframes jumi-backdrop-filter {
-    to {
-      backdrop-filter: var(--jumi-backdrop-filter);
+  @keyframes jumi-back-out-up {
+    0% {
+      transform: scale(1) translateY(0) rotateZ(0deg);
+    }
+    100% {
+      transform: scale(0) translateY(-2000px) rotateZ(-360deg);
     }
   }
-}
-@layer base {
-  @keyframes jumi-backdrop-filter {
-    to {
-      backdrop-filter: var(--jumi-backdrop-filter);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-backdrop-filter {
-    to {
-      backdrop-filter: var(--jumi-backdrop-filter);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-backdrop-filter {
-    to {
-      backdrop-filter: var(--jumi-backdrop-filter);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-backdrop-filter {
-    to {
-      backdrop-filter: var(--jumi-backdrop-filter);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-backdrop-filter {
-    to {
-      backdrop-filter: var(--jumi-backdrop-filter);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-backdrop-filter {
-    to {
-      backdrop-filter: var(--jumi-backdrop-filter);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-background {
-    to {
-      background: var(--jumi-background);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-background-color {
-    to {
-      background-color: var(--jumi-background-color);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-background-color {
-    to {
-      background-color: var(--jumi-background-color);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-background-position {
-    to {
-      background-position: var(--jumi-background-position);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-block-size {
-    to {
-      block-size: var(--jumi-block-size);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border {
-    to {
-      border: var(--jumi-border);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-block {
-    to {
-      border-block: var(--jumi-border-block);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-radius {
-    to {
-      border-radius: var(--jumi-border-radius);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-block-end-width {
-    to {
-      border-block-end-width: var(--jumi-border-block-end-width);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-radius {
-    to {
-      border-radius: var(--jumi-border-radius);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-block-start-width {
-    to {
-      border-block-start-width: var(--jumi-border-block-start-width);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-block-width {
-    to {
-      border-block-width: var(--jumi-border-block-width);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-bottom-left-radius {
-    to {
-      border-bottom-left-radius: var(--jumi-border-bottom-left-radius);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-radius {
-    to {
-      border-radius: var(--jumi-border-radius);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-bottom-right-radius {
-    to {
-      border-bottom-right-radius: var(--jumi-border-bottom-right-radius);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-bottom-width {
-    to {
-      border-bottom-width: var(--jumi-border-bottom-width);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-color {
-    to {
-      border-color: var(--jumi-border-color);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-end-end-radius {
-    to {
-      border-end-end-radius: var(--jumi-border-end-end-radius);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-end-start-radius {
-    to {
-      border-end-start-radius: var(--jumi-border-end-start-radius);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-image {
-    to {
-      border-image: var(--jumi-border-image);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-image-outset {
-    to {
-      border-image-outset: var(--jumi-border-image-outset);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-image-outset {
-    to {
-      border-image-outset: var(--jumi-border-image-outset);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-image-outset {
-    to {
-      border-image-outset: var(--jumi-border-image-outset);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-image-outset {
-    to {
-      border-image-outset: var(--jumi-border-image-outset);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-image-outset {
-    to {
-      border-image-outset: var(--jumi-border-image-outset);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-image-outset {
-    to {
-      border-image-outset: var(--jumi-border-image-outset);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-image-outset {
-    to {
-      border-image-outset: var(--jumi-border-image-outset);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-radius {
-    to {
-      border-radius: var(--jumi-border-radius);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-inline-end-width {
-    to {
-      border-inline-end-width: var(--jumi-border-inline-end-width);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-radius {
-    to {
-      border-radius: var(--jumi-border-radius);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-inline-start-width {
-    to {
-      border-inline-start-width: var(--jumi-border-inline-start-width);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-inline-width {
-    to {
-      border-inline-width: var(--jumi-border-inline-width);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-radius {
-    to {
-      border-radius: var(--jumi-border-radius);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-left-width {
-    to {
-      border-left-width: var(--jumi-border-left-width);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-radius {
-    to {
-      border-radius: var(--jumi-border-radius);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-radius {
-    to {
-      border-radius: var(--jumi-border-radius);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-radius {
-    to {
-      border-radius: var(--jumi-border-radius);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-right-width {
-    to {
-      border-right-width: var(--jumi-border-right-width);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-start-end-radius {
-    to {
-      border-start-end-radius: var(--jumi-border-start-end-radius);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-start-start-radius {
-    to {
-      border-start-start-radius: var(--jumi-border-start-start-radius);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-top-left-radius {
-    to {
-      border-top-left-radius: var(--jumi-border-top-left-radius);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-radius {
-    to {
-      border-radius: var(--jumi-border-radius);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-top-right-radius {
-    to {
-      border-top-right-radius: var(--jumi-border-top-right-radius);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-top-width {
-    to {
-      border-top-width: var(--jumi-border-top-width);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-border-width {
-    to {
-      border-width: var(--jumi-border-width);
-    }
-  }
-}
-@layer base {
   @keyframes jumi-bounce-in {
     0% {
       transform: scale3d(0.8, 0.8, 0.8);
@@ -3591,8 +4249,6 @@
       transform: scale3d(1, 1, 1);
     }
   }
-}
-@layer base {
   @keyframes jumi-bounce-out {
     20% {
       transform: scale3d(0.9, 0.9, 0.9);
@@ -3604,183 +4260,6 @@
       transform: scale3d(0.3, 0.3, 0.3);
     }
   }
-}
-@layer base {
-  @keyframes jumi-box-shadow {
-    to {
-      box-shadow: var(--jumi-box-shadow);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-box-shadow {
-    to {
-      box-shadow: var(--jumi-box-shadow);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-box-shadow-inset {
-    to {
-      box-shadow: var(--jumi-box-shadow-inset);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-box-shadow-inset {
-    to {
-      box-shadow: var(--jumi-box-shadow-inset);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-box-shadow-inset {
-    to {
-      box-shadow: var(--jumi-box-shadow-inset);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-box-shadow-inset {
-    to {
-      box-shadow: var(--jumi-box-shadow-inset);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-box-shadow-inset {
-    to {
-      box-shadow: var(--jumi-box-shadow-inset);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-box-shadow {
-    to {
-      box-shadow: var(--jumi-box-shadow);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-box-shadow {
-    to {
-      box-shadow: var(--jumi-box-shadow);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-box-shadow {
-    to {
-      box-shadow: var(--jumi-box-shadow);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-color {
-    to {
-      color: var(--jumi-color);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-color {
-    to {
-      color: var(--jumi-color);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-color {
-    to {
-      color: var(--jumi-color);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-column-count {
-    to {
-      column-count: var(--jumi-column-count);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-gap {
-    to {
-      gap: var(--jumi-gap);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-column-rule {
-    to {
-      column-rule: var(--jumi-column-rule);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-column-rule-color {
-    to {
-      column-rule-color: var(--jumi-column-rule-color);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-columns {
-    to {
-      columns: var(--jumi-columns);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-contain-intrinsic-size {
-    to {
-      contain-intrinsic-size: var(--jumi-contain-intrinsic-size);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-counter-increment {
-    to {
-      counter-increment: var(--jumi-counter-increment);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-counter-reset {
-    to {
-      counter-reset: var(--jumi-counter-reset);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-counter-set {
-    to {
-      counter-set: var(--jumi-counter-set);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-cx {
-    to {
-      cx: var(--jumi-cx);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-cy {
-    to {
-      cy: var(--jumi-cy);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-d {
-    to {
-      d: var(--jumi-d);
-    }
-  }
-}
-@layer base {
   @keyframes jumi-fade-down {
     from {
       opacity: 0;
@@ -3791,8 +4270,26 @@
       transform: translate3d(0, 0, 0);
     }
   }
-}
-@layer base {
+  @keyframes jumi-fade-down-left {
+    from {
+      opacity: 0;
+      transform: translate3d(-40px, -40px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+  @keyframes jumi-fade-down-right {
+    from {
+      opacity: 0;
+      transform: translate3d(40px, -40px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
   @keyframes jumi-fade-in {
     from {
       opacity: 0;
@@ -3801,8 +4298,6 @@
       opacity: 1;
     }
   }
-}
-@layer base {
   @keyframes jumi-fade-left {
     from {
       opacity: 0;
@@ -3813,8 +4308,6 @@
       transform: translate3d(0, 0, 0);
     }
   }
-}
-@layer base {
   @keyframes jumi-fade-out {
     from {
       opacity: 1;
@@ -3823,8 +4316,6 @@
       opacity: 0;
     }
   }
-}
-@layer base {
   @keyframes jumi-fade-right {
     from {
       opacity: 0;
@@ -3835,8 +4326,6 @@
       transform: translate3d(0, 0, 0);
     }
   }
-}
-@layer base {
   @keyframes jumi-fade-up {
     from {
       opacity: 0;
@@ -3847,120 +4336,110 @@
       transform: translate3d(0, 0, 0);
     }
   }
-}
-@layer base {
-  @keyframes jumi-fill {
+  @keyframes jumi-fade-up-left {
+    from {
+      opacity: 0;
+      transform: translate3d(-40px, 40px, 0);
+    }
     to {
-      fill: var(--jumi-fill);
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
     }
   }
-}
-@layer base {
-  @keyframes jumi-fill {
+  @keyframes jumi-fade-up-right {
+    from {
+      opacity: 0;
+      transform: translate3d(40px, 40px, 0);
+    }
     to {
-      fill: var(--jumi-fill);
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
     }
   }
-}
-@layer base {
-  @keyframes jumi-filter {
+  @keyframes jumi-flip-down {
+    40% {
+      animation-timing-function: ease-in;
+      transform: perspective(400px) rotateX(20deg);
+    }
+    60% {
+      opacity: 1;
+      transform: perspective(400px) rotateX(-10deg);
+    }
+    80% {
+      transform: perspective(400px) rotateX(5deg);
+    }
+    from {
+      animation-timing-function: ease-in;
+      opacity: 0;
+      transform: perspective(400px) rotateX(-90deg);
+    }
     to {
-      filter: var(--jumi-filter);
+      transform: perspective(400px);
     }
   }
-}
-@layer base {
-  @keyframes jumi-filter {
+  @keyframes jumi-flip-left {
+    40% {
+      animation-timing-function: ease-in;
+      transform: perspective(400px) rotateY(20deg);
+    }
+    60% {
+      opacity: 1;
+      transform: perspective(400px) rotateY(-10deg);
+    }
+    80% {
+      transform: perspective(400px) rotateY(5deg);
+    }
+    from {
+      animation-timing-function: ease-in;
+      opacity: 0;
+      transform: perspective(400px) rotateY(-90deg);
+    }
     to {
-      filter: var(--jumi-filter);
+      transform: perspective(400px);
     }
   }
-}
-@layer base {
-  @keyframes jumi-filter {
+  @keyframes jumi-flip-right {
+    40% {
+      animation-timing-function: ease-in;
+      transform: perspective(400px) rotateY(-20deg);
+    }
+    60% {
+      opacity: 1;
+      transform: perspective(400px) rotateY(10deg);
+    }
+    80% {
+      transform: perspective(400px) rotateY(-5deg);
+    }
+    from {
+      animation-timing-function: ease-in;
+      opacity: 0;
+      transform: perspective(400px) rotateY(90deg);
+    }
     to {
-      filter: var(--jumi-filter);
+      transform: perspective(400px);
     }
   }
-}
-@layer base {
-  @keyframes jumi-filter {
+  @keyframes jumi-flip-up {
+    40% {
+      animation-timing-function: ease-in;
+      transform: perspective(400px) rotateX(-20deg);
+    }
+    60% {
+      opacity: 1;
+      transform: perspective(400px) rotateX(10deg);
+    }
+    80% {
+      transform: perspective(400px) rotateX(-5deg);
+    }
+    from {
+      animation-timing-function: ease-in;
+      opacity: 0;
+      transform: perspective(400px) rotateX(90deg);
+    }
     to {
-      filter: var(--jumi-filter);
+      transform: perspective(400px);
     }
   }
-}
-@layer base {
-  @keyframes jumi-filter {
-    to {
-      filter: var(--jumi-filter);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-filter {
-    to {
-      filter: var(--jumi-filter);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-filter {
-    to {
-      filter: var(--jumi-filter);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-filter {
-    to {
-      filter: var(--jumi-filter);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-filter {
-    to {
-      filter: var(--jumi-filter);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-filter {
-    to {
-      filter: var(--jumi-filter);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-filter {
-    to {
-      filter: var(--jumi-filter);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-flex-flow {
-    to {
-      flex-flow: var(--jumi-flex-flow);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-flex-grow {
-    to {
-      flex-grow: var(--jumi-flex-grow);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-flex-shrink {
-    to {
-      flex-shrink: var(--jumi-flex-shrink);
-    }
-  }
-}
-@layer base {
   @keyframes jumi-flip-x {
     40% {
       animation-timing-function: ease-in;
@@ -3980,8 +4459,6 @@
       transform: perspective(400px) rotateX(0deg);
     }
   }
-}
-@layer base {
   @keyframes jumi-flip-y {
     40% {
       animation-timing-function: ease-in;
@@ -4001,267 +4478,55 @@
       transform: perspective(400px) rotateY(0deg);
     }
   }
-}
-@layer base {
-  @keyframes jumi-font-synthesis {
-    to {
-      font-synthesis: var(--jumi-font-synthesis);
+  @keyframes jumi-heart-beat {
+    14% {
+      transform: scale3d(1.3, 1.3, 1.3);
+    }
+    28% {
+      transform: scale3d(1, 1, 1);
+    }
+    42% {
+      transform: scale3d(1.3, 1.3, 1.3);
+    }
+    70% {
+      transform: scale3d(1, 1, 1);
+    }
+    from {
+      transform: scale3d(1, 1, 1);
     }
   }
-}
-@layer base {
-  @keyframes jumi-font-variant {
+  @keyframes jumi-jello {
+    11.1% {
+      transform: skewX(-12.5deg) skewY(-12.5deg);
+    }
+    22.2% {
+      transform: skewX(6.25deg) skewY(6.25deg);
+    }
+    33.3% {
+      transform: skewX(-3.125deg) skewY(-3.125deg);
+    }
+    44.4% {
+      transform: skewX(1.5625deg) skewY(1.5625deg);
+    }
+    55.5% {
+      transform: skewX(-0.78125deg) skewY(-0.78125deg);
+    }
+    66.6% {
+      transform: skewX(0.390625deg) skewY(0.390625deg);
+    }
+    77.7% {
+      transform: skewX(-0.1953125deg) skewY(-0.1953125deg);
+    }
+    88.8% {
+      transform: skewX(0.09765625deg) skewY(0.09765625deg);
+    }
+    from {
+      transform: none;
+    }
     to {
-      font-variant: var(--jumi-font-variant);
+      transform: none;
     }
   }
-}
-@layer base {
-  @keyframes jumi-font-variation-settings {
-    to {
-      font-variation-settings: var(--jumi-font-variation-settings);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-grid {
-    to {
-      grid: var(--jumi-grid);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-grid-template-areas {
-    to {
-      grid-template-areas: var(--jumi-grid-template-areas);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-height {
-    to {
-      height: var(--jumi-height);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-hyphenate-character {
-    to {
-      hyphenate-character: var(--jumi-hyphenate-character);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-initial-letter {
-    to {
-      initial-letter: var(--jumi-initial-letter);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-justify-items {
-    to {
-      justify-items: var(--jumi-justify-items);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-line-clamp {
-    to {
-      line-clamp: var(--jumi-line-clamp);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-list-style {
-    to {
-      list-style: var(--jumi-list-style);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-list-style-image {
-    to {
-      list-style-image: var(--jumi-list-style-image);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-marker {
-    to {
-      marker: var(--jumi-marker);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-marker-end {
-    to {
-      marker-end: var(--jumi-marker-end);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-marker-mid {
-    to {
-      marker-mid: var(--jumi-marker-mid);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-marker-start {
-    to {
-      marker-start: var(--jumi-marker-start);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-mask {
-    to {
-      mask: var(--jumi-mask);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-mask-border {
-    to {
-      mask-border: var(--jumi-mask-border);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-mask-border-source {
-    to {
-      mask-border-source: var(--jumi-mask-border-source);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-mask-border-width {
-    to {
-      mask-border-width: var(--jumi-mask-border-width);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-mask-image {
-    to {
-      mask-image: var(--jumi-mask-image);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-math-depth {
-    to {
-      math-depth: var(--jumi-math-depth);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-object-position {
-    to {
-      object-position: var(--jumi-object-position);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-object-position {
-    to {
-      object-position: var(--jumi-object-position);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-offset-anchor {
-    to {
-      offset-anchor: var(--jumi-offset-anchor);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-offset-anchor {
-    to {
-      offset-anchor: var(--jumi-offset-anchor);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-offset-anchor {
-    to {
-      offset-anchor: var(--jumi-offset-anchor);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-offset-position {
-    to {
-      offset-position: var(--jumi-offset-position);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-offset-position {
-    to {
-      offset-position: var(--jumi-offset-position);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-opacity {
-    to {
-      opacity: var(--jumi-opacity);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-opacity {
-    to {
-      opacity: var(--jumi-opacity);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-opacity {
-    to {
-      opacity: var(--jumi-opacity);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-opacity {
-    to {
-      opacity: var(--jumi-opacity);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-orphans {
-    to {
-      orphans: var(--jumi-orphans);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-outline {
-    to {
-      outline: var(--jumi-outline);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-overscroll-behavior {
-    to {
-      overscroll-behavior: var(--jumi-overscroll-behavior);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-page {
-    to {
-      page: var(--jumi-page);
-    }
-  }
-}
-@layer base {
   @keyframes jumi-pulsate {
     50% {
       transform: scale3d(1.05, 1.05, 1.05);
@@ -4273,113 +4538,46 @@
       transform: scale3d(1, 1, 1);
     }
   }
-}
-@layer base {
-  @keyframes jumi-transform {
+  @keyframes jumi-reveal-bottom {
+    from {
+      bottom: 0;
+      inset-inline: 0;
+      width: 100%;
+    }
     to {
-      transform: var(--jumi-transform);
+      width: 0%;
     }
   }
-}
-@layer base {
-  @keyframes jumi-transform {
+  @keyframes jumi-reveal-left {
+    from {
+      inset-block: 0;
+      left: 0;
+      width: 0%;
+    }
     to {
-      transform: var(--jumi-transform);
+      width: 100%;
     }
   }
-}
-@layer base {
-  @keyframes jumi-transform {
+  @keyframes jumi-reveal-right {
+    from {
+      inset-block: 0;
+      right: 0;
+      width: 0%;
+    }
     to {
-      transform: var(--jumi-transform);
+      width: 100%;
     }
   }
-}
-@layer base {
-  @keyframes jumi-transform {
+  @keyframes jumi-reveal-top {
+    from {
+      height: 0%;
+      inset-inline: 0;
+      top: 0;
+    }
     to {
-      transform: var(--jumi-transform);
+      height: 100%;
     }
   }
-}
-@layer base {
-  @keyframes jumi-transform {
-    to {
-      transform: var(--jumi-transform);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-transform {
-    to {
-      transform: var(--jumi-transform);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-transform {
-    to {
-      transform: var(--jumi-transform);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-transform {
-    to {
-      transform: var(--jumi-transform);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-transform {
-    to {
-      transform: var(--jumi-transform);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-gap {
-    to {
-      gap: var(--jumi-gap);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-transform {
-    to {
-      transform: var(--jumi-transform);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-transform {
-    to {
-      transform: var(--jumi-transform);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-transform {
-    to {
-      transform: var(--jumi-transform);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-transform {
-    to {
-      transform: var(--jumi-transform);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-transform {
-    to {
-      transform: var(--jumi-transform);
-    }
-  }
-}
-@layer base {
   @keyframes jumi-shake {
     10%, 30%, 50%, 70%, 90% {
       transform: translate3d(-10px, 0, 0);
@@ -4391,8 +4589,33 @@
       transform: translate3d(0, 0, 0);
     }
   }
-}
-@layer base {
+  @keyframes jumi-slide-in-down {
+    from {
+      transform: translate3d(0, -100%, 0);
+      visibility: visible;
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+  @keyframes jumi-slide-in-left {
+    from {
+      transform: translate3d(-100%, 0, 0);
+      visibility: visible;
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+  @keyframes jumi-slide-in-right {
+    from {
+      transform: translate3d(100%, 0, 0);
+      visibility: visible;
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+    }
+  }
   @keyframes jumi-slide-in-up {
     from {
       transform: translate3d(0, 100%, 0);
@@ -4402,8 +4625,6 @@
       transform: translate3d(0, 0, 0);
     }
   }
-}
-@layer base {
   @keyframes jumi-swing {
     20% {
       transform: rotateZ(15deg);
@@ -4421,85 +4642,23 @@
       transform: rotateZ(0deg);
     }
   }
-}
-@layer base {
-  @keyframes jumi-text-shadow {
+  @keyframes jumi-tada {
+    10%, 20% {
+      transform: scale3d(0.9, 0.9, 0.9) rotateZ(-3deg);
+    }
+    30%, 50%, 70%, 90% {
+      transform: scale3d(1.1, 1.1, 1.1) rotateZ(3deg);
+    }
+    40%, 60%, 80% {
+      transform: scale3d(0.9, 0.9, 0.9) rotateZ(-3deg);
+    }
+    from {
+      transform: scale3d(1, 1, 1);
+    }
     to {
-      text-shadow: var(--jumi-text-shadow);
+      transform: scale3d(1, 1, 1);
     }
   }
-}
-@layer base {
-  @keyframes jumi-text-shadow {
-    to {
-      text-shadow: var(--jumi-text-shadow);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-transform {
-    to {
-      transform: var(--jumi-transform);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-transform {
-    to {
-      transform: var(--jumi-transform);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-transform {
-    to {
-      transform: var(--jumi-transform);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-transform {
-    to {
-      transform: var(--jumi-transform);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-transform {
-    to {
-      transform: var(--jumi-transform);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-transform {
-    to {
-      transform: var(--jumi-transform);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-transform {
-    to {
-      transform: var(--jumi-transform);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-width {
-    to {
-      width: var(--jumi-width);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-width {
-    to {
-      width: var(--jumi-width);
-    }
-  }
-}
-@layer base {
   @keyframes jumi-wobble {
     15% {
       transform: translate3d(-25%, 0, 0) rotateZ(-5deg);
@@ -4523,8 +4682,6 @@
       transform: translate3d(0, 0, 0);
     }
   }
-}
-@layer base {
   @keyframes jumi-zoom-in {
     50% {
       transform: scale3d(1.05, 1.05, 1.05);
@@ -4536,8 +4693,50 @@
       transform: scale3d(1, 1, 1);
     }
   }
-}
-@layer base {
+  @keyframes jumi-zoom-in-down {
+    50% {
+      transform: scale3d(1.05, 1.05, 1.05) translate3d(0, 60%, 0);
+    }
+    from {
+      transform: scale3d(0.3, 0.3, 0.3) translate3d(0, -100%, 0);
+    }
+    to {
+      transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
+    }
+  }
+  @keyframes jumi-zoom-in-left {
+    50% {
+      transform: scale3d(1.05, 1.05, 1.05) translate3d(60%, 0, 0);
+    }
+    from {
+      transform: scale3d(0.3, 0.3, 0.3) translate3d(-100%, 0, 0);
+    }
+    to {
+      transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
+    }
+  }
+  @keyframes jumi-zoom-in-right {
+    50% {
+      transform: scale3d(1.05, 1.05, 1.05) translate3d(-60%, 0, 0);
+    }
+    from {
+      transform: scale3d(0.3, 0.3, 0.3) translate3d(100%, 0, 0);
+    }
+    to {
+      transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
+    }
+  }
+  @keyframes jumi-zoom-in-up {
+    50% {
+      transform: scale3d(1.05, 1.05, 1.05) translate3d(0, -60%, 0);
+    }
+    from {
+      transform: scale3d(0.3, 0.3, 0.3) translate3d(0, 100%, 0);
+    }
+    to {
+      transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
+    }
+  }
   @keyframes jumi-zoom-out {
     50% {
       transform: scale3d(0.95, 0.95, 0.95);
@@ -4549,106 +4748,1595 @@
       transform: scale3d(0.3, 0.3, 0.3);
     }
   }
+  @keyframes jumi-zoom-out-down {
+    50% {
+      transform: scale3d(0.95, 0.95, 0.95) translate3d(0, 60%, 0);
+    }
+    from {
+      transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
+    }
+    to {
+      transform: scale3d(0.3, 0.3, 0.3) translate3d(0, 100%, 0);
+    }
+  }
+  @keyframes jumi-zoom-out-left {
+    50% {
+      transform: scale3d(0.95, 0.95, 0.95) translate3d(-60%, 0, 0);
+    }
+    from {
+      transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
+    }
+    to {
+      transform: scale3d(0.3, 0.3, 0.3) translate3d(-100%, 0, 0);
+    }
+  }
+  @keyframes jumi-zoom-out-right {
+    50% {
+      transform: scale3d(0.95, 0.95, 0.95) translate3d(60%, 0, 0);
+    }
+    from {
+      transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
+    }
+    to {
+      transform: scale3d(0.3, 0.3, 0.3) translate3d(100%, 0, 0);
+    }
+  }
+  @keyframes jumi-zoom-out-up {
+    50% {
+      transform: scale3d(0.95, 0.95, 0.95) translate3d(0, -60%, 0);
+    }
+    from {
+      transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
+    }
+    to {
+      transform: scale3d(0.3, 0.3, 0.3) translate3d(0, -100%, 0);
+    }
+  }
 }
 @layer base {
+  @keyframes jumi-accent-color {
+    to {
+      accent-color: var(--jumi-accent-color);
+    }
+  }
+  @keyframes jumi-align-content {
+    to {
+      align-content: var(--jumi-align-content);
+    }
+  }
+  @keyframes jumi-align-items {
+    to {
+      align-items: var(--jumi-align-items);
+    }
+  }
+  @keyframes jumi-align-self {
+    to {
+      align-self: var(--jumi-align-self);
+    }
+  }
+  @keyframes jumi-alignment-baseline {
+    to {
+      alignment-baseline: var(--jumi-alignment-baseline);
+    }
+  }
+  @keyframes jumi-all {
+    to {
+      all: var(--jumi-all);
+    }
+  }
+  @keyframes jumi-appearance {
+    to {
+      appearance: var(--jumi-appearance);
+    }
+  }
+  @keyframes jumi-aspect-ratio {
+    to {
+      aspect-ratio: var(--jumi-aspect-ratio);
+    }
+  }
+  @keyframes jumi-backdrop-filter {
+    to {
+      backdrop-filter: var(--jumi-backdrop-filter);
+    }
+  }
+  @keyframes jumi-backface-visibility {
+    to {
+      backface-visibility: var(--jumi-backface-visibility);
+    }
+  }
+  @keyframes jumi-background {
+    to {
+      background: var(--jumi-background);
+    }
+  }
+  @keyframes jumi-background-attachment {
+    to {
+      background-attachment: var(--jumi-background-attachment);
+    }
+  }
+  @keyframes jumi-background-blend-mode {
+    to {
+      background-blend-mode: var(--jumi-background-blend-mode);
+    }
+  }
+  @keyframes jumi-background-clip {
+    to {
+      background-clip: var(--jumi-background-clip);
+    }
+  }
+  @keyframes jumi-background-color {
+    to {
+      background-color: var(--jumi-background-color);
+    }
+  }
+  @keyframes jumi-background-image {
+    to {
+      background-image: var(--jumi-background-image);
+    }
+  }
+  @keyframes jumi-background-origin {
+    to {
+      background-origin: var(--jumi-background-origin);
+    }
+  }
+  @keyframes jumi-background-position {
+    to {
+      background-position: var(--jumi-background-position);
+    }
+  }
+  @keyframes jumi-background-repeat {
+    to {
+      background-repeat: var(--jumi-background-repeat);
+    }
+  }
+  @keyframes jumi-background-size {
+    to {
+      background-size: var(--jumi-background-size);
+    }
+  }
+  @keyframes jumi-block-size {
+    to {
+      block-size: var(--jumi-block-size);
+    }
+  }
+  @keyframes jumi-border {
+    to {
+      border: var(--jumi-border);
+    }
+  }
+  @keyframes jumi-border-block {
+    to {
+      border-block: var(--jumi-border-block);
+    }
+  }
+  @keyframes jumi-border-block-color {
+    to {
+      border-block-color: var(--jumi-border-block-color);
+    }
+  }
+  @keyframes jumi-border-block-end {
+    to {
+      border-block-end: var(--jumi-border-block-end);
+    }
+  }
+  @keyframes jumi-border-block-end-color {
+    to {
+      border-block-end-color: var(--jumi-border-block-end-color);
+    }
+  }
+  @keyframes jumi-border-block-end-style {
+    to {
+      border-block-end-style: var(--jumi-border-block-end-style);
+    }
+  }
+  @keyframes jumi-border-block-end-width {
+    to {
+      border-block-end-width: var(--jumi-border-block-end-width);
+    }
+  }
+  @keyframes jumi-border-block-start {
+    to {
+      border-block-start: var(--jumi-border-block-start);
+    }
+  }
+  @keyframes jumi-border-block-start-color {
+    to {
+      border-block-start-color: var(--jumi-border-block-start-color);
+    }
+  }
+  @keyframes jumi-border-block-start-style {
+    to {
+      border-block-start-style: var(--jumi-border-block-start-style);
+    }
+  }
+  @keyframes jumi-border-block-start-width {
+    to {
+      border-block-start-width: var(--jumi-border-block-start-width);
+    }
+  }
+  @keyframes jumi-border-block-style {
+    to {
+      border-block-style: var(--jumi-border-block-style);
+    }
+  }
+  @keyframes jumi-border-block-width {
+    to {
+      border-block-width: var(--jumi-border-block-width);
+    }
+  }
+  @keyframes jumi-border-bottom {
+    to {
+      border-bottom: var(--jumi-border-bottom);
+    }
+  }
+  @keyframes jumi-border-bottom-color {
+    to {
+      border-bottom-color: var(--jumi-border-bottom-color);
+    }
+  }
+  @keyframes jumi-border-bottom-left-radius {
+    to {
+      border-bottom-left-radius: var(--jumi-border-bottom-left-radius);
+    }
+  }
+  @keyframes jumi-border-bottom-right-radius {
+    to {
+      border-bottom-right-radius: var(--jumi-border-bottom-right-radius);
+    }
+  }
+  @keyframes jumi-border-bottom-style {
+    to {
+      border-bottom-style: var(--jumi-border-bottom-style);
+    }
+  }
+  @keyframes jumi-border-bottom-width {
+    to {
+      border-bottom-width: var(--jumi-border-bottom-width);
+    }
+  }
+  @keyframes jumi-border-collapse {
+    to {
+      border-collapse: var(--jumi-border-collapse);
+    }
+  }
+  @keyframes jumi-border-color {
+    to {
+      border-color: var(--jumi-border-color);
+    }
+  }
+  @keyframes jumi-border-end-end-radius {
+    to {
+      border-end-end-radius: var(--jumi-border-end-end-radius);
+    }
+  }
+  @keyframes jumi-border-end-start-radius {
+    to {
+      border-end-start-radius: var(--jumi-border-end-start-radius);
+    }
+  }
+  @keyframes jumi-border-image {
+    to {
+      border-image: var(--jumi-border-image);
+    }
+  }
+  @keyframes jumi-border-image-outset {
+    to {
+      border-image-outset: var(--jumi-border-image-outset);
+    }
+  }
+  @keyframes jumi-border-image-repeat {
+    to {
+      border-image-repeat: var(--jumi-border-image-repeat);
+    }
+  }
+  @keyframes jumi-border-image-slice {
+    to {
+      border-image-slice: var(--jumi-border-image-slice);
+    }
+  }
+  @keyframes jumi-border-image-source {
+    to {
+      border-image-source: var(--jumi-border-image-source);
+    }
+  }
+  @keyframes jumi-border-image-width {
+    to {
+      border-image-width: var(--jumi-border-image-width);
+    }
+  }
+  @keyframes jumi-border-inline {
+    to {
+      border-inline: var(--jumi-border-inline);
+    }
+  }
+  @keyframes jumi-border-inline-color {
+    to {
+      border-inline-color: var(--jumi-border-inline-color);
+    }
+  }
+  @keyframes jumi-border-inline-end {
+    to {
+      border-inline-end: var(--jumi-border-inline-end);
+    }
+  }
+  @keyframes jumi-border-inline-end-color {
+    to {
+      border-inline-end-color: var(--jumi-border-inline-end-color);
+    }
+  }
+  @keyframes jumi-border-inline-end-style {
+    to {
+      border-inline-end-style: var(--jumi-border-inline-end-style);
+    }
+  }
+  @keyframes jumi-border-inline-end-width {
+    to {
+      border-inline-end-width: var(--jumi-border-inline-end-width);
+    }
+  }
+  @keyframes jumi-border-inline-start {
+    to {
+      border-inline-start: var(--jumi-border-inline-start);
+    }
+  }
+  @keyframes jumi-border-inline-start-color {
+    to {
+      border-inline-start-color: var(--jumi-border-inline-start-color);
+    }
+  }
+  @keyframes jumi-border-inline-start-style {
+    to {
+      border-inline-start-style: var(--jumi-border-inline-start-style);
+    }
+  }
+  @keyframes jumi-border-inline-start-width {
+    to {
+      border-inline-start-width: var(--jumi-border-inline-start-width);
+    }
+  }
+  @keyframes jumi-border-inline-style {
+    to {
+      border-inline-style: var(--jumi-border-inline-style);
+    }
+  }
+  @keyframes jumi-border-inline-width {
+    to {
+      border-inline-width: var(--jumi-border-inline-width);
+    }
+  }
+  @keyframes jumi-border-left {
+    to {
+      border-left: var(--jumi-border-left);
+    }
+  }
+  @keyframes jumi-border-left-color {
+    to {
+      border-left-color: var(--jumi-border-left-color);
+    }
+  }
+  @keyframes jumi-border-left-style {
+    to {
+      border-left-style: var(--jumi-border-left-style);
+    }
+  }
+  @keyframes jumi-border-left-width {
+    to {
+      border-left-width: var(--jumi-border-left-width);
+    }
+  }
+  @keyframes jumi-border-radius {
+    to {
+      border-radius: var(--jumi-border-radius);
+    }
+  }
+  @keyframes jumi-border-right {
+    to {
+      border-right: var(--jumi-border-right);
+    }
+  }
+  @keyframes jumi-border-right-color {
+    to {
+      border-right-color: var(--jumi-border-right-color);
+    }
+  }
+  @keyframes jumi-border-right-style {
+    to {
+      border-right-style: var(--jumi-border-right-style);
+    }
+  }
+  @keyframes jumi-border-right-width {
+    to {
+      border-right-width: var(--jumi-border-right-width);
+    }
+  }
+  @keyframes jumi-border-spacing {
+    to {
+      border-spacing: var(--jumi-border-spacing);
+    }
+  }
+  @keyframes jumi-border-start-end-radius {
+    to {
+      border-start-end-radius: var(--jumi-border-start-end-radius);
+    }
+  }
+  @keyframes jumi-border-start-start-radius {
+    to {
+      border-start-start-radius: var(--jumi-border-start-start-radius);
+    }
+  }
+  @keyframes jumi-border-style {
+    to {
+      border-style: var(--jumi-border-style);
+    }
+  }
+  @keyframes jumi-border-top {
+    to {
+      border-top: var(--jumi-border-top);
+    }
+  }
+  @keyframes jumi-border-top-color {
+    to {
+      border-top-color: var(--jumi-border-top-color);
+    }
+  }
+  @keyframes jumi-border-top-left-radius {
+    to {
+      border-top-left-radius: var(--jumi-border-top-left-radius);
+    }
+  }
+  @keyframes jumi-border-top-right-radius {
+    to {
+      border-top-right-radius: var(--jumi-border-top-right-radius);
+    }
+  }
+  @keyframes jumi-border-top-style {
+    to {
+      border-top-style: var(--jumi-border-top-style);
+    }
+  }
+  @keyframes jumi-border-top-width {
+    to {
+      border-top-width: var(--jumi-border-top-width);
+    }
+  }
+  @keyframes jumi-border-width {
+    to {
+      border-width: var(--jumi-border-width);
+    }
+  }
+  @keyframes jumi-bottom {
+    to {
+      bottom: var(--jumi-bottom);
+    }
+  }
+  @keyframes jumi-box-decoration-break {
+    to {
+      box-decoration-break: var(--jumi-box-decoration-break);
+    }
+  }
+  @keyframes jumi-box-shadow {
+    to {
+      box-shadow: var(--jumi-box-shadow);
+    }
+  }
+  @keyframes jumi-box-shadow-inset {
+    to {
+      box-shadow: var(--jumi-box-shadow-inset);
+    }
+  }
+  @keyframes jumi-box-sizing {
+    to {
+      box-sizing: var(--jumi-box-sizing);
+    }
+  }
+  @keyframes jumi-break-after {
+    to {
+      break-after: var(--jumi-break-after);
+    }
+  }
+  @keyframes jumi-break-before {
+    to {
+      break-before: var(--jumi-break-before);
+    }
+  }
+  @keyframes jumi-break-inside {
+    to {
+      break-inside: var(--jumi-break-inside);
+    }
+  }
+  @keyframes jumi-caption-side {
+    to {
+      caption-side: var(--jumi-caption-side);
+    }
+  }
+  @keyframes jumi-caret-color {
+    to {
+      caret-color: var(--jumi-caret-color);
+    }
+  }
+  @keyframes jumi-clear {
+    to {
+      clear: var(--jumi-clear);
+    }
+  }
+  @keyframes jumi-clip-path {
+    to {
+      clip-path: var(--jumi-clip-path);
+    }
+  }
+  @keyframes jumi-clip-rule {
+    to {
+      clip-rule: var(--jumi-clip-rule);
+    }
+  }
+  @keyframes jumi-color {
+    to {
+      color: var(--jumi-color);
+    }
+  }
+  @keyframes jumi-color-interpolation {
+    to {
+      color-interpolation: var(--jumi-color-interpolation);
+    }
+  }
+  @keyframes jumi-color-interpolation-filters {
+    to {
+      color-interpolation-filters: var(--jumi-color-interpolation-filters);
+    }
+  }
+  @keyframes jumi-color-scheme {
+    to {
+      color-scheme: var(--jumi-color-scheme);
+    }
+  }
+  @keyframes jumi-column-count {
+    to {
+      column-count: var(--jumi-column-count);
+    }
+  }
+  @keyframes jumi-column-fill {
+    to {
+      column-fill: var(--jumi-column-fill);
+    }
+  }
+  @keyframes jumi-column-gap {
+    to {
+      column-gap: var(--jumi-column-gap);
+    }
+  }
+  @keyframes jumi-column-rule {
+    to {
+      column-rule: var(--jumi-column-rule);
+    }
+  }
+  @keyframes jumi-column-rule-color {
+    to {
+      column-rule-color: var(--jumi-column-rule-color);
+    }
+  }
+  @keyframes jumi-column-rule-style {
+    to {
+      column-rule-style: var(--jumi-column-rule-style);
+    }
+  }
+  @keyframes jumi-column-rule-width {
+    to {
+      column-rule-width: var(--jumi-column-rule-width);
+    }
+  }
+  @keyframes jumi-column-span {
+    to {
+      column-span: var(--jumi-column-span);
+    }
+  }
+  @keyframes jumi-column-width {
+    to {
+      column-width: var(--jumi-column-width);
+    }
+  }
+  @keyframes jumi-columns {
+    to {
+      columns: var(--jumi-columns);
+    }
+  }
+  @keyframes jumi-contain {
+    to {
+      contain: var(--jumi-contain);
+    }
+  }
+  @keyframes jumi-contain-intrinsic-block-size {
+    to {
+      contain-intrinsic-block-size: var(--jumi-contain-intrinsic-block-size);
+    }
+  }
+  @keyframes jumi-contain-intrinsic-height {
+    to {
+      contain-intrinsic-height: var(--jumi-contain-intrinsic-height);
+    }
+  }
+  @keyframes jumi-contain-intrinsic-inline-size {
+    to {
+      contain-intrinsic-inline-size: var(--jumi-contain-intrinsic-inline-size);
+    }
+  }
+  @keyframes jumi-contain-intrinsic-size {
+    to {
+      contain-intrinsic-size: var(--jumi-contain-intrinsic-size);
+    }
+  }
+  @keyframes jumi-contain-intrinsic-width {
+    to {
+      contain-intrinsic-width: var(--jumi-contain-intrinsic-width);
+    }
+  }
+  @keyframes jumi-content {
+    to {
+      content: var(--jumi-content);
+    }
+  }
+  @keyframes jumi-content-visibility {
+    to {
+      content-visibility: var(--jumi-content-visibility);
+    }
+  }
+  @keyframes jumi-counter-increment {
+    to {
+      counter-increment: var(--jumi-counter-increment);
+    }
+  }
+  @keyframes jumi-counter-reset {
+    to {
+      counter-reset: var(--jumi-counter-reset);
+    }
+  }
+  @keyframes jumi-counter-set {
+    to {
+      counter-set: var(--jumi-counter-set);
+    }
+  }
+  @keyframes jumi-cursor {
+    to {
+      cursor: var(--jumi-cursor);
+    }
+  }
+  @keyframes jumi-cx {
+    to {
+      cx: var(--jumi-cx);
+    }
+  }
+  @keyframes jumi-cy {
+    to {
+      cy: var(--jumi-cy);
+    }
+  }
+  @keyframes jumi-d {
+    to {
+      d: var(--jumi-d);
+    }
+  }
+  @keyframes jumi-display {
+    to {
+      display: var(--jumi-display);
+    }
+  }
+  @keyframes jumi-dominant-baseline {
+    to {
+      dominant-baseline: var(--jumi-dominant-baseline);
+    }
+  }
+  @keyframes jumi-empty-cells {
+    to {
+      empty-cells: var(--jumi-empty-cells);
+    }
+  }
+  @keyframes jumi-fill {
+    to {
+      fill: var(--jumi-fill);
+    }
+  }
+  @keyframes jumi-fill-opacity {
+    to {
+      fill-opacity: var(--jumi-fill-opacity);
+    }
+  }
+  @keyframes jumi-fill-rule {
+    to {
+      fill-rule: var(--jumi-fill-rule);
+    }
+  }
+  @keyframes jumi-filter {
+    to {
+      filter: var(--jumi-filter);
+    }
+  }
+  @keyframes jumi-flex {
+    to {
+      flex: var(--jumi-flex);
+    }
+  }
+  @keyframes jumi-flex-basis {
+    to {
+      flex-basis: var(--jumi-flex-basis);
+    }
+  }
+  @keyframes jumi-flex-direction {
+    to {
+      flex-direction: var(--jumi-flex-direction);
+    }
+  }
+  @keyframes jumi-flex-flow {
+    to {
+      flex-flow: var(--jumi-flex-flow);
+    }
+  }
+  @keyframes jumi-flex-grow {
+    to {
+      flex-grow: var(--jumi-flex-grow);
+    }
+  }
+  @keyframes jumi-flex-shrink {
+    to {
+      flex-shrink: var(--jumi-flex-shrink);
+    }
+  }
+  @keyframes jumi-flex-wrap {
+    to {
+      flex-wrap: var(--jumi-flex-wrap);
+    }
+  }
+  @keyframes jumi-float {
+    to {
+      float: var(--jumi-float);
+    }
+  }
+  @keyframes jumi-flood-color {
+    to {
+      flood-color: var(--jumi-flood-color);
+    }
+  }
+  @keyframes jumi-flood-opacity {
+    to {
+      flood-opacity: var(--jumi-flood-opacity);
+    }
+  }
+  @keyframes jumi-font {
+    to {
+      font: var(--jumi-font);
+    }
+  }
+  @keyframes jumi-font-family {
+    to {
+      font-family: var(--jumi-font-family);
+    }
+  }
+  @keyframes jumi-font-feature-settings {
+    to {
+      font-feature-settings: var(--jumi-font-feature-settings);
+    }
+  }
+  @keyframes jumi-font-kerning {
+    to {
+      font-kerning: var(--jumi-font-kerning);
+    }
+  }
+  @keyframes jumi-font-language-override {
+    to {
+      font-language-override: var(--jumi-font-language-override);
+    }
+  }
+  @keyframes jumi-font-optical-sizing {
+    to {
+      font-optical-sizing: var(--jumi-font-optical-sizing);
+    }
+  }
+  @keyframes jumi-font-palette {
+    to {
+      font-palette: var(--jumi-font-palette);
+    }
+  }
+  @keyframes jumi-font-size {
+    to {
+      font-size: var(--jumi-font-size);
+    }
+  }
+  @keyframes jumi-font-size-adjust {
+    to {
+      font-size-adjust: var(--jumi-font-size-adjust);
+    }
+  }
+  @keyframes jumi-font-style {
+    to {
+      font-style: var(--jumi-font-style);
+    }
+  }
+  @keyframes jumi-font-synthesis {
+    to {
+      font-synthesis: var(--jumi-font-synthesis);
+    }
+  }
+  @keyframes jumi-font-synthesis-position {
+    to {
+      font-synthesis-position: var(--jumi-font-synthesis-position);
+    }
+  }
+  @keyframes jumi-font-synthesis-small-caps {
+    to {
+      font-synthesis-small-caps: var(--jumi-font-synthesis-small-caps);
+    }
+  }
+  @keyframes jumi-font-synthesis-style {
+    to {
+      font-synthesis-style: var(--jumi-font-synthesis-style);
+    }
+  }
+  @keyframes jumi-font-synthesis-weight {
+    to {
+      font-synthesis-weight: var(--jumi-font-synthesis-weight);
+    }
+  }
+  @keyframes jumi-font-variant {
+    to {
+      font-variant: var(--jumi-font-variant);
+    }
+  }
+  @keyframes jumi-font-variant-alternates {
+    to {
+      font-variant-alternates: var(--jumi-font-variant-alternates);
+    }
+  }
+  @keyframes jumi-font-variant-caps {
+    to {
+      font-variant-caps: var(--jumi-font-variant-caps);
+    }
+  }
+  @keyframes jumi-font-variant-east-asian {
+    to {
+      font-variant-east-asian: var(--jumi-font-variant-east-asian);
+    }
+  }
+  @keyframes jumi-font-variant-emoji {
+    to {
+      font-variant-emoji: var(--jumi-font-variant-emoji);
+    }
+  }
+  @keyframes jumi-font-variant-ligatures {
+    to {
+      font-variant-ligatures: var(--jumi-font-variant-ligatures);
+    }
+  }
+  @keyframes jumi-font-variant-numeric {
+    to {
+      font-variant-numeric: var(--jumi-font-variant-numeric);
+    }
+  }
+  @keyframes jumi-font-variant-position {
+    to {
+      font-variant-position: var(--jumi-font-variant-position);
+    }
+  }
+  @keyframes jumi-font-variation-settings {
+    to {
+      font-variation-settings: var(--jumi-font-variation-settings);
+    }
+  }
+  @keyframes jumi-font-weight {
+    to {
+      font-weight: var(--jumi-font-weight);
+    }
+  }
+  @keyframes jumi-forced-color-adjust {
+    to {
+      forced-color-adjust: var(--jumi-forced-color-adjust);
+    }
+  }
+  @keyframes jumi-gap {
+    to {
+      gap: var(--jumi-gap);
+    }
+  }
+  @keyframes jumi-grid {
+    to {
+      grid: var(--jumi-grid);
+    }
+  }
+  @keyframes jumi-grid-auto-columns {
+    to {
+      grid-auto-columns: var(--jumi-grid-auto-columns);
+    }
+  }
+  @keyframes jumi-grid-auto-flow {
+    to {
+      grid-auto-flow: var(--jumi-grid-auto-flow);
+    }
+  }
+  @keyframes jumi-grid-auto-rows {
+    to {
+      grid-auto-rows: var(--jumi-grid-auto-rows);
+    }
+  }
+  @keyframes jumi-grid-column {
+    to {
+      grid-column: var(--jumi-grid-column);
+    }
+  }
+  @keyframes jumi-grid-column-end {
+    to {
+      grid-column-end: var(--jumi-grid-column-end);
+    }
+  }
+  @keyframes jumi-grid-column-start {
+    to {
+      grid-column-start: var(--jumi-grid-column-start);
+    }
+  }
+  @keyframes jumi-grid-row {
+    to {
+      grid-row: var(--jumi-grid-row);
+    }
+  }
+  @keyframes jumi-grid-row-end {
+    to {
+      grid-row-end: var(--jumi-grid-row-end);
+    }
+  }
+  @keyframes jumi-grid-row-start {
+    to {
+      grid-row-start: var(--jumi-grid-row-start);
+    }
+  }
+  @keyframes jumi-grid-template-areas {
+    to {
+      grid-template-areas: var(--jumi-grid-template-areas);
+    }
+  }
+  @keyframes jumi-grid-template-columns {
+    to {
+      grid-template-columns: var(--jumi-grid-template-columns);
+    }
+  }
+  @keyframes jumi-grid-template-rows {
+    to {
+      grid-template-rows: var(--jumi-grid-template-rows);
+    }
+  }
+  @keyframes jumi-hanging-punctuation {
+    to {
+      hanging-punctuation: var(--jumi-hanging-punctuation);
+    }
+  }
   @keyframes jumi-height {
     to {
       height: var(--jumi-height);
     }
   }
-}
-@layer base {
-  @keyframes jumi-width {
+  @keyframes jumi-hyphenate-character {
     to {
-      width: var(--jumi-width);
+      hyphenate-character: var(--jumi-hyphenate-character);
     }
   }
-}
-@layer base {
-  @keyframes jumi-accent-color {
+  @keyframes jumi-hyphenate-limit-chars {
     to {
-      accent-color: var(--jumi-accent-color);
+      hyphenate-limit-chars: var(--jumi-hyphenate-limit-chars);
     }
   }
-}
-@layer base {
-  @keyframes jumi-bounce-in {
-    0% {
-      transform: scale3d(0.8, 0.8, 0.8);
-    }
-    20% {
-      transform: scale3d(1.1, 1.1, 1.1);
-    }
-    40% {
-      transform: scale3d(0.9, 0.9, 0.9);
-    }
-    60% {
-      transform: scale3d(1.03, 1.03, 1.03);
-    }
-    80% {
-      transform: scale3d(0.97, 0.97, 0.97);
-    }
-    from, 20%, 40%, 60%, 80%, to {
-      animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
-    }
+  @keyframes jumi-hyphens {
     to {
-      transform: scale3d(1, 1, 1);
+      hyphens: var(--jumi-hyphens);
     }
   }
-}
-@layer base {
+  @keyframes jumi-image-orientation {
+    to {
+      image-orientation: var(--jumi-image-orientation);
+    }
+  }
+  @keyframes jumi-image-rendering {
+    to {
+      image-rendering: var(--jumi-image-rendering);
+    }
+  }
+  @keyframes jumi-initial-letter {
+    to {
+      initial-letter: var(--jumi-initial-letter);
+    }
+  }
+  @keyframes jumi-inline-size {
+    to {
+      inline-size: var(--jumi-inline-size);
+    }
+  }
+  @keyframes jumi-inset {
+    to {
+      inset: var(--jumi-inset);
+    }
+  }
+  @keyframes jumi-inset-block {
+    to {
+      inset-block: var(--jumi-inset-block);
+    }
+  }
+  @keyframes jumi-inset-block-end {
+    to {
+      inset-block-end: var(--jumi-inset-block-end);
+    }
+  }
+  @keyframes jumi-inset-block-start {
+    to {
+      inset-block-start: var(--jumi-inset-block-start);
+    }
+  }
+  @keyframes jumi-inset-inline {
+    to {
+      inset-inline: var(--jumi-inset-inline);
+    }
+  }
+  @keyframes jumi-inset-inline-end {
+    to {
+      inset-inline-end: var(--jumi-inset-inline-end);
+    }
+  }
+  @keyframes jumi-inset-inline-start {
+    to {
+      inset-inline-start: var(--jumi-inset-inline-start);
+    }
+  }
+  @keyframes jumi-justify-content {
+    to {
+      justify-content: var(--jumi-justify-content);
+    }
+  }
+  @keyframes jumi-justify-items {
+    to {
+      justify-items: var(--jumi-justify-items);
+    }
+  }
+  @keyframes jumi-justify-self {
+    to {
+      justify-self: var(--jumi-justify-self);
+    }
+  }
+  @keyframes jumi-left {
+    to {
+      left: var(--jumi-left);
+    }
+  }
+  @keyframes jumi-letter-spacing {
+    to {
+      letter-spacing: var(--jumi-letter-spacing);
+    }
+  }
+  @keyframes jumi-lighting-color {
+    to {
+      lighting-color: var(--jumi-lighting-color);
+    }
+  }
+  @keyframes jumi-line-break {
+    to {
+      line-break: var(--jumi-line-break);
+    }
+  }
+  @keyframes jumi-line-clamp {
+    to {
+      line-clamp: var(--jumi-line-clamp);
+    }
+  }
+  @keyframes jumi-line-height {
+    to {
+      line-height: var(--jumi-line-height);
+    }
+  }
+  @keyframes jumi-list-style {
+    to {
+      list-style: var(--jumi-list-style);
+    }
+  }
+  @keyframes jumi-list-style-image {
+    to {
+      list-style-image: var(--jumi-list-style-image);
+    }
+  }
+  @keyframes jumi-list-style-position {
+    to {
+      list-style-position: var(--jumi-list-style-position);
+    }
+  }
+  @keyframes jumi-list-style-type {
+    to {
+      list-style-type: var(--jumi-list-style-type);
+    }
+  }
+  @keyframes jumi-margin {
+    to {
+      margin: var(--jumi-margin);
+    }
+  }
+  @keyframes jumi-margin-block {
+    to {
+      margin-block: var(--jumi-margin-block);
+    }
+  }
+  @keyframes jumi-margin-block-end {
+    to {
+      margin-block-end: var(--jumi-margin-block-end);
+    }
+  }
+  @keyframes jumi-margin-block-start {
+    to {
+      margin-block-start: var(--jumi-margin-block-start);
+    }
+  }
+  @keyframes jumi-margin-bottom {
+    to {
+      margin-bottom: var(--jumi-margin-bottom);
+    }
+  }
+  @keyframes jumi-margin-inline {
+    to {
+      margin-inline: var(--jumi-margin-inline);
+    }
+  }
+  @keyframes jumi-margin-inline-end {
+    to {
+      margin-inline-end: var(--jumi-margin-inline-end);
+    }
+  }
+  @keyframes jumi-margin-inline-start {
+    to {
+      margin-inline-start: var(--jumi-margin-inline-start);
+    }
+  }
+  @keyframes jumi-margin-left {
+    to {
+      margin-left: var(--jumi-margin-left);
+    }
+  }
+  @keyframes jumi-margin-right {
+    to {
+      margin-right: var(--jumi-margin-right);
+    }
+  }
+  @keyframes jumi-margin-top {
+    to {
+      margin-top: var(--jumi-margin-top);
+    }
+  }
+  @keyframes jumi-marker {
+    to {
+      marker: var(--jumi-marker);
+    }
+  }
+  @keyframes jumi-marker-end {
+    to {
+      marker-end: var(--jumi-marker-end);
+    }
+  }
+  @keyframes jumi-marker-mid {
+    to {
+      marker-mid: var(--jumi-marker-mid);
+    }
+  }
+  @keyframes jumi-marker-start {
+    to {
+      marker-start: var(--jumi-marker-start);
+    }
+  }
+  @keyframes jumi-mask {
+    to {
+      mask: var(--jumi-mask);
+    }
+  }
+  @keyframes jumi-mask-border {
+    to {
+      mask-border: var(--jumi-mask-border);
+    }
+  }
+  @keyframes jumi-mask-border-mode {
+    to {
+      mask-border-mode: var(--jumi-mask-border-mode);
+    }
+  }
+  @keyframes jumi-mask-border-outset {
+    to {
+      mask-border-outset: var(--jumi-mask-border-outset);
+    }
+  }
+  @keyframes jumi-mask-border-repeat {
+    to {
+      mask-border-repeat: var(--jumi-mask-border-repeat);
+    }
+  }
+  @keyframes jumi-mask-border-slice {
+    to {
+      mask-border-slice: var(--jumi-mask-border-slice);
+    }
+  }
+  @keyframes jumi-mask-border-source {
+    to {
+      mask-border-source: var(--jumi-mask-border-source);
+    }
+  }
+  @keyframes jumi-mask-border-width {
+    to {
+      mask-border-width: var(--jumi-mask-border-width);
+    }
+  }
+  @keyframes jumi-mask-clip {
+    to {
+      mask-clip: var(--jumi-mask-clip);
+    }
+  }
+  @keyframes jumi-mask-composite {
+    to {
+      mask-composite: var(--jumi-mask-composite);
+    }
+  }
+  @keyframes jumi-mask-image {
+    to {
+      mask-image: var(--jumi-mask-image);
+    }
+  }
+  @keyframes jumi-mask-mode {
+    to {
+      mask-mode: var(--jumi-mask-mode);
+    }
+  }
+  @keyframes jumi-mask-origin {
+    to {
+      mask-origin: var(--jumi-mask-origin);
+    }
+  }
+  @keyframes jumi-mask-position {
+    to {
+      mask-position: var(--jumi-mask-position);
+    }
+  }
+  @keyframes jumi-mask-repeat {
+    to {
+      mask-repeat: var(--jumi-mask-repeat);
+    }
+  }
+  @keyframes jumi-mask-size {
+    to {
+      mask-size: var(--jumi-mask-size);
+    }
+  }
+  @keyframes jumi-mask-type {
+    to {
+      mask-type: var(--jumi-mask-type);
+    }
+  }
+  @keyframes jumi-math-depth {
+    to {
+      math-depth: var(--jumi-math-depth);
+    }
+  }
+  @keyframes jumi-math-style {
+    to {
+      math-style: var(--jumi-math-style);
+    }
+  }
+  @keyframes jumi-max-block-size {
+    to {
+      max-block-size: var(--jumi-max-block-size);
+    }
+  }
+  @keyframes jumi-max-height {
+    to {
+      max-height: var(--jumi-max-height);
+    }
+  }
+  @keyframes jumi-max-inline-size {
+    to {
+      max-inline-size: var(--jumi-max-inline-size);
+    }
+  }
+  @keyframes jumi-max-width {
+    to {
+      max-width: var(--jumi-max-width);
+    }
+  }
+  @keyframes jumi-min-block-size {
+    to {
+      min-block-size: var(--jumi-min-block-size);
+    }
+  }
+  @keyframes jumi-min-height {
+    to {
+      min-height: var(--jumi-min-height);
+    }
+  }
+  @keyframes jumi-min-inline-size {
+    to {
+      min-inline-size: var(--jumi-min-inline-size);
+    }
+  }
+  @keyframes jumi-min-width {
+    to {
+      min-width: var(--jumi-min-width);
+    }
+  }
+  @keyframes jumi-mix-blend-mode {
+    to {
+      mix-blend-mode: var(--jumi-mix-blend-mode);
+    }
+  }
+  @keyframes jumi-object-fit {
+    to {
+      object-fit: var(--jumi-object-fit);
+    }
+  }
+  @keyframes jumi-object-position {
+    to {
+      object-position: var(--jumi-object-position);
+    }
+  }
+  @keyframes jumi-offset {
+    to {
+      offset: var(--jumi-offset);
+    }
+  }
+  @keyframes jumi-offset-anchor {
+    to {
+      offset-anchor: var(--jumi-offset-anchor);
+    }
+  }
+  @keyframes jumi-offset-distance {
+    to {
+      offset-distance: var(--jumi-offset-distance);
+    }
+  }
+  @keyframes jumi-offset-path {
+    to {
+      offset-path: var(--jumi-offset-path);
+    }
+  }
+  @keyframes jumi-offset-position {
+    to {
+      offset-position: var(--jumi-offset-position);
+    }
+  }
+  @keyframes jumi-offset-rotate {
+    to {
+      offset-rotate: var(--jumi-offset-rotate);
+    }
+  }
+  @keyframes jumi-opacity {
+    to {
+      opacity: var(--jumi-opacity);
+    }
+  }
+  @keyframes jumi-order {
+    to {
+      order: var(--jumi-order);
+    }
+  }
+  @keyframes jumi-orphans {
+    to {
+      orphans: var(--jumi-orphans);
+    }
+  }
+  @keyframes jumi-outline {
+    to {
+      outline: var(--jumi-outline);
+    }
+  }
+  @keyframes jumi-outline-offset {
+    to {
+      outline-offset: var(--jumi-outline-offset);
+    }
+  }
+  @keyframes jumi-overflow {
+    to {
+      overflow: var(--jumi-overflow);
+    }
+  }
+  @keyframes jumi-overflow-anchor {
+    to {
+      overflow-anchor: var(--jumi-overflow-anchor);
+    }
+  }
+  @keyframes jumi-overflow-block {
+    to {
+      overflow-block: var(--jumi-overflow-block);
+    }
+  }
+  @keyframes jumi-overflow-clip-margin {
+    to {
+      overflow-clip-margin: var(--jumi-overflow-clip-margin);
+    }
+  }
+  @keyframes jumi-overflow-inline {
+    to {
+      overflow-inline: var(--jumi-overflow-inline);
+    }
+  }
+  @keyframes jumi-overflow-wrap {
+    to {
+      overflow-wrap: var(--jumi-overflow-wrap);
+    }
+  }
+  @keyframes jumi-overscroll-behavior {
+    to {
+      overscroll-behavior: var(--jumi-overscroll-behavior);
+    }
+  }
+  @keyframes jumi-overscroll-behavior-block {
+    to {
+      overscroll-behavior-block: var(--jumi-overscroll-behavior-block);
+    }
+  }
+  @keyframes jumi-overscroll-behavior-inline {
+    to {
+      overscroll-behavior-inline: var(--jumi-overscroll-behavior-inline);
+    }
+  }
+  @keyframes jumi-overscroll-behavior-x {
+    to {
+      overscroll-behavior-x: var(--jumi-overscroll-behavior-x);
+    }
+  }
+  @keyframes jumi-overscroll-behavior-y {
+    to {
+      overscroll-behavior-y: var(--jumi-overscroll-behavior-y);
+    }
+  }
+  @keyframes jumi-padding {
+    to {
+      padding: var(--jumi-padding);
+    }
+  }
+  @keyframes jumi-padding-block {
+    to {
+      padding-block: var(--jumi-padding-block);
+    }
+  }
+  @keyframes jumi-padding-block-end {
+    to {
+      padding-block-end: var(--jumi-padding-block-end);
+    }
+  }
+  @keyframes jumi-padding-block-start {
+    to {
+      padding-block-start: var(--jumi-padding-block-start);
+    }
+  }
+  @keyframes jumi-padding-bottom {
+    to {
+      padding-bottom: var(--jumi-padding-bottom);
+    }
+  }
+  @keyframes jumi-padding-inline {
+    to {
+      padding-inline: var(--jumi-padding-inline);
+    }
+  }
+  @keyframes jumi-padding-inline-end {
+    to {
+      padding-inline-end: var(--jumi-padding-inline-end);
+    }
+  }
+  @keyframes jumi-padding-inline-start {
+    to {
+      padding-inline-start: var(--jumi-padding-inline-start);
+    }
+  }
+  @keyframes jumi-padding-left {
+    to {
+      padding-left: var(--jumi-padding-left);
+    }
+  }
+  @keyframes jumi-padding-right {
+    to {
+      padding-right: var(--jumi-padding-right);
+    }
+  }
+  @keyframes jumi-padding-top {
+    to {
+      padding-top: var(--jumi-padding-top);
+    }
+  }
+  @keyframes jumi-page {
+    to {
+      page: var(--jumi-page);
+    }
+  }
+  @keyframes jumi-paint-order {
+    to {
+      paint-order: var(--jumi-paint-order);
+    }
+  }
+  @keyframes jumi-perspective-origin {
+    to {
+      perspective-origin: var(--jumi-perspective-origin);
+    }
+  }
+  @keyframes jumi-position {
+    to {
+      position: var(--jumi-position);
+    }
+  }
+  @keyframes jumi-right {
+    to {
+      right: var(--jumi-right);
+    }
+  }
+  @keyframes jumi-stroke {
+    to {
+      stroke: var(--jumi-stroke);
+    }
+  }
+  @keyframes jumi-stroke-dasharray {
+    to {
+      stroke-dasharray: var(--jumi-stroke-dasharray);
+    }
+  }
+  @keyframes jumi-stroke-dashoffset {
+    to {
+      stroke-dashoffset: var(--jumi-stroke-dashoffset);
+    }
+  }
+  @keyframes jumi-stroke-linecap {
+    to {
+      stroke-linecap: var(--jumi-stroke-linecap);
+    }
+  }
+  @keyframes jumi-stroke-linejoin {
+    to {
+      stroke-linejoin: var(--jumi-stroke-linejoin);
+    }
+  }
+  @keyframes jumi-stroke-miterlimit {
+    to {
+      stroke-miterlimit: var(--jumi-stroke-miterlimit);
+    }
+  }
+  @keyframes jumi-stroke-opacity {
+    to {
+      stroke-opacity: var(--jumi-stroke-opacity);
+    }
+  }
+  @keyframes jumi-stroke-width {
+    to {
+      stroke-width: var(--jumi-stroke-width);
+    }
+  }
+  @keyframes jumi-text-align {
+    to {
+      text-align: var(--jumi-text-align);
+    }
+  }
+  @keyframes jumi-text-align-last {
+    to {
+      text-align-last: var(--jumi-text-align-last);
+    }
+  }
+  @keyframes jumi-text-shadow {
+    to {
+      text-shadow: var(--jumi-text-shadow);
+    }
+  }
+  @keyframes jumi-top {
+    to {
+      top: var(--jumi-top);
+    }
+  }
   @keyframes jumi-transform {
     to {
       transform: var(--jumi-transform);
     }
   }
-}
-@layer base {
-  @keyframes jumi-transform {
+  @keyframes jumi-visibility {
     to {
-      transform: var(--jumi-transform);
+      visibility: var(--jumi-visibility);
     }
   }
-}
-@layer base {
   @keyframes jumi-width {
     to {
       width: var(--jumi-width);
     }
   }
-}
-@layer base {
-  @keyframes jumi-width {
+  @keyframes jumi-z-index {
     to {
-      width: var(--jumi-width);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-accent-color {
-    to {
-      accent-color: var(--jumi-accent-color);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-fade-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-slide-in-left {
-    from {
-      transform: translate3d(-100%, 0, 0);
-      visibility: visible;
-    }
-    to {
-      transform: translate3d(0, 0, 0);
+      z-index: var(--jumi-z-index);
     }
   }
 }

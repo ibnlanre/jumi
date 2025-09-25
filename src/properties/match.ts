@@ -1,7 +1,6 @@
 import type { Api, Collection, MatchProperty, MatchPropertyValue, TailwindTheme } from '@/types'
 
-import { aspectRatio } from '@/composition/aspect-ratio'
-import { getCreator } from '@/helpers/create'
+import { create } from '@/helpers/create'
 import { css } from '@/helpers/css'
 import { merge } from '@/helpers/merge'
 import { animationModifiers } from '@/keyframes/property'
@@ -125,7 +124,6 @@ import { textAlign } from '@/theme/text-align'
 import { textShadow } from '@/theme/text-shadow'
 import { transformStyle } from '@/theme/transform-style'
 import { visibility } from '@/theme/visibility'
-import { propertyVariables } from '@/variables/property'
 
 import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette'
 
@@ -134,7 +132,6 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
     return flattenColorPalette(merge(values, api.theme(key)))
   }
 
-  const create = getCreator(api)
   const matchProperties: Partial<MatchProperty> = {
     'animate': {
       property: value => ({
@@ -149,7 +146,6 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
       }),
       type: 'color',
       values: getValues('accentColor'),
-      variables: propertyVariables['accent-color'],
     },
     'animate-align-content': {
       property: value => ({
@@ -157,7 +153,6 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
         '--jumi-align-content-keyframes': create.animation('align-content'),
       }),
       values: alignContent,
-      variables: propertyVariables['align-content'],
     },
     'animate-align-items': {
       property: value => ({
@@ -165,9 +160,6 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
         '--jumi-align-items-keyframes': create.animation('align-items'),
       }),
       values: alignItems,
-      variables: {
-        '--jumi-align-items': 'normal',
-      },
     },
     'animate-align-self': {
       property: value => ({
@@ -175,9 +167,6 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
         '--jumi-align-self-keyframes': create.animation('align-self'),
       }),
       values: alignSelf,
-      variables: {
-        '--jumi-align-self': 'auto',
-      },
     },
     'animate-alignment-baseline': {
       property: value => ({
@@ -185,9 +174,6 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
         '--jumi-alignment-baseline-keyframes': create.animation('alignment-baseline'),
       }),
       values: alignmentBaseline,
-      variables: {
-        '--jumi-alignment-baseline': 'baseline',
-      },
     },
     'animate-all': {
       property: value => ({
@@ -195,18 +181,12 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
         '--jumi-all-keyframes': create.animation('all'),
       }),
       values: all,
-      variables: {
-        '--jumi-all': 'initial',
-      },
     },
     'animate-anchor-name': {
       property: value => ({
         'anchor-name': value,
       }),
       values: empty.none,
-      variables: {
-        '--jumi-anchor-name': 'none',
-      },
     },
     'animate-appearance': {
       property: value => ({
@@ -214,9 +194,6 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
         '--jumi-appearance-keyframes': create.animation('appearance'),
       }),
       values: appearance,
-      variables: {
-        '--jumi-appearance': 'none',
-      },
     },
     'animate-aspect-ratio': {
       property: value => ({
@@ -225,7 +202,6 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
       }),
       type: 'ratio',
       values: empty.auto,
-      variables: propertyVariables['aspect-ratio'],
     },
     'animate-aspect-ratio-height': {
       property: value => ({
@@ -234,7 +210,6 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
       }),
       type: 'ratio',
       values: empty.auto,
-      variables: propertyVariables['aspect-ratio'],
     },
     'animate-aspect-ratio-width': {
       property: value => ({
@@ -243,7 +218,6 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
       }),
       type: 'ratio',
       values: empty.auto,
-      variables: propertyVariables["aspect-ratio"]
     },
     'animate-backdrop-blur': {
       property: value => ({

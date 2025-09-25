@@ -3,9 +3,7 @@ import type { PluginCreator } from 'tailwindcss/plugin'
 
 import type { Effect } from '@/theme/effects'
 
-export type AddProperty = Collection<CssInJs, AddPropertyKey>
-
-export type AddPropertyKey = `.animate`
+export type AddProperty = Collection<CssInJs>
 
 export type AnimationProperty
   = | 'composition'
@@ -637,11 +635,9 @@ export type Property
     | 'box-shadow-inset-color'
     | 'box-shadow-inset-offset-x'
     | 'box-shadow-inset-offset-y'
-    | 'box-shadow-inset-opacity'
     | 'box-shadow-inset-spread'
     | 'box-shadow-offset-x'
     | 'box-shadow-offset-y'
-    | 'box-shadow-opacity'
     | 'box-shadow-spread'
     | 'box-sizing'
     | 'break-after'
@@ -1016,7 +1012,6 @@ export type Property
     | 'text-shadow-color'
     | 'text-shadow-offset-x'
     | 'text-shadow-offset-y'
-    | 'text-shadow-opacity'
     | 'text-transform'
     | 'text-underline-offset'
     | 'text-underline-position'

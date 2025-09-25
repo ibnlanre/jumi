@@ -6,7 +6,7 @@ import { propertyVariables } from '@/variables/property'
 import { variants } from '@/variants'
 
 import { effectKeyframes } from './keyframes/effects'
-import { animationKeyframes, animationProperties, propertyKeyframes } from './keyframes/property'
+import { propertyKeyframes } from './keyframes/property'
 import { addProperties } from './properties/add'
 
 import createPlugin from 'tailwindcss/plugin'
@@ -23,16 +23,6 @@ import createPlugin from 'tailwindcss/plugin'
 const keyframes: Array<CssInJs> = [effectKeyframes, propertyKeyframes]
 
 /**
- * CSS @property declarations for custom properties.
- *
- * These are placed in the @base layer because:
- * - @property rules must be defined globally like @keyframes
- * - They register CSS custom properties with type information
- * - They need to be available before any CSS that uses the properties
- */
-const properties: Array<CssInJs> = [animationProperties]
-
-/**
  * CSS custom properties (variables) that provide default values.
  *
  * These are placed in the @utilities layer because:
@@ -41,7 +31,7 @@ const properties: Array<CssInJs> = [animationProperties]
  * - This can lead to unforeseen problems where pseudo-elements inherit unwanted values
  * - @utilities layer provides the right specificity without forced inheritance
  */
-const variables: Array<Collection<CssInJs>> = [ animationVariables]
+const variables: Array<Collection<CssInJs>> = [propertyVariables, animationVariables]
 
 /**
  * Utility classes and animation properties.
@@ -51,13 +41,13 @@ const variables: Array<Collection<CssInJs>> = [ animationVariables]
  * - They should have appropriate specificity for overriding defaults
  * - They work alongside the variables to create the complete animation system
  */
-const utilities: Array<Collection<CssInJs>> = [addProperties] // animationKeyframes
+const utilities: Array<Collection<CssInJs>> = [addProperties]
 
 const jumi = createPlugin((api) => {
   const { addBase, addUtilities, matchUtilities, matchVariant } = api
 
   variables.concat(utilities).forEach(addUtilities)
-  properties.forEach(addBase)
+  keyframes.forEach(addBase)
 
   for (const variant of variants) {
     matchVariant(variant.name, variant.generator, {

@@ -1,6 +1,6 @@
-import type { AtRule, Property } from 'csstype'
+import type { Property } from 'csstype'
 
-import type { Attribute, AttributeKeyframes } from '@/types'
+import type { AttributeKeyframes } from '@/types'
 
 import { css } from '@/helpers/css'
 
@@ -1556,39 +1556,28 @@ export const propertyKeyframes: Partial<AttributeKeyframes> = {
 }
 
 type KeyframesCollection = {
-  attributes: Record<string, string>
   names: string[]
-  properties: Record<`@property ${string}`, AtRule.PropertyHyphen>
-  variables: Record<string, string>
+  properties: Record<string, string>
 }
 
 const keyframes: KeyframesCollection = Object.keys(propertyKeyframes).reduce(
-  (acc, key) => {
-    const [, name] = key.split(' ') as [string, `jumi-${Attribute}`]
+  (result, key) => {
+    /** @type {[string, `jumi-${Attribute}`]} */
+    const [keyframes, name] = key.split(' ')
 
-    const variable = [name, 'keyframes'].join('-') as `jumi-${Attribute}-keyframes`
-    const property = name.slice('jumi-'.length) as Attribute
+    /** @type {`jumi-${Attribute}-keyframes`} */
+    const variable = [name, keyframes.slice(1)].join('-')
 
-    acc.names.push(css('var', `--${variable}`, 'none'))
-    acc.attributes[property] = property
-    acc.variables[`--${variable}`] = 'none'
-    // acc.properties[`@property --${variable}`] = {
-    //   'inherits': 'false',
-    //   'initial-value': 'none',
-    //   'syntax': '"*"',
-    // }
+    /** @type {Attribute} */
+    const property = name.slice('jumi-'.length)
 
-    return acc
+    result.names.push(css('var', `--${variable}`, 'none'))
+    result.properties[property] = property
+
+    return result
   },
-  {
-    attributes: {},
-    names: [],
-    properties: {},
-    variables: {},
-  } as KeyframesCollection,
+  { names: [], properties: {} } as KeyframesCollection,
 )
 
 export const animationName = keyframes.names.join(', ')
-export const animationModifiers = keyframes.attributes
-export const animationProperties = keyframes.properties
-export const animationKeyframes = { '.animate': keyframes.variables }
+export const animationModifiers = keyframes.properties
