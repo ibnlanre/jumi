@@ -1,5 +1,10 @@
 export const animationTimingFunction = {
   'ease': 'ease',
+  'ease-bounce-out': 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+  'ease-elastic': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+  'ease-entrance': 'cubic-bezier(0.215, 0.61, 0.355, 1)',
+  'ease-exit': 'cubic-bezier(0.55, 0.085, 0.68, 0.53)',
+  'ease-exit-sharp': 'cubic-bezier(0.6, -0.28, 0.735, 0.045)',
   'ease-in': 'ease-in',
   'ease-in-back': 'cubic-bezier(0.36, 0, 0.66, -0.56)',
   'ease-in-circ': 'cubic-bezier(0.55, 0, 1, 0.45)',
@@ -27,6 +32,7 @@ export const animationTimingFunction = {
   'ease-out-quart': 'cubic-bezier(0.25, 1, 0.5, 1)',
   'ease-out-quint': 'cubic-bezier(0.22, 1, 0.36, 1)',
   'ease-out-sine': 'cubic-bezier(0.61, 1, 0.88, 1)',
+  'ease-smooth': 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
   'linear': 'linear',
   'step-end': 'step-end',
   'step-start': 'step-start',
