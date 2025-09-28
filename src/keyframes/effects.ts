@@ -650,15 +650,15 @@ export const effectKeyframes = {
     '@keyframes jumi-flip-card-x': {
       '0%': {
         backfaceVisibility: 'hidden',
-        transform: 'perspective(1000px) rotateX(0deg)',
+        transform: 'rotateX(0deg)',
       },
       '50%': {
         backfaceVisibility: 'hidden',
-        transform: 'perspective(1000px) rotateX(90deg)',
+        transform: 'rotateX(90deg)',
       },
       '100%': {
         backfaceVisibility: 'hidden',
-        transform: 'perspective(1000px) rotateX(180deg)',
+        transform: 'rotateX(180deg)',
       },
     },
   },
@@ -666,28 +666,28 @@ export const effectKeyframes = {
     '@keyframes jumi-flip-card-y': {
       '0%': {
         backfaceVisibility: 'hidden',
-        transform: 'perspective(1000px) rotateY(0deg)',
+        transform: 'rotateY(0deg)',
       },
       '50%': {
         backfaceVisibility: 'hidden',
-        transform: 'perspective(1000px) rotateY(90deg)',
+        transform: 'rotateY(90deg)',
       },
       '100%': {
         backfaceVisibility: 'hidden',
-        transform: 'perspective(1000px) rotateY(180deg)',
+        transform: 'rotateY(180deg)',
       },
     },
   },
   'flip-diagonal': {
     '@keyframes jumi-flip-diagonal': {
       '0%': {
-        transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg)',
+        transform: 'rotateX(0deg) rotateY(0deg)',
       },
       '50%': {
-        transform: 'perspective(1000px) rotateX(90deg) rotateY(90deg)',
+        transform: 'rotateX(90deg) rotateY(90deg)',
       },
       '100%': {
-        transform: 'perspective(1000px) rotateX(180deg) rotateY(180deg)',
+        transform: 'rotateX(180deg) rotateY(180deg)',
       },
     },
   },
@@ -695,21 +695,21 @@ export const effectKeyframes = {
     '@keyframes jumi-flip-in-bottom': {
       '40%': {
         opacity: '1',
-        transform: 'perspective(600px) rotateX(15deg)',
+        transform: 'rotateX(15deg)',
         transformOrigin: 'center top',
       },
       '70%': {
-        transform: 'perspective(600px) rotateX(-8deg)',
+        transform: 'rotateX(-8deg)',
         transformOrigin: 'center top',
       },
       'from': {
         opacity: '0',
-        transform: 'perspective(600px) rotateX(-90deg)',
+        transform: 'rotateX(-90deg)',
         transformOrigin: 'center top',
       },
       'to': {
         opacity: '1',
-        transform: 'perspective(600px) rotateX(0deg)',
+        transform: 'rotateX(0deg)',
         transformOrigin: 'center top',
       },
     },
@@ -718,21 +718,21 @@ export const effectKeyframes = {
     '@keyframes jumi-flip-in-left': {
       '40%': {
         opacity: '1',
-        transform: 'perspective(600px) rotateY(-15deg)',
+        transform: 'rotateY(-15deg)',
         transformOrigin: 'right center',
       },
       '70%': {
-        transform: 'perspective(600px) rotateY(8deg)',
+        transform: 'rotateY(8deg)',
         transformOrigin: 'right center',
       },
       'from': {
         opacity: '0',
-        transform: 'perspective(600px) rotateY(90deg)',
+        transform: 'rotateY(90deg)',
         transformOrigin: 'right center',
       },
       'to': {
         opacity: '1',
-        transform: 'perspective(600px) rotateY(0deg)',
+        transform: 'rotateY(0deg)',
         transformOrigin: 'right center',
       },
     },
@@ -741,21 +741,21 @@ export const effectKeyframes = {
     '@keyframes jumi-flip-in-right': {
       '40%': {
         opacity: '1',
-        transform: 'perspective(600px) rotateY(15deg)',
+        transform: 'rotateY(15deg)',
         transformOrigin: 'left center',
       },
       '70%': {
-        transform: 'perspective(600px) rotateY(-8deg)',
+        transform: 'rotateY(-8deg)',
         transformOrigin: 'left center',
       },
       'from': {
         opacity: '0',
-        transform: 'perspective(600px) rotateY(-90deg)',
+        transform: 'rotateY(-90deg)',
         transformOrigin: 'left center',
       },
       'to': {
         opacity: '1',
-        transform: 'perspective(600px) rotateY(0deg)',
+        transform: 'rotateY(0deg)',
         transformOrigin: 'left center',
       },
     },
@@ -764,21 +764,21 @@ export const effectKeyframes = {
     '@keyframes jumi-flip-in-top': {
       '40%': {
         opacity: '1',
-        transform: 'perspective(600px) rotateX(-15deg)',
+        transform: 'rotateX(-15deg)',
         transformOrigin: 'center bottom',
       },
       '70%': {
-        transform: 'perspective(600px) rotateX(8deg)',
+        transform: 'rotateX(8deg)',
         transformOrigin: 'center bottom',
       },
       'from': {
         opacity: '0',
-        transform: 'perspective(600px) rotateX(90deg)',
+        transform: 'rotateX(90deg)',
         transformOrigin: 'center bottom',
       },
       'to': {
         opacity: '1',
-        transform: 'perspective(600px) rotateX(0deg)',
+        transform: 'rotateX(0deg)',
         transformOrigin: 'center bottom',
       },
     },
@@ -787,21 +787,21 @@ export const effectKeyframes = {
     '@keyframes jumi-flip-in-x': {
       '40%': {
         opacity: '1',
-        transform: 'perspective(600px) rotateX(20deg)',
+        transform: 'rotateX(20deg)',
       },
       '70%': {
-        transform: 'perspective(600px) rotateX(-10deg)',
+        transform: 'rotateX(-10deg)',
       },
       '90%': {
-        transform: 'perspective(600px) rotateX(5deg)',
+        transform: 'rotateX(5deg)',
       },
       'from': {
         opacity: '0',
-        transform: 'perspective(600px) rotateX(-90deg)',
+        transform: 'rotateX(-90deg)',
       },
       'to': {
         opacity: '1',
-        transform: 'perspective(600px) rotateX(0deg)',
+        transform: 'rotateX(0deg)',
       },
     },
   },
@@ -809,135 +809,135 @@ export const effectKeyframes = {
     '@keyframes jumi-flip-in-y': {
       '40%': {
         opacity: '1',
-        transform: 'perspective(600px) rotateY(20deg)',
+        transform: 'rotateY(20deg)',
       },
       '70%': {
-        transform: 'perspective(600px) rotateY(-10deg)',
+        transform: 'rotateY(-10deg)',
       },
       '90%': {
-        transform: 'perspective(600px) rotateY(5deg)',
+        transform: 'rotateY(5deg)',
       },
       'from': {
         opacity: '0',
-        transform: 'perspective(600px) rotateY(-90deg)',
+        transform: 'rotateY(-90deg)',
       },
       'to': {
         opacity: '1',
-        transform: 'perspective(600px) rotateY(0deg)',
+        transform: 'rotateY(0deg)',
       },
     },
   },
   'flip-wobble-x': {
     '@keyframes jumi-flip-wobble-x': {
       '0%': {
-        transform: 'perspective(600px) rotateX(0deg)',
+        transform: 'rotateX(0deg)',
       },
       '15%': {
-        transform: 'perspective(600px) rotateX(-25deg)',
+        transform: 'rotateX(-25deg)',
       },
       '30%': {
-        transform: 'perspective(600px) rotateX(15deg)',
+        transform: 'rotateX(15deg)',
       },
       '45%': {
-        transform: 'perspective(600px) rotateX(-10deg)',
+        transform: 'rotateX(-10deg)',
       },
       '60%': {
-        transform: 'perspective(600px) rotateX(5deg)',
+        transform: 'rotateX(5deg)',
       },
       '75%': {
-        transform: 'perspective(600px) rotateX(-2deg)',
+        transform: 'rotateX(-2deg)',
       },
       '100%': {
-        transform: 'perspective(600px) rotateX(0deg)',
+        transform: 'rotateX(0deg)',
       },
     },
   },
   'flip-wobble-y': {
     '@keyframes jumi-flip-wobble-y': {
       '0%': {
-        transform: 'perspective(600px) rotateY(0deg)',
+        transform: 'rotateY(0deg)',
       },
       '15%': {
-        transform: 'perspective(600px) rotateY(-25deg)',
+        transform: 'rotateY(-25deg)',
       },
       '30%': {
-        transform: 'perspective(600px) rotateY(15deg)',
+        transform: 'rotateY(15deg)',
       },
       '45%': {
-        transform: 'perspective(600px) rotateY(-10deg)',
+        transform: 'rotateY(-10deg)',
       },
       '60%': {
-        transform: 'perspective(600px) rotateY(5deg)',
+        transform: 'rotateY(5deg)',
       },
       '75%': {
-        transform: 'perspective(600px) rotateY(-2deg)',
+        transform: 'rotateY(-2deg)',
       },
       '100%': {
-        transform: 'perspective(600px) rotateY(0deg)',
+        transform: 'rotateY(0deg)',
       },
     },
   },
   'flip-x': {
     '@keyframes jumi-flip-x': {
       '0%': {
-        transform: 'perspective(800px) rotateX(0deg)',
+        transform: 'rotateX(0deg)',
       },
       '100%': {
-        transform: 'perspective(800px) rotateX(360deg)',
+        transform: 'rotateX(360deg)',
       },
     },
   },
   'flip-x-elastic': {
     '@keyframes jumi-flip-x-elastic': {
       '0%': {
-        transform: 'perspective(800px) rotateX(0deg)',
+        transform: 'rotateX(0deg)',
       },
       '20%': {
-        transform: 'perspective(800px) rotateX(200deg)',
+        transform: 'rotateX(200deg)',
       },
       '40%': {
-        transform: 'perspective(800px) rotateX(160deg)',
+        transform: 'rotateX(160deg)',
       },
       '60%': {
-        transform: 'perspective(800px) rotateX(190deg)',
+        transform: 'rotateX(190deg)',
       },
       '80%': {
-        transform: 'perspective(800px) rotateX(175deg)',
+        transform: 'rotateX(175deg)',
       },
       '100%': {
-        transform: 'perspective(800px) rotateX(180deg)',
+        transform: 'rotateX(180deg)',
       },
     },
   },
   'flip-y': {
     '@keyframes jumi-flip-y': {
       '0%': {
-        transform: 'perspective(800px) rotateY(0deg)',
+        transform: 'rotateY(0deg)',
       },
       '100%': {
-        transform: 'perspective(800px) rotateY(360deg)',
+        transform: 'rotateY(360deg)',
       },
     },
   },
   'flip-y-elastic': {
     '@keyframes jumi-flip-y-elastic': {
       '0%': {
-        transform: 'perspective(800px) rotateY(0deg)',
+        transform: 'rotateY(0deg)',
       },
       '20%': {
-        transform: 'perspective(800px) rotateY(200deg)',
+        transform: 'rotateY(200deg)',
       },
       '40%': {
-        transform: 'perspective(800px) rotateY(160deg)',
+        transform: 'rotateY(160deg)',
       },
       '60%': {
-        transform: 'perspective(800px) rotateY(190deg)',
+        transform: 'rotateY(190deg)',
       },
       '80%': {
-        transform: 'perspective(800px) rotateY(175deg)',
+        transform: 'rotateY(175deg)',
       },
       '100%': {
-        transform: 'perspective(800px) rotateY(180deg)',
+        transform: 'rotateY(180deg)',
       },
     },
   },
@@ -945,15 +945,15 @@ export const effectKeyframes = {
     '@keyframes jumi-flip-zoom-x': {
       '0%': {
         opacity: '1',
-        transform: 'perspective(800px) scale(1) rotateX(0deg)',
+        transform: 'scale(1) rotateX(0deg)',
       },
       '50%': {
         opacity: '0.7',
-        transform: 'perspective(800px) scale(0.8) rotateX(90deg)',
+        transform: 'scale(0.8) rotateX(90deg)',
       },
       '100%': {
         opacity: '1',
-        transform: 'perspective(800px) scale(1) rotateX(180deg)',
+        transform: 'scale(1) rotateX(180deg)',
       },
     },
   },
@@ -961,15 +961,15 @@ export const effectKeyframes = {
     '@keyframes jumi-flip-zoom-y': {
       '0%': {
         opacity: '1',
-        transform: 'perspective(800px) scale(1) rotateY(0deg)',
+        transform: 'scale(1) rotateY(0deg)',
       },
       '50%': {
         opacity: '0.7',
-        transform: 'perspective(800px) scale(0.8) rotateY(90deg)',
+        transform: 'scale(0.8) rotateY(90deg)',
       },
       '100%': {
         opacity: '1',
-        transform: 'perspective(800px) scale(1) rotateY(180deg)',
+        transform: 'scale(1) rotateY(180deg)',
       },
     },
   },
@@ -1838,10 +1838,10 @@ export const effectKeyframes = {
   'spin': {
     '@keyframes jumi-spin': {
       '0%': {
-        transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg)',
+        transform: 'rotateX(0deg) rotateY(0deg)',
       },
       '100%': {
-        transform: 'perspective(1000px) rotateX(360deg) rotateY(360deg)',
+        transform: 'rotateX(360deg) rotateY(360deg)',
       },
     },
   },
@@ -2179,13 +2179,13 @@ export const effectKeyframes = {
   'tilt': {
     '@keyframes jumi-tilt': {
       '0%': {
-        transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg)',
+        transform: 'rotateX(0deg) rotateY(0deg)',
       },
       '50%': {
-        transform: 'perspective(1000px) rotateX(15deg) rotateY(15deg)',
+        transform: 'rotateX(15deg) rotateY(15deg)',
       },
       '100%': {
-        transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg)',
+        transform: 'rotateX(0deg) rotateY(0deg)',
       },
     },
   },
@@ -2408,16 +2408,16 @@ export const effectKeyframes = {
   'wobbling': {
     '@keyframes jumi-wobbling': {
       '0%': {
-        transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg)',
+        transform: 'rotateX(0deg) rotateY(0deg)',
       },
       '25%': {
-        transform: 'perspective(1000px) rotateX(-10deg) rotateY(10deg)',
+        transform: 'rotateX(-10deg) rotateY(10deg)',
       },
       '75%': {
-        transform: 'perspective(1000px) rotateX(10deg) rotateY(-10deg)',
+        transform: 'rotateX(10deg) rotateY(-10deg)',
       },
       '100%': {
-        transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg)',
+        transform: 'rotateX(0deg) rotateY(0deg)',
       },
     },
   },
@@ -2687,15 +2687,15 @@ export const effectKeyframes = {
     '@keyframes jumi-zoom-tilt-in': {
       '0%': {
         opacity: '0',
-        transform: 'perspective(1000px) scale3d(0.3, 0.3, 0.3) rotateX(30deg)',
+        transform: 'scale3d(0.3, 0.3, 0.3) rotateX(30deg)',
       },
       '50%': {
         opacity: '1',
-        transform: 'perspective(1000px) scale3d(1.1, 1.1, 1.1) rotateX(15deg)',
+        transform: 'scale3d(1.1, 1.1, 1.1) rotateX(15deg)',
       },
       '100%': {
         opacity: '1',
-        transform: 'perspective(1000px) scale3d(1, 1, 1) rotateX(0deg)',
+        transform: 'scale3d(1, 1, 1) rotateX(0deg)',
       },
     },
   },
@@ -2703,15 +2703,15 @@ export const effectKeyframes = {
     '@keyframes jumi-zoom-tilt-out': {
       '0%': {
         opacity: '1',
-        transform: 'perspective(1000px) scale3d(1, 1, 1) rotateX(0deg)',
+        transform: 'scale3d(1, 1, 1) rotateX(0deg)',
       },
       '50%': {
         opacity: '1',
-        transform: 'perspective(1000px) scale3d(0.9, 0.9, 0.9) rotateX(-15deg)',
+        transform: 'scale3d(0.9, 0.9, 0.9) rotateX(-15deg)',
       },
       '100%': {
         opacity: '0',
-        transform: 'perspective(1000px) scale3d(0.2, 0.2, 0.2) rotateX(-30deg)',
+        transform: 'scale3d(0.2, 0.2, 0.2) rotateX(-30deg)',
       },
     },
   },
