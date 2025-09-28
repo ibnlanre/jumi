@@ -1,9 +1,9 @@
-import type { Api, Collection, MatchProperty, MatchPropertyValue, TailwindTheme } from '@/types'
+import type { Api, Collection, MatchProperty, MatchUtilitiesPropertyValue, TailwindTheme } from '@/types'
 
 import { create } from '@/helpers/create'
 import { css } from '@/helpers/css'
 import { merge } from '@/helpers/merge'
-import { animationModifiers } from '@/keyframes/property'
+import { animationAttributes } from '@/keyframes/property'
 import { alignContent } from '@/theme/align-content'
 import { alignItems } from '@/theme/align-items'
 import { alignSelf } from '@/theme/align-self'
@@ -67,7 +67,6 @@ import { fontKerning } from '@/theme/font-kerning'
 import { fontSize } from '@/theme/font-size'
 import { fontSizeAdjust, fontSizeAdjustMetric } from '@/theme/font-size-adjust'
 import { fontStyle } from '@/theme/font-style'
-import { fontSynthesisPosition } from '@/theme/font-synthesis-position'
 import { fontSynthesisSmallCaps } from '@/theme/font-synthesis-small-caps'
 import { fontSynthesisStyle } from '@/theme/font-synthesis-style'
 import { fontSynthesisWeight } from '@/theme/font-synthesis-weight'
@@ -127,7 +126,7 @@ import { visibility } from '@/theme/visibility'
 
 import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette'
 
-export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
+export function getMatchProperties(api: Api): Collection<MatchUtilitiesPropertyValue> {
   function getValues<const Values extends Collection>(key: TailwindTheme, values?: Values) {
     return flattenColorPalette(merge(values, api.theme(key)))
   }
@@ -181,12 +180,6 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
         '--jumi-all-keyframes': create.animation('all'),
       }),
       values: all,
-    },
-    'animate-anchor-name': {
-      property: value => ({
-        'anchor-name': value,
-      }),
-      values: empty.none,
     },
     'animate-appearance': {
       property: value => ({
@@ -527,6 +520,13 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
         '--jumi-border-block-keyframes': create.animation('border-block'),
       }),
       values: getValues('borderWidth'),
+    },
+    'animate-border-block-color': {
+      property: value => ({
+        '--jumi-border-block-color': value,
+      }),
+      type: 'color',
+      values: getValues('borderColor'),
     },
     'animate-border-block-end-radius': {
       property: value => ({
@@ -886,54 +886,6 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
       }),
       type: 'color',
       values: getValues('boxShadowColor'),
-    },
-    'animate-box-shadow-inset': {
-      property: value => ({
-        '--jumi-box-shadow-inset': value,
-        '--jumi-box-shadow-inset-keyframes': create.animation('box-shadow-inset'),
-      }),
-      type: ['length', 'shadow', 'any'],
-      values: getValues('boxShadow'),
-    },
-    'animate-box-shadow-inset-blur': {
-      property: value => ({
-        '--jumi-box-shadow-inset-blur': value,
-        '--jumi-box-shadow-inset-keyframes': create.animation('box-shadow-inset'),
-      }),
-      type: ['length', 'percentage'],
-      values: getValues('blur'),
-    },
-    'animate-box-shadow-inset-color': {
-      property: value => ({
-        '--jumi-box-shadow-inset-color': value,
-        '--jumi-box-shadow-inset-keyframes': create.animation('box-shadow-inset'),
-      }),
-      type: 'color',
-      values: getValues('boxShadowColor'),
-    },
-    'animate-box-shadow-inset-offset-x': {
-      property: value => ({
-        '--jumi-box-shadow-inset-keyframes': create.animation('box-shadow-inset'),
-        '--jumi-box-shadow-inset-offset-x': value,
-      }),
-      type: ['length', 'percentage'],
-      values: empty.number,
-    },
-    'animate-box-shadow-inset-offset-y': {
-      property: value => ({
-        '--jumi-box-shadow-inset-keyframes': create.animation('box-shadow-inset'),
-        '--jumi-box-shadow-inset-offset-y': value,
-      }),
-      type: ['length', 'percentage'],
-      values: empty.number,
-    },
-    'animate-box-shadow-inset-spread': {
-      property: value => ({
-        '--jumi-box-shadow-inset-keyframes': create.animation('box-shadow-inset'),
-        '--jumi-box-shadow-inset-spread': value,
-      }),
-      type: ['length', 'percentage'],
-      values: empty.number,
     },
     'animate-box-shadow-offset-x': {
       property: value => ({
@@ -1557,13 +1509,6 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
         '--jumi-font-synthesis-keyframes': create.animation('font-synthesis'),
       }),
       values: empty.none,
-    },
-    'animate-font-synthesis-position': {
-      property: value => ({
-        '--jumi-font-synthesis-position': value,
-        '--jumi-font-synthesis-position-keyframes': create.animation('font-synthesis-position'),
-      }),
-      values: fontSynthesisPosition,
     },
     'animate-font-synthesis-small-caps': {
       property: value => ({
@@ -3163,12 +3108,37 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
       type: ['length', 'percentage', 'any'],
       values: getValues('width'),
     },
+    'animate-x': {
+      property: value => ({
+        '--jumi-transform-keyframes': create.animation('transform'),
+        '--jumi-z': value,
+      }),
+      supportsNegativeValues: true,
+      type: ['length', 'percentage'],
+      values: empty.number,
+    },
+    'animate-y': {
+      property: value => ({
+        '--jumi-transform-keyframes': create.animation('transform'),
+        '--jumi-y': value,
+      }),
+      supportsNegativeValues: true,
+      type: ['length', 'percentage'],
+      values: empty.number,
+    },
+
     'animate-z-index': {
       property: value => ({
         '--jumi-z-index': value,
         '--jumi-z-index-keyframes': create.animation('z-index'),
       }),
       values: getValues('zIndex'),
+    },
+    'animation': {
+      property: value => ({
+        '--jumi-animation': value,
+      }),
+      values: getValues('animation'),
     },
     'animation-composition': {
       property: value => ({
@@ -3177,7 +3147,7 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
       values: animationComposition,
     },
     'animation-delay': {
-      modifiers: animationModifiers,
+      modifiers: animationAttributes,
       property: (value, { modifier }) => {
         if (modifier === null) return { '--jumi-animation-delay': value }
         return { [`--jumi-${modifier}-animation-delay`]: value }
@@ -3185,7 +3155,7 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
       values: animationDelay,
     },
     'animation-direction': {
-      modifiers: animationModifiers,
+      modifiers: animationAttributes,
       property: (value, { modifier }) => {
         if (modifier === null) return { '--jumi-animation-direction': value }
         return { [`--jumi-${modifier}-animation-direction`]: value }
@@ -3193,7 +3163,7 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
       values: animationDirection,
     },
     'animation-duration': {
-      modifiers: animationModifiers,
+      modifiers: animationAttributes,
       property: (value, { modifier }) => {
         if (modifier === null) return { '--jumi-animation-duration': value }
         return { [`--jumi-${modifier}-animation-duration`]: value }
@@ -3201,7 +3171,7 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
       values: animationDuration,
     },
     'animation-fill-mode': {
-      modifiers: animationModifiers,
+      modifiers: animationAttributes,
       property: (value, { modifier }) => {
         if (modifier === null) return { '--jumi-animation-fill-mode': value }
         return { [`--jumi-${modifier}-animation-fill-mode`]: value }
@@ -3209,7 +3179,7 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
       values: animationFillMode,
     },
     'animation-iteration-count': {
-      modifiers: animationModifiers,
+      modifiers: animationAttributes,
       property: (value, { modifier }) => {
         if (modifier === null) return { '--jumi-animation-iteration-count': value }
         return { [`--jumi-${modifier}-animation-iteration-count`]: value }
@@ -3217,8 +3187,14 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
       type: 'number',
       values: animationIterationCount,
     },
+    'animation-name': {
+      property: value => ({
+        '--jumi-animation-name': value,
+      }),
+      values: empty.none,
+    },
     'animation-play-state': {
-      modifiers: animationModifiers,
+      modifiers: animationAttributes,
       property: (value, { modifier }) => {
         if (modifier === null) return { '--jumi-animation-play-state': value }
         return { [`--jumi-${modifier}-animation-play-state`]: value }
@@ -3305,7 +3281,7 @@ export function getMatchProperties(api: Api): Collection<MatchPropertyValue> {
       values: animationTimelineScroller,
     },
     'animation-timing-function': {
-      modifiers: animationModifiers,
+      modifiers: animationAttributes,
       property: (value, { modifier }) => {
         if (modifier === null) return { '--jumi-animation-timing-function': value }
         return { [`--jumi-${modifier}-animation-timing-function`]: value }

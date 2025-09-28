@@ -13,14 +13,15 @@
   ],
   "scripts": {
     "lint": "eslint --fix .",
-    "build": "tsup src/index.ts --format cjs,esm --dts",
-    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
-    "test": "npm run build && npm run test:integration",
-    "test:integration": "tailwindcss -i ./examples/input.css -o ./examples/output.css --config ./examples/tailwind.config.js",
+    "bundle": "tsup src/index.ts --format cjs,esm --dts",
+    "watch-bundle": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "build": "npm run bundle && npm run tailwind",
+    "tailwind": "tailwindcss -i ./examples/input.css -o ./examples/output.css --config ./examples/tailwind.config.js",
     "prepublishOnly": "npm run build",
     "check-types": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "analyze": "node scripts/analyze.js"
   },
   "keywords": [
     "tailwindcss",
@@ -34,6 +35,9 @@
   ],
   "author": "Ridwan Olanrewaju",
   "license": "MIT",
+   "peerDependencies": {
+    "tailwindcss": ">=3.0.0 || insiders"
+  },
   "devDependencies": {
     "@chromatic-com/storybook": "^4.1.1",
     "@storybook/addon-a11y": "^9.1.6",

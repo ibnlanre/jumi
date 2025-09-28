@@ -1,10 +1,10 @@
 import type { Effect } from '@/theme/effects'
-import type { Attribute } from '@/types'
+import type { StandardPropertyType } from '@/types'
 
 import { css } from '@/helpers/css'
 
 export const create = {
-  animation(attribute: Attribute): string {
+  animation(attribute: StandardPropertyType): string {
     const name = `jumi-${attribute}` as const
 
     return [

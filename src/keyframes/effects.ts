@@ -1,6 +1,6 @@
-import type { EffectKeyframes } from '@/types'
+import type { EffectKeyframesCollection } from '@/types'
 
-export const effectKeyframes: EffectKeyframes = {
+export const effectKeyframes: EffectKeyframesCollection = {
   '@keyframes jumi-back-in': {
     '0%': {
       transform: 'scale(0) rotateZ(-360deg)',

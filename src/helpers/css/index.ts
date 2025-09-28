@@ -1,15 +1,15 @@
-import type { AnimationProperty, CSSFunction, Property } from '@/types'
+import type { CSSFunction, CSSValue } from '@/types'
 
-type AnimationVariables = `--jumi-animation-${AnimationProperty}`
-type PropertyVariables = `--jumi-${Property}`
-type Variables = AnimationVariables | PropertyVariables | (string & {})
+export function css<const Fn extends CSSFunction>(fn: Fn): `${Fn}()`
+export function css<const Fn extends CSSFunction, const Value extends string>(fn: Fn, value: Value): `${Fn}(${Value})`
+export function css<const Fn extends CSSFunction, const Value extends string, const Fallback extends string>(fn: Fn, value: Value, fallback: Fallback): `${Fn}(${Value}, ${Fallback})`
 
-export function css(fn: 'url', value?: string): string
-export function css(fn: CSSFunction, value: string): string
-export function css(fn: 'var', value: Variables, fallback?: string): string
-
-export function css(fn: CSSFunction, value?: string, fallback?: string): string {
-  if (fallback) return `${fn}(${value}, ${fallback})`
-  if (value) return `${fn}(${value})`
-  return `${fn}()`
+export function css<
+  const Fn extends CSSFunction,
+  const Value extends string,
+  const Fallback extends string,
+>(fn: Fn, value?: Value, fallback?: Fallback) {
+  if (fallback) return `${fn}(${value}, ${fallback})` as const
+  if (value) return `${fn}(${value})` as const
+  return `${fn}()` as const
 }

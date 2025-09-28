@@ -1,5 +1,12 @@
-import type { Collection, PropertyVariables } from '@/types'
+import type { PropertyVariables } from '@/types'
 
+import { animation } from '@/composition/animation'
+import {
+  animationRange,
+  animationRangeEnd,
+  animationRangeStart,
+} from '@/composition/animation-range'
+import { animationTimelineInset } from '@/composition/animation-timeline'
 import { aspectRatio } from '@/composition/aspect-ratio'
 import { backdropFilter } from '@/composition/backdrop-filter'
 import { backdropFilterDropShadow } from '@/composition/backdrop-filter-drop-shadow'
@@ -24,10 +31,10 @@ import { borderLeft } from '@/composition/border-left'
 import { borderRadius } from '@/composition/border-radius'
 import { borderRight } from '@/composition/border-right'
 import { borderTop } from '@/composition/border-top'
-import { boxShadow } from '@/composition/box-shadow'
-import { boxShadowInset } from '@/composition/box-shadow-inset'
+import { boxShadow, boxShadowInset, boxShadowOutset } from '@/composition/box-shadow'
 import { columnRule } from '@/composition/column-rule'
 import { columns } from '@/composition/columns'
+import { container } from '@/composition/container'
 import { filter } from '@/composition/filter'
 import { filterDropShadow } from '@/composition/filter-drop-shadow'
 import { flex } from '@/composition/flex'
@@ -35,8 +42,10 @@ import { flexFlow } from '@/composition/flex-flow'
 import { font } from '@/composition/font'
 import { fontSynthesis } from '@/composition/font-synthesis'
 import { grid } from '@/composition/grid'
+import { gridArea } from '@/composition/grid-area'
 import { gridColumn } from '@/composition/grid-column'
 import { gridRow } from '@/composition/grid-row'
+import { gridTemplate } from '@/composition/grid-template'
 import { hyphenateLimitChars } from '@/composition/hyphenate-limit-chars'
 import { inset } from '@/composition/inset'
 import { insetBlock } from '@/composition/inset-block'
@@ -59,6 +68,8 @@ import { overscrollBehavior } from '@/composition/overscroll-behavior'
 import { padding } from '@/composition/padding'
 import { paddingBlock } from '@/composition/padding-block'
 import { paddingInline } from '@/composition/padding-inline'
+import { positionTry } from '@/composition/position-try'
+import { scrollTimeline } from '@/composition/scroll-timeline'
 import { textShadow } from '@/composition/text-shadow'
 import {
   matrix,
@@ -71,9 +82,11 @@ import {
   translate,
   translate3d,
 } from '@/composition/transform'
+import { transition } from '@/composition/transition'
+import { viewTimeline } from '@/composition/view-timeline'
 import { css } from '@/helpers/css'
 
-export const propertyVariables: Collection<PropertyVariables> = {
+export const propertyVariables: PropertyVariables = {
   '.animate': {
     '--jumi-accent-color': 'auto',
     '--jumi-align-content': 'normal',
@@ -82,6 +95,29 @@ export const propertyVariables: Collection<PropertyVariables> = {
     '--jumi-alignment-baseline': 'baseline',
     '--jumi-all': 'initial',
     '--jumi-anchor-name': 'none',
+    '--jumi-animation': animation,
+    '--jumi-animation-composition': 'replace',
+    '--jumi-animation-delay': '0s',
+    '--jumi-animation-direction': 'normal',
+    '--jumi-animation-duration': '1s',
+    '--jumi-animation-fill-mode': 'forwards',
+    '--jumi-animation-iteration-count': '1',
+    '--jumi-animation-name': 'none',
+    '--jumi-animation-play-state': 'running',
+    '--jumi-animation-range': animationRange,
+    '--jumi-animation-range-end': animationRangeEnd,
+    '--jumi-animation-range-end-offset': '100%',
+    '--jumi-animation-range-end-timeline': 'normal',
+    '--jumi-animation-range-start': animationRangeStart,
+    '--jumi-animation-range-start-offset': '0%',
+    '--jumi-animation-range-start-timeline': 'normal',
+    '--jumi-animation-timeline': 'auto',
+    '--jumi-animation-timeline-axis': 'block',
+    '--jumi-animation-timeline-inset': animationTimelineInset,
+    '--jumi-animation-timeline-inset-end': 'auto',
+    '--jumi-animation-timeline-inset-start': 'auto',
+    '--jumi-animation-timeline-scroller': 'nearest',
+    '--jumi-animation-timing-function': 'ease',
     '--jumi-appearance': 'none',
     '--jumi-aspect-ratio': aspectRatio,
     '--jumi-aspect-ratio-height': 'auto',
@@ -209,13 +245,9 @@ export const propertyVariables: Collection<PropertyVariables> = {
     '--jumi-box-shadow-blur': '0',
     '--jumi-box-shadow-color': 'transparent',
     '--jumi-box-shadow-inset': boxShadowInset,
-    '--jumi-box-shadow-inset-blur': '0',
-    '--jumi-box-shadow-inset-color': 'transparent',
-    '--jumi-box-shadow-inset-offset-x': '0',
-    '--jumi-box-shadow-inset-offset-y': '0',
-    '--jumi-box-shadow-inset-spread': '0',
     '--jumi-box-shadow-offset-x': '0',
     '--jumi-box-shadow-offset-y': '0',
+    '--jumi-box-shadow-outset': boxShadowOutset,
     '--jumi-box-shadow-spread': '0',
     '--jumi-box-sizing': 'content-box',
     '--jumi-break-after': 'auto',
@@ -246,6 +278,9 @@ export const propertyVariables: Collection<PropertyVariables> = {
     '--jumi-contain-intrinsic-inline-size': 'none',
     '--jumi-contain-intrinsic-size': 'none',
     '--jumi-contain-intrinsic-width': 'none',
+    '--jumi-container': container,
+    '--jumi-container-name': 'none',
+    '--jumi-container-type': 'normal',
     '--jumi-content': 'normal',
     '--jumi-content-visibility': 'visible',
     '--jumi-counter-increment': 'none',
@@ -255,6 +290,7 @@ export const propertyVariables: Collection<PropertyVariables> = {
     '--jumi-cx': '0',
     '--jumi-cy': '0',
     '--jumi-d': 'none',
+    '--jumi-direction': 'ltr',
     '--jumi-display': 'inline',
     '--jumi-display-inside': 'flow',
     '--jumi-display-outside': 'block',
@@ -272,7 +308,6 @@ export const propertyVariables: Collection<PropertyVariables> = {
     '--jumi-filter-drop-shadow-color': 'transparent',
     '--jumi-filter-drop-shadow-offset-x': '0',
     '--jumi-filter-drop-shadow-offset-y': '0',
-    '--jumi-filter-drop-shadow-opacity': '1',
     '--jumi-filter-grayscale': css('grayscale', '0'),
     '--jumi-filter-hue-rotate': css('hue-rotate', '0deg'),
     '--jumi-filter-invert': css('invert', '0'),
@@ -299,9 +334,9 @@ export const propertyVariables: Collection<PropertyVariables> = {
     '--jumi-font-palette': 'normal',
     '--jumi-font-size': 'medium',
     '--jumi-font-size-adjust': 'none',
+    '--jumi-font-smooth': 'auto',
     '--jumi-font-style': 'normal',
     '--jumi-font-synthesis': fontSynthesis,
-    '--jumi-font-synthesis-position': 'none',
     '--jumi-font-synthesis-small-caps': 'auto',
     '--jumi-font-synthesis-style': 'auto',
     '--jumi-font-synthesis-weight': 'auto',
@@ -318,6 +353,7 @@ export const propertyVariables: Collection<PropertyVariables> = {
     '--jumi-forced-color-adjust': 'auto',
     '--jumi-gap': '0',
     '--jumi-grid': grid,
+    '--jumi-grid-area': gridArea,
     '--jumi-grid-auto-columns': 'auto',
     '--jumi-grid-auto-flow': 'row',
     '--jumi-grid-auto-rows': 'auto',
@@ -327,6 +363,7 @@ export const propertyVariables: Collection<PropertyVariables> = {
     '--jumi-grid-row': gridRow,
     '--jumi-grid-row-end': 'auto',
     '--jumi-grid-row-start': 'auto',
+    '--jumi-grid-template': gridTemplate,
     '--jumi-grid-template-areas': 'none',
     '--jumi-grid-template-columns': 'none',
     '--jumi-grid-template-rows': 'none',
@@ -349,6 +386,7 @@ export const propertyVariables: Collection<PropertyVariables> = {
     '--jumi-inset-inline': insetInline,
     '--jumi-inset-inline-end': 'auto',
     '--jumi-inset-inline-start': 'auto',
+    '--jumi-isolation': 'auto',
     '--jumi-justify-content': 'normal',
     '--jumi-justify-items': 'legacy',
     '--jumi-justify-self': 'auto',
@@ -511,7 +549,16 @@ export const propertyVariables: Collection<PropertyVariables> = {
     '--jumi-place-content': 'normal',
     '--jumi-place-items': 'normal',
     '--jumi-place-self': 'auto',
+    '--jumi-pointer-events': 'auto',
     '--jumi-position': 'static',
+    '--jumi-position-anchor': 'auto',
+    '--jumi-position-area': 'none',
+    '--jumi-position-try': positionTry,
+    '--jumi-position-try-fallbacks': 'none',
+    '--jumi-position-try-order': 'normal',
+    '--jumi-print-color-adjust': 'economy',
+    '--jumi-quotes': 'auto',
+    '--jumi-r': '0',
     '--jumi-resize': 'none',
     '--jumi-right': 'auto',
     '--jumi-rotate': '0deg',
@@ -520,11 +567,17 @@ export const propertyVariables: Collection<PropertyVariables> = {
     '--jumi-rotate-y': '0',
     '--jumi-rotate-z': '1',
     '--jumi-row-gap': '0',
+    '--jumi-ruby-align': 'space-around',
+    '--jumi-ruby-overhang': 'auto',
+    '--jumi-ruby-position': 'alternate',
+    '--jumi-rx': '0',
+    '--jumi-ry': '0',
     '--jumi-scale': '1',
     '--jumi-scale-3d': scale3d,
     '--jumi-scale-x': '1',
     '--jumi-scale-y': '1',
     '--jumi-scale-z': '1',
+    '--jumi-scroll-behavior': 'auto',
     '--jumi-scroll-margin': '0',
     '--jumi-scroll-margin-block': '0',
     '--jumi-scroll-margin-block-end': '0',
@@ -547,10 +600,24 @@ export const propertyVariables: Collection<PropertyVariables> = {
     '--jumi-scroll-padding-left': '0',
     '--jumi-scroll-padding-right': '0',
     '--jumi-scroll-padding-top': '0',
+    '--jumi-scroll-snap-align': 'none',
+    '--jumi-scroll-snap-stop': 'normal',
+    '--jumi-scroll-snap-type': 'none',
+    '--jumi-scroll-timeline': scrollTimeline,
+    '--jumi-scroll-timeline-axis': 'block',
+    '--jumi-scroll-timeline-name': 'none',
+    '--jumi-scrollbar-color': 'auto',
+    '--jumi-scrollbar-gutter': 'auto',
+    '--jumi-scrollbar-width': 'auto',
+    '--jumi-shape-image-threshold': '0.0',
+    '--jumi-shape-margin': '0',
     '--jumi-shape-outside': 'none',
+    '--jumi-shape-rendering': 'auto',
     '--jumi-skew': skew,
     '--jumi-skew-x': '0deg',
     '--jumi-skew-y': '0deg',
+    '--jumi-stop-color': 'black',
+    '--jumi-stop-opacity': '1',
     '--jumi-stroke': 'none',
     '--jumi-stroke-dasharray': 'none',
     '--jumi-stroke-dashoffset': '0',
@@ -559,6 +626,7 @@ export const propertyVariables: Collection<PropertyVariables> = {
     '--jumi-stroke-miterlimit': '4',
     '--jumi-stroke-opacity': '1',
     '--jumi-stroke-width': '1px',
+    '--jumi-tab-size': '8',
     '--jumi-table-layout': 'auto',
     '--jumi-text-align': 'baseline',
     '--jumi-text-align-last': 'auto',
@@ -594,7 +662,9 @@ export const propertyVariables: Collection<PropertyVariables> = {
     '--jumi-text-wrap': 'wrap',
     '--jumi-text-wrap-mode': 'wrap',
     '--jumi-text-wrap-style': 'auto',
+    '--jumi-timeline-scope': 'none',
     '--jumi-top': 'auto',
+    '--jumi-touch-action': 'auto',
     '--jumi-transform': transform,
     '--jumi-transform-box': 'view-box',
     '--jumi-transform-origin': 'center',
@@ -602,18 +672,39 @@ export const propertyVariables: Collection<PropertyVariables> = {
     '--jumi-transform-origin-y': '50%',
     '--jumi-transform-origin-z': '0px',
     '--jumi-transform-style': 'flat',
+    '--jumi-transition': transition,
+    '--jumi-transition-behavior': 'normal',
+    '--jumi-transition-delay': '0s',
+    '--jumi-transition-duration': '0s',
+    '--jumi-transition-property': 'all',
+    '--jumi-transition-timing-function': 'ease',
     '--jumi-translate': '0px',
     '--jumi-translate-3d': translate3d,
     '--jumi-translate-x': translate,
     '--jumi-translate-y': translate,
     '--jumi-translate-z': '0px',
-    '--jumi-user-drag': 'auto',
+    '--jumi-unicode-bidi': 'normal',
     '--jumi-user-select': 'auto',
+    '--jumi-vector-effect': 'none',
     '--jumi-vertical-align': 'baseline',
+    '--jumi-view-timeline': viewTimeline,
+    '--jumi-view-timeline-axis': 'block',
+    '--jumi-view-timeline-inset': 'auto',
+    '--jumi-view-timeline-name': 'none',
+    '--jumi-view-transition-class': 'none',
+    '--jumi-view-transition-name': 'none',
     '--jumi-visibility': 'visible',
     '--jumi-white-space': 'normal',
+    '--jumi-white-space-collapse': 'collapse',
+    '--jumi-widows': '2',
     '--jumi-width': 'auto',
+    '--jumi-will-change': 'auto',
     '--jumi-word-break': 'normal',
+    '--jumi-word-spacing': 'normal',
+    '--jumi-writing-mode': 'horizontal-tb',
+    '--jumi-x': '0',
+    '--jumi-y': '0',
     '--jumi-z-index': 'auto',
+    '--jumi-zoom': '1',
   },
 }

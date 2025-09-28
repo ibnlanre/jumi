@@ -1,504 +1,15 @@
-import type { PropertiesHyphen, SvgAttributes } from 'csstype'
+import type { AtRule, StandardPropertiesHyphen, SvgPropertiesHyphen } from 'csstype'
 import type { PluginCreator } from 'tailwindcss/plugin'
 
 import type { Effect } from '@/theme/effects'
 
 export type AddProperty = Collection<CssInJs>
 
-export type AnimationProperty
-  = | 'composition'
-    | 'delay'
-    | 'direction'
-    | 'duration'
-    | 'fill-mode'
-    | 'iteration-count'
-    | 'name'
-    | 'play-state'
-    | 'range'
-    | 'range-end'
-    | 'range-end-offset'
-    | 'range-end-timeline'
-    | 'range-start'
-    | 'range-start-offset'
-    | 'range-start-timeline'
-    | 'timeline'
-    | 'timeline-axis'
-    | 'timeline-inset'
-    | 'timeline-inset-end'
-    | 'timeline-inset-start'
-    | 'timeline-scroller'
-    | 'timing-function'
+export type AnchorFunction
+  = | 'anchor'
+    | 'anchor-size'
 
-export type AnimationVariables = {
-  [key in '--jumi-animation' | AnimationVariable]?: string
-}
-
-export type Api = Parameters<PluginCreator> extends [infer U] ? U : never
-
-export type Attribute
-  = 'accent-color'
-    | 'align-content'
-    | 'align-items'
-    | 'align-self'
-    | 'alignment-baseline'
-    | 'all'
-    | 'appearance'
-    | 'aspect-ratio'
-    | 'backdrop-filter'
-    | 'backface-visibility'
-    | 'background'
-    | 'background-attachment'
-    | 'background-blend-mode'
-    | 'background-clip'
-    | 'background-color'
-    | 'background-image'
-    | 'background-origin'
-    | 'background-position'
-    | 'background-repeat'
-    | 'background-size'
-    | 'block-size'
-    | 'border'
-    | 'border-block'
-    | 'border-block-color'
-    | 'border-block-end'
-    | 'border-block-end-color'
-    | 'border-block-end-style'
-    | 'border-block-end-width'
-    | 'border-block-start'
-    | 'border-block-start-color'
-    | 'border-block-start-style'
-    | 'border-block-start-width'
-    | 'border-block-style'
-    | 'border-block-width'
-    | 'border-bottom'
-    | 'border-bottom-color'
-    | 'border-bottom-left-radius'
-    | 'border-bottom-right-radius'
-    | 'border-bottom-style'
-    | 'border-bottom-width'
-    | 'border-collapse'
-    | 'border-color'
-    | 'border-end-end-radius'
-    | 'border-end-start-radius'
-    | 'border-image'
-    | 'border-image-outset'
-    | 'border-image-repeat'
-    | 'border-image-slice'
-    | 'border-image-source'
-    | 'border-image-width'
-    | 'border-inline'
-    | 'border-inline-color'
-    | 'border-inline-end'
-    | 'border-inline-end-color'
-    | 'border-inline-end-style'
-    | 'border-inline-end-width'
-    | 'border-inline-start'
-    | 'border-inline-start-color'
-    | 'border-inline-start-style'
-    | 'border-inline-start-width'
-    | 'border-inline-style'
-    | 'border-inline-width'
-    | 'border-left'
-    | 'border-left-color'
-    | 'border-left-style'
-    | 'border-left-width'
-    | 'border-radius'
-    | 'border-right'
-    | 'border-right-color'
-    | 'border-right-style'
-    | 'border-right-width'
-    | 'border-spacing'
-    | 'border-start-end-radius'
-    | 'border-start-start-radius'
-    | 'border-style'
-    | 'border-top'
-    | 'border-top-color'
-    | 'border-top-left-radius'
-    | 'border-top-right-radius'
-    | 'border-top-style'
-    | 'border-top-width'
-    | 'border-width'
-    | 'bottom'
-    | 'box-decoration-break'
-    | 'box-shadow'
-    | 'box-shadow-inset'
-    | 'box-sizing'
-    | 'break-after'
-    | 'break-before'
-    | 'break-inside'
-    | 'caption-side'
-    | 'caret-color'
-    | 'clear'
-    | 'clip-path'
-    | 'clip-rule'
-    | 'color'
-    | 'color-interpolation'
-    | 'color-interpolation-filters'
-    | 'color-scheme'
-    | 'column-count'
-    | 'column-fill'
-    | 'column-gap'
-    | 'column-gap'
-    | 'column-rule'
-    | 'column-rule-color'
-    | 'column-rule-style'
-    | 'column-rule-width'
-    | 'column-span'
-    | 'column-width'
-    | 'columns'
-    | 'contain'
-    | 'contain-intrinsic-block-size'
-    | 'contain-intrinsic-height'
-    | 'contain-intrinsic-inline-size'
-    | 'contain-intrinsic-size'
-    | 'contain-intrinsic-width'
-    | 'content'
-    | 'content-visibility'
-    | 'counter-increment'
-    | 'counter-reset'
-    | 'counter-set'
-    | 'cursor'
-    | 'cx'
-    | 'cy'
-    | 'd'
-    | 'display'
-    | 'dominant-baseline'
-    | 'empty-cells'
-    | 'fill'
-    | 'fill-opacity'
-    | 'fill-rule'
-    | 'filter'
-    | 'flex'
-    | 'flex-basis'
-    | 'flex-direction'
-    | 'flex-flow'
-    | 'flex-grow'
-    | 'flex-shrink'
-    | 'flex-wrap'
-    | 'float'
-    | 'flood-color'
-    | 'flood-opacity'
-    | 'font'
-    | 'font-family'
-    | 'font-feature-settings'
-    | 'font-kerning'
-    | 'font-language-override'
-    | 'font-optical-sizing'
-    | 'font-palette'
-    | 'font-size'
-    | 'font-size-adjust'
-    | 'font-style'
-    | 'font-synthesis'
-    | 'font-synthesis-position'
-    | 'font-synthesis-small-caps'
-    | 'font-synthesis-style'
-    | 'font-synthesis-weight'
-    | 'font-variant'
-    | 'font-variant-alternates'
-    | 'font-variant-caps'
-    | 'font-variant-east-asian'
-    | 'font-variant-emoji'
-    | 'font-variant-ligatures'
-    | 'font-variant-numeric'
-    | 'font-variant-position'
-    | 'font-variation-settings'
-    | 'font-weight'
-    | 'forced-color-adjust'
-    | 'gap'
-    | 'grid'
-    | 'grid-auto-columns'
-    | 'grid-auto-flow'
-    | 'grid-auto-rows'
-    | 'grid-column'
-    | 'grid-column-end'
-    | 'grid-column-start'
-    | 'grid-row'
-    | 'grid-row-end'
-    | 'grid-row-start'
-    | 'grid-template-areas'
-    | 'grid-template-columns'
-    | 'grid-template-rows'
-    | 'hanging-punctuation'
-    | 'height'
-    | 'hyphenate-character'
-    | 'hyphenate-limit-chars'
-    | 'hyphens'
-    | 'image-orientation'
-    | 'image-rendering'
-    | 'initial-letter'
-    | 'inline-size'
-    | 'inset'
-    | 'inset-block'
-    | 'inset-block-end'
-    | 'inset-block-start'
-    | 'inset-inline'
-    | 'inset-inline-end'
-    | 'inset-inline-start'
-    | 'justify-content'
-    | 'justify-items'
-    | 'justify-self'
-    | 'left'
-    | 'letter-spacing'
-    | 'lighting-color'
-    | 'line-break'
-    | 'line-clamp'
-    | 'line-height'
-    | 'list-style'
-    | 'list-style-image'
-    | 'list-style-position'
-    | 'list-style-type'
-    | 'margin'
-    | 'margin-block'
-    | 'margin-block-end'
-    | 'margin-block-start'
-    | 'margin-bottom'
-    | 'margin-inline'
-    | 'margin-inline-end'
-    | 'margin-inline-start'
-    | 'margin-left'
-    | 'margin-right'
-    | 'margin-top'
-    | 'marker'
-    | 'marker-end'
-    | 'marker-mid'
-    | 'marker-start'
-    | 'mask'
-    | 'mask-border'
-    | 'mask-border-mode'
-    | 'mask-border-outset'
-    | 'mask-border-repeat'
-    | 'mask-border-slice'
-    | 'mask-border-source'
-    | 'mask-border-width'
-    | 'mask-clip'
-    | 'mask-composite'
-    | 'mask-image'
-    | 'mask-mode'
-    | 'mask-origin'
-    | 'mask-position'
-    | 'mask-repeat'
-    | 'mask-size'
-    | 'mask-type'
-    | 'math-depth'
-    | 'math-style'
-    | 'max-block-size'
-    | 'max-height'
-    | 'max-inline-size'
-    | 'max-width'
-    | 'min-block-size'
-    | 'min-height'
-    | 'min-inline-size'
-    | 'min-width'
-    | 'mix-blend-mode'
-    | 'object-fit'
-    | 'object-position'
-    | 'offset'
-    | 'offset-anchor'
-    | 'offset-distance'
-    | 'offset-path'
-    | 'offset-position'
-    | 'offset-rotate'
-    | 'opacity'
-    | 'order'
-    | 'orphans'
-    | 'outline'
-    | 'outline-offset'
-    | 'overflow'
-    | 'overflow-anchor'
-    | 'overflow-block'
-    | 'overflow-clip-margin'
-    | 'overflow-inline'
-    | 'overflow-wrap'
-    | 'overscroll-behavior'
-    | 'overscroll-behavior-block'
-    | 'overscroll-behavior-inline'
-    | 'overscroll-behavior-x'
-    | 'overscroll-behavior-y'
-    | 'padding'
-    | 'padding-block'
-    | 'padding-block-end'
-    | 'padding-block-start'
-    | 'padding-bottom'
-    | 'padding-inline'
-    | 'padding-inline-end'
-    | 'padding-inline-start'
-    | 'padding-left'
-    | 'padding-right'
-    | 'padding-top'
-    | 'page'
-    | 'paint-order'
-    | 'perspective-origin'
-    | 'place-content'
-    | 'place-items'
-    | 'place-self'
-    | 'position'
-    | 'resize'
-    | 'right'
-    | 'row-gap'
-    | 'scroll-margin'
-    | 'scroll-margin-block'
-    | 'scroll-margin-block-end'
-    | 'scroll-margin-block-start'
-    | 'scroll-margin-bottom'
-    | 'scroll-margin-inline'
-    | 'scroll-margin-inline-end'
-    | 'scroll-margin-inline-start'
-    | 'scroll-margin-left'
-    | 'scroll-margin-right'
-    | 'scroll-margin-top'
-    | 'scroll-padding'
-    | 'scroll-padding-block'
-    | 'scroll-padding-block-end'
-    | 'scroll-padding-block-start'
-    | 'scroll-padding-bottom'
-    | 'scroll-padding-inline'
-    | 'scroll-padding-inline-end'
-    | 'scroll-padding-inline-start'
-    | 'scroll-padding-left'
-    | 'scroll-padding-right'
-    | 'scroll-padding-top'
-    | 'shape-outside'
-    | 'stroke'
-    | 'stroke-dasharray'
-    | 'stroke-dashoffset'
-    | 'stroke-linecap'
-    | 'stroke-linejoin'
-    | 'stroke-miterlimit'
-    | 'stroke-opacity'
-    | 'stroke-width'
-    | 'table-layout'
-    | 'text-align'
-    | 'text-align-last'
-    | 'text-anchor'
-    | 'text-autospace'
-    | 'text-box'
-    | 'text-box-edge'
-    | 'text-box-trim'
-    | 'text-combine-upright'
-    | 'text-decoration'
-    | 'text-decoration-color'
-    | 'text-decoration-line'
-    | 'text-decoration-skip-ink'
-    | 'text-decoration-style'
-    | 'text-decoration-thickness'
-    | 'text-emphasis'
-    | 'text-emphasis-color'
-    | 'text-emphasis-position'
-    | 'text-emphasis-style'
-    | 'text-indent'
-    | 'text-justify'
-    | 'text-orientation'
-    | 'text-overflow'
-    | 'text-rendering'
-    | 'text-shadow'
-    | 'text-transform'
-    | 'text-underline-offset'
-    | 'text-underline-position'
-    | 'text-wrap'
-    | 'text-wrap-mode'
-    | 'text-wrap-style'
-    | 'top'
-    | 'transform'
-    | 'transform-box'
-    | 'transform-origin'
-    | 'transform-origin-x'
-    | 'transform-origin-y'
-    | 'transform-origin-z'
-    | 'transform-style'
-    | 'user-drag'
-    | 'user-select'
-    | 'vertical-align'
-    | 'visibility'
-    | 'white-space'
-    | 'width'
-    | 'word-break'
-    | 'z-index'
-
-export type AttributeKeyframes = Collection<Keyframes, `@keyframes jumi-${Attribute}`>
-
-export type Collection<Values = any, Key extends PropertyKey = string> = Record<Key, Values>
-
-export type CSSFunction
-  = | AnchorFunction
-    | AnimationFunction
-    | ColorFunction
-    | ComparisonFunction
-    | CounterFunction
-    | ExponentialFunction
-    | FilterFunction
-    | FontFunction
-    | GradientFunction
-    | ImageFunction
-    | MatrixFunction
-    | ReferenceFunction
-    | RotationFunction
-    | ScalingFunction
-    | ShapeFunction
-    | SkewFunction
-    | SteppedValueFunction
-    | TranslationFunction
-    | TreeCountingFunction
-    | TrigonometricFunction
-
-export interface CssInJs extends Partial<KeyframeVariables>, Partial<PropertyVariables> {
-  [key: string]: Collection | string | string[]
-}
-
-export type CSSRuleObject = CssInJs | CssInJs[]
-
-export type DataType
-  = | 'absolute-size'
-    | 'angle'
-    | 'any'
-    | 'bg-size'
-    | 'color'
-    | 'family-name'
-    | 'generic-name'
-    | 'image'
-    | 'integer'
-    | 'length'
-    | 'line-width'
-    | 'number'
-    | 'percentage'
-    | 'position'
-    | 'ratio'
-    | 'relative-size'
-    | 'shadow'
-    | 'url'
-    | 'vector'
-
-export type EffectKeyframes = Collection<Keyframes, `@keyframes jumi-${Effect}`>
-
-export type KeyframeDefinition = Collection<Collection<number | string>>
-
-export type Keyframes = Collection<Partial<Record<SvgAttribute, string>> | PropertiesHyphen>
-
-export type KeyframeVariables = Collection<'none' | (string & {}), PropertyKeyframes>
-
-export type MatchProperty = Collection<MatchPropertyValue, MatchPropertyKeys>
-
-export type MatchPropertyFunction = (value: string, extra: { modifier: null | string }) => CSSRuleObject
-
-export type MatchPropertyKeys = 'animate' | `animate-${Property}` | `animation-${AnimationProperty}`
-
-export interface MatchPropertyValue extends Partial<Options> {
-  property: MatchPropertyFunction
-}
-
-export interface MatchVariant {
-  generator: (value: string) => string
-  name: string
-  values: Collection<string>
-}
-
-export interface Options {
-  modifiers: Collection<string>
-  supportsNegativeValues: boolean
-  type: Array<DataType> | DataType
-  values: Collection
-}
-
-export type Property
+export type AnimatableStandardPropertyType
   = | 'accent-color'
     | 'align-content'
     | 'align-items'
@@ -508,24 +19,7 @@ export type Property
     | 'anchor-name'
     | 'appearance'
     | 'aspect-ratio'
-    | 'aspect-ratio-height'
-    | 'aspect-ratio-width'
-    | 'backdrop-blur'
-    | 'backdrop-brightness'
-    | 'backdrop-contrast'
-    | 'backdrop-drop-shadow'
-    | 'backdrop-drop-shadow-blur'
-    | 'backdrop-drop-shadow-color'
-    | 'backdrop-drop-shadow-offset-x'
-    | 'backdrop-drop-shadow-offset-y'
     | 'backdrop-filter'
-    | 'backdrop-grayscale'
-    | 'backdrop-hue-rotate'
-    | 'backdrop-invert'
-    | 'backdrop-opacity'
-    | 'backdrop-saturate'
-    | 'backdrop-sepia'
-    | 'backdrop-url'
     | 'backface-visibility'
     | 'background'
     | 'background-attachment'
@@ -536,30 +30,19 @@ export type Property
     | 'background-origin'
     | 'background-position'
     | 'background-position-x'
-    | 'background-position-x-edge'
-    | 'background-position-x-offset'
     | 'background-position-y'
-    | 'background-position-y-edge'
-    | 'background-position-y-offset'
     | 'background-repeat'
-    | 'background-repeat-x'
-    | 'background-repeat-y'
     | 'background-size'
-    | 'background-size-height'
-    | 'background-size-width'
     | 'block-size'
     | 'border'
     | 'border-block'
     | 'border-block-color'
     | 'border-block-end'
     | 'border-block-end-color'
-    | 'border-block-end-radius'
     | 'border-block-end-style'
     | 'border-block-end-width'
-    | 'border-block-radius'
     | 'border-block-start'
     | 'border-block-start-color'
-    | 'border-block-start-radius'
     | 'border-block-start-style'
     | 'border-block-start-width'
     | 'border-block-style'
@@ -567,7 +50,6 @@ export type Property
     | 'border-bottom'
     | 'border-bottom-color'
     | 'border-bottom-left-radius'
-    | 'border-bottom-radius'
     | 'border-bottom-right-radius'
     | 'border-bottom-style'
     | 'border-bottom-width'
@@ -577,15 +59,7 @@ export type Property
     | 'border-end-start-radius'
     | 'border-image'
     | 'border-image-outset'
-    | 'border-image-outset-bottom'
-    | 'border-image-outset-left'
-    | 'border-image-outset-right'
-    | 'border-image-outset-top'
-    | 'border-image-outset-x'
-    | 'border-image-outset-y'
     | 'border-image-repeat'
-    | 'border-image-repeat-x'
-    | 'border-image-repeat-y'
     | 'border-image-slice'
     | 'border-image-source'
     | 'border-image-width'
@@ -593,26 +67,21 @@ export type Property
     | 'border-inline-color'
     | 'border-inline-end'
     | 'border-inline-end-color'
-    | 'border-inline-end-radius'
     | 'border-inline-end-style'
     | 'border-inline-end-width'
-    | 'border-inline-radius'
     | 'border-inline-start'
     | 'border-inline-start-color'
-    | 'border-inline-start-radius'
     | 'border-inline-start-style'
     | 'border-inline-start-width'
     | 'border-inline-style'
     | 'border-inline-width'
     | 'border-left'
     | 'border-left-color'
-    | 'border-left-radius'
     | 'border-left-style'
     | 'border-left-width'
     | 'border-radius'
     | 'border-right'
     | 'border-right-color'
-    | 'border-right-radius'
     | 'border-right-style'
     | 'border-right-width'
     | 'border-spacing'
@@ -622,7 +91,6 @@ export type Property
     | 'border-top'
     | 'border-top-color'
     | 'border-top-left-radius'
-    | 'border-top-radius'
     | 'border-top-right-radius'
     | 'border-top-style'
     | 'border-top-width'
@@ -630,23 +98,11 @@ export type Property
     | 'bottom'
     | 'box-decoration-break'
     | 'box-shadow'
-    | 'box-shadow-blur'
-    | 'box-shadow-color'
-    | 'box-shadow-inset'
-    | 'box-shadow-inset-blur'
-    | 'box-shadow-inset-color'
-    | 'box-shadow-inset-offset-x'
-    | 'box-shadow-inset-offset-y'
-    | 'box-shadow-inset-spread'
-    | 'box-shadow-offset-x'
-    | 'box-shadow-offset-y'
-    | 'box-shadow-spread'
     | 'box-sizing'
     | 'break-after'
     | 'break-before'
     | 'break-inside'
     | 'caption-side'
-    | 'caret-color'
     | 'caret-color'
     | 'clear'
     | 'clip-path'
@@ -671,6 +127,7 @@ export type Property
     | 'contain-intrinsic-inline-size'
     | 'contain-intrinsic-size'
     | 'contain-intrinsic-width'
+    | 'container-type'
     | 'content'
     | 'content-visibility'
     | 'counter-increment'
@@ -681,30 +138,12 @@ export type Property
     | 'cy'
     | 'd'
     | 'display'
-    | 'display-inside'
-    | 'display-outside'
     | 'dominant-baseline'
     | 'empty-cells'
     | 'fill'
     | 'fill-opacity'
     | 'fill-rule'
     | 'filter'
-    | 'filter-blur'
-    | 'filter-brightness'
-    | 'filter-contrast'
-    | 'filter-drop-shadow'
-    | 'filter-drop-shadow-blur'
-    | 'filter-drop-shadow-color'
-    | 'filter-drop-shadow-offset-x'
-    | 'filter-drop-shadow-offset-y'
-    | 'filter-drop-shadow-opacity'
-    | 'filter-grayscale'
-    | 'filter-hue-rotate'
-    | 'filter-invert'
-    | 'filter-opacity'
-    | 'filter-saturate'
-    | 'filter-sepia'
-    | 'filter-url'
     | 'flex'
     | 'flex-basis'
     | 'flex-direction'
@@ -726,7 +165,6 @@ export type Property
     | 'font-size-adjust'
     | 'font-style'
     | 'font-synthesis'
-    | 'font-synthesis-position'
     | 'font-synthesis-small-caps'
     | 'font-synthesis-style'
     | 'font-synthesis-weight'
@@ -743,6 +181,7 @@ export type Property
     | 'forced-color-adjust'
     | 'gap'
     | 'grid'
+    | 'grid-area'
     | 'grid-auto-columns'
     | 'grid-auto-flow'
     | 'grid-auto-rows'
@@ -752,6 +191,7 @@ export type Property
     | 'grid-row'
     | 'grid-row-end'
     | 'grid-row-start'
+    | 'grid-template'
     | 'grid-template-areas'
     | 'grid-template-columns'
     | 'grid-template-rows'
@@ -759,9 +199,6 @@ export type Property
     | 'height'
     | 'hyphenate-character'
     | 'hyphenate-limit-chars'
-    | 'hyphenate-limit-minimum-characters-after'
-    | 'hyphenate-limit-minimum-characters-before'
-    | 'hyphenate-limit-minimum-word-length'
     | 'hyphens'
     | 'image-orientation'
     | 'image-rendering'
@@ -806,22 +243,8 @@ export type Property
     | 'mask-border'
     | 'mask-border-mode'
     | 'mask-border-outset'
-    | 'mask-border-outset-bottom'
-    | 'mask-border-outset-left'
-    | 'mask-border-outset-right'
-    | 'mask-border-outset-top'
-    | 'mask-border-outset-x'
-    | 'mask-border-outset-y'
     | 'mask-border-repeat'
-    | 'mask-border-repeat-x'
-    | 'mask-border-repeat-y'
     | 'mask-border-slice'
-    | 'mask-border-slice-bottom'
-    | 'mask-border-slice-left'
-    | 'mask-border-slice-right'
-    | 'mask-border-slice-top'
-    | 'mask-border-slice-x'
-    | 'mask-border-slice-y'
     | 'mask-border-source'
     | 'mask-border-width'
     | 'mask-clip'
@@ -830,38 +253,11 @@ export type Property
     | 'mask-mode'
     | 'mask-origin'
     | 'mask-position'
-    | 'mask-position-x'
-    | 'mask-position-y'
     | 'mask-repeat'
     | 'mask-size'
     | 'mask-type'
     | 'math-depth'
-    | 'math-depth-add'
     | 'math-style'
-    | 'matrix'
-    | 'matrix-3d'
-    | 'matrix-a1'
-    | 'matrix-a2'
-    | 'matrix-a3'
-    | 'matrix-a4'
-    | 'matrix-a'
-    | 'matrix-b1'
-    | 'matrix-b2'
-    | 'matrix-b3'
-    | 'matrix-b4'
-    | 'matrix-b'
-    | 'matrix-c1'
-    | 'matrix-c2'
-    | 'matrix-c3'
-    | 'matrix-c4'
-    | 'matrix-c'
-    | 'matrix-d1'
-    | 'matrix-d2'
-    | 'matrix-d3'
-    | 'matrix-d4'
-    | 'matrix-d'
-    | 'matrix-tx'
-    | 'matrix-ty'
     | 'max-block-size'
     | 'max-height'
     | 'max-inline-size'
@@ -873,29 +269,11 @@ export type Property
     | 'mix-blend-mode'
     | 'object-fit'
     | 'object-position'
-    | 'object-position-x'
-    | 'object-position-x-edge'
-    | 'object-position-x-offset'
-    | 'object-position-y'
-    | 'object-position-y-edge'
-    | 'object-position-y-offset'
     | 'offset'
     | 'offset-anchor'
-    | 'offset-anchor-x'
-    | 'offset-anchor-x-edge'
-    | 'offset-anchor-x-offset'
-    | 'offset-anchor-y'
-    | 'offset-anchor-y-edge'
-    | 'offset-anchor-y-offset'
     | 'offset-distance'
     | 'offset-path'
     | 'offset-position'
-    | 'offset-position-x'
-    | 'offset-position-x-edge'
-    | 'offset-position-x-offset'
-    | 'offset-position-y'
-    | 'offset-position-y-edge'
-    | 'offset-position-y-offset'
     | 'offset-rotate'
     | 'opacity'
     | 'order'
@@ -936,20 +314,26 @@ export type Property
     | 'place-content'
     | 'place-items'
     | 'place-self'
+    | 'pointer-events'
     | 'position'
+    | 'position-anchor'
+    | 'position-area'
+    | 'position-try'
+    | 'position-try-fallbacks'
+    | 'position-try-order'
+    | 'print-color-adjust'
+    | 'quotes'
+    | 'r'
     | 'resize'
     | 'right'
     | 'rotate'
-    | 'rotate-3d'
-    | 'rotate-x'
-    | 'rotate-y'
-    | 'rotate-z'
     | 'row-gap'
+    | 'ruby-align'
+    | 'ruby-overhang'
+    | 'ruby-position'
+    | 'rx'
+    | 'ry'
     | 'scale'
-    | 'scale-3d'
-    | 'scale-x'
-    | 'scale-y'
-    | 'scale-z'
     | 'scroll-margin'
     | 'scroll-margin-block'
     | 'scroll-margin-block-end'
@@ -972,10 +356,18 @@ export type Property
     | 'scroll-padding-left'
     | 'scroll-padding-right'
     | 'scroll-padding-top'
+    | 'scroll-snap-align'
+    | 'scroll-snap-stop'
+    | 'scroll-snap-type'
+    | 'scrollbar-color'
+    | 'scrollbar-gutter'
+    | 'scrollbar-width'
+    | 'shape-image-threshold'
+    | 'shape-margin'
     | 'shape-outside'
-    | 'skew'
-    | 'skew-x'
-    | 'skew-y'
+    | 'shape-rendering'
+    | 'stop-color'
+    | 'stop-opacity'
     | 'stroke'
     | 'stroke-dasharray'
     | 'stroke-dashoffset'
@@ -984,6 +376,7 @@ export type Property
     | 'stroke-miterlimit'
     | 'stroke-opacity'
     | 'stroke-width'
+    | 'tab-size'
     | 'table-layout'
     | 'text-align'
     | 'text-align-last'
@@ -1004,16 +397,11 @@ export type Property
     | 'text-emphasis-position'
     | 'text-emphasis-style'
     | 'text-indent'
-    | 'text-indent'
     | 'text-justify'
     | 'text-orientation'
     | 'text-overflow'
     | 'text-rendering'
     | 'text-shadow'
-    | 'text-shadow-blur-radius'
-    | 'text-shadow-color'
-    | 'text-shadow-offset-x'
-    | 'text-shadow-offset-y'
     | 'text-transform'
     | 'text-underline-offset'
     | 'text-underline-position'
@@ -1024,31 +412,562 @@ export type Property
     | 'transform'
     | 'transform-box'
     | 'transform-origin'
+    | 'transform-style'
+    | 'translate'
+    | 'user-select'
+    | 'vector-effect'
+    | 'vertical-align'
+    | 'view-timeline-inset'
+    | 'view-transition-class'
+    | 'view-transition-name'
+    | 'visibility'
+    | 'white-space'
+    | 'white-space-collapse'
+    | 'widows'
+    | 'width'
+    | 'will-change'
+    | 'word-break'
+    | 'word-spacing'
+    | 'writing-mode'
+    | 'x'
+    | 'y'
+    | 'z-index'
+
+export type AnimationFrame = 'from' | 'to' | `${number}%` | (string & {})
+
+export type AnimationFunction
+  = | 'scroll'
+    | 'view'
+
+export type AnimationPropertyRegister = `@property --jumi-${StandardAnimationPropertyType}`
+
+export type AnimationPropertyRegisterCollection = Partial<Record<AnimationPropertyRegister, AtRule.PropertyHyphen<string>>>
+
+export type AnimationPropertyType = NonStandardAnimtionPropertyType | StandardAnimationPropertyType
+
+export type AnimationPropertyVariable = `--jumi-${AnimationPropertyType}`
+
+export type AnimationVariableCollection = Record<AnimationPropertyVariable, string>
+
+export type Api = Parameters<PluginCreator> extends [infer U] ? U : never
+
+export type Collection<Values = any, Key extends PropertyKey = string> = Record<Key, Values>
+
+export type ColorFunction
+  = | 'color'
+    | 'color-mix'
+    | 'contrast-color'
+    | 'device-cmyk'
+    | 'hsl'
+    | 'hwb'
+    | 'lab'
+    | 'lch'
+    | 'light-dark'
+    | 'oklab'
+    | 'oklch'
+    | 'rgb'
+
+export type ComparisonFunction
+  = | 'clamp'
+    | 'max'
+    | 'min'
+
+export type CounterFunction
+  = | 'counter'
+    | 'counters'
+    | 'symbols'
+
+export type CSSFunction
+  = | AnchorFunction
+    | AnimationFunction
+    | ColorFunction
+    | ComparisonFunction
+    | CounterFunction
+    | ExponentialFunction
+    | FilterFunction
+    | FontFunction
+    | GradientFunction
+    | ImageFunction
+    | MatrixFunction
+    | ReferenceFunction
+    | RotationFunction
+    | ScalingFunction
+    | ShapeFunction
+    | SkewFunction
+    | SteppedValueFunction
+    | TranslationFunction
+    | TreeCountingFunction
+    | TrigonometricFunction
+
+export interface CssInJs extends Partial<KeyframeVariables>, Partial<PropertyVariableCollection> {
+  [key: string]: Collection | string | string[]
+}
+
+export type CSSRuleObject = CssInJs | CssInJs[]
+
+export type CSSValue = (string & {}) | Variable
+
+export type DataType
+  = | 'absolute-size'
+    | 'angle'
+    | 'any'
+    | 'bg-size'
+    | 'color'
+    | 'family-name'
+    | 'generic-name'
+    | 'image'
+    | 'integer'
+    | 'length'
+    | 'line-width'
+    | 'number'
+    | 'percentage'
+    | 'position'
+    | 'ratio'
+    | 'relative-size'
+    | 'shadow'
+    | 'url'
+    | 'vector'
+
+export type DeprecatedNonStandardPropertyType
+  = | 'box-align'
+    | 'box-direction'
+    | 'box-flex'
+    | 'box-flex-group'
+    | 'box-lines'
+    | 'box-ordinal-group'
+    | 'box-orient'
+    | 'box-pack'
+    | 'user-modify'
+
+export type DeprecatedPropertyType = DeprecatedNonStandardPropertyType | DeprecatedStandardPropertyType
+
+export type DeprecatedStandardPropertyType
+  = | 'clip'
+    | 'font-stretch'
+    | 'page-break-after'
+    | 'page-break-before'
+    | 'page-break-inside'
+
+export type EffectKeyframes = `@keyframes jumi-${Effect}`
+
+export type EffectKeyframesCollection = Record<EffectKeyframes, Keyframes>
+
+export type ExperimentatalPropertyType
+  = | 'caret'
+    | 'caret-animation'
+    | 'caret-shape'
+    | 'corner-block-end-shape'
+    | 'corner-block-start-shape'
+    | 'corner-bottom-left-shape'
+    | 'corner-bottom-right-shape'
+    | 'corner-bottom-shape'
+    | 'corner-end-end-shape'
+    | 'corner-end-start-shape'
+    | 'corner-inline-end-shape'
+    | 'corner-inline-start-shape'
+    | 'corner-left-shape'
+    | 'corner-right-shape'
+    | 'corner-shape'
+    | 'corner-start-end-shape'
+    | 'corner-start-start-shape'
+    | 'corner-top-left-shape'
+    | 'corner-top-right-shape'
+    | 'corner-top-shape'
+    | 'field-sizing'
+    | 'font-synthesis-position'
+    | 'image-resolution'
+    | 'interpolate-size'
+    | 'line-height-step'
+    | 'margin-trim'
+    | 'math-shift'
+    | 'overlay'
+    | 'position-visibility'
+    | 'reading-flow'
+    | 'reading-order'
+    | 'scroll-marker-group'
+    | 'scroll-target-group'
+    | 'speak-as'
+    | 'text-decoration-skip'
+    | 'text-size-adjust'
+    | 'text-spacing-trim'
+
+export type ExponentialFunction
+  = | 'abs'
+    | 'exp'
+    | 'hypot'
+    | 'log'
+    | 'pow'
+    | 'sign'
+    | 'sqrt'
+
+export type FilterFunction
+  = | 'blur'
+    | 'brightness'
+    | 'contrast'
+    | 'drop-shadow'
+    | 'grayscale'
+    | 'hue-rotate'
+    | 'invert'
+    | 'opacity'
+    | 'saturate'
+    | 'sepia'
+
+export type FontFunction
+  = | 'annotation'
+    | 'character-variant'
+    | 'ornaments'
+    | 'styleset'
+    | 'stylistic'
+    | 'swash'
+
+export type GradientFunction
+  = | 'conic-gradient'
+    | 'linear-gradient'
+    | 'radial-gradient'
+    | 'repeating-conic-gradient'
+    | 'repeating-linear-gradient'
+    | 'repeating-radial-gradient'
+
+export type ImageFunction
+  = | 'cross-fade'
+    | 'element'
+    | 'image'
+    | 'image-set'
+    | 'paint'
+
+export type KeyframeDefinition = Collection<Collection<number | string>>
+
+export type Keyframes = Partial<Record<AnimationFrame, PropertiesType>>
+
+export type KeyframesVariableReference = `var(${StandardPropertyKeyframesVariable}, none)`
+
+export type KeyframeVariables = Record<StandardPropertyKeyframesVariable, string>
+
+export type MatchProperty = Record<MatchUtilitiesPropertyKey, MatchUtilitiesPropertyValue>
+
+export interface MatchUtilitiesOptions {
+  modifiers: Collection<string>
+  supportsNegativeValues: boolean
+  type: Array<DataType> | DataType
+  values: Collection
+}
+
+export type MatchUtilitiesPropertyFunction = (value: string, extra: { modifier: null | string }) => CSSRuleObject
+
+export type MatchUtilitiesPropertyKey = 'animate' | `animate-${AnimatableStandardPropertyType}` | `animate-${NonStandardPropertyType}` | AnimationPropertyType
+
+export interface MatchUtilitiesPropertyValue extends Partial<MatchUtilitiesOptions> {
+  property: MatchUtilitiesPropertyFunction
+}
+
+export interface MatchVariant {
+  generator: (value: string) => string
+  name: string
+  values: Collection<string>
+}
+
+export type MatrixFunction
+  = | 'calc'
+    | 'calc-size'
+    | 'matrix3d'
+    | 'matrix'
+    | 'perspective'
+
+export type NonAnimatableStandardPropertyType
+  = | 'anchor-name'
+    | 'container'
+    | 'container-name'
+    | 'direction'
+    | 'isolation'
+    | 'scroll-behavior'
+    | 'scroll-timeline'
+    | 'scroll-timeline-axis'
+    | 'scroll-timeline-name'
+    | 'timeline-scope'
+    | 'touch-action'
+    | 'transition'
+    | 'transition-behavior'
+    | 'transition-delay'
+    | 'transition-duration'
+    | 'transition-property'
+    | 'transition-timing-function'
+    | 'unicode-bidi'
+    | 'view-timeline'
+    | 'view-timeline-axis'
+    | 'view-timeline-name'
+    | 'zoom'
+    | StandardAnimationPropertyType
+
+export type NonStandardAnimtionPropertyType
+  = | 'animation-range-end-offset'
+    | 'animation-range-end-timeline'
+    | 'animation-range-start-offset'
+    | 'animation-range-start-timeline'
+    | 'animation-timeline-axis'
+    | 'animation-timeline-inset'
+    | 'animation-timeline-inset-end'
+    | 'animation-timeline-inset-start'
+    | 'animation-timeline-scroller'
+
+export type NonStandardPropertyType
+  = | 'aspect-ratio-height'
+    | 'aspect-ratio-width'
+    | 'backdrop-blur'
+    | 'backdrop-brightness'
+    | 'backdrop-contrast'
+    | 'backdrop-drop-shadow'
+    | 'backdrop-drop-shadow-blur'
+    | 'backdrop-drop-shadow-color'
+    | 'backdrop-drop-shadow-offset-x'
+    | 'backdrop-drop-shadow-offset-y'
+    | 'backdrop-grayscale'
+    | 'backdrop-hue-rotate'
+    | 'backdrop-invert'
+    | 'backdrop-opacity'
+    | 'backdrop-saturate'
+    | 'backdrop-sepia'
+    | 'backdrop-url'
+    | 'background-position-x-edge'
+    | 'background-position-x-offset'
+    | 'background-position-y-edge'
+    | 'background-position-y-offset'
+    | 'background-repeat-x'
+    | 'background-repeat-y'
+    | 'background-size-height'
+    | 'background-size-width'
+    | 'border-block-end-radius'
+    | 'border-block-radius'
+    | 'border-block-start-radius'
+    | 'border-bottom-radius'
+    | 'border-image-outset-bottom'
+    | 'border-image-outset-left'
+    | 'border-image-outset-right'
+    | 'border-image-outset-top'
+    | 'border-image-outset-x'
+    | 'border-image-outset-y'
+    | 'border-image-repeat-x'
+    | 'border-image-repeat-y'
+    | 'border-inline-end-radius'
+    | 'border-inline-radius'
+    | 'border-inline-start-radius'
+    | 'border-left-radius'
+    | 'border-right-radius'
+    | 'border-top-radius'
+    | 'box-shadow-blur'
+    | 'box-shadow-color'
+    | 'box-shadow-inset'
+    | 'box-shadow-offset-x'
+    | 'box-shadow-offset-y'
+    | 'box-shadow-outset'
+    | 'box-shadow-spread'
+    | 'display-inside'
+    | 'display-outside'
+    | 'filter-blur'
+    | 'filter-brightness'
+    | 'filter-contrast'
+    | 'filter-drop-shadow'
+    | 'filter-drop-shadow-blur'
+    | 'filter-drop-shadow-color'
+    | 'filter-drop-shadow-offset-x'
+    | 'filter-drop-shadow-offset-y'
+    | 'filter-grayscale'
+    | 'filter-hue-rotate'
+    | 'filter-invert'
+    | 'filter-opacity'
+    | 'filter-saturate'
+    | 'filter-sepia'
+    | 'filter-url'
+    | 'font-smooth'
+    | 'hyphenate-limit-minimum-characters-after'
+    | 'hyphenate-limit-minimum-characters-before'
+    | 'hyphenate-limit-minimum-word-length'
+    | 'mask-border-outset-bottom'
+    | 'mask-border-outset-left'
+    | 'mask-border-outset-right'
+    | 'mask-border-outset-top'
+    | 'mask-border-outset-x'
+    | 'mask-border-outset-y'
+    | 'mask-border-repeat-x'
+    | 'mask-border-repeat-y'
+    | 'mask-border-slice-bottom'
+    | 'mask-border-slice-left'
+    | 'mask-border-slice-right'
+    | 'mask-border-slice-top'
+    | 'mask-border-slice-x'
+    | 'mask-border-slice-y'
+    | 'mask-position-x'
+    | 'mask-position-y'
+    | 'math-depth-add'
+    | 'matrix'
+    | 'matrix-3d'
+    | 'matrix-a1'
+    | 'matrix-a2'
+    | 'matrix-a3'
+    | 'matrix-a4'
+    | 'matrix-a'
+    | 'matrix-b1'
+    | 'matrix-b2'
+    | 'matrix-b3'
+    | 'matrix-b4'
+    | 'matrix-b'
+    | 'matrix-c1'
+    | 'matrix-c2'
+    | 'matrix-c3'
+    | 'matrix-c4'
+    | 'matrix-c'
+    | 'matrix-d1'
+    | 'matrix-d2'
+    | 'matrix-d3'
+    | 'matrix-d4'
+    | 'matrix-d'
+    | 'matrix-tx'
+    | 'matrix-ty'
+    | 'object-position-x'
+    | 'object-position-x-edge'
+    | 'object-position-x-offset'
+    | 'object-position-y'
+    | 'object-position-y-edge'
+    | 'object-position-y-offset'
+    | 'offset-anchor-x'
+    | 'offset-anchor-x-edge'
+    | 'offset-anchor-x-offset'
+    | 'offset-anchor-y'
+    | 'offset-anchor-y-edge'
+    | 'offset-anchor-y-offset'
+    | 'offset-position-x'
+    | 'offset-position-x-edge'
+    | 'offset-position-x-offset'
+    | 'offset-position-y'
+    | 'offset-position-y-edge'
+    | 'offset-position-y-offset'
+    | 'rotate-3d'
+    | 'rotate-x'
+    | 'rotate-y'
+    | 'rotate-z'
+    | 'scale-3d'
+    | 'scale-x'
+    | 'scale-y'
+    | 'scale-z'
+    | 'skew'
+    | 'skew-x'
+    | 'skew-y'
+    | 'text-shadow-blur-radius'
+    | 'text-shadow-color'
+    | 'text-shadow-offset-x'
+    | 'text-shadow-offset-y'
     | 'transform-origin-x'
     | 'transform-origin-y'
     | 'transform-origin-z'
-    | 'transform-style'
-    | 'translate'
     | 'translate-3d'
     | 'translate-x'
     | 'translate-y'
     | 'translate-z'
-    | 'user-drag'
-    | 'user-select'
-    | 'vertical-align'
-    | 'visibility'
-    | 'white-space'
-    | 'width'
-    | 'word-break'
-    | 'z-index'
 
-export type PropertyKeyframes = `--jumi-${Attribute}-keyframes`
+export interface PropertiesType<TLength = 0 | (string & {}), TTime = string & {}>
+  extends StandardPropertiesType<TLength, TTime>, SvgPropertiesType<TLength, TTime> {
+  [key: string]: unknown
+}
 
-export type PropertyVariable = `--jumi-${Property}`
+export type PropertyType
+  = | NonStandardAnimtionPropertyType
+    | NonStandardPropertyType
+    | StandardPropertyType
 
-export type PropertyVariables = Collection<string, PropertyVariable>
+export type PropertyVariable = `--jumi-${PropertyType}`
 
-export type SvgAttribute = SvgAttributes extends `[${infer U}]` ? U : never
+export type PropertyVariableCollection = Record<PropertyVariable, string>
+
+export type PropertyVariables = Record<string, PropertyVariableCollection>
+
+export type ReferenceFunction
+  = | 'attr'
+    | 'env'
+    | 'if'
+    | 'url'
+    | 'var'
+
+export type RotationFunction
+  = | 'rotate3d'
+    | 'rotate'
+    | 'rotateX'
+    | 'rotateY'
+    | 'rotateZ'
+
+export type ScalingFunction
+  = | 'scale3d'
+    | 'scale'
+    | 'scaleX'
+    | 'scaleY'
+    | 'scaleZ'
+
+export type ShapeFunction
+  = | 'circle'
+    | 'ellipse'
+    | 'inset'
+    | 'path'
+    | 'polygon'
+    | 'ray'
+    | 'rect'
+    | 'shape'
+    | 'superellipse'
+    | 'xywh'
+
+export type SkewFunction
+  = | 'skew'
+    | 'skewX'
+    | 'skewY'
+
+export type StandardAnimationPropertyType
+  = | 'animation'
+    | 'animation-composition'
+    | 'animation-delay'
+    | 'animation-direction'
+    | 'animation-duration'
+    | 'animation-fill-mode'
+    | 'animation-iteration-count'
+    | 'animation-name'
+    | 'animation-play-state'
+    | 'animation-range'
+    | 'animation-range-end'
+    | 'animation-range-start'
+    | 'animation-timeline'
+    | 'animation-timing-function'
+
+export interface StandardPropertiesType<TLength = 0 | (string & {}), TTime = string & {}>
+  extends StandardPropertiesHyphen<TLength, TTime> {
+  'text-autospace'?: string
+  'text-box-edge'?: string
+  'text-box-trim'?: string
+  'text-wrap-mode'?: string
+  'text-wrap-style'?: string
+  'textbox'?: string
+  'view-transition-class'?: string
+}
+
+export type StandardPropertyKeyframes = `@keyframes jumi-${AnimatableStandardPropertyType}`
+
+export type StandardPropertyKeyframesCollection = Record<StandardPropertyKeyframes, Keyframes>
+
+export type StandardPropertyKeyframesVariable = `--jumi-${AnimatableStandardPropertyType}-keyframes`
+
+export type StandardPropertyType
+  = | AnimatableStandardPropertyType
+    | NonAnimatableStandardPropertyType
+
+export type SteppedValueFunction
+  = | 'mod'
+    | 'rem'
+    | 'round'
+
+export interface SvgPropertiesType<TLength = 0 | (string & {}), TTime = string & {}>
+  extends SvgPropertiesHyphen<TLength, TTime> {
+  'color-interpolation-filters'?: string
+  'cx'?: string
+  'cy'?: string
+  'd'?: string
+  'x'?: string
+  'y'?: string
+}
 
 export type TailwindTheme
   = | 'accentColor'
@@ -1170,154 +1089,25 @@ export type TailwindTheme
     | 'transitionProperty'
     | 'transitionTimingFunction'
     | 'translate'
+    | 'whiteSpace'
     | 'width'
     | 'willChange'
+    | 'x'
+    | 'y'
     | 'zIndex'
 
-export interface Variables extends AnimationVariables, KeyframeVariables, PropertyVariables {
-  [key: string]: string
-}
-
-type AnchorFunction
-  = | 'anchor'
-    | 'anchor-size'
-
-type AnimationFunction
-  = | 'scroll'
-    | 'view'
-
-type AnimationVariable = `--jumi-animation-${AnimationProperty}`
-
-type ColorFunction
-  = | 'color'
-    | 'color-mix'
-    | 'contrast-color'
-    | 'device-cmyk'
-    | 'hsl'
-    | 'hwb'
-    | 'lab'
-    | 'lch'
-    | 'light-dark'
-    | 'oklab'
-    | 'oklch'
-    | 'rgb'
-
-type ComparisonFunction
-  = | 'clamp'
-    | 'max'
-    | 'min'
-
-type CounterFunction
-  = | 'counter'
-    | 'counters'
-    | 'symbols'
-
-type ExponentialFunction
-  = | 'abs'
-    | 'exp'
-    | 'hypot'
-    | 'log'
-    | 'pow'
-    | 'sign'
-    | 'sqrt'
-
-type FilterFunction
-  = | 'blur'
-    | 'brightness'
-    | 'contrast'
-    | 'drop-shadow'
-    | 'grayscale'
-    | 'hue-rotate'
-    | 'invert'
-    | 'opacity'
-    | 'saturate'
-    | 'sepia'
-
-type FontFunction
-  = | 'annotation'
-    | 'character-variant'
-    | 'ornaments'
-    | 'styleset'
-    | 'stylistic'
-    | 'swash'
-
-type GradientFunction
-  = | 'conic-gradient'
-    | 'linear-gradient'
-    | 'radial-gradient'
-    | 'repeating-conic-gradient'
-    | 'repeating-linear-gradient'
-    | 'repeating-radial-gradient'
-
-type ImageFunction
-  = | 'cross-fade'
-    | 'element'
-    | 'image'
-    | 'image-set'
-    | 'paint'
-
-type MatrixFunction
-  = | 'calc'
-    | 'calc-size'
-    | 'matrix3d'
-    | 'matrix'
-    | 'perspective'
-
-type ReferenceFunction
-  = | 'attr'
-    | 'env'
-    | 'if'
-    | 'url'
-    | 'var'
-
-type RotationFunction
-  = | 'rotate3d'
-    | 'rotate'
-    | 'rotateX'
-    | 'rotateY'
-    | 'rotateZ'
-
-type ScalingFunction
-  = | 'scale3d'
-    | 'scale'
-    | 'scaleX'
-    | 'scaleY'
-    | 'scaleZ'
-
-type ShapeFunction
-  = | 'circle'
-    | 'ellipse'
-    | 'inset'
-    | 'path'
-    | 'polygon'
-    | 'ray'
-    | 'rect'
-    | 'shape'
-    | 'superellipse'
-    | 'xywh'
-
-type SkewFunction
-  = | 'skew'
-    | 'skewX'
-    | 'skewY'
-
-type SteppedValueFunction
-  = | 'mod'
-    | 'rem'
-    | 'round'
-
-type TranslationFunction
+export type TranslationFunction
   = | 'translate3d'
     | 'translate'
     | 'translateX'
     | 'translateY'
     | 'translateZ'
 
-type TreeCountingFunction
+export type TreeCountingFunction
   = | 'sibling-count'
     | 'sibling-index'
 
-type TrigonometricFunction
+export type TrigonometricFunction
   = | 'acos'
     | 'asin'
     | 'atan2'
@@ -1325,3 +1115,9 @@ type TrigonometricFunction
     | 'cos'
     | 'sin'
     | 'tan'
+
+export type Variable = PropertyVariable | StandardPropertyKeyframesVariable
+
+export interface VariablesCollection extends AnimationVariableCollection, KeyframeVariables, PropertyVariableCollection {
+  [key: string]: string
+}

@@ -1,10 +1,10 @@
 import type { Property } from 'csstype'
 
-import type { AttributeKeyframes } from '@/types'
+import type { StandardPropertyKeyframesCollection } from '@/types'
 
 import { css } from '@/helpers/css'
 
-export const propertyKeyframes: Partial<AttributeKeyframes> = {
+export const propertyKeyframes: StandardPropertyKeyframesCollection = {
   '@keyframes jumi-accent-color': {
     to: {
       'accent-color': css('var', '--jumi-accent-color'),
@@ -36,6 +36,11 @@ export const propertyKeyframes: Partial<AttributeKeyframes> = {
       all: css('var', '--jumi-all') as Property.All,
     },
   },
+  '@keyframes jumi-anchor-name': {
+    to: {
+      'anchor-name': css('var', '--jumi-anchor-name'),
+    },
+  },
   '@keyframes jumi-appearance': {
     to: {
       appearance: css('var', '--jumi-appearance') as Property.Appearance,
@@ -64,7 +69,7 @@ export const propertyKeyframes: Partial<AttributeKeyframes> = {
   },
   '@keyframes jumi-background-attachment': {
     to: {
-      'background-attachment': css('var', '--jumi-background-attachment') as Property.BackgroundAttachment,
+      'background-attachment': css('var', '--jumi-background-attachment'),
     },
   },
   '@keyframes jumi-background-blend-mode': {
@@ -74,7 +79,7 @@ export const propertyKeyframes: Partial<AttributeKeyframes> = {
   },
   '@keyframes jumi-background-clip': {
     to: {
-      'background-clip': css('var', '--jumi-background-clip') as Property.BackgroundClip,
+      'background-clip': css('var', '--jumi-background-clip'),
     },
   },
   '@keyframes jumi-background-color': {
@@ -89,7 +94,7 @@ export const propertyKeyframes: Partial<AttributeKeyframes> = {
   },
   '@keyframes jumi-background-origin': {
     to: {
-      'background-origin': css('var', '--jumi-background-origin') as Property.BackgroundOrigin,
+      'background-origin': css('var', '--jumi-background-origin'),
     },
   },
   '@keyframes jumi-background-position': {
@@ -97,9 +102,19 @@ export const propertyKeyframes: Partial<AttributeKeyframes> = {
       'background-position': css('var', '--jumi-background-position'),
     },
   },
+  '@keyframes jumi-background-position-x': {
+    to: {
+      'background-position-x': css('var', '--jumi-background-position-x'),
+    },
+  },
+  '@keyframes jumi-background-position-y': {
+    to: {
+      'background-position-y': css('var', '--jumi-background-position-y'),
+    },
+  },
   '@keyframes jumi-background-repeat': {
     to: {
-      'background-repeat': css('var', '--jumi-background-repeat') as Property.BackgroundRepeat,
+      'background-repeat': css('var', '--jumi-background-repeat'),
     },
   },
   '@keyframes jumi-background-size': {
@@ -432,11 +447,6 @@ export const propertyKeyframes: Partial<AttributeKeyframes> = {
       'box-shadow': css('var', '--jumi-box-shadow'),
     },
   },
-  '@keyframes jumi-box-shadow-inset': {
-    to: {
-      'box-shadow': css('var', '--jumi-box-shadow-inset') as Property.BoxShadow,
-    },
-  },
   '@keyframes jumi-box-sizing': {
     to: {
       'box-sizing': css('var', '--jumi-box-sizing') as Property.BoxSizing,
@@ -580,6 +590,11 @@ export const propertyKeyframes: Partial<AttributeKeyframes> = {
   '@keyframes jumi-contain-intrinsic-width': {
     to: {
       'contain-intrinsic-width': css('var', '--jumi-contain-intrinsic-width'),
+    },
+  },
+  '@keyframes jumi-container-type': {
+    to: {
+      'container-type': css('var', '--jumi-container-type') as Property.ContainerType,
     },
   },
   '@keyframes jumi-content': {
@@ -767,11 +782,6 @@ export const propertyKeyframes: Partial<AttributeKeyframes> = {
       'font-synthesis': css('var', '--jumi-font-synthesis'),
     },
   },
-  '@keyframes jumi-font-synthesis-position': {
-    to: {
-      'font-synthesis-position': css('var', '--jumi-font-synthesis-position') as Property.FontSynthesisPosition,
-    },
-  },
   '@keyframes jumi-font-synthesis-small-caps': {
     to: {
       'font-synthesis-small-caps': css('var', '--jumi-font-synthesis-small-caps') as Property.FontSynthesisSmallCaps,
@@ -852,6 +862,11 @@ export const propertyKeyframes: Partial<AttributeKeyframes> = {
       grid: css('var', '--jumi-grid'),
     },
   },
+  '@keyframes jumi-grid-area': {
+    to: {
+      'grid-area': css('var', '--jumi-grid-area'),
+    },
+  },
   '@keyframes jumi-grid-auto-columns': {
     to: {
       'grid-auto-columns': css('var', '--jumi-grid-auto-columns'),
@@ -895,6 +910,11 @@ export const propertyKeyframes: Partial<AttributeKeyframes> = {
   '@keyframes jumi-grid-row-start': {
     to: {
       'grid-row-start': css('var', '--jumi-grid-row-start'),
+    },
+  },
+  '@keyframes jumi-grid-template': {
+    to: {
+      'grid-template': css('var', '--jumi-grid-template'),
     },
   },
   '@keyframes jumi-grid-template-areas': {
@@ -1333,9 +1353,24 @@ export const propertyKeyframes: Partial<AttributeKeyframes> = {
       outline: css('var', '--jumi-outline'),
     },
   },
+  '@keyframes jumi-outline-color': {
+    to: {
+      'outline-color': css('var', '--jumi-outline-color'),
+    },
+  },
   '@keyframes jumi-outline-offset': {
     to: {
       'outline-offset': css('var', '--jumi-outline-offset'),
+    },
+  },
+  '@keyframes jumi-outline-style': {
+    to: {
+      'outline-style': css('var', '--jumi-outline-style'),
+    },
+  },
+  '@keyframes jumi-outline-width': {
+    to: {
+      'outline-width': css('var', '--jumi-outline-width'),
     },
   },
   '@keyframes jumi-overflow': {
@@ -1366,6 +1401,16 @@ export const propertyKeyframes: Partial<AttributeKeyframes> = {
   '@keyframes jumi-overflow-wrap': {
     to: {
       'overflow-wrap': css('var', '--jumi-overflow-wrap') as Property.OverflowWrap,
+    },
+  },
+  '@keyframes jumi-overflow-x': {
+    to: {
+      'overflow-x': css('var', '--jumi-overflow-x') as Property.OverflowX,
+    },
+  },
+  '@keyframes jumi-overflow-y': {
+    to: {
+      'overflow-y': css('var', '--jumi-overflow-y') as Property.OverflowY,
     },
   },
   '@keyframes jumi-overscroll-behavior': {
@@ -1458,9 +1503,34 @@ export const propertyKeyframes: Partial<AttributeKeyframes> = {
       'paint-order': css('var', '--jumi-paint-order') as Property.PaintOrder,
     },
   },
+  '@keyframes jumi-perspective': {
+    to: {
+      perspective: css('var', '--jumi-perspective'),
+    },
+  },
   '@keyframes jumi-perspective-origin': {
     to: {
       'perspective-origin': css('var', '--jumi-perspective-origin'),
+    },
+  },
+  '@keyframes jumi-place-content': {
+    to: {
+      'place-content': css('var', '--jumi-place-content'),
+    },
+  },
+  '@keyframes jumi-place-items': {
+    to: {
+      'place-items': css('var', '--jumi-place-items'),
+    },
+  },
+  '@keyframes jumi-place-self': {
+    to: {
+      'place-self': css('var', '--jumi-place-self'),
+    },
+  },
+  '@keyframes jumi-pointer-events': {
+    to: {
+      'pointer-events': css('var', '--jumi-pointer-events') as Property.PointerEvents,
     },
   },
   '@keyframes jumi-position': {
@@ -1468,9 +1538,264 @@ export const propertyKeyframes: Partial<AttributeKeyframes> = {
       position: css('var', '--jumi-position') as Property.Position,
     },
   },
+  '@keyframes jumi-position-anchor': {
+    to: {
+      'position-anchor': css('var', '--jumi-position-anchor'),
+    },
+  },
+  '@keyframes jumi-position-area': {
+    to: {
+      'position-area': css('var', '--jumi-position-area'),
+    },
+  },
+  '@keyframes jumi-position-try': {
+    to: {
+      'position-try': css('var', '--jumi-position-try'),
+    },
+  },
+  '@keyframes jumi-position-try-fallbacks': {
+    to: {
+      'position-try-fallbacks': css('var', '--jumi-position-try-fallbacks'),
+    },
+  },
+  '@keyframes jumi-position-try-order': {
+    to: {
+      'position-try-order': css('var', '--jumi-position-try-order'),
+    },
+  },
+  '@keyframes jumi-print-color-adjust': {
+    to: {
+      'print-color-adjust': css('var', '--jumi-print-color-adjust') as Property.PrintColorAdjust,
+    },
+  },
+  '@keyframes jumi-quotes': {
+    to: {
+      quotes: css('var', '--jumi-quotes'),
+    },
+  },
+  '@keyframes jumi-r': {
+    to: {
+      r: css('var', '--jumi-r'),
+    },
+  },
+  '@keyframes jumi-resize': {
+    to: {
+      resize: css('var', '--jumi-resize') as Property.Resize,
+    },
+  },
   '@keyframes jumi-right': {
     to: {
       right: css('var', '--jumi-right'),
+    },
+  },
+  '@keyframes jumi-rotate': {
+    to: {
+      rotate: css('var', '--jumi-rotate'),
+    },
+  },
+  '@keyframes jumi-row-gap': {
+    to: {
+      'row-gap': css('var', '--jumi-row-gap'),
+    },
+  },
+  '@keyframes jumi-ruby-align': {
+    to: {
+      'ruby-align': css('var', '--jumi-ruby-align') as Property.RubyAlign,
+    },
+  },
+  '@keyframes jumi-ruby-overhang': {
+    to: {
+      'ruby-overhang': css('var', '--jumi-ruby-overhang'),
+    },
+  },
+  '@keyframes jumi-ruby-position': {
+    to: {
+      'ruby-position': css('var', '--jumi-ruby-position'),
+    },
+  },
+  '@keyframes jumi-rx': {
+    to: {
+      rx: css('var', '--jumi-rx'),
+    },
+  },
+  '@keyframes jumi-ry': {
+    to: {
+      ry: css('var', '--jumi-ry'),
+    },
+  },
+  '@keyframes jumi-scale': {
+    to: {
+      scale: css('var', '--jumi-scale'),
+    },
+  },
+  '@keyframes jumi-scroll-margin': {
+    to: {
+      'scroll-margin': css('var', '--jumi-scroll-margin'),
+    },
+  },
+  '@keyframes jumi-scroll-margin-block': {
+    to: {
+      'scroll-margin-block': css('var', '--jumi-scroll-margin-block'),
+    },
+  },
+  '@keyframes jumi-scroll-margin-block-end': {
+    to: {
+      'scroll-margin-block-end': css('var', '--jumi-scroll-margin-block-end'),
+    },
+  },
+  '@keyframes jumi-scroll-margin-block-start': {
+    to: {
+      'scroll-margin-block-start': css('var', '--jumi-scroll-margin-block-start'),
+    },
+  },
+  '@keyframes jumi-scroll-margin-bottom': {
+    to: {
+      'scroll-margin-bottom': css('var', '--jumi-scroll-margin-bottom'),
+    },
+  },
+  '@keyframes jumi-scroll-margin-inline': {
+    to: {
+      'scroll-margin-inline': css('var', '--jumi-scroll-margin-inline'),
+    },
+  },
+  '@keyframes jumi-scroll-margin-inline-end': {
+    to: {
+      'scroll-margin-inline-end': css('var', '--jumi-scroll-margin-inline-end'),
+    },
+  },
+  '@keyframes jumi-scroll-margin-inline-start': {
+    to: {
+      'scroll-margin-inline-start': css('var', '--jumi-scroll-margin-inline-start'),
+    },
+  },
+  '@keyframes jumi-scroll-margin-left': {
+    to: {
+      'scroll-margin-left': css('var', '--jumi-scroll-margin-left'),
+    },
+  },
+  '@keyframes jumi-scroll-margin-right': {
+    to: {
+      'scroll-margin-right': css('var', '--jumi-scroll-margin-right'),
+    },
+  },
+  '@keyframes jumi-scroll-margin-top': {
+    to: {
+      'scroll-margin-top': css('var', '--jumi-scroll-margin-top'),
+    },
+  },
+  '@keyframes jumi-scroll-padding': {
+    to: {
+      'scroll-padding': css('var', '--jumi-scroll-padding'),
+    },
+  },
+  '@keyframes jumi-scroll-padding-block': {
+    to: {
+      'scroll-padding-block': css('var', '--jumi-scroll-padding-block'),
+    },
+  },
+  '@keyframes jumi-scroll-padding-block-end': {
+    to: {
+      'scroll-padding-block-end': css('var', '--jumi-scroll-padding-block-end'),
+    },
+  },
+  '@keyframes jumi-scroll-padding-block-start': {
+    to: {
+      'scroll-padding-block-start': css('var', '--jumi-scroll-padding-block-start'),
+    },
+  },
+  '@keyframes jumi-scroll-padding-bottom': {
+    to: {
+      'scroll-padding-bottom': css('var', '--jumi-scroll-padding-bottom'),
+    },
+  },
+  '@keyframes jumi-scroll-padding-inline': {
+    to: {
+      'scroll-padding-inline': css('var', '--jumi-scroll-padding-inline'),
+    },
+  },
+  '@keyframes jumi-scroll-padding-inline-end': {
+    to: {
+      'scroll-padding-inline-end': css('var', '--jumi-scroll-padding-inline-end'),
+    },
+  },
+  '@keyframes jumi-scroll-padding-inline-start': {
+    to: {
+      'scroll-padding-inline-start': css('var', '--jumi-scroll-padding-inline-start'),
+    },
+  },
+  '@keyframes jumi-scroll-padding-left': {
+    to: {
+      'scroll-padding-left': css('var', '--jumi-scroll-padding-left'),
+    },
+  },
+  '@keyframes jumi-scroll-padding-right': {
+    to: {
+      'scroll-padding-right': css('var', '--jumi-scroll-padding-right'),
+    },
+  },
+  '@keyframes jumi-scroll-padding-top': {
+    to: {
+      'scroll-padding-top': css('var', '--jumi-scroll-padding-top'),
+    },
+  },
+  '@keyframes jumi-scroll-snap-align': {
+    to: {
+      'scroll-snap-align': css('var', '--jumi-scroll-snap-align'),
+    },
+  },
+  '@keyframes jumi-scroll-snap-stop': {
+    to: {
+      'scroll-snap-stop': css('var', '--jumi-scroll-snap-stop') as Property.ScrollSnapStop,
+    },
+  },
+  '@keyframes jumi-scroll-snap-type': {
+    to: {
+      'scroll-snap-type': css('var', '--jumi-scroll-snap-type'),
+    },
+  },
+  '@keyframes jumi-scrollbar-color': {
+    to: {
+      'scrollbar-color': css('var', '--jumi-scrollbar-color'),
+    },
+  },
+  '@keyframes jumi-scrollbar-gutter': {
+    to: {
+      'scrollbar-gutter': css('var', '--jumi-scrollbar-gutter'),
+    },
+  },
+  '@keyframes jumi-scrollbar-width': {
+    to: {
+      'scrollbar-width': css('var', '--jumi-scrollbar-width') as Property.ScrollbarWidth,
+    },
+  },
+  '@keyframes jumi-shape-image-threshold': {
+    to: {
+      'shape-image-threshold': css('var', '--jumi-shape-image-threshold'),
+    },
+  },
+  '@keyframes jumi-shape-margin': {
+    to: {
+      'shape-margin': css('var', '--jumi-shape-margin'),
+    },
+  },
+  '@keyframes jumi-shape-outside': {
+    to: {
+      'shape-outside': css('var', '--jumi-shape-outside'),
+    },
+  },
+  '@keyframes jumi-shape-rendering': {
+    to: {
+      'shape-rendering': css('var', '--jumi-shape-rendering') as Property.ShapeRendering,
+    },
+  },
+  '@keyframes jumi-stop-color': {
+    to: {
+      'stop-color': css('var', '--jumi-stop-color'),
+    },
+  },
+  '@keyframes jumi-stop-opacity': {
+    to: {
+      'stop-opacity': css('var', '--jumi-stop-opacity'),
     },
   },
   '@keyframes jumi-stroke': {
@@ -1513,6 +1838,16 @@ export const propertyKeyframes: Partial<AttributeKeyframes> = {
       'stroke-width': css('var', '--jumi-stroke-width'),
     },
   },
+  '@keyframes jumi-tab-size': {
+    to: {
+      'tab-size': css('var', '--jumi-tab-size'),
+    },
+  },
+  '@keyframes jumi-table-layout': {
+    to: {
+      'table-layout': css('var', '--jumi-table-layout') as Property.TableLayout,
+    },
+  },
   '@keyframes jumi-text-align': {
     to: {
       'text-align': css('var', '--jumi-text-align') as Property.TextAlign,
@@ -1523,9 +1858,144 @@ export const propertyKeyframes: Partial<AttributeKeyframes> = {
       'text-align-last': css('var', '--jumi-text-align-last') as Property.TextAlignLast,
     },
   },
+  '@keyframes jumi-text-anchor': {
+    to: {
+      'text-anchor': css('var', '--jumi-text-anchor') as Property.TextAnchor,
+    },
+  },
+  '@keyframes jumi-text-autospace': {
+    to: {
+      'text-autospace': css('var', '--jumi-text-autospace') as Property.MsTextAutospace,
+    },
+  },
+  '@keyframes jumi-text-box': {
+    to: {
+      textbox: css('var', '--jumi-text-box'),
+    },
+  },
+  '@keyframes jumi-text-box-edge': {
+    to: {
+      'text-box-edge': css('var', '--jumi-text-box-edge'),
+    },
+  },
+  '@keyframes jumi-text-box-trim': {
+    to: {
+      'text-box-trim': css('var', '--jumi-text-box-trim'),
+    },
+  },
+  '@keyframes jumi-text-combine-upright': {
+    to: {
+      'text-combine-upright': css('var', '--jumi-text-combine-upright'),
+    },
+  },
+  '@keyframes jumi-text-decoration': {
+    to: {
+      'text-decoration': css('var', '--jumi-text-decoration'),
+    },
+  },
+  '@keyframes jumi-text-decoration-color': {
+    to: {
+      'text-decoration-color': css('var', '--jumi-text-decoration-color'),
+    },
+  },
+  '@keyframes jumi-text-decoration-line': {
+    to: {
+      'text-decoration-line': css('var', '--jumi-text-decoration-line'),
+    },
+  },
+  '@keyframes jumi-text-decoration-skip-ink': {
+    to: {
+      'text-decoration-skip-ink': css('var', '--jumi-text-decoration-skip-ink') as Property.TextDecorationSkipInk,
+    },
+  },
+  '@keyframes jumi-text-decoration-style': {
+    to: {
+      'text-decoration-style': css('var', '--jumi-text-decoration-style') as Property.TextDecorationStyle,
+    },
+  },
+  '@keyframes jumi-text-decoration-thickness': {
+    to: {
+      'text-decoration-thickness': css('var', '--jumi-text-decoration-thickness'),
+    },
+  },
+  '@keyframes jumi-text-emphasis': {
+    to: {
+      'text-emphasis': css('var', '--jumi-text-emphasis'),
+    },
+  },
+  '@keyframes jumi-text-emphasis-color': {
+    to: {
+      'text-emphasis-color': css('var', '--jumi-text-emphasis-color'),
+    },
+  },
+  '@keyframes jumi-text-emphasis-position': {
+    to: {
+      'text-emphasis-position': css('var', '--jumi-text-emphasis-position'),
+    },
+  },
+  '@keyframes jumi-text-emphasis-style': {
+    to: {
+      'text-emphasis-style': css('var', '--jumi-text-emphasis-style'),
+    },
+  },
+  '@keyframes jumi-text-indent': {
+    to: {
+      'text-indent': css('var', '--jumi-text-indent'),
+    },
+  },
+  '@keyframes jumi-text-justify': {
+    to: {
+      'text-justify': css('var', '--jumi-text-justify') as Property.TextJustify,
+    },
+  },
+  '@keyframes jumi-text-orientation': {
+    to: {
+      'text-orientation': css('var', '--jumi-text-orientation') as Property.TextOrientation,
+    },
+  },
+  '@keyframes jumi-text-overflow': {
+    to: {
+      'text-overflow': css('var', '--jumi-text-overflow'),
+    },
+  },
+  '@keyframes jumi-text-rendering': {
+    to: {
+      'text-rendering': css('var', '--jumi-text-rendering') as Property.TextRendering,
+    },
+  },
   '@keyframes jumi-text-shadow': {
     to: {
       'text-shadow': css('var', '--jumi-text-shadow'),
+    },
+  },
+  '@keyframes jumi-text-transform': {
+    to: {
+      'text-transform': css('var', '--jumi-text-transform') as Property.TextTransform,
+    },
+  },
+  '@keyframes jumi-text-underline-offset': {
+    to: {
+      'text-underline-offset': css('var', '--jumi-text-underline-offset'),
+    },
+  },
+  '@keyframes jumi-text-underline-position': {
+    to: {
+      'text-underline-position': css('var', '--jumi-text-underline-position'),
+    },
+  },
+  '@keyframes jumi-text-wrap': {
+    to: {
+      'text-wrap': css('var', '--jumi-text-wrap') as Property.TextWrap,
+    },
+  },
+  '@keyframes jumi-text-wrap-mode': {
+    to: {
+      'text-wrap-mode': css('var', '--jumi-text-wrap-mode'),
+    },
+  },
+  '@keyframes jumi-text-wrap-style': {
+    to: {
+      'text-wrap-style': css('var', '--jumi-text-wrap-style'),
     },
   },
   '@keyframes jumi-top': {
@@ -1538,14 +2008,109 @@ export const propertyKeyframes: Partial<AttributeKeyframes> = {
       transform: css('var', '--jumi-transform'),
     },
   },
+  '@keyframes jumi-transform-box': {
+    to: {
+      'transform-box': css('var', '--jumi-transform-box') as Property.TransformBox,
+    },
+  },
+  '@keyframes jumi-transform-origin': {
+    to: {
+      'transform-origin': css('var', '--jumi-transform-origin'),
+    },
+  },
+  '@keyframes jumi-transform-style': {
+    to: {
+      'transform-style': css('var', '--jumi-transform-style') as Property.TransformStyle,
+    },
+  },
+  '@keyframes jumi-translate': {
+    to: {
+      translate: css('var', '--jumi-translate'),
+    },
+  },
+  '@keyframes jumi-user-select': {
+    to: {
+      'user-select': css('var', '--jumi-user-select') as Property.UserSelect,
+    },
+  },
+  '@keyframes jumi-vector-effect': {
+    to: {
+      'vector-effect': css('var', '--jumi-vector-effect') as Property.VectorEffect,
+    },
+  },
+  '@keyframes jumi-vertical-align': {
+    to: {
+      'vertical-align': css('var', '--jumi-vertical-align'),
+    },
+  },
+  '@keyframes jumi-view-timeline-inset': {
+    to: {
+      'view-timeline-inset': css('var', '--jumi-view-timeline-inset'),
+    },
+  },
+  '@keyframes jumi-view-transition-class': {
+    to: {
+      'view-transition-class': css('var', '--jumi-view-transition-class'),
+    },
+  },
+  '@keyframes jumi-view-transition-name': {
+    to: {
+      'view-transition-name': css('var', '--jumi-view-transition-name'),
+    },
+  },
   '@keyframes jumi-visibility': {
     to: {
       visibility: css('var', '--jumi-visibility') as Property.Visibility,
     },
   },
+  '@keyframes jumi-white-space': {
+    to: {
+      'white-space': css('var', '--jumi-white-space'),
+    },
+  },
+  '@keyframes jumi-white-space-collapse': {
+    to: {
+      'white-space-collapse': css('var', '--jumi-white-space-collapse') as Property.WhiteSpaceCollapse,
+    },
+  },
+  '@keyframes jumi-widows': {
+    to: {
+      widows: css('var', '--jumi-widows'),
+    },
+  },
   '@keyframes jumi-width': {
     to: {
       width: css('var', '--jumi-width'),
+    },
+  },
+  '@keyframes jumi-will-change': {
+    to: {
+      'will-change': css('var', '--jumi-will-change'),
+    },
+  },
+  '@keyframes jumi-word-break': {
+    to: {
+      'word-break': css('var', '--jumi-word-break') as Property.WordBreak,
+    },
+  },
+  '@keyframes jumi-word-spacing': {
+    to: {
+      'word-spacing': css('var', '--jumi-word-spacing'),
+    },
+  },
+  '@keyframes jumi-writing-mode': {
+    to: {
+      'writing-mode': css('var', '--jumi-writing-mode') as Property.WritingMode,
+    },
+  },
+  '@keyframes jumi-x': {
+    to: {
+      x: css('var', '--jumi-x'),
+    },
+  },
+  '@keyframes jumi-y': {
+    to: {
+      y: css('var', '--jumi-y'),
     },
   },
   '@keyframes jumi-z-index': {
@@ -1556,8 +2121,8 @@ export const propertyKeyframes: Partial<AttributeKeyframes> = {
 }
 
 type KeyframesCollection = {
+  attributes: Record<string, string>
   names: string[]
-  properties: Record<string, string>
 }
 
 const keyframes: KeyframesCollection = Object.keys(propertyKeyframes).reduce(
@@ -1572,12 +2137,12 @@ const keyframes: KeyframesCollection = Object.keys(propertyKeyframes).reduce(
     const property = name.slice('jumi-'.length)
 
     result.names.push(css('var', `--${variable}`, 'none'))
-    result.properties[property] = property
+    result.attributes[property] = property
 
     return result
   },
-  { names: [], properties: {} } as KeyframesCollection,
+  { attributes: {}, names: [] } as KeyframesCollection,
 )
 
 export const animationName = keyframes.names.join(', ')
-export const animationModifiers = keyframes.properties
+export const animationAttributes = keyframes.attributes

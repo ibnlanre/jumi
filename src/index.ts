@@ -1,13 +1,12 @@
 import type { Collection, CssInJs } from '@/types'
 
+import { effectKeyframes } from '@/keyframes/effects'
+import { propertyKeyframes } from '@/keyframes/property'
+import { addProperties } from '@/properties/add'
 import { getMatchProperties } from '@/properties/match'
-import { animationVariables } from '@/variables/animation'
 import { propertyVariables } from '@/variables/property'
+import { animationRegister } from '@/variables/register'
 import { variants } from '@/variants'
-
-import { effectKeyframes } from './keyframes/effects'
-import { propertyKeyframes } from './keyframes/property'
-import { addProperties } from './properties/add'
 
 import createPlugin from 'tailwindcss/plugin'
 
@@ -23,6 +22,16 @@ import createPlugin from 'tailwindcss/plugin'
 const keyframes: Array<CssInJs> = [effectKeyframes, propertyKeyframes]
 
 /**
+ * CSS @property declarations for custom properties.
+ *
+ * These are placed in the @base layer because:
+ * - @property rules must be defined globally like @keyframes
+ * - They register CSS custom properties with type information
+ * - They need to be available before any CSS that uses the properties
+ */
+const properties: Array<CssInJs> = [animationRegister]
+
+/**
  * CSS custom properties (variables) that provide default values.
  *
  * These are placed in the @utilities layer because:
@@ -31,7 +40,7 @@ const keyframes: Array<CssInJs> = [effectKeyframes, propertyKeyframes]
  * - This can lead to unforeseen problems where pseudo-elements inherit unwanted values
  * - @utilities layer provides the right specificity without forced inheritance
  */
-const variables: Array<Collection<CssInJs>> = [propertyVariables, animationVariables]
+const variables: Array<Collection<CssInJs>> = [propertyVariables]
 
 /**
  * Utility classes and animation properties.
@@ -47,7 +56,7 @@ const jumi = createPlugin((api) => {
   const { addBase, addUtilities, matchUtilities, matchVariant } = api
 
   variables.concat(utilities).forEach(addUtilities)
-  keyframes.forEach(addBase)
+  keyframes.concat(properties).forEach(addBase)
 
   for (const variant of variants) {
     matchVariant(variant.name, variant.generator, {
