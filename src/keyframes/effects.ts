@@ -416,6 +416,58 @@ export const effectKeyframes = {
       },
     },
   },
+  'expand-down': {
+    '@keyframes jumi-expand-down': {
+      '0%': {
+        height: '0%',
+        opacity: '1',
+      },
+      '100%': {
+        height: '100%',
+        opacity: '1',
+      },
+    },
+  },
+  'expand-left': {
+    '@keyframes jumi-expand-left': {
+      '0%': {
+        opacity: '1',
+        width: '0%',
+      },
+      '100%': {
+        opacity: '1',
+        width: '100%',
+      },
+    },
+  },
+  'expand-right': {
+    '@keyframes jumi-expand-right': {
+      '0%': {
+        opacity: '1',
+        transformOrigin: 'right',
+        width: '0%',
+      },
+      '100%': {
+        opacity: '1',
+        transformOrigin: 'right',
+        width: '100%',
+      },
+    },
+  },
+  'expand-up': {
+    '@keyframes jumi-expand-up': {
+      '0%': {
+        height: '0%',
+        opacity: '1',
+        transformOrigin: 'bottom',
+      },
+      '100%': {
+        height: '100%',
+        opacity: '1',
+        transformOrigin: 'bottom',
+      },
+    },
+  },
   'fade-in': {
     '@keyframes jumi-fade-in': {
       '0%': {
@@ -983,186 +1035,6 @@ export const effectKeyframes = {
       },
     },
   },
-  'frame-in': {
-    '@keyframes jumi-frame-in': {
-      '0%': {
-        'clip-path': 'polygon(0 40%, 100% 40%, 100% 60%, 0 60%)',
-      },
-      '100%': {
-        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-      },
-    },
-  },
-  'frame-in-bottom': {
-    '@keyframes jumi-frame-in-bottom': {
-      '0%': {
-        'clip-path': 'polygon(0 100%, 100% 100%, 100% 100%, 0 100%)',
-      },
-      '100%': {
-        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-      },
-    },
-  },
-  'frame-in-bottom-left': {
-    '@keyframes jumi-frame-in-bottom-left': {
-      '0%': {
-        'clip-path': 'polygon(0 100%, 0 100%, 0 100%, 0 100%)',
-      },
-      '100%': {
-        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-      },
-    },
-  },
-  'frame-in-bottom-right': {
-    '@keyframes jumi-frame-in-bottom-right': {
-      '0%': {
-        'clip-path': 'polygon(100% 100%, 100% 100%, 100% 100%, 100% 100%)',
-      },
-      '100%': {
-        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-      },
-    },
-  },
-  'frame-in-left': {
-    '@keyframes jumi-frame-in-left': {
-      '0%': {
-        'clip-path': 'polygon(0 0, 0 0, 0 100%, 0 100%)',
-      },
-      '100%': {
-        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-      },
-    },
-  },
-  'frame-in-right': {
-    '@keyframes jumi-frame-in-right': {
-      '0%': {
-        'clip-path': 'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)',
-      },
-      '100%': {
-        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-      },
-    },
-  },
-  'frame-in-top': {
-    '@keyframes jumi-frame-in-top': {
-      '0%': {
-        'clip-path': 'polygon(0 0, 100% 0, 100% 0, 0 0)',
-      },
-      '100%': {
-        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-      },
-    },
-  },
-  'frame-in-top-left': {
-    '@keyframes jumi-frame-in-top-left': {
-      '0%': {
-        'clip-path': 'polygon(0 0, 0 0, 0 0, 0 0)',
-      },
-      '100%': {
-        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-      },
-    },
-  },
-  'frame-in-top-right': {
-    '@keyframes jumi-frame-in-top-right': {
-      '0%': {
-        'clip-path': 'polygon(100% 0, 100% 0, 100% 0, 100% 0)',
-      },
-      '100%': {
-        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-      },
-    },
-  },
-  'frame-out': {
-    '@keyframes jumi-frame-out': {
-      '0%': {
-        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-      },
-      '100%': {
-        'clip-path': 'polygon(0 40%, 100% 40%, 100% 60%, 0 60%)',
-      },
-    },
-  },
-  'frame-out-bottom': {
-    '@keyframes jumi-frame-out-bottom': {
-      '0%': {
-        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-      },
-      '100%': {
-        'clip-path': 'polygon(0 100%, 100% 100%, 100% 100%, 0 100%)',
-      },
-    },
-  },
-  'frame-out-bottom-left': {
-    '@keyframes jumi-frame-out-bottom-left': {
-      '0%': {
-        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-      },
-      '100%': {
-        'clip-path': 'polygon(0 100%, 0 100%, 0 100%, 0 100%)',
-      },
-    },
-  },
-  'frame-out-bottom-right': {
-    '@keyframes jumi-frame-out-bottom-right': {
-      '0%': {
-        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-      },
-      '100%': {
-        'clip-path': 'polygon(100% 100%, 100% 100%, 100% 100%, 100% 100%)',
-      },
-    },
-  },
-  'frame-out-left': {
-    '@keyframes jumi-frame-out-left': {
-      '0%': {
-        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-      },
-      '100%': {
-        'clip-path': 'polygon(0 0, 0 0, 0 100%, 0 100%)',
-      },
-    },
-  },
-  'frame-out-right': {
-    '@keyframes jumi-frame-out-right': {
-      '0%': {
-        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-      },
-      '100%': {
-        'clip-path': 'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)',
-      },
-    },
-  },
-  'frame-out-top': {
-    '@keyframes jumi-frame-out-top': {
-      '0%': {
-        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-      },
-      '100%': {
-        'clip-path': 'polygon(0 0, 100% 0, 100% 0, 0 0)',
-      },
-    },
-  },
-  'frame-out-top-left': {
-    '@keyframes jumi-frame-out-top-left': {
-      '0%': {
-        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-      },
-      '100%': {
-        'clip-path': 'polygon(0 0, 0 0, 0 0, 0 0)',
-      },
-    },
-  },
-  'frame-out-top-right': {
-    '@keyframes jumi-frame-out-top-right': {
-      '0%': {
-        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-      },
-      '100%': {
-        'clip-path': 'polygon(100% 0, 100% 0, 100% 0, 100% 0)',
-      },
-    },
-  },
   'glitch': {
     '@keyframes jumi-glitch': {
       '0%, 100%': {
@@ -1310,6 +1182,96 @@ export const effectKeyframes = {
       },
     },
   },
+  'mask': {
+    '@keyframes jumi-mask': {
+      '0%': {
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+      },
+      '100%': {
+        'clip-path': 'polygon(0 40%, 100% 40%, 100% 60%, 0 60%)',
+      },
+    },
+  },
+  'mask-bottom': {
+    '@keyframes jumi-mask-bottom': {
+      '0%': {
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+      },
+      '100%': {
+        'clip-path': 'polygon(0 100%, 100% 100%, 100% 100%, 0 100%)',
+      },
+    },
+  },
+  'mask-bottom-left': {
+    '@keyframes jumi-mask-bottom-left': {
+      '0%': {
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+      },
+      '100%': {
+        'clip-path': 'polygon(0 100%, 0 100%, 0 100%, 0 100%)',
+      },
+    },
+  },
+  'mask-bottom-right': {
+    '@keyframes jumi-mask-bottom-right': {
+      '0%': {
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+      },
+      '100%': {
+        'clip-path': 'polygon(100% 100%, 100% 100%, 100% 100%, 100% 100%)',
+      },
+    },
+  },
+  'mask-left': {
+    '@keyframes jumi-mask-left': {
+      '0%': {
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+      },
+      '100%': {
+        'clip-path': 'polygon(0 0, 0 0, 0 100%, 0 100%)',
+      },
+    },
+  },
+  'mask-right': {
+    '@keyframes jumi-mask-right': {
+      '0%': {
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+      },
+      '100%': {
+        'clip-path': 'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)',
+      },
+    },
+  },
+  'mask-top': {
+    '@keyframes jumi-mask-top': {
+      '0%': {
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+      },
+      '100%': {
+        'clip-path': 'polygon(0 0, 100% 0, 100% 0, 0 0)',
+      },
+    },
+  },
+  'mask-top-left': {
+    '@keyframes jumi-mask-top-left': {
+      '0%': {
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+      },
+      '100%': {
+        'clip-path': 'polygon(0 0, 0 0, 0 0, 0 0)',
+      },
+    },
+  },
+  'mask-top-right': {
+    '@keyframes jumi-mask-top-right': {
+      '0%': {
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+      },
+      '100%': {
+        'clip-path': 'polygon(100% 0, 100% 0, 100% 0, 100% 0)',
+      },
+    },
+  },
   'morph': {
     '@keyframes jumi-morph': {
       '0%': {
@@ -1371,51 +1333,51 @@ export const effectKeyframes = {
       },
     },
   },
-  'reveal-bottom': {
-    '@keyframes jumi-reveal-bottom': {
-      from: {
-        'bottom': 0,
-        'inset-inline': 0,
-        'width': '100%',
+  'reveal-down': {
+    '@keyframes jumi-reveal-down': {
+      '0%': {
+        clipPath: 'polygon(0 0, 100% 0, 100% 0, 0 0)',
+        opacity: '0',
       },
-      to: {
-        width: '0%',
+      '100%': {
+        clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+        opacity: '1',
       },
     },
   },
   'reveal-left': {
     '@keyframes jumi-reveal-left': {
-      from: {
-        'inset-block': 0,
-        'left': 0,
-        'width': '0%',
+      '0%': {
+        clipPath: 'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)',
+        opacity: '0',
       },
-      to: {
-        width: '100%',
+      '100%': {
+        clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+        opacity: '1',
       },
     },
   },
   'reveal-right': {
     '@keyframes jumi-reveal-right': {
-      from: {
-        'inset-block': 0,
-        'right': 0,
-        'width': '0%',
+      '0%': {
+        clipPath: 'polygon(0 0, 0 0, 0 100%, 0 100%)',
+        opacity: '0',
       },
-      to: {
-        width: '100%',
+      '100%': {
+        clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+        opacity: '1',
       },
     },
   },
-  'reveal-top': {
-    '@keyframes jumi-reveal-top': {
-      from: {
-        'height': '0%',
-        'inset-inline': 0,
-        'top': 0,
+  'reveal-up': {
+    '@keyframes jumi-reveal-up': {
+      '0%': {
+        clipPath: 'polygon(0 100%, 100% 100%, 100% 100%, 0 100%)',
+        opacity: '0',
       },
-      to: {
-        height: '100%',
+      '100%': {
+        clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+        opacity: '1',
       },
     },
   },
@@ -1448,6 +1410,158 @@ export const effectKeyframes = {
       },
       '100%': {
         transform: 'rotate(360deg)',
+      },
+    },
+  },
+  'rush-in-down': {
+    '@keyframes jumi-rush-in-down': {
+      '0%': {
+        opacity: '0',
+        transform: 'translateY(-200px) skewY(30deg) scale(0.8)',
+      },
+      '60%': {
+        opacity: '1',
+        transform: 'translateY(20px) skewY(-5deg) scale(1.05)',
+      },
+      '80%': {
+        transform: 'translateY(-5px) skewY(2deg) scale(0.98)',
+      },
+      '100%': {
+        opacity: '1',
+        transform: 'translateY(0) skewY(0deg) scale(1)',
+      },
+    },
+  },
+  'rush-in-left': {
+    '@keyframes jumi-rush-in-left': {
+      '0%': {
+        opacity: '0',
+        transform: 'translateX(-200px) skewX(30deg) scale(0.8)',
+      },
+      '60%': {
+        opacity: '1',
+        transform: 'translateX(20px) skewX(-5deg) scale(1.05)',
+      },
+      '80%': {
+        transform: 'translateX(-5px) skewX(2deg) scale(0.98)',
+      },
+      '100%': {
+        opacity: '1',
+        transform: 'translateX(0) skewX(0deg) scale(1)',
+      },
+    },
+  },
+  'rush-in-right': {
+    '@keyframes jumi-rush-in-right': {
+      '0%': {
+        opacity: '0',
+        transform: 'translateX(200px) skewX(-30deg) scale(0.8)',
+      },
+      '60%': {
+        opacity: '1',
+        transform: 'translateX(-20px) skewX(5deg) scale(1.05)',
+      },
+      '80%': {
+        transform: 'translateX(5px) skewX(-2deg) scale(0.98)',
+      },
+      '100%': {
+        opacity: '1',
+        transform: 'translateX(0) skewX(0deg) scale(1)',
+      },
+    },
+  },
+  'rush-in-up': {
+    '@keyframes jumi-rush-in-up': {
+      '0%': {
+        opacity: '0',
+        transform: 'translateY(200px) skewY(-30deg) scale(0.8)',
+      },
+      '60%': {
+        opacity: '1',
+        transform: 'translateY(-20px) skewY(5deg) scale(1.05)',
+      },
+      '80%': {
+        transform: 'translateY(5px) skewY(-2deg) scale(0.98)',
+      },
+      '100%': {
+        opacity: '1',
+        transform: 'translateY(0) skewY(0deg) scale(1)',
+      },
+    },
+  },
+  'rush-out-down': {
+    '@keyframes jumi-rush-out-down': {
+      '0%': {
+        opacity: '1',
+        transform: 'translateY(0) skewY(0deg) scale(1)',
+      },
+      '20%': {
+        transform: 'translateY(-5px) skewY(2deg) scale(0.98)',
+      },
+      '40%': {
+        opacity: '1',
+        transform: 'translateY(20px) skewY(-5deg) scale(1.05)',
+      },
+      '100%': {
+        opacity: '0',
+        transform: 'translateY(200px) skewY(-30deg) scale(0.8)',
+      },
+    },
+  },
+  'rush-out-left': {
+    '@keyframes jumi-rush-out-left': {
+      '0%': {
+        opacity: '1',
+        transform: 'translateX(0) skewX(0deg) scale(1)',
+      },
+      '20%': {
+        transform: 'translateX(5px) skewX(-2deg) scale(0.98)',
+      },
+      '40%': {
+        opacity: '1',
+        transform: 'translateX(-20px) skewX(5deg) scale(1.05)',
+      },
+      '100%': {
+        opacity: '0',
+        transform: 'translateX(-200px) skewX(30deg) scale(0.8)',
+      },
+    },
+  },
+  'rush-out-right': {
+    '@keyframes jumi-rush-out-right': {
+      '0%': {
+        opacity: '1',
+        transform: 'translateX(0) skewX(0deg) scale(1)',
+      },
+      '20%': {
+        transform: 'translateX(-5px) skewX(2deg) scale(0.98)',
+      },
+      '40%': {
+        opacity: '1',
+        transform: 'translateX(20px) skewX(-5deg) scale(1.05)',
+      },
+      '100%': {
+        opacity: '0',
+        transform: 'translateX(200px) skewX(-30deg) scale(0.8)',
+      },
+    },
+  },
+  'rush-out-up': {
+    '@keyframes jumi-rush-out-up': {
+      '0%': {
+        opacity: '1',
+        transform: 'translateY(0) skewY(0deg) scale(1)',
+      },
+      '20%': {
+        transform: 'translateY(5px) skewY(-2deg) scale(0.98)',
+      },
+      '40%': {
+        opacity: '1',
+        transform: 'translateY(-20px) skewY(5deg) scale(1.05)',
+      },
+      '100%': {
+        opacity: '0',
+        transform: 'translateY(-200px) skewY(30deg) scale(0.8)',
       },
     },
   },
@@ -1585,7 +1699,6 @@ export const effectKeyframes = {
       },
     },
   },
-
   'slide-in-right': {
     '@keyframes jumi-slide-in-right': {
       '0%': {
@@ -1682,7 +1795,6 @@ export const effectKeyframes = {
       },
     },
   },
-
   'slide-out-down': {
     '@keyframes jumi-slide-out-down': {
       '0%': {
@@ -1784,54 +1896,6 @@ export const effectKeyframes = {
       '100%': {
         opacity: '1',
         transform: 'translate3d(0, 0, 0)',
-      },
-    },
-  },
-  'slide-reveal-down': {
-    '@keyframes jumi-slide-reveal-down': {
-      '0%': {
-        clipPath: 'polygon(0 0, 100% 0, 100% 0, 0 0)',
-        opacity: '0',
-      },
-      '100%': {
-        clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-        opacity: '1',
-      },
-    },
-  },
-  'slide-reveal-left': {
-    '@keyframes jumi-slide-reveal-left': {
-      '0%': {
-        clipPath: 'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)',
-        opacity: '0',
-      },
-      '100%': {
-        clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-        opacity: '1',
-      },
-    },
-  },
-  'slide-reveal-right': {
-    '@keyframes jumi-slide-reveal-right': {
-      '0%': {
-        clipPath: 'polygon(0 0, 0 0, 0 100%, 0 100%)',
-        opacity: '0',
-      },
-      '100%': {
-        clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-        opacity: '1',
-      },
-    },
-  },
-  'slide-reveal-up': {
-    '@keyframes jumi-slide-reveal-up': {
-      '0%': {
-        clipPath: 'polygon(0 100%, 100% 100%, 100% 100%, 0 100%)',
-        opacity: '0',
-      },
-      '100%': {
-        clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-        opacity: '1',
       },
     },
   },
@@ -2342,6 +2406,96 @@ export const effectKeyframes = {
       },
     },
   },
+  'unmask': {
+    '@keyframes jumi-unmask': {
+      '0%': {
+        'clip-path': 'polygon(0 40%, 100% 40%, 100% 60%, 0 60%)',
+      },
+      '100%': {
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+      },
+    },
+  },
+  'unmask-bottom': {
+    '@keyframes jumi-unmask-bottom': {
+      '0%': {
+        'clip-path': 'polygon(0 100%, 100% 100%, 100% 100%, 0 100%)',
+      },
+      '100%': {
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+      },
+    },
+  },
+  'unmask-bottom-left': {
+    '@keyframes jumi-unmask-bottom-left': {
+      '0%': {
+        'clip-path': 'polygon(0 100%, 0 100%, 0 100%, 0 100%)',
+      },
+      '100%': {
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+      },
+    },
+  },
+  'unmask-bottom-right': {
+    '@keyframes jumi-unmask-bottom-right': {
+      '0%': {
+        'clip-path': 'polygon(100% 100%, 100% 100%, 100% 100%, 100% 100%)',
+      },
+      '100%': {
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+      },
+    },
+  },
+  'unmask-left': {
+    '@keyframes jumi-unmask-left': {
+      '0%': {
+        'clip-path': 'polygon(0 0, 0 0, 0 100%, 0 100%)',
+      },
+      '100%': {
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+      },
+    },
+  },
+  'unmask-right': {
+    '@keyframes jumi-unmask-right': {
+      '0%': {
+        'clip-path': 'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)',
+      },
+      '100%': {
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+      },
+    },
+  },
+  'unmask-top': {
+    '@keyframes jumi-unmask-top': {
+      '0%': {
+        'clip-path': 'polygon(0 0, 100% 0, 100% 0, 0 0)',
+      },
+      '100%': {
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+      },
+    },
+  },
+  'unmask-top-left': {
+    '@keyframes jumi-unmask-top-left': {
+      '0%': {
+        'clip-path': 'polygon(0 0, 0 0, 0 0, 0 0)',
+      },
+      '100%': {
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+      },
+    },
+  },
+  'unmask-top-right': {
+    '@keyframes jumi-unmask-top-right': {
+      '0%': {
+        'clip-path': 'polygon(100% 0, 100% 0, 100% 0, 100% 0)',
+      },
+      '100%': {
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+      },
+    },
+  },
   'wave': {
     '@keyframes jumi-wave': {
       '0%, 100%': {
@@ -2433,7 +2587,6 @@ export const effectKeyframes = {
       },
     },
   },
-
   'zoom-in': {
     '@keyframes jumi-zoom-in': {
       '0%': {
@@ -2450,7 +2603,6 @@ export const effectKeyframes = {
       },
     },
   },
-
   'zoom-in-down': {
     '@keyframes jumi-zoom-in-down': {
       '0%': {
@@ -2467,7 +2619,6 @@ export const effectKeyframes = {
       },
     },
   },
-
   'zoom-in-elastic': {
     '@keyframes jumi-zoom-in-elastic': {
       '0%': {
@@ -2522,7 +2673,6 @@ export const effectKeyframes = {
       },
     },
   },
-
   'zoom-in-up': {
     '@keyframes jumi-zoom-in-up': {
       '0%': {
@@ -2539,7 +2689,6 @@ export const effectKeyframes = {
       },
     },
   },
-
   'zoom-out': {
     '@keyframes jumi-zoom-out': {
       '0%': {
@@ -2556,7 +2705,6 @@ export const effectKeyframes = {
       },
     },
   },
-
   'zoom-out-down': {
     '@keyframes jumi-zoom-out-down': {
       '0%': {
@@ -2627,7 +2775,6 @@ export const effectKeyframes = {
       },
     },
   },
-
   'zoom-out-up': {
     '@keyframes jumi-zoom-out-up': {
       '0%': {
