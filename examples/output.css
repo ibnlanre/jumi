@@ -1091,13 +1091,6 @@
     --tw-gradient-to: var(--color-yellow-500);
     --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
   }
-  .mask-b-from-current {
-    mask-image: var(--tw-mask-linear), var(--tw-mask-radial), var(--tw-mask-conic);
-    mask-composite: intersect;
-    --tw-mask-linear: var(--tw-mask-left), var(--tw-mask-right), var(--tw-mask-bottom), var(--tw-mask-top);
-    --tw-mask-bottom: linear-gradient(to bottom, var(--tw-mask-bottom-from-color) var(--tw-mask-bottom-from-position), var(--tw-mask-bottom-to-color) var(--tw-mask-bottom-to-position));
-    --tw-mask-bottom-from-color: currentcolor;
-  }
   .mask-none {
     mask-image: none;
   }
@@ -4314,2766 +4307,6 @@
   }
 }
 @layer base {
-  @keyframes jumi-back-in {
-    0% {
-      transform: scale(0) rotateZ(-360deg);
-    }
-    100% {
-      transform: scale(1) rotateZ(0deg);
-    }
-  }
-  @keyframes jumi-back-in-down {
-    0% {
-      transform: scale(0) translateY(-2000px) rotateZ(-360deg);
-    }
-    100% {
-      transform: scale(1) translateY(0) rotateZ(0deg);
-    }
-  }
-  @keyframes jumi-back-in-left {
-    0% {
-      transform: scale(0) translateX(-2000px) rotateZ(-360deg);
-    }
-    100% {
-      transform: scale(1) translateX(0) rotateZ(0deg);
-    }
-  }
-  @keyframes jumi-back-in-right {
-    0% {
-      transform: scale(0) translateX(2000px) rotateZ(360deg);
-    }
-    100% {
-      transform: scale(1) translateX(0) rotateZ(0deg);
-    }
-  }
-  @keyframes jumi-back-in-up {
-    0% {
-      transform: scale(0) translateY(2000px) rotateZ(360deg);
-    }
-    100% {
-      transform: scale(1) translateY(0) rotateZ(0deg);
-    }
-  }
-  @keyframes jumi-back-out {
-    0% {
-      transform: scale(1) rotateZ(0deg);
-    }
-    100% {
-      transform: scale(0) rotateZ(360deg);
-    }
-  }
-  @keyframes jumi-back-out-down {
-    0% {
-      transform: scale(1) translateY(0) rotateZ(0deg);
-    }
-    100% {
-      transform: scale(0) translateY(2000px) rotateZ(360deg);
-    }
-  }
-  @keyframes jumi-back-out-left {
-    0% {
-      transform: scale(1) translateX(0) rotateZ(0deg);
-    }
-    100% {
-      transform: scale(0) translateX(-2000px) rotateZ(-360deg);
-    }
-  }
-  @keyframes jumi-back-out-right {
-    0% {
-      transform: scale(1) translateX(0) rotateZ(0deg);
-    }
-    100% {
-      transform: scale(0) translateX(2000px) rotateZ(360deg);
-    }
-  }
-  @keyframes jumi-back-out-up {
-    0% {
-      transform: scale(1) translateY(0) rotateZ(0deg);
-    }
-    100% {
-      transform: scale(0) translateY(-2000px) rotateZ(-360deg);
-    }
-  }
-  @keyframes jumi-bounce-in {
-    0% {
-      transform: scale3d(0.8, 0.8, 0.8);
-    }
-    20% {
-      transform: scale3d(1.1, 1.1, 1.1);
-    }
-    40% {
-      transform: scale3d(0.9, 0.9, 0.9);
-    }
-    60% {
-      transform: scale3d(1.03, 1.03, 1.03);
-    }
-    80% {
-      transform: scale3d(0.97, 0.97, 0.97);
-    }
-    from, 20%, 40%, 60%, 80%, to {
-      animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
-    }
-    to {
-      transform: scale3d(1, 1, 1);
-    }
-  }
-  @keyframes jumi-bounce-out {
-    20% {
-      transform: scale3d(0.9, 0.9, 0.9);
-    }
-    50%, 55% {
-      transform: scale3d(1.1, 1.1, 1.1);
-    }
-    to {
-      transform: scale3d(0.3, 0.3, 0.3);
-    }
-  }
-  @keyframes jumi-fade-down {
-    from {
-      opacity: 0;
-      transform: translate3d(0, -40px, 0);
-    }
-    to {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
-  }
-  @keyframes jumi-fade-down-left {
-    from {
-      opacity: 0;
-      transform: translate3d(-40px, -40px, 0);
-    }
-    to {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
-  }
-  @keyframes jumi-fade-down-right {
-    from {
-      opacity: 0;
-      transform: translate3d(40px, -40px, 0);
-    }
-    to {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
-  }
-  @keyframes jumi-fade-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-  @keyframes jumi-fade-left {
-    from {
-      opacity: 0;
-      transform: translate3d(-40px, 0, 0);
-    }
-    to {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
-  }
-  @keyframes jumi-fade-out {
-    from {
-      opacity: 1;
-    }
-    to {
-      opacity: 0;
-    }
-  }
-  @keyframes jumi-fade-right {
-    from {
-      opacity: 0;
-      transform: translate3d(40px, 0, 0);
-    }
-    to {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
-  }
-  @keyframes jumi-fade-up {
-    from {
-      opacity: 0;
-      transform: translate3d(0, 40px, 0);
-    }
-    to {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
-  }
-  @keyframes jumi-fade-up-left {
-    from {
-      opacity: 0;
-      transform: translate3d(-40px, 40px, 0);
-    }
-    to {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
-  }
-  @keyframes jumi-fade-up-right {
-    from {
-      opacity: 0;
-      transform: translate3d(40px, 40px, 0);
-    }
-    to {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
-  }
-  @keyframes jumi-flip-down {
-    40% {
-      animation-timing-function: ease-in;
-      transform: perspective(400px) rotateX(20deg);
-    }
-    60% {
-      opacity: 1;
-      transform: perspective(400px) rotateX(-10deg);
-    }
-    80% {
-      transform: perspective(400px) rotateX(5deg);
-    }
-    from {
-      animation-timing-function: ease-in;
-      opacity: 0;
-      transform: perspective(400px) rotateX(-90deg);
-    }
-    to {
-      transform: perspective(400px);
-    }
-  }
-  @keyframes jumi-flip-left {
-    40% {
-      animation-timing-function: ease-in;
-      transform: perspective(400px) rotateY(20deg);
-    }
-    60% {
-      opacity: 1;
-      transform: perspective(400px) rotateY(-10deg);
-    }
-    80% {
-      transform: perspective(400px) rotateY(5deg);
-    }
-    from {
-      animation-timing-function: ease-in;
-      opacity: 0;
-      transform: perspective(400px) rotateY(-90deg);
-    }
-    to {
-      transform: perspective(400px);
-    }
-  }
-  @keyframes jumi-flip-right {
-    40% {
-      animation-timing-function: ease-in;
-      transform: perspective(400px) rotateY(-20deg);
-    }
-    60% {
-      opacity: 1;
-      transform: perspective(400px) rotateY(10deg);
-    }
-    80% {
-      transform: perspective(400px) rotateY(-5deg);
-    }
-    from {
-      animation-timing-function: ease-in;
-      opacity: 0;
-      transform: perspective(400px) rotateY(90deg);
-    }
-    to {
-      transform: perspective(400px);
-    }
-  }
-  @keyframes jumi-flip-up {
-    40% {
-      animation-timing-function: ease-in;
-      transform: perspective(400px) rotateX(-20deg);
-    }
-    60% {
-      opacity: 1;
-      transform: perspective(400px) rotateX(10deg);
-    }
-    80% {
-      transform: perspective(400px) rotateX(-5deg);
-    }
-    from {
-      animation-timing-function: ease-in;
-      opacity: 0;
-      transform: perspective(400px) rotateX(90deg);
-    }
-    to {
-      transform: perspective(400px);
-    }
-  }
-  @keyframes jumi-flip-x {
-    40% {
-      animation-timing-function: ease-in;
-      transform: perspective(400px) rotateX(-20deg);
-    }
-    60% {
-      transform: perspective(400px) rotateX(10deg);
-    }
-    80% {
-      transform: perspective(400px) rotateX(-5deg);
-    }
-    from {
-      animation-timing-function: ease-in;
-      transform: perspective(400px) rotateX(-90deg);
-    }
-    to {
-      transform: perspective(400px) rotateX(0deg);
-    }
-  }
-  @keyframes jumi-flip-y {
-    40% {
-      animation-timing-function: ease-in;
-      transform: perspective(400px) rotateY(-20deg);
-    }
-    60% {
-      transform: perspective(400px) rotateY(10deg);
-    }
-    80% {
-      transform: perspective(400px) rotateY(-5deg);
-    }
-    from {
-      animation-timing-function: ease-in;
-      transform: perspective(400px) rotateY(-90deg);
-    }
-    to {
-      transform: perspective(400px) rotateY(0deg);
-    }
-  }
-  @keyframes jumi-heart-beat {
-    14% {
-      transform: scale3d(1.3, 1.3, 1.3);
-    }
-    28% {
-      transform: scale3d(1, 1, 1);
-    }
-    42% {
-      transform: scale3d(1.3, 1.3, 1.3);
-    }
-    70% {
-      transform: scale3d(1, 1, 1);
-    }
-    from {
-      transform: scale3d(1, 1, 1);
-    }
-  }
-  @keyframes jumi-jello {
-    11.1% {
-      transform: skewX(-12.5deg) skewY(-12.5deg);
-    }
-    22.2% {
-      transform: skewX(6.25deg) skewY(6.25deg);
-    }
-    33.3% {
-      transform: skewX(-3.125deg) skewY(-3.125deg);
-    }
-    44.4% {
-      transform: skewX(1.5625deg) skewY(1.5625deg);
-    }
-    55.5% {
-      transform: skewX(-0.78125deg) skewY(-0.78125deg);
-    }
-    66.6% {
-      transform: skewX(0.390625deg) skewY(0.390625deg);
-    }
-    77.7% {
-      transform: skewX(-0.1953125deg) skewY(-0.1953125deg);
-    }
-    88.8% {
-      transform: skewX(0.09765625deg) skewY(0.09765625deg);
-    }
-    from {
-      transform: none;
-    }
-    to {
-      transform: none;
-    }
-  }
-  @keyframes jumi-pulsate {
-    50% {
-      transform: scale3d(1.05, 1.05, 1.05);
-    }
-    from {
-      transform: scale3d(1, 1, 1);
-    }
-    to {
-      transform: scale3d(1, 1, 1);
-    }
-  }
-  @keyframes jumi-reveal-bottom {
-    from {
-      bottom: 0;
-      inset-inline: 0;
-      width: 100%;
-    }
-    to {
-      width: 0%;
-    }
-  }
-  @keyframes jumi-reveal-left {
-    from {
-      inset-block: 0;
-      left: 0;
-      width: 0%;
-    }
-    to {
-      width: 100%;
-    }
-  }
-  @keyframes jumi-reveal-right {
-    from {
-      inset-block: 0;
-      right: 0;
-      width: 0%;
-    }
-    to {
-      width: 100%;
-    }
-  }
-  @keyframes jumi-reveal-top {
-    from {
-      height: 0%;
-      inset-inline: 0;
-      top: 0;
-    }
-    to {
-      height: 100%;
-    }
-  }
-  @keyframes jumi-shake {
-    10%, 30%, 50%, 70%, 90% {
-      transform: translate3d(-10px, 0, 0);
-    }
-    20%, 40%, 60%, 80% {
-      transform: translate3d(10px, 0, 0);
-    }
-    from, to {
-      transform: translate3d(0, 0, 0);
-    }
-  }
-  @keyframes jumi-slide-in-down {
-    from {
-      transform: translate3d(0, -100%, 0);
-      visibility: visible;
-    }
-    to {
-      transform: translate3d(0, 0, 0);
-    }
-  }
-  @keyframes jumi-slide-in-left {
-    from {
-      transform: translate3d(-100%, 0, 0);
-      visibility: visible;
-    }
-    to {
-      transform: translate3d(0, 0, 0);
-    }
-  }
-  @keyframes jumi-slide-in-right {
-    from {
-      transform: translate3d(100%, 0, 0);
-      visibility: visible;
-    }
-    to {
-      transform: translate3d(0, 0, 0);
-    }
-  }
-  @keyframes jumi-slide-in-up {
-    from {
-      transform: translate3d(0, 100%, 0);
-      visibility: visible;
-    }
-    to {
-      transform: translate3d(0, 0, 0);
-    }
-  }
-  @keyframes jumi-swing {
-    20% {
-      transform: rotateZ(15deg);
-    }
-    40% {
-      transform: rotateZ(-10deg);
-    }
-    60% {
-      transform: rotateZ(5deg);
-    }
-    80% {
-      transform: rotateZ(-5deg);
-    }
-    to {
-      transform: rotateZ(0deg);
-    }
-  }
-  @keyframes jumi-tada {
-    10%, 20% {
-      transform: scale3d(0.9, 0.9, 0.9) rotateZ(-3deg);
-    }
-    30%, 50%, 70%, 90% {
-      transform: scale3d(1.1, 1.1, 1.1) rotateZ(3deg);
-    }
-    40%, 60%, 80% {
-      transform: scale3d(0.9, 0.9, 0.9) rotateZ(-3deg);
-    }
-    from {
-      transform: scale3d(1, 1, 1);
-    }
-    to {
-      transform: scale3d(1, 1, 1);
-    }
-  }
-  @keyframes jumi-wobble {
-    15% {
-      transform: translate3d(-25%, 0, 0) rotateZ(-5deg);
-    }
-    30% {
-      transform: translate3d(20%, 0, 0) rotateZ(3deg);
-    }
-    45% {
-      transform: translate3d(-15%, 0, 0) rotateZ(-3deg);
-    }
-    60% {
-      transform: translate3d(10%, 0, 0) rotateZ(2deg);
-    }
-    75% {
-      transform: translate3d(-5%, 0, 0) rotateZ(-1deg);
-    }
-    from {
-      transform: translate3d(0, 0, 0);
-    }
-    to {
-      transform: translate3d(0, 0, 0);
-    }
-  }
-  @keyframes jumi-zoom-in {
-    50% {
-      transform: scale3d(1.05, 1.05, 1.05);
-    }
-    from {
-      transform: scale3d(0.3, 0.3, 0.3);
-    }
-    to {
-      transform: scale3d(1, 1, 1);
-    }
-  }
-  @keyframes jumi-zoom-in-down {
-    50% {
-      transform: scale3d(1.05, 1.05, 1.05) translate3d(0, 60%, 0);
-    }
-    from {
-      transform: scale3d(0.3, 0.3, 0.3) translate3d(0, -100%, 0);
-    }
-    to {
-      transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
-    }
-  }
-  @keyframes jumi-zoom-in-left {
-    50% {
-      transform: scale3d(1.05, 1.05, 1.05) translate3d(60%, 0, 0);
-    }
-    from {
-      transform: scale3d(0.3, 0.3, 0.3) translate3d(-100%, 0, 0);
-    }
-    to {
-      transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
-    }
-  }
-  @keyframes jumi-zoom-in-right {
-    50% {
-      transform: scale3d(1.05, 1.05, 1.05) translate3d(-60%, 0, 0);
-    }
-    from {
-      transform: scale3d(0.3, 0.3, 0.3) translate3d(100%, 0, 0);
-    }
-    to {
-      transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
-    }
-  }
-  @keyframes jumi-zoom-in-up {
-    50% {
-      transform: scale3d(1.05, 1.05, 1.05) translate3d(0, -60%, 0);
-    }
-    from {
-      transform: scale3d(0.3, 0.3, 0.3) translate3d(0, 100%, 0);
-    }
-    to {
-      transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
-    }
-  }
-  @keyframes jumi-zoom-out {
-    50% {
-      transform: scale3d(0.95, 0.95, 0.95);
-    }
-    from {
-      transform: scale3d(1, 1, 1);
-    }
-    to {
-      transform: scale3d(0.3, 0.3, 0.3);
-    }
-  }
-  @keyframes jumi-zoom-out-down {
-    50% {
-      transform: scale3d(0.95, 0.95, 0.95) translate3d(0, 60%, 0);
-    }
-    from {
-      transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
-    }
-    to {
-      transform: scale3d(0.3, 0.3, 0.3) translate3d(0, 100%, 0);
-    }
-  }
-  @keyframes jumi-zoom-out-left {
-    50% {
-      transform: scale3d(0.95, 0.95, 0.95) translate3d(-60%, 0, 0);
-    }
-    from {
-      transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
-    }
-    to {
-      transform: scale3d(0.3, 0.3, 0.3) translate3d(-100%, 0, 0);
-    }
-  }
-  @keyframes jumi-zoom-out-right {
-    50% {
-      transform: scale3d(0.95, 0.95, 0.95) translate3d(60%, 0, 0);
-    }
-    from {
-      transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
-    }
-    to {
-      transform: scale3d(0.3, 0.3, 0.3) translate3d(100%, 0, 0);
-    }
-  }
-  @keyframes jumi-zoom-out-up {
-    50% {
-      transform: scale3d(0.95, 0.95, 0.95) translate3d(0, -60%, 0);
-    }
-    from {
-      transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
-    }
-    to {
-      transform: scale3d(0.3, 0.3, 0.3) translate3d(0, -100%, 0);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-accent-color {
-    to {
-      accent-color: var(--jumi-accent-color);
-    }
-  }
-  @keyframes jumi-align-content {
-    to {
-      align-content: var(--jumi-align-content);
-    }
-  }
-  @keyframes jumi-align-items {
-    to {
-      align-items: var(--jumi-align-items);
-    }
-  }
-  @keyframes jumi-align-self {
-    to {
-      align-self: var(--jumi-align-self);
-    }
-  }
-  @keyframes jumi-alignment-baseline {
-    to {
-      alignment-baseline: var(--jumi-alignment-baseline);
-    }
-  }
-  @keyframes jumi-all {
-    to {
-      all: var(--jumi-all);
-    }
-  }
-  @keyframes jumi-anchor-name {
-    to {
-      anchor-name: var(--jumi-anchor-name);
-    }
-  }
-  @keyframes jumi-appearance {
-    to {
-      appearance: var(--jumi-appearance);
-    }
-  }
-  @keyframes jumi-aspect-ratio {
-    to {
-      aspect-ratio: var(--jumi-aspect-ratio);
-    }
-  }
-  @keyframes jumi-backdrop-filter {
-    to {
-      backdrop-filter: var(--jumi-backdrop-filter);
-    }
-  }
-  @keyframes jumi-backface-visibility {
-    to {
-      backface-visibility: var(--jumi-backface-visibility);
-    }
-  }
-  @keyframes jumi-background {
-    to {
-      background: var(--jumi-background);
-    }
-  }
-  @keyframes jumi-background-attachment {
-    to {
-      background-attachment: var(--jumi-background-attachment);
-    }
-  }
-  @keyframes jumi-background-blend-mode {
-    to {
-      background-blend-mode: var(--jumi-background-blend-mode);
-    }
-  }
-  @keyframes jumi-background-clip {
-    to {
-      background-clip: var(--jumi-background-clip);
-    }
-  }
-  @keyframes jumi-background-color {
-    to {
-      background-color: var(--jumi-background-color);
-    }
-  }
-  @keyframes jumi-background-image {
-    to {
-      background-image: var(--jumi-background-image);
-    }
-  }
-  @keyframes jumi-background-origin {
-    to {
-      background-origin: var(--jumi-background-origin);
-    }
-  }
-  @keyframes jumi-background-position {
-    to {
-      background-position: var(--jumi-background-position);
-    }
-  }
-  @keyframes jumi-background-position-x {
-    to {
-      background-position-x: var(--jumi-background-position-x);
-    }
-  }
-  @keyframes jumi-background-position-y {
-    to {
-      background-position-y: var(--jumi-background-position-y);
-    }
-  }
-  @keyframes jumi-background-repeat {
-    to {
-      background-repeat: var(--jumi-background-repeat);
-    }
-  }
-  @keyframes jumi-background-size {
-    to {
-      background-size: var(--jumi-background-size);
-    }
-  }
-  @keyframes jumi-block-size {
-    to {
-      block-size: var(--jumi-block-size);
-    }
-  }
-  @keyframes jumi-border {
-    to {
-      border: var(--jumi-border);
-    }
-  }
-  @keyframes jumi-border-block {
-    to {
-      border-block: var(--jumi-border-block);
-    }
-  }
-  @keyframes jumi-border-block-color {
-    to {
-      border-block-color: var(--jumi-border-block-color);
-    }
-  }
-  @keyframes jumi-border-block-end {
-    to {
-      border-block-end: var(--jumi-border-block-end);
-    }
-  }
-  @keyframes jumi-border-block-end-color {
-    to {
-      border-block-end-color: var(--jumi-border-block-end-color);
-    }
-  }
-  @keyframes jumi-border-block-end-style {
-    to {
-      border-block-end-style: var(--jumi-border-block-end-style);
-    }
-  }
-  @keyframes jumi-border-block-end-width {
-    to {
-      border-block-end-width: var(--jumi-border-block-end-width);
-    }
-  }
-  @keyframes jumi-border-block-start {
-    to {
-      border-block-start: var(--jumi-border-block-start);
-    }
-  }
-  @keyframes jumi-border-block-start-color {
-    to {
-      border-block-start-color: var(--jumi-border-block-start-color);
-    }
-  }
-  @keyframes jumi-border-block-start-style {
-    to {
-      border-block-start-style: var(--jumi-border-block-start-style);
-    }
-  }
-  @keyframes jumi-border-block-start-width {
-    to {
-      border-block-start-width: var(--jumi-border-block-start-width);
-    }
-  }
-  @keyframes jumi-border-block-style {
-    to {
-      border-block-style: var(--jumi-border-block-style);
-    }
-  }
-  @keyframes jumi-border-block-width {
-    to {
-      border-block-width: var(--jumi-border-block-width);
-    }
-  }
-  @keyframes jumi-border-bottom {
-    to {
-      border-bottom: var(--jumi-border-bottom);
-    }
-  }
-  @keyframes jumi-border-bottom-color {
-    to {
-      border-bottom-color: var(--jumi-border-bottom-color);
-    }
-  }
-  @keyframes jumi-border-bottom-left-radius {
-    to {
-      border-bottom-left-radius: var(--jumi-border-bottom-left-radius);
-    }
-  }
-  @keyframes jumi-border-bottom-right-radius {
-    to {
-      border-bottom-right-radius: var(--jumi-border-bottom-right-radius);
-    }
-  }
-  @keyframes jumi-border-bottom-style {
-    to {
-      border-bottom-style: var(--jumi-border-bottom-style);
-    }
-  }
-  @keyframes jumi-border-bottom-width {
-    to {
-      border-bottom-width: var(--jumi-border-bottom-width);
-    }
-  }
-  @keyframes jumi-border-collapse {
-    to {
-      border-collapse: var(--jumi-border-collapse);
-    }
-  }
-  @keyframes jumi-border-color {
-    to {
-      border-color: var(--jumi-border-color);
-    }
-  }
-  @keyframes jumi-border-end-end-radius {
-    to {
-      border-end-end-radius: var(--jumi-border-end-end-radius);
-    }
-  }
-  @keyframes jumi-border-end-start-radius {
-    to {
-      border-end-start-radius: var(--jumi-border-end-start-radius);
-    }
-  }
-  @keyframes jumi-border-image {
-    to {
-      border-image: var(--jumi-border-image);
-    }
-  }
-  @keyframes jumi-border-image-outset {
-    to {
-      border-image-outset: var(--jumi-border-image-outset);
-    }
-  }
-  @keyframes jumi-border-image-repeat {
-    to {
-      border-image-repeat: var(--jumi-border-image-repeat);
-    }
-  }
-  @keyframes jumi-border-image-slice {
-    to {
-      border-image-slice: var(--jumi-border-image-slice);
-    }
-  }
-  @keyframes jumi-border-image-source {
-    to {
-      border-image-source: var(--jumi-border-image-source);
-    }
-  }
-  @keyframes jumi-border-image-width {
-    to {
-      border-image-width: var(--jumi-border-image-width);
-    }
-  }
-  @keyframes jumi-border-inline {
-    to {
-      border-inline: var(--jumi-border-inline);
-    }
-  }
-  @keyframes jumi-border-inline-color {
-    to {
-      border-inline-color: var(--jumi-border-inline-color);
-    }
-  }
-  @keyframes jumi-border-inline-end {
-    to {
-      border-inline-end: var(--jumi-border-inline-end);
-    }
-  }
-  @keyframes jumi-border-inline-end-color {
-    to {
-      border-inline-end-color: var(--jumi-border-inline-end-color);
-    }
-  }
-  @keyframes jumi-border-inline-end-style {
-    to {
-      border-inline-end-style: var(--jumi-border-inline-end-style);
-    }
-  }
-  @keyframes jumi-border-inline-end-width {
-    to {
-      border-inline-end-width: var(--jumi-border-inline-end-width);
-    }
-  }
-  @keyframes jumi-border-inline-start {
-    to {
-      border-inline-start: var(--jumi-border-inline-start);
-    }
-  }
-  @keyframes jumi-border-inline-start-color {
-    to {
-      border-inline-start-color: var(--jumi-border-inline-start-color);
-    }
-  }
-  @keyframes jumi-border-inline-start-style {
-    to {
-      border-inline-start-style: var(--jumi-border-inline-start-style);
-    }
-  }
-  @keyframes jumi-border-inline-start-width {
-    to {
-      border-inline-start-width: var(--jumi-border-inline-start-width);
-    }
-  }
-  @keyframes jumi-border-inline-style {
-    to {
-      border-inline-style: var(--jumi-border-inline-style);
-    }
-  }
-  @keyframes jumi-border-inline-width {
-    to {
-      border-inline-width: var(--jumi-border-inline-width);
-    }
-  }
-  @keyframes jumi-border-left {
-    to {
-      border-left: var(--jumi-border-left);
-    }
-  }
-  @keyframes jumi-border-left-color {
-    to {
-      border-left-color: var(--jumi-border-left-color);
-    }
-  }
-  @keyframes jumi-border-left-style {
-    to {
-      border-left-style: var(--jumi-border-left-style);
-    }
-  }
-  @keyframes jumi-border-left-width {
-    to {
-      border-left-width: var(--jumi-border-left-width);
-    }
-  }
-  @keyframes jumi-border-radius {
-    to {
-      border-radius: var(--jumi-border-radius);
-    }
-  }
-  @keyframes jumi-border-right {
-    to {
-      border-right: var(--jumi-border-right);
-    }
-  }
-  @keyframes jumi-border-right-color {
-    to {
-      border-right-color: var(--jumi-border-right-color);
-    }
-  }
-  @keyframes jumi-border-right-style {
-    to {
-      border-right-style: var(--jumi-border-right-style);
-    }
-  }
-  @keyframes jumi-border-right-width {
-    to {
-      border-right-width: var(--jumi-border-right-width);
-    }
-  }
-  @keyframes jumi-border-spacing {
-    to {
-      border-spacing: var(--jumi-border-spacing);
-    }
-  }
-  @keyframes jumi-border-start-end-radius {
-    to {
-      border-start-end-radius: var(--jumi-border-start-end-radius);
-    }
-  }
-  @keyframes jumi-border-start-start-radius {
-    to {
-      border-start-start-radius: var(--jumi-border-start-start-radius);
-    }
-  }
-  @keyframes jumi-border-style {
-    to {
-      border-style: var(--jumi-border-style);
-    }
-  }
-  @keyframes jumi-border-top {
-    to {
-      border-top: var(--jumi-border-top);
-    }
-  }
-  @keyframes jumi-border-top-color {
-    to {
-      border-top-color: var(--jumi-border-top-color);
-    }
-  }
-  @keyframes jumi-border-top-left-radius {
-    to {
-      border-top-left-radius: var(--jumi-border-top-left-radius);
-    }
-  }
-  @keyframes jumi-border-top-right-radius {
-    to {
-      border-top-right-radius: var(--jumi-border-top-right-radius);
-    }
-  }
-  @keyframes jumi-border-top-style {
-    to {
-      border-top-style: var(--jumi-border-top-style);
-    }
-  }
-  @keyframes jumi-border-top-width {
-    to {
-      border-top-width: var(--jumi-border-top-width);
-    }
-  }
-  @keyframes jumi-border-width {
-    to {
-      border-width: var(--jumi-border-width);
-    }
-  }
-  @keyframes jumi-bottom {
-    to {
-      bottom: var(--jumi-bottom);
-    }
-  }
-  @keyframes jumi-box-decoration-break {
-    to {
-      box-decoration-break: var(--jumi-box-decoration-break);
-    }
-  }
-  @keyframes jumi-box-shadow {
-    to {
-      box-shadow: var(--jumi-box-shadow);
-    }
-  }
-  @keyframes jumi-box-sizing {
-    to {
-      box-sizing: var(--jumi-box-sizing);
-    }
-  }
-  @keyframes jumi-break-after {
-    to {
-      break-after: var(--jumi-break-after);
-    }
-  }
-  @keyframes jumi-break-before {
-    to {
-      break-before: var(--jumi-break-before);
-    }
-  }
-  @keyframes jumi-break-inside {
-    to {
-      break-inside: var(--jumi-break-inside);
-    }
-  }
-  @keyframes jumi-caption-side {
-    to {
-      caption-side: var(--jumi-caption-side);
-    }
-  }
-  @keyframes jumi-caret-color {
-    to {
-      caret-color: var(--jumi-caret-color);
-    }
-  }
-  @keyframes jumi-clear {
-    to {
-      clear: var(--jumi-clear);
-    }
-  }
-  @keyframes jumi-clip-path {
-    to {
-      clip-path: var(--jumi-clip-path);
-    }
-  }
-  @keyframes jumi-clip-rule {
-    to {
-      clip-rule: var(--jumi-clip-rule);
-    }
-  }
-  @keyframes jumi-color {
-    to {
-      color: var(--jumi-color);
-    }
-  }
-  @keyframes jumi-color-interpolation {
-    to {
-      color-interpolation: var(--jumi-color-interpolation);
-    }
-  }
-  @keyframes jumi-color-interpolation-filters {
-    to {
-      color-interpolation-filters: var(--jumi-color-interpolation-filters);
-    }
-  }
-  @keyframes jumi-color-scheme {
-    to {
-      color-scheme: var(--jumi-color-scheme);
-    }
-  }
-  @keyframes jumi-column-count {
-    to {
-      column-count: var(--jumi-column-count);
-    }
-  }
-  @keyframes jumi-column-fill {
-    to {
-      column-fill: var(--jumi-column-fill);
-    }
-  }
-  @keyframes jumi-column-gap {
-    to {
-      column-gap: var(--jumi-column-gap);
-    }
-  }
-  @keyframes jumi-column-rule {
-    to {
-      column-rule: var(--jumi-column-rule);
-    }
-  }
-  @keyframes jumi-column-rule-color {
-    to {
-      column-rule-color: var(--jumi-column-rule-color);
-    }
-  }
-  @keyframes jumi-column-rule-style {
-    to {
-      column-rule-style: var(--jumi-column-rule-style);
-    }
-  }
-  @keyframes jumi-column-rule-width {
-    to {
-      column-rule-width: var(--jumi-column-rule-width);
-    }
-  }
-  @keyframes jumi-column-span {
-    to {
-      column-span: var(--jumi-column-span);
-    }
-  }
-  @keyframes jumi-column-width {
-    to {
-      column-width: var(--jumi-column-width);
-    }
-  }
-  @keyframes jumi-columns {
-    to {
-      columns: var(--jumi-columns);
-    }
-  }
-  @keyframes jumi-contain {
-    to {
-      contain: var(--jumi-contain);
-    }
-  }
-  @keyframes jumi-contain-intrinsic-block-size {
-    to {
-      contain-intrinsic-block-size: var(--jumi-contain-intrinsic-block-size);
-    }
-  }
-  @keyframes jumi-contain-intrinsic-height {
-    to {
-      contain-intrinsic-height: var(--jumi-contain-intrinsic-height);
-    }
-  }
-  @keyframes jumi-contain-intrinsic-inline-size {
-    to {
-      contain-intrinsic-inline-size: var(--jumi-contain-intrinsic-inline-size);
-    }
-  }
-  @keyframes jumi-contain-intrinsic-size {
-    to {
-      contain-intrinsic-size: var(--jumi-contain-intrinsic-size);
-    }
-  }
-  @keyframes jumi-contain-intrinsic-width {
-    to {
-      contain-intrinsic-width: var(--jumi-contain-intrinsic-width);
-    }
-  }
-  @keyframes jumi-container-type {
-    to {
-      container-type: var(--jumi-container-type);
-    }
-  }
-  @keyframes jumi-content {
-    to {
-      content: var(--jumi-content);
-    }
-  }
-  @keyframes jumi-content-visibility {
-    to {
-      content-visibility: var(--jumi-content-visibility);
-    }
-  }
-  @keyframes jumi-counter-increment {
-    to {
-      counter-increment: var(--jumi-counter-increment);
-    }
-  }
-  @keyframes jumi-counter-reset {
-    to {
-      counter-reset: var(--jumi-counter-reset);
-    }
-  }
-  @keyframes jumi-counter-set {
-    to {
-      counter-set: var(--jumi-counter-set);
-    }
-  }
-  @keyframes jumi-cursor {
-    to {
-      cursor: var(--jumi-cursor);
-    }
-  }
-  @keyframes jumi-cx {
-    to {
-      cx: var(--jumi-cx);
-    }
-  }
-  @keyframes jumi-cy {
-    to {
-      cy: var(--jumi-cy);
-    }
-  }
-  @keyframes jumi-d {
-    to {
-      d: var(--jumi-d);
-    }
-  }
-  @keyframes jumi-display {
-    to {
-      display: var(--jumi-display);
-    }
-  }
-  @keyframes jumi-dominant-baseline {
-    to {
-      dominant-baseline: var(--jumi-dominant-baseline);
-    }
-  }
-  @keyframes jumi-empty-cells {
-    to {
-      empty-cells: var(--jumi-empty-cells);
-    }
-  }
-  @keyframes jumi-fill {
-    to {
-      fill: var(--jumi-fill);
-    }
-  }
-  @keyframes jumi-fill-opacity {
-    to {
-      fill-opacity: var(--jumi-fill-opacity);
-    }
-  }
-  @keyframes jumi-fill-rule {
-    to {
-      fill-rule: var(--jumi-fill-rule);
-    }
-  }
-  @keyframes jumi-filter {
-    to {
-      filter: var(--jumi-filter);
-    }
-  }
-  @keyframes jumi-flex {
-    to {
-      flex: var(--jumi-flex);
-    }
-  }
-  @keyframes jumi-flex-basis {
-    to {
-      flex-basis: var(--jumi-flex-basis);
-    }
-  }
-  @keyframes jumi-flex-direction {
-    to {
-      flex-direction: var(--jumi-flex-direction);
-    }
-  }
-  @keyframes jumi-flex-flow {
-    to {
-      flex-flow: var(--jumi-flex-flow);
-    }
-  }
-  @keyframes jumi-flex-grow {
-    to {
-      flex-grow: var(--jumi-flex-grow);
-    }
-  }
-  @keyframes jumi-flex-shrink {
-    to {
-      flex-shrink: var(--jumi-flex-shrink);
-    }
-  }
-  @keyframes jumi-flex-wrap {
-    to {
-      flex-wrap: var(--jumi-flex-wrap);
-    }
-  }
-  @keyframes jumi-float {
-    to {
-      float: var(--jumi-float);
-    }
-  }
-  @keyframes jumi-flood-color {
-    to {
-      flood-color: var(--jumi-flood-color);
-    }
-  }
-  @keyframes jumi-flood-opacity {
-    to {
-      flood-opacity: var(--jumi-flood-opacity);
-    }
-  }
-  @keyframes jumi-font {
-    to {
-      font: var(--jumi-font);
-    }
-  }
-  @keyframes jumi-font-family {
-    to {
-      font-family: var(--jumi-font-family);
-    }
-  }
-  @keyframes jumi-font-feature-settings {
-    to {
-      font-feature-settings: var(--jumi-font-feature-settings);
-    }
-  }
-  @keyframes jumi-font-kerning {
-    to {
-      font-kerning: var(--jumi-font-kerning);
-    }
-  }
-  @keyframes jumi-font-language-override {
-    to {
-      font-language-override: var(--jumi-font-language-override);
-    }
-  }
-  @keyframes jumi-font-optical-sizing {
-    to {
-      font-optical-sizing: var(--jumi-font-optical-sizing);
-    }
-  }
-  @keyframes jumi-font-palette {
-    to {
-      font-palette: var(--jumi-font-palette);
-    }
-  }
-  @keyframes jumi-font-size {
-    to {
-      font-size: var(--jumi-font-size);
-    }
-  }
-  @keyframes jumi-font-size-adjust {
-    to {
-      font-size-adjust: var(--jumi-font-size-adjust);
-    }
-  }
-  @keyframes jumi-font-style {
-    to {
-      font-style: var(--jumi-font-style);
-    }
-  }
-  @keyframes jumi-font-synthesis {
-    to {
-      font-synthesis: var(--jumi-font-synthesis);
-    }
-  }
-  @keyframes jumi-font-synthesis-small-caps {
-    to {
-      font-synthesis-small-caps: var(--jumi-font-synthesis-small-caps);
-    }
-  }
-  @keyframes jumi-font-synthesis-style {
-    to {
-      font-synthesis-style: var(--jumi-font-synthesis-style);
-    }
-  }
-  @keyframes jumi-font-synthesis-weight {
-    to {
-      font-synthesis-weight: var(--jumi-font-synthesis-weight);
-    }
-  }
-  @keyframes jumi-font-variant {
-    to {
-      font-variant: var(--jumi-font-variant);
-    }
-  }
-  @keyframes jumi-font-variant-alternates {
-    to {
-      font-variant-alternates: var(--jumi-font-variant-alternates);
-    }
-  }
-  @keyframes jumi-font-variant-caps {
-    to {
-      font-variant-caps: var(--jumi-font-variant-caps);
-    }
-  }
-  @keyframes jumi-font-variant-east-asian {
-    to {
-      font-variant-east-asian: var(--jumi-font-variant-east-asian);
-    }
-  }
-  @keyframes jumi-font-variant-emoji {
-    to {
-      font-variant-emoji: var(--jumi-font-variant-emoji);
-    }
-  }
-  @keyframes jumi-font-variant-ligatures {
-    to {
-      font-variant-ligatures: var(--jumi-font-variant-ligatures);
-    }
-  }
-  @keyframes jumi-font-variant-numeric {
-    to {
-      font-variant-numeric: var(--jumi-font-variant-numeric);
-    }
-  }
-  @keyframes jumi-font-variant-position {
-    to {
-      font-variant-position: var(--jumi-font-variant-position);
-    }
-  }
-  @keyframes jumi-font-variation-settings {
-    to {
-      font-variation-settings: var(--jumi-font-variation-settings);
-    }
-  }
-  @keyframes jumi-font-weight {
-    to {
-      font-weight: var(--jumi-font-weight);
-    }
-  }
-  @keyframes jumi-forced-color-adjust {
-    to {
-      forced-color-adjust: var(--jumi-forced-color-adjust);
-    }
-  }
-  @keyframes jumi-gap {
-    to {
-      gap: var(--jumi-gap);
-    }
-  }
-  @keyframes jumi-grid {
-    to {
-      grid: var(--jumi-grid);
-    }
-  }
-  @keyframes jumi-grid-area {
-    to {
-      grid-area: var(--jumi-grid-area);
-    }
-  }
-  @keyframes jumi-grid-auto-columns {
-    to {
-      grid-auto-columns: var(--jumi-grid-auto-columns);
-    }
-  }
-  @keyframes jumi-grid-auto-flow {
-    to {
-      grid-auto-flow: var(--jumi-grid-auto-flow);
-    }
-  }
-  @keyframes jumi-grid-auto-rows {
-    to {
-      grid-auto-rows: var(--jumi-grid-auto-rows);
-    }
-  }
-  @keyframes jumi-grid-column {
-    to {
-      grid-column: var(--jumi-grid-column);
-    }
-  }
-  @keyframes jumi-grid-column-end {
-    to {
-      grid-column-end: var(--jumi-grid-column-end);
-    }
-  }
-  @keyframes jumi-grid-column-start {
-    to {
-      grid-column-start: var(--jumi-grid-column-start);
-    }
-  }
-  @keyframes jumi-grid-row {
-    to {
-      grid-row: var(--jumi-grid-row);
-    }
-  }
-  @keyframes jumi-grid-row-end {
-    to {
-      grid-row-end: var(--jumi-grid-row-end);
-    }
-  }
-  @keyframes jumi-grid-row-start {
-    to {
-      grid-row-start: var(--jumi-grid-row-start);
-    }
-  }
-  @keyframes jumi-grid-template {
-    to {
-      grid-template: var(--jumi-grid-template);
-    }
-  }
-  @keyframes jumi-grid-template-areas {
-    to {
-      grid-template-areas: var(--jumi-grid-template-areas);
-    }
-  }
-  @keyframes jumi-grid-template-columns {
-    to {
-      grid-template-columns: var(--jumi-grid-template-columns);
-    }
-  }
-  @keyframes jumi-grid-template-rows {
-    to {
-      grid-template-rows: var(--jumi-grid-template-rows);
-    }
-  }
-  @keyframes jumi-hanging-punctuation {
-    to {
-      hanging-punctuation: var(--jumi-hanging-punctuation);
-    }
-  }
-  @keyframes jumi-height {
-    to {
-      height: var(--jumi-height);
-    }
-  }
-  @keyframes jumi-hyphenate-character {
-    to {
-      hyphenate-character: var(--jumi-hyphenate-character);
-    }
-  }
-  @keyframes jumi-hyphenate-limit-chars {
-    to {
-      hyphenate-limit-chars: var(--jumi-hyphenate-limit-chars);
-    }
-  }
-  @keyframes jumi-hyphens {
-    to {
-      hyphens: var(--jumi-hyphens);
-    }
-  }
-  @keyframes jumi-image-orientation {
-    to {
-      image-orientation: var(--jumi-image-orientation);
-    }
-  }
-  @keyframes jumi-image-rendering {
-    to {
-      image-rendering: var(--jumi-image-rendering);
-    }
-  }
-  @keyframes jumi-initial-letter {
-    to {
-      initial-letter: var(--jumi-initial-letter);
-    }
-  }
-  @keyframes jumi-inline-size {
-    to {
-      inline-size: var(--jumi-inline-size);
-    }
-  }
-  @keyframes jumi-inset {
-    to {
-      inset: var(--jumi-inset);
-    }
-  }
-  @keyframes jumi-inset-block {
-    to {
-      inset-block: var(--jumi-inset-block);
-    }
-  }
-  @keyframes jumi-inset-block-end {
-    to {
-      inset-block-end: var(--jumi-inset-block-end);
-    }
-  }
-  @keyframes jumi-inset-block-start {
-    to {
-      inset-block-start: var(--jumi-inset-block-start);
-    }
-  }
-  @keyframes jumi-inset-inline {
-    to {
-      inset-inline: var(--jumi-inset-inline);
-    }
-  }
-  @keyframes jumi-inset-inline-end {
-    to {
-      inset-inline-end: var(--jumi-inset-inline-end);
-    }
-  }
-  @keyframes jumi-inset-inline-start {
-    to {
-      inset-inline-start: var(--jumi-inset-inline-start);
-    }
-  }
-  @keyframes jumi-justify-content {
-    to {
-      justify-content: var(--jumi-justify-content);
-    }
-  }
-  @keyframes jumi-justify-items {
-    to {
-      justify-items: var(--jumi-justify-items);
-    }
-  }
-  @keyframes jumi-justify-self {
-    to {
-      justify-self: var(--jumi-justify-self);
-    }
-  }
-  @keyframes jumi-left {
-    to {
-      left: var(--jumi-left);
-    }
-  }
-  @keyframes jumi-letter-spacing {
-    to {
-      letter-spacing: var(--jumi-letter-spacing);
-    }
-  }
-  @keyframes jumi-lighting-color {
-    to {
-      lighting-color: var(--jumi-lighting-color);
-    }
-  }
-  @keyframes jumi-line-break {
-    to {
-      line-break: var(--jumi-line-break);
-    }
-  }
-  @keyframes jumi-line-clamp {
-    to {
-      line-clamp: var(--jumi-line-clamp);
-    }
-  }
-  @keyframes jumi-line-height {
-    to {
-      line-height: var(--jumi-line-height);
-    }
-  }
-  @keyframes jumi-list-style {
-    to {
-      list-style: var(--jumi-list-style);
-    }
-  }
-  @keyframes jumi-list-style-image {
-    to {
-      list-style-image: var(--jumi-list-style-image);
-    }
-  }
-  @keyframes jumi-list-style-position {
-    to {
-      list-style-position: var(--jumi-list-style-position);
-    }
-  }
-  @keyframes jumi-list-style-type {
-    to {
-      list-style-type: var(--jumi-list-style-type);
-    }
-  }
-  @keyframes jumi-margin {
-    to {
-      margin: var(--jumi-margin);
-    }
-  }
-  @keyframes jumi-margin-block {
-    to {
-      margin-block: var(--jumi-margin-block);
-    }
-  }
-  @keyframes jumi-margin-block-end {
-    to {
-      margin-block-end: var(--jumi-margin-block-end);
-    }
-  }
-  @keyframes jumi-margin-block-start {
-    to {
-      margin-block-start: var(--jumi-margin-block-start);
-    }
-  }
-  @keyframes jumi-margin-bottom {
-    to {
-      margin-bottom: var(--jumi-margin-bottom);
-    }
-  }
-  @keyframes jumi-margin-inline {
-    to {
-      margin-inline: var(--jumi-margin-inline);
-    }
-  }
-  @keyframes jumi-margin-inline-end {
-    to {
-      margin-inline-end: var(--jumi-margin-inline-end);
-    }
-  }
-  @keyframes jumi-margin-inline-start {
-    to {
-      margin-inline-start: var(--jumi-margin-inline-start);
-    }
-  }
-  @keyframes jumi-margin-left {
-    to {
-      margin-left: var(--jumi-margin-left);
-    }
-  }
-  @keyframes jumi-margin-right {
-    to {
-      margin-right: var(--jumi-margin-right);
-    }
-  }
-  @keyframes jumi-margin-top {
-    to {
-      margin-top: var(--jumi-margin-top);
-    }
-  }
-  @keyframes jumi-marker {
-    to {
-      marker: var(--jumi-marker);
-    }
-  }
-  @keyframes jumi-marker-end {
-    to {
-      marker-end: var(--jumi-marker-end);
-    }
-  }
-  @keyframes jumi-marker-mid {
-    to {
-      marker-mid: var(--jumi-marker-mid);
-    }
-  }
-  @keyframes jumi-marker-start {
-    to {
-      marker-start: var(--jumi-marker-start);
-    }
-  }
-  @keyframes jumi-mask {
-    to {
-      mask: var(--jumi-mask);
-    }
-  }
-  @keyframes jumi-mask-border {
-    to {
-      mask-border: var(--jumi-mask-border);
-    }
-  }
-  @keyframes jumi-mask-border-mode {
-    to {
-      mask-border-mode: var(--jumi-mask-border-mode);
-    }
-  }
-  @keyframes jumi-mask-border-outset {
-    to {
-      mask-border-outset: var(--jumi-mask-border-outset);
-    }
-  }
-  @keyframes jumi-mask-border-repeat {
-    to {
-      mask-border-repeat: var(--jumi-mask-border-repeat);
-    }
-  }
-  @keyframes jumi-mask-border-slice {
-    to {
-      mask-border-slice: var(--jumi-mask-border-slice);
-    }
-  }
-  @keyframes jumi-mask-border-source {
-    to {
-      mask-border-source: var(--jumi-mask-border-source);
-    }
-  }
-  @keyframes jumi-mask-border-width {
-    to {
-      mask-border-width: var(--jumi-mask-border-width);
-    }
-  }
-  @keyframes jumi-mask-clip {
-    to {
-      mask-clip: var(--jumi-mask-clip);
-    }
-  }
-  @keyframes jumi-mask-composite {
-    to {
-      mask-composite: var(--jumi-mask-composite);
-    }
-  }
-  @keyframes jumi-mask-image {
-    to {
-      mask-image: var(--jumi-mask-image);
-    }
-  }
-  @keyframes jumi-mask-mode {
-    to {
-      mask-mode: var(--jumi-mask-mode);
-    }
-  }
-  @keyframes jumi-mask-origin {
-    to {
-      mask-origin: var(--jumi-mask-origin);
-    }
-  }
-  @keyframes jumi-mask-position {
-    to {
-      mask-position: var(--jumi-mask-position);
-    }
-  }
-  @keyframes jumi-mask-repeat {
-    to {
-      mask-repeat: var(--jumi-mask-repeat);
-    }
-  }
-  @keyframes jumi-mask-size {
-    to {
-      mask-size: var(--jumi-mask-size);
-    }
-  }
-  @keyframes jumi-mask-type {
-    to {
-      mask-type: var(--jumi-mask-type);
-    }
-  }
-  @keyframes jumi-math-depth {
-    to {
-      math-depth: var(--jumi-math-depth);
-    }
-  }
-  @keyframes jumi-math-style {
-    to {
-      math-style: var(--jumi-math-style);
-    }
-  }
-  @keyframes jumi-max-block-size {
-    to {
-      max-block-size: var(--jumi-max-block-size);
-    }
-  }
-  @keyframes jumi-max-height {
-    to {
-      max-height: var(--jumi-max-height);
-    }
-  }
-  @keyframes jumi-max-inline-size {
-    to {
-      max-inline-size: var(--jumi-max-inline-size);
-    }
-  }
-  @keyframes jumi-max-width {
-    to {
-      max-width: var(--jumi-max-width);
-    }
-  }
-  @keyframes jumi-min-block-size {
-    to {
-      min-block-size: var(--jumi-min-block-size);
-    }
-  }
-  @keyframes jumi-min-height {
-    to {
-      min-height: var(--jumi-min-height);
-    }
-  }
-  @keyframes jumi-min-inline-size {
-    to {
-      min-inline-size: var(--jumi-min-inline-size);
-    }
-  }
-  @keyframes jumi-min-width {
-    to {
-      min-width: var(--jumi-min-width);
-    }
-  }
-  @keyframes jumi-mix-blend-mode {
-    to {
-      mix-blend-mode: var(--jumi-mix-blend-mode);
-    }
-  }
-  @keyframes jumi-object-fit {
-    to {
-      object-fit: var(--jumi-object-fit);
-    }
-  }
-  @keyframes jumi-object-position {
-    to {
-      object-position: var(--jumi-object-position);
-    }
-  }
-  @keyframes jumi-offset {
-    to {
-      offset: var(--jumi-offset);
-    }
-  }
-  @keyframes jumi-offset-anchor {
-    to {
-      offset-anchor: var(--jumi-offset-anchor);
-    }
-  }
-  @keyframes jumi-offset-distance {
-    to {
-      offset-distance: var(--jumi-offset-distance);
-    }
-  }
-  @keyframes jumi-offset-path {
-    to {
-      offset-path: var(--jumi-offset-path);
-    }
-  }
-  @keyframes jumi-offset-position {
-    to {
-      offset-position: var(--jumi-offset-position);
-    }
-  }
-  @keyframes jumi-offset-rotate {
-    to {
-      offset-rotate: var(--jumi-offset-rotate);
-    }
-  }
-  @keyframes jumi-opacity {
-    to {
-      opacity: var(--jumi-opacity);
-    }
-  }
-  @keyframes jumi-order {
-    to {
-      order: var(--jumi-order);
-    }
-  }
-  @keyframes jumi-orphans {
-    to {
-      orphans: var(--jumi-orphans);
-    }
-  }
-  @keyframes jumi-outline {
-    to {
-      outline: var(--jumi-outline);
-    }
-  }
-  @keyframes jumi-outline-color {
-    to {
-      outline-color: var(--jumi-outline-color);
-    }
-  }
-  @keyframes jumi-outline-offset {
-    to {
-      outline-offset: var(--jumi-outline-offset);
-    }
-  }
-  @keyframes jumi-outline-style {
-    to {
-      outline-style: var(--jumi-outline-style);
-    }
-  }
-  @keyframes jumi-outline-width {
-    to {
-      outline-width: var(--jumi-outline-width);
-    }
-  }
-  @keyframes jumi-overflow {
-    to {
-      overflow: var(--jumi-overflow);
-    }
-  }
-  @keyframes jumi-overflow-anchor {
-    to {
-      overflow-anchor: var(--jumi-overflow-anchor);
-    }
-  }
-  @keyframes jumi-overflow-block {
-    to {
-      overflow-block: var(--jumi-overflow-block);
-    }
-  }
-  @keyframes jumi-overflow-clip-margin {
-    to {
-      overflow-clip-margin: var(--jumi-overflow-clip-margin);
-    }
-  }
-  @keyframes jumi-overflow-inline {
-    to {
-      overflow-inline: var(--jumi-overflow-inline);
-    }
-  }
-  @keyframes jumi-overflow-wrap {
-    to {
-      overflow-wrap: var(--jumi-overflow-wrap);
-    }
-  }
-  @keyframes jumi-overflow-x {
-    to {
-      overflow-x: var(--jumi-overflow-x);
-    }
-  }
-  @keyframes jumi-overflow-y {
-    to {
-      overflow-y: var(--jumi-overflow-y);
-    }
-  }
-  @keyframes jumi-overscroll-behavior {
-    to {
-      overscroll-behavior: var(--jumi-overscroll-behavior);
-    }
-  }
-  @keyframes jumi-overscroll-behavior-block {
-    to {
-      overscroll-behavior-block: var(--jumi-overscroll-behavior-block);
-    }
-  }
-  @keyframes jumi-overscroll-behavior-inline {
-    to {
-      overscroll-behavior-inline: var(--jumi-overscroll-behavior-inline);
-    }
-  }
-  @keyframes jumi-overscroll-behavior-x {
-    to {
-      overscroll-behavior-x: var(--jumi-overscroll-behavior-x);
-    }
-  }
-  @keyframes jumi-overscroll-behavior-y {
-    to {
-      overscroll-behavior-y: var(--jumi-overscroll-behavior-y);
-    }
-  }
-  @keyframes jumi-padding {
-    to {
-      padding: var(--jumi-padding);
-    }
-  }
-  @keyframes jumi-padding-block {
-    to {
-      padding-block: var(--jumi-padding-block);
-    }
-  }
-  @keyframes jumi-padding-block-end {
-    to {
-      padding-block-end: var(--jumi-padding-block-end);
-    }
-  }
-  @keyframes jumi-padding-block-start {
-    to {
-      padding-block-start: var(--jumi-padding-block-start);
-    }
-  }
-  @keyframes jumi-padding-bottom {
-    to {
-      padding-bottom: var(--jumi-padding-bottom);
-    }
-  }
-  @keyframes jumi-padding-inline {
-    to {
-      padding-inline: var(--jumi-padding-inline);
-    }
-  }
-  @keyframes jumi-padding-inline-end {
-    to {
-      padding-inline-end: var(--jumi-padding-inline-end);
-    }
-  }
-  @keyframes jumi-padding-inline-start {
-    to {
-      padding-inline-start: var(--jumi-padding-inline-start);
-    }
-  }
-  @keyframes jumi-padding-left {
-    to {
-      padding-left: var(--jumi-padding-left);
-    }
-  }
-  @keyframes jumi-padding-right {
-    to {
-      padding-right: var(--jumi-padding-right);
-    }
-  }
-  @keyframes jumi-padding-top {
-    to {
-      padding-top: var(--jumi-padding-top);
-    }
-  }
-  @keyframes jumi-page {
-    to {
-      page: var(--jumi-page);
-    }
-  }
-  @keyframes jumi-paint-order {
-    to {
-      paint-order: var(--jumi-paint-order);
-    }
-  }
-  @keyframes jumi-perspective {
-    to {
-      perspective: var(--jumi-perspective);
-    }
-  }
-  @keyframes jumi-perspective-origin {
-    to {
-      perspective-origin: var(--jumi-perspective-origin);
-    }
-  }
-  @keyframes jumi-place-content {
-    to {
-      place-content: var(--jumi-place-content);
-    }
-  }
-  @keyframes jumi-place-items {
-    to {
-      place-items: var(--jumi-place-items);
-    }
-  }
-  @keyframes jumi-place-self {
-    to {
-      place-self: var(--jumi-place-self);
-    }
-  }
-  @keyframes jumi-pointer-events {
-    to {
-      pointer-events: var(--jumi-pointer-events);
-    }
-  }
-  @keyframes jumi-position {
-    to {
-      position: var(--jumi-position);
-    }
-  }
-  @keyframes jumi-position-anchor {
-    to {
-      position-anchor: var(--jumi-position-anchor);
-    }
-  }
-  @keyframes jumi-position-area {
-    to {
-      position-area: var(--jumi-position-area);
-    }
-  }
-  @keyframes jumi-position-try {
-    to {
-      position-try: var(--jumi-position-try);
-    }
-  }
-  @keyframes jumi-position-try-fallbacks {
-    to {
-      position-try-fallbacks: var(--jumi-position-try-fallbacks);
-    }
-  }
-  @keyframes jumi-position-try-order {
-    to {
-      position-try-order: var(--jumi-position-try-order);
-    }
-  }
-  @keyframes jumi-print-color-adjust {
-    to {
-      print-color-adjust: var(--jumi-print-color-adjust);
-    }
-  }
-  @keyframes jumi-quotes {
-    to {
-      quotes: var(--jumi-quotes);
-    }
-  }
-  @keyframes jumi-r {
-    to {
-      r: var(--jumi-r);
-    }
-  }
-  @keyframes jumi-resize {
-    to {
-      resize: var(--jumi-resize);
-    }
-  }
-  @keyframes jumi-right {
-    to {
-      right: var(--jumi-right);
-    }
-  }
-  @keyframes jumi-rotate {
-    to {
-      rotate: var(--jumi-rotate);
-    }
-  }
-  @keyframes jumi-row-gap {
-    to {
-      row-gap: var(--jumi-row-gap);
-    }
-  }
-  @keyframes jumi-ruby-align {
-    to {
-      ruby-align: var(--jumi-ruby-align);
-    }
-  }
-  @keyframes jumi-ruby-overhang {
-    to {
-      ruby-overhang: var(--jumi-ruby-overhang);
-    }
-  }
-  @keyframes jumi-ruby-position {
-    to {
-      ruby-position: var(--jumi-ruby-position);
-    }
-  }
-  @keyframes jumi-rx {
-    to {
-      rx: var(--jumi-rx);
-    }
-  }
-  @keyframes jumi-ry {
-    to {
-      ry: var(--jumi-ry);
-    }
-  }
-  @keyframes jumi-scale {
-    to {
-      scale: var(--jumi-scale);
-    }
-  }
-  @keyframes jumi-scroll-margin {
-    to {
-      scroll-margin: var(--jumi-scroll-margin);
-    }
-  }
-  @keyframes jumi-scroll-margin-block {
-    to {
-      scroll-margin-block: var(--jumi-scroll-margin-block);
-    }
-  }
-  @keyframes jumi-scroll-margin-block-end {
-    to {
-      scroll-margin-block-end: var(--jumi-scroll-margin-block-end);
-    }
-  }
-  @keyframes jumi-scroll-margin-block-start {
-    to {
-      scroll-margin-block-start: var(--jumi-scroll-margin-block-start);
-    }
-  }
-  @keyframes jumi-scroll-margin-bottom {
-    to {
-      scroll-margin-bottom: var(--jumi-scroll-margin-bottom);
-    }
-  }
-  @keyframes jumi-scroll-margin-inline {
-    to {
-      scroll-margin-inline: var(--jumi-scroll-margin-inline);
-    }
-  }
-  @keyframes jumi-scroll-margin-inline-end {
-    to {
-      scroll-margin-inline-end: var(--jumi-scroll-margin-inline-end);
-    }
-  }
-  @keyframes jumi-scroll-margin-inline-start {
-    to {
-      scroll-margin-inline-start: var(--jumi-scroll-margin-inline-start);
-    }
-  }
-  @keyframes jumi-scroll-margin-left {
-    to {
-      scroll-margin-left: var(--jumi-scroll-margin-left);
-    }
-  }
-  @keyframes jumi-scroll-margin-right {
-    to {
-      scroll-margin-right: var(--jumi-scroll-margin-right);
-    }
-  }
-  @keyframes jumi-scroll-margin-top {
-    to {
-      scroll-margin-top: var(--jumi-scroll-margin-top);
-    }
-  }
-  @keyframes jumi-scroll-padding {
-    to {
-      scroll-padding: var(--jumi-scroll-padding);
-    }
-  }
-  @keyframes jumi-scroll-padding-block {
-    to {
-      scroll-padding-block: var(--jumi-scroll-padding-block);
-    }
-  }
-  @keyframes jumi-scroll-padding-block-end {
-    to {
-      scroll-padding-block-end: var(--jumi-scroll-padding-block-end);
-    }
-  }
-  @keyframes jumi-scroll-padding-block-start {
-    to {
-      scroll-padding-block-start: var(--jumi-scroll-padding-block-start);
-    }
-  }
-  @keyframes jumi-scroll-padding-bottom {
-    to {
-      scroll-padding-bottom: var(--jumi-scroll-padding-bottom);
-    }
-  }
-  @keyframes jumi-scroll-padding-inline {
-    to {
-      scroll-padding-inline: var(--jumi-scroll-padding-inline);
-    }
-  }
-  @keyframes jumi-scroll-padding-inline-end {
-    to {
-      scroll-padding-inline-end: var(--jumi-scroll-padding-inline-end);
-    }
-  }
-  @keyframes jumi-scroll-padding-inline-start {
-    to {
-      scroll-padding-inline-start: var(--jumi-scroll-padding-inline-start);
-    }
-  }
-  @keyframes jumi-scroll-padding-left {
-    to {
-      scroll-padding-left: var(--jumi-scroll-padding-left);
-    }
-  }
-  @keyframes jumi-scroll-padding-right {
-    to {
-      scroll-padding-right: var(--jumi-scroll-padding-right);
-    }
-  }
-  @keyframes jumi-scroll-padding-top {
-    to {
-      scroll-padding-top: var(--jumi-scroll-padding-top);
-    }
-  }
-  @keyframes jumi-scroll-snap-align {
-    to {
-      scroll-snap-align: var(--jumi-scroll-snap-align);
-    }
-  }
-  @keyframes jumi-scroll-snap-stop {
-    to {
-      scroll-snap-stop: var(--jumi-scroll-snap-stop);
-    }
-  }
-  @keyframes jumi-scroll-snap-type {
-    to {
-      scroll-snap-type: var(--jumi-scroll-snap-type);
-    }
-  }
-  @keyframes jumi-scrollbar-color {
-    to {
-      scrollbar-color: var(--jumi-scrollbar-color);
-    }
-  }
-  @keyframes jumi-scrollbar-gutter {
-    to {
-      scrollbar-gutter: var(--jumi-scrollbar-gutter);
-    }
-  }
-  @keyframes jumi-scrollbar-width {
-    to {
-      scrollbar-width: var(--jumi-scrollbar-width);
-    }
-  }
-  @keyframes jumi-shape-image-threshold {
-    to {
-      shape-image-threshold: var(--jumi-shape-image-threshold);
-    }
-  }
-  @keyframes jumi-shape-margin {
-    to {
-      shape-margin: var(--jumi-shape-margin);
-    }
-  }
-  @keyframes jumi-shape-outside {
-    to {
-      shape-outside: var(--jumi-shape-outside);
-    }
-  }
-  @keyframes jumi-shape-rendering {
-    to {
-      shape-rendering: var(--jumi-shape-rendering);
-    }
-  }
-  @keyframes jumi-stop-color {
-    to {
-      stop-color: var(--jumi-stop-color);
-    }
-  }
-  @keyframes jumi-stop-opacity {
-    to {
-      stop-opacity: var(--jumi-stop-opacity);
-    }
-  }
-  @keyframes jumi-stroke {
-    to {
-      stroke: var(--jumi-stroke);
-    }
-  }
-  @keyframes jumi-stroke-dasharray {
-    to {
-      stroke-dasharray: var(--jumi-stroke-dasharray);
-    }
-  }
-  @keyframes jumi-stroke-dashoffset {
-    to {
-      stroke-dashoffset: var(--jumi-stroke-dashoffset);
-    }
-  }
-  @keyframes jumi-stroke-linecap {
-    to {
-      stroke-linecap: var(--jumi-stroke-linecap);
-    }
-  }
-  @keyframes jumi-stroke-linejoin {
-    to {
-      stroke-linejoin: var(--jumi-stroke-linejoin);
-    }
-  }
-  @keyframes jumi-stroke-miterlimit {
-    to {
-      stroke-miterlimit: var(--jumi-stroke-miterlimit);
-    }
-  }
-  @keyframes jumi-stroke-opacity {
-    to {
-      stroke-opacity: var(--jumi-stroke-opacity);
-    }
-  }
-  @keyframes jumi-stroke-width {
-    to {
-      stroke-width: var(--jumi-stroke-width);
-    }
-  }
-  @keyframes jumi-tab-size {
-    to {
-      tab-size: var(--jumi-tab-size);
-    }
-  }
-  @keyframes jumi-table-layout {
-    to {
-      table-layout: var(--jumi-table-layout);
-    }
-  }
-  @keyframes jumi-text-align {
-    to {
-      text-align: var(--jumi-text-align);
-    }
-  }
-  @keyframes jumi-text-align-last {
-    to {
-      text-align-last: var(--jumi-text-align-last);
-    }
-  }
-  @keyframes jumi-text-anchor {
-    to {
-      text-anchor: var(--jumi-text-anchor);
-    }
-  }
-  @keyframes jumi-text-autospace {
-    to {
-      text-autospace: var(--jumi-text-autospace);
-    }
-  }
-  @keyframes jumi-text-box {
-    to {
-      textbox: var(--jumi-text-box);
-    }
-  }
-  @keyframes jumi-text-box-edge {
-    to {
-      text-box-edge: var(--jumi-text-box-edge);
-    }
-  }
-  @keyframes jumi-text-box-trim {
-    to {
-      text-box-trim: var(--jumi-text-box-trim);
-    }
-  }
-  @keyframes jumi-text-combine-upright {
-    to {
-      text-combine-upright: var(--jumi-text-combine-upright);
-    }
-  }
-  @keyframes jumi-text-decoration {
-    to {
-      text-decoration: var(--jumi-text-decoration);
-    }
-  }
-  @keyframes jumi-text-decoration-color {
-    to {
-      text-decoration-color: var(--jumi-text-decoration-color);
-    }
-  }
-  @keyframes jumi-text-decoration-line {
-    to {
-      text-decoration-line: var(--jumi-text-decoration-line);
-    }
-  }
-  @keyframes jumi-text-decoration-skip-ink {
-    to {
-      text-decoration-skip-ink: var(--jumi-text-decoration-skip-ink);
-    }
-  }
-  @keyframes jumi-text-decoration-style {
-    to {
-      text-decoration-style: var(--jumi-text-decoration-style);
-    }
-  }
-  @keyframes jumi-text-decoration-thickness {
-    to {
-      text-decoration-thickness: var(--jumi-text-decoration-thickness);
-    }
-  }
-  @keyframes jumi-text-emphasis {
-    to {
-      text-emphasis: var(--jumi-text-emphasis);
-    }
-  }
-  @keyframes jumi-text-emphasis-color {
-    to {
-      text-emphasis-color: var(--jumi-text-emphasis-color);
-    }
-  }
-  @keyframes jumi-text-emphasis-position {
-    to {
-      text-emphasis-position: var(--jumi-text-emphasis-position);
-    }
-  }
-  @keyframes jumi-text-emphasis-style {
-    to {
-      text-emphasis-style: var(--jumi-text-emphasis-style);
-    }
-  }
-  @keyframes jumi-text-indent {
-    to {
-      text-indent: var(--jumi-text-indent);
-    }
-  }
-  @keyframes jumi-text-justify {
-    to {
-      text-justify: var(--jumi-text-justify);
-    }
-  }
-  @keyframes jumi-text-orientation {
-    to {
-      text-orientation: var(--jumi-text-orientation);
-    }
-  }
-  @keyframes jumi-text-overflow {
-    to {
-      text-overflow: var(--jumi-text-overflow);
-    }
-  }
-  @keyframes jumi-text-rendering {
-    to {
-      text-rendering: var(--jumi-text-rendering);
-    }
-  }
-  @keyframes jumi-text-shadow {
-    to {
-      text-shadow: var(--jumi-text-shadow);
-    }
-  }
-  @keyframes jumi-text-transform {
-    to {
-      text-transform: var(--jumi-text-transform);
-    }
-  }
-  @keyframes jumi-text-underline-offset {
-    to {
-      text-underline-offset: var(--jumi-text-underline-offset);
-    }
-  }
-  @keyframes jumi-text-underline-position {
-    to {
-      text-underline-position: var(--jumi-text-underline-position);
-    }
-  }
-  @keyframes jumi-text-wrap {
-    to {
-      text-wrap: var(--jumi-text-wrap);
-    }
-  }
-  @keyframes jumi-text-wrap-mode {
-    to {
-      text-wrap-mode: var(--jumi-text-wrap-mode);
-    }
-  }
-  @keyframes jumi-text-wrap-style {
-    to {
-      text-wrap-style: var(--jumi-text-wrap-style);
-    }
-  }
-  @keyframes jumi-top {
-    to {
-      top: var(--jumi-top);
-    }
-  }
-  @keyframes jumi-transform {
-    to {
-      transform: var(--jumi-transform);
-    }
-  }
-  @keyframes jumi-transform-box {
-    to {
-      transform-box: var(--jumi-transform-box);
-    }
-  }
-  @keyframes jumi-transform-origin {
-    to {
-      transform-origin: var(--jumi-transform-origin);
-    }
-  }
-  @keyframes jumi-transform-style {
-    to {
-      transform-style: var(--jumi-transform-style);
-    }
-  }
-  @keyframes jumi-translate {
-    to {
-      translate: var(--jumi-translate);
-    }
-  }
-  @keyframes jumi-user-select {
-    to {
-      user-select: var(--jumi-user-select);
-    }
-  }
-  @keyframes jumi-vector-effect {
-    to {
-      vector-effect: var(--jumi-vector-effect);
-    }
-  }
-  @keyframes jumi-vertical-align {
-    to {
-      vertical-align: var(--jumi-vertical-align);
-    }
-  }
-  @keyframes jumi-view-timeline-inset {
-    to {
-      view-timeline-inset: var(--jumi-view-timeline-inset);
-    }
-  }
-  @keyframes jumi-view-transition-class {
-    to {
-      view-transition-class: var(--jumi-view-transition-class);
-    }
-  }
-  @keyframes jumi-view-transition-name {
-    to {
-      view-transition-name: var(--jumi-view-transition-name);
-    }
-  }
-  @keyframes jumi-visibility {
-    to {
-      visibility: var(--jumi-visibility);
-    }
-  }
-  @keyframes jumi-white-space {
-    to {
-      white-space: var(--jumi-white-space);
-    }
-  }
-  @keyframes jumi-white-space-collapse {
-    to {
-      white-space-collapse: var(--jumi-white-space-collapse);
-    }
-  }
-  @keyframes jumi-widows {
-    to {
-      widows: var(--jumi-widows);
-    }
-  }
-  @keyframes jumi-width {
-    to {
-      width: var(--jumi-width);
-    }
-  }
-  @keyframes jumi-will-change {
-    to {
-      will-change: var(--jumi-will-change);
-    }
-  }
-  @keyframes jumi-word-break {
-    to {
-      word-break: var(--jumi-word-break);
-    }
-  }
-  @keyframes jumi-word-spacing {
-    to {
-      word-spacing: var(--jumi-word-spacing);
-    }
-  }
-  @keyframes jumi-writing-mode {
-    to {
-      writing-mode: var(--jumi-writing-mode);
-    }
-  }
-  @keyframes jumi-x {
-    to {
-      x: var(--jumi-x);
-    }
-  }
-  @keyframes jumi-y {
-    to {
-      y: var(--jumi-y);
-    }
-  }
-  @keyframes jumi-z-index {
-    to {
-      z-index: var(--jumi-z-index);
-    }
-  }
-}
-@layer base {
   @property --jumi-animation-composition {
     inherits: false;
     initial-value: replace;
@@ -7113,6 +4346,455 @@
     inherits: false;
     initial-value: ease;
     syntax: "ease | linear | ease-in | ease-out | ease-in-out | step-start | step-end";
+  }
+}
+@layer base {
+  @keyframes jumi-aspect-ratio {
+    to {
+      aspect-ratio: var(--jumi-aspect-ratio);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-back-in {
+    0% {
+      transform: scale(0) rotateZ(-360deg);
+    }
+    100% {
+      transform: scale(1) rotateZ(0deg);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-back-in-down {
+    0% {
+      transform: scale(0) translateY(-2000px) rotateZ(-360deg);
+    }
+    100% {
+      transform: scale(1) translateY(0) rotateZ(0deg);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-back-in-left {
+    0% {
+      transform: scale(0) translateX(-2000px) rotateZ(-360deg);
+    }
+    100% {
+      transform: scale(1) translateX(0) rotateZ(0deg);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-back-in-right {
+    0% {
+      transform: scale(0) translateX(2000px) rotateZ(360deg);
+    }
+    100% {
+      transform: scale(1) translateX(0) rotateZ(0deg);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-back-in-up {
+    0% {
+      transform: scale(0) translateY(2000px) rotateZ(360deg);
+    }
+    100% {
+      transform: scale(1) translateY(0) rotateZ(0deg);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-backdrop-filter {
+    to {
+      backdrop-filter: var(--jumi-backdrop-filter);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-background-color {
+    to {
+      background-color: var(--jumi-background-color);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-border-radius {
+    to {
+      border-radius: var(--jumi-border-radius);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-border-image-outset {
+    to {
+      border-image-outset: var(--jumi-border-image-outset);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-bounce-in {
+    0% {
+      transform: scale3d(0.8, 0.8, 0.8);
+    }
+    20% {
+      transform: scale3d(1.1, 1.1, 1.1);
+    }
+    40% {
+      transform: scale3d(0.9, 0.9, 0.9);
+    }
+    60% {
+      transform: scale3d(1.03, 1.03, 1.03);
+    }
+    80% {
+      transform: scale3d(0.97, 0.97, 0.97);
+    }
+    from, 20%, 40%, 60%, 80%, to {
+      animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+    to {
+      transform: scale3d(1, 1, 1);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-bounce-out {
+    20% {
+      transform: scale3d(0.9, 0.9, 0.9);
+    }
+    50%, 55% {
+      transform: scale3d(1.1, 1.1, 1.1);
+    }
+    to {
+      transform: scale3d(0.3, 0.3, 0.3);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-box-shadow {
+    to {
+      box-shadow: var(--jumi-box-shadow);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-color {
+    to {
+      color: var(--jumi-color);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-fade-down {
+    from {
+      opacity: 0;
+      transform: translate3d(0, -40px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-fade-left {
+    from {
+      opacity: 0;
+      transform: translate3d(-40px, 0, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-fade-right {
+    from {
+      opacity: 0;
+      transform: translate3d(40px, 0, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-fade-up {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 40px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-fill {
+    to {
+      fill: var(--jumi-fill);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-filter {
+    to {
+      filter: var(--jumi-filter);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-flip-x {
+    40% {
+      animation-timing-function: ease-in;
+      transform: perspective(400px) rotateX(-20deg);
+    }
+    60% {
+      transform: perspective(400px) rotateX(10deg);
+    }
+    80% {
+      transform: perspective(400px) rotateX(-5deg);
+    }
+    from {
+      animation-timing-function: ease-in;
+      transform: perspective(400px) rotateX(-90deg);
+    }
+    to {
+      transform: perspective(400px) rotateX(0deg);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-flip-y {
+    40% {
+      animation-timing-function: ease-in;
+      transform: perspective(400px) rotateY(-20deg);
+    }
+    60% {
+      transform: perspective(400px) rotateY(10deg);
+    }
+    80% {
+      transform: perspective(400px) rotateY(-5deg);
+    }
+    from {
+      animation-timing-function: ease-in;
+      transform: perspective(400px) rotateY(-90deg);
+    }
+    to {
+      transform: perspective(400px) rotateY(0deg);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-object-position {
+    to {
+      object-position: var(--jumi-object-position);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-offset-anchor {
+    to {
+      offset-anchor: var(--jumi-offset-anchor);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-offset-position {
+    to {
+      offset-position: var(--jumi-offset-position);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-opacity {
+    to {
+      opacity: var(--jumi-opacity);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-pulsate {
+    50% {
+      transform: scale3d(1.05, 1.05, 1.05);
+    }
+    from {
+      transform: scale3d(1, 1, 1);
+    }
+    to {
+      transform: scale3d(1, 1, 1);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-transform {
+    to {
+      transform: var(--jumi-transform);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-gap {
+    to {
+      gap: var(--jumi-gap);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-shake {
+    10%, 30%, 50%, 70%, 90% {
+      transform: translate3d(-10px, 0, 0);
+    }
+    20%, 40%, 60%, 80% {
+      transform: translate3d(10px, 0, 0);
+    }
+    from, to {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-slide-in-up {
+    from {
+      transform: translate3d(0, 100%, 0);
+      visibility: visible;
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-swing {
+    20% {
+      transform: rotateZ(15deg);
+    }
+    40% {
+      transform: rotateZ(-10deg);
+    }
+    60% {
+      transform: rotateZ(5deg);
+    }
+    80% {
+      transform: rotateZ(-5deg);
+    }
+    to {
+      transform: rotateZ(0deg);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-text-shadow {
+    to {
+      text-shadow: var(--jumi-text-shadow);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-width {
+    to {
+      width: var(--jumi-width);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-wobble {
+    15% {
+      transform: translate3d(-25%, 0, 0) rotateZ(-5deg);
+    }
+    30% {
+      transform: translate3d(20%, 0, 0) rotateZ(3deg);
+    }
+    45% {
+      transform: translate3d(-15%, 0, 0) rotateZ(-3deg);
+    }
+    60% {
+      transform: translate3d(10%, 0, 0) rotateZ(2deg);
+    }
+    75% {
+      transform: translate3d(-5%, 0, 0) rotateZ(-1deg);
+    }
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-zoom-in {
+    50% {
+      transform: scale3d(1.05, 1.05, 1.05);
+    }
+    from {
+      transform: scale3d(0.3, 0.3, 0.3);
+    }
+    to {
+      transform: scale3d(1, 1, 1);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-zoom-out {
+    50% {
+      transform: scale3d(0.95, 0.95, 0.95);
+    }
+    from {
+      transform: scale3d(1, 1, 1);
+    }
+    to {
+      transform: scale3d(0.3, 0.3, 0.3);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-height {
+    to {
+      height: var(--jumi-height);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-accent-color {
+    to {
+      accent-color: var(--jumi-accent-color);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-slide-in-left {
+    from {
+      transform: translate3d(-100%, 0, 0);
+      visibility: visible;
+    }
+    to {
+      transform: translate3d(0, 0, 0);
+    }
   }
 }
 @property --tw-border-spacing-x {
@@ -7241,61 +4923,6 @@
   syntax: "<length-percentage>";
   inherits: false;
   initial-value: 100%;
-}
-@property --tw-mask-linear {
-  syntax: "*";
-  inherits: false;
-  initial-value: linear-gradient(#fff, #fff);
-}
-@property --tw-mask-radial {
-  syntax: "*";
-  inherits: false;
-  initial-value: linear-gradient(#fff, #fff);
-}
-@property --tw-mask-conic {
-  syntax: "*";
-  inherits: false;
-  initial-value: linear-gradient(#fff, #fff);
-}
-@property --tw-mask-left {
-  syntax: "*";
-  inherits: false;
-  initial-value: linear-gradient(#fff, #fff);
-}
-@property --tw-mask-right {
-  syntax: "*";
-  inherits: false;
-  initial-value: linear-gradient(#fff, #fff);
-}
-@property --tw-mask-bottom {
-  syntax: "*";
-  inherits: false;
-  initial-value: linear-gradient(#fff, #fff);
-}
-@property --tw-mask-top {
-  syntax: "*";
-  inherits: false;
-  initial-value: linear-gradient(#fff, #fff);
-}
-@property --tw-mask-bottom-from-position {
-  syntax: "*";
-  inherits: false;
-  initial-value: 0%;
-}
-@property --tw-mask-bottom-to-position {
-  syntax: "*";
-  inherits: false;
-  initial-value: 100%;
-}
-@property --tw-mask-bottom-from-color {
-  syntax: "*";
-  inherits: false;
-  initial-value: black;
-}
-@property --tw-mask-bottom-to-color {
-  syntax: "*";
-  inherits: false;
-  initial-value: transparent;
 }
 @property --tw-leading {
   syntax: "*";
@@ -7540,17 +5167,6 @@
       --tw-gradient-from-position: 0%;
       --tw-gradient-via-position: 50%;
       --tw-gradient-to-position: 100%;
-      --tw-mask-linear: linear-gradient(#fff, #fff);
-      --tw-mask-radial: linear-gradient(#fff, #fff);
-      --tw-mask-conic: linear-gradient(#fff, #fff);
-      --tw-mask-left: linear-gradient(#fff, #fff);
-      --tw-mask-right: linear-gradient(#fff, #fff);
-      --tw-mask-bottom: linear-gradient(#fff, #fff);
-      --tw-mask-top: linear-gradient(#fff, #fff);
-      --tw-mask-bottom-from-position: 0%;
-      --tw-mask-bottom-to-position: 100%;
-      --tw-mask-bottom-from-color: black;
-      --tw-mask-bottom-to-color: transparent;
       --tw-leading: initial;
       --tw-font-weight: initial;
       --tw-tracking: initial;

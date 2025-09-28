@@ -1,6 +1,5 @@
 import type { PropertyVariables } from '@/types'
 
-import { animation } from '@/composition/animation'
 import {
   animationRange,
   animationRangeEnd,
@@ -85,6 +84,7 @@ import {
 import { transition } from '@/composition/transition'
 import { viewTimeline } from '@/composition/view-timeline'
 import { css } from '@/helpers/css'
+import { propertyVariableReferences } from '@/keyframes/property'
 
 export const propertyVariables: PropertyVariables = {
   '.animate': {
@@ -95,7 +95,7 @@ export const propertyVariables: PropertyVariables = {
     '--jumi-alignment-baseline': 'baseline',
     '--jumi-all': 'initial',
     '--jumi-anchor-name': 'none',
-    '--jumi-animation': animation,
+    '--jumi-animation': propertyVariableReferences,
     '--jumi-animation-composition': 'replace',
     '--jumi-animation-delay': '0s',
     '--jumi-animation-direction': 'normal',

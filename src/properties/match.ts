@@ -1,9 +1,9 @@
-import type { Api, Collection, MatchProperty, MatchUtilitiesPropertyValue, TailwindTheme } from '@/types'
+import type { Collection, GetMatchProperties, MatchProperty, TailwindTheme } from '@/types'
 
-import { create } from '@/helpers/create'
+import { getCreator } from '@/helpers/create'
 import { css } from '@/helpers/css'
 import { merge } from '@/helpers/merge'
-import { animationAttributes } from '@/keyframes/property'
+import { propertyCollection } from '@/keyframes/property'
 import { alignContent } from '@/theme/align-content'
 import { alignItems } from '@/theme/align-items'
 import { alignSelf } from '@/theme/align-self'
@@ -126,11 +126,12 @@ import { visibility } from '@/theme/visibility'
 
 import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette'
 
-export function getMatchProperties(api: Api): Collection<MatchUtilitiesPropertyValue> {
+export const getMatchProperties: GetMatchProperties = (api) => {
   function getValues<const Values extends Collection>(key: TailwindTheme, values?: Values) {
     return flattenColorPalette(merge(values, api.theme(key)))
   }
 
+  const create = getCreator(api)
   const matchProperties: Partial<MatchProperty> = {
     'animate': {
       property: value => ({
@@ -3147,7 +3148,7 @@ export function getMatchProperties(api: Api): Collection<MatchUtilitiesPropertyV
       values: animationComposition,
     },
     'animation-delay': {
-      modifiers: animationAttributes,
+      modifiers: propertyCollection,
       property: (value, { modifier }) => {
         if (modifier === null) return { '--jumi-animation-delay': value }
         return { [`--jumi-${modifier}-animation-delay`]: value }
@@ -3155,7 +3156,7 @@ export function getMatchProperties(api: Api): Collection<MatchUtilitiesPropertyV
       values: animationDelay,
     },
     'animation-direction': {
-      modifiers: animationAttributes,
+      modifiers: propertyCollection,
       property: (value, { modifier }) => {
         if (modifier === null) return { '--jumi-animation-direction': value }
         return { [`--jumi-${modifier}-animation-direction`]: value }
@@ -3163,7 +3164,7 @@ export function getMatchProperties(api: Api): Collection<MatchUtilitiesPropertyV
       values: animationDirection,
     },
     'animation-duration': {
-      modifiers: animationAttributes,
+      modifiers: propertyCollection,
       property: (value, { modifier }) => {
         if (modifier === null) return { '--jumi-animation-duration': value }
         return { [`--jumi-${modifier}-animation-duration`]: value }
@@ -3171,7 +3172,7 @@ export function getMatchProperties(api: Api): Collection<MatchUtilitiesPropertyV
       values: animationDuration,
     },
     'animation-fill-mode': {
-      modifiers: animationAttributes,
+      modifiers: propertyCollection,
       property: (value, { modifier }) => {
         if (modifier === null) return { '--jumi-animation-fill-mode': value }
         return { [`--jumi-${modifier}-animation-fill-mode`]: value }
@@ -3179,7 +3180,7 @@ export function getMatchProperties(api: Api): Collection<MatchUtilitiesPropertyV
       values: animationFillMode,
     },
     'animation-iteration-count': {
-      modifiers: animationAttributes,
+      modifiers: propertyCollection,
       property: (value, { modifier }) => {
         if (modifier === null) return { '--jumi-animation-iteration-count': value }
         return { [`--jumi-${modifier}-animation-iteration-count`]: value }
@@ -3194,7 +3195,7 @@ export function getMatchProperties(api: Api): Collection<MatchUtilitiesPropertyV
       values: empty.none,
     },
     'animation-play-state': {
-      modifiers: animationAttributes,
+      modifiers: propertyCollection,
       property: (value, { modifier }) => {
         if (modifier === null) return { '--jumi-animation-play-state': value }
         return { [`--jumi-${modifier}-animation-play-state`]: value }
@@ -3281,7 +3282,7 @@ export function getMatchProperties(api: Api): Collection<MatchUtilitiesPropertyV
       values: animationTimelineScroller,
     },
     'animation-timing-function': {
-      modifiers: animationAttributes,
+      modifiers: propertyCollection,
       property: (value, { modifier }) => {
         if (modifier === null) return { '--jumi-animation-timing-function': value }
         return { [`--jumi-${modifier}-animation-timing-function`]: value }

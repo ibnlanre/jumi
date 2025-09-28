@@ -548,9 +548,11 @@ export type DeprecatedStandardPropertyType
     | 'page-break-before'
     | 'page-break-inside'
 
-export type EffectKeyframes = `@keyframes jumi-${Effect}`
+export type EffectKeyframes<Key extends string> = `@keyframes jumi-${Key}`
 
-export type EffectKeyframesCollection = Record<EffectKeyframes, Keyframes>
+export type EffectKeyframesCollection = {
+  [Key in Effect]: Record<EffectKeyframes<Key>, Keyframes>
+}
 
 export type ExperimentatalPropertyType
   = | 'caret'
@@ -620,6 +622,8 @@ export type FontFunction
     | 'stylistic'
     | 'swash'
 
+export type GetMatchProperties = (api: Api) => Collection<MatchUtilitiesPropertyValue>
+
 export type GradientFunction
   = | 'conic-gradient'
     | 'linear-gradient'
@@ -658,6 +662,7 @@ export type MatchUtilitiesPropertyKey = 'animate' | `animate-${AnimatableStandar
 
 export interface MatchUtilitiesPropertyValue extends Partial<MatchUtilitiesOptions> {
   property: MatchUtilitiesPropertyFunction
+  variables?: Collection<string>
 }
 
 export interface MatchVariant {
@@ -944,9 +949,11 @@ export interface StandardPropertiesType<TLength = 0 | (string & {}), TTime = str
   'view-transition-class'?: string
 }
 
-export type StandardPropertyKeyframes = `@keyframes jumi-${AnimatableStandardPropertyType}`
+export type StandardPropertyKeyframes<Key extends string> = `@keyframes jumi-${Key}`
 
-export type StandardPropertyKeyframesCollection = Record<StandardPropertyKeyframes, Keyframes>
+export type StandardPropertyKeyframesCollection = {
+  [Key in AnimatableStandardPropertyType]: Record<StandardPropertyKeyframes<Key>, Keyframes>
+}
 
 export type StandardPropertyKeyframesVariable = `--jumi-${AnimatableStandardPropertyType}-keyframes`
 
