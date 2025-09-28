@@ -331,6 +331,12 @@
   .row-end-auto {
     grid-row-end: auto;
   }
+  .float-left {
+    float: left;
+  }
+  .float-right {
+    float: right;
+  }
   .container {
     width: 100%;
     @media (width >= 40rem) {
@@ -3010,17 +3016,29 @@
   .animate-flip-y {
     --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-flip-y;
   }
+  .animate-letter-spacing {
+    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-letter-spacing;
+  }
   .animate-pulsate {
     --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-pulsate;
   }
   .animate-shake {
     --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-shake;
   }
+  .animate-skew-x {
+    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-skew-x;
+  }
+  .animate-skew-y {
+    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-skew-y;
+  }
   .animate-slide-in-up {
     --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-slide-in-up;
   }
   .animate-swing {
     --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-swing;
+  }
+  .animate-text-shadow {
+    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-text-shadow;
   }
   .animate-wobble {
     --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-wobble;
@@ -4678,6 +4696,26 @@
   }
 }
 @layer base {
+  @keyframes jumi-skew-x {
+    0% {
+      transform: skewX(0deg);
+    }
+    100% {
+      transform: skewX(20deg);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-skew-y {
+    0% {
+      transform: skewY(0deg);
+    }
+    100% {
+      transform: skewY(20deg);
+    }
+  }
+}
+@layer base {
   @keyframes jumi-slide-in-up {
     from {
       transform: translate3d(0, 100%, 0);
@@ -4709,8 +4747,14 @@
 }
 @layer base {
   @keyframes jumi-text-shadow {
-    to {
-      text-shadow: var(--jumi-text-shadow);
+    0% {
+      text-shadow: 0 0 0 transparent;
+    }
+    50% {
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+    }
+    100% {
+      text-shadow: 0 0 0 transparent;
     }
   }
 }

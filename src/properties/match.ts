@@ -3,6 +3,7 @@ import type { Collection, GetMatchProperties, MatchProperty, TailwindTheme } fro
 import { getCreator } from '@/helpers/create'
 import { css } from '@/helpers/css'
 import { merge } from '@/helpers/merge'
+import { effectCollection } from '@/keyframes/effects'
 import { propertyCollection } from '@/keyframes/property'
 import { alignContent } from '@/theme/align-content'
 import { alignItems } from '@/theme/align-items'
@@ -53,7 +54,6 @@ import { contentVisibility } from '@/theme/content-visibility'
 import { cursor } from '@/theme/cursor'
 import { display, displayInside, displayOutside } from '@/theme/display'
 import { dominantBaseline } from '@/theme/dominant-baseline'
-import { effects } from '@/theme/effects'
 import { empty } from '@/theme/empty'
 import { emptyCells } from '@/theme/empty-cell'
 import { fill } from '@/theme/fill'
@@ -137,7 +137,7 @@ export const getMatchProperties: GetMatchProperties = (api) => {
       property: value => ({
         '--jumi-animation': create.effect(value),
       }),
-      values: effects,
+      values: effectCollection,
     },
     'animate-accent-color': {
       property: value => ({
