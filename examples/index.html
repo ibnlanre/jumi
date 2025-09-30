@@ -11,12 +11,12 @@
     <div class="max-w-4xl p-8 mx-auto space-y-8">
       <header class="mb-12 text-center">
         <h1
-          class="text-4xl font-bold text-gray-900 animate-zoom-in animation-duration-1 animate-text-shadow-2xl hover:before:animate-width-full before:animation-duration-1 before:border-b-2"
+          class="text-4xl font-bold text-gray-900 effect-zoom-in animation-duration-1 animate-text-shadow-2xl hover:before:animate-width-full before:animation-duration-1 before:border-b-2"
         >
           Jumi Animation Plugin
         </h1>
         <p
-          class="text-lg text-gray-600 animate animate-fade-in animation-duration-2 animation-delay-500 animate-color-gray-500 hover:animate-accent-color-amber-100 animation-iteration-count-infinite animate-justify-items-safe-center animate-backdrop-drop-shadow-color-amber-100/75"
+          class="text-lg text-gray-600 animate effect-fade-in if-child-is-h1/then:bg-white animation-duration-2 animation-delay-500 animate-color-gray-500 hover:animate-accent-color-amber-100 animation-iteration-count-infinite animate-justify-items-safe-center animate-backdrop-filter-drop-shadow-color-amber-100/75"
         >
           A comprehensive TailwindCSS animation library
         </p>
@@ -27,23 +27,23 @@
         <h2 class="mb-4 text-2xl font-semibold">Transform Animations</h2>
         <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
           <!-- Translate -->
-          <div class="p-4 text-center bg-blue-100 rounded">
+          <div class="p-4 overflow-hidden text-center bg-blue-100 rounded">
             <h3 class="mb-2 font-medium">Translate</h3>
             <div
-              class="w-16 h-16 mx-auto bg-blue-500 animate-hyphenate-limit-chars-[5]/minimun-characters-after rounded animate animate-translate-x-[20px] animation-duration-2 animation-iteration-count-infinite animation-direction-alternate "
+              class="w-16 h-16 mx-auto bg-blue-500 animate-hyphenate-limit-chars-[12]/minimum-characters-after rounded animate animate-translate-x-[20px] animation-duration-2 animation-iteration-count-infinite animation-direction-alternate "
             ></div>
           </div>
 
           <!-- Rotate -->
-          <div class="p-4 text-center bg-green-100 rounded">
+          <div class="p-4 overflow-hidden text-center bg-green-100 rounded">
             <h3 class="mb-2 font-medium">Rotate</h3>
             <div
-              class="w-16 h-16 mx-auto bg-green-500 rounded animate-height-21 animate animate-rotate-46 animation-direction-alternate animation-duration-5/transform animation-iteration-count-infinite"
+              class="w-16 h-16 mx-auto bg-green-500 rounded animate animate-rotate-46 animation-direction-alternate animation-duration-3/transform animation-iteration-count-infinite"
             ></div>
           </div>
 
           <!-- Scale -->
-          <div class="p-4 text-center bg-purple-100 rounded">
+          <div class="p-4 overflow-hidden text-center bg-purple-100 rounded">
             <h3 class="mb-2 font-medium">Scale</h3>
             <div
               class="w-16 h-16 mx-auto bg-purple-500 rounded animate animate-scale-125 animation-duration-1 animation-iteration-count-infinite animation-direction-alternate"
@@ -51,10 +51,10 @@
           </div>
 
           <!-- Combined -->
-          <div class="p-4 text-center bg-red-100 rounded">
+          <div class="p-4 overflow-hidden text-center bg-red-100 rounded">
             <h3 class="mb-2 font-medium">Combined</h3>
             <div
-              class="w-16 h-16 mx-auto bg-red-500 rounded animate animate-translate-top-right-3 animate-rotate-45 animate-scale-110 animation-duration-2 animation-delay-2/accent-color animation-iteration-count-infinite animation-direction-alternate"
+              class="w-16 h-16 mx-auto bg-red-500 rounded animate animate-rotate-45 animate-scale-110 animation-duration-2 animation-delay-2/accent-color animation-iteration-count-infinite animation-direction-alternate"
             ></div>
           </div>
         </div>
@@ -65,35 +65,83 @@
         <h2 class="mb-4 text-2xl font-semibold">Effect Animations</h2>
         <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
           <!-- Bounce In -->
-          <div class="p-4 text-center bg-yellow-100 rounded">
+          <div class="p-4 overflow-hidden text-center bg-yellow-100 rounded">
             <h3 class="mb-2 font-medium">Bounce In</h3>
             <div
-              class="w-16 h-16 mx-auto bg-yellow-500 rounded-full animate animate-bounce-in animation-duration-1 animation-iteration-count-infinite"
+              class="w-16 h-16 mx-auto bg-yellow-500 rounded-full animate effect-bounce-in animation-duration-1 animation-iteration-count-infinite"
             ></div>
           </div>
 
           <!-- Fade In -->
-          <div class="p-4 text-center bg-indigo-100 rounded">
+          <div class="p-4 overflow-hidden text-center bg-indigo-100 rounded">
             <h3 class="mb-2 font-medium">Fade In</h3>
             <div
-              class="w-16 h-16 mx-auto bg-indigo-500 rounded-full animate animate-fade-in animation-duration-2 animation-iteration-count-infinite animation-direction-alternate if-sibling-is-[*]:animate-accent-color-amber-500"
+              class="w-16 h-16 mx-auto bg-indigo-500 rounded-full animate effect-fade-in animation-duration-2 animation-iteration-count-infinite animation-direction-alternate if-sibling-is-[*]:animate-accent-color-amber-500"
             ></div>
           </div>
 
           <!-- Slide In Up -->
-          <div class="p-4 text-center bg-pink-100 rounded">
+          <div class="p-4 overflow-hidden text-center bg-pink-100 rounded">
             <h3 class="mb-2 font-medium">Slide In Up</h3>
             <div
-              class="w-16 h-16 mx-auto bg-pink-500 rounded-full animate animate-slide-in-up animation-duration-1 animation-iteration-count-infinite animation-direction-alternate"
+              class="w-16 h-16 mx-auto bg-pink-500 rounded-full animate effect-slide-in-up animation-duration-1 animation-iteration-count-infinite animation-direction-alternate"
             ></div>
           </div>
 
           <!-- Zoom In -->
-          <div class="p-4 text-center bg-teal-100 rounded">
+          <div class="p-4 overflow-hidden text-center bg-teal-100 rounded">
             <h3 class="mb-2 font-medium">Zoom In</h3>
             <div
-              class="w-16 h-16 mx-auto bg-teal-500 rounded-full animate animate-zoom-in animation-duration-2 animation-iteration-count-infinite"
+              class="w-16 h-16 mx-auto bg-teal-500 rounded-full animate effect-zoom-in animation-duration-2 animation-iteration-count-infinite"
             ></div>
+          </div>
+
+            <!-- Fold/Unfold -->
+          <div class="p-4 overflow-hidden text-center bg-blue-100 rounded">
+            <h3 class="mb-2 font-medium">Fold Effect</h3>
+            <div class="w-16 h-16 mx-auto bg-blue-500 rounded animate effect-fold-in animation-duration-2 animation-iteration-count-infinite animation-direction-alternate"></div>
+          </div>
+
+          <!-- Rush Animation -->
+          <div class="p-4 overflow-hidden text-center bg-orange-100 rounded">
+            <h3 class="mb-2 font-medium">Rush Effect</h3>
+            <div class="w-16 h-16 mx-auto bg-orange-500 rounded animate effect-rush-in-right animation-duration-1 animation-iteration-count-infinite"></div>
+          </div>
+          
+          <!-- Float Motion -->
+          <div class="p-4 overflow-hidden text-center rounded bg-cyan-100">
+            <h3 class="mb-2 font-medium">Float Motion</h3>
+            <div class="w-16 h-16 mx-auto rounded bg-cyan-500 animate effect-float animation-duration-3 animation-iteration-count-infinite"></div>
+          </div>
+
+          <!-- Curved Motion -->
+          <div class="p-4 overflow-hidden text-center bg-green-100 rounded">
+            <h3 class="mb-2 font-medium">Arc Motion</h3>
+            <div class="w-16 h-16 mx-auto bg-green-500 rounded animate effect-arc-bottom-right animation-duration-2 animation-iteration-count-infinite"></div>
+          </div>
+
+          <!-- Bubble Burst -->
+          <div class="p-4 overflow-hidden text-center bg-purple-100 rounded">
+            <h3 class="mb-2 font-medium">Bubble Burst</h3>
+            <div class="w-16 h-16 mx-auto bg-purple-500 rounded animate effect-bubble animation-duration-2 animation-iteration-count-infinite"></div>
+          </div>
+
+          <!-- Modern Slide -->
+          <div class="p-4 overflow-hidden text-center bg-pink-100 rounded">
+            <h3 class="mb-2 font-medium">Modern Slide</h3>
+            <div class="w-16 h-16 mx-auto bg-pink-500 rounded animate effect-slide-in-down animation-duration-1 animation-iteration-count-infinite animation-direction-alternate"></div>
+          </div>
+
+          <!-- Magnetic Pull -->
+          <div class="p-4 overflow-hidden text-center bg-yellow-100 rounded">
+            <h3 class="mb-2 font-medium">Magnetic Effect</h3>
+            <div class="w-16 h-16 mx-auto bg-yellow-500 rounded animate effect-magnetic animation-duration-2 animation-iteration-count-infinite"></div>
+          </div>
+
+          <!-- Mask Reveal -->
+          <div class="p-4 overflow-hidden text-center bg-indigo-100 rounded">
+            <h3 class="mb-2 font-medium">Mask Reveal</h3>
+            <div class="w-16 h-16 mx-auto bg-indigo-500 rounded animate effect-circle-in animation-duration-2 animation-iteration-count-infinite animation-direction-alternate"></div>
           </div>
         </div>
       </section>
@@ -106,7 +154,7 @@
         </p>
         <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
           <!-- Width -->
-          <div class="p-4 text-center bg-blue-100 rounded if-child-is-[h3]:animate-width-16">
+          <div class="p-4 text-center overflow-hidden bg-blue-100 rounded if-child-is-[h3]:animate-width-16">
             <h3 class="mb-2 font-medium">Width</h3>
             <div
               class="w-1/5 h-16 mx-auto bg-blue-500 rounded animate animate-width-32 animation-duration-2 animation-iteration-count-infinite animation-direction-alternate"
@@ -114,7 +162,7 @@
           </div>
 
           <!-- Height -->
-          <div class="p-4 text-center bg-green-100 rounded">
+          <div class="p-4 overflow-hidden text-center bg-green-100 rounded">
             <h3 class="mb-2 font-medium">Height</h3>
             <div
               class="animate w-16 bg-green-500 rounded mx-auto animate-height-20 animation-duration-2 animation-iteration-count-infinite animation-direction-alternate h-[2rem]"
@@ -122,7 +170,7 @@
           </div>
 
           <!-- Opacity -->
-          <div class="p-4 text-center bg-purple-100 rounded">
+          <div class="p-4 overflow-hidden text-center bg-purple-100 rounded">
             <h3 class="mb-2 font-medium">Opacity</h3>
             <div
               class="w-16 h-16 mx-auto bg-purple-500 rounded animate animate-opacity-20 animation-duration-2 animation-iteration-count-infinite animation-direction-alternate"
@@ -130,7 +178,7 @@
           </div>
 
           <!-- Border Radius -->
-          <div class="p-4 text-center bg-red-100 rounded">
+          <div class="p-4 overflow-hidden text-center bg-red-100 rounded">
             <h3 class="mb-2 font-medium">Border Radius</h3>
             <div
               class="w-16 h-16 mx-auto bg-red-500 rounded-[0px] animate animate-border-radius-[20px] animation-duration-2 animation-iteration-count-infinite animation-direction-alternate"
@@ -141,7 +189,7 @@
         <!-- Second row with color animations -->
         <div class="grid grid-cols-2 gap-4 mt-4 md:grid-cols-4">
           <!-- Background Color -->
-          <div class="p-4 text-center bg-gray-100 rounded">
+          <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
             <h3 class="mb-2 font-medium">Background Color</h3>
             <div
               class="w-16 h-16 mx-auto bg-gray-300 rounded animate animate-background-color-blue-500 animation-duration-2 animation-iteration-count-infinite animation-direction-alternate"
@@ -149,7 +197,7 @@
           </div>
 
           <!-- Text Color -->
-          <div class="p-4 text-center bg-gray-100 rounded">
+          <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
             <h3 class="mb-2 font-medium">Text Color</h3>
             <div
               class="flex items-center justify-center w-16 h-16 mx-auto text-gray-800 bg-white rounded animate animate-color-red-500 animation-duration-2 animation-iteration-count-infinite animation-direction-alternate"
@@ -159,7 +207,7 @@
           </div>
 
           <!-- Blur Effect -->
-          <div class="p-4 text-center bg-gray-100 rounded">
+          <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
             <h3 class="mb-2 font-medium">Blur</h3>
             <div
               class="w-16 h-16 mx-auto rounded animate bg-gradient-to-r from-pink-500 to-yellow-500 blur-[1px] animate-filter-blur-md animation-duration-6 animation-iteration-count-infinite animation-direction-alternate"
@@ -167,7 +215,7 @@
           </div>
 
           <!-- SVG Fill Color -->
-          <div class="p-4 text-center bg-yellow-100 rounded">
+          <div class="p-4 overflow-hidden text-center bg-yellow-100 rounded">
             <h3 class="mb-2 font-medium">SVG Fill</h3>
             <svg
               class="w-16 h-16 mx-auto"
@@ -192,7 +240,7 @@
         </p>
         <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
           <!-- Top Border Reveal -->
-          <div class="p-4 text-center bg-blue-100 rounded">
+          <div class="p-4 overflow-hidden text-center bg-blue-100 rounded">
             <h3 class="mb-2 font-medium">Top Border</h3>
             <div
               class="relative w-16 h-16 mx-auto bg-blue-500 rounded before:absolute before:top-0 before:left-0 before:w-0 before:h-0 before:border-t-4 before:border-white before:animate before:animate-width-full before:animation-duration-3 before:animation-iteration-count-infinite"
@@ -200,7 +248,7 @@
           </div>
 
           <!-- Right Border Reveal -->
-          <div class="p-4 text-center bg-green-100 rounded">
+          <div class="p-4 overflow-hidden text-center bg-green-100 rounded">
             <h3 class="mb-2 font-medium">Right Border</h3>
             <div
               class="relative w-16 h-16 mx-auto bg-green-500 rounded before:absolute before:top-0 before:right-0 before:w-0 before:h-0 before:border-r-4 before:border-white before:animate before:animate-height-full before:animation-duration-3 before:animation-iteration-count-infinite before:animation-delay-500"
@@ -208,7 +256,7 @@
           </div>
 
           <!-- Bottom Border Reveal -->
-          <div class="p-4 text-center bg-purple-100 rounded">
+          <div class="p-4 overflow-hidden text-center bg-purple-100 rounded">
             <h3 class="mb-2 font-medium">Bottom Border</h3>
             <div
               class="relative w-16 h-16 mx-auto bg-purple-500 rounded before:absolute before:bottom-0 before:left-0 before:w-0 before:h-0 before:border-b-4 before:border-white before:animate before:animate-width-full before:animation-duration-3 before:animation-iteration-count-infinite before:animation-delay-1"
@@ -216,7 +264,7 @@
           </div>
 
           <!-- Left Border Reveal -->
-          <div class="p-4 text-center bg-red-100 rounded">
+          <div class="p-4 overflow-hidden text-center bg-red-100 rounded">
             <h3 class="mb-2 font-medium">Left Border</h3>
             <div
               class="relative w-16 h-16 mx-auto bg-red-500 rounded before:absolute before:top-0 before:left-0 before:w-0 before:h-0 before:border-l-4 before:border-white before:animate before:animate-height-full before:animation-duration-3 before:animation-iteration-count-infinite before:animation-delay-1.5"
@@ -226,40 +274,18 @@
 
         <!-- Demonstration with different border widths -->
         <div class="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2">
-          <div class="p-4 text-center bg-gray-100 rounded">
+          <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
             <h3 class="mb-2 font-medium">Thick Border (8px)</h3>
             <div
               class="relative w-32 h-32 mx-auto bg-indigo-500 rounded before:absolute before:top-0 before:left-0 before:w-0 before:h-0 before:border-t-8 before:border-white before:animate before:animate-width-full before:animation-duration-2 before:animation-iteration-count-infinite before:animation-direction-alternate"
             ></div>
           </div>
 
-          <div class="p-4 text-center bg-gray-100 rounded">
+          <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
             <h3 class="mb-2 font-medium">Thin Border (2px)</h3>
             <div
               class="relative w-32 h-32 mx-auto bg-orange-500 rounded before:absolute before:bottom-0 before:left-0 before:w-0 before:h-0 before:border-b-2 before:border-white before:animate before:animate-width-full before:animation-duration-2 before:animation-iteration-count-infinite before:animation-direction-alternate"
             ></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Hover Effects -->
-      <section class="p-6 bg-white rounded-lg shadow-lg">
-        <h2 class="mb-4 text-2xl font-semibold">Hover Effects</h2>
-        <div class="grid grid-cols-2 gap-4 md:grid-cols-3">
-          <div class="p-6 text-center bg-gray-200 rounded-lg cursor-pointer animate hover:animate-bounce-in hover:animation-duration-500">
-              Hover to Bounce
-          </div>
-
-          <div
-            class="p-6 text-center bg-gray-200 rounded-lg cursor-pointer animate hover:animate-scale-110 hover:animation-duration-300"
-          >
-            Hover to Scale
-          </div>
-
-          <div
-            class="p-6 text-center bg-gray-200 rounded-lg cursor-pointer animate hover:animate-rotate-5 hover:animation-duration-200"
-          >
-            Hover to Rotate
           </div>
         </div>
       </section>
@@ -272,7 +298,7 @@
           <div class="text-center">
             <h3 class="mb-2 font-medium">Duration</h3>
             <div
-              class="w-16 h-16 mx-auto bg-orange-500 rounded animate animate-bounce-in animation-duration-3 animation-iteration-count-infinite"
+              class="w-16 h-16 mx-auto bg-orange-500 rounded animate effect-bounce-in animation-duration-3 animation-iteration-count-infinite"
             ></div>
             <p class="mt-2 text-sm text-gray-600">3s duration</p>
           </div>
@@ -281,7 +307,7 @@
           <div class="text-center">
             <h3 class="mb-2 font-medium">Delay</h3>
             <div
-              class="w-16 h-16 mx-auto bg-orange-500 rounded animate animate-bounce-in animation-duration-1 animation-delay-1 animation-iteration-count-infinite"
+              class="w-16 h-16 mx-auto bg-orange-500 rounded animate effect-bounce-in animation-duration-1 animation-delay-1 animation-iteration-count-infinite"
             ></div>
             <p class="mt-2 text-sm text-gray-600">1s delay</p>
           </div>
@@ -290,34 +316,60 @@
           <div class="text-center">
             <h3 class="mb-2 font-medium">Easing</h3>
             <div
-              class="w-16 h-16 mx-auto bg-orange-500 rounded animate animate-translate-x-[20px] animation-duration-2 animate-ease-ease-in-out-back animation-iteration-count-infinite animation-direction-alternate"
+              class="w-16 h-16 mx-auto bg-orange-500 rounded animate animate-translate-x-[20px] animation-duration-2 animation-timing-function-ease-in-out-back animation-iteration-count-infinite animation-direction-alternate"
             ></div>
             <p class="mt-2 text-sm text-gray-600">Back easing</p>
           </div>
         </div>
       </section>
 
-      <!-- Property Animations -->
+      <!-- Stagger Animations -->
       <section class="p-6 bg-white rounded-lg shadow-lg">
-        <h2 class="mb-4 text-2xl font-semibold">Property Animations</h2>
-        <div class="space-y-4">
-          <!-- Width Animation -->
-          <div class="text-center">
-            <h3 class="mb-2 font-medium">Width Animation</h3>
-            <div
-              class="w-1/5 h-8 rounded animate bg-gradient-to-r from-blue-400 to-purple-600 animate-width-full animation-duration-3 animation-iteration-count-infinite animation-direction-alternate"
-            ></div>
+        <h2 class="mb-4 text-2xl font-semibold">Stagger Animations</h2>
+        <p class="mb-4 text-gray-600">
+          Sequential animations with automatic delay calculation using CSS calc()
+        </p>
+        
+        <!-- Basic Stagger -->
+        <div class="mb-6">
+          <h3 class="mb-2 font-medium">Basic Stagger (100ms intervals)</h3>
+          <div class="flex gap-2 p-4 bg-gray-100 rounded animation-delay-forward-100/5 *:animate *:w-12 *:h-12 *:bg-blue-500 *:rounded *:effect-bounce-in *:animation-duration-2 *:animation-iteration-count-infinite *:animation-direction-alternate">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
           </div>
+        </div>
 
-          <!-- Color Animation -->
-          <div class="text-center">
-            <h3 class="mb-2 font-medium">Background Color Animation</h3>
-            <div
-              class="w-32 h-32 mx-auto bg-blue-700 rounded-full animate animate-background-color-red-500 animation-duration-2 animation-iteration-count-infinite animation-direction-alternate"
-            ></div>
+        <!-- Reverse Stagger -->
+        <div class="mb-6">
+          <h3 class="mb-2 font-medium">Reverse Stagger (150ms intervals)</h3>
+          <div class="flex gap-2 p-4 bg-gray-100 rounded animation-delay-backward-150/5 *:animate *:w-12 *:h-12 *:bg-green-500 *:rounded *:effect-slide-in-up *:animation-duration-1.5 *:animation-iteration-count-infinite *:animation-direction-alternate">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        </div>
+
+        <!-- Custom Stagger with Modifier -->
+        <div class="mb-6">
+          <h3 class="mb-2 font-medium">Custom Stagger (300ms intervals, 8 children max)</h3>
+          <div class="grid grid-cols-4 gap-2 p-4 bg-gray-100 rounded *:rounded animation-delay-forward-300/[8] *:w-12 *:h-12 *:bg-purple-500 *:animate *:effect-zoom-in *:animation-duration-3 *:animation-iteration-count-infinite *:animation-direction-alternate">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
           </div>
         </div>
       </section>
+
 
       <!-- Custom CSS Variables -->
       <section class="p-6 bg-white rounded-lg shadow-lg">

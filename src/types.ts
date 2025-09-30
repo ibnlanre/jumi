@@ -1,7 +1,7 @@
 import type { AtRule, StandardPropertiesHyphen, SvgPropertiesHyphen } from 'csstype'
 import type { PluginCreator } from 'tailwindcss/plugin'
 
-import type { Effect } from '@/theme/effects'
+import type { effectKeyframes } from '@/keyframes/effects'
 
 export type AddProperty = Collection<CssInJs>
 
@@ -472,6 +472,10 @@ export type ComparisonFunction
     | 'max'
     | 'min'
 
+export type ComponentKey
+  = | 'animation-delay-backward'
+    | 'animation-delay-forward'
+
 export type CounterFunction
   = | 'counter'
     | 'counters'
@@ -548,9 +552,11 @@ export type DeprecatedStandardPropertyType
     | 'page-break-before'
     | 'page-break-inside'
 
+export type Effect = keyof typeof effectKeyframes
+
 export type EffectKeyframes<Key extends string> = `@keyframes jumi-${Key}`
 
-export type EffectKeyframesCollection = {
+export type EffectKeyframesCollection<Effect extends string = string> = {
   [Key in Effect]: Record<EffectKeyframes<Key>, Keyframes>
 }
 
@@ -647,6 +653,14 @@ export type KeyframesVariableReference = `var(${StandardPropertyKeyframesVariabl
 
 export type KeyframeVariables = Record<StandardPropertyKeyframesVariable, string>
 
+export type MatchComponents = Record<ComponentKey, MatchComponentsPropertyValue>
+
+export type MatchComponentsPropertyFunction = (value: string, extra: { modifier: null | string }) => CssInJs
+
+export interface MatchComponentsPropertyValue extends Partial<MatchUtilitiesOptions> {
+  property: MatchComponentsPropertyFunction
+}
+
 export type MatchProperty = Record<MatchUtilitiesPropertyKey, MatchUtilitiesPropertyValue>
 
 export interface MatchUtilitiesOptions {
@@ -658,15 +672,14 @@ export interface MatchUtilitiesOptions {
 
 export type MatchUtilitiesPropertyFunction = (value: string, extra: { modifier: null | string }) => CSSRuleObject
 
-export type MatchUtilitiesPropertyKey = 'animate' | `animate-${AnimatableStandardPropertyType}` | `animate-${NonStandardPropertyType}` | AnimationPropertyType
+export type MatchUtilitiesPropertyKey = 'effect' | `animate-${AnimatableStandardPropertyType}` | `animate-${NonStandardPropertyType}` | AnimationPropertyType
 
 export interface MatchUtilitiesPropertyValue extends Partial<MatchUtilitiesOptions> {
   property: MatchUtilitiesPropertyFunction
-  variables?: Collection<string>
 }
 
 export interface MatchVariant {
-  generator: (value: string) => string
+  generator: (value: string, extra: { modifier: null | string }) => string | string[]
   name: string
   values: Collection<string>
 }
@@ -717,21 +730,21 @@ export type NonStandardAnimtionPropertyType
 export type NonStandardPropertyType
   = | 'aspect-ratio-height'
     | 'aspect-ratio-width'
-    | 'backdrop-blur'
-    | 'backdrop-brightness'
-    | 'backdrop-contrast'
-    | 'backdrop-drop-shadow'
-    | 'backdrop-drop-shadow-blur'
-    | 'backdrop-drop-shadow-color'
-    | 'backdrop-drop-shadow-offset-x'
-    | 'backdrop-drop-shadow-offset-y'
-    | 'backdrop-grayscale'
-    | 'backdrop-hue-rotate'
-    | 'backdrop-invert'
-    | 'backdrop-opacity'
-    | 'backdrop-saturate'
-    | 'backdrop-sepia'
-    | 'backdrop-url'
+    | 'backdrop-filter-blur'
+    | 'backdrop-filter-brightness'
+    | 'backdrop-filter-contrast'
+    | 'backdrop-filter-drop-shadow'
+    | 'backdrop-filter-drop-shadow-blur'
+    | 'backdrop-filter-drop-shadow-color'
+    | 'backdrop-filter-drop-shadow-offset-x'
+    | 'backdrop-filter-drop-shadow-offset-y'
+    | 'backdrop-filter-grayscale'
+    | 'backdrop-filter-hue-rotate'
+    | 'backdrop-filter-invert'
+    | 'backdrop-filter-opacity'
+    | 'backdrop-filter-saturate'
+    | 'backdrop-filter-sepia'
+    | 'backdrop-filter-url'
     | 'background-position-x-edge'
     | 'background-position-x-offset'
     | 'background-position-y-edge'

@@ -1,6 +1,7 @@
-import type { Collection, CssInJs } from '@/types'
+import type { Collection, ComponentKey, CssInJs, MatchComponentsPropertyValue } from '@/types'
 
 import { addProperties } from '@/properties/add'
+import { component } from '@/properties/component'
 import { getMatchProperties } from '@/properties/match'
 import { propertyVariables } from '@/variables/property'
 import { animationRegister } from '@/variables/register'
@@ -40,7 +41,7 @@ const variables: Array<Collection<CssInJs>> = [propertyVariables]
 const utilities: Array<Collection<CssInJs>> = [addProperties]
 
 const jumi = createPlugin((api) => {
-  const { addBase, addUtilities, matchUtilities, matchVariant } = api
+  const { addBase, addUtilities, matchComponents, matchUtilities, matchVariant } = api
 
   properties.forEach(addBase)
   utilities.concat(variables).forEach(addUtilities)
@@ -55,6 +56,11 @@ const jumi = createPlugin((api) => {
   for (const name in matchProperties) {
     const { property, ...options } = matchProperties[name]
     matchUtilities({ [name]: property }, options)
+  }
+
+  for (const name in component) {
+    const { property, ...options } = component[name]
+    matchComponents({ [name]: property }, options)
   }
 })
 

@@ -1,5 +1,4 @@
-import type { Effect } from '@/theme/effects'
-import type { AnimatableStandardPropertyType, Api, CssInJs } from '@/types'
+import type { AnimatableStandardPropertyType, Api, CssInJs, Effect } from '@/types'
 
 import { css } from '@/helpers/css'
 import { effectKeyframes } from '@/keyframes/effects'
@@ -34,7 +33,7 @@ export function getCreator(api: Api) {
       ].join(' ')
     },
     effect(attribute: string): string {
-      const name = `jumi-${attribute as Effect}` as const
+      const name = `jumi-effect-${attribute as Effect}` as const
       const keyframes: CssInJs = effectKeyframes[attribute as Effect]
       addKeyframes(api, attribute, keyframes)
 

@@ -10,6 +10,7 @@
     --color-red-100: oklch(93.6% 0.032 17.717);
     --color-red-500: oklch(63.7% 0.237 25.331);
     --color-red-950: oklch(25.8% 0.092 26.042);
+    --color-orange-100: oklch(95.4% 0.038 75.164);
     --color-orange-500: oklch(70.5% 0.213 47.604);
     --color-orange-950: oklch(26.6% 0.079 36.259);
     --color-amber-950: oklch(27.9% 0.077 45.635);
@@ -25,6 +26,8 @@
     --color-teal-100: oklch(95.3% 0.051 180.801);
     --color-teal-500: oklch(70.4% 0.14 182.503);
     --color-teal-950: oklch(27.7% 0.046 192.524);
+    --color-cyan-100: oklch(95.6% 0.045 203.388);
+    --color-cyan-500: oklch(71.5% 0.143 215.221);
     --color-cyan-950: oklch(30.2% 0.056 229.695);
     --color-sky-950: oklch(29.3% 0.066 243.157);
     --color-blue-100: oklch(93.2% 0.032 255.585);
@@ -331,12 +334,6 @@
   .row-end-auto {
     grid-row-end: auto;
   }
-  .float-left {
-    float: left;
-  }
-  .float-right {
-    float: right;
-  }
   .container {
     width: 100%;
     @media (width >= 40rem) {
@@ -470,9 +467,6 @@
   .size-fit {
     width: fit-content;
     height: fit-content;
-  }
-  .h-8 {
-    height: calc(var(--spacing) * 8);
   }
   .h-12 {
     height: calc(var(--spacing) * 12);
@@ -660,9 +654,6 @@
   .animate {
     animation: var(--jumi-animation);
   }
-  .cursor-pointer {
-    cursor: pointer;
-  }
   .cursor-zoom-out {
     cursor: zoom-out;
   }
@@ -708,6 +699,9 @@
   .grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  .grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
   .grid-cols-\[200px_minmax\(900px\,_1fr\)_100px\] {
     grid-template-columns: 200px minmax(900px, 1fr) 100px;
   }
@@ -752,6 +746,9 @@
   }
   .justify-items-stretch {
     justify-items: stretch;
+  }
+  .gap-2 {
+    gap: calc(var(--spacing) * 2);
   }
   .gap-4 {
     gap: calc(var(--spacing) * 4);
@@ -955,14 +952,14 @@
   .bg-blue-600 {
     background-color: var(--color-blue-600);
   }
-  .bg-blue-700 {
-    background-color: var(--color-blue-700);
+  .bg-cyan-100 {
+    background-color: var(--color-cyan-100);
+  }
+  .bg-cyan-500 {
+    background-color: var(--color-cyan-500);
   }
   .bg-gray-100 {
     background-color: var(--color-gray-100);
-  }
-  .bg-gray-200 {
-    background-color: var(--color-gray-200);
   }
   .bg-gray-300 {
     background-color: var(--color-gray-300);
@@ -978,6 +975,9 @@
   }
   .bg-indigo-500 {
     background-color: var(--color-indigo-500);
+  }
+  .bg-orange-100 {
+    background-color: var(--color-orange-100);
   }
   .bg-orange-500 {
     background-color: var(--color-orange-500);
@@ -1050,10 +1050,6 @@
   }
   .bg-none {
     background-image: none;
-  }
-  .from-blue-400 {
-    --tw-gradient-from: var(--color-blue-400);
-    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
   }
   .from-blue-500 {
     --tw-gradient-from: var(--color-blue-500);
@@ -1138,8 +1134,29 @@
   .mask-clip-content {
     mask-clip: content-box;
   }
+  .mask-bottom {
+    mask-position: bottom;
+  }
+  .mask-bottom-left {
+    mask-position: left bottom;
+  }
+  .mask-bottom-right {
+    mask-position: right bottom;
+  }
+  .mask-left {
+    mask-position: left;
+  }
+  .mask-right {
+    mask-position: right;
+  }
   .mask-top {
     mask-position: top;
+  }
+  .mask-top-left {
+    mask-position: left top;
+  }
+  .mask-top-right {
+    mask-position: right top;
   }
   .mask-repeat {
     mask-repeat: repeat;
@@ -1548,11 +1565,6 @@
   .filter {
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
   }
-  .backdrop-blur {
-    --tw-backdrop-blur: blur(8px);
-    -webkit-backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
-    backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
-  }
   .backdrop-blur-3xl {
     --tw-backdrop-blur: blur(var(--blur-3xl));
     -webkit-backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
@@ -1691,22 +1703,22 @@
     --jumi-aspect-ratio: var(--jumi-aspect-ratio-width) var(--jumi-aspect-ratio-height);
     --jumi-aspect-ratio-height: auto;
     --jumi-aspect-ratio-width: auto;
-    --jumi-backdrop-blur: blur(0);
-    --jumi-backdrop-brightness: brightness(1);
-    --jumi-backdrop-contrast: contrast(1);
-    --jumi-backdrop-drop-shadow: drop-shadow(var(--jumi-backdrop-drop-shadow-offset-x) var(--jumi-backdrop-drop-shadow-offset-y) var(--jumi-backdrop-drop-shadow-blur) var(--jumi-backdrop-drop-shadow-color));
-    --jumi-backdrop-drop-shadow-blur: 0;
-    --jumi-backdrop-drop-shadow-color: transparent;
-    --jumi-backdrop-drop-shadow-offset-x: 0;
-    --jumi-backdrop-drop-shadow-offset-y: 0;
-    --jumi-backdrop-filter: var(--jumi-backdrop-blur) var(--jumi-backdrop-brightness) var(--jumi-backdrop-contrast) var(--jumi-backdrop-drop-shadow) var(--jumi-backdrop-grayscale) var(--jumi-backdrop-hue-rotate) var(--jumi-backdrop-invert) var(--jumi-backdrop-opacity) var(--jumi-backdrop-saturate) var(--jumi-backdrop-sepia);
-    --jumi-backdrop-grayscale: grayscale(0);
-    --jumi-backdrop-hue-rotate: hue-rotate(0deg);
-    --jumi-backdrop-invert: invert(0);
-    --jumi-backdrop-opacity: opacity(1);
-    --jumi-backdrop-saturate: saturate(1);
-    --jumi-backdrop-sepia: sepia(0);
-    --jumi-backdrop-url: url();
+    --jumi-backdrop-filter: var(--jumi-backdrop-filter-blur) var(--jumi-backdrop-filter-brightness) var(--jumi-backdrop-filter-contrast) var(--jumi-backdrop-filter-drop-shadow) var(--jumi-backdrop-filter-grayscale) var(--jumi-backdrop-filter-hue-rotate) var(--jumi-backdrop-filter-invert) var(--jumi-backdrop-filter-opacity) var(--jumi-backdrop-filter-saturate) var(--jumi-backdrop-filter-sepia);
+    --jumi-backdrop-filter-blur: blur(0);
+    --jumi-backdrop-filter-brightness: brightness(1);
+    --jumi-backdrop-filter-contrast: contrast(1);
+    --jumi-backdrop-filter-drop-shadow: drop-shadow(var(--jumi-backdrop-filter-drop-shadow-offset-x) var(--jumi-backdrop-filter-drop-shadow-offset-y) var(--jumi-backdrop-filter-drop-shadow-blur) var(--jumi-backdrop-filter-drop-shadow-color));
+    --jumi-backdrop-filter-drop-shadow-blur: 0;
+    --jumi-backdrop-filter-drop-shadow-color: transparent;
+    --jumi-backdrop-filter-drop-shadow-offset-x: 0;
+    --jumi-backdrop-filter-drop-shadow-offset-y: 0;
+    --jumi-backdrop-filter-grayscale: grayscale(0);
+    --jumi-backdrop-filter-hue-rotate: hue-rotate(0deg);
+    --jumi-backdrop-filter-invert: invert(0);
+    --jumi-backdrop-filter-opacity: opacity(1);
+    --jumi-backdrop-filter-saturate: saturate(1);
+    --jumi-backdrop-filter-sepia: sepia(0);
+    --jumi-backdrop-filter-url: url();
     --jumi-backface-visibility: visible;
     --jumi-background: var(--jumi-background-attachment) var(--jumi-background-clip) var(--jumi-background-color) var(--jumi-background-image) var(--jumi-background-origin) var(--jumi-background-position) var(--jumi-background-repeat) var(--jumi-background-size);
     --jumi-background-attachment: scroll;
@@ -2276,6 +2288,66 @@
     --jumi-z-index: auto;
     --jumi-zoom: 1;
   }
+  .animation-delay-forward-300\/\[8\] {
+    & > :nth-child(1) {
+      animation-delay: calc(300ms * 0);
+    }
+    & > :nth-child(2) {
+      animation-delay: calc(300ms * 1);
+    }
+    & > :nth-child(3) {
+      animation-delay: calc(300ms * 2);
+    }
+    & > :nth-child(4) {
+      animation-delay: calc(300ms * 3);
+    }
+    & > :nth-child(5) {
+      animation-delay: calc(300ms * 4);
+    }
+    & > :nth-child(6) {
+      animation-delay: calc(300ms * 5);
+    }
+    & > :nth-child(7) {
+      animation-delay: calc(300ms * 6);
+    }
+    & > :nth-child(8) {
+      animation-delay: calc(300ms * 7);
+    }
+  }
+  .animation-delay-backward-150\/5 {
+    & > :nth-child(1) {
+      animation-delay: calc(150ms * 4);
+    }
+    & > :nth-child(2) {
+      animation-delay: calc(150ms * 3);
+    }
+    & > :nth-child(3) {
+      animation-delay: calc(150ms * 2);
+    }
+    & > :nth-child(4) {
+      animation-delay: calc(150ms * 1);
+    }
+    & > :nth-child(5) {
+      animation-delay: calc(150ms * 0);
+    }
+  }
+  .animation-delay-forward-100\/5 {
+    & > :nth-child(1) {
+      animation-delay: calc(100ms * 0);
+    }
+    & > :nth-child(2) {
+      animation-delay: calc(100ms * 1);
+    }
+    & > :nth-child(3) {
+      animation-delay: calc(100ms * 2);
+    }
+    & > :nth-child(4) {
+      animation-delay: calc(100ms * 3);
+    }
+    & > :nth-child(5) {
+      animation-delay: calc(100ms * 4);
+    }
+  }
   .animate-border-block-end-radius {
     --jumi-border-end-end-radius: 0.25rem;
     --jumi-border-end-start-radius: 0.25rem;
@@ -2356,6 +2428,10 @@
     --jumi-scale-y: 1.25;
     --jumi-transform-keyframes: var(--jumi-transform-animation-duration, var(--jumi-animation-duration)) var(--jumi-transform-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-transform-animation-delay, var(--jumi-animation-delay)) var(--jumi-transform-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-transform-animation-direction, var(--jumi-animation-direction)) var(--jumi-transform-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-transform-animation-play-state, var(--jumi-animation-play-state)) jumi-transform;
   }
+  .animate-align-content-center {
+    --jumi-align-content: center;
+    --jumi-align-content-keyframes: var(--jumi-align-content-animation-duration, var(--jumi-animation-duration)) var(--jumi-align-content-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-align-content-animation-delay, var(--jumi-animation-delay)) var(--jumi-align-content-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-align-content-animation-direction, var(--jumi-animation-direction)) var(--jumi-align-content-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-align-content-animation-play-state, var(--jumi-animation-play-state)) jumi-align-content;
+  }
   .animate-aspect-ratio {
     --jumi-aspect-ratio: auto;
     --jumi-aspect-ratio-keyframes: var(--jumi-aspect-ratio-animation-duration, var(--jumi-animation-duration)) var(--jumi-aspect-ratio-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-aspect-ratio-animation-delay, var(--jumi-animation-delay)) var(--jumi-aspect-ratio-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-aspect-ratio-animation-direction, var(--jumi-animation-direction)) var(--jumi-aspect-ratio-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-aspect-ratio-animation-play-state, var(--jumi-animation-play-state)) jumi-aspect-ratio;
@@ -2368,49 +2444,53 @@
     --jumi-aspect-ratio-keyframes: var(--jumi-aspect-ratio-animation-duration, var(--jumi-animation-duration)) var(--jumi-aspect-ratio-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-aspect-ratio-animation-delay, var(--jumi-animation-delay)) var(--jumi-aspect-ratio-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-aspect-ratio-animation-direction, var(--jumi-animation-direction)) var(--jumi-aspect-ratio-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-aspect-ratio-animation-play-state, var(--jumi-animation-play-state)) jumi-aspect-ratio;
     --jumi-aspect-ratio-width: auto;
   }
-  .animate-backdrop-blur {
-    --jumi-backdrop-blur: blur(8px);
-    --jumi-backdrop-filter-keyframes: var(--jumi-backdrop-filter-animation-duration, var(--jumi-animation-duration)) var(--jumi-backdrop-filter-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-backdrop-filter-animation-delay, var(--jumi-animation-delay)) var(--jumi-backdrop-filter-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-backdrop-filter-animation-direction, var(--jumi-animation-direction)) var(--jumi-backdrop-filter-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-backdrop-filter-animation-play-state, var(--jumi-animation-play-state)) jumi-backdrop-filter;
-  }
-  .animate-backdrop-drop-shadow {
-    --jumi-backdrop-drop-shadow: drop-shadow(none);
-    --jumi-backdrop-filter-keyframes: var(--jumi-backdrop-filter-animation-duration, var(--jumi-animation-duration)) var(--jumi-backdrop-filter-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-backdrop-filter-animation-delay, var(--jumi-animation-delay)) var(--jumi-backdrop-filter-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-backdrop-filter-animation-direction, var(--jumi-animation-direction)) var(--jumi-backdrop-filter-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-backdrop-filter-animation-play-state, var(--jumi-animation-play-state)) jumi-backdrop-filter;
-  }
-  .animate-backdrop-drop-shadow-blur {
-    --jumi-backdrop-drop-shadow-blur: 0px;
-    --jumi-backdrop-filter-keyframes: var(--jumi-backdrop-filter-animation-duration, var(--jumi-animation-duration)) var(--jumi-backdrop-filter-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-backdrop-filter-animation-delay, var(--jumi-animation-delay)) var(--jumi-backdrop-filter-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-backdrop-filter-animation-direction, var(--jumi-animation-direction)) var(--jumi-backdrop-filter-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-backdrop-filter-animation-play-state, var(--jumi-animation-play-state)) jumi-backdrop-filter;
-  }
-  .animate-backdrop-drop-shadow-color-amber-100\/75 {
-    --jumi-backdrop-drop-shadow-color: color-mix(in oklab, oklch(96.2% 0.059 95.617) 75%, transparent);
-    --jumi-backdrop-filter-keyframes: var(--jumi-backdrop-filter-animation-duration, var(--jumi-animation-duration)) var(--jumi-backdrop-filter-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-backdrop-filter-animation-delay, var(--jumi-animation-delay)) var(--jumi-backdrop-filter-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-backdrop-filter-animation-direction, var(--jumi-animation-direction)) var(--jumi-backdrop-filter-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-backdrop-filter-animation-play-state, var(--jumi-animation-play-state)) jumi-backdrop-filter;
-  }
-  .animate-backdrop-drop-shadow-offset-x {
-    --jumi-backdrop-drop-shadow-offset-x: ;
-    --jumi-backdrop-filter-keyframes: var(--jumi-backdrop-filter-animation-duration, var(--jumi-animation-duration)) var(--jumi-backdrop-filter-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-backdrop-filter-animation-delay, var(--jumi-animation-delay)) var(--jumi-backdrop-filter-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-backdrop-filter-animation-direction, var(--jumi-animation-direction)) var(--jumi-backdrop-filter-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-backdrop-filter-animation-play-state, var(--jumi-animation-play-state)) jumi-backdrop-filter;
-  }
-  .animate-backdrop-drop-shadow-offset-y {
-    --jumi-backdrop-drop-shadow-offset-y: ;
-    --jumi-backdrop-filter-keyframes: var(--jumi-backdrop-filter-animation-duration, var(--jumi-animation-duration)) var(--jumi-backdrop-filter-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-backdrop-filter-animation-delay, var(--jumi-animation-delay)) var(--jumi-backdrop-filter-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-backdrop-filter-animation-direction, var(--jumi-animation-direction)) var(--jumi-backdrop-filter-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-backdrop-filter-animation-play-state, var(--jumi-animation-play-state)) jumi-backdrop-filter;
-  }
   .animate-backdrop-filter {
     --jumi-backdrop-filter: none;
     --jumi-backdrop-filter-keyframes: var(--jumi-backdrop-filter-animation-duration, var(--jumi-animation-duration)) var(--jumi-backdrop-filter-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-backdrop-filter-animation-delay, var(--jumi-animation-delay)) var(--jumi-backdrop-filter-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-backdrop-filter-animation-direction, var(--jumi-animation-direction)) var(--jumi-backdrop-filter-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-backdrop-filter-animation-play-state, var(--jumi-animation-play-state)) jumi-backdrop-filter;
   }
-  .animate-backdrop-grayscale {
+  .animate-backdrop-filter-blur {
+    --jumi-backdrop-filter-blur: blur(8px);
     --jumi-backdrop-filter-keyframes: var(--jumi-backdrop-filter-animation-duration, var(--jumi-animation-duration)) var(--jumi-backdrop-filter-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-backdrop-filter-animation-delay, var(--jumi-animation-delay)) var(--jumi-backdrop-filter-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-backdrop-filter-animation-direction, var(--jumi-animation-direction)) var(--jumi-backdrop-filter-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-backdrop-filter-animation-play-state, var(--jumi-animation-play-state)) jumi-backdrop-filter;
-    --jumi-backdrop-grayscale: grayscale(100%);
   }
-  .animate-backdrop-invert {
+  .animate-backdrop-filter-drop-shadow {
+    --jumi-backdrop-filter-drop-shadow: drop-shadow(none);
     --jumi-backdrop-filter-keyframes: var(--jumi-backdrop-filter-animation-duration, var(--jumi-animation-duration)) var(--jumi-backdrop-filter-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-backdrop-filter-animation-delay, var(--jumi-animation-delay)) var(--jumi-backdrop-filter-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-backdrop-filter-animation-direction, var(--jumi-animation-direction)) var(--jumi-backdrop-filter-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-backdrop-filter-animation-play-state, var(--jumi-animation-play-state)) jumi-backdrop-filter;
-    --jumi-backdrop-invert: invert(100%);
   }
-  .animate-backdrop-sepia {
+  .animate-backdrop-filter-drop-shadow-blur {
+    --jumi-backdrop-filter-drop-shadow-blur: 0px;
     --jumi-backdrop-filter-keyframes: var(--jumi-backdrop-filter-animation-duration, var(--jumi-animation-duration)) var(--jumi-backdrop-filter-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-backdrop-filter-animation-delay, var(--jumi-animation-delay)) var(--jumi-backdrop-filter-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-backdrop-filter-animation-direction, var(--jumi-animation-direction)) var(--jumi-backdrop-filter-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-backdrop-filter-animation-play-state, var(--jumi-animation-play-state)) jumi-backdrop-filter;
-    --jumi-backdrop-sepia: sepia(100%);
   }
-  .animate-backdrop-url {
+  .animate-backdrop-filter-drop-shadow-color-amber-100\/75 {
+    --jumi-backdrop-filter-drop-shadow-color: color-mix(in oklab, oklch(96.2% 0.059 95.617) 75%, transparent);
     --jumi-backdrop-filter-keyframes: var(--jumi-backdrop-filter-animation-duration, var(--jumi-animation-duration)) var(--jumi-backdrop-filter-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-backdrop-filter-animation-delay, var(--jumi-animation-delay)) var(--jumi-backdrop-filter-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-backdrop-filter-animation-direction, var(--jumi-animation-direction)) var(--jumi-backdrop-filter-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-backdrop-filter-animation-play-state, var(--jumi-animation-play-state)) jumi-backdrop-filter;
-    --jumi-backdrop-url: url();
+  }
+  .animate-backdrop-filter-drop-shadow-color-blue-500 {
+    --jumi-backdrop-filter-drop-shadow-color: oklch(62.3% 0.214 259.815);
+    --jumi-backdrop-filter-keyframes: var(--jumi-backdrop-filter-animation-duration, var(--jumi-animation-duration)) var(--jumi-backdrop-filter-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-backdrop-filter-animation-delay, var(--jumi-animation-delay)) var(--jumi-backdrop-filter-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-backdrop-filter-animation-direction, var(--jumi-animation-direction)) var(--jumi-backdrop-filter-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-backdrop-filter-animation-play-state, var(--jumi-animation-play-state)) jumi-backdrop-filter;
+  }
+  .animate-backdrop-filter-drop-shadow-offset-x {
+    --jumi-backdrop-filter-drop-shadow-offset-x: ;
+    --jumi-backdrop-filter-keyframes: var(--jumi-backdrop-filter-animation-duration, var(--jumi-animation-duration)) var(--jumi-backdrop-filter-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-backdrop-filter-animation-delay, var(--jumi-animation-delay)) var(--jumi-backdrop-filter-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-backdrop-filter-animation-direction, var(--jumi-animation-direction)) var(--jumi-backdrop-filter-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-backdrop-filter-animation-play-state, var(--jumi-animation-play-state)) jumi-backdrop-filter;
+  }
+  .animate-backdrop-filter-drop-shadow-offset-y {
+    --jumi-backdrop-filter-drop-shadow-offset-y: ;
+    --jumi-backdrop-filter-keyframes: var(--jumi-backdrop-filter-animation-duration, var(--jumi-animation-duration)) var(--jumi-backdrop-filter-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-backdrop-filter-animation-delay, var(--jumi-animation-delay)) var(--jumi-backdrop-filter-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-backdrop-filter-animation-direction, var(--jumi-animation-direction)) var(--jumi-backdrop-filter-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-backdrop-filter-animation-play-state, var(--jumi-animation-play-state)) jumi-backdrop-filter;
+  }
+  .animate-backdrop-filter-grayscale {
+    --jumi-backdrop-filter-grayscale: grayscale(100%);
+    --jumi-backdrop-filter-keyframes: var(--jumi-backdrop-filter-animation-duration, var(--jumi-animation-duration)) var(--jumi-backdrop-filter-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-backdrop-filter-animation-delay, var(--jumi-animation-delay)) var(--jumi-backdrop-filter-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-backdrop-filter-animation-direction, var(--jumi-animation-direction)) var(--jumi-backdrop-filter-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-backdrop-filter-animation-play-state, var(--jumi-animation-play-state)) jumi-backdrop-filter;
+  }
+  .animate-backdrop-filter-invert {
+    --jumi-backdrop-filter-invert: invert(100%);
+    --jumi-backdrop-filter-keyframes: var(--jumi-backdrop-filter-animation-duration, var(--jumi-animation-duration)) var(--jumi-backdrop-filter-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-backdrop-filter-animation-delay, var(--jumi-animation-delay)) var(--jumi-backdrop-filter-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-backdrop-filter-animation-direction, var(--jumi-animation-direction)) var(--jumi-backdrop-filter-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-backdrop-filter-animation-play-state, var(--jumi-animation-play-state)) jumi-backdrop-filter;
+  }
+  .animate-backdrop-filter-sepia {
+    --jumi-backdrop-filter-keyframes: var(--jumi-backdrop-filter-animation-duration, var(--jumi-animation-duration)) var(--jumi-backdrop-filter-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-backdrop-filter-animation-delay, var(--jumi-animation-delay)) var(--jumi-backdrop-filter-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-backdrop-filter-animation-direction, var(--jumi-animation-direction)) var(--jumi-backdrop-filter-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-backdrop-filter-animation-play-state, var(--jumi-animation-play-state)) jumi-backdrop-filter;
+    --jumi-backdrop-filter-sepia: sepia(100%);
+  }
+  .animate-backdrop-filter-url {
+    --jumi-backdrop-filter-keyframes: var(--jumi-backdrop-filter-animation-duration, var(--jumi-animation-duration)) var(--jumi-backdrop-filter-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-backdrop-filter-animation-delay, var(--jumi-animation-delay)) var(--jumi-backdrop-filter-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-backdrop-filter-animation-direction, var(--jumi-animation-direction)) var(--jumi-backdrop-filter-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-backdrop-filter-animation-play-state, var(--jumi-animation-play-state)) jumi-backdrop-filter;
+    --jumi-backdrop-filter-url: url();
   }
   .animate-background {
     --jumi-background: none;
@@ -2450,6 +2530,10 @@
   }
   .animate-border-bottom-left-radius {
     --jumi-border-bottom-left-radius: 0.25rem;
+    --jumi-border-bottom-left-radius-keyframes: var(--jumi-border-bottom-left-radius-animation-duration, var(--jumi-animation-duration)) var(--jumi-border-bottom-left-radius-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-border-bottom-left-radius-animation-delay, var(--jumi-animation-delay)) var(--jumi-border-bottom-left-radius-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-border-bottom-left-radius-animation-direction, var(--jumi-animation-direction)) var(--jumi-border-bottom-left-radius-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-border-bottom-left-radius-animation-play-state, var(--jumi-animation-play-state)) jumi-border-bottom-left-radius;
+  }
+  .animate-border-bottom-left-radius-lg {
+    --jumi-border-bottom-left-radius: 0.5rem;
     --jumi-border-bottom-left-radius-keyframes: var(--jumi-border-bottom-left-radius-animation-duration, var(--jumi-animation-duration)) var(--jumi-border-bottom-left-radius-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-border-bottom-left-radius-animation-delay, var(--jumi-animation-delay)) var(--jumi-border-bottom-left-radius-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-border-bottom-left-radius-animation-direction, var(--jumi-animation-direction)) var(--jumi-border-bottom-left-radius-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-border-bottom-left-radius-animation-play-state, var(--jumi-animation-play-state)) jumi-border-bottom-left-radius;
   }
   .animate-border-bottom-right-radius {
@@ -2728,6 +2812,10 @@
     --jumi-hyphenate-character: auto;
     --jumi-hyphenate-character-keyframes: var(--jumi-hyphenate-character-animation-duration, var(--jumi-animation-duration)) var(--jumi-hyphenate-character-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-hyphenate-character-animation-delay, var(--jumi-animation-delay)) var(--jumi-hyphenate-character-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-hyphenate-character-animation-direction, var(--jumi-animation-direction)) var(--jumi-hyphenate-character-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-hyphenate-character-animation-play-state, var(--jumi-animation-play-state)) jumi-hyphenate-character;
   }
+  .animate-hyphenate-limit-chars-\[12\]\/minimum-characters-after {
+    --jumi-hyphenate-limit-chars-keyframes: var(--jumi-hyphenate-limit-chars-animation-duration, var(--jumi-animation-duration)) var(--jumi-hyphenate-limit-chars-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-hyphenate-limit-chars-animation-delay, var(--jumi-animation-delay)) var(--jumi-hyphenate-limit-chars-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-hyphenate-limit-chars-animation-direction, var(--jumi-animation-direction)) var(--jumi-hyphenate-limit-chars-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-hyphenate-limit-chars-animation-play-state, var(--jumi-animation-play-state)) jumi-hyphenate-limit-chars;
+    --jumi-hyphenate-limit-chars: 12;
+  }
   .animate-initial-letter {
     --jumi-initial-letter: normal;
     --jumi-initial-letter-keyframes: var(--jumi-initial-letter-animation-duration, var(--jumi-animation-duration)) var(--jumi-initial-letter-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-initial-letter-animation-delay, var(--jumi-animation-delay)) var(--jumi-initial-letter-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-initial-letter-animation-direction, var(--jumi-animation-direction)) var(--jumi-initial-letter-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-initial-letter-animation-play-state, var(--jumi-animation-play-state)) jumi-initial-letter;
@@ -2968,86 +3056,8 @@
     -webkit-user-select: auto;
     user-select: auto;
   }
-  .animate-back-in {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-back-in;
-  }
-  .animate-back-in-down {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-back-in-down;
-  }
-  .animate-back-in-left {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-back-in-left;
-  }
-  .animate-back-in-right {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-back-in-right;
-  }
-  .animate-back-in-up {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-back-in-up;
-  }
   .animate-border-block-color {
     --jumi-border-block-color: currentcolor;
-  }
-  .animate-bounce-in {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-bounce-in;
-  }
-  .animate-bounce-out {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-bounce-out;
-  }
-  .animate-fade-down {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-fade-down;
-  }
-  .animate-fade-in {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-fade-in;
-  }
-  .animate-fade-left {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-fade-left;
-  }
-  .animate-fade-out {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-fade-out;
-  }
-  .animate-fade-right {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-fade-right;
-  }
-  .animate-fade-up {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-fade-up;
-  }
-  .animate-flip-x {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-flip-x;
-  }
-  .animate-flip-y {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-flip-y;
-  }
-  .animate-letter-spacing {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-letter-spacing;
-  }
-  .animate-pulsate {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-pulsate;
-  }
-  .animate-shake {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-shake;
-  }
-  .animate-skew-x {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-skew-x;
-  }
-  .animate-skew-y {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-skew-y;
-  }
-  .animate-slide-in-up {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-slide-in-up;
-  }
-  .animate-swing {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-swing;
-  }
-  .animate-text-shadow {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-text-shadow;
-  }
-  .animate-wobble {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-wobble;
-  }
-  .animate-zoom-in {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-zoom-in;
-  }
-  .animate-zoom-out {
-    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-zoom-out;
   }
   .animation-\[jumi-rotate-z_3s_ease-in-out_infinite_alternate\] {
     --jumi-animation: jumi-rotate-z 3s ease-in-out infinite alternate;
@@ -3094,8 +3104,8 @@
   .animation-duration-3 {
     --jumi-animation-duration: 3s;
   }
-  .animation-duration-5\/transform {
-    --jumi-transform-animation-duration: 5s;
+  .animation-duration-3\/transform {
+    --jumi-transform-animation-duration: 3s;
   }
   .animation-duration-6 {
     --jumi-animation-duration: 6s;
@@ -3193,8 +3203,47 @@
   .animation-timing-function-ease-in-cubic {
     --jumi-animation-timing-function: cubic-bezier(0.32, 0, 0.67, 0);
   }
+  .animation-timing-function-ease-in-out-back {
+    --jumi-animation-timing-function: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+  }
   .animation-timing-function-ease-out {
     --jumi-animation-timing-function: ease-out;
+  }
+  .effect-arc-bottom-right {
+    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-arc-bottom-right;
+  }
+  .effect-bounce-in {
+    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-bounce-in;
+  }
+  .effect-bubble {
+    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-bubble;
+  }
+  .effect-circle-in {
+    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-circle-in;
+  }
+  .effect-fade-in {
+    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-fade-in;
+  }
+  .effect-float {
+    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-float;
+  }
+  .effect-fold-in {
+    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-fold-in;
+  }
+  .effect-magnetic {
+    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-magnetic;
+  }
+  .effect-rush-in-right {
+    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-rush-in-right;
+  }
+  .effect-slide-in-down {
+    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-slide-in-down;
+  }
+  .effect-slide-in-up {
+    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-slide-in-up;
+  }
+  .effect-zoom-in {
+    --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-zoom-in;
   }
   .perspective-distant {
     perspective: var(--perspective-distant);
@@ -3219,6 +3268,703 @@
   }
   .transform-3d {
     transform-style: preserve-3d;
+  }
+  .\*\:h-12 {
+    :is(& > *) {
+      height: calc(var(--spacing) * 12);
+    }
+  }
+  .\*\:w-12 {
+    :is(& > *) {
+      width: calc(var(--spacing) * 12);
+    }
+  }
+  .\*\:animate {
+    :is(& > *) {
+      animation: var(--jumi-animation);
+    }
+  }
+  .\*\:rounded {
+    :is(& > *) {
+      border-radius: 0.25rem;
+    }
+  }
+  .\*\:bg-blue-500 {
+    :is(& > *) {
+      background-color: var(--color-blue-500);
+    }
+  }
+  .\*\:bg-green-500 {
+    :is(& > *) {
+      background-color: var(--color-green-500);
+    }
+  }
+  .\*\:bg-purple-500 {
+    :is(& > *) {
+      background-color: var(--color-purple-500);
+    }
+  }
+  .\*\:animate {
+    :is(& > *) {
+      --jumi-accent-color: auto;
+      --jumi-align-content: normal;
+      --jumi-align-items: normal;
+      --jumi-align-self: auto;
+      --jumi-alignment-baseline: baseline;
+      --jumi-all: initial;
+      --jumi-anchor-name: none;
+      --jumi-animation: var(--jumi-accent-color-keyframes, none), var(--jumi-align-content-keyframes, none), var(--jumi-align-items-keyframes, none), var(--jumi-align-self-keyframes, none), var(--jumi-alignment-baseline-keyframes, none), var(--jumi-all-keyframes, none), var(--jumi-anchor-name-keyframes, none), var(--jumi-appearance-keyframes, none), var(--jumi-aspect-ratio-keyframes, none), var(--jumi-backdrop-filter-keyframes, none), var(--jumi-backface-visibility-keyframes, none), var(--jumi-background-keyframes, none), var(--jumi-background-attachment-keyframes, none), var(--jumi-background-blend-mode-keyframes, none), var(--jumi-background-clip-keyframes, none), var(--jumi-background-color-keyframes, none), var(--jumi-background-image-keyframes, none), var(--jumi-background-origin-keyframes, none), var(--jumi-background-position-keyframes, none), var(--jumi-background-position-x-keyframes, none), var(--jumi-background-position-y-keyframes, none), var(--jumi-background-repeat-keyframes, none), var(--jumi-background-size-keyframes, none), var(--jumi-block-size-keyframes, none), var(--jumi-border-keyframes, none), var(--jumi-border-block-keyframes, none), var(--jumi-border-block-color-keyframes, none), var(--jumi-border-block-end-keyframes, none), var(--jumi-border-block-end-color-keyframes, none), var(--jumi-border-block-end-style-keyframes, none), var(--jumi-border-block-end-width-keyframes, none), var(--jumi-border-block-start-keyframes, none), var(--jumi-border-block-start-color-keyframes, none), var(--jumi-border-block-start-style-keyframes, none), var(--jumi-border-block-start-width-keyframes, none), var(--jumi-border-block-style-keyframes, none), var(--jumi-border-block-width-keyframes, none), var(--jumi-border-bottom-keyframes, none), var(--jumi-border-bottom-color-keyframes, none), var(--jumi-border-bottom-left-radius-keyframes, none), var(--jumi-border-bottom-right-radius-keyframes, none), var(--jumi-border-bottom-style-keyframes, none), var(--jumi-border-bottom-width-keyframes, none), var(--jumi-border-collapse-keyframes, none), var(--jumi-border-color-keyframes, none), var(--jumi-border-end-end-radius-keyframes, none), var(--jumi-border-end-start-radius-keyframes, none), var(--jumi-border-image-keyframes, none), var(--jumi-border-image-outset-keyframes, none), var(--jumi-border-image-repeat-keyframes, none), var(--jumi-border-image-slice-keyframes, none), var(--jumi-border-image-source-keyframes, none), var(--jumi-border-image-width-keyframes, none), var(--jumi-border-inline-keyframes, none), var(--jumi-border-inline-color-keyframes, none), var(--jumi-border-inline-end-keyframes, none), var(--jumi-border-inline-end-color-keyframes, none), var(--jumi-border-inline-end-style-keyframes, none), var(--jumi-border-inline-end-width-keyframes, none), var(--jumi-border-inline-start-keyframes, none), var(--jumi-border-inline-start-color-keyframes, none), var(--jumi-border-inline-start-style-keyframes, none), var(--jumi-border-inline-start-width-keyframes, none), var(--jumi-border-inline-style-keyframes, none), var(--jumi-border-inline-width-keyframes, none), var(--jumi-border-left-keyframes, none), var(--jumi-border-left-color-keyframes, none), var(--jumi-border-left-style-keyframes, none), var(--jumi-border-left-width-keyframes, none), var(--jumi-border-radius-keyframes, none), var(--jumi-border-right-keyframes, none), var(--jumi-border-right-color-keyframes, none), var(--jumi-border-right-style-keyframes, none), var(--jumi-border-right-width-keyframes, none), var(--jumi-border-spacing-keyframes, none), var(--jumi-border-start-end-radius-keyframes, none), var(--jumi-border-start-start-radius-keyframes, none), var(--jumi-border-style-keyframes, none), var(--jumi-border-top-keyframes, none), var(--jumi-border-top-color-keyframes, none), var(--jumi-border-top-left-radius-keyframes, none), var(--jumi-border-top-right-radius-keyframes, none), var(--jumi-border-top-style-keyframes, none), var(--jumi-border-top-width-keyframes, none), var(--jumi-border-width-keyframes, none), var(--jumi-bottom-keyframes, none), var(--jumi-box-decoration-break-keyframes, none), var(--jumi-box-shadow-keyframes, none), var(--jumi-box-sizing-keyframes, none), var(--jumi-break-after-keyframes, none), var(--jumi-break-before-keyframes, none), var(--jumi-break-inside-keyframes, none), var(--jumi-caption-side-keyframes, none), var(--jumi-caret-color-keyframes, none), var(--jumi-clear-keyframes, none), var(--jumi-clip-path-keyframes, none), var(--jumi-clip-rule-keyframes, none), var(--jumi-color-keyframes, none), var(--jumi-color-interpolation-keyframes, none), var(--jumi-color-interpolation-filters-keyframes, none), var(--jumi-color-scheme-keyframes, none), var(--jumi-column-count-keyframes, none), var(--jumi-column-fill-keyframes, none), var(--jumi-column-gap-keyframes, none), var(--jumi-column-rule-keyframes, none), var(--jumi-column-rule-color-keyframes, none), var(--jumi-column-rule-style-keyframes, none), var(--jumi-column-rule-width-keyframes, none), var(--jumi-column-span-keyframes, none), var(--jumi-column-width-keyframes, none), var(--jumi-columns-keyframes, none), var(--jumi-contain-keyframes, none), var(--jumi-contain-intrinsic-block-size-keyframes, none), var(--jumi-contain-intrinsic-height-keyframes, none), var(--jumi-contain-intrinsic-inline-size-keyframes, none), var(--jumi-contain-intrinsic-size-keyframes, none), var(--jumi-contain-intrinsic-width-keyframes, none), var(--jumi-container-type-keyframes, none), var(--jumi-content-keyframes, none), var(--jumi-content-visibility-keyframes, none), var(--jumi-counter-increment-keyframes, none), var(--jumi-counter-reset-keyframes, none), var(--jumi-counter-set-keyframes, none), var(--jumi-cursor-keyframes, none), var(--jumi-cx-keyframes, none), var(--jumi-cy-keyframes, none), var(--jumi-d-keyframes, none), var(--jumi-display-keyframes, none), var(--jumi-dominant-baseline-keyframes, none), var(--jumi-empty-cells-keyframes, none), var(--jumi-fill-keyframes, none), var(--jumi-fill-opacity-keyframes, none), var(--jumi-fill-rule-keyframes, none), var(--jumi-filter-keyframes, none), var(--jumi-flex-keyframes, none), var(--jumi-flex-basis-keyframes, none), var(--jumi-flex-direction-keyframes, none), var(--jumi-flex-flow-keyframes, none), var(--jumi-flex-grow-keyframes, none), var(--jumi-flex-shrink-keyframes, none), var(--jumi-flex-wrap-keyframes, none), var(--jumi-float-keyframes, none), var(--jumi-flood-color-keyframes, none), var(--jumi-flood-opacity-keyframes, none), var(--jumi-font-keyframes, none), var(--jumi-font-family-keyframes, none), var(--jumi-font-feature-settings-keyframes, none), var(--jumi-font-kerning-keyframes, none), var(--jumi-font-language-override-keyframes, none), var(--jumi-font-optical-sizing-keyframes, none), var(--jumi-font-palette-keyframes, none), var(--jumi-font-size-keyframes, none), var(--jumi-font-size-adjust-keyframes, none), var(--jumi-font-style-keyframes, none), var(--jumi-font-synthesis-keyframes, none), var(--jumi-font-synthesis-small-caps-keyframes, none), var(--jumi-font-synthesis-style-keyframes, none), var(--jumi-font-synthesis-weight-keyframes, none), var(--jumi-font-variant-keyframes, none), var(--jumi-font-variant-alternates-keyframes, none), var(--jumi-font-variant-caps-keyframes, none), var(--jumi-font-variant-east-asian-keyframes, none), var(--jumi-font-variant-emoji-keyframes, none), var(--jumi-font-variant-ligatures-keyframes, none), var(--jumi-font-variant-numeric-keyframes, none), var(--jumi-font-variant-position-keyframes, none), var(--jumi-font-variation-settings-keyframes, none), var(--jumi-font-weight-keyframes, none), var(--jumi-forced-color-adjust-keyframes, none), var(--jumi-gap-keyframes, none), var(--jumi-grid-keyframes, none), var(--jumi-grid-area-keyframes, none), var(--jumi-grid-auto-columns-keyframes, none), var(--jumi-grid-auto-flow-keyframes, none), var(--jumi-grid-auto-rows-keyframes, none), var(--jumi-grid-column-keyframes, none), var(--jumi-grid-column-end-keyframes, none), var(--jumi-grid-column-start-keyframes, none), var(--jumi-grid-row-keyframes, none), var(--jumi-grid-row-end-keyframes, none), var(--jumi-grid-row-start-keyframes, none), var(--jumi-grid-template-keyframes, none), var(--jumi-grid-template-areas-keyframes, none), var(--jumi-grid-template-columns-keyframes, none), var(--jumi-grid-template-rows-keyframes, none), var(--jumi-hanging-punctuation-keyframes, none), var(--jumi-height-keyframes, none), var(--jumi-hyphenate-character-keyframes, none), var(--jumi-hyphenate-limit-chars-keyframes, none), var(--jumi-hyphens-keyframes, none), var(--jumi-image-orientation-keyframes, none), var(--jumi-image-rendering-keyframes, none), var(--jumi-initial-letter-keyframes, none), var(--jumi-inline-size-keyframes, none), var(--jumi-inset-keyframes, none), var(--jumi-inset-block-keyframes, none), var(--jumi-inset-block-end-keyframes, none), var(--jumi-inset-block-start-keyframes, none), var(--jumi-inset-inline-keyframes, none), var(--jumi-inset-inline-end-keyframes, none), var(--jumi-inset-inline-start-keyframes, none), var(--jumi-justify-content-keyframes, none), var(--jumi-justify-items-keyframes, none), var(--jumi-justify-self-keyframes, none), var(--jumi-left-keyframes, none), var(--jumi-letter-spacing-keyframes, none), var(--jumi-lighting-color-keyframes, none), var(--jumi-line-break-keyframes, none), var(--jumi-line-clamp-keyframes, none), var(--jumi-line-height-keyframes, none), var(--jumi-list-style-keyframes, none), var(--jumi-list-style-image-keyframes, none), var(--jumi-list-style-position-keyframes, none), var(--jumi-list-style-type-keyframes, none), var(--jumi-margin-keyframes, none), var(--jumi-margin-block-keyframes, none), var(--jumi-margin-block-end-keyframes, none), var(--jumi-margin-block-start-keyframes, none), var(--jumi-margin-bottom-keyframes, none), var(--jumi-margin-inline-keyframes, none), var(--jumi-margin-inline-end-keyframes, none), var(--jumi-margin-inline-start-keyframes, none), var(--jumi-margin-left-keyframes, none), var(--jumi-margin-right-keyframes, none), var(--jumi-margin-top-keyframes, none), var(--jumi-marker-keyframes, none), var(--jumi-marker-end-keyframes, none), var(--jumi-marker-mid-keyframes, none), var(--jumi-marker-start-keyframes, none), var(--jumi-mask-keyframes, none), var(--jumi-mask-border-keyframes, none), var(--jumi-mask-border-mode-keyframes, none), var(--jumi-mask-border-outset-keyframes, none), var(--jumi-mask-border-repeat-keyframes, none), var(--jumi-mask-border-slice-keyframes, none), var(--jumi-mask-border-source-keyframes, none), var(--jumi-mask-border-width-keyframes, none), var(--jumi-mask-clip-keyframes, none), var(--jumi-mask-composite-keyframes, none), var(--jumi-mask-image-keyframes, none), var(--jumi-mask-mode-keyframes, none), var(--jumi-mask-origin-keyframes, none), var(--jumi-mask-position-keyframes, none), var(--jumi-mask-repeat-keyframes, none), var(--jumi-mask-size-keyframes, none), var(--jumi-mask-type-keyframes, none), var(--jumi-math-depth-keyframes, none), var(--jumi-math-style-keyframes, none), var(--jumi-max-block-size-keyframes, none), var(--jumi-max-height-keyframes, none), var(--jumi-max-inline-size-keyframes, none), var(--jumi-max-width-keyframes, none), var(--jumi-min-block-size-keyframes, none), var(--jumi-min-height-keyframes, none), var(--jumi-min-inline-size-keyframes, none), var(--jumi-min-width-keyframes, none), var(--jumi-mix-blend-mode-keyframes, none), var(--jumi-object-fit-keyframes, none), var(--jumi-object-position-keyframes, none), var(--jumi-offset-keyframes, none), var(--jumi-offset-anchor-keyframes, none), var(--jumi-offset-distance-keyframes, none), var(--jumi-offset-path-keyframes, none), var(--jumi-offset-position-keyframes, none), var(--jumi-offset-rotate-keyframes, none), var(--jumi-opacity-keyframes, none), var(--jumi-order-keyframes, none), var(--jumi-orphans-keyframes, none), var(--jumi-outline-keyframes, none), var(--jumi-outline-color-keyframes, none), var(--jumi-outline-offset-keyframes, none), var(--jumi-outline-style-keyframes, none), var(--jumi-outline-width-keyframes, none), var(--jumi-overflow-keyframes, none), var(--jumi-overflow-anchor-keyframes, none), var(--jumi-overflow-block-keyframes, none), var(--jumi-overflow-clip-margin-keyframes, none), var(--jumi-overflow-inline-keyframes, none), var(--jumi-overflow-wrap-keyframes, none), var(--jumi-overflow-x-keyframes, none), var(--jumi-overflow-y-keyframes, none), var(--jumi-overscroll-behavior-keyframes, none), var(--jumi-overscroll-behavior-block-keyframes, none), var(--jumi-overscroll-behavior-inline-keyframes, none), var(--jumi-overscroll-behavior-x-keyframes, none), var(--jumi-overscroll-behavior-y-keyframes, none), var(--jumi-padding-keyframes, none), var(--jumi-padding-block-keyframes, none), var(--jumi-padding-block-end-keyframes, none), var(--jumi-padding-block-start-keyframes, none), var(--jumi-padding-bottom-keyframes, none), var(--jumi-padding-inline-keyframes, none), var(--jumi-padding-inline-end-keyframes, none), var(--jumi-padding-inline-start-keyframes, none), var(--jumi-padding-left-keyframes, none), var(--jumi-padding-right-keyframes, none), var(--jumi-padding-top-keyframes, none), var(--jumi-page-keyframes, none), var(--jumi-paint-order-keyframes, none), var(--jumi-perspective-keyframes, none), var(--jumi-perspective-origin-keyframes, none), var(--jumi-place-content-keyframes, none), var(--jumi-place-items-keyframes, none), var(--jumi-place-self-keyframes, none), var(--jumi-pointer-events-keyframes, none), var(--jumi-position-keyframes, none), var(--jumi-position-anchor-keyframes, none), var(--jumi-position-area-keyframes, none), var(--jumi-position-try-keyframes, none), var(--jumi-position-try-fallbacks-keyframes, none), var(--jumi-position-try-order-keyframes, none), var(--jumi-print-color-adjust-keyframes, none), var(--jumi-quotes-keyframes, none), var(--jumi-r-keyframes, none), var(--jumi-resize-keyframes, none), var(--jumi-right-keyframes, none), var(--jumi-rotate-keyframes, none), var(--jumi-row-gap-keyframes, none), var(--jumi-ruby-align-keyframes, none), var(--jumi-ruby-overhang-keyframes, none), var(--jumi-ruby-position-keyframes, none), var(--jumi-rx-keyframes, none), var(--jumi-ry-keyframes, none), var(--jumi-scale-keyframes, none), var(--jumi-scroll-margin-keyframes, none), var(--jumi-scroll-margin-block-keyframes, none), var(--jumi-scroll-margin-block-end-keyframes, none), var(--jumi-scroll-margin-block-start-keyframes, none), var(--jumi-scroll-margin-bottom-keyframes, none), var(--jumi-scroll-margin-inline-keyframes, none), var(--jumi-scroll-margin-inline-end-keyframes, none), var(--jumi-scroll-margin-inline-start-keyframes, none), var(--jumi-scroll-margin-left-keyframes, none), var(--jumi-scroll-margin-right-keyframes, none), var(--jumi-scroll-margin-top-keyframes, none), var(--jumi-scroll-padding-keyframes, none), var(--jumi-scroll-padding-block-keyframes, none), var(--jumi-scroll-padding-block-end-keyframes, none), var(--jumi-scroll-padding-block-start-keyframes, none), var(--jumi-scroll-padding-bottom-keyframes, none), var(--jumi-scroll-padding-inline-keyframes, none), var(--jumi-scroll-padding-inline-end-keyframes, none), var(--jumi-scroll-padding-inline-start-keyframes, none), var(--jumi-scroll-padding-left-keyframes, none), var(--jumi-scroll-padding-right-keyframes, none), var(--jumi-scroll-padding-top-keyframes, none), var(--jumi-scroll-snap-align-keyframes, none), var(--jumi-scroll-snap-stop-keyframes, none), var(--jumi-scroll-snap-type-keyframes, none), var(--jumi-scrollbar-color-keyframes, none), var(--jumi-scrollbar-gutter-keyframes, none), var(--jumi-scrollbar-width-keyframes, none), var(--jumi-shape-image-threshold-keyframes, none), var(--jumi-shape-margin-keyframes, none), var(--jumi-shape-outside-keyframes, none), var(--jumi-shape-rendering-keyframes, none), var(--jumi-stop-color-keyframes, none), var(--jumi-stop-opacity-keyframes, none), var(--jumi-stroke-keyframes, none), var(--jumi-stroke-dasharray-keyframes, none), var(--jumi-stroke-dashoffset-keyframes, none), var(--jumi-stroke-linecap-keyframes, none), var(--jumi-stroke-linejoin-keyframes, none), var(--jumi-stroke-miterlimit-keyframes, none), var(--jumi-stroke-opacity-keyframes, none), var(--jumi-stroke-width-keyframes, none), var(--jumi-tab-size-keyframes, none), var(--jumi-table-layout-keyframes, none), var(--jumi-text-align-keyframes, none), var(--jumi-text-align-last-keyframes, none), var(--jumi-text-anchor-keyframes, none), var(--jumi-text-autospace-keyframes, none), var(--jumi-text-box-keyframes, none), var(--jumi-text-box-edge-keyframes, none), var(--jumi-text-box-trim-keyframes, none), var(--jumi-text-combine-upright-keyframes, none), var(--jumi-text-decoration-keyframes, none), var(--jumi-text-decoration-color-keyframes, none), var(--jumi-text-decoration-line-keyframes, none), var(--jumi-text-decoration-skip-ink-keyframes, none), var(--jumi-text-decoration-style-keyframes, none), var(--jumi-text-decoration-thickness-keyframes, none), var(--jumi-text-emphasis-keyframes, none), var(--jumi-text-emphasis-color-keyframes, none), var(--jumi-text-emphasis-position-keyframes, none), var(--jumi-text-emphasis-style-keyframes, none), var(--jumi-text-indent-keyframes, none), var(--jumi-text-justify-keyframes, none), var(--jumi-text-orientation-keyframes, none), var(--jumi-text-overflow-keyframes, none), var(--jumi-text-rendering-keyframes, none), var(--jumi-text-shadow-keyframes, none), var(--jumi-text-transform-keyframes, none), var(--jumi-text-underline-offset-keyframes, none), var(--jumi-text-underline-position-keyframes, none), var(--jumi-text-wrap-keyframes, none), var(--jumi-text-wrap-mode-keyframes, none), var(--jumi-text-wrap-style-keyframes, none), var(--jumi-top-keyframes, none), var(--jumi-transform-keyframes, none), var(--jumi-transform-box-keyframes, none), var(--jumi-transform-origin-keyframes, none), var(--jumi-transform-style-keyframes, none), var(--jumi-translate-keyframes, none), var(--jumi-user-select-keyframes, none), var(--jumi-vector-effect-keyframes, none), var(--jumi-vertical-align-keyframes, none), var(--jumi-view-timeline-inset-keyframes, none), var(--jumi-view-transition-class-keyframes, none), var(--jumi-view-transition-name-keyframes, none), var(--jumi-visibility-keyframes, none), var(--jumi-white-space-keyframes, none), var(--jumi-white-space-collapse-keyframes, none), var(--jumi-widows-keyframes, none), var(--jumi-width-keyframes, none), var(--jumi-will-change-keyframes, none), var(--jumi-word-break-keyframes, none), var(--jumi-word-spacing-keyframes, none), var(--jumi-writing-mode-keyframes, none), var(--jumi-x-keyframes, none), var(--jumi-y-keyframes, none), var(--jumi-z-index-keyframes, none);
+      --jumi-animation-composition: replace;
+      --jumi-animation-delay: 0s;
+      --jumi-animation-direction: normal;
+      --jumi-animation-duration: 1s;
+      --jumi-animation-fill-mode: forwards;
+      --jumi-animation-iteration-count: 1;
+      --jumi-animation-name: none;
+      --jumi-animation-play-state: running;
+      --jumi-animation-range: var(--jumi-animation-range-start) var(--jumi-animation-range-end);
+      --jumi-animation-range-end: var(--jumi-animation-range-end-timeline) var(--jumi-animation-range-end-offset);
+      --jumi-animation-range-end-offset: 100%;
+      --jumi-animation-range-end-timeline: normal;
+      --jumi-animation-range-start: var(--jumi-animation-range-start-timeline) var(--jumi-animation-range-start-offset);
+      --jumi-animation-range-start-offset: 0%;
+      --jumi-animation-range-start-timeline: normal;
+      --jumi-animation-timeline: auto;
+      --jumi-animation-timeline-axis: block;
+      --jumi-animation-timeline-inset: var(--jumi-animation-timeline-inset-start) var(--jumi-animation-timeline-inset-end);
+      --jumi-animation-timeline-inset-end: auto;
+      --jumi-animation-timeline-inset-start: auto;
+      --jumi-animation-timeline-scroller: nearest;
+      --jumi-animation-timing-function: ease;
+      --jumi-appearance: none;
+      --jumi-aspect-ratio: var(--jumi-aspect-ratio-width) var(--jumi-aspect-ratio-height);
+      --jumi-aspect-ratio-height: auto;
+      --jumi-aspect-ratio-width: auto;
+      --jumi-backdrop-filter: var(--jumi-backdrop-filter-blur) var(--jumi-backdrop-filter-brightness) var(--jumi-backdrop-filter-contrast) var(--jumi-backdrop-filter-drop-shadow) var(--jumi-backdrop-filter-grayscale) var(--jumi-backdrop-filter-hue-rotate) var(--jumi-backdrop-filter-invert) var(--jumi-backdrop-filter-opacity) var(--jumi-backdrop-filter-saturate) var(--jumi-backdrop-filter-sepia);
+      --jumi-backdrop-filter-blur: blur(0);
+      --jumi-backdrop-filter-brightness: brightness(1);
+      --jumi-backdrop-filter-contrast: contrast(1);
+      --jumi-backdrop-filter-drop-shadow: drop-shadow(var(--jumi-backdrop-filter-drop-shadow-offset-x) var(--jumi-backdrop-filter-drop-shadow-offset-y) var(--jumi-backdrop-filter-drop-shadow-blur) var(--jumi-backdrop-filter-drop-shadow-color));
+      --jumi-backdrop-filter-drop-shadow-blur: 0;
+      --jumi-backdrop-filter-drop-shadow-color: transparent;
+      --jumi-backdrop-filter-drop-shadow-offset-x: 0;
+      --jumi-backdrop-filter-drop-shadow-offset-y: 0;
+      --jumi-backdrop-filter-grayscale: grayscale(0);
+      --jumi-backdrop-filter-hue-rotate: hue-rotate(0deg);
+      --jumi-backdrop-filter-invert: invert(0);
+      --jumi-backdrop-filter-opacity: opacity(1);
+      --jumi-backdrop-filter-saturate: saturate(1);
+      --jumi-backdrop-filter-sepia: sepia(0);
+      --jumi-backdrop-filter-url: url();
+      --jumi-backface-visibility: visible;
+      --jumi-background: var(--jumi-background-attachment) var(--jumi-background-clip) var(--jumi-background-color) var(--jumi-background-image) var(--jumi-background-origin) var(--jumi-background-position) var(--jumi-background-repeat) var(--jumi-background-size);
+      --jumi-background-attachment: scroll;
+      --jumi-background-blend-mode: normal;
+      --jumi-background-clip: border-box;
+      --jumi-background-color: transparent;
+      --jumi-background-image: none;
+      --jumi-background-origin: padding-box;
+      --jumi-background-position: var(--jumi-background-position-x) var(--jumi-background-position-y);
+      --jumi-background-position-x: var(--jumi-background-position-x-edge) var(--jumi-background-position-x-offset);
+      --jumi-background-position-x-edge: left;
+      --jumi-background-position-x-offset: 0%;
+      --jumi-background-position-y: var(--jumi-background-position-y-edge) var(--jumi-background-position-y-offset);
+      --jumi-background-position-y-edge: top;
+      --jumi-background-position-y-offset: 0%;
+      --jumi-background-repeat: var(--jumi-background-repeat-x) var(--jumi-background-repeat-y);
+      --jumi-background-repeat-x: repeat;
+      --jumi-background-repeat-y: repeat;
+      --jumi-background-size: var(--jumi-background-size-width) var(--jumi-background-size-height);
+      --jumi-background-size-height: auto;
+      --jumi-background-size-width: auto;
+      --jumi-block-size: auto;
+      --jumi-border: var(--jumi-border-width) var(--jumi-border-style) var(--jumi-border-color);
+      --jumi-border-block: var(--jumi-border-block-width) var(--jumi-border-block-style) var(--jumi-border-block-color);
+      --jumi-border-block-color: currentColor;
+      --jumi-border-block-end: var(--jumi-border-block-end-width) var(--jumi-border-block-end-style) var(--jumi-border-block-end-color);
+      --jumi-border-block-end-color: currentColor;
+      --jumi-border-block-end-radius: 0;
+      --jumi-border-block-end-style: none;
+      --jumi-border-block-end-width: medium;
+      --jumi-border-block-radius: var(--jumi-border-block-start-radius) var(--jumi-border-block-end-radius);
+      --jumi-border-block-start: var(--jumi-border-block-start-width) var(--jumi-border-block-start-style) var(--jumi-border-block-start-color);
+      --jumi-border-block-start-color: currentColor;
+      --jumi-border-block-start-radius: 0;
+      --jumi-border-block-start-style: none;
+      --jumi-border-block-start-width: medium;
+      --jumi-border-block-style: none;
+      --jumi-border-block-width: medium;
+      --jumi-border-bottom: var(--jumi-border-bottom-width) var(--jumi-border-bottom-style) var(--jumi-border-bottom-color);
+      --jumi-border-bottom-color: currentColor;
+      --jumi-border-bottom-left-radius: 0;
+      --jumi-border-bottom-radius: 0;
+      --jumi-border-bottom-right-radius: 0;
+      --jumi-border-bottom-style: none;
+      --jumi-border-bottom-width: medium;
+      --jumi-border-collapse: separate;
+      --jumi-border-color: currentColor;
+      --jumi-border-end-end-radius: 0;
+      --jumi-border-end-start-radius: 0;
+      --jumi-border-image: var(--jumi-border-image-outset) var(--jumi-border-image-repeat) var(--jumi-border-image-slice) var(--jumi-border-image-source) var(--jumi-border-image-width);
+      --jumi-border-image-outset: var(--jumi-border-image-outset-top) var(--jumi-border-image-outset-right) var(--jumi-border-image-outset-bottom) var(--jumi-border-image-outset-left);
+      --jumi-border-image-outset-bottom: 0;
+      --jumi-border-image-outset-left: 0;
+      --jumi-border-image-outset-right: 0;
+      --jumi-border-image-outset-top: 0;
+      --jumi-border-image-outset-x: var(--jumi-border-image-outset-right) var(--jumi-border-image-outset-left);
+      --jumi-border-image-outset-y: var(--jumi-border-image-outset-top) var(--jumi-border-image-outset-bottom);
+      --jumi-border-image-repeat: var(--jumi-border-image-repeat-x) var(--jumi-border-image-repeat-y);
+      --jumi-border-image-repeat-x: stretch;
+      --jumi-border-image-repeat-y: stretch;
+      --jumi-border-image-slice: 100%;
+      --jumi-border-image-source: none;
+      --jumi-border-image-width: 1;
+      --jumi-border-inline: var(--jumi-border-inline-width) var(--jumi-border-inline-style) var(--jumi-border-inline-color);
+      --jumi-border-inline-color: currentColor;
+      --jumi-border-inline-end: var(--jumi-border-inline-end-width) var(--jumi-border-inline-end-style) var(--jumi-border-inline-end-color);
+      --jumi-border-inline-end-color: currentColor;
+      --jumi-border-inline-end-radius: 0;
+      --jumi-border-inline-end-style: none;
+      --jumi-border-inline-end-width: medium;
+      --jumi-border-inline-radius: var(--jumi-border-inline-start-radius) var(--jumi-border-inline-end-radius);
+      --jumi-border-inline-start: var(--jumi-border-inline-start-width) var(--jumi-border-inline-start-style) var(--jumi-border-inline-start-color);
+      --jumi-border-inline-start-color: currentColor;
+      --jumi-border-inline-start-radius: 0;
+      --jumi-border-inline-start-style: none;
+      --jumi-border-inline-start-width: medium;
+      --jumi-border-inline-style: none;
+      --jumi-border-inline-width: medium;
+      --jumi-border-left: var(--jumi-border-left-width) var(--jumi-border-left-style) var(--jumi-border-left-color);
+      --jumi-border-left-color: currentColor;
+      --jumi-border-left-radius: 0;
+      --jumi-border-left-style: none;
+      --jumi-border-left-width: medium;
+      --jumi-border-radius: var(--jumi-border-top-left-radius) var(--jumi-border-top-right-radius) var(--jumi-border-bottom-right-radius) var(--jumi-border-bottom-left-radius);
+      --jumi-border-right: var(--jumi-border-right-width) var(--jumi-border-right-style) var(--jumi-border-right-color);
+      --jumi-border-right-color: currentColor;
+      --jumi-border-right-radius: 0;
+      --jumi-border-right-style: none;
+      --jumi-border-right-width: medium;
+      --jumi-border-spacing: 0;
+      --jumi-border-start-end-radius: 0;
+      --jumi-border-start-start-radius: 0;
+      --jumi-border-style: none;
+      --jumi-border-top: var(--jumi-border-top-width) var(--jumi-border-top-style) var(--jumi-border-top-color);
+      --jumi-border-top-color: currentColor;
+      --jumi-border-top-left-radius: 0;
+      --jumi-border-top-radius: 0;
+      --jumi-border-top-right-radius: 0;
+      --jumi-border-top-style: none;
+      --jumi-border-top-width: medium;
+      --jumi-border-width: medium;
+      --jumi-bottom: auto;
+      --jumi-box-decoration-break: slice;
+      --jumi-box-shadow: var(--jumi-box-shadow-inset, var(--jumi-box-shadow-outset));
+      --jumi-box-shadow-blur: 0;
+      --jumi-box-shadow-color: transparent;
+      --jumi-box-shadow-inset: inset var(--jumi-box-shadow-offset-x) var(--jumi-box-shadow-offset-y) var(--jumi-box-shadow-blur) var(--jumi-box-shadow-spread) var(--jumi-box-shadow-color);
+      --jumi-box-shadow-offset-x: 0;
+      --jumi-box-shadow-offset-y: 0;
+      --jumi-box-shadow-outset: var(--jumi-box-shadow-offset-x) var(--jumi-box-shadow-offset-y) var(--jumi-box-shadow-blur) var(--jumi-box-shadow-spread) var(--jumi-box-shadow-color);
+      --jumi-box-shadow-spread: 0;
+      --jumi-box-sizing: content-box;
+      --jumi-break-after: auto;
+      --jumi-break-before: auto;
+      --jumi-break-inside: auto;
+      --jumi-caption-side: top;
+      --jumi-caret-color: auto;
+      --jumi-clear: none;
+      --jumi-clip-path: none;
+      --jumi-clip-rule: nonzero;
+      --jumi-color: canvastext;
+      --jumi-color-interpolation: auto;
+      --jumi-color-interpolation-filters: linearRGB;
+      --jumi-color-scheme: normal;
+      --jumi-column-count: auto;
+      --jumi-column-fill: balance;
+      --jumi-column-gap: normal;
+      --jumi-column-rule: var(--jumi-column-rule-width) var(--jumi-column-rule-style) var(--jumi-column-rule-color);
+      --jumi-column-rule-color: medium;
+      --jumi-column-rule-style: none;
+      --jumi-column-rule-width: currentColor;
+      --jumi-column-span: none;
+      --jumi-column-width: auto;
+      --jumi-columns: var(--jumi-column-count) var(--jumi-column-width);
+      --jumi-contain: none;
+      --jumi-contain-intrinsic-block-size: none;
+      --jumi-contain-intrinsic-height: none;
+      --jumi-contain-intrinsic-inline-size: none;
+      --jumi-contain-intrinsic-size: none;
+      --jumi-contain-intrinsic-width: none;
+      --jumi-container: var(--jumi-container-name) var(--jumi-container-type);
+      --jumi-container-name: none;
+      --jumi-container-type: normal;
+      --jumi-content: normal;
+      --jumi-content-visibility: visible;
+      --jumi-counter-increment: none;
+      --jumi-counter-reset: none;
+      --jumi-counter-set: none;
+      --jumi-cursor: auto;
+      --jumi-cx: 0;
+      --jumi-cy: 0;
+      --jumi-d: none;
+      --jumi-direction: ltr;
+      --jumi-display: inline;
+      --jumi-display-inside: flow;
+      --jumi-display-outside: block;
+      --jumi-dominant-baseline: auto;
+      --jumi-empty-cells: show;
+      --jumi-fill: black;
+      --jumi-fill-opacity: 1;
+      --jumi-fill-rule: nonzero;
+      --jumi-filter: var(--jumi-filter-blur) var(--jumi-filter-brightness) var(--jumi-filter-contrast) var(--jumi-filter-grayscale) var(--jumi-filter-hue-rotate) var(--jumi-filter-invert) var(--jumi-filter-saturate) var(--jumi-filter-sepia) var(--jumi-filter-opacity) var(--jumi-filter-drop-shadow);
+      --jumi-filter-blur: blur(0);
+      --jumi-filter-brightness: brightness(1);
+      --jumi-filter-contrast: contrast(1);
+      --jumi-filter-drop-shadow: drop-shadow(var(--jumi-filter-drop-shadow-offset-x) var(--jumi-filter-drop-shadow-offset-y) var(--jumi-filter-drop-shadow-blur) var(--jumi-filter-drop-shadow-color));
+      --jumi-filter-drop-shadow-blur: 0;
+      --jumi-filter-drop-shadow-color: transparent;
+      --jumi-filter-drop-shadow-offset-x: 0;
+      --jumi-filter-drop-shadow-offset-y: 0;
+      --jumi-filter-grayscale: grayscale(0);
+      --jumi-filter-hue-rotate: hue-rotate(0deg);
+      --jumi-filter-invert: invert(0);
+      --jumi-filter-opacity: opacity(1);
+      --jumi-filter-saturate: saturate(1);
+      --jumi-filter-sepia: sepia(0);
+      --jumi-filter-url: url();
+      --jumi-flex: var(--jumi-flex-grow) var(--jumi-flex-shrink) var(--jumi-flex-basis);
+      --jumi-flex-basis: auto;
+      --jumi-flex-direction: row;
+      --jumi-flex-flow: var(--jumi-flex-direction) var(--jumi-flex-wrap);
+      --jumi-flex-grow: 0;
+      --jumi-flex-shrink: 1;
+      --jumi-flex-wrap: nowrap;
+      --jumi-float: none;
+      --jumi-flood-color: black;
+      --jumi-flood-opacity: 1;
+      --jumi-font: var(--jumi-font-family) var(--jumi-font-size) var(--jumi-font-stretch) var(--jumi-font-style) var(--jumi-font-variant) var(--jumi-font-weight) var(--jumi-line-height);
+      --jumi-font-family: inherit;
+      --jumi-font-feature-settings: normal;
+      --jumi-font-kerning: auto;
+      --jumi-font-language-override: normal;
+      --jumi-font-optical-sizing: auto;
+      --jumi-font-palette: normal;
+      --jumi-font-size: medium;
+      --jumi-font-size-adjust: none;
+      --jumi-font-smooth: auto;
+      --jumi-font-style: normal;
+      --jumi-font-synthesis: var(--jumi-font-synthesis-weight) var(--jumi-font-synthesis-style) var(--jumi-font-synthesis-small-caps) var(--jumi-font-synthesis-position);
+      --jumi-font-synthesis-small-caps: auto;
+      --jumi-font-synthesis-style: auto;
+      --jumi-font-synthesis-weight: auto;
+      --jumi-font-variant: normal;
+      --jumi-font-variant-alternates: normal;
+      --jumi-font-variant-caps: normal;
+      --jumi-font-variant-east-asian: normal;
+      --jumi-font-variant-emoji: normal;
+      --jumi-font-variant-ligatures: normal;
+      --jumi-font-variant-numeric: normal;
+      --jumi-font-variant-position: normal;
+      --jumi-font-variation-settings: normal;
+      --jumi-font-weight: normal;
+      --jumi-forced-color-adjust: auto;
+      --jumi-gap: 0;
+      --jumi-grid: var(--jumi-grid-template, var(--jumi-grid-template-rows, var(--jumi-grid-auto-rows)) / var(--jumi-grid-auto-flow) var(--jumi-grid-auto-columns, var(--jumi-grid-template-columns)));
+      --jumi-grid-area: var(--jumi-grid-row-start) / var(--jumi-grid-column-start) / var(--jumi-grid-row-end) / var(--jumi-grid-column-end);
+      --jumi-grid-auto-columns: auto;
+      --jumi-grid-auto-flow: row;
+      --jumi-grid-auto-rows: auto;
+      --jumi-grid-column: var(--jumi-grid-column-start) / var(--jumi-grid-column-end);
+      --jumi-grid-column-end: auto;
+      --jumi-grid-column-start: auto;
+      --jumi-grid-row: var(--jumi-grid-row-start) / var(--jumi-grid-row-end);
+      --jumi-grid-row-end: auto;
+      --jumi-grid-row-start: auto;
+      --jumi-grid-template: var(--jumi-grid-template-areas) var(--jumi-grid-template-rows) / var(--jumi-grid-template-columns);
+      --jumi-grid-template-areas: none;
+      --jumi-grid-template-columns: none;
+      --jumi-grid-template-rows: none;
+      --jumi-hanging-punctuation: none;
+      --jumi-height: auto;
+      --jumi-hyphenate-character: auto;
+      --jumi-hyphenate-limit-chars: var(--jumi-hyphenate-limit-minimum-word-length) var(--jumi-hyphenate-limit-minimum-characters-before) var(--jumi-hyphenate-limit-minimum-characters-after);
+      --jumi-hyphenate-limit-minimum-characters-after: auto;
+      --jumi-hyphenate-limit-minimum-characters-before: auto;
+      --jumi-hyphenate-limit-minimum-word-length: auto;
+      --jumi-hyphens: manual;
+      --jumi-image-orientation: from-image;
+      --jumi-image-rendering: auto;
+      --jumi-initial-letter: normal;
+      --jumi-inline-size: auto;
+      --jumi-inset: var(--jumi-top) var(--jumi-right) var(--jumi-bottom) var(--jumi-left);
+      --jumi-inset-block: var(--jumi-inset-block-start) var(--jumi-inset-block-end);
+      --jumi-inset-block-end: auto;
+      --jumi-inset-block-start: auto;
+      --jumi-inset-inline: var(--jumi-inset-inline-start) var(--jumi-inset-inline-end);
+      --jumi-inset-inline-end: auto;
+      --jumi-inset-inline-start: auto;
+      --jumi-isolation: auto;
+      --jumi-justify-content: normal;
+      --jumi-justify-items: legacy;
+      --jumi-justify-self: auto;
+      --jumi-left: auto;
+      --jumi-letter-spacing: normal;
+      --jumi-lighting-color: white;
+      --jumi-line-break: auto;
+      --jumi-line-clamp: none;
+      --jumi-line-height: normal;
+      --jumi-list-style: var(--jumi-list-style-type) var(--jumi-list-style-position) var(--jumi-list-style-image);
+      --jumi-list-style-image: none;
+      --jumi-list-style-position: outside;
+      --jumi-list-style-type: disc;
+      --jumi-margin: var(--jumi-margin-top) var(--jumi-margin-right) var(--jumi-margin-bottom) var(--jumi-margin-left);
+      --jumi-margin-block: var(--jumi-margin-block-start) var(--jumi-margin-block-end);
+      --jumi-margin-block-end: 0;
+      --jumi-margin-block-start: 0;
+      --jumi-margin-bottom: 0;
+      --jumi-margin-inline: var(--jumi-margin-inline-start) var(--jumi-margin-inline-end);
+      --jumi-margin-inline-end: 0;
+      --jumi-margin-inline-start: 0;
+      --jumi-margin-left: 0;
+      --jumi-margin-right: 0;
+      --jumi-margin-top: 0;
+      --jumi-marker: var(--jumi-marker-start) var(--jumi-marker-mid) var(--jumi-marker-end);
+      --jumi-marker-end: none;
+      --jumi-marker-mid: none;
+      --jumi-marker-start: none;
+      --jumi-mask: none;
+      --jumi-mask-border: none;
+      --jumi-mask-border-mode: alpha;
+      --jumi-mask-border-outset: var(--jumi-mask-border-outset-top) var(--jumi-mask-border-outset-right) var(--jumi-mask-border-outset-bottom) var(--jumi-mask-border-outset-left);
+      --jumi-mask-border-outset-bottom: 0;
+      --jumi-mask-border-outset-left: 0;
+      --jumi-mask-border-outset-right: 0;
+      --jumi-mask-border-outset-top: 0;
+      --jumi-mask-border-outset-x: var(--jumi-mask-border-outset-left) var(--jumi-mask-border-outset-right);
+      --jumi-mask-border-outset-y: var(--jumi-mask-border-outset-top) var(--jumi-mask-border-outset-bottom);
+      --jumi-mask-border-repeat: var(--jumi-mask-border-repeat-y) var(--jumi-mask-border-repeat-x);
+      --jumi-mask-border-repeat-x: stretch;
+      --jumi-mask-border-repeat-y: stretch;
+      --jumi-mask-border-slice: var(--jumi-mask-border-slice-top) var(--jumi-mask-border-slice-right) var(--jumi-mask-border-slice-bottom) var(--jumi-mask-border-slice-left);
+      --jumi-mask-border-slice-bottom: 0;
+      --jumi-mask-border-slice-left: 0;
+      --jumi-mask-border-slice-right: 0;
+      --jumi-mask-border-slice-top: 0;
+      --jumi-mask-border-slice-x: var(--jumi-mask-border-slice-left) var(--jumi-mask-border-slice-right);
+      --jumi-mask-border-slice-y: var(--jumi-mask-border-slice-top) var(--jumi-mask-border-slice-bottom);
+      --jumi-mask-border-source: none;
+      --jumi-mask-border-width: auto;
+      --jumi-mask-clip: border-box;
+      --jumi-mask-composite: add;
+      --jumi-mask-image: none;
+      --jumi-mask-mode: match-source;
+      --jumi-mask-origin: border-box;
+      --jumi-mask-position: var(--jumi-mask-position-x) var(--jumi-mask-position-y);
+      --jumi-mask-position-x: 0%;
+      --jumi-mask-position-y: 0%;
+      --jumi-mask-repeat: repeat;
+      --jumi-mask-size: auto;
+      --jumi-mask-type: luminance;
+      --jumi-math-depth: 0;
+      --jumi-math-depth-add: 0;
+      --jumi-math-style: normal;
+      --jumi-matrix: matrix(var(--jumi-matrix-a), var(--jumi-matrix-b), var(--jumi-matrix-c), var(--jumi-matrix-d), var(--jumi-matrix-tx), var(--jumi-matrix-ty));
+      --jumi-matrix-3d: matrix3d(var(--jumi-matrix-a1), var(--jumi-matrix-b1), var(--jumi-matrix-c1), var(--jumi-matrix-d1), var(--jumi-matrix-a2), var(--jumi-matrix-b2), var(--jumi-matrix-c2), var(--jumi-matrix-d2), var(--jumi-matrix-a3), var(--jumi-matrix-b3), var(--jumi-matrix-c3), var(--jumi-matrix-d3), var(--jumi-matrix-a4), var(--jumi-matrix-b4), var(--jumi-matrix-c4), var(--jumi-matrix-d4));
+      --jumi-matrix-a: 1;
+      --jumi-matrix-a1: 1;
+      --jumi-matrix-a2: 0;
+      --jumi-matrix-a3: 0;
+      --jumi-matrix-a4: 0;
+      --jumi-matrix-b: 0;
+      --jumi-matrix-b1: 0;
+      --jumi-matrix-b2: 1;
+      --jumi-matrix-b3: 0;
+      --jumi-matrix-b4: 0;
+      --jumi-matrix-c: 0;
+      --jumi-matrix-c1: 0;
+      --jumi-matrix-c2: 0;
+      --jumi-matrix-c3: 1;
+      --jumi-matrix-c4: 0;
+      --jumi-matrix-d: 1;
+      --jumi-matrix-d1: 0;
+      --jumi-matrix-d2: 0;
+      --jumi-matrix-d3: 0;
+      --jumi-matrix-d4: 1;
+      --jumi-matrix-tx: 0;
+      --jumi-matrix-ty: 0;
+      --jumi-max-block-size: none;
+      --jumi-max-height: none;
+      --jumi-max-inline-size: none;
+      --jumi-max-width: none;
+      --jumi-min-block-size: 0;
+      --jumi-min-height: auto;
+      --jumi-min-inline-size: 0;
+      --jumi-min-width: auto;
+      --jumi-mix-blend-mode: normal;
+      --jumi-object-fit: fill;
+      --jumi-object-position: var(--jumi-object-position-x) var(--jumi-object-position-y);
+      --jumi-object-position-x: var(--jumi-object-position-x-edge) var(--jumi-object-position-x-offset);
+      --jumi-object-position-x-edge: left;
+      --jumi-object-position-x-offset: 50%;
+      --jumi-object-position-y: var(--jumi-object-position-y-edge) var(--jumi-object-position-y-offset);
+      --jumi-object-position-y-edge: top;
+      --jumi-object-position-y-offset: 50%;
+      --jumi-offset: none;
+      --jumi-offset-anchor: var(--jumi-offset-anchor-x) var(--jumi-offset-anchor-y);
+      --jumi-offset-anchor-x: var(--jumi-offset-anchor-x-edge) var(--jumi-offset-anchor-x-offset);
+      --jumi-offset-anchor-x-edge: center;
+      --jumi-offset-anchor-x-offset: 0;
+      --jumi-offset-anchor-y: var(--jumi-offset-anchor-y-edge) var(--jumi-offset-anchor-y-offset);
+      --jumi-offset-anchor-y-edge: center;
+      --jumi-offset-anchor-y-offset: 0;
+      --jumi-offset-distance: 0;
+      --jumi-offset-path: none;
+      --jumi-offset-position: normal;
+      --jumi-offset-position-x: var(--jumi-offset-position-x-edge) var(--jumi-offset-position-x-offset);
+      --jumi-offset-position-x-edge: left;
+      --jumi-offset-position-x-offset: 50%;
+      --jumi-offset-position-y: var(--jumi-offset-position-y-edge) var(--jumi-offset-position-y-offset);
+      --jumi-offset-position-y-edge: top;
+      --jumi-offset-position-y-offset: 50%;
+      --jumi-offset-rotate: auto;
+      --jumi-opacity: 1;
+      --jumi-order: 0;
+      --jumi-orphans: 2;
+      --jumi-outline: var(--jumi-outline-width) var(--jumi-outline-style) var(--jumi-outline-color);
+      --jumi-outline-color: currentColor;
+      --jumi-outline-offset: 0;
+      --jumi-outline-style: none;
+      --jumi-outline-width: medium;
+      --jumi-overflow: var(--jumi-overflow-x) var(--jumi-overflow-y);
+      --jumi-overflow-anchor: auto;
+      --jumi-overflow-block: auto;
+      --jumi-overflow-clip-margin: 0px;
+      --jumi-overflow-inline: auto;
+      --jumi-overflow-wrap: normal;
+      --jumi-overflow-x: visible;
+      --jumi-overflow-y: visible;
+      --jumi-overscroll-behavior: var(--jumi-overscroll-behavior-x) var(--jumi-overscroll-behavior-y);
+      --jumi-overscroll-behavior-block: auto;
+      --jumi-overscroll-behavior-inline: auto;
+      --jumi-overscroll-behavior-x: auto;
+      --jumi-overscroll-behavior-y: auto;
+      --jumi-padding: var(--jumi-padding-top) var(--jumi-padding-right) var(--jumi-padding-bottom) var(--jumi-padding-left);
+      --jumi-padding-block: var(--jumi-padding-block-start) var(--jumi-padding-block-end);
+      --jumi-padding-block-end: 0;
+      --jumi-padding-block-start: 0;
+      --jumi-padding-bottom: 0;
+      --jumi-padding-inline: var(--jumi-padding-inline-start) var(--jumi-padding-inline-end);
+      --jumi-padding-inline-end: 0;
+      --jumi-padding-inline-start: 0;
+      --jumi-padding-left: 0;
+      --jumi-padding-right: 0;
+      --jumi-padding-top: 0;
+      --jumi-page: auto;
+      --jumi-paint-order: normal;
+      --jumi-perspective: perspective(none);
+      --jumi-perspective-origin: center;
+      --jumi-place-content: normal;
+      --jumi-place-items: normal;
+      --jumi-place-self: auto;
+      --jumi-pointer-events: auto;
+      --jumi-position: static;
+      --jumi-position-anchor: auto;
+      --jumi-position-area: none;
+      --jumi-position-try: var(--jumi-position-try-order) var(--jumi-position-try-fallbacks);
+      --jumi-position-try-fallbacks: none;
+      --jumi-position-try-order: normal;
+      --jumi-print-color-adjust: economy;
+      --jumi-quotes: auto;
+      --jumi-r: 0;
+      --jumi-resize: none;
+      --jumi-right: auto;
+      --jumi-rotate: 0deg;
+      --jumi-rotate-3d: rotate3d(var(--jumi-rotate-x), var(--jumi-rotate-y), var(--jumi-rotate-z), var(--jumi-rotate));
+      --jumi-rotate-x: 0;
+      --jumi-rotate-y: 0;
+      --jumi-rotate-z: 1;
+      --jumi-row-gap: 0;
+      --jumi-ruby-align: space-around;
+      --jumi-ruby-overhang: auto;
+      --jumi-ruby-position: alternate;
+      --jumi-rx: 0;
+      --jumi-ry: 0;
+      --jumi-scale: 1;
+      --jumi-scale-3d: scale3d(var(--jumi-scale-x), var(--jumi-scale-y), var(--jumi-scale-z));
+      --jumi-scale-x: 1;
+      --jumi-scale-y: 1;
+      --jumi-scale-z: 1;
+      --jumi-scroll-behavior: auto;
+      --jumi-scroll-margin: 0;
+      --jumi-scroll-margin-block: 0;
+      --jumi-scroll-margin-block-end: 0;
+      --jumi-scroll-margin-block-start: 0;
+      --jumi-scroll-margin-bottom: 0;
+      --jumi-scroll-margin-inline: 0;
+      --jumi-scroll-margin-inline-end: 0;
+      --jumi-scroll-margin-inline-start: 0;
+      --jumi-scroll-margin-left: 0;
+      --jumi-scroll-margin-right: 0;
+      --jumi-scroll-margin-top: 0;
+      --jumi-scroll-padding: 0;
+      --jumi-scroll-padding-block: 0;
+      --jumi-scroll-padding-block-end: 0;
+      --jumi-scroll-padding-block-start: 0;
+      --jumi-scroll-padding-bottom: 0;
+      --jumi-scroll-padding-inline: 0;
+      --jumi-scroll-padding-inline-end: 0;
+      --jumi-scroll-padding-inline-start: 0;
+      --jumi-scroll-padding-left: 0;
+      --jumi-scroll-padding-right: 0;
+      --jumi-scroll-padding-top: 0;
+      --jumi-scroll-snap-align: none;
+      --jumi-scroll-snap-stop: normal;
+      --jumi-scroll-snap-type: none;
+      --jumi-scroll-timeline: var(--jumi-scroll-timeline-name) var(--jumi-scroll-timeline-axis);
+      --jumi-scroll-timeline-axis: block;
+      --jumi-scroll-timeline-name: none;
+      --jumi-scrollbar-color: auto;
+      --jumi-scrollbar-gutter: auto;
+      --jumi-scrollbar-width: auto;
+      --jumi-shape-image-threshold: 0.0;
+      --jumi-shape-margin: 0;
+      --jumi-shape-outside: none;
+      --jumi-shape-rendering: auto;
+      --jumi-skew: skew(var(--jumi-skew-x), var(--jumi-skew-y));
+      --jumi-skew-x: 0deg;
+      --jumi-skew-y: 0deg;
+      --jumi-stop-color: black;
+      --jumi-stop-opacity: 1;
+      --jumi-stroke: none;
+      --jumi-stroke-dasharray: none;
+      --jumi-stroke-dashoffset: 0;
+      --jumi-stroke-linecap: butt;
+      --jumi-stroke-linejoin: miter;
+      --jumi-stroke-miterlimit: 4;
+      --jumi-stroke-opacity: 1;
+      --jumi-stroke-width: 1px;
+      --jumi-tab-size: 8;
+      --jumi-table-layout: auto;
+      --jumi-text-align: baseline;
+      --jumi-text-align-last: auto;
+      --jumi-text-anchor: start;
+      --jumi-text-autospace: normal;
+      --jumi-text-box: normal;
+      --jumi-text-box-edge: leading;
+      --jumi-text-box-trim: none;
+      --jumi-text-combine-upright: none;
+      --jumi-text-decoration: none;
+      --jumi-text-decoration-color: currentColor;
+      --jumi-text-decoration-line: none;
+      --jumi-text-decoration-skip-ink: auto;
+      --jumi-text-decoration-style: solid;
+      --jumi-text-decoration-thickness: auto;
+      --jumi-text-emphasis: none;
+      --jumi-text-emphasis-color: currentColor;
+      --jumi-text-emphasis-position: over right;
+      --jumi-text-emphasis-style: none;
+      --jumi-text-indent: 0;
+      --jumi-text-justify: auto;
+      --jumi-text-orientation: mixed;
+      --jumi-text-overflow: clip;
+      --jumi-text-rendering: auto;
+      --jumi-text-shadow: var(--jumi-text-shadow-offset-x) var(--jumi-text-shadow-offset-y) var(--jumi-text-shadow-blur-radius) var(--jumi-text-shadow-color);
+      --jumi-text-shadow-blur-radius: 0;
+      --jumi-text-shadow-color: currentColor;
+      --jumi-text-shadow-offset-x: 0px;
+      --jumi-text-shadow-offset-y: 0px;
+      --jumi-text-transform: none;
+      --jumi-text-underline-offset: auto;
+      --jumi-text-underline-position: auto;
+      --jumi-text-wrap: wrap;
+      --jumi-text-wrap-mode: wrap;
+      --jumi-text-wrap-style: auto;
+      --jumi-timeline-scope: none;
+      --jumi-top: auto;
+      --jumi-touch-action: auto;
+      --jumi-transform: var(--jumi-perspective) var(--jumi-matrix) var(--jumi-matrix-3d) var(--jumi-rotate-3d) var(--jumi-scale-3d) var(--jumi-skew) var(--jumi-translate-3d);
+      --jumi-transform-box: view-box;
+      --jumi-transform-origin: center;
+      --jumi-transform-origin-x: 50%;
+      --jumi-transform-origin-y: 50%;
+      --jumi-transform-origin-z: 0px;
+      --jumi-transform-style: flat;
+      --jumi-transition: var(--jumi-transition-property) var(--jumi-transition-duration) var(--jumi-transition-timing-function) var(--jumi-transition-delay);
+      --jumi-transition-behavior: normal;
+      --jumi-transition-delay: 0s;
+      --jumi-transition-duration: 0s;
+      --jumi-transition-property: all;
+      --jumi-transition-timing-function: ease;
+      --jumi-translate: 0px;
+      --jumi-translate-3d: translate3d(var(--jumi-translate-x), var(--jumi-translate-y), var(--jumi-translate-z));
+      --jumi-translate-x: var(--jumi-translate);
+      --jumi-translate-y: var(--jumi-translate);
+      --jumi-translate-z: 0px;
+      --jumi-unicode-bidi: normal;
+      --jumi-user-select: auto;
+      --jumi-vector-effect: none;
+      --jumi-vertical-align: baseline;
+      --jumi-view-timeline: var(--jumi-view-timeline-name) var(--jumi-view-timeline-inset) var(--jumi-view-timeline-axis);
+      --jumi-view-timeline-axis: block;
+      --jumi-view-timeline-inset: auto;
+      --jumi-view-timeline-name: none;
+      --jumi-view-transition-class: none;
+      --jumi-view-transition-name: none;
+      --jumi-visibility: visible;
+      --jumi-white-space: normal;
+      --jumi-white-space-collapse: collapse;
+      --jumi-widows: 2;
+      --jumi-width: auto;
+      --jumi-will-change: auto;
+      --jumi-word-break: normal;
+      --jumi-word-spacing: normal;
+      --jumi-writing-mode: horizontal-tb;
+      --jumi-x: 0;
+      --jumi-y: 0;
+      --jumi-z-index: auto;
+      --jumi-zoom: 1;
+    }
+  }
+  .\*\:animation-direction-alternate {
+    :is(& > *) {
+      --jumi-animation-direction: alternate;
+    }
+  }
+  .\*\:animation-duration-1\.5 {
+    :is(& > *) {
+      --jumi-animation-duration: 1.5s;
+    }
+  }
+  .\*\:animation-duration-2 {
+    :is(& > *) {
+      --jumi-animation-duration: 2s;
+    }
+  }
+  .\*\:animation-duration-3 {
+    :is(& > *) {
+      --jumi-animation-duration: 3s;
+    }
+  }
+  .\*\:animation-iteration-count-infinite {
+    :is(& > *) {
+      --jumi-animation-iteration-count: infinite;
+    }
+  }
+  .\*\:effect-bounce-in {
+    :is(& > *) {
+      --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-bounce-in;
+    }
+  }
+  .\*\:effect-slide-in-up {
+    :is(& > *) {
+      --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-slide-in-up;
+    }
+  }
+  .\*\:effect-zoom-in {
+    :is(& > *) {
+      --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-zoom-in;
+    }
   }
   .not-hover\:bg-gray-500 {
     &:not(*:hover) {
@@ -3361,22 +4107,22 @@
       --jumi-aspect-ratio: var(--jumi-aspect-ratio-width) var(--jumi-aspect-ratio-height);
       --jumi-aspect-ratio-height: auto;
       --jumi-aspect-ratio-width: auto;
-      --jumi-backdrop-blur: blur(0);
-      --jumi-backdrop-brightness: brightness(1);
-      --jumi-backdrop-contrast: contrast(1);
-      --jumi-backdrop-drop-shadow: drop-shadow(var(--jumi-backdrop-drop-shadow-offset-x) var(--jumi-backdrop-drop-shadow-offset-y) var(--jumi-backdrop-drop-shadow-blur) var(--jumi-backdrop-drop-shadow-color));
-      --jumi-backdrop-drop-shadow-blur: 0;
-      --jumi-backdrop-drop-shadow-color: transparent;
-      --jumi-backdrop-drop-shadow-offset-x: 0;
-      --jumi-backdrop-drop-shadow-offset-y: 0;
-      --jumi-backdrop-filter: var(--jumi-backdrop-blur) var(--jumi-backdrop-brightness) var(--jumi-backdrop-contrast) var(--jumi-backdrop-drop-shadow) var(--jumi-backdrop-grayscale) var(--jumi-backdrop-hue-rotate) var(--jumi-backdrop-invert) var(--jumi-backdrop-opacity) var(--jumi-backdrop-saturate) var(--jumi-backdrop-sepia);
-      --jumi-backdrop-grayscale: grayscale(0);
-      --jumi-backdrop-hue-rotate: hue-rotate(0deg);
-      --jumi-backdrop-invert: invert(0);
-      --jumi-backdrop-opacity: opacity(1);
-      --jumi-backdrop-saturate: saturate(1);
-      --jumi-backdrop-sepia: sepia(0);
-      --jumi-backdrop-url: url();
+      --jumi-backdrop-filter: var(--jumi-backdrop-filter-blur) var(--jumi-backdrop-filter-brightness) var(--jumi-backdrop-filter-contrast) var(--jumi-backdrop-filter-drop-shadow) var(--jumi-backdrop-filter-grayscale) var(--jumi-backdrop-filter-hue-rotate) var(--jumi-backdrop-filter-invert) var(--jumi-backdrop-filter-opacity) var(--jumi-backdrop-filter-saturate) var(--jumi-backdrop-filter-sepia);
+      --jumi-backdrop-filter-blur: blur(0);
+      --jumi-backdrop-filter-brightness: brightness(1);
+      --jumi-backdrop-filter-contrast: contrast(1);
+      --jumi-backdrop-filter-drop-shadow: drop-shadow(var(--jumi-backdrop-filter-drop-shadow-offset-x) var(--jumi-backdrop-filter-drop-shadow-offset-y) var(--jumi-backdrop-filter-drop-shadow-blur) var(--jumi-backdrop-filter-drop-shadow-color));
+      --jumi-backdrop-filter-drop-shadow-blur: 0;
+      --jumi-backdrop-filter-drop-shadow-color: transparent;
+      --jumi-backdrop-filter-drop-shadow-offset-x: 0;
+      --jumi-backdrop-filter-drop-shadow-offset-y: 0;
+      --jumi-backdrop-filter-grayscale: grayscale(0);
+      --jumi-backdrop-filter-hue-rotate: hue-rotate(0deg);
+      --jumi-backdrop-filter-invert: invert(0);
+      --jumi-backdrop-filter-opacity: opacity(1);
+      --jumi-backdrop-filter-saturate: saturate(1);
+      --jumi-backdrop-filter-sepia: sepia(0);
+      --jumi-backdrop-filter-url: url();
       --jumi-backface-visibility: visible;
       --jumi-background: var(--jumi-background-attachment) var(--jumi-background-clip) var(--jumi-background-color) var(--jumi-background-image) var(--jumi-background-origin) var(--jumi-background-position) var(--jumi-background-repeat) var(--jumi-background-size);
       --jumi-background-attachment: scroll;
@@ -4082,42 +4828,6 @@
       }
     }
   }
-  .hover\:animate-rotate-5 {
-    &:hover {
-      @media (hover: hover) {
-        --jumi-rotate: 5deg;
-        --jumi-transform-keyframes: var(--jumi-transform-animation-duration, var(--jumi-animation-duration)) var(--jumi-transform-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-transform-animation-delay, var(--jumi-animation-delay)) var(--jumi-transform-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-transform-animation-direction, var(--jumi-animation-direction)) var(--jumi-transform-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-transform-animation-play-state, var(--jumi-animation-play-state)) jumi-transform;
-      }
-    }
-  }
-  .hover\:animate-bounce-in {
-    &:hover {
-      @media (hover: hover) {
-        --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-bounce-in;
-      }
-    }
-  }
-  .hover\:animation-duration-200 {
-    &:hover {
-      @media (hover: hover) {
-        --jumi-animation-duration: 200ms;
-      }
-    }
-  }
-  .hover\:animation-duration-300 {
-    &:hover {
-      @media (hover: hover) {
-        --jumi-animation-duration: 300ms;
-      }
-    }
-  }
-  .hover\:animation-duration-500 {
-    &:hover {
-      @media (hover: hover) {
-        --jumi-animation-duration: 500ms;
-      }
-    }
-  }
   .hover\:before\:animate-width-full {
     &:hover {
       @media (hover: hover) {
@@ -4191,16 +4901,6 @@
   .md\:grid-cols-4 {
     @media (width >= 48rem) {
       grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-  }
-  .md\:animate-slide-in-left {
-    @media (width >= 48rem) {
-      --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-slide-in-left;
-    }
-  }
-  .lg\:animate-fade-in {
-    @media (width >= 64rem) {
-      --jumi-animation: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-fade-in;
     }
   }
   .\@sm\:flex {
@@ -4303,10 +5003,39 @@
       color: var(--color-white);
     }
   }
+  .if-child-is-h1\/then\:bg-white {
+    & h1 {
+      background-color: var(--color-white);
+    }
+  }
+  .if-child-is-h1\:text-blue-500 {
+    & h1 {
+      color: var(--color-blue-500);
+    }
+  }
   .if-child-is-\[h3\]\:animate-width-16 {
     & h3 {
       --jumi-width: 4rem;
       --jumi-width-keyframes: var(--jumi-width-animation-duration, var(--jumi-animation-duration)) var(--jumi-width-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-width-animation-delay, var(--jumi-animation-delay)) var(--jumi-width-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-width-animation-direction, var(--jumi-animation-direction)) var(--jumi-width-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-width-animation-play-state, var(--jumi-animation-play-state)) jumi-width;
+    }
+  }
+  .if-direct-child-is-button\:space-x-4 {
+    & > button {
+      :where(& > :not(:last-child)) {
+        --tw-space-x-reverse: 0;
+        margin-inline-start: calc(calc(var(--spacing) * 4) * var(--tw-space-x-reverse));
+        margin-inline-end: calc(calc(var(--spacing) * 4) * calc(1 - var(--tw-space-x-reverse)));
+      }
+    }
+  }
+  .if-next-sibling-is-p\:mb-2 {
+    & + p {
+      margin-bottom: calc(var(--spacing) * 2);
+    }
+  }
+  .if-sibling-is-img\:flex {
+    & ~ img {
+      display: flex;
     }
   }
   .if-sibling-is-\[\*\]\:animate-accent-color-amber-500 {
@@ -4343,7 +5072,7 @@
   @property --jumi-animation-duration {
     inherits: false;
     initial-value: 1s;
-    syntax: "<time [0s,∞]>";
+    syntax: "<time>";
   }
   @property --jumi-animation-fill-mode {
     inherits: false;
@@ -4353,7 +5082,7 @@
   @property --jumi-animation-iteration-count {
     inherits: false;
     initial-value: 1;
-    syntax: "<number [0,∞]> | infinite";
+    syntax: "<number> | infinite";
   }
   @property --jumi-animation-play-state {
     inherits: false;
@@ -4367,59 +5096,54 @@
   }
 }
 @layer base {
+  @keyframes jumi-effect-bounce-in {
+    0% {
+      opacity: 0;
+      transform: scale3d(0.3, 0.3, 0.3);
+    }
+    50% {
+      opacity: 1;
+      transform: scale3d(1.1, 1.1, 1.1);
+    }
+    100% {
+      opacity: 1;
+      transform: scale3d(1, 1, 1);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-effect-slide-in-up {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, 100%, 0);
+      visibility: visible;
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-effect-zoom-in {
+    0% {
+      opacity: 0;
+      transform: scale3d(0.3, 0.3, 0.3);
+    }
+    50% {
+      opacity: 1;
+      transform: scale3d(1.08, 1.08, 1.08);
+    }
+    100% {
+      opacity: 1;
+      transform: scale3d(1, 1, 1);
+    }
+  }
+}
+@layer base {
   @keyframes jumi-aspect-ratio {
     to {
       aspect-ratio: var(--jumi-aspect-ratio);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-back-in {
-    0% {
-      transform: scale(0) rotateZ(-360deg);
-    }
-    100% {
-      transform: scale(1) rotateZ(0deg);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-back-in-down {
-    0% {
-      transform: scale(0) translateY(-2000px) rotateZ(-360deg);
-    }
-    100% {
-      transform: scale(1) translateY(0) rotateZ(0deg);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-back-in-left {
-    0% {
-      transform: scale(0) translateX(-2000px) rotateZ(-360deg);
-    }
-    100% {
-      transform: scale(1) translateX(0) rotateZ(0deg);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-back-in-right {
-    0% {
-      transform: scale(0) translateX(2000px) rotateZ(360deg);
-    }
-    100% {
-      transform: scale(1) translateX(0) rotateZ(0deg);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-back-in-up {
-    0% {
-      transform: scale(0) translateY(2000px) rotateZ(360deg);
-    }
-    100% {
-      transform: scale(1) translateY(0) rotateZ(0deg);
     }
   }
 }
@@ -4445,47 +5169,16 @@
   }
 }
 @layer base {
+  @keyframes jumi-border-bottom-left-radius {
+    to {
+      border-bottom-left-radius: var(--jumi-border-bottom-left-radius);
+    }
+  }
+}
+@layer base {
   @keyframes jumi-border-image-outset {
     to {
       border-image-outset: var(--jumi-border-image-outset);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-bounce-in {
-    0% {
-      transform: scale3d(0.8, 0.8, 0.8);
-    }
-    20% {
-      transform: scale3d(1.1, 1.1, 1.1);
-    }
-    40% {
-      transform: scale3d(0.9, 0.9, 0.9);
-    }
-    60% {
-      transform: scale3d(1.03, 1.03, 1.03);
-    }
-    80% {
-      transform: scale3d(0.97, 0.97, 0.97);
-    }
-    from, 20%, 40%, 60%, 80%, to {
-      animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
-    }
-    to {
-      transform: scale3d(1, 1, 1);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-bounce-out {
-    20% {
-      transform: scale3d(0.9, 0.9, 0.9);
-    }
-    50%, 55% {
-      transform: scale3d(1.1, 1.1, 1.1);
-    }
-    to {
-      transform: scale3d(0.3, 0.3, 0.3);
     }
   }
 }
@@ -4504,74 +5197,6 @@
   }
 }
 @layer base {
-  @keyframes jumi-fade-down {
-    from {
-      opacity: 0;
-      transform: translate3d(0, -40px, 0);
-    }
-    to {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-fade-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-fade-left {
-    from {
-      opacity: 0;
-      transform: translate3d(-40px, 0, 0);
-    }
-    to {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-fade-out {
-    from {
-      opacity: 1;
-    }
-    to {
-      opacity: 0;
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-fade-right {
-    from {
-      opacity: 0;
-      transform: translate3d(40px, 0, 0);
-    }
-    to {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-fade-up {
-    from {
-      opacity: 0;
-      transform: translate3d(0, 40px, 0);
-    }
-    to {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
-  }
-}
-@layer base {
   @keyframes jumi-fill {
     to {
       fill: var(--jumi-fill);
@@ -4582,48 +5207,6 @@
   @keyframes jumi-filter {
     to {
       filter: var(--jumi-filter);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-flip-x {
-    40% {
-      animation-timing-function: ease-in;
-      transform: perspective(400px) rotateX(-20deg);
-    }
-    60% {
-      transform: perspective(400px) rotateX(10deg);
-    }
-    80% {
-      transform: perspective(400px) rotateX(-5deg);
-    }
-    from {
-      animation-timing-function: ease-in;
-      transform: perspective(400px) rotateX(-90deg);
-    }
-    to {
-      transform: perspective(400px) rotateX(0deg);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-flip-y {
-    40% {
-      animation-timing-function: ease-in;
-      transform: perspective(400px) rotateY(-20deg);
-    }
-    60% {
-      transform: perspective(400px) rotateY(10deg);
-    }
-    80% {
-      transform: perspective(400px) rotateY(-5deg);
-    }
-    from {
-      animation-timing-function: ease-in;
-      transform: perspective(400px) rotateY(-90deg);
-    }
-    to {
-      transform: perspective(400px) rotateY(0deg);
     }
   }
 }
@@ -4656,19 +5239,6 @@
   }
 }
 @layer base {
-  @keyframes jumi-pulsate {
-    50% {
-      transform: scale3d(1.05, 1.05, 1.05);
-    }
-    from {
-      transform: scale3d(1, 1, 1);
-    }
-    to {
-      transform: scale3d(1, 1, 1);
-    }
-  }
-}
-@layer base {
   @keyframes jumi-transform {
     to {
       transform: var(--jumi-transform);
@@ -4683,78 +5253,9 @@
   }
 }
 @layer base {
-  @keyframes jumi-shake {
-    10%, 30%, 50%, 70%, 90% {
-      transform: translate3d(-10px, 0, 0);
-    }
-    20%, 40%, 60%, 80% {
-      transform: translate3d(10px, 0, 0);
-    }
-    from, to {
-      transform: translate3d(0, 0, 0);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-skew-x {
-    0% {
-      transform: skewX(0deg);
-    }
-    100% {
-      transform: skewX(20deg);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-skew-y {
-    0% {
-      transform: skewY(0deg);
-    }
-    100% {
-      transform: skewY(20deg);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-slide-in-up {
-    from {
-      transform: translate3d(0, 100%, 0);
-      visibility: visible;
-    }
-    to {
-      transform: translate3d(0, 0, 0);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-swing {
-    20% {
-      transform: rotateZ(15deg);
-    }
-    40% {
-      transform: rotateZ(-10deg);
-    }
-    60% {
-      transform: rotateZ(5deg);
-    }
-    80% {
-      transform: rotateZ(-5deg);
-    }
-    to {
-      transform: rotateZ(0deg);
-    }
-  }
-}
-@layer base {
   @keyframes jumi-text-shadow {
-    0% {
-      text-shadow: 0 0 0 transparent;
-    }
-    50% {
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
-    }
-    100% {
-      text-shadow: 0 0 0 transparent;
+    to {
+      text-shadow: var(--jumi-text-shadow);
     }
   }
 }
@@ -4766,57 +5267,6 @@
   }
 }
 @layer base {
-  @keyframes jumi-wobble {
-    15% {
-      transform: translate3d(-25%, 0, 0) rotateZ(-5deg);
-    }
-    30% {
-      transform: translate3d(20%, 0, 0) rotateZ(3deg);
-    }
-    45% {
-      transform: translate3d(-15%, 0, 0) rotateZ(-3deg);
-    }
-    60% {
-      transform: translate3d(10%, 0, 0) rotateZ(2deg);
-    }
-    75% {
-      transform: translate3d(-5%, 0, 0) rotateZ(-1deg);
-    }
-    from {
-      transform: translate3d(0, 0, 0);
-    }
-    to {
-      transform: translate3d(0, 0, 0);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-zoom-in {
-    50% {
-      transform: scale3d(1.05, 1.05, 1.05);
-    }
-    from {
-      transform: scale3d(0.3, 0.3, 0.3);
-    }
-    to {
-      transform: scale3d(1, 1, 1);
-    }
-  }
-}
-@layer base {
-  @keyframes jumi-zoom-out {
-    50% {
-      transform: scale3d(0.95, 0.95, 0.95);
-    }
-    from {
-      transform: scale3d(1, 1, 1);
-    }
-    to {
-      transform: scale3d(0.3, 0.3, 0.3);
-    }
-  }
-}
-@layer base {
   @keyframes jumi-height {
     to {
       height: var(--jumi-height);
@@ -4824,20 +5274,131 @@
   }
 }
 @layer base {
-  @keyframes jumi-accent-color {
-    to {
-      accent-color: var(--jumi-accent-color);
+  @keyframes jumi-effect-arc-bottom-right {
+    0% {
+      opacity: 0;
+      rotate: -90deg;
+      transform-origin: bottom;
+      translate-x: 45px;
+      translate-y: -45px;
+    }
+    100% {
+      opacity: 1;
+      rotate: 0deg;
+      transform-origin: bottom;
+      translate-x: 0px;
+      translate-y: 0px;
     }
   }
 }
 @layer base {
-  @keyframes jumi-slide-in-left {
-    from {
-      transform: translate3d(-100%, 0, 0);
+  @keyframes jumi-effect-bubble {
+    0% {
+      border-radius: 50%;
+      opacity: 0;
+      transform: scale(0) translateY(50px);
+    }
+    50% {
+      border-radius: 60% 40% 50% 50%;
+      opacity: 0.7;
+      transform: scale(0.8) translateY(-10px);
+    }
+    100% {
+      border-radius: 50%;
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-effect-circle-in {
+    0% {
+      clip-path: circle(0% at 50% 50%);
+    }
+    100% {
+      clip-path: circle(100% at 50% 50%);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-effect-fade-in {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-effect-fold-in {
+    0% {
+      opacity: 0;
+      transform: scaleY(0) rotateX(-90deg);
+      transform-origin: bottom;
+    }
+    50% {
+      opacity: 0.7;
+      transform: scaleY(0.5) rotateX(-45deg);
+    }
+    100% {
+      opacity: 1;
+      transform: scaleY(1) rotateX(0deg);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-effect-magnetic {
+    0% {
+      transform: translateX(0) scale(1);
+    }
+    30% {
+      transform: translateX(-15px) scale(1.1);
+    }
+    60% {
+      transform: translateX(10px) scale(0.9);
+    }
+    100% {
+      transform: translateX(0) scale(1);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-effect-rush-in-right {
+    0% {
+      opacity: 0;
+      transform: translateX(200px) skewX(-30deg) scale(0.8);
+    }
+    60% {
+      opacity: 1;
+      transform: translateX(-20px) skewX(5deg) scale(1.05);
+    }
+    80% {
+      transform: translateX(5px) skewX(-2deg) scale(0.98);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0) skewX(0deg) scale(1);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-effect-slide-in-down {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, -100%, 0);
       visibility: visible;
     }
-    to {
+    100% {
+      opacity: 1;
       transform: translate3d(0, 0, 0);
+    }
+  }
+}
+@layer base {
+  @keyframes jumi-accent-color {
+    to {
+      accent-color: var(--jumi-accent-color);
     }
   }
 }

@@ -2,6 +2,7 @@ import type { Collection, GetMatchProperties, MatchProperty, TailwindTheme } fro
 
 import { getCreator } from '@/helpers/create'
 import { css } from '@/helpers/css'
+import { join } from '@/helpers/join'
 import { merge } from '@/helpers/merge'
 import { effectCollection } from '@/keyframes/effects'
 import { propertyCollection } from '@/keyframes/property'
@@ -133,12 +134,6 @@ export const getMatchProperties: GetMatchProperties = (api) => {
 
   const create = getCreator(api)
   const matchProperties: Partial<MatchProperty> = {
-    'animate': {
-      property: value => ({
-        '--jumi-animation': create.effect(value),
-      }),
-      values: effectCollection,
-    },
     'animate-accent-color': {
       property: value => ({
         '--jumi-accent-color': value,
@@ -213,70 +208,6 @@ export const getMatchProperties: GetMatchProperties = (api) => {
       type: 'ratio',
       values: empty.auto,
     },
-    'animate-backdrop-blur': {
-      property: value => ({
-        '--jumi-backdrop-blur': css('blur', value),
-        '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
-      }),
-      type: 'length',
-      values: getValues('backdropBlur'),
-    },
-    'animate-backdrop-brightness': {
-      property: value => ({
-        '--jumi-backdrop-brightness': css('brightness', value),
-        '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
-      }),
-      type: ['number', 'percentage'],
-      values: getValues('backdropBrightness'),
-    },
-    'animate-backdrop-contrast': {
-      property: value => ({
-        '--jumi-backdrop-contrast': css('contrast', value),
-        '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
-      }),
-      type: ['number', 'percentage'],
-      values: getValues('backdropContrast'),
-    },
-    'animate-backdrop-drop-shadow': {
-      property: value => ({
-        '--jumi-backdrop-drop-shadow': css('drop-shadow', value),
-        '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
-      }),
-      type: ['length', 'shadow', 'any'],
-      values: empty.none,
-    },
-    'animate-backdrop-drop-shadow-blur': {
-      property: value => ({
-        '--jumi-backdrop-drop-shadow-blur': value,
-        '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
-      }),
-      type: ['length', 'percentage'],
-      values: empty.length,
-    },
-    'animate-backdrop-drop-shadow-color': {
-      property: value => ({
-        '--jumi-backdrop-drop-shadow-color': value,
-        '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
-      }),
-      type: 'color',
-      values: getValues('boxShadowColor'),
-    },
-    'animate-backdrop-drop-shadow-offset-x': {
-      property: value => ({
-        '--jumi-backdrop-drop-shadow-offset-x': value,
-        '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
-      }),
-      type: ['length', 'percentage'],
-      values: empty.string,
-    },
-    'animate-backdrop-drop-shadow-offset-y': {
-      property: value => ({
-        '--jumi-backdrop-drop-shadow-offset-y': value,
-        '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
-      }),
-      type: ['length', 'percentage'],
-      values: empty.string,
-    },
     'animate-backdrop-filter': {
       property: value => ({
         '--jumi-backdrop-filter': value,
@@ -284,58 +215,122 @@ export const getMatchProperties: GetMatchProperties = (api) => {
       }),
       values: empty.none,
     },
-    'animate-backdrop-grayscale': {
+    'animate-backdrop-filter-blur': {
       property: value => ({
+        '--jumi-backdrop-filter-blur': css('blur', value),
         '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
-        '--jumi-backdrop-grayscale': css('grayscale', value),
+      }),
+      type: 'length',
+      values: getValues('backdropBlur'),
+    },
+    'animate-backdrop-filter-brightness': {
+      property: value => ({
+        '--jumi-backdrop-filter-brightness': css('brightness', value),
+        '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
+      }),
+      type: ['number', 'percentage'],
+      values: getValues('backdropBrightness'),
+    },
+    'animate-backdrop-filter-contrast': {
+      property: value => ({
+        '--jumi-backdrop-filter-contrast': css('contrast', value),
+        '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
+      }),
+      type: ['number', 'percentage'],
+      values: getValues('backdropContrast'),
+    },
+    'animate-backdrop-filter-drop-shadow': {
+      property: value => ({
+        '--jumi-backdrop-filter-drop-shadow': css('drop-shadow', value),
+        '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
+      }),
+      type: ['length', 'shadow', 'any'],
+      values: empty.none,
+    },
+    'animate-backdrop-filter-drop-shadow-blur': {
+      property: value => ({
+        '--jumi-backdrop-filter-drop-shadow-blur': value,
+        '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
+      }),
+      type: ['length', 'percentage'],
+      values: empty.length,
+    },
+    'animate-backdrop-filter-drop-shadow-color': {
+      property: value => ({
+        '--jumi-backdrop-filter-drop-shadow-color': value,
+        '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
+      }),
+      type: 'color',
+      values: getValues('boxShadowColor'),
+    },
+    'animate-backdrop-filter-drop-shadow-offset-x': {
+      property: value => ({
+        '--jumi-backdrop-filter-drop-shadow-offset-x': value,
+        '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
+      }),
+      type: ['length', 'percentage'],
+      values: empty.string,
+    },
+    'animate-backdrop-filter-drop-shadow-offset-y': {
+      property: value => ({
+        '--jumi-backdrop-filter-drop-shadow-offset-y': value,
+        '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
+      }),
+      type: ['length', 'percentage'],
+      values: empty.string,
+    },
+    'animate-backdrop-filter-grayscale': {
+      property: value => ({
+        '--jumi-backdrop-filter-grayscale': css('grayscale', value),
+        '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
       }),
       type: ['number', 'percentage'],
       values: getValues('backdropGrayscale'),
     },
-    'animate-backdrop-hue-rotate': {
+    'animate-backdrop-filter-hue-rotate': {
       property: value => ({
+        '--jumi-backdrop-filter-hue-rotate': css('hue-rotate', value),
         '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
-        '--jumi-backdrop-hue-rotate': css('hue-rotate', value),
       }),
       type: 'angle',
       values: getValues('backdropHueRotate'),
     },
-    'animate-backdrop-invert': {
+    'animate-backdrop-filter-invert': {
       property: value => ({
+        '--jumi-backdrop-filter-invert': css('invert', value),
         '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
-        '--jumi-backdrop-invert': css('invert', value),
       }),
       type: ['number', 'percentage'],
       values: getValues('backdropInvert'),
     },
-    'animate-backdrop-opacity': {
+    'animate-backdrop-filter-opacity': {
       property: value => ({
         '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
-        '--jumi-backdrop-opacity': css('opacity', value),
+        '--jumi-backdrop-filter-opacity': css('opacity', value),
       }),
       type: ['number', 'percentage'],
       values: getValues('backdropOpacity'),
     },
-    'animate-backdrop-saturate': {
+    'animate-backdrop-filter-saturate': {
       property: value => ({
         '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
-        '--jumi-backdrop-saturate': css('saturate', value),
+        '--jumi-backdrop-filter-saturate': css('saturate', value),
       }),
       type: ['number', 'percentage'],
       values: getValues('backdropSaturate'),
     },
-    'animate-backdrop-sepia': {
+    'animate-backdrop-filter-sepia': {
       property: value => ({
         '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
-        '--jumi-backdrop-sepia': css('sepia', value),
+        '--jumi-backdrop-filter-sepia': css('sepia', value),
       }),
       type: ['number', 'percentage'],
       values: getValues('backdropSepia'),
     },
-    'animate-backdrop-url': {
+    'animate-backdrop-filter-url': {
       property: value => ({
         '--jumi-backdrop-filter-keyframes': create.animation('backdrop-filter'),
-        '--jumi-backdrop-url': css('url', value),
+        '--jumi-backdrop-filter-url': css('url', value),
       }),
       type: 'url',
       values: empty.string,
@@ -1209,7 +1204,7 @@ export const getMatchProperties: GetMatchProperties = (api) => {
     'animate-display-inside': {
       modifiers: displayOutside,
       property: (value, { modifier }) => ({
-        '--jumi-display-inside': modifier === null ? value : `${modifier} ${value}`,
+        '--jumi-display-inside': modifier ? join(modifier, value) : value,
         '--jumi-display-keyframes': create.animation('display'),
       }),
       values: displayInside,
@@ -1218,7 +1213,7 @@ export const getMatchProperties: GetMatchProperties = (api) => {
       modifiers: displayInside,
       property: (value, { modifier }) => ({
         '--jumi-display-keyframes': create.animation('display'),
-        '--jumi-display-outside': modifier === null ? value : `${value} ${modifier}`,
+        '--jumi-display-outside': modifier ? join(value, modifier) : value,
       }),
       values: displayOutside,
     },
@@ -1381,7 +1376,7 @@ export const getMatchProperties: GetMatchProperties = (api) => {
     'animate-filter-url': {
       property: value => ({
         '--jumi-filter-keyframes': create.animation('filter'),
-        '--jumi-filter-url': `url(${value})`,
+        '--jumi-filter-url': css('url', value),
       }),
       type: 'url',
       values: empty.string,
@@ -1491,7 +1486,7 @@ export const getMatchProperties: GetMatchProperties = (api) => {
     'animate-font-size-adjust': {
       modifiers: fontSizeAdjustMetric,
       property: (value, { modifier }) => ({
-        '--jumi-font-size-adjust': modifier === null ? value : `${value} ${modifier}`,
+        '--jumi-font-size-adjust': modifier ? join(value, modifier) : value,
         '--jumi-font-size-adjust-keyframes': create.animation('font-size-adjust'),
       }),
       type: ['number', 'any'],
@@ -1499,7 +1494,7 @@ export const getMatchProperties: GetMatchProperties = (api) => {
     },
     'animate-font-style': {
       property: (value, { modifier }) => ({
-        '--jumi-font-style': modifier === null ? value : `${value} ${modifier}`,
+        '--jumi-font-style': modifier ? join(value, modifier) : value,
         '--jumi-font-style-keyframes': create.animation('font-style'),
       }),
       values: fontStyle,
@@ -1556,7 +1551,7 @@ export const getMatchProperties: GetMatchProperties = (api) => {
     'animate-font-variant-east-asian': {
       modifiers: fontVariantEastAsianWidth,
       property: (value, { modifier }) => ({
-        '--jumi-font-variant-east-asian': modifier === null ? value : `${value} ${modifier}`,
+        '--jumi-font-variant-east-asian': modifier ? join(value, modifier) : value,
         '--jumi-font-variant-east-asian-keyframes': create.animation('font-variant-east-asian'),
       }),
       values: fontVariantEastAsian,
@@ -1629,7 +1624,7 @@ export const getMatchProperties: GetMatchProperties = (api) => {
     'animate-grid-auto-flow': {
       modifiers: gridAutoFlowPacking,
       property: (value, { modifier }) => ({
-        '--jumi-grid-auto-flow': modifier === null ? value : `${value} ${modifier}`,
+        '--jumi-grid-auto-flow': modifier ? join(value, modifier) : value,
         '--jumi-grid-auto-flow-keyframes': create.animation('grid-auto-flow'),
       }),
       values: gridAutoFlow,
@@ -1650,14 +1645,14 @@ export const getMatchProperties: GetMatchProperties = (api) => {
     },
     'animate-grid-column-end': {
       property: (value, { modifier }) => ({
-        '--jumi-grid-column-end': modifier === null ? value : `${modifier} value`,
+        '--jumi-grid-column-end': modifier ? join(modifier, value) : value,
         '--jumi-grid-column-end-keyframes': create.animation('grid-column-end'),
       }),
       values: getValues('gridColumnEnd'),
     },
     'animate-grid-column-start': {
       property: (value, { modifier }) => ({
-        '--jumi-grid-column-start': modifier === null ? value : `${modifier} value`,
+        '--jumi-grid-column-start': modifier ? join(modifier, value) : value,
         '--jumi-grid-column-start-keyframes': create.animation('grid-column-start'),
       }),
       values: getValues('gridColumnStart'),
@@ -1672,7 +1667,7 @@ export const getMatchProperties: GetMatchProperties = (api) => {
     'animate-grid-row-end': {
       modifiers: gridSize,
       property: (value, { modifier }) => ({
-        '--jumi-grid-row-end': modifier === null ? value : `${modifier} value`,
+        '--jumi-grid-row-end': modifier ? join(modifier, value) : value,
         '--jumi-grid-row-end-keyframes': create.animation('grid-row-end'),
       }),
       values: getValues('gridRowEnd'),
@@ -1680,7 +1675,7 @@ export const getMatchProperties: GetMatchProperties = (api) => {
     'animate-grid-row-start': {
       modifiers: gridSize,
       property: (value, { modifier }) => ({
-        '--jumi-grid-row-start': modifier === null ? value : `${modifier} value`,
+        '--jumi-grid-row-start': modifier ? join(modifier, value) : value,
         '--jumi-grid-row-start-keyframes': create.animation('grid-row-start'),
       }),
       values: getValues('gridRowStart'),
@@ -1787,7 +1782,7 @@ export const getMatchProperties: GetMatchProperties = (api) => {
     'animate-initial-letter': {
       modifiers: initialLetterPosition,
       property: (value, { modifier }) => ({
-        '--jumi-initial-letter': modifier === null ? value : `${value} ${modifier}`,
+        '--jumi-initial-letter': modifier ? join(value, modifier) : value,
         '--jumi-initial-letter-keyframes': create.animation('initial-letter'),
       }),
       type: ['number', 'integer', 'any'],
@@ -3127,7 +3122,6 @@ export const getMatchProperties: GetMatchProperties = (api) => {
       type: ['length', 'percentage'],
       values: empty.number,
     },
-
     'animate-z-index': {
       property: value => ({
         '--jumi-z-index': value,
@@ -3150,7 +3144,7 @@ export const getMatchProperties: GetMatchProperties = (api) => {
     'animation-delay': {
       modifiers: propertyCollection,
       property: (value, { modifier }) => {
-        if (modifier === null) return { '--jumi-animation-delay': value }
+        if (!modifier) return { '--jumi-animation-delay': value }
         return { [`--jumi-${modifier}-animation-delay`]: value }
       },
       values: animationDelay,
@@ -3158,7 +3152,7 @@ export const getMatchProperties: GetMatchProperties = (api) => {
     'animation-direction': {
       modifiers: propertyCollection,
       property: (value, { modifier }) => {
-        if (modifier === null) return { '--jumi-animation-direction': value }
+        if (!modifier) return { '--jumi-animation-direction': value }
         return { [`--jumi-${modifier}-animation-direction`]: value }
       },
       values: animationDirection,
@@ -3166,7 +3160,7 @@ export const getMatchProperties: GetMatchProperties = (api) => {
     'animation-duration': {
       modifiers: propertyCollection,
       property: (value, { modifier }) => {
-        if (modifier === null) return { '--jumi-animation-duration': value }
+        if (!modifier) return { '--jumi-animation-duration': value }
         return { [`--jumi-${modifier}-animation-duration`]: value }
       },
       values: animationDuration,
@@ -3174,7 +3168,7 @@ export const getMatchProperties: GetMatchProperties = (api) => {
     'animation-fill-mode': {
       modifiers: propertyCollection,
       property: (value, { modifier }) => {
-        if (modifier === null) return { '--jumi-animation-fill-mode': value }
+        if (!modifier) return { '--jumi-animation-fill-mode': value }
         return { [`--jumi-${modifier}-animation-fill-mode`]: value }
       },
       values: animationFillMode,
@@ -3182,7 +3176,7 @@ export const getMatchProperties: GetMatchProperties = (api) => {
     'animation-iteration-count': {
       modifiers: propertyCollection,
       property: (value, { modifier }) => {
-        if (modifier === null) return { '--jumi-animation-iteration-count': value }
+        if (!modifier) return { '--jumi-animation-iteration-count': value }
         return { [`--jumi-${modifier}-animation-iteration-count`]: value }
       },
       type: 'number',
@@ -3197,7 +3191,7 @@ export const getMatchProperties: GetMatchProperties = (api) => {
     'animation-play-state': {
       modifiers: propertyCollection,
       property: (value, { modifier }) => {
-        if (modifier === null) return { '--jumi-animation-play-state': value }
+        if (!modifier) return { '--jumi-animation-play-state': value }
         return { [`--jumi-${modifier}-animation-play-state`]: value }
       },
       values: animationPlayState,
@@ -3284,10 +3278,16 @@ export const getMatchProperties: GetMatchProperties = (api) => {
     'animation-timing-function': {
       modifiers: propertyCollection,
       property: (value, { modifier }) => {
-        if (modifier === null) return { '--jumi-animation-timing-function': value }
+        if (!modifier) return { '--jumi-animation-timing-function': value }
         return { [`--jumi-${modifier}-animation-timing-function`]: value }
       },
       values: animationTimingFunction,
+    },
+    'effect': {
+      property: value => ({
+        '--jumi-animation': create.effect(value),
+      }),
+      values: effectCollection,
     },
   }
 

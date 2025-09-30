@@ -19,7 +19,7 @@ export const animationRegister: AnimationPropertyRegisterCollection = {
   '@property --jumi-animation-duration': {
     'inherits': 'false',
     'initial-value': '1s',
-    'syntax': '"<time [0s,∞]>"',
+    'syntax': '"<time>"',
   },
   '@property --jumi-animation-fill-mode': {
     'inherits': 'false',
@@ -29,7 +29,7 @@ export const animationRegister: AnimationPropertyRegisterCollection = {
   '@property --jumi-animation-iteration-count': {
     'inherits': 'false',
     'initial-value': '1',
-    'syntax': '"<number [0,∞]> | infinite"',
+    'syntax': '"<number> | infinite"',
   },
   '@property --jumi-animation-play-state': {
     'inherits': 'false',
