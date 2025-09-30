@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { AnimationShowcase } from '../components/AnimationShowcase'
+import { AnimationShowcase } from '../components/animation-showcase'
 
 const meta = {
   argTypes: {

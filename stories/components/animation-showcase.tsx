@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react'
 export interface AnimationShowcaseProps {
   /** Animation class to apply */
   animationClass: string
+  /** Background class for the showcase container */
+  backgroundClass?: string
   /** Custom content to animate */
   children?: React.ReactNode
   /** Description of the animation */
@@ -17,6 +19,7 @@ export interface AnimationShowcaseProps {
 
 export function AnimationShowcase({
   animationClass,
+  backgroundClass = 'bg-white',
   children,
   description,
   show = true,
@@ -38,7 +41,7 @@ export function AnimationShowcase({
   )
 
   return (
-    <div className="flex flex-col items-center gap-4 p-8 bg-white border rounded-lg shadow-sm">
+    <div className={`flex flex-col items-center gap-4 p-8 border rounded-lg shadow-sm overflow-hidden ${backgroundClass}`}>
       <div className="text-center">
         <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
         {description && <p className="mt-1 text-sm text-gray-600">{description}</p>}

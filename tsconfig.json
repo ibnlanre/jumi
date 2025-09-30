@@ -5,6 +5,7 @@
     "baseUrl": ".",
     "checkJs": false,
     "jsx": "react-jsx",
+    "moduleDetection": "auto",
     "declaration": true,
     "declarationMap": true,
     "emitDeclarationOnly": true,
@@ -20,6 +21,7 @@
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noUncheckedIndexedAccess": false,
+    "noUncheckedSideEffectImports":false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "paths": {
@@ -33,11 +35,11 @@
     "target": "es2022",
     "verbatimModuleSyntax": true
   },
-  "exclude": ["node_modules", "dist", "build", "coverage", "examples", "examples"],
+  "exclude": ["node_modules", "dist", "build", "coverage", "examples"],
   "include": [
     "./**/*.ts",
     "./**/*.tsx",
-    ".storybook/*.ts",
+    ".storybook",
     "vitest.config.mts",
     "vitest.setup.ts",
     "tsup.config.ts"
