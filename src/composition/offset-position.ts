@@ -1,11 +1,17 @@
 import { css } from '@/helpers/css'
+import { join } from '@/helpers/join'
 
-export const offsetPositionX = [
+export const offsePosition = join([
+  css('var', '--jumi-offset-position-x'),
+  css('var', '--jumi-offset-position-y'),
+], ' ')
+
+export const offsetPositionX = join([
   css('var', '--jumi-offset-position-x-edge'),
   css('var', '--jumi-offset-position-x-offset'),
-].join(' ')
+], ' ')
 
-export const offsetPositionY = [
+export const offsetPositionY = join([
   css('var', '--jumi-offset-position-y-edge'),
   css('var', '--jumi-offset-position-y-offset'),
-].join(' ')
+], ' ')

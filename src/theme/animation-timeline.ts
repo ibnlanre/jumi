@@ -1,12 +1,8 @@
-import {
-  animationTimelineScroll,
-  animationTimelineView,
-} from '@/composition/animation-timeline'
 import { css } from '@/helpers/css'
 
 export const animationTimeline = {
   auto: 'auto',
   none: 'none',
-  scroll: css('scroll', animationTimelineScroll),
-  view: css('view', animationTimelineView),
+  scroll: css('var', '--jumi-animation-timeline-scroll'),
+  view: css('var', '--jumi-animation-timeline-view'),
 } as const

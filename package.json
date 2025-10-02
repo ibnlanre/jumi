@@ -19,6 +19,9 @@
     "tailwind": "tailwindcss -i ./examples/input.css -o ./examples/output.css --config ./examples/tailwind.config.js",
     "prepublishOnly": "npm run build",
     "check-types": "tsc --noEmit",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "analyze": "node scripts/analyze.js"

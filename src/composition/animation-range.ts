@@ -1,16 +1,17 @@
 import { css } from '@/helpers/css'
+import { join } from '@/helpers/join'
 
-export const animationRange = [
+export const animationRange = join([
   css('var', '--jumi-animation-range-start'),
   css('var', '--jumi-animation-range-end'),
-].join(' ')
+])
 
-export const animationRangeStart = [
+export const animationRangeStart = join([
   css('var', '--jumi-animation-range-start-timeline'),
   css('var', '--jumi-animation-range-start-offset'),
-].join(' ')
+])
 
-export const animationRangeEnd = [
+export const animationRangeEnd = join([
   css('var', '--jumi-animation-range-end-timeline'),
   css('var', '--jumi-animation-range-end-offset'),
-].join(' ')
+])

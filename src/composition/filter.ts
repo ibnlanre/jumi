@@ -1,6 +1,7 @@
 import { css } from '@/helpers/css'
+import { join } from '@/helpers/join'
 
-export const filter = [
+export const filter = join([
   css('var', '--jumi-filter-blur'),
   css('var', '--jumi-filter-brightness'),
   css('var', '--jumi-filter-contrast'),
@@ -11,4 +12,4 @@ export const filter = [
   css('var', '--jumi-filter-sepia'),
   css('var', '--jumi-filter-opacity'),
   css('var', '--jumi-filter-drop-shadow'),
-].join(' ')
+], ' ')

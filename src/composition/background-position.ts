@@ -1,16 +1,17 @@
 import { css } from '@/helpers/css'
+import { join } from '@/helpers/join'
 
-export const backgroundPosition = [
+export const backgroundPosition = join([
   css('var', '--jumi-background-position-x'),
   css('var', '--jumi-background-position-y'),
-].join(' ')
+], ' ')
 
-export const backgroundPositionX = [
+export const backgroundPositionX = join([
   css('var', '--jumi-background-position-x-edge'),
   css('var', '--jumi-background-position-x-offset'),
-].join(' ')
+], ' ')
 
-export const backgroundPositionY = [
+export const backgroundPositionY = join([
   css('var', '--jumi-background-position-y-edge'),
   css('var', '--jumi-background-position-y-offset'),
-].join(' ')
+], ' ')

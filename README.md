@@ -85,7 +85,7 @@ module.exports = {
 </div>
 
 <!-- Natural language variants -->
-<div class="if-child-is-h1/then:animate-accent-color-amber-500">
+<div class="if-child-is-h1:animate-accent-color-amber-500">
   <h1>This heading triggers color animation on parent</h1>
 </div>
 
@@ -161,18 +161,18 @@ Intuitive relationship-based styling:
 
 ```html
 <!-- Child state triggers parent animation -->
-<div class="if-child-is-h1/then:animate-accent-color-blue-500">
+<div class="if-child-is-h1:animate-accent-color-blue-500">
   <h1>This heading triggers color change above</h1>
 </div>
 
 <!-- Sibling relationships -->
-<div class="if-next-sibling-is-[button]/then:animate-width-full">
+<div class="if-next-sibling-is-button:animate-width-full">
   This grows when followed by a button
 </div>
 <button>I'm the next sibling</button>
 
 <!-- Direct child targeting -->
-<nav class="if-direct-child-is-[a]/then:animate-height-auto">
+<nav class="if-direct-child-is-[*]:animate-height-auto">
   <a href="/">Direct child link</a>
 </nav>
 ```
@@ -505,26 +505,6 @@ Complex animation sequences:
 </div>
 ```
 
-## 📖 Migration Guide
-
-### From Jumi v1 (Sass) to v2 (TailwindCSS Plugin)
-
-| Old (v1)                  | New (v2)                        | Notes                           |
-| ------------------------- | ------------------------------- | ------------------------------- |
-| `jumi-duration-2s`        | `animate-duration-2`            | Simplified naming               |
-| `jumi-translate-l-5`      | `animate-translate-left-5`      | Added `animate-` prefix         |
-| `jumi-bounce-in`          | `animate-bounce-in`             | Added `animate-` prefix         |
-| `base:jumi-translate-l-5` | `animate-translate-left-5-base` | Base classes renamed            |
-| `hover:jumi-bounce-in`    | `hover:animate-bounce-in`       | Works with TailwindCSS variants |
-
-### Key Changes
-
-1. **Prefix**: All classes now use the `animate-` prefix for consistency with TailwindCSS
-2. **Variants**: Hover and responsive variants now use TailwindCSS's variant system
-3. **Configuration**: Plugin configuration through `tailwind.config.js` instead of Sass variables
-4. **TypeScript**: Full TypeScript support with intellisense
-5. **Tree Shaking**: Only used utilities are included in the final CSS
-
 ## 🎨 Complete Class Reference
 
 ### Animation Timing & Control
@@ -588,9 +568,9 @@ Complex animation sequences:
 
 | Class Pattern | Description | Example |
 |---------------|-------------|---------|
-| `if-child-is-{selector}/then:{utility}` | Child state triggers parent | `if-child-is-h1/then:animate-color-blue-500` |
-| `if-sibling-is-{selector}/then:{utility}` | Sibling state triggers | `if-sibling-is-[button]/then:animate-width-full` |
-| `if-direct-child-is-{selector}/then:{utility}` | Direct child targeting | `if-direct-child-is-[a]/then:animate-height-auto` |
+| `if-child-is-{selector}:{utility}` | Child state triggers parent | `if-child-is-h1:animate-color-blue-500` |
+| `if-sibling-is-{selector}:{utility}` | Sibling state triggers | `if-sibling-is-button:animate-width-full` |
+| `if-direct-child-is-{selector}:{utility}` | Direct child targeting | `if-direct-child-is-a:animate-height-auto` |
 
 ## 🤝 Contributing
 
@@ -603,8 +583,6 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ## 🙏 Acknowledgments
 
 - Built on top of [TailwindCSS](https://tailwindcss.com/)
-- Inspired by [Animate.css](https://animate.style/)
-- CSS custom properties pattern from the original Jumi v1
 
 ---
 

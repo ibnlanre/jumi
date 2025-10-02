@@ -1,4 +1,4 @@
 export const fillRule = {
-  'nonzero': 'nonzero',
-  'evenodd': 'evenodd',
+  evenodd: 'evenodd',
+  nonzero: 'nonzero',
 } as const

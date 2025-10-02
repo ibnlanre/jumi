@@ -1,18 +1,19 @@
 import { css } from '@/helpers/css'
+import { join } from '@/helpers/join'
 
-export const borderImageOutset = [
+export const borderImageOutset = join([
   css('var', '--jumi-border-image-outset-top'),
   css('var', '--jumi-border-image-outset-right'),
   css('var', '--jumi-border-image-outset-bottom'),
   css('var', '--jumi-border-image-outset-left'),
-].join(' ')
+], ' ')
 
-export const borderImageOutsetX = [
+export const borderImageOutsetX = join([
   css('var', '--jumi-border-image-outset-right'),
   css('var', '--jumi-border-image-outset-left'),
-].join(' ')
+], ' ')
 
-export const borderImageOutsetY = [
+export const borderImageOutsetY = join([
   css('var', '--jumi-border-image-outset-top'),
   css('var', '--jumi-border-image-outset-bottom'),
-].join(' ')
+], ' ')

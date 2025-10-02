@@ -1,6 +1,7 @@
 import { css } from '@/helpers/css'
+import { join } from '@/helpers/join'
 
-export const backdropFilter = [
+export const backdropFilter = join([
   css('var', '--jumi-backdrop-filter-blur'),
   css('var', '--jumi-backdrop-filter-brightness'),
   css('var', '--jumi-backdrop-filter-contrast'),
@@ -11,4 +12,4 @@ export const backdropFilter = [
   css('var', '--jumi-backdrop-filter-opacity'),
   css('var', '--jumi-backdrop-filter-saturate'),
   css('var', '--jumi-backdrop-filter-sepia'),
-].join(' ')
+], ' ')

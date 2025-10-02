@@ -1,9 +1,8 @@
-import type { Collection, ComponentKey, CssInJs, MatchComponentsPropertyValue } from '@/types'
+import type { Collection, CssInJs } from '@/types'
 
 import { addProperties } from '@/properties/add'
-import { component } from '@/properties/component'
-import { getMatchProperties } from '@/properties/match'
-import { propertyVariables } from '@/variables/property'
+import { getMatchComponents } from '@/properties/component'
+import { getMatchUtilities } from '@/properties/match'
 import { animationRegister } from '@/variables/register'
 import { variants } from '@/variants'
 
@@ -17,18 +16,7 @@ import createPlugin from 'tailwindcss/plugin'
  * - They register CSS custom properties with type information
  * - They need to be available before any CSS that uses the properties
  */
-const properties: Array<CssInJs> = [animationRegister]
-
-/**
- * CSS custom properties (variables) that provide default values.
- *
- * These are placed in the @utilities layer because:
- * - When placed in @base, they get inherited by pseudo-elements (:before, :after)
- * - Inherited variables cannot be easily overridden in pseudo-elements
- * - This can lead to unforeseen problems where pseudo-elements inherit unwanted values
- * - @utilities layer provides the right specificity without forced inheritance
- */
-const variables: Array<Collection<CssInJs>> = [propertyVariables]
+const register: Array<CssInJs> = [animationRegister]
 
 /**
  * Utility classes and animation properties.
@@ -38,13 +26,13 @@ const variables: Array<Collection<CssInJs>> = [propertyVariables]
  * - They should have appropriate specificity for overriding defaults
  * - They work alongside the variables to create the complete animation system
  */
-const utilities: Array<Collection<CssInJs>> = [addProperties]
+const properties: Array<Collection<CssInJs>> = [addProperties]
 
 const jumi = createPlugin((api) => {
   const { addBase, addUtilities, matchComponents, matchUtilities, matchVariant } = api
 
-  properties.forEach(addBase)
-  utilities.concat(variables).forEach(addUtilities)
+  register.forEach(addBase)
+  // properties.forEach(addUtilities)
 
   for (const variant of variants) {
     matchVariant(variant.name, variant.generator, {
@@ -52,14 +40,15 @@ const jumi = createPlugin((api) => {
     })
   }
 
-  const matchProperties = getMatchProperties(api)
-  for (const name in matchProperties) {
-    const { property, ...options } = matchProperties[name]
+  const utilities = getMatchUtilities(api)
+  for (const name in utilities) {
+    const { property, ...options } = utilities[name]
     matchUtilities({ [name]: property }, options)
   }
 
-  for (const name in component) {
-    const { property, ...options } = component[name]
+  const components = getMatchComponents(api)
+  for (const name in components) {
+    const { property, ...options } = components[name]
     matchComponents({ [name]: property }, options)
   }
 })

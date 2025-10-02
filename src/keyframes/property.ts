@@ -1,8 +1,9 @@
 import type { Property } from 'csstype'
 
-import type { StandardPropertyKeyframesCollection } from '@/types'
+import type { AnimatableStandardPropertyType, KeyframesVariableReference, StandardPropertyKeyframesCollection } from '@/types'
 
 import { css } from '@/helpers/css'
+import { join } from '@/helpers/join'
 
 export const propertyKeyframes: StandardPropertyKeyframesCollection = {
   'accent-color': {
@@ -2964,13 +2965,16 @@ export const propertyKeyframes: StandardPropertyKeyframesCollection = {
   },
 }
 
-type KeyframesCollection = {
-  collection: Record<string, string>
-  names: string[]
-  variables: string[]
+type Keyframes = {
+  collection: PropertyCollection
+  names: PropertyNames
+  variables: Array<KeyframesVariableReference>
 }
+type PropertyCollection = Partial<Record<AnimatableStandardPropertyType, AnimatableStandardPropertyType>>
+type PropertyNames = Array<AnimatableStandardPropertyType>
 
-const keyframes: KeyframesCollection = Object.keys(propertyKeyframes).reduce(
+const propertyKeys = Object.keys(propertyKeyframes) as PropertyNames
+const keyframes = propertyKeys.reduce(
   (result, property) => {
     const variable = css('var', `--jumi-${property}-keyframes`, 'none')
     result.variables.push(variable)
@@ -2980,9 +2984,9 @@ const keyframes: KeyframesCollection = Object.keys(propertyKeyframes).reduce(
 
     return result
   },
-  { collection: {}, names: [], variables: [] } as KeyframesCollection,
+  { collection: {}, names: [], variables: [] } as Keyframes,
 )
 
 export const propertyNames = keyframes.names
 export const propertyCollection = keyframes.collection
-export const propertyVariableReferences = keyframes.variables.join(', ')
+export const propertyVariableReferences = join(keyframes.variables, ', ')

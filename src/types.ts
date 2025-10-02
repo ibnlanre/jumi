@@ -628,7 +628,9 @@ export type FontFunction
     | 'stylistic'
     | 'swash'
 
-export type GetMatchProperties = (api: Api) => Collection<MatchUtilitiesPropertyValue>
+export type GetMatchComponents = (api: Api) => Collection<MatchComponentsPropertyValue>
+
+export type GetMatchUtilities = (api: Api) => Collection<MatchUtilitiesPropertyValue>
 
 export type GradientFunction
   = | 'conic-gradient'
@@ -672,7 +674,7 @@ export interface MatchUtilitiesOptions {
 
 export type MatchUtilitiesPropertyFunction = (value: string, extra: { modifier: null | string }) => CSSRuleObject
 
-export type MatchUtilitiesPropertyKey = 'effect' | `animate-${AnimatableStandardPropertyType}` | `animate-${NonStandardPropertyType}` | AnimationPropertyType
+export type MatchUtilitiesPropertyKey = 'animate' | 'effect' | `animate-${AnimatableStandardPropertyType}` | `animate-${NonStandardPropertyType}` | AnimationPropertyType
 
 export interface MatchUtilitiesPropertyValue extends Partial<MatchUtilitiesOptions> {
   property: MatchUtilitiesPropertyFunction
@@ -725,7 +727,9 @@ export type NonStandardAnimtionPropertyType
     | 'animation-timeline-inset'
     | 'animation-timeline-inset-end'
     | 'animation-timeline-inset-start'
+    | 'animation-timeline-scroll'
     | 'animation-timeline-scroller'
+    | 'animation-timeline-view'
 
 export type NonStandardPropertyType
   = | 'aspect-ratio-height'
@@ -858,7 +862,10 @@ export type NonStandardPropertyType
     | 'offset-position-y'
     | 'offset-position-y-edge'
     | 'offset-position-y-offset'
+    | 'position-area-x'
+    | 'position-area-y'
     | 'rotate-3d'
+    | 'rotate-angle'
     | 'rotate-x'
     | 'rotate-y'
     | 'rotate-z'
@@ -869,7 +876,7 @@ export type NonStandardPropertyType
     | 'skew'
     | 'skew-x'
     | 'skew-y'
-    | 'text-shadow-blur-radius'
+    | 'text-shadow-blur'
     | 'text-shadow-color'
     | 'text-shadow-offset-x'
     | 'text-shadow-offset-y'
@@ -903,6 +910,8 @@ export type ReferenceFunction
     | 'if'
     | 'url'
     | 'var'
+
+export type Register = (attribute: string, options: { keyframes: CssInJs, variables?: CssInJs }) => void
 
 export type RotationFunction
   = | 'rotate3d'
