@@ -2989,4 +2989,4 @@ const keyframes = propertyKeys.reduce(
 
 export const propertyNames = keyframes.names
 export const propertyCollection = keyframes.collection
-export const propertyVariableReferences = join(keyframes.variables, ', ')
+export const keyframeVariables = join(keyframes.variables, ', ')

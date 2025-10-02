@@ -451,6 +451,10 @@ export type AnimationVariableCollection = Record<AnimationPropertyVariable, stri
 
 export type Api = Parameters<PluginCreator> extends [infer U] ? U : never
 
+export type BareValue = (value: BareValueParameter) => Array<CssInJs> | void
+
+export type BareValueParameter = { fraction: null | string, kind: 'named', value: string }
+
 export type Collection<Values = any, Key extends PropertyKey = string> = Record<Key, Values>
 
 export type ColorFunction
@@ -669,7 +673,7 @@ export interface MatchUtilitiesOptions {
   modifiers: Collection<string>
   supportsNegativeValues: boolean
   type: Array<DataType> | DataType
-  values: Collection
+  values: Collection<string>
 }
 
 export type MatchUtilitiesPropertyFunction = (value: string, extra: { modifier: null | string }) => CSSRuleObject
@@ -692,6 +696,12 @@ export type MatrixFunction
     | 'matrix3d'
     | 'matrix'
     | 'perspective'
+
+export type NamedUtilityValue = {
+  fraction: null | string
+  kind: 'named'
+  value: string
+}
 
 export type NonAnimatableStandardPropertyType
   = | 'anchor-name'
@@ -911,7 +921,10 @@ export type ReferenceFunction
     | 'url'
     | 'var'
 
-export type Register = (attribute: string, options: { keyframes: CssInJs, variables?: CssInJs }) => void
+export type Register = (attribute: string, options: {
+  keyframes: Collection<CssInJs>
+  variables?: CssInJs
+}) => void
 
 export type RotationFunction
   = | 'rotate3d'

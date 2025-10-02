@@ -9,7 +9,7 @@ import { propertyKeyframes, propertyNames } from '@/keyframes/property'
 
 import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette'
 
-export function getCreator({ addBase, theme }: Api) {
+export function getCreator({ addBase, addUtilities, theme }: Api) {
   /**
    * Upon loading the plugin, TailwindCSS processes all utilities and variants.
    * However, keyframes should only be added once to avoid duplication.
@@ -29,7 +29,7 @@ export function getCreator({ addBase, theme }: Api) {
     animation(attribute: AnimatableStandardPropertyType): string {
       const name = `jumi-${attribute}` as const
       const variables = animate(assemble(attribute))
-      const keyframes: CssInJs = propertyKeyframes[attribute]
+      const keyframes = propertyKeyframes[attribute] as Collection<CssInJs>
 
       if (properties.has(attribute)) properties.delete(attribute)
       else register(attribute, { keyframes, variables })
@@ -47,7 +47,7 @@ export function getCreator({ addBase, theme }: Api) {
     },
     effect(attribute: string): string {
       const name = `jumi-effect-${attribute as Effect}` as const
-      const keyframes: CssInJs = effectKeyframes[attribute as Effect]
+      const keyframes = effectKeyframes[attribute as Effect] as Collection<CssInJs>
 
       register(attribute, { keyframes })
 
@@ -72,7 +72,7 @@ export function getCreator({ addBase, theme }: Api) {
      * of the property in this set indicates that its keyframes have already
      * been added, preventing duplicate additions.
      */
-    registry: new Set<string>(),
+    registry: new Set<string>(['effect']),
 
     theme: (key: TailwindTheme, values?: Collection) => {
       return flattenColorPalette(merge(values, theme(key)))
@@ -92,8 +92,8 @@ export function getCreator({ addBase, theme }: Api) {
     if (create.registry.has(attribute)) return
     create.registry.add(attribute)
 
-    if (variables) addBase(merge(variables, keyframes))
-    else addBase(keyframes)
+    if (variables) addBase(variables)
+    addUtilities(keyframes)
   }
 
   return create

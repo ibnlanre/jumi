@@ -1,5 +1,7 @@
-import type { Collection, GetMatchUtilities, MatchProperty } from '@/types'
+import type { BareValue, BareValueParameter, Collection, GetMatchUtilities, MatchProperty } from '@/types'
 
+import { animate } from '@/helpers/animate'
+import { assemble } from '@/helpers/assemble'
 import { getCreator } from '@/helpers/create'
 import { css } from '@/helpers/css'
 import { join } from '@/helpers/join'
@@ -127,7 +129,34 @@ import { visibility } from '@/theme/visibility'
 export const getMatchUtilities: GetMatchUtilities = (api) => {
   const { animation, effect, registry, theme } = getCreator(api)
 
+  const values: any = {
+    __BARE_VALUE__: ({ value }: BareValueParameter) => {
+      console.log('hello world', value)
+
+      if (!value.startsWith('z')) return
+
+      const properties = Array.from(registry).map((value) => {
+        return css('var', `--jumi-${value}-keyframes`, 'none')
+      }).join(', ')
+
+      const animation = animate({
+        '--jumi-animation': properties,
+      })
+
+      api.addBase(animation)
+    },
+  } satisfies Collection<BareValue, '__BARE_VALUE__'>
+
   const matchProperties: Partial<MatchProperty> = {
+    'animate': {
+      property: () => {
+        return merge(assemble('animation'), {
+          animation: css('var', '--jumi-animation'),
+        })
+      },
+      type: 'any',
+      values,
+    },
     'animate-accent-color': {
       property: value => ({
         '--jumi-accent-color': value,
@@ -3363,26 +3392,9 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'effect': {
       property: value => ({
-        '--jumi-animation': effect(value),
+        '--jumi-effect-keyframes': effect(value),
       }),
       values: effectCollection,
-    },
-
-    /* eslint-disable */
-    'animate': {
-      property: () => {
-        const properties = Array.from(registry).map((property) => {
-          return css('var', `--jumi-${property}-keyframes`, 'none')
-        }).join(', ')
-
-        console.log('registry', properties)
-        return {
-          '--jumi-animation': properties,
-        }
-
-      },
-      type: 'any',
-      values: empty.string,
     },
   }
 
