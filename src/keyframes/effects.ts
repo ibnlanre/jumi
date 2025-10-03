@@ -1,5 +1,3 @@
-import type { Collection } from '@/types'
-
 export const effectKeyframes = {
   'accordion': {
     '@keyframes jumi-effect-accordion': {
@@ -3272,8 +3270,3 @@ export const effectKeyframes = {
     },
   },
 } as const
-
-export const effects: Collection<string> = {}
-for (const attribute in effectKeyframes) {
-  effects[attribute] = attribute
-}

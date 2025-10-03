@@ -5,8 +5,8 @@ import { getCreator } from '@/helpers/create'
 import { css } from '@/helpers/css'
 import { join } from '@/helpers/join'
 import { merge } from '@/helpers/merge'
-import { effects } from '@/keyframes/effects'
-import { properties } from '@/keyframes/property'
+import { effectKeyframes } from '@/keyframes/effects'
+import { propertyKeyframes } from '@/keyframes/property'
 import { alignContent } from '@/theme/align-content'
 import { alignItems } from '@/theme/align-items'
 import { alignSelf } from '@/theme/align-self'
@@ -127,6 +127,18 @@ import { visibility } from '@/theme/visibility'
 
 export const getMatchUtilities: GetMatchUtilities = (api) => {
   const { animation, effect, register, theme } = getCreator(api)
+
+  const modifiers: Collection<string> = {}
+  const effects: Collection<string> = {}
+
+  for (const attribute in propertyKeyframes) {
+    modifiers[attribute] = attribute
+  }
+
+  for (const attribute in effectKeyframes) {
+    modifiers[attribute] = attribute
+    effects[attribute] = attribute
+  }
 
   const matchProperties: Partial<MatchProperty> = {
     'animate-accent-color': {
@@ -3230,7 +3242,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       values: animationComposition,
     },
     'animation-delay': {
-      modifiers: properties,
+      modifiers,
       property: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-delay': value }
         return { [`--jumi-${modifier}-animation-delay`]: value }
@@ -3238,7 +3250,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       values: theme('transitionDelay'),
     },
     'animation-direction': {
-      modifiers: properties,
+      modifiers,
       property: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-direction': value }
         return { [`--jumi-${modifier}-animation-direction`]: value }
@@ -3246,7 +3258,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       values: animationDirection,
     },
     'animation-duration': {
-      modifiers: properties,
+      modifiers,
       property: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-duration': value }
         return { [`--jumi-${modifier}-animation-duration`]: value }
@@ -3254,7 +3266,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       values: theme('transitionDuration'),
     },
     'animation-fill-mode': {
-      modifiers: properties,
+      modifiers,
       property: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-fill-mode': value }
         return { [`--jumi-${modifier}-animation-fill-mode`]: value }
@@ -3262,7 +3274,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       values: animationFillMode,
     },
     'animation-iteration-count': {
-      modifiers: properties,
+      modifiers,
       property: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-iteration-count': value }
         return { [`--jumi-${modifier}-animation-iteration-count`]: value }
@@ -3277,7 +3289,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       values: empty.none,
     },
     'animation-play-state': {
-      modifiers: properties,
+      modifiers,
       property: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-play-state': value }
         return { [`--jumi-${modifier}-animation-play-state`]: value }
@@ -3364,7 +3376,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       values: animationTimelineScroller,
     },
     'animation-timing-function': {
-      modifiers: properties,
+      modifiers,
       property: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-timing-function': value }
         return { [`--jumi-${modifier}-animation-timing-function`]: value }

@@ -2963,8 +2963,3 @@ export const propertyKeyframes: Record<AnimatableStandardPropertyType, Collectio
     },
   },
 } satisfies StandardPropertyKeyframesCollection
-
-export const properties: Collection<string> = {}
-for (const attribute in propertyKeyframes) {
-  properties[attribute] = attribute
-}
