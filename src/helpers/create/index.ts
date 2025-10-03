@@ -1,4 +1,4 @@
-import type { AnimatableStandardPropertyType, Api, Collection, CssInJs, Effect, Register, TailwindTheme } from '@/types'
+import type { AnimatableStandardPropertyType, Api, Collection, Register, TailwindTheme } from '@/types'
 
 import { css } from '@/helpers/css'
 import { merge } from '@/helpers/merge'
@@ -8,39 +8,50 @@ import { propertyKeyframes } from '@/keyframes/property'
 import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette'
 
 export function getCreator({ addUtilities, theme }: Api) {
+  const effects = new Set<string>()
+  const properties = new Set<string>()
+
   const create = {
-    animation(attribute: AnimatableStandardPropertyType): string {
-      const name = `jumi-${attribute}` as const
-      const keyframes = propertyKeyframes[attribute]
-
-      register(create.register, { attribute, keyframes })
-      return variables(attribute, name)
-    },
     effect(attribute: string): string {
-      const name = `jumi-effect-${attribute as Effect}` as const
-      const keyframes = effectKeyframes[attribute as Effect] as Collection<CssInJs>
-
-      register(create.register, { attribute, keyframes })
-      return variables(attribute, name)
+      const keyframes = effectKeyframes[attribute]
+      register(effects, { attribute, keyframes })
+      return variables(attribute)
     },
 
     /**
-     * This set tracks properties and effects that have already had their keyframes
-     * and CSS custom properties (variables) added to the base styles.
+     * This set tracks effects that have already had their keyframes added to
+     * the base styles.
+     *
+     * When an effect is used for the first time, its keyframes are added and
+     * the effect is recorded in this set. On subsequent uses, the presence of
+     * the effect in this set indicates that its keyframes have already been
+     * added, preventing duplicate additions.
+     */
+    get effects() { return Array.from(effects).sort() },
+
+    /**
+     * This set tracks properties that have already had their keyframes and
+     * CSS custom properties (variables) added to the base styles.
      *
      * When a property is used for the first time, its keyframes are added and
      * the property is recorded in this set. On subsequent uses, the presence
      * of the property in this set indicates that its keyframes have already
      * been added, preventing duplicate additions.
      */
-    register: new Set<string>(),
+    get properties() { return Array.from(properties).sort() },
+
+    property(attribute: AnimatableStandardPropertyType): string {
+      const keyframes = propertyKeyframes[attribute]
+      register(properties, { attribute, keyframes })
+      return variables(attribute)
+    },
 
     theme: (key: TailwindTheme, values?: Collection) => {
       return flattenColorPalette(merge(values, theme(key)))
     },
   }
 
-  const variables = (attribute: string, name: string) => {
+  const variables = (attribute: string, name = `jumi-${attribute}`) => {
     return [
       css('var', `--jumi-${attribute}-animation-duration`, css('var', '--jumi-animation-duration')),
       css('var', `--jumi-${attribute}-animation-timing-function`, css('var', '--jumi-animation-timing-function')),

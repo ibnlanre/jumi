@@ -5,8 +5,8 @@ import { getCreator } from '@/helpers/create'
 import { css } from '@/helpers/css'
 import { join } from '@/helpers/join'
 import { merge } from '@/helpers/merge'
-import { effectKeyframes } from '@/keyframes/effects'
-import { propertyKeyframes } from '@/keyframes/property'
+import { cssEffects } from '@/keyframes/effects'
+import { cssProperties } from '@/keyframes/property'
 import { alignContent } from '@/theme/align-content'
 import { alignItems } from '@/theme/align-items'
 import { alignSelf } from '@/theme/align-self'
@@ -126,25 +126,21 @@ import { transformStyle } from '@/theme/transform-style'
 import { visibility } from '@/theme/visibility'
 
 export const getMatchUtilities: GetMatchUtilities = (api) => {
-  const { animation, effect, register, theme } = getCreator(api)
-
-  const modifiers: Collection<string> = {}
-  const effects: Collection<string> = {}
-
-  for (const attribute in propertyKeyframes) {
-    modifiers[attribute] = attribute
-  }
-
-  for (const attribute in effectKeyframes) {
-    modifiers[attribute] = attribute
-    effects[attribute] = attribute
-  }
+  const creator = getCreator(api)
+  const modifiers = merge(cssProperties, cssEffects)
+  const { effect, property, theme } = creator
 
   const matchProperties: Partial<MatchProperty> = {
+    'animate': {
+      property: value => ({
+        [`--jumi-${value}-animation`]: effect(value),
+      }),
+      values: cssEffects,
+    },
     'animate-accent-color': {
       property: value => ({
         '--jumi-accent-color': value,
-        '--jumi-accent-color-keyframes': animation('accent-color'),
+        '--jumi-accent-color-property': property('accent-color'),
       }),
       type: 'color',
       values: theme('accentColor'),
@@ -152,49 +148,49 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-align-content': {
       property: value => ({
         '--jumi-align-content': value,
-        '--jumi-align-content-keyframes': animation('align-content'),
+        '--jumi-align-content-property': property('align-content'),
       }),
       values: alignContent,
     },
     'animate-align-items': {
       property: value => ({
         '--jumi-align-items': value,
-        '--jumi-align-items-keyframes': animation('align-items'),
+        '--jumi-align-items-property': property('align-items'),
       }),
       values: alignItems,
     },
     'animate-align-self': {
       property: value => ({
         '--jumi-align-self': value,
-        '--jumi-align-self-keyframes': animation('align-self'),
+        '--jumi-align-self-property': property('align-self'),
       }),
       values: alignSelf,
     },
     'animate-alignment-baseline': {
       property: value => ({
         '--jumi-alignment-baseline': value,
-        '--jumi-alignment-baseline-keyframes': animation('alignment-baseline'),
+        '--jumi-alignment-baseline-property': property('alignment-baseline'),
       }),
       values: alignmentBaseline,
     },
     'animate-all': {
       property: value => ({
         '--jumi-all': value,
-        '--jumi-all-keyframes': animation('all'),
+        '--jumi-all-property': property('all'),
       }),
       values: all,
     },
     'animate-appearance': {
       property: value => ({
         '--jumi-appearance': value,
-        '--jumi-appearance-keyframes': animation('appearance'),
+        '--jumi-appearance-property': property('appearance'),
       }),
       values: appearance,
     },
     'animate-aspect-ratio': {
       property: value => ({
         '--jumi-aspect-ratio': value,
-        '--jumi-aspect-ratio-keyframes': animation('aspect-ratio'),
+        '--jumi-aspect-ratio-property': property('aspect-ratio'),
       }),
       type: 'ratio',
       values: empty.auto,
@@ -202,14 +198,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-aspect-ratio-height': {
       property: value => ({
         '--jumi-aspect-ratio-height': value,
-        '--jumi-aspect-ratio-keyframes': animation('aspect-ratio'),
+        '--jumi-aspect-ratio-property': property('aspect-ratio'),
       }),
       type: 'ratio',
       values: empty.auto,
     },
     'animate-aspect-ratio-width': {
       property: value => ({
-        '--jumi-aspect-ratio-keyframes': animation('aspect-ratio'),
+        '--jumi-aspect-ratio-property': property('aspect-ratio'),
         '--jumi-aspect-ratio-width': value,
       }),
       type: 'ratio',
@@ -218,14 +214,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-backdrop-filter': {
       property: value => ({
         '--jumi-backdrop-filter': value,
-        '--jumi-backdrop-filter-keyframes': animation('backdrop-filter'),
+        '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       values: empty.none,
     },
     'animate-backdrop-filter-blur': {
       property: value => ({
         '--jumi-backdrop-filter-blur': css('blur', value),
-        '--jumi-backdrop-filter-keyframes': animation('backdrop-filter'),
+        '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: 'length',
       values: theme('backdropBlur'),
@@ -233,7 +229,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-backdrop-filter-brightness': {
       property: value => ({
         '--jumi-backdrop-filter-brightness': css('brightness', value),
-        '--jumi-backdrop-filter-keyframes': animation('backdrop-filter'),
+        '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: ['number', 'percentage'],
       values: theme('backdropBrightness'),
@@ -241,7 +237,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-backdrop-filter-contrast': {
       property: value => ({
         '--jumi-backdrop-filter-contrast': css('contrast', value),
-        '--jumi-backdrop-filter-keyframes': animation('backdrop-filter'),
+        '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: ['number', 'percentage'],
       values: theme('backdropContrast'),
@@ -249,7 +245,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-backdrop-filter-drop-shadow': {
       property: value => ({
         '--jumi-backdrop-filter-drop-shadow': css('drop-shadow', value),
-        '--jumi-backdrop-filter-keyframes': animation('backdrop-filter'),
+        '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: ['length', 'shadow', 'any'],
       values: theme('dropShadow'),
@@ -257,7 +253,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-backdrop-filter-drop-shadow-blur': {
       property: value => ({
         '--jumi-backdrop-filter-drop-shadow-blur': value,
-        '--jumi-backdrop-filter-keyframes': animation('backdrop-filter'),
+        '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
@@ -265,7 +261,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-backdrop-filter-drop-shadow-color': {
       property: value => ({
         '--jumi-backdrop-filter-drop-shadow-color': value,
-        '--jumi-backdrop-filter-keyframes': animation('backdrop-filter'),
+        '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: 'color',
       values: theme('boxShadowColor'),
@@ -273,7 +269,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-backdrop-filter-drop-shadow-offset-x': {
       property: value => ({
         '--jumi-backdrop-filter-drop-shadow-offset-x': value,
-        '--jumi-backdrop-filter-keyframes': animation('backdrop-filter'),
+        '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
@@ -281,7 +277,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-backdrop-filter-drop-shadow-offset-y': {
       property: value => ({
         '--jumi-backdrop-filter-drop-shadow-offset-y': value,
-        '--jumi-backdrop-filter-keyframes': animation('backdrop-filter'),
+        '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
@@ -289,7 +285,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-backdrop-filter-grayscale': {
       property: value => ({
         '--jumi-backdrop-filter-grayscale': css('grayscale', value),
-        '--jumi-backdrop-filter-keyframes': animation('backdrop-filter'),
+        '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: ['number', 'percentage'],
       values: theme('backdropGrayscale'),
@@ -297,7 +293,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-backdrop-filter-hue-rotate': {
       property: value => ({
         '--jumi-backdrop-filter-hue-rotate': css('hue-rotate', value),
-        '--jumi-backdrop-filter-keyframes': animation('backdrop-filter'),
+        '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: 'angle',
       values: theme('backdropHueRotate'),
@@ -305,22 +301,22 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-backdrop-filter-invert': {
       property: value => ({
         '--jumi-backdrop-filter-invert': css('invert', value),
-        '--jumi-backdrop-filter-keyframes': animation('backdrop-filter'),
+        '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: ['number', 'percentage'],
       values: theme('backdropInvert'),
     },
     'animate-backdrop-filter-opacity': {
       property: value => ({
-        '--jumi-backdrop-filter-keyframes': animation('backdrop-filter'),
         '--jumi-backdrop-filter-opacity': css('opacity', value),
+        '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: ['number', 'percentage'],
       values: theme('backdropOpacity'),
     },
     'animate-backdrop-filter-saturate': {
       property: value => ({
-        '--jumi-backdrop-filter-keyframes': animation('backdrop-filter'),
+        '--jumi-backdrop-filter-property': property('backdrop-filter'),
         '--jumi-backdrop-filter-saturate': css('saturate', value),
       }),
       type: ['number', 'percentage'],
@@ -328,7 +324,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-backdrop-filter-sepia': {
       property: value => ({
-        '--jumi-backdrop-filter-keyframes': animation('backdrop-filter'),
+        '--jumi-backdrop-filter-property': property('backdrop-filter'),
         '--jumi-backdrop-filter-sepia': css('sepia', value),
       }),
       type: ['number', 'percentage'],
@@ -336,7 +332,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-backdrop-filter-url': {
       property: value => ({
-        '--jumi-backdrop-filter-keyframes': animation('backdrop-filter'),
+        '--jumi-backdrop-filter-property': property('backdrop-filter'),
         '--jumi-backdrop-filter-url': css('url', value),
       }),
       type: 'url',
@@ -345,14 +341,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-backface-visibility': {
       property: value => ({
         '--jumi-backface-visibility': value,
-        '--jumi-backface-visibility-keyframes': animation('backface-visibility'),
+        '--jumi-backface-visibility-property': property('backface-visibility'),
       }),
       values: backfaceVisibility,
     },
     'animate-background': {
       property: value => ({
         '--jumi-background': value,
-        '--jumi-background-keyframes': animation('background'),
+        '--jumi-background-property': property('background'),
       }),
       type: ['color', 'image', 'position', 'url', 'any'],
       values: empty.none,
@@ -360,28 +356,28 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-background-attachment': {
       property: value => ({
         '--jumi-background-attachment': value,
-        '--jumi-background-attachment-keyframes': animation('background-attachment'),
+        '--jumi-background-attachment-property': property('background-attachment'),
       }),
       values: backgroundAttachment,
     },
     'animate-background-blend-mode': {
       property: value => ({
         '--jumi-background-blend-mode': value,
-        '--jumi-background-blend-mode-keyframes': animation('background-blend-mode'),
+        '--jumi-background-blend-mode-property': property('background-blend-mode'),
       }),
       values: mixBlendMode,
     },
     'animate-background-clip': {
       property: value => ({
         '--jumi-background-clip': value,
-        '--jumi-background-clip-keyframes': animation('background-clip'),
+        '--jumi-background-clip-property': property('background-clip'),
       }),
       values: backgroundClip,
     },
     'animate-background-color': {
       property: value => ({
         '--jumi-background-color': value,
-        '--jumi-background-color-keyframes': animation('background-color'),
+        '--jumi-background-color-property': property('background-color'),
       }),
       type: 'color',
       values: theme('backgroundColor'),
@@ -389,7 +385,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-background-image': {
       property: value => ({
         '--jumi-background-image': value,
-        '--jumi-background-image-keyframes': animation('background-image'),
+        '--jumi-background-image-property': property('background-image'),
       }),
       type: 'image',
       values: theme('backgroundImage'),
@@ -397,21 +393,21 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-background-origin': {
       property: value => ({
         '--jumi-background-origin': value,
-        '--jumi-background-origin-keyframes': animation('background-origin'),
+        '--jumi-background-origin-property': property('background-origin'),
       }),
       values: backgroundOrigin,
     },
     'animate-background-position': {
       property: value => ({
         '--jumi-background-position': value,
-        '--jumi-background-position-keyframes': animation('background-position'),
+        '--jumi-background-position-property': property('background-position'),
       }),
       type: ['position', 'percentage', 'length', 'any'],
       values: theme('backgroundPosition'),
     },
     'animate-background-position-x': {
       property: value => ({
-        '--jumi-background-position-keyframes': animation('background-position'),
+        '--jumi-background-position-property': property('background-position'),
         '--jumi-background-position-x': value,
       }),
       type: ['position', 'percentage', 'length', 'any'],
@@ -419,7 +415,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-background-position-x-edge': {
       property: value => ({
-        '--jumi-background-position-keyframes': animation('background-position'),
+        '--jumi-background-position-property': property('background-position'),
         '--jumi-background-position-x-edge': value,
       }),
       type: 'position',
@@ -427,7 +423,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-background-position-x-offset': {
       property: value => ({
-        '--jumi-background-position-keyframes': animation('background-position'),
+        '--jumi-background-position-property': property('background-position'),
         '--jumi-background-position-x-offset': value,
       }),
       type: ['percentage', 'length'],
@@ -435,7 +431,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-background-position-y': {
       property: value => ({
-        '--jumi-background-position-keyframes': animation('background-position'),
+        '--jumi-background-position-property': property('background-position'),
         '--jumi-background-position-y': value,
       }),
       type: ['position', 'percentage', 'length', 'any'],
@@ -443,7 +439,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-background-position-y-edge': {
       property: value => ({
-        '--jumi-background-position-keyframes': animation('background-position'),
+        '--jumi-background-position-property': property('background-position'),
         '--jumi-background-position-y-edge': value,
       }),
       type: 'position',
@@ -451,7 +447,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-background-position-y-offset': {
       property: value => ({
-        '--jumi-background-position-keyframes': animation('background-position'),
+        '--jumi-background-position-property': property('background-position'),
         '--jumi-background-position-y-offset': value,
       }),
       type: ['percentage', 'length'],
@@ -460,20 +456,20 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-background-repeat': {
       property: value => ({
         '--jumi-background-repeat': value,
-        '--jumi-background-repeat-keyframes': animation('background-repeat'),
+        '--jumi-background-repeat-property': property('background-repeat'),
       }),
       values: backgroundRepeat,
     },
     'animate-background-repeat-x': {
       property: value => ({
-        '--jumi-background-repeat-keyframes': animation('background-repeat'),
+        '--jumi-background-repeat-property': property('background-repeat'),
         '--jumi-background-repeat-x': value,
       }),
       values: backgroundRepeatAxis,
     },
     'animate-background-repeat-y': {
       property: value => ({
-        '--jumi-background-repeat-keyframes': animation('background-repeat'),
+        '--jumi-background-repeat-property': property('background-repeat'),
         '--jumi-background-repeat-y': value,
       }),
       values: backgroundRepeatAxis,
@@ -481,21 +477,21 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-background-size': {
       property: value => ({
         '--jumi-background-size': value,
-        '--jumi-background-size-keyframes': animation('background-size'),
+        '--jumi-background-size-property': property('background-size'),
       }),
       values: theme('backgroundSize'),
     },
     'animate-background-size-height': {
       property: value => ({
         '--jumi-background-size-height': value,
-        '--jumi-background-size-keyframes': animation('background-size'),
+        '--jumi-background-size-property': property('background-size'),
       }),
       type: ['length', 'percentage'],
       values: theme('backgroundSize'),
     },
     'animate-background-size-width': {
       property: value => ({
-        '--jumi-background-size-keyframes': animation('background-size'),
+        '--jumi-background-size-property': property('background-size'),
         '--jumi-background-size-width': value,
       }),
       type: ['length', 'percentage'],
@@ -504,7 +500,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-block-size': {
       property: value => ({
         '--jumi-block-size': value,
-        '--jumi-block-size-keyframes': animation('block-size'),
+        '--jumi-block-size-property': property('block-size'),
       }),
       type: ['length', 'percentage', 'any'],
       values: empty.auto,
@@ -512,7 +508,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-border': {
       property: value => ({
         '--jumi-border': value,
-        '--jumi-border-keyframes': animation('border'),
+        '--jumi-border-property': property('border'),
       }),
       type: ['line-width', 'length'],
       values: empty.none,
@@ -520,7 +516,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-border-block': {
       property: value => ({
         '--jumi-border-block': value,
-        '--jumi-border-block-keyframes': animation('border-block'),
+        '--jumi-border-block-property': property('border-block'),
       }),
       values: theme('borderWidth'),
     },
@@ -535,21 +531,21 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       property: value => ({
         '--jumi-border-end-end-radius': value,
         '--jumi-border-end-start-radius': value,
-        '--jumi-border-radius-keyframes': animation('border-radius'),
+        '--jumi-border-radius-property': property('border-radius'),
       }),
       values: theme('borderRadius'),
     },
     'animate-border-block-end-width': {
       property: value => ({
         '--jumi-border-block-end-width': value,
-        '--jumi-border-block-end-width-keyframes': animation('border-block-end-width'),
+        '--jumi-border-block-end-width-property': property('border-block-end-width'),
       }),
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-border-block-start-radius': {
       property: value => ({
-        '--jumi-border-radius-keyframes': animation('border-radius'),
+        '--jumi-border-radius-property': property('border-radius'),
         '--jumi-border-start-end-radius': value,
         '--jumi-border-start-start-radius': value,
       }),
@@ -558,7 +554,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-border-block-start-width': {
       property: value => ({
         '--jumi-border-block-start-width': value,
-        '--jumi-border-block-start-width-keyframes': animation('border-block-start-width'),
+        '--jumi-border-block-start-width-property': property('border-block-start-width'),
       }),
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
@@ -567,7 +563,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       property: value => ({
         '--jumi-border-block-end-width': value,
         '--jumi-border-block-start-width': value,
-        '--jumi-border-block-width-keyframes': animation('border-block-width'),
+        '--jumi-border-block-width-property': property('border-block-width'),
       }),
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
@@ -575,7 +571,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-border-bottom-left-radius': {
       property: value => ({
         '--jumi-border-bottom-left-radius': value,
-        '--jumi-border-bottom-left-radius-keyframes': animation('border-bottom-left-radius'),
+        '--jumi-border-bottom-left-radius-property': property('border-bottom-left-radius'),
       }),
       values: theme('borderRadius'),
     },
@@ -583,21 +579,21 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       property: value => ({
         '--jumi-border-bottom-left-radius': value,
         '--jumi-border-bottom-right-radius': value,
-        '--jumi-border-radius-keyframes': animation('border-radius'),
+        '--jumi-border-radius-property': property('border-radius'),
       }),
       values: theme('borderRadius'),
     },
     'animate-border-bottom-right-radius': {
       property: value => ({
         '--jumi-border-bottom-right-radius': value,
-        '--jumi-border-bottom-right-radius-keyframes': animation('border-bottom-right-radius'),
+        '--jumi-border-bottom-right-radius-property': property('border-bottom-right-radius'),
       }),
       values: theme('borderRadius'),
     },
     'animate-border-bottom-width': {
       property: value => ({
         '--jumi-border-bottom-width': value,
-        '--jumi-border-bottom-width-keyframes': animation('border-bottom-width'),
+        '--jumi-border-bottom-width-property': property('border-bottom-width'),
       }),
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
@@ -605,14 +601,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-border-collapse': {
       property: value => ({
         '--jumi-border-collapse': value,
-        '--jumi-border-collapse-keyframes': animation('border-collapse'),
+        '--jumi-border-collapse-property': property('border-collapse'),
       }),
       values: borderCollapse,
     },
     'animate-border-color': {
       property: value => ({
         '--jumi-border-color': value,
-        '--jumi-border-color-keyframes': animation('border-color'),
+        '--jumi-border-color-property': property('border-color'),
       }),
       type: 'color',
       values: theme('borderColor'),
@@ -620,21 +616,21 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-border-end-end-radius': {
       property: value => ({
         '--jumi-border-end-end-radius': value,
-        '--jumi-border-end-end-radius-keyframes': animation('border-end-end-radius'),
+        '--jumi-border-end-end-radius-property': property('border-end-end-radius'),
       }),
       values: theme('borderRadius'),
     },
     'animate-border-end-start-radius': {
       property: value => ({
         '--jumi-border-end-start-radius': value,
-        '--jumi-border-end-start-radius-keyframes': animation('border-end-start-radius'),
+        '--jumi-border-end-start-radius-property': property('border-end-start-radius'),
       }),
       values: theme('borderRadius'),
     },
     'animate-border-image': {
       property: value => ({
         '--jumi-border-image': value,
-        '--jumi-border-image-keyframes': animation('border-image'),
+        '--jumi-border-image-property': property('border-image'),
       }),
       type: 'image',
       values: empty.none,
@@ -642,7 +638,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-border-image-outset': {
       property: value => ({
         '--jumi-border-image-outset': value,
-        '--jumi-border-image-outset-keyframes': animation('border-image-outset'),
+        '--jumi-border-image-outset-property': property('border-image-outset'),
       }),
       type: ['number', 'length'],
       values: empty.number,
@@ -650,22 +646,22 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-border-image-outset-bottom': {
       property: value => ({
         '--jumi-border-image-outset-bottom': value,
-        '--jumi-border-image-outset-keyframes': animation('border-image-outset'),
+        '--jumi-border-image-outset-property': property('border-image-outset'),
       }),
       type: ['number', 'length'],
       values: empty.number,
     },
     'animate-border-image-outset-left': {
       property: value => ({
-        '--jumi-border-image-outset-keyframes': animation('border-image-outset'),
         '--jumi-border-image-outset-left': value,
+        '--jumi-border-image-outset-property': property('border-image-outset'),
       }),
       type: ['number', 'length'],
       values: empty.number,
     },
     'animate-border-image-outset-right': {
       property: value => ({
-        '--jumi-border-image-outset-keyframes': animation('border-image-outset'),
+        '--jumi-border-image-outset-property': property('border-image-outset'),
         '--jumi-border-image-outset-right': value,
       }),
       type: ['number', 'length'],
@@ -673,7 +669,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-border-image-outset-top': {
       property: value => ({
-        '--jumi-border-image-outset-keyframes': animation('border-image-outset'),
+        '--jumi-border-image-outset-property': property('border-image-outset'),
         '--jumi-border-image-outset-top': value,
       }),
       type: ['number', 'length'],
@@ -681,8 +677,8 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-border-image-outset-x': {
       property: value => ({
-        '--jumi-border-image-outset-keyframes': animation('border-image-outset'),
         '--jumi-border-image-outset-left': value,
+        '--jumi-border-image-outset-property': property('border-image-outset'),
         '--jumi-border-image-outset-right': value,
       }),
       type: ['number', 'length'],
@@ -691,7 +687,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-border-image-outset-y': {
       property: value => ({
         '--jumi-border-image-outset-bottom': value,
-        '--jumi-border-image-outset-keyframes': animation('border-image-outset'),
+        '--jumi-border-image-outset-property': property('border-image-outset'),
         '--jumi-border-image-outset-top': value,
       }),
       type: ['number', 'length'],
@@ -700,20 +696,20 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-border-image-repeat': {
       property: value => ({
         '--jumi-border-image-repeat': value,
-        '--jumi-border-image-repeat-keyframes': animation('border-image-repeat'),
+        '--jumi-border-image-repeat-property': property('border-image-repeat'),
       }),
       values: borderImageRepeat,
     },
     'animate-border-image-repeat-x': {
       property: value => ({
-        '--jumi-border-image-repeat-keyframes': animation('border-image-repeat'),
+        '--jumi-border-image-repeat-property': property('border-image-repeat'),
         '--jumi-border-image-repeat-x': value,
       }),
       values: borderImageRepeat,
     },
     'animate-border-image-repeat-y': {
       property: value => ({
-        '--jumi-border-image-repeat-keyframes': animation('border-image-repeat'),
+        '--jumi-border-image-repeat-property': property('border-image-repeat'),
         '--jumi-border-image-repeat-y': value,
       }),
       values: borderImageRepeat,
@@ -721,7 +717,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-border-inline-end-radius': {
       property: value => ({
         '--jumi-border-end-end-radius': value,
-        '--jumi-border-radius-keyframes': animation('border-radius'),
+        '--jumi-border-radius-property': property('border-radius'),
         '--jumi-border-start-end-radius': value,
       }),
       values: theme('borderRadius'),
@@ -729,7 +725,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-border-inline-end-width': {
       property: value => ({
         '--jumi-border-inline-end-width': value,
-        '--jumi-border-inline-end-width-keyframes': animation('border-inline-end-width'),
+        '--jumi-border-inline-end-width-property': property('border-inline-end-width'),
       }),
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
@@ -737,7 +733,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-border-inline-start-radius': {
       property: value => ({
         '--jumi-border-end-start-radius': value,
-        '--jumi-border-radius-keyframes': animation('border-radius'),
+        '--jumi-border-radius-property': property('border-radius'),
         '--jumi-border-start-start-radius': value,
       }),
       values: theme('borderRadius'),
@@ -745,7 +741,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-border-inline-start-width': {
       property: value => ({
         '--jumi-border-inline-start-width': value,
-        '--jumi-border-inline-start-width-keyframes': animation('border-inline-start-width'),
+        '--jumi-border-inline-start-width-property': property('border-inline-start-width'),
       }),
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
@@ -754,7 +750,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       property: value => ({
         '--jumi-border-inline-end-width': value,
         '--jumi-border-inline-start-width': value,
-        '--jumi-border-inline-width-keyframes': animation('border-inline-width'),
+        '--jumi-border-inline-width-property': property('border-inline-width'),
       }),
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
@@ -762,7 +758,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-border-left-radius': {
       property: value => ({
         '--jumi-border-bottom-left-radius': value,
-        '--jumi-border-keyframes': animation('border-radius'),
+        '--jumi-border-property': property('border-radius'),
         '--jumi-border-top-left-radius': value,
       }),
       values: theme('borderRadius'),
@@ -770,7 +766,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-border-left-width': {
       property: value => ({
         '--jumi-border-left-width': value,
-        '--jumi-border-left-width-keyframes': animation('border-left-width'),
+        '--jumi-border-left-width-property': property('border-left-width'),
       }),
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
@@ -778,14 +774,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-border-radius': {
       property: value => ({
         '--jumi-border-radius': value,
-        '--jumi-border-radius-keyframes': animation('border-radius'),
+        '--jumi-border-radius-property': property('border-radius'),
       }),
       values: theme('borderRadius'),
     },
     'animate-border-right-radius': {
       property: value => ({
         '--jumi-border-bottom-right-radius': value,
-        '--jumi-border-radius-keyframes': animation('border-radius'),
+        '--jumi-border-radius-property': property('border-radius'),
         '--jumi-border-top-right-radius': value,
       }),
       values: theme('borderRadius'),
@@ -793,7 +789,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-border-right-width': {
       property: value => ({
         '--jumi-border-right-width': value,
-        '--jumi-border-right-width-keyframes': animation('border-right-width'),
+        '--jumi-border-right-width-property': property('border-right-width'),
       }),
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
@@ -801,27 +797,27 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-border-start-end-radius': {
       property: value => ({
         '--jumi-border-start-end-radius': value,
-        '--jumi-border-start-end-radius-keyframes': animation('border-start-end-radius'),
+        '--jumi-border-start-end-radius-property': property('border-start-end-radius'),
       }),
       values: theme('borderRadius'),
     },
     'animate-border-start-start-radius': {
       property: value => ({
         '--jumi-border-start-start-radius': value,
-        '--jumi-border-start-start-radius-keyframes': animation('border-start-start-radius'),
+        '--jumi-border-start-start-radius-property': property('border-start-start-radius'),
       }),
       values: theme('borderRadius'),
     },
     'animate-border-top-left-radius': {
       property: value => ({
         '--jumi-border-top-left-radius': value,
-        '--jumi-border-top-left-radius-keyframes': animation('border-top-left-radius'),
+        '--jumi-border-top-left-radius-property': property('border-top-left-radius'),
       }),
       values: theme('borderRadius'),
     },
     'animate-border-top-radius': {
       property: value => ({
-        '--jumi-border-radius-keyframes': animation('border-radius'),
+        '--jumi-border-radius-property': property('border-radius'),
         '--jumi-border-top-left-radius': value,
         '--jumi-border-top-right-radius': value,
       }),
@@ -830,14 +826,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-border-top-right-radius': {
       property: value => ({
         '--jumi-border-top-right-radius': value,
-        '--jumi-border-top-right-radius-keyframes': animation('border-top-right-radius'),
+        '--jumi-border-top-right-radius-property': property('border-top-right-radius'),
       }),
       values: theme('borderRadius'),
     },
     'animate-border-top-width': {
       property: value => ({
         '--jumi-border-top-width': value,
-        '--jumi-border-top-width-keyframes': animation('border-top-width'),
+        '--jumi-border-top-width-property': property('border-top-width'),
       }),
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
@@ -845,7 +841,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-border-width': {
       property: value => ({
         '--jumi-border-width': value,
-        '--jumi-border-width-keyframes': animation('border-width'),
+        '--jumi-border-width-property': property('border-width'),
       }),
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
@@ -853,7 +849,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-bottom': {
       property: value => ({
         '--jumi-bottom': value,
-        '--jumi-bottom-keyframes': animation('bottom'),
+        '--jumi-bottom-property': property('bottom'),
       }),
       supportsNegativeValues: true,
       type: ['number', 'length', 'percentage'],
@@ -862,14 +858,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-box-decoration-break': {
       property: value => ({
         '--jumi-box-decoration-break': value,
-        '--jumi-box-decoration-break-keyframes': animation('box-decoration-break'),
+        '--jumi-box-decoration-break-property': property('box-decoration-break'),
       }),
       values: boxDecorationBreak,
     },
     'animate-box-shadow': {
       property: value => ({
         '--jumi-box-shadow': value,
-        '--jumi-box-shadow-keyframes': animation('box-shadow'),
+        '--jumi-box-shadow-property': property('box-shadow'),
       }),
       type: ['length', 'shadow', 'any'],
       values: theme('boxShadow'),
@@ -877,7 +873,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-box-shadow-blur': {
       property: value => ({
         '--jumi-box-shadow-blur': value,
-        '--jumi-box-shadow-keyframes': animation('box-shadow'),
+        '--jumi-box-shadow-property': property('box-shadow'),
       }),
       type: ['length', 'percentage'],
       values: theme('blur'),
@@ -885,30 +881,30 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-box-shadow-color': {
       property: value => ({
         '--jumi-box-shadow-color': value,
-        '--jumi-box-shadow-keyframes': animation('box-shadow'),
+        '--jumi-box-shadow-property': property('box-shadow'),
       }),
       type: 'color',
       values: theme('boxShadowColor'),
     },
     'animate-box-shadow-offset-x': {
       property: value => ({
-        '--jumi-box-shadow-keyframes': animation('box-shadow'),
         '--jumi-box-shadow-offset-x': value,
+        '--jumi-box-shadow-property': property('box-shadow'),
       }),
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
     },
     'animate-box-shadow-offset-y': {
       property: value => ({
-        '--jumi-box-shadow-keyframes': animation('box-shadow'),
         '--jumi-box-shadow-offset-y': value,
+        '--jumi-box-shadow-property': property('box-shadow'),
       }),
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
     },
     'animate-box-shadow-spread': {
       property: value => ({
-        '--jumi-box-shadow-keyframes': animation('box-shadow'),
+        '--jumi-box-shadow-property': property('box-shadow'),
         '--jumi-box-shadow-spread': value,
       }),
       type: ['length', 'percentage'],
@@ -917,42 +913,42 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-box-sizing': {
       property: value => ({
         '--jumi-box-sizing': value,
-        '--jumi-box-sizing-keyframes': animation('box-sizing'),
+        '--jumi-box-sizing-property': property('box-sizing'),
       }),
       values: boxSizing,
     },
     'animate-break-after': {
       property: value => ({
         '--jumi-break-after': value,
-        '--jumi-break-after-keyframes': animation('break-after'),
+        '--jumi-break-after-property': property('break-after'),
       }),
       values: breakAfter,
     },
     'animate-break-before': {
       property: value => ({
         '--jumi-break-before': value,
-        '--jumi-break-before-keyframes': animation('break-before'),
+        '--jumi-break-before-property': property('break-before'),
       }),
       values: breakBefore,
     },
     'animate-break-inside': {
       property: value => ({
         '--jumi-break-inside': value,
-        '--jumi-break-inside-keyframes': animation('break-inside'),
+        '--jumi-break-inside-property': property('break-inside'),
       }),
       values: breakInside,
     },
     'animate-caption-side': {
       property: value => ({
         '--jumi-caption-side': value,
-        '--jumi-caption-side-keyframes': animation('caption-side'),
+        '--jumi-caption-side-property': property('caption-side'),
       }),
       values: captionSide,
     },
     'animate-caret-color': {
       property: value => ({
         '--jumi-caret-color': value,
-        '--jumi-caret-color-keyframes': animation('caret-color'),
+        '--jumi-caret-color-property': property('caret-color'),
       }),
       type: 'color',
       values: theme('caretColor'),
@@ -960,28 +956,28 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-clear': {
       property: value => ({
         '--jumi-clear': value,
-        '--jumi-clear-keyframes': animation('clear'),
+        '--jumi-clear-property': property('clear'),
       }),
       values: clear,
     },
     'animate-clip-path': {
       property: value => ({
         '--jumi-clip-path': value,
-        '--jumi-clip-path-keyframes': animation('clip-path'),
+        '--jumi-clip-path-property': property('clip-path'),
       }),
       values: clipPath,
     },
     'animate-clip-rule': {
       property: value => ({
         '--jumi-clip-rule': value,
-        '--jumi-clip-rule-keyframes': animation('clip-rule'),
+        '--jumi-clip-rule-property': property('clip-rule'),
       }),
       values: clipRule,
     },
     'animate-color': {
       property: value => ({
         '--jumi-color': value,
-        '--jumi-color-keyframes': animation('color'),
+        '--jumi-color-property': property('color'),
       }),
       type: 'color',
       values: theme('colors'),
@@ -989,28 +985,28 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-color-interpolation': {
       property: value => ({
         '--jumi-color-interpolation': value,
-        '--jumi-color-interpolation-keyframes': animation('color-interpolation'),
+        '--jumi-color-interpolation-property': property('color-interpolation'),
       }),
       values: colorInterpolation,
     },
     'animate-color-interpolation-filters': {
       property: value => ({
         '--jumi-color-interpolation-filters': value,
-        '--jumi-color-interpolation-filters-keyframes': animation('color-interpolation-filters'),
+        '--jumi-color-interpolation-filters-property': property('color-interpolation-filters'),
       }),
       values: colorInterpolation,
     },
     'animate-color-scheme': {
       property: value => ({
         '--jumi-color-scheme': value,
-        '--jumi-color-scheme-keyframes': animation('color-scheme'),
+        '--jumi-color-scheme-property': property('color-scheme'),
       }),
       values: colorScheme,
     },
     'animate-column-count': {
       property: value => ({
         '--jumi-column-count': value,
-        '--jumi-column-count-keyframes': animation('column-count'),
+        '--jumi-column-count-property': property('column-count'),
       }),
       type: 'integer',
       values: empty.auto,
@@ -1018,14 +1014,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-column-fill': {
       property: value => ({
         '--jumi-column-fill': value,
-        '--jumi-column-fill-keyframes': animation('column-fill'),
+        '--jumi-column-fill-property': property('column-fill'),
       }),
       values: columnFill,
     },
     'animate-column-gap': {
       property: value => ({
         '--jumi-column-gap': value,
-        '--jumi-gap-keyframes': animation('gap'),
+        '--jumi-gap-property': property('gap'),
       }),
       type: ['length', 'percentage'],
       values: empty.number,
@@ -1033,7 +1029,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-column-rule': {
       property: value => ({
         '--jumi-column-rule': value,
-        '--jumi-column-rule-keyframes': animation('column-rule'),
+        '--jumi-column-rule-property': property('column-rule'),
       }),
       type: ['line-width', 'length'],
       values: empty.none,
@@ -1041,7 +1037,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-column-rule-color': {
       property: value => ({
         '--jumi-column-rule-color': value,
-        '--jumi-column-rule-color-keyframes': animation('column-rule-color'),
+        '--jumi-column-rule-color-property': property('column-rule-color'),
       }),
       type: 'color',
       values: theme('borderColor'),
@@ -1049,14 +1045,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-column-rule-style': {
       property: value => ({
         '--jumi-column-rule-style': value,
-        '--jumi-column-rule-style-keyframes': animation('column-rule-style'),
+        '--jumi-column-rule-style-property': property('column-rule-style'),
       }),
       values: columnRuleStyle,
     },
     'animate-column-rule-width': {
       property: value => ({
         '--jumi-column-rule-width': value,
-        '--jumi-column-rule-width-keyframes': animation('column-rule-width'),
+        '--jumi-column-rule-width-property': property('column-rule-width'),
       }),
       type: ['line-width', 'length'],
       values: columnRuleWidth,
@@ -1064,7 +1060,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-column-span': {
       property: value => ({
         '--jumi-column-span': value,
-        '--jumi-column-span-keyframes': animation('column-span'),
+        '--jumi-column-span-property': property('column-span'),
       }),
       type: 'integer',
       values: columnSpan,
@@ -1072,7 +1068,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-column-width': {
       property: value => ({
         '--jumi-column-width': value,
-        '--jumi-column-width-keyframes': animation('column-width'),
+        '--jumi-column-width-property': property('column-width'),
       }),
       type: ['length', 'percentage'],
       values: columnWidth,
@@ -1080,7 +1076,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-columns': {
       property: value => ({
         '--jumi-columns': value,
-        '--jumi-columns-keyframes': animation('columns'),
+        '--jumi-columns-property': property('columns'),
       }),
       type: ['line-width', 'length', 'integer'],
       values: empty.auto,
@@ -1088,14 +1084,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-contain': {
       property: value => ({
         '--jumi-contain': value,
-        '--jumi-contain-keyframes': animation('contain'),
+        '--jumi-contain-property': property('contain'),
       }),
       values: contain,
     },
     'animate-contain-intrinsic-block-size': {
       property: value => ({
         '--jumi-contain-intrinsic-block-size': value,
-        '--jumi-contain-intrinsic-block-size-keyframes': animation('contain-intrinsic-block-size'),
+        '--jumi-contain-intrinsic-block-size-property': property('contain-intrinsic-block-size'),
       }),
       type: 'length',
       values: containIntrinsic,
@@ -1103,7 +1099,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-contain-intrinsic-height': {
       property: value => ({
         '--jumi-contain-intrinsic-height': value,
-        '--jumi-contain-intrinsic-height-keyframes': animation('contain-intrinsic-height'),
+        '--jumi-contain-intrinsic-height-property': property('contain-intrinsic-height'),
       }),
       type: 'length',
       values: containIntrinsic,
@@ -1111,7 +1107,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-contain-intrinsic-inline-size': {
       property: value => ({
         '--jumi-contain-intrinsic-inline-size': value,
-        '--jumi-contain-intrinsic-inline-size-keyframes': animation('contain-intrinsic-inline-size'),
+        '--jumi-contain-intrinsic-inline-size-property': property('contain-intrinsic-inline-size'),
       }),
       type: 'length',
       values: containIntrinsic,
@@ -1119,7 +1115,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-contain-intrinsic-size': {
       property: value => ({
         '--jumi-contain-intrinsic-size': value,
-        '--jumi-contain-intrinsic-size-keyframes': animation('contain-intrinsic-size'),
+        '--jumi-contain-intrinsic-size-property': property('contain-intrinsic-size'),
       }),
       type: 'length',
       values: empty.none,
@@ -1127,7 +1123,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-contain-intrinsic-width': {
       property: value => ({
         '--jumi-contain-intrinsic-width': value,
-        '--jumi-contain-intrinsic-width-keyframes': animation('contain-intrinsic-width'),
+        '--jumi-contain-intrinsic-width-property': property('contain-intrinsic-width'),
       }),
       type: 'length',
       values: containIntrinsic,
@@ -1135,7 +1131,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-content': {
       property: value => ({
         '--jumi-content': value,
-        '--jumi-content-keyframes': animation('content'),
+        '--jumi-content-property': property('content'),
       }),
       type: ['image', 'any'],
       values: content,
@@ -1143,14 +1139,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-content-visibility': {
       property: value => ({
         '--jumi-content-visibility': value,
-        '--jumi-content-visibility-keyframes': animation('content-visibility'),
+        '--jumi-content-visibility-property': property('content-visibility'),
       }),
       values: contentVisibility,
     },
     'animate-counter-increment': {
       property: value => ({
         '--jumi-counter-increment': value,
-        '--jumi-counter-increment-keyframes': animation('counter-increment'),
+        '--jumi-counter-increment-property': property('counter-increment'),
       }),
       type: ['integer', 'any'],
       values: empty.none,
@@ -1158,7 +1154,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-counter-reset': {
       property: value => ({
         '--jumi-counter-reset': value,
-        '--jumi-counter-reset-keyframes': animation('counter-reset'),
+        '--jumi-counter-reset-property': property('counter-reset'),
       }),
       type: ['integer', 'any'],
       values: empty.none,
@@ -1166,7 +1162,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-counter-set': {
       property: value => ({
         '--jumi-counter-set': value,
-        '--jumi-counter-set-keyframes': animation('counter-set'),
+        '--jumi-counter-set-property': property('counter-set'),
       }),
       type: ['integer', 'any'],
       values: empty.none,
@@ -1174,14 +1170,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-cursor': {
       property: value => ({
         '--jumi-cursor': value,
-        '--jumi-cursor-keyframes': animation('cursor'),
+        '--jumi-cursor-property': property('cursor'),
       }),
       values: cursor,
     },
     'animate-cx': {
       property: value => ({
         '--jumi-cx': value,
-        '--jumi-cx-keyframes': animation('cx'),
+        '--jumi-cx-property': property('cx'),
       }),
       type: ['length', 'percentage'],
       values: empty.number,
@@ -1189,7 +1185,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-cy': {
       property: value => ({
         '--jumi-cy': value,
-        '--jumi-cy-keyframes': animation('cy'),
+        '--jumi-cy-property': property('cy'),
       }),
       type: ['length', 'percentage'],
       values: empty.number,
@@ -1197,14 +1193,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-d': {
       property: value => ({
         '--jumi-d': value,
-        '--jumi-d-keyframes': animation('d'),
+        '--jumi-d-property': property('d'),
       }),
       values: empty.none,
     },
     'animate-display': {
       property: value => ({
         '--jumi-display': value,
-        '--jumi-display-keyframes': animation('display'),
+        '--jumi-display-property': property('display'),
       }),
       values: display,
     },
@@ -1212,36 +1208,36 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       modifiers: displayOutside,
       property: (value, { modifier }) => ({
         '--jumi-display-inside': modifier ? join([modifier, value]) : value,
-        '--jumi-display-keyframes': animation('display'),
+        '--jumi-display-property': property('display'),
       }),
       values: displayInside,
     },
     'animate-display-outside': {
       modifiers: displayInside,
       property: (value, { modifier }) => ({
-        '--jumi-display-keyframes': animation('display'),
         '--jumi-display-outside': modifier ? join([value, modifier]) : value,
+        '--jumi-display-property': property('display'),
       }),
       values: displayOutside,
     },
     'animate-dominant-baseline': {
       property: value => ({
         '--jumi-dominant-baseline': value,
-        '--jumi-dominant-baseline-keyframes': animation('dominant-baseline'),
+        '--jumi-dominant-baseline-property': property('dominant-baseline'),
       }),
       values: dominantBaseline,
     },
     'animate-empty-cells': {
       property: value => ({
         '--jumi-empty-cells': value,
-        '--jumi-empty-cells-keyframes': animation('empty-cells'),
+        '--jumi-empty-cells-property': property('empty-cells'),
       }),
       values: emptyCells,
     },
     'animate-fill': {
       property: value => ({
         '--jumi-fill': value,
-        '--jumi-fill-keyframes': animation('fill'),
+        '--jumi-fill-property': property('fill'),
       }),
       type: ['color', 'url', 'any'],
       values: theme('colors', fill),
@@ -1249,7 +1245,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-fill-opacity': {
       property: value => ({
         '--jumi-fill-opacity': value,
-        '--jumi-fill-opacity-keyframes': animation('fill-opacity'),
+        '--jumi-fill-opacity-property': property('fill-opacity'),
       }),
       type: ['number', 'percentage'],
       values: theme('opacity'),
@@ -1257,21 +1253,21 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-fill-rule': {
       property: value => ({
         '--jumi-fill-rule': value,
-        '--jumi-fill-rule-keyframes': animation('fill-rule'),
+        '--jumi-fill-rule-property': property('fill-rule'),
       }),
       values: fillRule,
     },
     'animate-filter': {
       property: value => ({
         '--jumi-filter': value,
-        '--jumi-filter-keyframes': animation('filter'),
+        '--jumi-filter-property': property('filter'),
       }),
       values: empty.none,
     },
     'animate-filter-blur': {
       property: value => ({
         '--jumi-filter-blur': css('blur', value),
-        '--jumi-filter-keyframes': animation('filter'),
+        '--jumi-filter-property': property('filter'),
       }),
       type: 'length',
       values: theme('blur'),
@@ -1279,7 +1275,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-filter-brightness': {
       property: value => ({
         '--jumi-filter-brightness': css('brightness', value),
-        '--jumi-filter-keyframes': animation('filter'),
+        '--jumi-filter-property': property('filter'),
       }),
       type: ['number', 'percentage'],
       values: theme('brightness'),
@@ -1287,7 +1283,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-filter-contrast': {
       property: value => ({
         '--jumi-filter-contrast': css('contrast', value),
-        '--jumi-filter-keyframes': animation('filter'),
+        '--jumi-filter-property': property('filter'),
       }),
       type: ['number', 'percentage'],
       values: theme('contrast'),
@@ -1295,7 +1291,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-filter-drop-shadow': {
       property: value => ({
         '--jumi-filter-drop-shadow': css('drop-shadow', value),
-        '--jumi-filter-keyframes': animation('filter'),
+        '--jumi-filter-property': property('filter'),
       }),
       type: ['length', 'shadow', 'any'],
       values: theme('dropShadow'),
@@ -1303,7 +1299,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-filter-drop-shadow-blur': {
       property: value => ({
         '--jumi-filter-drop-shadow-blur': value,
-        '--jumi-filter-keyframes': animation('filter'),
+        '--jumi-filter-property': property('filter'),
       }),
       type: ['length', 'percentage'],
       values: theme('blur'),
@@ -1311,7 +1307,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-filter-drop-shadow-color': {
       property: value => ({
         '--jumi-filter-drop-shadow-color': value,
-        '--jumi-filter-keyframes': animation('filter'),
+        '--jumi-filter-property': property('filter'),
       }),
       type: 'color',
       values: theme('boxShadowColor'),
@@ -1319,7 +1315,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-filter-drop-shadow-offset-x': {
       property: value => ({
         '--jumi-filter-drop-shadow-offset-x': value,
-        '--jumi-filter-keyframes': animation('filter'),
+        '--jumi-filter-property': property('filter'),
       }),
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
@@ -1327,7 +1323,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-filter-drop-shadow-offset-y': {
       property: value => ({
         '--jumi-filter-drop-shadow-offset-y': value,
-        '--jumi-filter-keyframes': animation('filter'),
+        '--jumi-filter-property': property('filter'),
       }),
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
@@ -1335,7 +1331,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-filter-grayscale': {
       property: value => ({
         '--jumi-filter-grayscale': css('grayscale', value),
-        '--jumi-filter-keyframes': animation('filter'),
+        '--jumi-filter-property': property('filter'),
       }),
       type: ['number', 'percentage'],
       values: theme('grayscale'),
@@ -1343,7 +1339,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-filter-hue-rotate': {
       property: value => ({
         '--jumi-filter-hue-rotate': 'hue-rotate(' + value + ')',
-        '--jumi-filter-keyframes': animation('filter'),
+        '--jumi-filter-property': property('filter'),
       }),
       type: 'angle',
       values: theme('hueRotate'),
@@ -1351,22 +1347,22 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-filter-invert': {
       property: value => ({
         '--jumi-filter-invert': css('invert', value),
-        '--jumi-filter-keyframes': animation('filter'),
+        '--jumi-filter-property': property('filter'),
       }),
       type: ['number', 'percentage'],
       values: theme('invert'),
     },
     'animate-filter-opacity': {
       property: value => ({
-        '--jumi-filter-keyframes': animation('filter'),
         '--jumi-filter-opacity': css('opacity', value),
+        '--jumi-filter-property': property('filter'),
       }),
       type: ['number', 'percentage'],
       values: theme('opacity'),
     },
     'animate-filter-saturate': {
       property: value => ({
-        '--jumi-filter-keyframes': animation('filter'),
+        '--jumi-filter-property': property('filter'),
         '--jumi-filter-saturate': css('saturate', value),
       }),
       type: ['number', 'percentage'],
@@ -1374,7 +1370,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-filter-sepia': {
       property: value => ({
-        '--jumi-filter-keyframes': animation('filter'),
+        '--jumi-filter-property': property('filter'),
         '--jumi-filter-sepia': css('sepia', value),
       }),
       type: ['number', 'percentage'],
@@ -1382,7 +1378,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-filter-url': {
       property: value => ({
-        '--jumi-filter-keyframes': animation('filter'),
+        '--jumi-filter-property': property('filter'),
         '--jumi-filter-url': css('url', value),
       }),
       type: 'url',
@@ -1391,63 +1387,63 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-flex': {
       property: value => ({
         '--jumi-flex': value,
-        '--jumi-flex-keyframes': animation('flex'),
+        '--jumi-flex-property': property('flex'),
       }),
       values: theme('flex'),
     },
     'animate-flex-basis': {
       property: value => ({
         '--jumi-flex-basis': value,
-        '--jumi-flex-basis-keyframes': animation('flex-basis'),
+        '--jumi-flex-basis-property': property('flex-basis'),
       }),
       values: theme('flexBasis'),
     },
     'animate-flex-direction': {
       property: value => ({
         '--jumi-flex-direction': value,
-        '--jumi-flex-direction-keyframes': animation('flex-direction'),
+        '--jumi-flex-direction-property': property('flex-direction'),
       }),
       values: flexDirection,
     },
     'animate-flex-flow': {
       property: value => ({
         '--jumi-flex-flow': value,
-        '--jumi-flex-flow-keyframes': animation('flex-flow'),
+        '--jumi-flex-flow-property': property('flex-flow'),
       }),
       values: empty.string,
     },
     'animate-flex-grow': {
       property: value => ({
         '--jumi-flex-grow': value,
-        '--jumi-flex-grow-keyframes': animation('flex-grow'),
+        '--jumi-flex-grow-property': property('flex-grow'),
       }),
       values: theme('flexGrow'),
     },
     'animate-flex-shrink': {
       property: value => ({
         '--jumi-flex-shrink': value,
-        '--jumi-flex-shrink-keyframes': animation('flex-shrink'),
+        '--jumi-flex-shrink-property': property('flex-shrink'),
       }),
       values: theme('flexShrink'),
     },
     'animate-flex-wrap': {
       property: value => ({
         '--jumi-flex-wrap': value,
-        '--jumi-flex-wrap-keyframes': animation('flex-wrap'),
+        '--jumi-flex-wrap-property': property('flex-wrap'),
       }),
       values: flexWrap,
     },
     'animate-float': {
       property: value => ({
         '--jumi-float': value,
-        '--jumi-float-keyframes': animation('float'),
+        '--jumi-float-property': property('float'),
       }),
       values: float,
     },
     'animate-flood-color': {
       property: value => ({
         '--jumi-flood-color': value,
-        '--jumi-flood-color-keyframes': animation('flood-color'),
+        '--jumi-flood-color-property': property('flood-color'),
       }),
       type: 'color',
       values: theme('colors'),
@@ -1455,7 +1451,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-flood-opacity': {
       property: value => ({
         '--jumi-flood-opacity': value,
-        '--jumi-flood-opacity-keyframes': animation('flood-opacity'),
+        '--jumi-flood-opacity-property': property('flood-opacity'),
       }),
       type: ['number', 'percentage'],
       values: theme('opacity'),
@@ -1463,7 +1459,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-font-family': {
       property: value => ({
         '--jumi-font-family': value,
-        '--jumi-font-family-keyframes': animation('font-family'),
+        '--jumi-font-family-property': property('font-family'),
       }),
       type: ['generic-name', 'family-name'],
       values: fontFamily,
@@ -1471,7 +1467,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-font-feature-settings': {
       property: value => ({
         '--jumi-font-feature-settings': value,
-        '--jumi-font-feature-settings-keyframes': animation('font-feature-settings'),
+        '--jumi-font-feature-settings-property': property('font-feature-settings'),
       }),
       type: ['integer', 'any'],
       values: fontFeatureSettings,
@@ -1479,14 +1475,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-font-kerning': {
       property: value => ({
         '--jumi-font-kerning': value,
-        '--jumi-font-kerning-keyframes': animation('font-kerning'),
+        '--jumi-font-kerning-property': property('font-kerning'),
       }),
       values: fontKerning,
     },
     'animate-font-size': {
       property: value => ({
         '--jumi-font-size': value,
-        '--jumi-font-size-keyframes': animation('font-size'),
+        '--jumi-font-size-property': property('font-size'),
       }),
       values: fontSize,
     },
@@ -1494,7 +1490,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       modifiers: fontSizeAdjustMetric,
       property: (value, { modifier }) => ({
         '--jumi-font-size-adjust': modifier ? join([value, modifier]) : value,
-        '--jumi-font-size-adjust-keyframes': animation('font-size-adjust'),
+        '--jumi-font-size-adjust-property': property('font-size-adjust'),
       }),
       type: ['number', 'any'],
       values: fontSizeAdjust,
@@ -1502,56 +1498,56 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-font-style': {
       property: (value, { modifier }) => ({
         '--jumi-font-style': modifier ? join([value, modifier]) : value,
-        '--jumi-font-style-keyframes': animation('font-style'),
+        '--jumi-font-style-property': property('font-style'),
       }),
       values: fontStyle,
     },
     'animate-font-synthesis': {
       property: value => ({
         '--jumi-font-synthesis': value,
-        '--jumi-font-synthesis-keyframes': animation('font-synthesis'),
+        '--jumi-font-synthesis-property': property('font-synthesis'),
       }),
       values: empty.none,
     },
     'animate-font-synthesis-small-caps': {
       property: value => ({
         '--jumi-font-synthesis-small-caps': value,
-        '--jumi-font-synthesis-small-caps-keyframes': animation('font-synthesis-small-caps'),
+        '--jumi-font-synthesis-small-caps-property': property('font-synthesis-small-caps'),
       }),
       values: fontSynthesisSmallCaps,
     },
     'animate-font-synthesis-style': {
       property: value => ({
         '--jumi-font-synthesis-style': value,
-        '--jumi-font-synthesis-style-keyframes': animation('font-synthesis-style'),
+        '--jumi-font-synthesis-style-property': property('font-synthesis-style'),
       }),
       values: fontSynthesisStyle,
     },
     'animate-font-synthesis-weight': {
       property: value => ({
         '--jumi-font-synthesis-weight': value,
-        '--jumi-font-synthesis-weight-keyframes': animation('font-synthesis-weight'),
+        '--jumi-font-synthesis-weight-property': property('font-synthesis-weight'),
       }),
       values: fontSynthesisWeight,
     },
     'animate-font-variant': {
       property: value => ({
         '--jumi-font-variant': value,
-        '--jumi-font-variant-keyframes': animation('font-variant'),
+        '--jumi-font-variant-property': property('font-variant'),
       }),
       values: empty.string,
     },
     'animate-font-variant-alternates': {
       property: value => ({
         '--jumi-font-variant-alternates': value,
-        '--jumi-font-variant-alternates-keyframes': animation('font-variant-alternates'),
+        '--jumi-font-variant-alternates-property': property('font-variant-alternates'),
       }),
       values: fontVariantAlternates,
     },
     'animate-font-variant-caps': {
       property: value => ({
         '--jumi-font-variant-caps': value,
-        '--jumi-font-variant-caps-keyframes': animation('font-variant-caps'),
+        '--jumi-font-variant-caps-property': property('font-variant-caps'),
       }),
       values: fontVariantCaps,
     },
@@ -1559,35 +1555,35 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       modifiers: fontVariantEastAsianWidth,
       property: (value, { modifier }) => ({
         '--jumi-font-variant-east-asian': modifier ? join([value, modifier]) : value,
-        '--jumi-font-variant-east-asian-keyframes': animation('font-variant-east-asian'),
+        '--jumi-font-variant-east-asian-property': property('font-variant-east-asian'),
       }),
       values: fontVariantEastAsian,
     },
     'animate-font-variant-ligatures': {
       property: value => ({
         '--jumi-font-variant-ligatures': value,
-        '--jumi-font-variant-ligatures-keyframes': animation('font-variant-ligatures'),
+        '--jumi-font-variant-ligatures-property': property('font-variant-ligatures'),
       }),
       values: fontVariantLigatures,
     },
     'animate-font-variant-numeric': {
       property: value => ({
         '--jumi-font-variant-numeric': value,
-        '--jumi-font-variant-numeric-keyframes': animation('font-variant-numeric'),
+        '--jumi-font-variant-numeric-property': property('font-variant-numeric'),
       }),
       values: fontVariantNumeric,
     },
     'animate-font-variant-position': {
       property: value => ({
         '--jumi-font-variant-position': value,
-        '--jumi-font-variant-position-keyframes': animation('font-variant-position'),
+        '--jumi-font-variant-position-property': property('font-variant-position'),
       }),
       values: fontVariantPosition,
     },
     'animate-font-variation-settings': {
       property: value => ({
         '--jumi-font-variation-settings': value,
-        '--jumi-font-variation-settings-keyframes': animation('font-variation-settings'),
+        '--jumi-font-variation-settings-property': property('font-variation-settings'),
       }),
       type: ['number', 'any'],
       values: empty.string,
@@ -1595,7 +1591,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-font-weight': {
       property: value => ({
         '--jumi-font-weight': value,
-        '--jumi-font-weight-keyframes': animation('font-weight'),
+        '--jumi-font-weight-property': property('font-weight'),
       }),
       type: 'number',
       values: fontWeight,
@@ -1603,28 +1599,28 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-forced-color-adjust': {
       property: value => ({
         '--jumi-forced-color-adjust': value,
-        '--jumi-forced-color-adjust-keyframes': animation('forced-color-adjust'),
+        '--jumi-forced-color-adjust-property': property('forced-color-adjust'),
       }),
       values: forcedColorAdjust,
     },
     'animate-gap': {
       property: value => ({
         '--jumi-gap': value,
-        '--jumi-gap-keyframes': animation('gap'),
+        '--jumi-gap-property': property('gap'),
       }),
       values: theme('gap'),
     },
     'animate-grid': {
       property: value => ({
         '--jumi-grid': value,
-        '--jumi-grid-keyframes': animation('grid'),
+        '--jumi-grid-property': property('grid'),
       }),
       values: empty.string,
     },
     'animate-grid-auto-columns': {
       property: value => ({
         '--jumi-grid-auto-columns': value,
-        '--jumi-grid-auto-columns-keyframes': animation('grid-auto-columns'),
+        '--jumi-grid-auto-columns-property': property('grid-auto-columns'),
       }),
       values: theme('gridAutoColumns'),
     },
@@ -1632,42 +1628,42 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       modifiers: gridAutoFlowPacking,
       property: (value, { modifier }) => ({
         '--jumi-grid-auto-flow': modifier ? join([value, modifier]) : value,
-        '--jumi-grid-auto-flow-keyframes': animation('grid-auto-flow'),
+        '--jumi-grid-auto-flow-property': property('grid-auto-flow'),
       }),
       values: gridAutoFlow,
     },
     'animate-grid-auto-rows': {
       property: value => ({
         '--jumi-grid-auto-rows': value,
-        '--jumi-grid-auto-rows-keyframes': animation('grid-auto-rows'),
+        '--jumi-grid-auto-rows-property': property('grid-auto-rows'),
       }),
       values: theme('gridAutoRows'),
     },
     'animate-grid-column': {
       property: value => ({
         '--jumi-grid-column': value,
-        '--jumi-grid-column-keyframes': animation('grid-column'),
+        '--jumi-grid-column-property': property('grid-column'),
       }),
       values: theme('gridColumn'),
     },
     'animate-grid-column-end': {
       property: (value, { modifier }) => ({
         '--jumi-grid-column-end': modifier ? join([modifier, value]) : value,
-        '--jumi-grid-column-end-keyframes': animation('grid-column-end'),
+        '--jumi-grid-column-end-property': property('grid-column-end'),
       }),
       values: theme('gridColumnEnd'),
     },
     'animate-grid-column-start': {
       property: (value, { modifier }) => ({
         '--jumi-grid-column-start': modifier ? join([modifier, value]) : value,
-        '--jumi-grid-column-start-keyframes': animation('grid-column-start'),
+        '--jumi-grid-column-start-property': property('grid-column-start'),
       }),
       values: theme('gridColumnStart'),
     },
     'animate-grid-row': {
       property: value => ({
         '--jumi-grid-row': value,
-        '--jumi-grid-row-keyframes': animation('grid-row'),
+        '--jumi-grid-row-property': property('grid-row'),
       }),
       values: theme('gridRow'),
     },
@@ -1675,7 +1671,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       modifiers: gridSize,
       property: (value, { modifier }) => ({
         '--jumi-grid-row-end': modifier ? join([modifier, value]) : value,
-        '--jumi-grid-row-end-keyframes': animation('grid-row-end'),
+        '--jumi-grid-row-end-property': property('grid-row-end'),
       }),
       values: theme('gridRowEnd'),
     },
@@ -1683,42 +1679,42 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       modifiers: gridSize,
       property: (value, { modifier }) => ({
         '--jumi-grid-row-start': modifier ? join([modifier, value]) : value,
-        '--jumi-grid-row-start-keyframes': animation('grid-row-start'),
+        '--jumi-grid-row-start-property': property('grid-row-start'),
       }),
       values: theme('gridRowStart'),
     },
     'animate-grid-template-areas': {
       property: value => ({
         '--jumi-grid-template-areas': value,
-        '--jumi-grid-template-areas-keyframes': animation('grid-template-areas'),
+        '--jumi-grid-template-areas-property': property('grid-template-areas'),
       }),
       values: empty.none,
     },
     'animate-grid-template-columns': {
       property: value => ({
         '--jumi-grid-template-columns': value,
-        '--jumi-grid-template-columns-keyframes': animation('grid-template-columns'),
+        '--jumi-grid-template-columns-property': property('grid-template-columns'),
       }),
       values: theme('gridTemplateColumns'),
     },
     'animate-grid-template-rows': {
       property: value => ({
         '--jumi-grid-template-rows': value,
-        '--jumi-grid-template-rows-keyframes': animation('grid-template-rows'),
+        '--jumi-grid-template-rows-property': property('grid-template-rows'),
       }),
       values: theme('gridTemplateRows'),
     },
     'animate-hanging-punctuation': {
       property: value => ({
         '--jumi-hanging-punctuation': value,
-        '--jumi-hanging-punctuation-keyframes': animation('hanging-punctuation'),
+        '--jumi-hanging-punctuation-property': property('hanging-punctuation'),
       }),
       values: hangingPunctuation,
     },
     'animate-height': {
       property: value => ({
         '--jumi-height': value,
-        '--jumi-height-keyframes': animation('height'),
+        '--jumi-height-property': property('height'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
@@ -1727,7 +1723,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-hyphenate-character': {
       property: value => ({
         '--jumi-hyphenate-character': value,
-        '--jumi-hyphenate-character-keyframes': animation('hyphenate-character'),
+        '--jumi-hyphenate-character-property': property('hyphenate-character'),
       }),
       values: empty.auto,
     },
@@ -1735,7 +1731,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       modifiers: hyphenateLimitCharsProperties,
       property: (value) => {
         const hyphenateLimitChars: Collection<string> = {
-          '--jumi-hyphenate-limit-chars-keyframes': animation('hyphenate-limit-chars'),
+          '--jumi-hyphenate-limit-chars-property': property('hyphenate-limit-chars'),
         }
 
         switch (value) {
@@ -1767,14 +1763,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-hyphens': {
       property: value => ({
         '--jumi-hyphens': value,
-        '--jumi-hyphens-keyframes': animation('hyphens'),
+        '--jumi-hyphens-property': property('hyphens'),
       }),
       values: hyphens,
     },
     'animate-image-orientation': {
       property: value => ({
         '--jumi-image-orientation': value,
-        '--jumi-image-orientation-keyframes': animation('image-orientation'),
+        '--jumi-image-orientation-property': property('image-orientation'),
       }),
       type: ['angle', 'any'],
       values: imageOrientation,
@@ -1782,7 +1778,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-image-rendering': {
       property: value => ({
         '--jumi-image-rendering': value,
-        '--jumi-image-rendering-keyframes': animation('image-rendering'),
+        '--jumi-image-rendering-property': property('image-rendering'),
       }),
       values: imageRendering,
     },
@@ -1790,7 +1786,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       modifiers: initialLetterPosition,
       property: (value, { modifier }) => ({
         '--jumi-initial-letter': modifier ? join([value, modifier]) : value,
-        '--jumi-initial-letter-keyframes': animation('initial-letter'),
+        '--jumi-initial-letter-property': property('initial-letter'),
       }),
       type: ['number', 'integer', 'any'],
       values: initialLetter,
@@ -1798,7 +1794,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-inline-size': {
       property: value => ({
         '--jumi-inline-size': value,
-        '--jumi-inline-size-keyframes': animation('inline-size'),
+        '--jumi-inline-size-property': property('inline-size'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
@@ -1807,7 +1803,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-inset': {
       property: value => ({
         '--jumi-inset': value,
-        '--jumi-inset-keyframes': animation('inset'),
+        '--jumi-inset-property': property('inset'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
@@ -1816,7 +1812,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-inset-block': {
       property: value => ({
         '--jumi-inset-block': value,
-        '--jumi-inset-block-keyframes': animation('inset-block'),
+        '--jumi-inset-block-property': property('inset-block'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
@@ -1825,7 +1821,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-inset-block-end': {
       property: value => ({
         '--jumi-inset-block-end': value,
-        '--jumi-inset-block-end-keyframes': animation('inset-block-end'),
+        '--jumi-inset-block-end-property': property('inset-block-end'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
@@ -1834,7 +1830,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-inset-block-start': {
       property: value => ({
         '--jumi-inset-block-start': value,
-        '--jumi-inset-block-start-keyframes': animation('inset-block-start'),
+        '--jumi-inset-block-start-property': property('inset-block-start'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
@@ -1843,7 +1839,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-inset-inline': {
       property: value => ({
         '--jumi-inset-inline': value,
-        '--jumi-inset-inline-keyframes': animation('inset-inline'),
+        '--jumi-inset-inline-property': property('inset-inline'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
@@ -1852,7 +1848,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-inset-inline-end': {
       property: value => ({
         '--jumi-inset-inline-end': value,
-        '--jumi-inset-inline-end-keyframes': animation('inset-inline-end'),
+        '--jumi-inset-inline-end-property': property('inset-inline-end'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
@@ -1861,7 +1857,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-inset-inline-start': {
       property: value => ({
         '--jumi-inset-inline-start': value,
-        '--jumi-inset-inline-start-keyframes': animation('inset-inline-start'),
+        '--jumi-inset-inline-start-property': property('inset-inline-start'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
@@ -1870,28 +1866,28 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-justify-content': {
       property: value => ({
         '--jumi-justify-content': value,
-        '--jumi-justify-content-keyframes': animation('justify-content'),
+        '--jumi-justify-content-property': property('justify-content'),
       }),
       values: justifyContent,
     },
     'animate-justify-items': {
       property: value => ({
         '--jumi-justify-items': value,
-        '--jumi-justify-items-keyframes': animation('justify-items'),
+        '--jumi-justify-items-property': property('justify-items'),
       }),
       values: justifyItems,
     },
     'animate-justify-self': {
       property: value => ({
         '--jumi-justify-self': value,
-        '--jumi-justify-self-keyframes': animation('justify-self'),
+        '--jumi-justify-self-property': property('justify-self'),
       }),
       values: justifySelf,
     },
     'animate-left': {
       property: value => ({
         '--jumi-left': value,
-        '--jumi-left-keyframes': animation('left'),
+        '--jumi-left-property': property('left'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
@@ -1900,7 +1896,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-letter-spacing': {
       property: value => ({
         '--jumi-letter-spacing': value,
-        '--jumi-letter-spacing-keyframes': animation('letter-spacing'),
+        '--jumi-letter-spacing-property': property('letter-spacing'),
       }),
       type: ['length', 'percentage'],
       values: theme('letterSpacing'),
@@ -1908,7 +1904,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-lighting-color': {
       property: value => ({
         '--jumi-lighting-color': value,
-        '--jumi-lighting-color-keyframes': animation('lighting-color'),
+        '--jumi-lighting-color-property': property('lighting-color'),
       }),
       type: 'color',
       values: theme('colors'),
@@ -1916,14 +1912,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-line-break': {
       property: value => ({
         '--jumi-line-break': value,
-        '--jumi-line-break-keyframes': animation('line-break'),
+        '--jumi-line-break-property': property('line-break'),
       }),
       values: lineBreak,
     },
     'animate-line-clamp': {
       property: value => ({
         '--jumi-line-clamp': value,
-        '--jumi-line-clamp-keyframes': animation('line-clamp'),
+        '--jumi-line-clamp-property': property('line-clamp'),
       }),
       type: ['number', 'any'],
       values: empty.none,
@@ -1931,7 +1927,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-line-height': {
       property: value => ({
         '--jumi-line-height': value,
-        '--jumi-line-height-keyframes': animation('line-height'),
+        '--jumi-line-height-property': property('line-height'),
       }),
       type: ['number', 'length', 'percentage'],
       values: theme('lineHeight'),
@@ -1939,14 +1935,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-list-style': {
       property: value => ({
         '--jumi-list-style': value,
-        '--jumi-list-style-keyframes': animation('list-style'),
+        '--jumi-list-style-property': property('list-style'),
       }),
       values: empty.none,
     },
     'animate-list-style-image': {
       property: value => ({
         '--jumi-list-style-image': value,
-        '--jumi-list-style-image-keyframes': animation('list-style-image'),
+        '--jumi-list-style-image-property': property('list-style-image'),
       }),
       type: ['url', 'image', 'any'],
       values: empty.none,
@@ -1954,21 +1950,21 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-list-style-position': {
       property: value => ({
         '--jumi-list-style-position': value,
-        '--jumi-list-style-position-keyframes': animation('list-style-position'),
+        '--jumi-list-style-position-property': property('list-style-position'),
       }),
       values: listStylePosition,
     },
     'animate-list-style-type': {
       property: value => ({
         '--jumi-list-style-type': value,
-        '--jumi-list-style-type-keyframes': animation('list-style-type'),
+        '--jumi-list-style-type-property': property('list-style-type'),
       }),
       values: listStyleType,
     },
     'animate-margin': {
       property: value => ({
         '--jumi-margin': value,
-        '--jumi-margin-keyframes': animation('margin'),
+        '--jumi-margin-property': property('margin'),
       }),
       supportsNegativeValues: true,
       values: theme('margin'),
@@ -1976,7 +1972,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-margin-block': {
       property: value => ({
         '--jumi-margin-block': value,
-        '--jumi-margin-block-keyframes': animation('margin-block'),
+        '--jumi-margin-block-property': property('margin-block'),
       }),
       supportsNegativeValues: true,
       values: theme('margin'),
@@ -1984,7 +1980,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-margin-block-end': {
       property: value => ({
         '--jumi-margin-block-end': value,
-        '--jumi-margin-block-end-keyframes': animation('margin-block-end'),
+        '--jumi-margin-block-end-property': property('margin-block-end'),
       }),
       supportsNegativeValues: true,
       values: theme('margin'),
@@ -1992,7 +1988,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-margin-block-start': {
       property: value => ({
         '--jumi-margin-block-start': value,
-        '--jumi-margin-block-start-keyframes': animation('margin-block-start'),
+        '--jumi-margin-block-start-property': property('margin-block-start'),
       }),
       supportsNegativeValues: true,
       values: theme('margin'),
@@ -2000,7 +1996,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-margin-bottom': {
       property: value => ({
         '--jumi-margin-bottom': value,
-        '--jumi-margin-bottom-keyframes': animation('margin-bottom'),
+        '--jumi-margin-bottom-property': property('margin-bottom'),
       }),
       supportsNegativeValues: true,
       values: theme('margin'),
@@ -2008,7 +2004,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-margin-inline': {
       property: value => ({
         '--jumi-margin-inline': value,
-        '--jumi-margin-inline-keyframes': animation('margin-inline'),
+        '--jumi-margin-inline-property': property('margin-inline'),
       }),
       supportsNegativeValues: true,
       values: theme('margin'),
@@ -2016,7 +2012,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-margin-inline-end': {
       property: value => ({
         '--jumi-margin-inline-end': value,
-        '--jumi-margin-inline-end-keyframes': animation('margin-inline-end'),
+        '--jumi-margin-inline-end-property': property('margin-inline-end'),
       }),
       supportsNegativeValues: true,
       values: theme('margin'),
@@ -2024,7 +2020,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-margin-inline-start': {
       property: value => ({
         '--jumi-margin-inline-start': value,
-        '--jumi-margin-inline-start-keyframes': animation('margin-inline-start'),
+        '--jumi-margin-inline-start-property': property('margin-inline-start'),
       }),
       supportsNegativeValues: true,
       values: theme('margin'),
@@ -2032,7 +2028,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-margin-left': {
       property: value => ({
         '--jumi-margin-left': value,
-        '--jumi-margin-left-keyframes': animation('margin-left'),
+        '--jumi-margin-left-property': property('margin-left'),
       }),
       supportsNegativeValues: true,
       values: theme('margin'),
@@ -2040,7 +2036,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-margin-right': {
       property: value => ({
         '--jumi-margin-right': value,
-        '--jumi-margin-right-keyframes': animation('margin-right'),
+        '--jumi-margin-right-property': property('margin-right'),
       }),
       supportsNegativeValues: true,
       values: theme('margin'),
@@ -2048,7 +2044,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-margin-top': {
       property: value => ({
         '--jumi-margin-top': value,
-        '--jumi-margin-top-keyframes': animation('margin-top'),
+        '--jumi-margin-top-property': property('margin-top'),
       }),
       supportsNegativeValues: true,
       values: theme('margin'),
@@ -2056,56 +2052,56 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-marker': {
       property: value => ({
         '--jumi-marker': value,
-        '--jumi-marker-keyframes': animation('marker'),
+        '--jumi-marker-property': property('marker'),
       }),
       values: empty.none,
     },
     'animate-marker-end': {
       property: value => ({
         '--jumi-marker-end': value,
-        '--jumi-marker-end-keyframes': animation('marker-end'),
+        '--jumi-marker-end-property': property('marker-end'),
       }),
       values: empty.none,
     },
     'animate-marker-mid': {
       property: value => ({
         '--jumi-marker-mid': value,
-        '--jumi-marker-mid-keyframes': animation('marker-mid'),
+        '--jumi-marker-mid-property': property('marker-mid'),
       }),
       values: empty.none,
     },
     'animate-marker-start': {
       property: value => ({
         '--jumi-marker-start': value,
-        '--jumi-marker-start-keyframes': animation('marker-start'),
+        '--jumi-marker-start-property': property('marker-start'),
       }),
       values: empty.none,
     },
     'animate-mask': {
       property: value => ({
         '--jumi-mask': value,
-        '--jumi-mask-keyframes': animation('mask'),
+        '--jumi-mask-property': property('mask'),
       }),
       values: empty.none,
     },
     'animate-mask-border': {
       property: value => ({
         '--jumi-mask-border': value,
-        '--jumi-mask-border-keyframes': animation('mask-border'),
+        '--jumi-mask-border-property': property('mask-border'),
       }),
       values: empty.none,
     },
     'animate-mask-border-mode': {
       property: value => ({
         '--jumi-mask-border-mode': value,
-        '--jumi-mask-border-mode-keyframes': animation('mask-border-mode'),
+        '--jumi-mask-border-mode-property': property('mask-border-mode'),
       }),
       values: maskType,
     },
     'animate-mask-border-outset': {
       property: value => ({
         '--jumi-mask-border-outset': value,
-        '--jumi-mask-border-outset-keyframes': animation('mask-border-outset'),
+        '--jumi-mask-border-outset-property': property('mask-border-outset'),
       }),
       supportsNegativeValues: true,
       type: 'length',
@@ -2114,7 +2110,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-mask-border-outset-bottom': {
       property: value => ({
         '--jumi-mask-border-outset-bottom': value,
-        '--jumi-mask-border-outset-keyframes': animation('mask-border-outset'),
+        '--jumi-mask-border-outset-property': property('mask-border-outset'),
       }),
       supportsNegativeValues: true,
       type: 'length',
@@ -2122,8 +2118,8 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-mask-border-outset-left': {
       property: value => ({
-        '--jumi-mask-border-outset-keyframes': animation('mask-border-outset'),
         '--jumi-mask-border-outset-left': value,
+        '--jumi-mask-border-outset-property': property('mask-border-outset'),
       }),
       supportsNegativeValues: true,
       type: 'length',
@@ -2131,7 +2127,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-mask-border-outset-right': {
       property: value => ({
-        '--jumi-mask-border-outset-keyframes': animation('mask-border-outset'),
+        '--jumi-mask-border-outset-property': property('mask-border-outset'),
         '--jumi-mask-border-outset-right': value,
       }),
       supportsNegativeValues: true,
@@ -2140,7 +2136,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-mask-border-outset-top': {
       property: value => ({
-        '--jumi-mask-border-outset-keyframes': animation('mask-border-outset'),
+        '--jumi-mask-border-outset-property': property('mask-border-outset'),
         '--jumi-mask-border-outset-top': value,
       }),
       supportsNegativeValues: true,
@@ -2149,8 +2145,8 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-mask-border-outset-x': {
       property: value => ({
-        '--jumi-mask-border-outset-keyframes': animation('mask-border-outset'),
         '--jumi-mask-border-outset-left': value,
+        '--jumi-mask-border-outset-property': property('mask-border-outset'),
         '--jumi-mask-border-outset-right': value,
       }),
       supportsNegativeValues: true,
@@ -2160,7 +2156,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-mask-border-outset-y': {
       property: value => ({
         '--jumi-mask-border-outset-bottom': value,
-        '--jumi-mask-border-outset-keyframes': animation('mask-border-outset'),
+        '--jumi-mask-border-outset-property': property('mask-border-outset'),
         '--jumi-mask-border-outset-top': value,
       }),
       supportsNegativeValues: true,
@@ -2170,14 +2166,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-mask-border-repeat': {
       property: value => ({
         '--jumi-mask-border-repeat': value,
-        '--jumi-mask-border-repeat-keyframes': animation('mask-border-repeat'),
+        '--jumi-mask-border-repeat-property': property('mask-border-repeat'),
       }),
       values: maskBorderRepeat,
     },
     'animate-mask-border-slice': {
       property: value => ({
         '--jumi-mask-border-slice': value,
-        '--jumi-mask-border-slice-keyframes': animation('mask-border-slice'),
+        '--jumi-mask-border-slice-property': property('mask-border-slice'),
       }),
       type: ['number', 'percentage', 'any'],
       values: theme('inset', maskBorderSlice),
@@ -2185,22 +2181,22 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-mask-border-slice-bottom': {
       property: value => ({
         '--jumi-mask-border-slice-bottom': value,
-        '--jumi-mask-border-slice-keyframes': animation('mask-border-slice'),
+        '--jumi-mask-border-slice-property': property('mask-border-slice'),
       }),
       type: ['number', 'percentage', 'any'],
       values: theme('inset', maskBorderSlice),
     },
     'animate-mask-border-slice-left': {
       property: value => ({
-        '--jumi-mask-border-slice-keyframes': animation('mask-border-slice'),
         '--jumi-mask-border-slice-left': value,
+        '--jumi-mask-border-slice-property': property('mask-border-slice'),
       }),
       type: ['number', 'percentage', 'any'],
       values: theme('inset', maskBorderSlice),
     },
     'animate-mask-border-slice-right': {
       property: value => ({
-        '--jumi-mask-border-slice-keyframes': animation('mask-border-slice'),
+        '--jumi-mask-border-slice-property': property('mask-border-slice'),
         '--jumi-mask-border-slice-right': value,
       }),
       type: ['number', 'percentage', 'any'],
@@ -2208,7 +2204,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-mask-border-slice-top': {
       property: value => ({
-        '--jumi-mask-border-slice-keyframes': animation('mask-border-slice'),
+        '--jumi-mask-border-slice-property': property('mask-border-slice'),
         '--jumi-mask-border-slice-top': value,
       }),
       type: ['number', 'percentage', 'any'],
@@ -2216,8 +2212,8 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-mask-border-slice-x': {
       property: value => ({
-        '--jumi-mask-border-slice-keyframes': animation('mask-border-slice'),
         '--jumi-mask-border-slice-left': value,
+        '--jumi-mask-border-slice-property': property('mask-border-slice'),
         '--jumi-mask-border-slice-right': value,
       }),
       type: ['number', 'percentage', 'any'],
@@ -2226,7 +2222,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-mask-border-slice-y': {
       property: value => ({
         '--jumi-mask-border-slice-bottom': value,
-        '--jumi-mask-border-slice-keyframes': animation('mask-border-slice'),
+        '--jumi-mask-border-slice-property': property('mask-border-slice'),
         '--jumi-mask-border-slice-top': value,
       }),
       type: ['number', 'percentage', 'any'],
@@ -2235,7 +2231,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-mask-border-source': {
       property: value => ({
         '--jumi-mask-border-source': value,
-        '--jumi-mask-border-source-keyframes': animation('mask-border-source'),
+        '--jumi-mask-border-source-property': property('mask-border-source'),
       }),
       type: ['url', 'image', 'any'],
       values: empty.none,
@@ -2243,7 +2239,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-mask-border-width': {
       property: value => ({
         '--jumi-mask-border-width': value,
-        '--jumi-mask-border-width-keyframes': animation('mask-border-width'),
+        '--jumi-mask-border-width-property': property('mask-border-width'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
@@ -2252,21 +2248,21 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-mask-clip': {
       property: value => ({
         '--jumi-mask-clip': value,
-        '--jumi-mask-clip-keyframes': animation('mask-clip'),
+        '--jumi-mask-clip-property': property('mask-clip'),
       }),
       values: maskClip,
     },
     'animate-mask-composite': {
       property: value => ({
         '--jumi-mask-composite': value,
-        '--jumi-mask-composite-keyframes': animation('mask-composite'),
+        '--jumi-mask-composite-property': property('mask-composite'),
       }),
       values: maskComposite,
     },
     'animate-mask-image': {
       property: value => ({
         '--jumi-mask-image': value,
-        '--jumi-mask-image-keyframes': animation('mask-image'),
+        '--jumi-mask-image-property': property('mask-image'),
       }),
       type: ['url', 'image', 'any'],
       values: empty.none,
@@ -2274,35 +2270,35 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-mask-mode': {
       property: value => ({
         '--jumi-mask-mode': value,
-        '--jumi-mask-mode-keyframes': animation('mask-mode'),
+        '--jumi-mask-mode-property': property('mask-mode'),
       }),
       values: maskMode,
     },
     'animate-mask-origin': {
       property: value => ({
         '--jumi-mask-origin': value,
-        '--jumi-mask-origin-keyframes': animation('mask-origin'),
+        '--jumi-mask-origin-property': property('mask-origin'),
       }),
       values: maskOrigin,
     },
     'animate-mask-position': {
       property: value => ({
         '--jumi-mask-position': value,
-        '--jumi-mask-position-keyframes': animation('mask-position'),
+        '--jumi-mask-position-property': property('mask-position'),
       }),
       type: ['length', 'percentage', 'position'],
     },
     'animate-mask-repeat': {
       property: value => ({
         '--jumi-mask-repeat': value,
-        '--jumi-mask-repeat-keyframes': animation('mask-repeat'),
+        '--jumi-mask-repeat-property': property('mask-repeat'),
       }),
       values: backgroundRepeat,
     },
     'animate-mask-size': {
       property: value => ({
         '--jumi-mask-size': value,
-        '--jumi-mask-size-keyframes': animation('mask-size'),
+        '--jumi-mask-size-property': property('mask-size'),
       }),
       type: ['length', 'percentage'],
       values: theme('backgroundSize'),
@@ -2310,14 +2306,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-mask-type': {
       property: value => ({
         '--jumi-mask-type': value,
-        '--jumi-mask-type-keyframes': animation('mask-type'),
+        '--jumi-mask-type-property': property('mask-type'),
       }),
       values: maskType,
     },
     'animate-math-depth': {
       property: value => ({
         '--jumi-math-depth': value,
-        '--jumi-math-depth-keyframes': animation('math-depth'),
+        '--jumi-math-depth-property': property('math-depth'),
       }),
       supportsNegativeValues: true,
       type: 'integer',
@@ -2326,7 +2322,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-math-depth-add': {
       property: value => ({
         '--jumi-math-depth': `add(${value})`,
-        '--jumi-math-depth-keyframes': animation('math-depth'),
+        '--jumi-math-depth-property': property('math-depth'),
       }),
       supportsNegativeValues: true,
       type: 'integer',
@@ -2335,14 +2331,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-math-style': {
       property: value => ({
         '--jumi-math-style': value,
-        '--jumi-math-style-keyframes': animation('math-style'),
+        '--jumi-math-style-property': property('math-style'),
       }),
       values: mathStyle,
     },
     'animate-max-block-size': {
       property: value => ({
         '--jumi-max-block-size': value,
-        '--jumi-max-block-size-keyframes': animation('max-block-size'),
+        '--jumi-max-block-size-property': property('max-block-size'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
@@ -2351,7 +2347,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-max-height': {
       property: value => ({
         '--jumi-max-height': value,
-        '--jumi-max-height-keyframes': animation('max-height'),
+        '--jumi-max-height-property': property('max-height'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
@@ -2360,7 +2356,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-max-inline-size': {
       property: value => ({
         '--jumi-max-inline-size': value,
-        '--jumi-max-inline-size-keyframes': animation('max-inline-size'),
+        '--jumi-max-inline-size-property': property('max-inline-size'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
@@ -2369,7 +2365,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-max-width': {
       property: value => ({
         '--jumi-max-width': value,
-        '--jumi-max-width-keyframes': animation('max-width'),
+        '--jumi-max-width-property': property('max-width'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
@@ -2378,7 +2374,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-min-block-size': {
       property: value => ({
         '--jumi-min-block-size': value,
-        '--jumi-min-block-size-keyframes': animation('min-block-size'),
+        '--jumi-min-block-size-property': property('min-block-size'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
@@ -2387,7 +2383,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-min-height': {
       property: value => ({
         '--jumi-min-height': value,
-        '--jumi-min-height-keyframes': animation('min-height'),
+        '--jumi-min-height-property': property('min-height'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
@@ -2396,7 +2392,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-min-inline-size': {
       property: value => ({
         '--jumi-min-inline-size': value,
-        '--jumi-min-inline-size-keyframes': animation('min-inline-size'),
+        '--jumi-min-inline-size-property': property('min-inline-size'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
@@ -2405,7 +2401,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-min-width': {
       property: value => ({
         '--jumi-min-width': value,
-        '--jumi-min-width-keyframes': animation('min-width'),
+        '--jumi-min-width-property': property('min-width'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
@@ -2414,28 +2410,28 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-mix-blend-mode': {
       property: value => ({
         '--jumi-mix-blend-mode': value,
-        '--jumi-mix-blend-mode-keyframes': animation('mix-blend-mode'),
+        '--jumi-mix-blend-mode-property': property('mix-blend-mode'),
       }),
       values: mixBlendMode,
     },
     'animate-object-fit': {
       property: value => ({
         '--jumi-object-fit': value,
-        '--jumi-object-fit-keyframes': animation('object-fit'),
+        '--jumi-object-fit-property': property('object-fit'),
       }),
       values: objectFit,
     },
     'animate-object-position': {
       property: value => ({
         '--jumi-object-position': value,
-        '--jumi-object-position-keyframes': animation('object-position'),
+        '--jumi-object-position-property': property('object-position'),
       }),
       type: ['length', 'percentage', 'position', 'any'],
       values: theme('objectPosition'),
     },
     'animate-object-position-x': {
       property: value => ({
-        '--jumi-object-position-keyframes': animation('object-position'),
+        '--jumi-object-position-property': property('object-position'),
         '--jumi-object-position-x': value,
       }),
       type: ['length', 'percentage', 'position'],
@@ -2443,7 +2439,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-object-position-x-edge': {
       property: value => ({
-        '--jumi-object-position-keyframes': animation('object-position'),
+        '--jumi-object-position-property': property('object-position'),
         '--jumi-object-position-x-edge': value,
       }),
       type: 'position',
@@ -2451,7 +2447,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-object-position-x-offset': {
       property: value => ({
-        '--jumi-object-position-keyframes': animation('object-position'),
+        '--jumi-object-position-property': property('object-position'),
         '--jumi-object-position-x-offset': value,
       }),
       type: ['length', 'percentage'],
@@ -2459,7 +2455,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-object-position-y': {
       property: value => ({
-        '--jumi-object-position-keyframes': animation('object-position'),
+        '--jumi-object-position-property': property('object-position'),
         '--jumi-object-position-y': value,
       }),
       type: ['length', 'percentage', 'position'],
@@ -2467,7 +2463,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-object-position-y-edge': {
       property: value => ({
-        '--jumi-object-position-keyframes': animation('object-position'),
+        '--jumi-object-position-property': property('object-position'),
         '--jumi-object-position-y-edge': value,
       }),
       type: 'position',
@@ -2475,7 +2471,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-object-position-y-offset': {
       property: value => ({
-        '--jumi-object-position-keyframes': animation('object-position'),
+        '--jumi-object-position-property': property('object-position'),
         '--jumi-object-position-y-offset': value,
       }),
       type: ['length', 'percentage'],
@@ -2484,7 +2480,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-offset': {
       property: value => ({
         '--jumi-offset': value,
-        '--jumi-offset-keyframes': animation('offset'),
+        '--jumi-offset-property': property('offset'),
       }),
       type: ['length', 'percentage', 'position', 'any'],
       values: offsetAnchor,
@@ -2492,14 +2488,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-offset-anchor': {
       property: value => ({
         '--jumi-offset-anchor': value,
-        '--jumi-offset-anchor-keyframes': animation('offset-anchor'),
+        '--jumi-offset-anchor-property': property('offset-anchor'),
       }),
       type: ['length', 'percentage', 'position', 'any'],
       values: theme('objectPosition', empty.auto),
     },
     'animate-offset-anchor-x': {
       property: value => ({
-        '--jumi-offset-anchor-keyframes': animation('offset-anchor'),
+        '--jumi-offset-anchor-property': property('offset-anchor'),
         '--jumi-offset-anchor-x': value,
       }),
       type: ['length', 'percentage', 'position'],
@@ -2507,7 +2503,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-offset-anchor-x-edge': {
       property: value => ({
-        '--jumi-offset-anchor-keyframes': animation('offset-anchor'),
+        '--jumi-offset-anchor-property': property('offset-anchor'),
         '--jumi-offset-anchor-x-edge': value,
       }),
       type: 'position',
@@ -2515,7 +2511,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-offset-anchor-x-offset': {
       property: value => ({
-        '--jumi-offset-anchor-keyframes': animation('offset-anchor'),
+        '--jumi-offset-anchor-property': property('offset-anchor'),
         '--jumi-offset-anchor-x-offset': value,
       }),
       type: ['length', 'percentage'],
@@ -2523,7 +2519,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-offset-anchor-y': {
       property: value => ({
-        '--jumi-offset-anchor-keyframes': animation('offset-anchor'),
+        '--jumi-offset-anchor-property': property('offset-anchor'),
         '--jumi-offset-anchor-y': value,
       }),
       type: ['length', 'percentage', 'position'],
@@ -2531,7 +2527,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-offset-anchor-y-edge': {
       property: value => ({
-        '--jumi-offset-anchor-keyframes': animation('offset-anchor'),
+        '--jumi-offset-anchor-property': property('offset-anchor'),
         '--jumi-offset-anchor-y-edge': value,
       }),
       type: 'position',
@@ -2539,7 +2535,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-offset-anchor-y-offset': {
       property: value => ({
-        '--jumi-offset-anchor-keyframes': animation('offset-anchor'),
+        '--jumi-offset-anchor-property': property('offset-anchor'),
         '--jumi-offset-anchor-y-offset': value,
       }),
       type: ['length', 'percentage'],
@@ -2548,7 +2544,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-offset-distance': {
       property: value => ({
         '--jumi-offset-distance': value,
-        '--jumi-offset-distance-keyframes': animation('offset-distance'),
+        '--jumi-offset-distance-property': property('offset-distance'),
       }),
       type: ['length', 'percentage'],
       values: percentage,
@@ -2556,21 +2552,21 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-offset-path': {
       property: value => ({
         '--jumi-offset-path': value,
-        '--jumi-offset-path-keyframes': animation('offset-path'),
+        '--jumi-offset-path-property': property('offset-path'),
       }),
       values: offsetPath,
     },
     'animate-offset-position': {
       property: value => ({
         '--jumi-offset-position': value,
-        '--jumi-offset-position-keyframes': animation('offset-position'),
+        '--jumi-offset-position-property': property('offset-position'),
       }),
       type: ['length', 'percentage', 'position', 'any'],
       values: theme('objectPosition', offsetPosition),
     },
     'animate-offset-position-x': {
       property: value => ({
-        '--jumi-offset-position-keyframes': animation('offset-position'),
+        '--jumi-offset-position-property': property('offset-position'),
         '--jumi-offset-position-x': value,
       }),
       type: ['length', 'percentage', 'position'],
@@ -2578,7 +2574,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-offset-position-x-edge': {
       property: value => ({
-        '--jumi-offset-position-keyframes': animation('offset-position'),
+        '--jumi-offset-position-property': property('offset-position'),
         '--jumi-offset-position-x-edge': value,
       }),
       type: 'position',
@@ -2586,7 +2582,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-offset-position-x-offset': {
       property: value => ({
-        '--jumi-offset-position-keyframes': animation('offset-position'),
+        '--jumi-offset-position-property': property('offset-position'),
         '--jumi-offset-position-x-offset': value,
       }),
       type: ['length', 'percentage'],
@@ -2594,7 +2590,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-offset-position-y': {
       property: value => ({
-        '--jumi-offset-position-keyframes': animation('offset-position'),
+        '--jumi-offset-position-property': property('offset-position'),
         '--jumi-offset-position-y': value,
       }),
       type: ['length', 'percentage', 'position'],
@@ -2602,7 +2598,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-offset-position-y-edge': {
       property: value => ({
-        '--jumi-offset-position-keyframes': animation('offset-position'),
+        '--jumi-offset-position-property': property('offset-position'),
         '--jumi-offset-position-y-edge': value,
       }),
       type: 'position',
@@ -2610,7 +2606,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-offset-position-y-offset': {
       property: value => ({
-        '--jumi-offset-position-keyframes': animation('offset-position'),
+        '--jumi-offset-position-property': property('offset-position'),
         '--jumi-offset-position-y-offset': value,
       }),
       type: ['length', 'percentage'],
@@ -2619,7 +2615,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-offset-rotate': {
       property: value => ({
         '--jumi-offset-rotate': value,
-        '--jumi-offset-rotate-keyframes': animation('offset-rotate'),
+        '--jumi-offset-rotate-property': property('offset-rotate'),
       }),
       type: ['angle', 'any'],
       values: theme('rotate', offsetRotate),
@@ -2627,7 +2623,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-opacity': {
       property: value => ({
         '--jumi-opacity': value,
-        '--jumi-opacity-keyframes': animation('opacity'),
+        '--jumi-opacity-property': property('opacity'),
       }),
       type: ['number', 'percentage'],
       values: theme('opacity'),
@@ -2635,7 +2631,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-order': {
       property: value => ({
         '--jumi-order': value,
-        '--jumi-order-keyframes': animation('order'),
+        '--jumi-order-property': property('order'),
       }),
       supportsNegativeValues: true,
       type: 'integer',
@@ -2644,7 +2640,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-orphans': {
       property: value => ({
         '--jumi-orphans': value,
-        '--jumi-orphans-keyframes': animation('orphans'),
+        '--jumi-orphans-property': property('orphans'),
       }),
       type: 'integer',
       values: empty.number,
@@ -2652,7 +2648,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-outline': {
       property: value => ({
         '--jumi-outline': value,
-        '--jumi-outline-keyframes': animation('outline'),
+        '--jumi-outline-property': property('outline'),
       }),
       type: ['line-width', 'length', 'color', 'any'],
       values: empty.none,
@@ -2660,29 +2656,29 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-outline-color': {
       property: value => ({
         '--jumi-outline-color': value,
-        '--jumi-outline-keyframes': animation('outline'),
+        '--jumi-outline-property': property('outline'),
       }),
       type: 'color',
       values: theme('outlineColor'),
     },
     'animate-outline-offset': {
       property: value => ({
-        '--jumi-outline-keyframes': animation('outline'),
         '--jumi-outline-offset': value,
+        '--jumi-outline-property': property('outline'),
       }),
       type: 'length',
       values: theme('outlineOffset'),
     },
     'animate-outline-style': {
       property: value => ({
-        '--jumi-outline-keyframes': animation('outline'),
+        '--jumi-outline-property': property('outline'),
         '--jumi-outline-style': value,
       }),
       values: outlineStyle,
     },
     'animate-outline-width': {
       property: value => ({
-        '--jumi-outline-keyframes': animation('outline'),
+        '--jumi-outline-property': property('outline'),
         '--jumi-outline-width': value,
       }),
       type: ['line-width'],
@@ -2691,28 +2687,28 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-overflow': {
       property: value => ({
         '--jumi-overflow': value,
-        '--jumi-overflow-keyframes': animation('overflow'),
+        '--jumi-overflow-property': property('overflow'),
       }),
       values: overflow,
     },
     'animate-overflow-anchor': {
       property: value => ({
         '--jumi-overflow-anchor': value,
-        '--jumi-overflow-anchor-keyframes': animation('overflow-anchor'),
+        '--jumi-overflow-anchor-property': property('overflow-anchor'),
       }),
       values: overflowAnchor,
     },
     'animate-overflow-block': {
       property: value => ({
         '--jumi-overflow-block': value,
-        '--jumi-overflow-block-keyframes': animation('overflow-block'),
+        '--jumi-overflow-block-property': property('overflow-block'),
       }),
       values: overflow,
     },
     'animate-overflow-clip-margin': {
       property: value => ({
         '--jumi-overflow-clip-margin': value,
-        '--jumi-overflow-clip-margin-keyframes': animation('overflow-clip-margin'),
+        '--jumi-overflow-clip-margin-property': property('overflow-clip-margin'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'any'],
@@ -2721,27 +2717,27 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-overflow-inline': {
       property: value => ({
         '--jumi-overflow-inline': value,
-        '--jumi-overflow-inline-keyframes': animation('overflow-inline'),
+        '--jumi-overflow-inline-property': property('overflow-inline'),
       }),
       values: overflow,
     },
     'animate-overflow-wrap': {
       property: value => ({
         '--jumi-overflow-wrap': value,
-        '--jumi-overflow-wrap-keyframes': animation('overflow-wrap'),
+        '--jumi-overflow-wrap-property': property('overflow-wrap'),
       }),
       values: overflowWrap,
     },
     'animate-overflow-x': {
       property: value => ({
-        '--jumi-overflow-keyframes': animation('overflow'),
+        '--jumi-overflow-property': property('overflow'),
         '--jumi-overflow-x': value,
       }),
       values: overflow,
     },
     'animate-overflow-y': {
       property: value => ({
-        '--jumi-overflow-keyframes': animation('overflow'),
+        '--jumi-overflow-property': property('overflow'),
         '--jumi-overflow-y': value,
       }),
       values: overflow,
@@ -2749,42 +2745,42 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-overscroll-behavior': {
       property: value => ({
         '--jumi-overscroll-behavior': value,
-        '--jumi-overscroll-behavior-keyframes': animation('overscroll-behavior'),
+        '--jumi-overscroll-behavior-property': property('overscroll-behavior'),
       }),
       values: empty.auto,
     },
     'animate-overscroll-behavior-block': {
       property: value => ({
         '--jumi-overscroll-behavior-block': value,
-        '--jumi-overscroll-behavior-block-keyframes': animation('overscroll-behavior-block'),
+        '--jumi-overscroll-behavior-block-property': property('overscroll-behavior-block'),
       }),
       values: overscrollBehavior,
     },
     'animate-overscroll-behavior-inline': {
       property: value => ({
         '--jumi-overscroll-behavior-inline': value,
-        '--jumi-overscroll-behavior-inline-keyframes': animation('overscroll-behavior-inline'),
+        '--jumi-overscroll-behavior-inline-property': property('overscroll-behavior-inline'),
       }),
       values: overscrollBehavior,
     },
     'animate-overscroll-behavior-x': {
       property: value => ({
         '--jumi-overscroll-behavior-x': value,
-        '--jumi-overscroll-behavior-x-keyframes': animation('overscroll-behavior-x'),
+        '--jumi-overscroll-behavior-x-property': property('overscroll-behavior-x'),
       }),
       values: overscrollBehavior,
     },
     'animate-overscroll-behavior-y': {
       property: value => ({
         '--jumi-overscroll-behavior-y': value,
-        '--jumi-overscroll-behavior-y-keyframes': animation('overscroll-behavior-y'),
+        '--jumi-overscroll-behavior-y-property': property('overscroll-behavior-y'),
       }),
       values: overscrollBehavior,
     },
     'animate-padding': {
       property: value => ({
         '--jumi-padding': value,
-        '--jumi-padding-keyframes': animation('padding'),
+        '--jumi-padding-property': property('padding'),
       }),
       supportsNegativeValues: true,
       values: theme('padding'),
@@ -2792,7 +2788,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-padding-block': {
       property: value => ({
         '--jumi-padding-block': value,
-        '--jumi-padding-block-keyframes': animation('padding-block'),
+        '--jumi-padding-block-property': property('padding-block'),
       }),
       supportsNegativeValues: true,
       values: theme('padding'),
@@ -2800,7 +2796,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-padding-block-end': {
       property: value => ({
         '--jumi-padding-block-end': value,
-        '--jumi-padding-block-end-keyframes': animation('padding-block-end'),
+        '--jumi-padding-block-end-property': property('padding-block-end'),
       }),
       supportsNegativeValues: true,
       values: theme('padding'),
@@ -2808,7 +2804,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-padding-block-start': {
       property: value => ({
         '--jumi-padding-block-start': value,
-        '--jumi-padding-block-start-keyframes': animation('padding-block-start'),
+        '--jumi-padding-block-start-property': property('padding-block-start'),
       }),
       supportsNegativeValues: true,
       values: theme('padding'),
@@ -2816,7 +2812,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-padding-bottom': {
       property: value => ({
         '--jumi-padding-bottom': value,
-        '--jumi-padding-bottom-keyframes': animation('padding-bottom'),
+        '--jumi-padding-bottom-property': property('padding-bottom'),
       }),
       supportsNegativeValues: true,
       values: theme('padding'),
@@ -2824,7 +2820,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-padding-inline': {
       property: value => ({
         '--jumi-padding-inline': value,
-        '--jumi-padding-inline-keyframes': animation('padding-inline'),
+        '--jumi-padding-inline-property': property('padding-inline'),
       }),
       supportsNegativeValues: true,
       values: theme('padding'),
@@ -2832,7 +2828,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-padding-inline-end': {
       property: value => ({
         '--jumi-padding-inline-end': value,
-        '--jumi-padding-inline-end-keyframes': animation('padding-inline-end'),
+        '--jumi-padding-inline-end-property': property('padding-inline-end'),
       }),
       supportsNegativeValues: true,
       values: theme('padding'),
@@ -2840,7 +2836,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-padding-inline-start': {
       property: value => ({
         '--jumi-padding-inline-start': value,
-        '--jumi-padding-inline-start-keyframes': animation('padding-inline-start'),
+        '--jumi-padding-inline-start-property': property('padding-inline-start'),
       }),
       supportsNegativeValues: true,
       values: theme('padding'),
@@ -2848,7 +2844,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-padding-left': {
       property: value => ({
         '--jumi-padding-left': value,
-        '--jumi-padding-left-keyframes': animation('padding-left'),
+        '--jumi-padding-left-property': property('padding-left'),
       }),
       supportsNegativeValues: true,
       values: theme('padding'),
@@ -2856,7 +2852,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-padding-right': {
       property: value => ({
         '--jumi-padding-right': value,
-        '--jumi-padding-right-keyframes': animation('padding-right'),
+        '--jumi-padding-right-property': property('padding-right'),
       }),
       supportsNegativeValues: true,
       values: theme('padding'),
@@ -2864,7 +2860,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-padding-top': {
       property: value => ({
         '--jumi-padding-top': value,
-        '--jumi-padding-top-keyframes': animation('padding-top'),
+        '--jumi-padding-top-property': property('padding-top'),
       }),
       supportsNegativeValues: true,
       values: theme('padding'),
@@ -2872,28 +2868,28 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-page': {
       property: value => ({
         '--jumi-page': value,
-        '--jumi-page-keyframes': animation('page'),
+        '--jumi-page-property': property('page'),
       }),
       values: empty.auto,
     },
     'animate-paint-order': {
       property: value => ({
         '--jumi-paint-order': value,
-        '--jumi-paint-order-keyframes': animation('paint-order'),
+        '--jumi-paint-order-property': property('paint-order'),
       }),
       values: paintOrder,
     },
     'animate-position': {
       property: value => ({
         '--jumi-position': value,
-        '--jumi-position-keyframes': animation('position'),
+        '--jumi-position-property': property('position'),
       }),
       values: position,
     },
     'animate-right': {
       property: value => ({
         '--jumi-right': value,
-        '--jumi-right-keyframes': animation('right'),
+        '--jumi-right-property': property('right'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
@@ -2902,7 +2898,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-rotate': {
       property: value => ({
         '--jumi-rotate': value,
-        '--jumi-rotate-keyframes': animation('rotate'),
+        '--jumi-rotate-property': property('rotate'),
       }),
       supportsNegativeValues: true,
       type: ['angle', 'any'],
@@ -2911,14 +2907,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-rotate-3d': {
       property: value => ({
         '--jumi-rotate-3d': css('rotate3d', value),
-        '--jumi-transform-keyframes': animation('transform'),
+        '--jumi-transform-property': property('transform'),
       }),
       values: empty.string,
     },
     'animate-rotate-angle': {
       property: value => ({
         '--jumi-rotate-angle': value,
-        '--jumi-rotate-keyframes': animation('rotate'),
+        '--jumi-rotate-property': property('rotate'),
       }),
       supportsNegativeValues: true,
       type: 'angle',
@@ -2926,7 +2922,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-rotate-x': {
       property: value => ({
-        '--jumi-rotate-keyframes': animation('rotate'),
+        '--jumi-rotate-property': property('rotate'),
         '--jumi-rotate-x': value,
       }),
       supportsNegativeValues: true,
@@ -2935,7 +2931,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-rotate-y': {
       property: value => ({
-        '--jumi-rotate-keyframes': animation('rotate'),
+        '--jumi-rotate-property': property('rotate'),
         '--jumi-rotate-y': value,
       }),
       supportsNegativeValues: true,
@@ -2944,7 +2940,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-rotate-z': {
       property: value => ({
-        '--jumi-rotate-keyframes': animation('rotate'),
+        '--jumi-rotate-property': property('rotate'),
         '--jumi-rotate-z': value,
       }),
       supportsNegativeValues: true,
@@ -2953,7 +2949,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-row-gap': {
       property: value => ({
-        '--jumi-gap-keyframes': animation('gap'),
+        '--jumi-gap-property': property('gap'),
         '--jumi-row-gap': value,
       }),
       values: empty.number,
@@ -2962,7 +2958,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       property: (value) => {
         return {
           '--jumi-scale': value,
-          '--jumi-scale-keyframes': animation('scale'),
+          '--jumi-scale-property': property('scale'),
         }
       },
       supportsNegativeValues: true,
@@ -2971,7 +2967,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-scale-x': {
       property: value => ({
-        '--jumi-scale-keyframes': animation('scale'),
+        '--jumi-scale-property': property('scale'),
         '--jumi-scale-x': value,
       }),
       supportsNegativeValues: true,
@@ -2980,7 +2976,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-scale-y': {
       property: value => ({
-        '--jumi-scale-keyframes': animation('scale'),
+        '--jumi-scale-property': property('scale'),
         '--jumi-scale-y': value,
       }),
       supportsNegativeValues: true,
@@ -2989,7 +2985,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-scale-z': {
       property: value => ({
-        '--jumi-scale-keyframes': animation('scale'),
+        '--jumi-scale-property': property('scale'),
         '--jumi-scale-z': value,
       }),
       supportsNegativeValues: true,
@@ -3002,7 +2998,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
         return {
           '--jumi-skew-x': x ?? value,
           '--jumi-skew-y': y ?? x ?? value,
-          '--jumi-transform-keyframes': animation('transform'),
+          '--jumi-transform-property': property('transform'),
         }
       },
       supportsNegativeValues: true,
@@ -3011,7 +3007,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-skew-x': {
       property: value => ({
         '--jumi-skew-x': value,
-        '--jumi-transform-keyframes': animation('transform'),
+        '--jumi-transform-property': property('transform'),
       }),
       supportsNegativeValues: true,
       values: theme('skew'),
@@ -3019,7 +3015,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-skew-y': {
       property: value => ({
         '--jumi-skew-y': value,
-        '--jumi-transform-keyframes': animation('transform'),
+        '--jumi-transform-property': property('transform'),
       }),
       supportsNegativeValues: true,
       values: theme('skew'),
@@ -3027,35 +3023,35 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-stroke': {
       property: value => ({
         '--jumi-stroke': value,
-        '--jumi-stroke-keyframes': animation('stroke'),
+        '--jumi-stroke-property': property('stroke'),
       }),
       values: theme('colors'),
     },
     'animate-stroke-width': {
       property: value => ({
         '--jumi-stroke-width': value,
-        '--jumi-stroke-width-keyframes': animation('stroke-width'),
+        '--jumi-stroke-width-property': property('stroke-width'),
       }),
       values: theme('strokeWidth'),
     },
     'animate-text-align': {
       property: value => ({
         '--jumi-text-align': value,
-        '--jumi-text-align-keyframes': animation('text-align'),
+        '--jumi-text-align-property': property('text-align'),
       }),
       values: textAlign,
     },
     'animate-text-shadow': {
       property: value => ({
         '--jumi-text-shadow': value,
-        '--jumi-text-shadow-keyframes': animation('text-shadow'),
+        '--jumi-text-shadow-property': property('text-shadow'),
       }),
       values: theme('dropShadow'),
     },
     'animate-text-shadow-blur': {
       property: value => ({
         '--jumi-text-shadow-blur-radius': value,
-        '--jumi-text-shadow-keyframes': animation('text-shadow'),
+        '--jumi-text-shadow-property': property('text-shadow'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
@@ -3064,15 +3060,15 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-text-shadow-color': {
       property: value => ({
         '--jumi-text-shadow-color': value,
-        '--jumi-text-shadow-keyframes': animation('text-shadow'),
+        '--jumi-text-shadow-property': property('text-shadow'),
       }),
       type: 'color',
       values: theme('boxShadowColor'),
     },
     'animate-text-shadow-offset-x': {
       property: value => ({
-        '--jumi-text-shadow-keyframes': animation('text-shadow'),
         '--jumi-text-shadow-offset-x': value,
+        '--jumi-text-shadow-property': property('text-shadow'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
@@ -3080,8 +3076,8 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-text-shadow-offset-y': {
       property: value => ({
-        '--jumi-text-shadow-keyframes': animation('text-shadow'),
         '--jumi-text-shadow-offset-y': value,
+        '--jumi-text-shadow-property': property('text-shadow'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
@@ -3090,7 +3086,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-top': {
       property: value => ({
         '--jumi-top': value,
-        '--jumi-top-keyframes': animation('top'),
+        '--jumi-top-property': property('top'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
@@ -3099,21 +3095,21 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-transform': {
       property: value => ({
         '--jumi-transform': value,
-        '--jumi-transform-keyframes': animation('transform'),
+        '--jumi-transform-property': property('transform'),
       }),
       values: empty.string,
     },
     'animate-transform-origin': {
       property: value => ({
         '--jumi-transform-origin': value,
-        '--jumi-transform-origin-keyframes': animation('transform-origin'),
+        '--jumi-transform-origin-property': property('transform-origin'),
       }),
       type: ['length', 'percentage', 'position', 'any'],
       values: theme('transformOrigin'),
     },
     'animate-transform-origin-x': {
       property: value => ({
-        '--jumi-transform-origin-keyframes': animation('transform-origin'),
+        '--jumi-transform-origin-property': property('transform-origin'),
         '--jumi-transform-origin-x': value,
       }),
       type: ['length', 'percentage', 'position'],
@@ -3121,7 +3117,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-transform-origin-y': {
       property: value => ({
-        '--jumi-transform-origin-keyframes': animation('transform-origin'),
+        '--jumi-transform-origin-property': property('transform-origin'),
         '--jumi-transform-origin-y': value,
       }),
       type: ['length', 'percentage', 'position'],
@@ -3129,7 +3125,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-transform-origin-z': {
       property: value => ({
-        '--jumi-transform-origin-keyframes': animation('transform-origin'),
+        '--jumi-transform-origin-property': property('transform-origin'),
         '--jumi-transform-origin-z': value,
       }),
       supportsNegativeValues: true,
@@ -3138,7 +3134,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-transform-style': {
       property: value => ({
-        '--jumi-transform-keyframes': animation('transform'),
+        '--jumi-transform-property': property('transform'),
         '--jumi-transform-style': value,
       }),
       values: transformStyle,
@@ -3147,7 +3143,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       property: (value) => {
         return {
           '--jumi-translate': value,
-          '--jumi-translate-keyframes': animation('translate'),
+          '--jumi-translate-property': property('translate'),
         }
       },
       supportsNegativeValues: true,
@@ -3155,7 +3151,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-translate-3d': {
       property: value => ({
-        '--jumi-transform-keyframes': animation('transform'),
+        '--jumi-transform-property': property('transform'),
         '--jumi-translate-3d': css('translate3d', value),
       }),
       type: ['length', 'percentage', 'any'],
@@ -3163,7 +3159,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-translate-x': {
       property: value => ({
-        '--jumi-translate-keyframes': animation('translate'),
+        '--jumi-translate-property': property('translate'),
         '--jumi-translate-x': value,
       }),
       supportsNegativeValues: true,
@@ -3172,7 +3168,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-translate-y': {
       property: value => ({
-        '--jumi-translate-keyframes': animation('translate'),
+        '--jumi-translate-property': property('translate'),
         '--jumi-translate-y': value,
       }),
       supportsNegativeValues: true,
@@ -3181,7 +3177,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-translate-z': {
       property: value => ({
-        '--jumi-translate-keyframes': animation('translate'),
+        '--jumi-translate-property': property('translate'),
         '--jumi-translate-z': value,
       }),
       supportsNegativeValues: true,
@@ -3191,14 +3187,14 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-visibility': {
       property: value => ({
         '--jumi-visibility': value,
-        '--jumi-visibility-keyframes': animation('visibility'),
+        '--jumi-visibility-property': property('visibility'),
       }),
       values: visibility,
     },
     'animate-width': {
       property: value => ({
         '--jumi-width': value,
-        '--jumi-width-keyframes': animation('width'),
+        '--jumi-width-property': property('width'),
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
@@ -3206,8 +3202,8 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-x': {
       property: value => ({
-        '--jumi-transform-keyframes': animation('transform'),
-        '--jumi-z': value,
+        '--jumi-transform-property': property('x'),
+        '--jumi-x': value,
       }),
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
@@ -3215,7 +3211,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-y': {
       property: value => ({
-        '--jumi-transform-keyframes': animation('transform'),
+        '--jumi-transform-property': property('y'),
         '--jumi-y': value,
       }),
       supportsNegativeValues: true,
@@ -3225,15 +3221,9 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     'animate-z-index': {
       property: value => ({
         '--jumi-z-index': value,
-        '--jumi-z-index-keyframes': animation('z-index'),
+        '--jumi-z-index-property': property('z-index'),
       }),
       values: theme('zIndex'),
-    },
-    'animation': {
-      property: value => ({
-        animation: value,
-      }),
-      values: theme('animation'),
     },
     'animation-composition': {
       property: value => ({
@@ -3383,26 +3373,15 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       },
       values: animationTimingFunction,
     },
-    'effect': {
-      property: value => ({
-        [`--jumi-${value}-keyframes`]: effect(value),
-      }),
-      values: effects,
-    },
     'jumi': {
       property: () => {
-        const registry = Array.from(register).sort()
+        const properties = creator.properties.map(keyframe('property'))
+        const effects = creator.effects.map(keyframe('animation'))
+        const variables = properties.concat(effects).join(', ')
 
-        const keyframes = registry
-          .map((attribute) => {
-            const variable = `--jumi-${attribute}-keyframes`
-            return css('var', variable, 'none')
-          })
-          .join(', ')
-
-        return ['animation'].concat(registry).reduce(
+        return ['animation'].concat(creator.properties).reduce(
           (acc, attribute) => merge(acc, assemble(attribute)),
-          { animation: keyframes } as CssInJs,
+          { animation: variables } as CssInJs,
         )
       },
       values: { DEFAULT: '' },
@@ -3410,4 +3389,11 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
   }
 
   return matchProperties
+}
+
+export function keyframe(type: 'animation' | 'property') {
+  return (attribute: string) => {
+    const variable = join(['--jumi', attribute, type], '-')
+    return css('var', variable, 'none')
+  }
 }

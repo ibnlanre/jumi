@@ -1,6 +1,8 @@
-export const effectKeyframes = {
+import type { Collection, EffectKeyframes } from '@/types'
+
+export const effectKeyframes: Collection = {
   'accordion': {
-    '@keyframes jumi-effect-accordion': {
+    '@keyframes jumi-accordion': {
       '0%': {
         'max-height': '0',
         'opacity': '0',
@@ -20,7 +22,7 @@ export const effectKeyframes = {
     },
   },
   'arc-bottom-left': {
-    '@keyframes jumi-effect-arc-bottom-left': {
+    '@keyframes jumi-arc-bottom-left': {
       '0%': {
         'opacity': '0',
         'rotate': '90deg',
@@ -38,7 +40,7 @@ export const effectKeyframes = {
     },
   },
   'arc-bottom-right': {
-    '@keyframes jumi-effect-arc-bottom-right': {
+    '@keyframes jumi-arc-bottom-right': {
       '0%': {
         'opacity': '0',
         'rotate': '-90deg',
@@ -56,7 +58,7 @@ export const effectKeyframes = {
     },
   },
   'arc-top-left': {
-    '@keyframes jumi-effect-arc-top-left': {
+    '@keyframes jumi-arc-top-left': {
       '0%': {
         'opacity': '0',
         'rotate': '-90deg',
@@ -74,7 +76,7 @@ export const effectKeyframes = {
     },
   },
   'arc-top-right': {
-    '@keyframes jumi-effect-arc-top-right': {
+    '@keyframes jumi-arc-top-right': {
       '0%': {
         'opacity': '0',
         'rotate': '90deg',
@@ -92,7 +94,7 @@ export const effectKeyframes = {
     },
   },
   'back-in': {
-    '@keyframes jumi-effect-back-in': {
+    '@keyframes jumi-back-in': {
       '0%': {
         opacity: '0',
         transform: 'scale(0.3) rotateZ(-180deg)',
@@ -104,7 +106,7 @@ export const effectKeyframes = {
     },
   },
   'back-in-down': {
-    '@keyframes jumi-effect-back-in-down': {
+    '@keyframes jumi-back-in-down': {
       '0%': {
         opacity: '0',
         transform: 'scale(0.3) translateY(-100px) rotateZ(-180deg)',
@@ -116,7 +118,7 @@ export const effectKeyframes = {
     },
   },
   'back-in-left': {
-    '@keyframes jumi-effect-back-in-left': {
+    '@keyframes jumi-back-in-left': {
       '0%': {
         opacity: '0',
         transform: 'scale(0.3) translateX(-100px) rotateZ(-180deg)',
@@ -128,7 +130,7 @@ export const effectKeyframes = {
     },
   },
   'back-in-right': {
-    '@keyframes jumi-effect-back-in-right': {
+    '@keyframes jumi-back-in-right': {
       '0%': {
         opacity: '0',
         transform: 'scale(0.3) translateX(100px) rotateZ(180deg)',
@@ -140,7 +142,7 @@ export const effectKeyframes = {
     },
   },
   'back-in-up': {
-    '@keyframes jumi-effect-back-in-up': {
+    '@keyframes jumi-back-in-up': {
       '0%': {
         opacity: '0',
         transform: 'scale(0.3) translateY(100px) rotateZ(180deg)',
@@ -152,7 +154,7 @@ export const effectKeyframes = {
     },
   },
   'blink': {
-    '@keyframes jumi-effect-blink': {
+    '@keyframes jumi-blink': {
       '0%, 100%': {
         opacity: '1',
       },
@@ -162,7 +164,7 @@ export const effectKeyframes = {
     },
   },
   'blur-in': {
-    '@keyframes jumi-effect-blur-in': {
+    '@keyframes jumi-blur-in': {
       '0%': {
         filter: 'blur(10px)',
         opacity: '0',
@@ -174,7 +176,7 @@ export const effectKeyframes = {
     },
   },
   'blur-out': {
-    '@keyframes jumi-effect-blur-out': {
+    '@keyframes jumi-blur-out': {
       '0%': {
         filter: 'blur(0px)',
         opacity: '1',
@@ -186,7 +188,7 @@ export const effectKeyframes = {
     },
   },
   'bounce-in': {
-    '@keyframes jumi-effect-bounce-in': {
+    '@keyframes jumi-bounce-in': {
       '0%': {
         opacity: '0',
         transform: 'scale3d(0.3, 0.3, 0.3)',
@@ -202,7 +204,7 @@ export const effectKeyframes = {
     },
   },
   'bounce-in-down': {
-    '@keyframes jumi-effect-bounce-in-down': {
+    '@keyframes jumi-bounce-in-down': {
       '0%': {
         opacity: '0',
         transform: 'translate3d(0, -100px, 0)',
@@ -218,7 +220,7 @@ export const effectKeyframes = {
     },
   },
   'bounce-in-left': {
-    '@keyframes jumi-effect-bounce-in-left': {
+    '@keyframes jumi-bounce-in-left': {
       '0%': {
         opacity: '0',
         transform: 'translate3d(-100px, 0, 0)',
@@ -234,7 +236,7 @@ export const effectKeyframes = {
     },
   },
   'bounce-in-right': {
-    '@keyframes jumi-effect-bounce-in-right': {
+    '@keyframes jumi-bounce-in-right': {
       '0%': {
         opacity: '0',
         transform: 'translate3d(100px, 0, 0)',
@@ -250,7 +252,7 @@ export const effectKeyframes = {
     },
   },
   'bounce-in-up': {
-    '@keyframes jumi-effect-bounce-in-up': {
+    '@keyframes jumi-bounce-in-up': {
       '0%': {
         opacity: '0',
         transform: 'translate3d(0, 100px, 0)',
@@ -266,7 +268,7 @@ export const effectKeyframes = {
     },
   },
   'bounce-out': {
-    '@keyframes jumi-effect-bounce-out': {
+    '@keyframes jumi-bounce-out': {
       '0%': {
         opacity: '1',
         transform: 'scale3d(1, 1, 1)',
@@ -282,7 +284,7 @@ export const effectKeyframes = {
     },
   },
   'bounce-out-down': {
-    '@keyframes jumi-effect-bounce-out-down': {
+    '@keyframes jumi-bounce-out-down': {
       '0%': {
         opacity: '1',
         transform: 'translate3d(0, 0, 0)',
@@ -298,7 +300,7 @@ export const effectKeyframes = {
     },
   },
   'bounce-out-left': {
-    '@keyframes jumi-effect-bounce-out-left': {
+    '@keyframes jumi-bounce-out-left': {
       '0%': {
         opacity: '1',
         transform: 'translate3d(0, 0, 0)',
@@ -314,7 +316,7 @@ export const effectKeyframes = {
     },
   },
   'bounce-out-right': {
-    '@keyframes jumi-effect-bounce-out-right': {
+    '@keyframes jumi-bounce-out-right': {
       '0%': {
         opacity: '1',
         transform: 'translate3d(0, 0, 0)',
@@ -330,7 +332,7 @@ export const effectKeyframes = {
     },
   },
   'bounce-out-up': {
-    '@keyframes jumi-effect-bounce-out-up': {
+    '@keyframes jumi-bounce-out-up': {
       '0%': {
         opacity: '1',
         transform: 'translate3d(0, 0, 0)',
@@ -346,7 +348,7 @@ export const effectKeyframes = {
     },
   },
   'bubble': {
-    '@keyframes jumi-effect-bubble': {
+    '@keyframes jumi-bubble': {
       '0%': {
         'border-radius': '50%',
         'opacity': '0',
@@ -365,7 +367,7 @@ export const effectKeyframes = {
     },
   },
   'circle-in': {
-    '@keyframes jumi-effect-circle-in': {
+    '@keyframes jumi-circle-in': {
       '0%': {
         'clip-path': 'circle(0% at 50% 50%)',
       },
@@ -375,7 +377,7 @@ export const effectKeyframes = {
     },
   },
   'circle-in-bottom-left': {
-    '@keyframes jumi-effect-circle-in-bottom-left': {
+    '@keyframes jumi-circle-in-bottom-left': {
       '0%': {
         'clip-path': 'circle(0% at 0% 100%)',
       },
@@ -385,7 +387,7 @@ export const effectKeyframes = {
     },
   },
   'circle-in-bottom-right': {
-    '@keyframes jumi-effect-circle-in-bottom-right': {
+    '@keyframes jumi-circle-in-bottom-right': {
       '0%': {
         'clip-path': 'circle(0% at 100% 100%)',
       },
@@ -395,7 +397,7 @@ export const effectKeyframes = {
     },
   },
   'circle-in-top-left': {
-    '@keyframes jumi-effect-circle-in-top-left': {
+    '@keyframes jumi-circle-in-top-left': {
       '0%': {
         'clip-path': 'circle(0% at 0% 0%)',
       },
@@ -405,7 +407,7 @@ export const effectKeyframes = {
     },
   },
   'circle-in-top-right': {
-    '@keyframes jumi-effect-circle-in-top-right': {
+    '@keyframes jumi-circle-in-top-right': {
       '0%': {
         'clip-path': 'circle(0% at 100% 0%)',
       },
@@ -415,7 +417,7 @@ export const effectKeyframes = {
     },
   },
   'circle-out': {
-    '@keyframes jumi-effect-circle-out': {
+    '@keyframes jumi-circle-out': {
       '0%': {
         'clip-path': 'circle(100% at 50% 50%)',
       },
@@ -425,7 +427,7 @@ export const effectKeyframes = {
     },
   },
   'circle-out-bottom-left': {
-    '@keyframes jumi-effect-circle-out-bottom-left': {
+    '@keyframes jumi-circle-out-bottom-left': {
       '0%': {
         'clip-path': 'circle(150% at 0% 100%)',
       },
@@ -435,7 +437,7 @@ export const effectKeyframes = {
     },
   },
   'circle-out-bottom-right': {
-    '@keyframes jumi-effect-circle-out-bottom-right': {
+    '@keyframes jumi-circle-out-bottom-right': {
       '0%': {
         'clip-path': 'circle(150% at 100% 100%)',
       },
@@ -445,7 +447,7 @@ export const effectKeyframes = {
     },
   },
   'circle-out-top-left': {
-    '@keyframes jumi-effect-circle-out-top-left': {
+    '@keyframes jumi-circle-out-top-left': {
       '0%': {
         'clip-path': 'circle(150% at 0% 0%)',
       },
@@ -455,7 +457,7 @@ export const effectKeyframes = {
     },
   },
   'circle-out-top-right': {
-    '@keyframes jumi-effect-circle-out-top-right': {
+    '@keyframes jumi-circle-out-top-right': {
       '0%': {
         'clip-path': 'circle(150% at 100% 0%)',
       },
@@ -465,7 +467,7 @@ export const effectKeyframes = {
     },
   },
   'diamond-in': {
-    '@keyframes jumi-effect-diamond-in': {
+    '@keyframes jumi-diamond-in': {
       '0%': {
         'clip-path': 'polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%)',
       },
@@ -475,7 +477,7 @@ export const effectKeyframes = {
     },
   },
   'diamond-out': {
-    '@keyframes jumi-effect-diamond-out': {
+    '@keyframes jumi-diamond-out': {
       '0%': {
         'clip-path': 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
       },
@@ -485,7 +487,7 @@ export const effectKeyframes = {
     },
   },
   'distort': {
-    '@keyframes jumi-effect-distort': {
+    '@keyframes jumi-distort': {
       '0%': {
         filter: 'blur(0px)',
         transform: 'scale(1) skew(0deg, 0deg)',
@@ -509,7 +511,7 @@ export const effectKeyframes = {
     },
   },
   'drip': {
-    '@keyframes jumi-effect-drip': {
+    '@keyframes jumi-drip': {
       '0%': {
         'border-radius': '50% 50% 50% 50%',
         'opacity': '0',
@@ -536,7 +538,7 @@ export const effectKeyframes = {
     },
   },
   'elastic': {
-    '@keyframes jumi-effect-elastic': {
+    '@keyframes jumi-elastic': {
       '0%': {
         transform: 'scale(1)',
       },
@@ -555,7 +557,7 @@ export const effectKeyframes = {
     },
   },
   'expand-down': {
-    '@keyframes jumi-effect-expand-down': {
+    '@keyframes jumi-expand-down': {
       '0%': {
         height: '0%',
         opacity: '1',
@@ -567,7 +569,7 @@ export const effectKeyframes = {
     },
   },
   'expand-left': {
-    '@keyframes jumi-effect-expand-left': {
+    '@keyframes jumi-expand-left': {
       '0%': {
         opacity: '1',
         width: '0%',
@@ -579,7 +581,7 @@ export const effectKeyframes = {
     },
   },
   'expand-right': {
-    '@keyframes jumi-effect-expand-right': {
+    '@keyframes jumi-expand-right': {
       '0%': {
         'opacity': '1',
         'transform-origin': 'right',
@@ -593,7 +595,7 @@ export const effectKeyframes = {
     },
   },
   'expand-up': {
-    '@keyframes jumi-effect-expand-up': {
+    '@keyframes jumi-expand-up': {
       '0%': {
         'height': '0%',
         'opacity': '1',
@@ -607,7 +609,7 @@ export const effectKeyframes = {
     },
   },
   'explode': {
-    '@keyframes jumi-effect-explode': {
+    '@keyframes jumi-explode': {
       '0%': {
         'box-shadow': '0 0 0 0 currentColor',
         'opacity': '1',
@@ -626,29 +628,17 @@ export const effectKeyframes = {
     },
   },
   'fade-in': {
-    '@keyframes jumi-effect-fade-in': {
+    '@keyframes jumi-fade-in': {
       '0%': {
         opacity: '0',
       },
       '100%': {
-        opacity: '1',
-      },
-    },
-  },
-  'fade-in-blur': {
-    '@keyframes jumi-effect-fade-in-blur': {
-      '0%': {
-        filter: 'blur(8px)',
-        opacity: '0',
-      },
-      '100%': {
-        filter: 'blur(0px)',
         opacity: '1',
       },
     },
   },
   'fade-in-down': {
-    '@keyframes jumi-effect-fade-in-down': {
+    '@keyframes jumi-fade-in-down': {
       '0%': {
         opacity: '0',
         transform: 'translate3d(0, -60px, 0)',
@@ -660,7 +650,7 @@ export const effectKeyframes = {
     },
   },
   'fade-in-left': {
-    '@keyframes jumi-effect-fade-in-left': {
+    '@keyframes jumi-fade-in-left': {
       '0%': {
         opacity: '0',
         transform: 'translate3d(-60px, 0, 0)',
@@ -672,7 +662,7 @@ export const effectKeyframes = {
     },
   },
   'fade-in-right': {
-    '@keyframes jumi-effect-fade-in-right': {
+    '@keyframes jumi-fade-in-right': {
       '0%': {
         opacity: '0',
         transform: 'translate3d(60px, 0, 0)',
@@ -684,7 +674,7 @@ export const effectKeyframes = {
     },
   },
   'fade-in-up': {
-    '@keyframes jumi-effect-fade-in-up': {
+    '@keyframes jumi-fade-in-up': {
       '0%': {
         opacity: '0',
         transform: 'translate3d(0, 60px, 0)',
@@ -696,29 +686,17 @@ export const effectKeyframes = {
     },
   },
   'fade-out': {
-    '@keyframes jumi-effect-fade-out': {
+    '@keyframes jumi-fade-out': {
       '0%': {
         opacity: '1',
       },
       '100%': {
-        opacity: '0',
-      },
-    },
-  },
-  'fade-out-blur': {
-    '@keyframes jumi-effect-fade-out-blur': {
-      '0%': {
-        filter: 'blur(0px)',
-        opacity: '1',
-      },
-      '100%': {
-        filter: 'blur(8px)',
         opacity: '0',
       },
     },
   },
   'fade-out-down': {
-    '@keyframes jumi-effect-fade-out-down': {
+    '@keyframes jumi-fade-out-down': {
       '0%': {
         opacity: '1',
         transform: 'translate3d(0, 0, 0)',
@@ -730,7 +708,7 @@ export const effectKeyframes = {
     },
   },
   'fade-out-left': {
-    '@keyframes jumi-effect-fade-out-left': {
+    '@keyframes jumi-fade-out-left': {
       '0%': {
         opacity: '1',
         transform: 'translate3d(0, 0, 0)',
@@ -742,7 +720,7 @@ export const effectKeyframes = {
     },
   },
   'fade-out-right': {
-    '@keyframes jumi-effect-fade-out-right': {
+    '@keyframes jumi-fade-out-right': {
       '0%': {
         opacity: '1',
         transform: 'translate3d(0, 0, 0)',
@@ -754,7 +732,7 @@ export const effectKeyframes = {
     },
   },
   'fade-out-up': {
-    '@keyframes jumi-effect-fade-out-up': {
+    '@keyframes jumi-fade-out-up': {
       '0%': {
         opacity: '1',
         transform: 'translate3d(0, 0, 0)',
@@ -766,7 +744,7 @@ export const effectKeyframes = {
     },
   },
   'fall-down': {
-    '@keyframes jumi-effect-fall-down': {
+    '@keyframes jumi-fall-down': {
       '0%': {
         opacity: '1',
         transform: 'translateY(-300px) scaleY(1)',
@@ -780,7 +758,7 @@ export const effectKeyframes = {
     },
   },
   'fall-left': {
-    '@keyframes jumi-effect-fall-left': {
+    '@keyframes jumi-fall-left': {
       '0%': {
         opacity: '1',
         transform: 'translateX(-300px) scaleX(1)',
@@ -794,7 +772,7 @@ export const effectKeyframes = {
     },
   },
   'fall-right': {
-    '@keyframes jumi-effect-fall-right': {
+    '@keyframes jumi-fall-right': {
       '0%': {
         opacity: '1',
         transform: 'translateX(300px) scaleX(1)',
@@ -808,7 +786,7 @@ export const effectKeyframes = {
     },
   },
   'fall-up': {
-    '@keyframes jumi-effect-fall-up': {
+    '@keyframes jumi-fall-up': {
       '0%': {
         opacity: '1',
         transform: 'translateY(300px) scaleY(1)',
@@ -822,7 +800,7 @@ export const effectKeyframes = {
     },
   },
   'figure-eight': {
-    '@keyframes jumi-effect-figure-eight': {
+    '@keyframes jumi-figure-eight': {
       '0%': {
         transform: 'translateX(0) translateY(0) rotate(0deg)',
       },
@@ -853,7 +831,7 @@ export const effectKeyframes = {
     },
   },
   'flicker': {
-    '@keyframes jumi-effect-flicker': {
+    '@keyframes jumi-flicker': {
       '0%, 100%': {
         opacity: '1',
       },
@@ -887,7 +865,7 @@ export const effectKeyframes = {
     },
   },
   'flip-card-x': {
-    '@keyframes jumi-effect-flip-card-x': {
+    '@keyframes jumi-flip-card-x': {
       '0%': {
         backfaceVisibility: 'hidden',
         transform: 'rotateX(0deg)',
@@ -903,7 +881,7 @@ export const effectKeyframes = {
     },
   },
   'flip-card-y': {
-    '@keyframes jumi-effect-flip-card-y': {
+    '@keyframes jumi-flip-card-y': {
       '0%': {
         backfaceVisibility: 'hidden',
         transform: 'rotateY(0deg)',
@@ -919,7 +897,7 @@ export const effectKeyframes = {
     },
   },
   'flip-diagonal': {
-    '@keyframes jumi-effect-flip-diagonal': {
+    '@keyframes jumi-flip-diagonal': {
       '0%': {
         transform: 'rotateX(0deg) rotateY(0deg)',
       },
@@ -932,7 +910,7 @@ export const effectKeyframes = {
     },
   },
   'flip-in-bottom': {
-    '@keyframes jumi-effect-flip-in-bottom': {
+    '@keyframes jumi-flip-in-bottom': {
       '40%': {
         'opacity': '1',
         'transform': 'rotateX(15deg)',
@@ -955,7 +933,7 @@ export const effectKeyframes = {
     },
   },
   'flip-in-left': {
-    '@keyframes jumi-effect-flip-in-left': {
+    '@keyframes jumi-flip-in-left': {
       '40%': {
         'opacity': '1',
         'transform': 'rotateY(-15deg)',
@@ -978,7 +956,7 @@ export const effectKeyframes = {
     },
   },
   'flip-in-right': {
-    '@keyframes jumi-effect-flip-in-right': {
+    '@keyframes jumi-flip-in-right': {
       '40%': {
         'opacity': '1',
         'transform': 'rotateY(15deg)',
@@ -1001,7 +979,7 @@ export const effectKeyframes = {
     },
   },
   'flip-in-top': {
-    '@keyframes jumi-effect-flip-in-top': {
+    '@keyframes jumi-flip-in-top': {
       '40%': {
         'opacity': '1',
         'transform': 'rotateX(-15deg)',
@@ -1024,7 +1002,7 @@ export const effectKeyframes = {
     },
   },
   'flip-in-x': {
-    '@keyframes jumi-effect-flip-in-x': {
+    '@keyframes jumi-flip-in-x': {
       '40%': {
         opacity: '1',
         transform: 'rotateX(20deg)',
@@ -1046,7 +1024,7 @@ export const effectKeyframes = {
     },
   },
   'flip-in-y': {
-    '@keyframes jumi-effect-flip-in-y': {
+    '@keyframes jumi-flip-in-y': {
       '40%': {
         opacity: '1',
         transform: 'rotateY(20deg)',
@@ -1068,7 +1046,7 @@ export const effectKeyframes = {
     },
   },
   'flip-wobble-x': {
-    '@keyframes jumi-effect-flip-wobble-x': {
+    '@keyframes jumi-flip-wobble-x': {
       '0%': {
         transform: 'rotateX(0deg)',
       },
@@ -1093,7 +1071,7 @@ export const effectKeyframes = {
     },
   },
   'flip-wobble-y': {
-    '@keyframes jumi-effect-flip-wobble-y': {
+    '@keyframes jumi-flip-wobble-y': {
       '0%': {
         transform: 'rotateY(0deg)',
       },
@@ -1118,7 +1096,7 @@ export const effectKeyframes = {
     },
   },
   'flip-x': {
-    '@keyframes jumi-effect-flip-x': {
+    '@keyframes jumi-flip-x': {
       '0%': {
         transform: 'rotateX(0deg)',
       },
@@ -1128,7 +1106,7 @@ export const effectKeyframes = {
     },
   },
   'flip-x-elastic': {
-    '@keyframes jumi-effect-flip-x-elastic': {
+    '@keyframes jumi-flip-x-elastic': {
       '0%': {
         transform: 'rotateX(0deg)',
       },
@@ -1150,7 +1128,7 @@ export const effectKeyframes = {
     },
   },
   'flip-y': {
-    '@keyframes jumi-effect-flip-y': {
+    '@keyframes jumi-flip-y': {
       '0%': {
         transform: 'rotateY(0deg)',
       },
@@ -1160,7 +1138,7 @@ export const effectKeyframes = {
     },
   },
   'flip-y-elastic': {
-    '@keyframes jumi-effect-flip-y-elastic': {
+    '@keyframes jumi-flip-y-elastic': {
       '0%': {
         transform: 'rotateY(0deg)',
       },
@@ -1182,7 +1160,7 @@ export const effectKeyframes = {
     },
   },
   'flip-zoom-x': {
-    '@keyframes jumi-effect-flip-zoom-x': {
+    '@keyframes jumi-flip-zoom-x': {
       '0%': {
         opacity: '1',
         transform: 'scale(1) rotateX(0deg)',
@@ -1198,7 +1176,7 @@ export const effectKeyframes = {
     },
   },
   'flip-zoom-y': {
-    '@keyframes jumi-effect-flip-zoom-y': {
+    '@keyframes jumi-flip-zoom-y': {
       '0%': {
         opacity: '1',
         transform: 'scale(1) rotateY(0deg)',
@@ -1213,8 +1191,8 @@ export const effectKeyframes = {
       },
     },
   },
-  'float': {
-    '@keyframes jumi-effect-float': {
+  'floating': {
+    '@keyframes jumi-floating': {
       '0%, 100%': {
         transform: 'translateY(0px)',
       },
@@ -1224,7 +1202,7 @@ export const effectKeyframes = {
     },
   },
   'fold-in': {
-    '@keyframes jumi-effect-fold-in': {
+    '@keyframes jumi-fold-in': {
       '0%': {
         'opacity': '0',
         'transform': 'scaleY(0) rotateX(-90deg)',
@@ -1241,7 +1219,7 @@ export const effectKeyframes = {
     },
   },
   'fold-out': {
-    '@keyframes jumi-effect-fold-out': {
+    '@keyframes jumi-fold-out': {
       '0%': {
         'opacity': '1',
         'transform': 'scaleY(1) rotateX(0deg)',
@@ -1258,7 +1236,7 @@ export const effectKeyframes = {
     },
   },
   'glitch': {
-    '@keyframes jumi-effect-glitch': {
+    '@keyframes jumi-glitch': {
       '0%, 100%': {
         transform: 'translate(0)',
       },
@@ -1292,7 +1270,7 @@ export const effectKeyframes = {
     },
   },
   'glow': {
-    '@keyframes jumi-effect-glow': {
+    '@keyframes jumi-glow': {
       '0%': {
         filter: 'drop-shadow(0 0 5px currentColor)',
       },
@@ -1305,7 +1283,7 @@ export const effectKeyframes = {
     },
   },
   'heart-beat': {
-    '@keyframes jumi-effect-heart-beat': {
+    '@keyframes jumi-heart-beat': {
       '0%': {
         transform: 'scale3d(1, 1, 1)',
       },
@@ -1327,7 +1305,7 @@ export const effectKeyframes = {
     },
   },
   'hue-shift': {
-    '@keyframes jumi-effect-hue-shift': {
+    '@keyframes jumi-hue-shift': {
       '0%': {
         filter: 'hue-rotate(0deg)',
       },
@@ -1337,7 +1315,7 @@ export const effectKeyframes = {
     },
   },
   'implode': {
-    '@keyframes jumi-effect-implode': {
+    '@keyframes jumi-implode': {
       '0%': {
         'box-shadow': '0 0 50px 25px currentColor',
         'opacity': '1',
@@ -1356,7 +1334,7 @@ export const effectKeyframes = {
     },
   },
   'jello': {
-    '@keyframes jumi-effect-jello': {
+    '@keyframes jumi-jello': {
       '11.1%': {
         transform: 'skewX(-12.5deg) skewY(-12.5deg)',
       },
@@ -1390,7 +1368,7 @@ export const effectKeyframes = {
     },
   },
   'letter-space-in': {
-    '@keyframes jumi-effect-letter-space-in': {
+    '@keyframes jumi-letter-space-in': {
       '0%': {
         'letter-spacing': '-0.5em',
         'opacity': '0',
@@ -1402,7 +1380,7 @@ export const effectKeyframes = {
     },
   },
   'letter-space-out': {
-    '@keyframes jumi-effect-letter-space-out': {
+    '@keyframes jumi-letter-space-out': {
       '0%': {
         'letter-spacing': '0em',
         'opacity': '1',
@@ -1414,7 +1392,7 @@ export const effectKeyframes = {
     },
   },
   'lift': {
-    '@keyframes jumi-effect-lift': {
+    '@keyframes jumi-lift': {
       '0%': {
         transform: 'translateY(0) scale(1)',
       },
@@ -1424,7 +1402,7 @@ export const effectKeyframes = {
     },
   },
   'magnetic': {
-    '@keyframes jumi-effect-magnetic': {
+    '@keyframes jumi-magnetic': {
       '0%': {
         transform: 'translateX(0) scale(1)',
       },
@@ -1439,18 +1417,8 @@ export const effectKeyframes = {
       },
     },
   },
-  'mask': {
-    '@keyframes jumi-effect-mask': {
-      '0%': {
-        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-      },
-      '100%': {
-        'clip-path': 'polygon(0 40%, 100% 40%, 100% 60%, 0 60%)',
-      },
-    },
-  },
   'mask-bottom': {
-    '@keyframes jumi-effect-mask-bottom': {
+    '@keyframes jumi-mask-bottom': {
       '0%': {
         'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
       },
@@ -1460,7 +1428,7 @@ export const effectKeyframes = {
     },
   },
   'mask-bottom-left': {
-    '@keyframes jumi-effect-mask-bottom-left': {
+    '@keyframes jumi-mask-bottom-left': {
       '0%': {
         'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
       },
@@ -1470,7 +1438,7 @@ export const effectKeyframes = {
     },
   },
   'mask-bottom-right': {
-    '@keyframes jumi-effect-mask-bottom-right': {
+    '@keyframes jumi-mask-bottom-right': {
       '0%': {
         'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
       },
@@ -1479,8 +1447,18 @@ export const effectKeyframes = {
       },
     },
   },
+  'mask-center': {
+    '@keyframes jumi-mask-center': {
+      '0%': {
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+      },
+      '100%': {
+        'clip-path': 'polygon(0 40%, 100% 40%, 100% 60%, 0 60%)',
+      },
+    },
+  },
   'mask-left': {
-    '@keyframes jumi-effect-mask-left': {
+    '@keyframes jumi-mask-left': {
       '0%': {
         'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
       },
@@ -1490,7 +1468,7 @@ export const effectKeyframes = {
     },
   },
   'mask-right': {
-    '@keyframes jumi-effect-mask-right': {
+    '@keyframes jumi-mask-right': {
       '0%': {
         'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
       },
@@ -1500,7 +1478,7 @@ export const effectKeyframes = {
     },
   },
   'mask-top': {
-    '@keyframes jumi-effect-mask-top': {
+    '@keyframes jumi-mask-top': {
       '0%': {
         'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
       },
@@ -1510,7 +1488,7 @@ export const effectKeyframes = {
     },
   },
   'mask-top-left': {
-    '@keyframes jumi-effect-mask-top-left': {
+    '@keyframes jumi-mask-top-left': {
       '0%': {
         'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
       },
@@ -1520,7 +1498,7 @@ export const effectKeyframes = {
     },
   },
   'mask-top-right': {
-    '@keyframes jumi-effect-mask-top-right': {
+    '@keyframes jumi-mask-top-right': {
       '0%': {
         'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
       },
@@ -1530,7 +1508,7 @@ export const effectKeyframes = {
     },
   },
   'melt': {
-    '@keyframes jumi-effect-melt': {
+    '@keyframes jumi-melt': {
       '0%': {
         'border-radius': '10px',
         'opacity': '1',
@@ -1549,7 +1527,7 @@ export const effectKeyframes = {
     },
   },
   'morph': {
-    '@keyframes jumi-effect-morph': {
+    '@keyframes jumi-morph': {
       '0%': {
         transform: 'scale(1) skew(0deg)',
       },
@@ -1565,7 +1543,7 @@ export const effectKeyframes = {
     },
   },
   'neon': {
-    '@keyframes jumi-effect-neon': {
+    '@keyframes jumi-neon': {
       '0%, 100%': {
         filter: 'drop-shadow(0 0 5px currentColor) drop-shadow(0 0 10px currentColor)',
       },
@@ -1575,7 +1553,7 @@ export const effectKeyframes = {
     },
   },
   'power-off': {
-    '@keyframes jumi-effect-power-off': {
+    '@keyframes jumi-power-off': {
       '0%': {
         transform: 'scale3d(1, 1, 1)',
       },
@@ -1586,7 +1564,7 @@ export const effectKeyframes = {
     },
   },
   'power-on': {
-    '@keyframes jumi-effect-power-on': {
+    '@keyframes jumi-power-on': {
       '0%': {
         opacity: '0',
         transform: 'scale3d(0.1, 0.002, 1)',
@@ -1597,7 +1575,7 @@ export const effectKeyframes = {
     },
   },
   'pulsing': {
-    '@keyframes jumi-effect-pulsing': {
+    '@keyframes jumi-pulsing': {
       '50%': {
         transform: 'scale3d(1.05, 1.05, 1.05)',
       },
@@ -1610,7 +1588,7 @@ export const effectKeyframes = {
     },
   },
   'reveal-down': {
-    '@keyframes jumi-effect-reveal-down': {
+    '@keyframes jumi-reveal-down': {
       '0%': {
         clipPath: 'polygon(0 0, 100% 0, 100% 0, 0 0)',
         opacity: '0',
@@ -1622,7 +1600,7 @@ export const effectKeyframes = {
     },
   },
   'reveal-left': {
-    '@keyframes jumi-effect-reveal-left': {
+    '@keyframes jumi-reveal-left': {
       '0%': {
         clipPath: 'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)',
         opacity: '0',
@@ -1634,7 +1612,7 @@ export const effectKeyframes = {
     },
   },
   'reveal-right': {
-    '@keyframes jumi-effect-reveal-right': {
+    '@keyframes jumi-reveal-right': {
       '0%': {
         clipPath: 'polygon(0 0, 0 0, 0 100%, 0 100%)',
         opacity: '0',
@@ -1646,7 +1624,7 @@ export const effectKeyframes = {
     },
   },
   'reveal-swipe': {
-    '@keyframes jumi-effect-reveal-swipe': {
+    '@keyframes jumi-reveal-swipe': {
       '0%': {
         'clip-path': 'polygon(0 0, 0 0, 0 100%, 0 100%)',
         'opacity': '0',
@@ -1665,7 +1643,7 @@ export const effectKeyframes = {
     },
   },
   'reveal-up': {
-    '@keyframes jumi-effect-reveal-up': {
+    '@keyframes jumi-reveal-up': {
       '0%': {
         clipPath: 'polygon(0 100%, 100% 100%, 100% 100%, 0 100%)',
         opacity: '0',
@@ -1677,7 +1655,7 @@ export const effectKeyframes = {
     },
   },
   'ripple': {
-    '@keyframes jumi-effect-ripple': {
+    '@keyframes jumi-ripple': {
       '0%': {
         opacity: '1',
         transform: 'scale(1)',
@@ -1689,7 +1667,7 @@ export const effectKeyframes = {
     },
   },
   'rotate-left': {
-    '@keyframes jumi-effect-rotate-left': {
+    '@keyframes jumi-rotate-left': {
       '0%': {
         transform: 'rotate(0deg)',
       },
@@ -1699,7 +1677,7 @@ export const effectKeyframes = {
     },
   },
   'rotate-right': {
-    '@keyframes jumi-effect-rotate-right': {
+    '@keyframes jumi-rotate-right': {
       '0%': {
         transform: 'rotate(0deg)',
       },
@@ -1709,7 +1687,7 @@ export const effectKeyframes = {
     },
   },
   'rush-in-down': {
-    '@keyframes jumi-effect-rush-in-down': {
+    '@keyframes jumi-rush-in-down': {
       '0%': {
         opacity: '0',
         transform: 'translateY(-200px) skewY(30deg) scale(0.8)',
@@ -1728,7 +1706,7 @@ export const effectKeyframes = {
     },
   },
   'rush-in-left': {
-    '@keyframes jumi-effect-rush-in-left': {
+    '@keyframes jumi-rush-in-left': {
       '0%': {
         opacity: '0',
         transform: 'translateX(-200px) skewX(30deg) scale(0.8)',
@@ -1747,7 +1725,7 @@ export const effectKeyframes = {
     },
   },
   'rush-in-right': {
-    '@keyframes jumi-effect-rush-in-right': {
+    '@keyframes jumi-rush-in-right': {
       '0%': {
         opacity: '0',
         transform: 'translateX(200px) skewX(-30deg) scale(0.8)',
@@ -1766,7 +1744,7 @@ export const effectKeyframes = {
     },
   },
   'rush-in-up': {
-    '@keyframes jumi-effect-rush-in-up': {
+    '@keyframes jumi-rush-in-up': {
       '0%': {
         opacity: '0',
         transform: 'translateY(200px) skewY(-30deg) scale(0.8)',
@@ -1785,7 +1763,7 @@ export const effectKeyframes = {
     },
   },
   'rush-out-down': {
-    '@keyframes jumi-effect-rush-out-down': {
+    '@keyframes jumi-rush-out-down': {
       '0%': {
         opacity: '1',
         transform: 'translateY(0) skewY(0deg) scale(1)',
@@ -1804,7 +1782,7 @@ export const effectKeyframes = {
     },
   },
   'rush-out-left': {
-    '@keyframes jumi-effect-rush-out-left': {
+    '@keyframes jumi-rush-out-left': {
       '0%': {
         opacity: '1',
         transform: 'translateX(0) skewX(0deg) scale(1)',
@@ -1823,7 +1801,7 @@ export const effectKeyframes = {
     },
   },
   'rush-out-right': {
-    '@keyframes jumi-effect-rush-out-right': {
+    '@keyframes jumi-rush-out-right': {
       '0%': {
         opacity: '1',
         transform: 'translateX(0) skewX(0deg) scale(1)',
@@ -1842,7 +1820,7 @@ export const effectKeyframes = {
     },
   },
   'rush-out-up': {
-    '@keyframes jumi-effect-rush-out-up': {
+    '@keyframes jumi-rush-out-up': {
       '0%': {
         opacity: '1',
         transform: 'translateY(0) skewY(0deg) scale(1)',
@@ -1861,7 +1839,7 @@ export const effectKeyframes = {
     },
   },
   'scatter': {
-    '@keyframes jumi-effect-scatter': {
+    '@keyframes jumi-scatter': {
       '0%': {
         opacity: '1',
         transform: 'scale(1) translateX(0) translateY(0)',
@@ -1885,7 +1863,7 @@ export const effectKeyframes = {
     },
   },
   'shadow': {
-    '@keyframes jumi-effect-shadow': {
+    '@keyframes jumi-shadow': {
       '0%': {
         'text-shadow': '0 0 0 transparent',
       },
@@ -1898,7 +1876,7 @@ export const effectKeyframes = {
     },
   },
   'shake': {
-    '@keyframes jumi-effect-shake': {
+    '@keyframes jumi-shake': {
       '10%, 30%, 50%, 70%, 90%': {
         transform: 'translate3d(-10px, 0, 0)',
       },
@@ -1911,7 +1889,7 @@ export const effectKeyframes = {
     },
   },
   'shimmer': {
-    '@keyframes jumi-effect-shimmer': {
+    '@keyframes jumi-shimmer': {
       '0%': {
         opacity: '0',
         transform: 'translateX(-100%)',
@@ -1925,42 +1903,8 @@ export const effectKeyframes = {
       },
     },
   },
-  'skew-in': {
-    '@keyframes jumi-effect-skew-in': {
-      '0%': {
-        opacity: '0',
-        transform: 'skew(-20deg, -20deg)',
-      },
-      '100%': {
-        opacity: '1',
-        transform: 'skew(0deg, 0deg)',
-      },
-    },
-  },
-  'skew-out': {
-    '@keyframes jumi-effect-skew-out': {
-      '0%': {
-        opacity: '1',
-        transform: 'skew(0deg, 0deg)',
-      },
-      '100%': {
-        opacity: '0',
-        transform: 'skew(-20deg, -20deg)',
-      },
-    },
-  },
-  'skew-x': {
-    '@keyframes jumi-effect-skew-x': {
-      '0%': {
-        transform: 'skewX(0deg)',
-      },
-      '100%': {
-        transform: 'skewX(20deg)',
-      },
-    },
-  },
-  'skew-y': {
-    '@keyframes jumi-effect-skew-y': {
+  'skew-down': {
+    '@keyframes jumi-skew-down': {
       '0%': {
         transform: 'skewY(0deg)',
       },
@@ -1969,8 +1913,102 @@ export const effectKeyframes = {
       },
     },
   },
+  'skew-in': {
+    '@keyframes jumi-skew-in': {
+      '0%': {
+        opacity: '0',
+        transform: 'skew(-20deg, -20deg)',
+      },
+      '100%': {
+        opacity: '1',
+        transform: 'skew(0deg, 0deg)',
+      },
+    },
+  },
+  'skew-left': {
+    '@keyframes jumi-skew-left': {
+      '0%': {
+        transform: 'skewX(0deg)',
+      },
+      '100%': {
+        transform: 'skewX(-20deg)',
+      },
+    },
+  },
+  'skew-left-down': {
+    '@keyframes jumi-skew-left-down': {
+      '0%': {
+        transform: 'skew(0deg, 0deg)',
+      },
+      '100%': {
+        transform: 'skew(-20deg, 20deg)',
+      },
+    },
+  },
+  'skew-left-up': {
+    '@keyframes jumi-skew-left-up': {
+      '0%': {
+        transform: 'skew(0deg, 0deg)',
+      },
+      '100%': {
+        transform: 'skew(-20deg, -20deg)',
+      },
+    },
+  },
+  'skew-out': {
+    '@keyframes jumi-skew-out': {
+      '0%': {
+        opacity: '1',
+        transform: 'skew(0deg, 0deg)',
+      },
+      '100%': {
+        opacity: '0',
+        transform: 'skew(-20deg, -20deg)',
+      },
+    },
+  },
+  'skew-right': {
+    '@keyframes jumi-skew-right': {
+      '0%': {
+        transform: 'skewX(0deg)',
+      },
+      '100%': {
+        transform: 'skewX(20deg)',
+      },
+    },
+  },
+  'skew-right-down': {
+    '@keyframes jumi-skew-right-down': {
+      '0%': {
+        transform: 'skew(0deg, 0deg)',
+      },
+      '100%': {
+        transform: 'skew(20deg, 20deg)',
+      },
+    },
+  },
+  'skew-right-up': {
+    '@keyframes jumi-skew-right-up': {
+      '0%': {
+        transform: 'skew(0deg, 0deg)',
+      },
+      '100%': {
+        transform: 'skew(20deg, -20deg)',
+      },
+    },
+  },
+  'skew-up': {
+    '@keyframes jumi-skew-up': {
+      '0%': {
+        transform: 'skewY(0deg)',
+      },
+      '100%': {
+        transform: 'skewY(-20deg)',
+      },
+    },
+  },
   'slide-in-down': {
-    '@keyframes jumi-effect-slide-in-down': {
+    '@keyframes jumi-slide-in-down': {
       '0%': {
         opacity: '0',
         transform: 'translate3d(0, -100%, 0)',
@@ -1983,7 +2021,7 @@ export const effectKeyframes = {
     },
   },
   'slide-in-down-elastic': {
-    '@keyframes jumi-effect-slide-in-down-elastic': {
+    '@keyframes jumi-slide-in-down-elastic': {
       '0%': {
         opacity: '0',
         transform: 'translate3d(0, -100%, 0)',
@@ -2006,7 +2044,7 @@ export const effectKeyframes = {
     },
   },
   'slide-in-left': {
-    '@keyframes jumi-effect-slide-in-left': {
+    '@keyframes jumi-slide-in-left': {
       '0%': {
         opacity: '0',
         transform: 'translate3d(-100%, 0, 0)',
@@ -2019,7 +2057,7 @@ export const effectKeyframes = {
     },
   },
   'slide-in-right': {
-    '@keyframes jumi-effect-slide-in-right': {
+    '@keyframes jumi-slide-in-right': {
       '0%': {
         opacity: '0',
         transform: 'translate3d(100%, 0, 0)',
@@ -2032,7 +2070,7 @@ export const effectKeyframes = {
     },
   },
   'slide-in-up': {
-    '@keyframes jumi-effect-slide-in-up': {
+    '@keyframes jumi-slide-in-up': {
       '0%': {
         opacity: '0',
         transform: 'translate3d(0, 100%, 0)',
@@ -2045,7 +2083,7 @@ export const effectKeyframes = {
     },
   },
   'slide-in-up-elastic': {
-    '@keyframes jumi-effect-slide-in-up-elastic': {
+    '@keyframes jumi-slide-in-up-elastic': {
       '0%': {
         opacity: '0',
         transform: 'translate3d(0, 100%, 0)',
@@ -2068,7 +2106,7 @@ export const effectKeyframes = {
     },
   },
   'slide-in-up-left': {
-    '@keyframes jumi-effect-slide-in-up-left': {
+    '@keyframes jumi-slide-in-up-left': {
       '0%': {
         opacity: '0',
         transform: 'translate3d(-100%, 100%, 0)',
@@ -2081,7 +2119,7 @@ export const effectKeyframes = {
     },
   },
   'slide-in-up-right': {
-    '@keyframes jumi-effect-slide-in-up-right': {
+    '@keyframes jumi-slide-in-up-right': {
       '0%': {
         opacity: '0',
         transform: 'translate3d(100%, 100%, 0)',
@@ -2094,7 +2132,7 @@ export const effectKeyframes = {
     },
   },
   'slide-out-down': {
-    '@keyframes jumi-effect-slide-out-down': {
+    '@keyframes jumi-slide-out-down': {
       '0%': {
         opacity: '1',
         transform: 'translate3d(0, 0, 0)',
@@ -2107,7 +2145,7 @@ export const effectKeyframes = {
     },
   },
   'slide-out-left': {
-    '@keyframes jumi-effect-slide-out-left': {
+    '@keyframes jumi-slide-out-left': {
       '0%': {
         opacity: '1',
         transform: 'translate3d(0, 0, 0)',
@@ -2120,7 +2158,7 @@ export const effectKeyframes = {
     },
   },
   'slide-out-right': {
-    '@keyframes jumi-effect-slide-out-right': {
+    '@keyframes jumi-slide-out-right': {
       '0%': {
         opacity: '1',
         transform: 'translate3d(0, 0, 0)',
@@ -2133,7 +2171,7 @@ export const effectKeyframes = {
     },
   },
   'slide-out-up': {
-    '@keyframes jumi-effect-slide-out-up': {
+    '@keyframes jumi-slide-out-up': {
       '0%': {
         opacity: '1',
         transform: 'translate3d(0, 0, 0)',
@@ -2146,7 +2184,7 @@ export const effectKeyframes = {
     },
   },
   'slide-peek-down': {
-    '@keyframes jumi-effect-slide-peek-down': {
+    '@keyframes jumi-slide-peek-down': {
       '0%': {
         opacity: '0',
         transform: 'translate3d(0, -50%, 0)',
@@ -2159,7 +2197,7 @@ export const effectKeyframes = {
     },
   },
   'slide-peek-left': {
-    '@keyframes jumi-effect-slide-peek-left': {
+    '@keyframes jumi-slide-peek-left': {
       '0%': {
         opacity: '0',
         transform: 'translate3d(-50%, 0, 0)',
@@ -2172,7 +2210,7 @@ export const effectKeyframes = {
     },
   },
   'slide-peek-right': {
-    '@keyframes jumi-effect-slide-peek-right': {
+    '@keyframes jumi-slide-peek-right': {
       '0%': {
         opacity: '0',
         transform: 'translate3d(50%, 0, 0)',
@@ -2185,7 +2223,7 @@ export const effectKeyframes = {
     },
   },
   'slide-peek-up': {
-    '@keyframes jumi-effect-slide-peek-up': {
+    '@keyframes jumi-slide-peek-up': {
       '0%': {
         opacity: '0',
         transform: 'translate3d(0, 50%, 0)',
@@ -2198,7 +2236,7 @@ export const effectKeyframes = {
     },
   },
   'slide-stack': {
-    '@keyframes jumi-effect-slide-stack': {
+    '@keyframes jumi-slide-stack': {
       '0%': {
         'opacity': '0',
         'transform': 'translateX(-100%) translateY(-20px) scale(0.9)',
@@ -2217,7 +2255,7 @@ export const effectKeyframes = {
     },
   },
   'spin': {
-    '@keyframes jumi-effect-spin': {
+    '@keyframes jumi-spin': {
       '0%': {
         transform: 'rotateX(0deg) rotateY(0deg)',
       },
@@ -2227,7 +2265,7 @@ export const effectKeyframes = {
     },
   },
   'spiral': {
-    '@keyframes jumi-effect-spiral': {
+    '@keyframes jumi-spiral': {
       '0%': {
         transform: 'rotate(0deg) scale(1)',
       },
@@ -2240,7 +2278,7 @@ export const effectKeyframes = {
     },
   },
   'spiral-back-in': {
-    '@keyframes jumi-effect-spiral-back-in': {
+    '@keyframes jumi-spiral-back-in': {
       '0%': {
         opacity: '0',
         transform: 'rotate(-360deg) scale(0)',
@@ -2252,7 +2290,7 @@ export const effectKeyframes = {
     },
   },
   'spiral-back-out': {
-    '@keyframes jumi-effect-spiral-back-out': {
+    '@keyframes jumi-spiral-back-out': {
       '0%': {
         opacity: '1',
         transform: 'rotate(0deg) scale(1)',
@@ -2264,7 +2302,7 @@ export const effectKeyframes = {
     },
   },
   'spiral-in': {
-    '@keyframes jumi-effect-spiral-in': {
+    '@keyframes jumi-spiral-in': {
       '0%': {
         opacity: '0',
         transform: 'rotate(360deg) scale(0)',
@@ -2276,7 +2314,7 @@ export const effectKeyframes = {
     },
   },
   'spiral-out': {
-    '@keyframes jumi-effect-spiral-out': {
+    '@keyframes jumi-spiral-out': {
       '0%': {
         opacity: '1',
         transform: 'rotate(0deg) scale(1)',
@@ -2288,7 +2326,7 @@ export const effectKeyframes = {
     },
   },
   'spiral-path': {
-    '@keyframes jumi-effect-spiral-path': {
+    '@keyframes jumi-spiral-path': {
       '0%': {
         opacity: '0',
         transform: 'rotate(0deg) translateX(50px) rotate(0deg) scale(0.5)',
@@ -2312,7 +2350,7 @@ export const effectKeyframes = {
     },
   },
   'splash': {
-    '@keyframes jumi-effect-splash': {
+    '@keyframes jumi-splash': {
       '0%': {
         'border-radius': '50%',
         'opacity': '0',
@@ -2336,7 +2374,7 @@ export const effectKeyframes = {
     },
   },
   'spring-down': {
-    '@keyframes jumi-effect-spring-down': {
+    '@keyframes jumi-spring-down': {
       '0%': {
         opacity: '0',
         transform: 'translateY(-100px) scale(0.3)',
@@ -2354,7 +2392,7 @@ export const effectKeyframes = {
     },
   },
   'spring-left': {
-    '@keyframes jumi-effect-spring-left': {
+    '@keyframes jumi-spring-left': {
       '0%': {
         opacity: '0',
         transform: 'translateX(-100px) scale(0.3)',
@@ -2372,7 +2410,7 @@ export const effectKeyframes = {
     },
   },
   'spring-right': {
-    '@keyframes jumi-effect-spring-right': {
+    '@keyframes jumi-spring-right': {
       '0%': {
         opacity: '0',
         transform: 'translateX(100px) scale(0.3)',
@@ -2390,7 +2428,7 @@ export const effectKeyframes = {
     },
   },
   'spring-up': {
-    '@keyframes jumi-effect-spring-up': {
+    '@keyframes jumi-spring-up': {
       '0%': {
         opacity: '0',
         transform: 'translateY(100px) scale(0.3)',
@@ -2408,7 +2446,7 @@ export const effectKeyframes = {
     },
   },
   'square-in': {
-    '@keyframes jumi-effect-square-in': {
+    '@keyframes jumi-square-in': {
       '0%': {
         'clip-path': 'polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%)',
       },
@@ -2418,7 +2456,7 @@ export const effectKeyframes = {
     },
   },
   'square-in-bottom-left': {
-    '@keyframes jumi-effect-square-in-bottom-left': {
+    '@keyframes jumi-square-in-bottom-left': {
       '0%': {
         'clip-path': 'polygon(0% 100%, 0% 100%, 0% 100%, 0% 100%)',
       },
@@ -2428,7 +2466,7 @@ export const effectKeyframes = {
     },
   },
   'square-in-bottom-right': {
-    '@keyframes jumi-effect-square-in-bottom-right': {
+    '@keyframes jumi-square-in-bottom-right': {
       '0%': {
         'clip-path': 'polygon(100% 100%, 100% 100%, 100% 100%, 100% 100%)',
       },
@@ -2438,7 +2476,7 @@ export const effectKeyframes = {
     },
   },
   'square-in-top-left': {
-    '@keyframes jumi-effect-square-in-top-left': {
+    '@keyframes jumi-square-in-top-left': {
       '0%': {
         'clip-path': 'polygon(0% 0%, 0% 0%, 0% 0%, 0% 0%)',
       },
@@ -2448,7 +2486,7 @@ export const effectKeyframes = {
     },
   },
   'square-in-top-right': {
-    '@keyframes jumi-effect-square-in-top-right': {
+    '@keyframes jumi-square-in-top-right': {
       '0%': {
         'clip-path': 'polygon(100% 0%, 100% 0%, 100% 0%, 100% 0%)',
       },
@@ -2458,7 +2496,7 @@ export const effectKeyframes = {
     },
   },
   'square-out': {
-    '@keyframes jumi-effect-square-out': {
+    '@keyframes jumi-square-out': {
       '0%': {
         'clip-path': 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
       },
@@ -2468,7 +2506,7 @@ export const effectKeyframes = {
     },
   },
   'square-out-bottom-left': {
-    '@keyframes jumi-effect-square-out-bottom-left': {
+    '@keyframes jumi-square-out-bottom-left': {
       '0%': {
         'clip-path': 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
       },
@@ -2478,7 +2516,7 @@ export const effectKeyframes = {
     },
   },
   'square-out-bottom-right': {
-    '@keyframes jumi-effect-square-out-bottom-right': {
+    '@keyframes jumi-square-out-bottom-right': {
       '0%': {
         'clip-path': 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
       },
@@ -2488,7 +2526,7 @@ export const effectKeyframes = {
     },
   },
   'square-out-top-left': {
-    '@keyframes jumi-effect-square-out-top-left': {
+    '@keyframes jumi-square-out-top-left': {
       '0%': {
         'clip-path': 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
       },
@@ -2498,7 +2536,7 @@ export const effectKeyframes = {
     },
   },
   'square-out-top-right': {
-    '@keyframes jumi-effect-square-out-top-right': {
+    '@keyframes jumi-square-out-top-right': {
       '0%': {
         'clip-path': 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
       },
@@ -2508,7 +2546,7 @@ export const effectKeyframes = {
     },
   },
   'swing': {
-    '@keyframes jumi-effect-swing': {
+    '@keyframes jumi-swing': {
       '20%': {
         transform: 'rotateZ(15deg)',
       },
@@ -2527,7 +2565,7 @@ export const effectKeyframes = {
     },
   },
   'tada': {
-    '@keyframes jumi-effect-tada': {
+    '@keyframes jumi-tada': {
       '10%, 20%': {
         transform: 'scale3d(0.9, 0.9, 0.9) rotateZ(-3deg)',
       },
@@ -2546,7 +2584,7 @@ export const effectKeyframes = {
     },
   },
   'throw-down': {
-    '@keyframes jumi-effect-throw-down': {
+    '@keyframes jumi-throw-down': {
       '0%': {
         opacity: '0',
         transform: 'translateY(-200px) rotate(-45deg) scale(0.5)',
@@ -2561,7 +2599,7 @@ export const effectKeyframes = {
     },
   },
   'throw-left': {
-    '@keyframes jumi-effect-throw-left': {
+    '@keyframes jumi-throw-left': {
       '0%': {
         opacity: '0',
         transform: 'translateX(-200px) rotate(-45deg) scale(0.5)',
@@ -2576,7 +2614,7 @@ export const effectKeyframes = {
     },
   },
   'throw-right': {
-    '@keyframes jumi-effect-throw-right': {
+    '@keyframes jumi-throw-right': {
       '0%': {
         opacity: '0',
         transform: 'translateX(200px) rotate(45deg) scale(0.5)',
@@ -2591,7 +2629,7 @@ export const effectKeyframes = {
     },
   },
   'throw-up': {
-    '@keyframes jumi-effect-throw-up': {
+    '@keyframes jumi-throw-up': {
       '0%': {
         opacity: '0',
         transform: 'translateY(200px) rotate(45deg) scale(0.5)',
@@ -2606,7 +2644,7 @@ export const effectKeyframes = {
     },
   },
   'tilt': {
-    '@keyframes jumi-effect-tilt': {
+    '@keyframes jumi-tilt': {
       '0%': {
         transform: 'rotateX(0deg) rotateY(0deg)',
       },
@@ -2619,7 +2657,7 @@ export const effectKeyframes = {
     },
   },
   'triangle-in': {
-    '@keyframes jumi-effect-triangle-in': {
+    '@keyframes jumi-triangle-in': {
       '0%': {
         'clip-path': 'polygon(50% 50%, 50% 50%, 50% 50%)',
       },
@@ -2629,7 +2667,7 @@ export const effectKeyframes = {
     },
   },
   'triangle-in-bottom-left': {
-    '@keyframes jumi-effect-triangle-in-bottom-left': {
+    '@keyframes jumi-triangle-in-bottom-left': {
       '0%': {
         'clip-path': 'polygon(0% 100%, 0% 100%, 0% 100%)',
       },
@@ -2639,7 +2677,7 @@ export const effectKeyframes = {
     },
   },
   'triangle-in-bottom-right': {
-    '@keyframes jumi-effect-triangle-in-bottom-right': {
+    '@keyframes jumi-triangle-in-bottom-right': {
       '0%': {
         'clip-path': 'polygon(100% 100%, 100% 100%, 100% 100%)',
       },
@@ -2649,7 +2687,7 @@ export const effectKeyframes = {
     },
   },
   'triangle-in-top-left': {
-    '@keyframes jumi-effect-triangle-in-top-left': {
+    '@keyframes jumi-triangle-in-top-left': {
       '0%': {
         'clip-path': 'polygon(0% 0%, 0% 0%, 0% 0%)',
       },
@@ -2659,7 +2697,7 @@ export const effectKeyframes = {
     },
   },
   'triangle-in-top-right': {
-    '@keyframes jumi-effect-triangle-in-top-right': {
+    '@keyframes jumi-triangle-in-top-right': {
       '0%': {
         'clip-path': 'polygon(100% 0%, 100% 0%, 100% 0%)',
       },
@@ -2669,7 +2707,7 @@ export const effectKeyframes = {
     },
   },
   'triangle-out': {
-    '@keyframes jumi-effect-triangle-out': {
+    '@keyframes jumi-triangle-out': {
       '0%': {
         'clip-path': 'polygon(50% 0%, 100% 100%, 0% 100%)',
       },
@@ -2679,7 +2717,7 @@ export const effectKeyframes = {
     },
   },
   'triangle-out-bottom-left': {
-    '@keyframes jumi-effect-triangle-out-bottom-left': {
+    '@keyframes jumi-triangle-out-bottom-left': {
       '0%': {
         'clip-path': 'polygon(0% 0%, 100% 0%, 100% 100%)',
       },
@@ -2689,7 +2727,7 @@ export const effectKeyframes = {
     },
   },
   'triangle-out-bottom-right': {
-    '@keyframes jumi-effect-triangle-out-bottom-right': {
+    '@keyframes jumi-triangle-out-bottom-right': {
       '0%': {
         'clip-path': 'polygon(0% 0%, 100% 0%, 0% 100%)',
       },
@@ -2699,7 +2737,7 @@ export const effectKeyframes = {
     },
   },
   'triangle-out-top-left': {
-    '@keyframes jumi-effect-triangle-out-top-left': {
+    '@keyframes jumi-triangle-out-top-left': {
       '0%': {
         'clip-path': 'polygon(0% 0%, 100% 100%, 0% 100%)',
       },
@@ -2709,7 +2747,7 @@ export const effectKeyframes = {
     },
   },
   'triangle-out-top-right': {
-    '@keyframes jumi-effect-triangle-out-top-right': {
+    '@keyframes jumi-triangle-out-top-right': {
       '0%': {
         'clip-path': 'polygon(0% 0%, 100% 0%, 50% 100%)',
       },
@@ -2719,7 +2757,7 @@ export const effectKeyframes = {
     },
   },
   'twist': {
-    '@keyframes jumi-effect-twist': {
+    '@keyframes jumi-twist': {
       '0%': {
         transform: 'rotate(0deg) scaleX(1)',
       },
@@ -2738,7 +2776,7 @@ export const effectKeyframes = {
     },
   },
   'twist-in': {
-    '@keyframes jumi-effect-twist-in': {
+    '@keyframes jumi-twist-in': {
       '0%': {
         opacity: '0',
         transform: 'rotate(-180deg) scaleX(0)',
@@ -2750,7 +2788,7 @@ export const effectKeyframes = {
     },
   },
   'twist-out': {
-    '@keyframes jumi-effect-twist-out': {
+    '@keyframes jumi-twist-out': {
       '0%': {
         opacity: '1',
         transform: 'rotate(0deg) scaleX(1)',
@@ -2762,7 +2800,7 @@ export const effectKeyframes = {
     },
   },
   'typing': {
-    '@keyframes jumi-effect-typing': {
+    '@keyframes jumi-typing': {
       '0%': {
         width: '0',
       },
@@ -2772,7 +2810,7 @@ export const effectKeyframes = {
     },
   },
   'unfold-x': {
-    '@keyframes jumi-effect-unfold-x': {
+    '@keyframes jumi-unfold-x': {
       '0%': {
         'opacity': '0',
         'transform': 'scaleX(0) rotateY(90deg)',
@@ -2793,7 +2831,7 @@ export const effectKeyframes = {
     },
   },
   'unfold-y': {
-    '@keyframes jumi-effect-unfold-y': {
+    '@keyframes jumi-unfold-y': {
       '0%': {
         'opacity': '0',
         'transform': 'scaleY(0) rotateX(90deg)',
@@ -2814,7 +2852,7 @@ export const effectKeyframes = {
     },
   },
   'unmask': {
-    '@keyframes jumi-effect-unmask': {
+    '@keyframes jumi-unmask': {
       '0%': {
         'clip-path': 'polygon(0 40%, 100% 40%, 100% 60%, 0 60%)',
       },
@@ -2824,7 +2862,7 @@ export const effectKeyframes = {
     },
   },
   'unmask-bottom': {
-    '@keyframes jumi-effect-unmask-bottom': {
+    '@keyframes jumi-unmask-bottom': {
       '0%': {
         'clip-path': 'polygon(0 100%, 100% 100%, 100% 100%, 0 100%)',
       },
@@ -2834,7 +2872,7 @@ export const effectKeyframes = {
     },
   },
   'unmask-bottom-left': {
-    '@keyframes jumi-effect-unmask-bottom-left': {
+    '@keyframes jumi-unmask-bottom-left': {
       '0%': {
         'clip-path': 'polygon(0 100%, 0 100%, 0 100%, 0 100%)',
       },
@@ -2844,7 +2882,7 @@ export const effectKeyframes = {
     },
   },
   'unmask-bottom-right': {
-    '@keyframes jumi-effect-unmask-bottom-right': {
+    '@keyframes jumi-unmask-bottom-right': {
       '0%': {
         'clip-path': 'polygon(100% 100%, 100% 100%, 100% 100%, 100% 100%)',
       },
@@ -2854,7 +2892,7 @@ export const effectKeyframes = {
     },
   },
   'unmask-left': {
-    '@keyframes jumi-effect-unmask-left': {
+    '@keyframes jumi-unmask-left': {
       '0%': {
         'clip-path': 'polygon(0 0, 0 0, 0 100%, 0 100%)',
       },
@@ -2864,7 +2902,7 @@ export const effectKeyframes = {
     },
   },
   'unmask-right': {
-    '@keyframes jumi-effect-unmask-right': {
+    '@keyframes jumi-unmask-right': {
       '0%': {
         'clip-path': 'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)',
       },
@@ -2874,7 +2912,7 @@ export const effectKeyframes = {
     },
   },
   'unmask-top': {
-    '@keyframes jumi-effect-unmask-top': {
+    '@keyframes jumi-unmask-top': {
       '0%': {
         'clip-path': 'polygon(0 0, 100% 0, 100% 0, 0 0)',
       },
@@ -2884,7 +2922,7 @@ export const effectKeyframes = {
     },
   },
   'unmask-top-left': {
-    '@keyframes jumi-effect-unmask-top-left': {
+    '@keyframes jumi-unmask-top-left': {
       '0%': {
         'clip-path': 'polygon(0 0, 0 0, 0 0, 0 0)',
       },
@@ -2894,7 +2932,7 @@ export const effectKeyframes = {
     },
   },
   'unmask-top-right': {
-    '@keyframes jumi-effect-unmask-top-right': {
+    '@keyframes jumi-unmask-top-right': {
       '0%': {
         'clip-path': 'polygon(100% 0, 100% 0, 100% 0, 100% 0)',
       },
@@ -2904,7 +2942,7 @@ export const effectKeyframes = {
     },
   },
   'wave': {
-    '@keyframes jumi-effect-wave': {
+    '@keyframes jumi-wave': {
       '0%, 100%': {
         transform: 'rotate(0deg)',
       },
@@ -2929,7 +2967,7 @@ export const effectKeyframes = {
     },
   },
   'wiggle': {
-    '@keyframes jumi-effect-wiggle': {
+    '@keyframes jumi-wiggle': {
       '0%, 100%': {
         transform: 'rotate(0deg)',
       },
@@ -2942,7 +2980,7 @@ export const effectKeyframes = {
     },
   },
   'wobble': {
-    '@keyframes jumi-effect-wobble': {
+    '@keyframes jumi-wobble': {
       '15%': {
         transform: 'translate3d(-25%, 0, 0) rotateZ(-5deg)',
       },
@@ -2967,7 +3005,7 @@ export const effectKeyframes = {
     },
   },
   'wobbling': {
-    '@keyframes jumi-effect-wobbling': {
+    '@keyframes jumi-wobbling': {
       '0%': {
         transform: 'rotateX(0deg) rotateY(0deg)',
       },
@@ -2983,7 +3021,7 @@ export const effectKeyframes = {
     },
   },
   'word-slide': {
-    '@keyframes jumi-effect-word-slide': {
+    '@keyframes jumi-word-slide': {
       '0%': {
         opacity: '0',
         transform: 'translateY(20px)',
@@ -2995,7 +3033,7 @@ export const effectKeyframes = {
     },
   },
   'zoom-in': {
-    '@keyframes jumi-effect-zoom-in': {
+    '@keyframes jumi-zoom-in': {
       '0%': {
         opacity: '0',
         transform: 'scale3d(0.3, 0.3, 0.3)',
@@ -3011,7 +3049,7 @@ export const effectKeyframes = {
     },
   },
   'zoom-in-down': {
-    '@keyframes jumi-effect-zoom-in-down': {
+    '@keyframes jumi-zoom-in-down': {
       '0%': {
         opacity: '0',
         transform: 'scale3d(0.3, 0.3, 0.3) translate3d(0, -100%, 0)',
@@ -3027,7 +3065,7 @@ export const effectKeyframes = {
     },
   },
   'zoom-in-elastic': {
-    '@keyframes jumi-effect-zoom-in-elastic': {
+    '@keyframes jumi-zoom-in-elastic': {
       '0%': {
         opacity: '0',
         transform: 'scale3d(0.1, 0.1, 0.1)',
@@ -3049,7 +3087,7 @@ export const effectKeyframes = {
     },
   },
   'zoom-in-left': {
-    '@keyframes jumi-effect-zoom-in-left': {
+    '@keyframes jumi-zoom-in-left': {
       '0%': {
         opacity: '0',
         transform: 'scale3d(0.3, 0.3, 0.3) translate3d(-100%, 0, 0)',
@@ -3065,7 +3103,7 @@ export const effectKeyframes = {
     },
   },
   'zoom-in-right': {
-    '@keyframes jumi-effect-zoom-in-right': {
+    '@keyframes jumi-zoom-in-right': {
       '0%': {
         opacity: '0',
         transform: 'scale3d(0.3, 0.3, 0.3) translate3d(100%, 0, 0)',
@@ -3081,7 +3119,7 @@ export const effectKeyframes = {
     },
   },
   'zoom-in-up': {
-    '@keyframes jumi-effect-zoom-in-up': {
+    '@keyframes jumi-zoom-in-up': {
       '0%': {
         opacity: '0',
         transform: 'scale3d(0.3, 0.3, 0.3) translate3d(0, 100%, 0)',
@@ -3097,7 +3135,7 @@ export const effectKeyframes = {
     },
   },
   'zoom-out': {
-    '@keyframes jumi-effect-zoom-out': {
+    '@keyframes jumi-zoom-out': {
       '0%': {
         opacity: '1',
         transform: 'scale3d(1, 1, 1)',
@@ -3113,7 +3151,7 @@ export const effectKeyframes = {
     },
   },
   'zoom-out-down': {
-    '@keyframes jumi-effect-zoom-out-down': {
+    '@keyframes jumi-zoom-out-down': {
       '0%': {
         opacity: '1',
         transform: 'scale3d(1, 1, 1) translate3d(0, 0, 0)',
@@ -3129,7 +3167,7 @@ export const effectKeyframes = {
     },
   },
   'zoom-out-elastic': {
-    '@keyframes jumi-effect-zoom-out-elastic': {
+    '@keyframes jumi-zoom-out-elastic': {
       '0%': {
         opacity: '1',
         transform: 'scale3d(1, 1, 1)',
@@ -3151,7 +3189,7 @@ export const effectKeyframes = {
     },
   },
   'zoom-out-left': {
-    '@keyframes jumi-effect-zoom-out-left': {
+    '@keyframes jumi-zoom-out-left': {
       '0%': {
         opacity: '1',
         transform: 'scale3d(1, 1, 1) translate3d(0, 0, 0)',
@@ -3167,7 +3205,7 @@ export const effectKeyframes = {
     },
   },
   'zoom-out-right': {
-    '@keyframes jumi-effect-zoom-out-right': {
+    '@keyframes jumi-zoom-out-right': {
       '0%': {
         opacity: '1',
         transform: 'scale3d(1, 1, 1) translate3d(0, 0, 0)',
@@ -3183,7 +3221,7 @@ export const effectKeyframes = {
     },
   },
   'zoom-out-up': {
-    '@keyframes jumi-effect-zoom-out-up': {
+    '@keyframes jumi-zoom-out-up': {
       '0%': {
         opacity: '1',
         transform: 'scale3d(1, 1, 1) translate3d(0, 0, 0)',
@@ -3199,7 +3237,7 @@ export const effectKeyframes = {
     },
   },
   'zoom-pulse': {
-    '@keyframes jumi-effect-zoom-pulse': {
+    '@keyframes jumi-zoom-pulse': {
       '0%': {
         transform: 'scale3d(1, 1, 1)',
       },
@@ -3212,7 +3250,7 @@ export const effectKeyframes = {
     },
   },
   'zoom-pulse-grow': {
-    '@keyframes jumi-effect-zoom-pulse-grow': {
+    '@keyframes jumi-zoom-pulse-grow': {
       '0%': {
         transform: 'scale3d(1, 1, 1)',
       },
@@ -3225,7 +3263,7 @@ export const effectKeyframes = {
     },
   },
   'zoom-pulse-shrink': {
-    '@keyframes jumi-effect-zoom-pulse-shrink': {
+    '@keyframes jumi-zoom-pulse-shrink': {
       '0%': {
         transform: 'scale3d(1, 1, 1)',
       },
@@ -3238,7 +3276,7 @@ export const effectKeyframes = {
     },
   },
   'zoom-tilt-in': {
-    '@keyframes jumi-effect-zoom-tilt-in': {
+    '@keyframes jumi-zoom-tilt-in': {
       '0%': {
         opacity: '0',
         transform: 'scale3d(0.3, 0.3, 0.3) rotateX(30deg)',
@@ -3254,7 +3292,7 @@ export const effectKeyframes = {
     },
   },
   'zoom-tilt-out': {
-    '@keyframes jumi-effect-zoom-tilt-out': {
+    '@keyframes jumi-zoom-tilt-out': {
       '0%': {
         opacity: '1',
         transform: 'scale3d(1, 1, 1) rotateX(0deg)',
@@ -3269,4 +3307,9 @@ export const effectKeyframes = {
       },
     },
   },
-} as const
+} satisfies EffectKeyframes
+
+export const cssEffects: Collection<string> = {}
+for (const attribute in effectKeyframes) {
+  cssEffects[attribute] = attribute
+}
