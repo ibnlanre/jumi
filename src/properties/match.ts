@@ -1,13 +1,12 @@
-import type { BareValue, BareValueParameter, Collection, GetMatchUtilities, MatchProperty } from '@/types'
+import type { Collection, CssInJs, GetMatchUtilities, MatchProperty } from '@/types'
 
-import { animate } from '@/helpers/animate'
 import { assemble } from '@/helpers/assemble'
 import { getCreator } from '@/helpers/create'
 import { css } from '@/helpers/css'
 import { join } from '@/helpers/join'
 import { merge } from '@/helpers/merge'
-import { effectCollection } from '@/keyframes/effects'
-import { propertyCollection } from '@/keyframes/property'
+import { effects } from '@/keyframes/effects'
+import { properties } from '@/keyframes/property'
 import { alignContent } from '@/theme/align-content'
 import { alignItems } from '@/theme/align-items'
 import { alignSelf } from '@/theme/align-self'
@@ -127,36 +126,9 @@ import { transformStyle } from '@/theme/transform-style'
 import { visibility } from '@/theme/visibility'
 
 export const getMatchUtilities: GetMatchUtilities = (api) => {
-  const { animation, effect, registry, theme } = getCreator(api)
-
-  const values: any = {
-    __BARE_VALUE__: ({ value }: BareValueParameter) => {
-      console.log('hello world', value)
-
-      if (!value.startsWith('z')) return
-
-      const properties = Array.from(registry).map((value) => {
-        return css('var', `--jumi-${value}-keyframes`, 'none')
-      }).join(', ')
-
-      const animation = animate({
-        '--jumi-animation': properties,
-      })
-
-      api.addBase(animation)
-    },
-  } satisfies Collection<BareValue, '__BARE_VALUE__'>
+  const { animation, effect, register, theme } = getCreator(api)
 
   const matchProperties: Partial<MatchProperty> = {
-    'animate': {
-      property: () => {
-        return merge(assemble('animation'), {
-          animation: css('var', '--jumi-animation'),
-        })
-      },
-      type: 'any',
-      values,
-    },
     'animate-accent-color': {
       property: value => ({
         '--jumi-accent-color': value,
@@ -2976,14 +2948,13 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animate-scale': {
       property: (value) => {
-        const [x, y] = value.split(/\s+/)
         return {
+          '--jumi-scale': value,
           '--jumi-scale-keyframes': animation('scale'),
-          '--jumi-scale-x': x ?? value,
-          '--jumi-scale-y': y ?? x ?? value,
         }
       },
       supportsNegativeValues: true,
+      type: 'number',
       values: theme('scale'),
     },
     'animate-scale-x': {
@@ -3160,6 +3131,16 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       }),
       values: transformStyle,
     },
+    'animate-translate': {
+      property: (value) => {
+        return {
+          '--jumi-translate': value,
+          '--jumi-translate-keyframes': animation('translate'),
+        }
+      },
+      supportsNegativeValues: true,
+      values: theme('translate'),
+    },
     'animate-translate-3d': {
       property: value => ({
         '--jumi-transform-keyframes': animation('transform'),
@@ -3238,7 +3219,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'animation': {
       property: value => ({
-        '--jumi-animation': value,
+        animation: value,
       }),
       values: theme('animation'),
     },
@@ -3249,7 +3230,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       values: animationComposition,
     },
     'animation-delay': {
-      modifiers: propertyCollection,
+      modifiers: properties,
       property: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-delay': value }
         return { [`--jumi-${modifier}-animation-delay`]: value }
@@ -3257,7 +3238,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       values: theme('transitionDelay'),
     },
     'animation-direction': {
-      modifiers: propertyCollection,
+      modifiers: properties,
       property: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-direction': value }
         return { [`--jumi-${modifier}-animation-direction`]: value }
@@ -3265,7 +3246,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       values: animationDirection,
     },
     'animation-duration': {
-      modifiers: propertyCollection,
+      modifiers: properties,
       property: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-duration': value }
         return { [`--jumi-${modifier}-animation-duration`]: value }
@@ -3273,7 +3254,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       values: theme('transitionDuration'),
     },
     'animation-fill-mode': {
-      modifiers: propertyCollection,
+      modifiers: properties,
       property: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-fill-mode': value }
         return { [`--jumi-${modifier}-animation-fill-mode`]: value }
@@ -3281,7 +3262,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       values: animationFillMode,
     },
     'animation-iteration-count': {
-      modifiers: propertyCollection,
+      modifiers: properties,
       property: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-iteration-count': value }
         return { [`--jumi-${modifier}-animation-iteration-count`]: value }
@@ -3296,7 +3277,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       values: empty.none,
     },
     'animation-play-state': {
-      modifiers: propertyCollection,
+      modifiers: properties,
       property: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-play-state': value }
         return { [`--jumi-${modifier}-animation-play-state`]: value }
@@ -3383,7 +3364,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       values: animationTimelineScroller,
     },
     'animation-timing-function': {
-      modifiers: propertyCollection,
+      modifiers: properties,
       property: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-timing-function': value }
         return { [`--jumi-${modifier}-animation-timing-function`]: value }
@@ -3394,7 +3375,26 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       property: value => ({
         '--jumi-effect-keyframes': effect(value),
       }),
-      values: effectCollection,
+      values: effects,
+    },
+    'jumi': {
+      property: (value) => {
+        console.log('hello world', value)
+        const registry = Array.from(register).sort()
+
+        const keyframes = registry
+          .map((attribute) => {
+            const variable = `--jumi-${attribute}-keyframes`
+            return css('var', variable, 'none')
+          })
+          .join(', ')
+
+        return ['animation'].concat(registry).reduce(
+          (acc, attribute) => merge(acc, assemble(attribute)),
+          { animation: keyframes } as CssInJs,
+        )
+      },
+      values: { DEFAULT: '' },
     },
   }
 

@@ -1,6 +1,6 @@
-import type { AnimationPropertyRegisterCollection } from '@/types'
+import type { AnimationPropertyRegisterCollection, CssInJs } from '@/types'
 
-export const animationRegister: AnimationPropertyRegisterCollection = {
+export const animationRegister: CssInJs = {
   '@property --jumi-animation-composition': {
     'inherits': 'false',
     'initial-value': 'replace',
@@ -41,4 +41,4 @@ export const animationRegister: AnimationPropertyRegisterCollection = {
     'initial-value': 'ease',
     'syntax': '"ease | linear | ease-in | ease-out | ease-in-out | step-start | step-end"',
   },
-}
+} satisfies AnimationPropertyRegisterCollection

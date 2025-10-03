@@ -1,6 +1,3 @@
-import type { Collection, CssInJs } from '@/types'
-
-import { addProperties } from '@/properties/add'
 import { getMatchComponents } from '@/properties/component'
 import { getMatchUtilities } from '@/properties/match'
 import { animationRegister } from '@/variables/register'
@@ -16,28 +13,14 @@ import createPlugin from 'tailwindcss/plugin'
  * - They register CSS custom properties with type information
  * - They need to be available before any CSS that uses the properties
  */
-const register: Array<CssInJs> = [animationRegister]
-
-/**
- * Utility classes and animation properties.
- *
- * These are placed in the @utilities layer because:
- * - They are meant to be applied to specific elements as needed
- * - They should have appropriate specificity for overriding defaults
- * - They work alongside the variables to create the complete animation system
- */
-const properties: Array<Collection<CssInJs>> = [addProperties]
+const register = [animationRegister]
 
 const jumi = createPlugin((api) => {
-  const { addBase, addUtilities, matchComponents, matchUtilities, matchVariant } = api
-
+  const { addBase, matchComponents, matchUtilities, matchVariant } = api
   register.forEach(addBase)
-  // properties.forEach(addUtilities)
 
-  for (const variant of variants) {
-    matchVariant(variant.name, variant.generator, {
-      values: variant.values,
-    })
+  for (const { generator, name, values } of variants) {
+    matchVariant(name, generator, { values })
   }
 
   const utilities = getMatchUtilities(api)

@@ -4,12 +4,12 @@ import { propertyVariables } from '@/variables/property'
 
 type PropertyVariables = Partial<Record<PropertyVariable, string>>
 
-export function assemble(property: PropertyType): PropertyVariables {
+export function assemble(property: string): PropertyVariables {
   const variables: PropertyVariables = {}
-  const attribute = propertyVariables[property]
+  if (!assert(property)) return variables
 
-  if (typeof attribute !== 'object') return variables
-  const dependencies = attribute.dependencies || []
+  const attribute = propertyVariables[property]
+  const { dependencies = [], value, variable } = attribute
 
   if (dependencies.length) {
     for (const dependency of dependencies) {
@@ -18,9 +18,11 @@ export function assemble(property: PropertyType): PropertyVariables {
     }
   }
 
-  if (attribute.value) {
-    variables[attribute.variable] = attribute.value
-  }
+  if (value && variable) variables[variable] = value
 
   return variables
+}
+
+function assert(property: string): property is PropertyType {
+  return property in propertyVariables
 }

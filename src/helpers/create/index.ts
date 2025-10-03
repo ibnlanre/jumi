@@ -1,38 +1,21 @@
 import type { AnimatableStandardPropertyType, Api, Collection, CssInJs, Effect, Register, TailwindTheme } from '@/types'
 
-import { animate } from '@/helpers/animate'
-import { assemble } from '@/helpers/assemble'
 import { css } from '@/helpers/css'
 import { merge } from '@/helpers/merge'
 import { effectKeyframes } from '@/keyframes/effects'
-import { propertyKeyframes, propertyNames } from '@/keyframes/property'
+import { propertyKeyframes } from '@/keyframes/property'
 
 import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette'
 
-export function getCreator({ addBase, addUtilities, theme }: Api) {
-  /**
-   * Upon loading the plugin, TailwindCSS processes all utilities and variants.
-   * However, keyframes should only be added once to avoid duplication.
-   *
-   * This set tracks all properties that are valid for animation. The trick
-   * is to remove properties from this set as they are used. If a property is
-   * still in the set when requested, it means it hasn't been used yet and its
-   * keyframes can be added. If it's not in the set, it means the keyframes
-   * have already been added and should not be added again.
-   *
-   * This ensures that each property's keyframes are only added once,
-   * preventing duplication and potential conflicts in the generated CSS.
-   */
-  const properties = new Set<string>(propertyNames)
-
+export function getCreator({ addUtilities, theme }: Api) {
   const create = {
     animation(attribute: AnimatableStandardPropertyType): string {
       const name = `jumi-${attribute}` as const
-      const variables = animate(assemble(attribute))
-      const keyframes = propertyKeyframes[attribute] as Collection<CssInJs>
+      const keyframes = propertyKeyframes[attribute]
 
-      if (properties.has(attribute)) properties.delete(attribute)
-      else register(attribute, { keyframes, variables })
+      console.log('creating animation for:', attribute)
+
+      register(create.register, { attribute, keyframes })
 
       return [
         css('var', `--jumi-${attribute}-animation-duration`, css('var', '--jumi-animation-duration')),
@@ -49,7 +32,7 @@ export function getCreator({ addBase, addUtilities, theme }: Api) {
       const name = `jumi-effect-${attribute as Effect}` as const
       const keyframes = effectKeyframes[attribute as Effect] as Collection<CssInJs>
 
-      register(attribute, { keyframes })
+      register(create.effects, { attribute, keyframes })
 
       return [
         css('var', '--jumi-animation-duration'),
@@ -64,6 +47,17 @@ export function getCreator({ addBase, addUtilities, theme }: Api) {
     },
 
     /**
+     * This set tracks effects that have already had their keyframes added to
+     * the base styles.
+     *
+     * When an effect is used for the first time, its keyframes are added and
+     * the effect is recorded in this set. On subsequent uses, the presence of
+     * the effect in this set indicates that its keyframes have already been
+     * added, preventing duplicate additions.
+     */
+    effects: new Set<string>(),
+
+    /**
      * This set tracks properties that have already had their keyframes and
      * CSS custom properties (variables) added to the base styles.
      *
@@ -72,27 +66,25 @@ export function getCreator({ addBase, addUtilities, theme }: Api) {
      * of the property in this set indicates that its keyframes have already
      * been added, preventing duplicate additions.
      */
-    registry: new Set<string>(['effect']),
+    register: new Set<string>(['effect']),
 
     theme: (key: TailwindTheme, values?: Collection) => {
       return flattenColorPalette(merge(values, theme(key)))
     },
   }
 
-  /**
-   * CSS custom properties (variables) and keyframes that provide default values and animations.
-   *
-   * These are merged together and placed in the @base layer because:
-   * - Variables provide default values for the animation properties
-   * - Keyframes define the animation sequences
-   * - Both are needed together for the animation system to work
-   * - @base layer provides global availability without inheritance issues
-   */
-  const register: Register = (attribute: string, { keyframes, variables }) => {
-    if (create.registry.has(attribute)) return
-    create.registry.add(attribute)
+  const register: Register = (registry, { attribute, keyframes }) => {
+    if (registry.has(attribute)) return
+    registry.add(attribute)
 
-    if (variables) addBase(variables)
+    /**
+     * Utility classes and animation properties.
+     *
+     * These are placed in the @utilities layer because:
+     * - They are meant to be applied to specific elements as needed
+     * - They should have appropriate specificity for overriding defaults
+     * - They work alongside the variables to create the complete animation system
+     */
     addUtilities(keyframes)
   }
 

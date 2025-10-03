@@ -1,11 +1,10 @@
 import type { Property } from 'csstype'
 
-import type { AnimatableStandardPropertyType, KeyframesVariableReference, StandardPropertyKeyframesCollection } from '@/types'
+import type { AnimatableStandardPropertyType, Collection, CssInJs, StandardPropertyKeyframesCollection } from '@/types'
 
 import { css } from '@/helpers/css'
-import { join } from '@/helpers/join'
 
-export const propertyKeyframes: StandardPropertyKeyframesCollection = {
+export const propertyKeyframes: Record<AnimatableStandardPropertyType, Collection<CssInJs>> = {
   'accent-color': {
     '@keyframes jumi-accent-color': {
       to: {
@@ -2963,30 +2962,9 @@ export const propertyKeyframes: StandardPropertyKeyframesCollection = {
       },
     },
   },
+} satisfies StandardPropertyKeyframesCollection
+
+export const properties: Collection<string> = {}
+for (const attribute in propertyKeyframes) {
+  properties[attribute] = attribute
 }
-
-type Keyframes = {
-  collection: PropertyCollection
-  names: PropertyNames
-  variables: Array<KeyframesVariableReference>
-}
-type PropertyCollection = Partial<Record<AnimatableStandardPropertyType, AnimatableStandardPropertyType>>
-type PropertyNames = Array<AnimatableStandardPropertyType>
-
-const propertyKeys = Object.keys(propertyKeyframes) as PropertyNames
-const keyframes = propertyKeys.reduce(
-  (result, property) => {
-    const variable = css('var', `--jumi-${property}-keyframes`, 'none')
-    result.variables.push(variable)
-
-    result.collection[property] = property
-    result.names.push(property)
-
-    return result
-  },
-  { collection: {}, names: [], variables: [] } as Keyframes,
-)
-
-export const propertyNames = keyframes.names
-export const propertyCollection = keyframes.collection
-export const keyframeVariables = join(keyframes.variables, ', ')

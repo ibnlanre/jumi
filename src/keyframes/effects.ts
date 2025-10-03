@@ -1,3 +1,5 @@
+import type { Collection } from '@/types'
+
 export const effectKeyframes = {
   'accordion': {
     '@keyframes jumi-effect-accordion': {
@@ -3271,19 +3273,7 @@ export const effectKeyframes = {
   },
 } as const
 
-type KeyframesCollection = {
-  collection: Record<string, string>
-  names: string[]
+export const effects: Collection<string> = {}
+for (const attribute in effectKeyframes) {
+  effects[attribute] = attribute
 }
-
-const keyframes: KeyframesCollection = Object.keys(effectKeyframes).reduce(
-  (result, property) => {
-    result.collection[property] = property
-    result.names.push(property)
-    return result
-  },
-  { collection: {}, names: [] } as KeyframesCollection,
-)
-
-export const effectNames = keyframes.names
-export const effectCollection = keyframes.collection

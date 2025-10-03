@@ -451,7 +451,10 @@ export type AnimationVariableCollection = Record<AnimationPropertyVariable, stri
 
 export type Api = Parameters<PluginCreator> extends [infer U] ? U : never
 
-export type BareValue = (value: BareValueParameter) => Array<CssInJs> | void
+export interface BareValue {
+  __BARE_VALUE__: (value: BareValueParameter) => Array<CssInJs> | void
+  DEFAULT: string
+}
 
 export type BareValueParameter = { fraction: null | string, kind: 'named', value: string }
 
@@ -678,7 +681,7 @@ export interface MatchUtilitiesOptions {
 
 export type MatchUtilitiesPropertyFunction = (value: string, extra: { modifier: null | string }) => CSSRuleObject
 
-export type MatchUtilitiesPropertyKey = 'animate' | 'effect' | `animate-${AnimatableStandardPropertyType}` | `animate-${NonStandardPropertyType}` | AnimationPropertyType
+export type MatchUtilitiesPropertyKey = 'effect' | 'jumi' | `animate-${AnimatableStandardPropertyType}` | `animate-${NonStandardPropertyType}` | AnimationPropertyType
 
 export interface MatchUtilitiesPropertyValue extends Partial<MatchUtilitiesOptions> {
   property: MatchUtilitiesPropertyFunction
@@ -921,9 +924,9 @@ export type ReferenceFunction
     | 'url'
     | 'var'
 
-export type Register = (attribute: string, options: {
+export type Register = (register: Set<string>, options: {
+  attribute: string
   keyframes: Collection<CssInJs>
-  variables?: CssInJs
 }) => void
 
 export type RotationFunction
