@@ -13,8 +13,6 @@ export function getCreator({ addUtilities, theme }: Api) {
       const name = `jumi-${attribute}` as const
       const keyframes = propertyKeyframes[attribute]
 
-      console.log('creating animation for:', attribute)
-
       register(create.register, { attribute, keyframes })
 
       return [

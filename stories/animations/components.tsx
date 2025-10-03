@@ -88,7 +88,7 @@ export function AnimationGrid({
       <div className={`grid gap-6 ${gridClasses[columns as keyof typeof gridClasses] || gridClasses[3]}`}>
         {animations.map(animation => (
           <AnimationShowcase
-            animationClass={`animate ${animation.class} ${animation.duration || defaultDuration}`}
+            animationClass={`jumi ${animation.class} ${animation.duration || defaultDuration}`}
             backgroundClass={animation.backgroundClass || 'bg-white'}
             description={animation.description || ''}
             key={animation.name}
@@ -111,7 +111,7 @@ export function AnimationPlayground({
   const [selectedTiming, setSelectedTiming] = React.useState(timingFunctions[0])
   const [key, setKey] = React.useState(0)
 
-  const currentAnimation = `animate ${animationClass} ${selectedDuration} ${selectedDelay} ${selectedTiming}`
+  const currentAnimation = `jumi ${animationClass} ${selectedDuration} ${selectedDelay} ${selectedTiming}`
 
   return (
     <div className="p-6 space-y-6 rounded-lg bg-gray-50">
@@ -260,7 +260,7 @@ export function EffectComparison({ effects, title }: EffectComparisonProps) {
         {effects.map(effect => (
           <div className="space-y-4" key={effect.name}>
             <AnimationShowcase
-              animationClass={`animate ${effect.class} animation-duration-1`}
+              animationClass={`jumi ${effect.class} animation-duration-1`}
               backgroundClass={effect.backgroundClass || 'bg-white'}
               description={effect.description}
               title={effect.name}

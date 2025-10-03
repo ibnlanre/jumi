@@ -3378,8 +3378,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       values: effects,
     },
     'jumi': {
-      property: (value) => {
-        console.log('hello world', value)
+      property: () => {
         const registry = Array.from(register).sort()
 
         const keyframes = registry
