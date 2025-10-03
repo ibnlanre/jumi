@@ -14,61 +14,43 @@ export function getCreator({ addUtilities, theme }: Api) {
       const keyframes = propertyKeyframes[attribute]
 
       register(create.register, { attribute, keyframes })
-
-      return [
-        css('var', `--jumi-${attribute}-animation-duration`, css('var', '--jumi-animation-duration')),
-        css('var', `--jumi-${attribute}-animation-timing-function`, css('var', '--jumi-animation-timing-function')),
-        css('var', `--jumi-${attribute}-animation-delay`, css('var', '--jumi-animation-delay')),
-        css('var', `--jumi-${attribute}-animation-iteration-count`, css('var', '--jumi-animation-iteration-count')),
-        css('var', `--jumi-${attribute}-animation-direction`, css('var', '--jumi-animation-direction')),
-        css('var', `--jumi-${attribute}-animation-fill-mode`, css('var', '--jumi-animation-fill-mode')),
-        css('var', `--jumi-${attribute}-animation-play-state`, css('var', '--jumi-animation-play-state')),
-        name,
-      ].join(' ')
+      return variables(attribute, name)
     },
     effect(attribute: string): string {
       const name = `jumi-effect-${attribute as Effect}` as const
       const keyframes = effectKeyframes[attribute as Effect] as Collection<CssInJs>
 
-      register(create.effects, { attribute, keyframes })
-
-      return [
-        css('var', '--jumi-animation-duration'),
-        css('var', '--jumi-animation-timing-function'),
-        css('var', '--jumi-animation-delay'),
-        css('var', '--jumi-animation-iteration-count'),
-        css('var', '--jumi-animation-direction'),
-        css('var', '--jumi-animation-fill-mode'),
-        css('var', '--jumi-animation-play-state'),
-        name,
-      ].join(' ')
+      register(create.register, { attribute, keyframes })
+      return variables(attribute, name)
     },
 
     /**
-     * This set tracks effects that have already had their keyframes added to
-     * the base styles.
-     *
-     * When an effect is used for the first time, its keyframes are added and
-     * the effect is recorded in this set. On subsequent uses, the presence of
-     * the effect in this set indicates that its keyframes have already been
-     * added, preventing duplicate additions.
-     */
-    effects: new Set<string>(),
-
-    /**
-     * This set tracks properties that have already had their keyframes and
-     * CSS custom properties (variables) added to the base styles.
+     * This set tracks properties and effects that have already had their keyframes
+     * and CSS custom properties (variables) added to the base styles.
      *
      * When a property is used for the first time, its keyframes are added and
      * the property is recorded in this set. On subsequent uses, the presence
      * of the property in this set indicates that its keyframes have already
      * been added, preventing duplicate additions.
      */
-    register: new Set<string>(['effect']),
+    register: new Set<string>(),
 
     theme: (key: TailwindTheme, values?: Collection) => {
       return flattenColorPalette(merge(values, theme(key)))
     },
+  }
+
+  const variables = (attribute: string, name: string) => {
+    return [
+      css('var', `--jumi-${attribute}-animation-duration`, css('var', '--jumi-animation-duration')),
+      css('var', `--jumi-${attribute}-animation-timing-function`, css('var', '--jumi-animation-timing-function')),
+      css('var', `--jumi-${attribute}-animation-delay`, css('var', '--jumi-animation-delay')),
+      css('var', `--jumi-${attribute}-animation-iteration-count`, css('var', '--jumi-animation-iteration-count')),
+      css('var', `--jumi-${attribute}-animation-direction`, css('var', '--jumi-animation-direction')),
+      css('var', `--jumi-${attribute}-animation-fill-mode`, css('var', '--jumi-animation-fill-mode')),
+      css('var', `--jumi-${attribute}-animation-play-state`, css('var', '--jumi-animation-play-state')),
+      name,
+    ].join(' ')
   }
 
   const register: Register = (registry, { attribute, keyframes }) => {

@@ -3373,7 +3373,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
     },
     'effect': {
       property: value => ({
-        '--jumi-effect-keyframes': effect(value),
+        [`--jumi-${value}-keyframes`]: effect(value),
       }),
       values: effects,
     },

@@ -9,8 +9,8 @@ export const animationTimelineViewValues = join([
 export const animationTimelineView = css('view', animationTimelineViewValues)
 
 export const animationTimelineScrollValues = join([
-  css('var', '--jumi-animation-timeline-scroller'),
   css('var', '--jumi-animation-timeline-axis'),
+  css('var', '--jumi-animation-timeline-scroller'),
 ])
 
 export const animationTimelineScroll = css('scroll', animationTimelineScrollValues)

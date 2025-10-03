@@ -258,7 +258,7 @@
     max-width: var(--container-4xl);
   }
   .jumi {
-    animation: var(--jumi-accent-color-keyframes, none), var(--jumi-backdrop-filter-keyframes, none), var(--jumi-background-color-keyframes, none), var(--jumi-border-radius-keyframes, none), var(--jumi-color-keyframes, none), var(--jumi-effect-keyframes, none), var(--jumi-fill-keyframes, none), var(--jumi-filter-keyframes, none), var(--jumi-height-keyframes, none), var(--jumi-justify-items-keyframes, none), var(--jumi-opacity-keyframes, none), var(--jumi-rotate-keyframes, none), var(--jumi-scale-keyframes, none), var(--jumi-text-shadow-keyframes, none), var(--jumi-translate-keyframes, none), var(--jumi-width-keyframes, none);
+    animation: var(--jumi-accent-color-keyframes, none), var(--jumi-arc-bottom-right-keyframes, none), var(--jumi-backdrop-filter-keyframes, none), var(--jumi-background-color-keyframes, none), var(--jumi-border-radius-keyframes, none), var(--jumi-bounce-in-keyframes, none), var(--jumi-bubble-keyframes, none), var(--jumi-circle-in-keyframes, none), var(--jumi-color-keyframes, none), var(--jumi-fade-in-keyframes, none), var(--jumi-fill-keyframes, none), var(--jumi-filter-keyframes, none), var(--jumi-float-keyframes, none), var(--jumi-fold-in-keyframes, none), var(--jumi-height-keyframes, none), var(--jumi-justify-items-keyframes, none), var(--jumi-magnetic-keyframes, none), var(--jumi-opacity-keyframes, none), var(--jumi-rotate-keyframes, none), var(--jumi-rush-in-right-keyframes, none), var(--jumi-scale-keyframes, none), var(--jumi-slide-in-down-keyframes, none), var(--jumi-slide-in-up-keyframes, none), var(--jumi-text-shadow-keyframes, none), var(--jumi-translate-keyframes, none), var(--jumi-width-keyframes, none), var(--jumi-zoom-in-keyframes, none);
     --jumi-animation-composition: replace;
     --jumi-animation-delay: 0s;
     --jumi-animation-direction: normal;
@@ -268,7 +268,7 @@
     --jumi-animation-play-state: running;
     --jumi-animation-timeline-scroller: nearest;
     --jumi-animation-timeline-axis: block;
-    --jumi-animation-timeline-scroll: scroll(var(--jumi-animation-timeline-scroller) var(--jumi-animation-timeline-axis));
+    --jumi-animation-timeline-scroll: scroll(var(--jumi-animation-timeline-axis) var(--jumi-animation-timeline-scroller));
     --jumi-animation-timeline-inset-start: auto;
     --jumi-animation-timeline-inset-end: auto;
     --jumi-animation-timeline-inset: var(--jumi-animation-timeline-inset-start) var(--jumi-animation-timeline-inset-end);
@@ -314,6 +314,7 @@
     --jumi-filter-drop-shadow-color: transparent;
     --jumi-filter-drop-shadow: drop-shadow(var(--jumi-filter-drop-shadow-offset-x) var(--jumi-filter-drop-shadow-offset-y) var(--jumi-filter-drop-shadow-blur) var(--jumi-filter-drop-shadow-color));
     --jumi-filter: var(--jumi-filter-blur) var(--jumi-filter-brightness) var(--jumi-filter-contrast) var(--jumi-filter-grayscale) var(--jumi-filter-hue-rotate) var(--jumi-filter-invert) var(--jumi-filter-saturate) var(--jumi-filter-sepia) var(--jumi-filter-opacity) var(--jumi-filter-drop-shadow);
+    --jumi-float: none;
     --jumi-height: auto;
     --jumi-justify-items: legacy;
     --jumi-opacity: 1;
@@ -687,40 +688,40 @@
     --jumi-animation-timing-function: cubic-bezier(0.68, -0.6, 0.32, 1.6);
   }
   .effect-arc-bottom-right {
-    --jumi-effect-keyframes: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-arc-bottom-right;
+    --jumi-arc-bottom-right-keyframes: var(--jumi-arc-bottom-right-animation-duration, var(--jumi-animation-duration)) var(--jumi-arc-bottom-right-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-arc-bottom-right-animation-delay, var(--jumi-animation-delay)) var(--jumi-arc-bottom-right-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-arc-bottom-right-animation-direction, var(--jumi-animation-direction)) var(--jumi-arc-bottom-right-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-arc-bottom-right-animation-play-state, var(--jumi-animation-play-state)) jumi-effect-arc-bottom-right;
   }
   .effect-bounce-in {
-    --jumi-effect-keyframes: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-bounce-in;
+    --jumi-bounce-in-keyframes: var(--jumi-bounce-in-animation-duration, var(--jumi-animation-duration)) var(--jumi-bounce-in-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-bounce-in-animation-delay, var(--jumi-animation-delay)) var(--jumi-bounce-in-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-bounce-in-animation-direction, var(--jumi-animation-direction)) var(--jumi-bounce-in-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-bounce-in-animation-play-state, var(--jumi-animation-play-state)) jumi-effect-bounce-in;
   }
   .effect-bubble {
-    --jumi-effect-keyframes: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-bubble;
+    --jumi-bubble-keyframes: var(--jumi-bubble-animation-duration, var(--jumi-animation-duration)) var(--jumi-bubble-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-bubble-animation-delay, var(--jumi-animation-delay)) var(--jumi-bubble-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-bubble-animation-direction, var(--jumi-animation-direction)) var(--jumi-bubble-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-bubble-animation-play-state, var(--jumi-animation-play-state)) jumi-effect-bubble;
   }
   .effect-circle-in {
-    --jumi-effect-keyframes: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-circle-in;
+    --jumi-circle-in-keyframes: var(--jumi-circle-in-animation-duration, var(--jumi-animation-duration)) var(--jumi-circle-in-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-circle-in-animation-delay, var(--jumi-animation-delay)) var(--jumi-circle-in-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-circle-in-animation-direction, var(--jumi-animation-direction)) var(--jumi-circle-in-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-circle-in-animation-play-state, var(--jumi-animation-play-state)) jumi-effect-circle-in;
   }
   .effect-fade-in {
-    --jumi-effect-keyframes: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-fade-in;
+    --jumi-fade-in-keyframes: var(--jumi-fade-in-animation-duration, var(--jumi-animation-duration)) var(--jumi-fade-in-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-fade-in-animation-delay, var(--jumi-animation-delay)) var(--jumi-fade-in-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-fade-in-animation-direction, var(--jumi-animation-direction)) var(--jumi-fade-in-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-fade-in-animation-play-state, var(--jumi-animation-play-state)) jumi-effect-fade-in;
   }
   .effect-float {
-    --jumi-effect-keyframes: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-float;
+    --jumi-float-keyframes: var(--jumi-float-animation-duration, var(--jumi-animation-duration)) var(--jumi-float-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-float-animation-delay, var(--jumi-animation-delay)) var(--jumi-float-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-float-animation-direction, var(--jumi-animation-direction)) var(--jumi-float-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-float-animation-play-state, var(--jumi-animation-play-state)) jumi-effect-float;
   }
   .effect-fold-in {
-    --jumi-effect-keyframes: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-fold-in;
+    --jumi-fold-in-keyframes: var(--jumi-fold-in-animation-duration, var(--jumi-animation-duration)) var(--jumi-fold-in-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-fold-in-animation-delay, var(--jumi-animation-delay)) var(--jumi-fold-in-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-fold-in-animation-direction, var(--jumi-animation-direction)) var(--jumi-fold-in-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-fold-in-animation-play-state, var(--jumi-animation-play-state)) jumi-effect-fold-in;
   }
   .effect-magnetic {
-    --jumi-effect-keyframes: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-magnetic;
+    --jumi-magnetic-keyframes: var(--jumi-magnetic-animation-duration, var(--jumi-animation-duration)) var(--jumi-magnetic-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-magnetic-animation-delay, var(--jumi-animation-delay)) var(--jumi-magnetic-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-magnetic-animation-direction, var(--jumi-animation-direction)) var(--jumi-magnetic-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-magnetic-animation-play-state, var(--jumi-animation-play-state)) jumi-effect-magnetic;
   }
   .effect-rush-in-right {
-    --jumi-effect-keyframes: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-rush-in-right;
+    --jumi-rush-in-right-keyframes: var(--jumi-rush-in-right-animation-duration, var(--jumi-animation-duration)) var(--jumi-rush-in-right-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-rush-in-right-animation-delay, var(--jumi-animation-delay)) var(--jumi-rush-in-right-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-rush-in-right-animation-direction, var(--jumi-animation-direction)) var(--jumi-rush-in-right-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-rush-in-right-animation-play-state, var(--jumi-animation-play-state)) jumi-effect-rush-in-right;
   }
   .effect-slide-in-down {
-    --jumi-effect-keyframes: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-slide-in-down;
+    --jumi-slide-in-down-keyframes: var(--jumi-slide-in-down-animation-duration, var(--jumi-animation-duration)) var(--jumi-slide-in-down-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-slide-in-down-animation-delay, var(--jumi-animation-delay)) var(--jumi-slide-in-down-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-slide-in-down-animation-direction, var(--jumi-animation-direction)) var(--jumi-slide-in-down-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-slide-in-down-animation-play-state, var(--jumi-animation-play-state)) jumi-effect-slide-in-down;
   }
   .effect-slide-in-up {
-    --jumi-effect-keyframes: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-slide-in-up;
+    --jumi-slide-in-up-keyframes: var(--jumi-slide-in-up-animation-duration, var(--jumi-animation-duration)) var(--jumi-slide-in-up-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-slide-in-up-animation-delay, var(--jumi-animation-delay)) var(--jumi-slide-in-up-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-slide-in-up-animation-direction, var(--jumi-animation-direction)) var(--jumi-slide-in-up-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-slide-in-up-animation-play-state, var(--jumi-animation-play-state)) jumi-effect-slide-in-up;
   }
   .effect-zoom-in {
-    --jumi-effect-keyframes: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-zoom-in;
+    --jumi-zoom-in-keyframes: var(--jumi-zoom-in-animation-duration, var(--jumi-animation-duration)) var(--jumi-zoom-in-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-zoom-in-animation-delay, var(--jumi-animation-delay)) var(--jumi-zoom-in-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-zoom-in-animation-direction, var(--jumi-animation-direction)) var(--jumi-zoom-in-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-zoom-in-animation-play-state, var(--jumi-animation-play-state)) jumi-effect-zoom-in;
   }
   .\*\:h-12 {
     :is(& > *) {
@@ -734,7 +735,7 @@
   }
   .\*\:jumi {
     :is(& > *) {
-      animation: var(--jumi-effect-keyframes, none);
+      animation: var(--jumi-bounce-in-keyframes, none), var(--jumi-slide-in-up-keyframes, none), var(--jumi-zoom-in-keyframes, none);
       --jumi-animation-composition: replace;
       --jumi-animation-delay: 0s;
       --jumi-animation-direction: normal;
@@ -744,7 +745,7 @@
       --jumi-animation-play-state: running;
       --jumi-animation-timeline-scroller: nearest;
       --jumi-animation-timeline-axis: block;
-      --jumi-animation-timeline-scroll: scroll(var(--jumi-animation-timeline-scroller) var(--jumi-animation-timeline-axis));
+      --jumi-animation-timeline-scroll: scroll(var(--jumi-animation-timeline-axis) var(--jumi-animation-timeline-scroller));
       --jumi-animation-timeline-inset-start: auto;
       --jumi-animation-timeline-inset-end: auto;
       --jumi-animation-timeline-inset: var(--jumi-animation-timeline-inset-start) var(--jumi-animation-timeline-inset-end);
@@ -800,17 +801,17 @@
   }
   .\*\:effect-bounce-in {
     :is(& > *) {
-      --jumi-effect-keyframes: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-bounce-in;
+      --jumi-bounce-in-keyframes: var(--jumi-bounce-in-animation-duration, var(--jumi-animation-duration)) var(--jumi-bounce-in-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-bounce-in-animation-delay, var(--jumi-animation-delay)) var(--jumi-bounce-in-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-bounce-in-animation-direction, var(--jumi-animation-direction)) var(--jumi-bounce-in-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-bounce-in-animation-play-state, var(--jumi-animation-play-state)) jumi-effect-bounce-in;
     }
   }
   .\*\:effect-slide-in-up {
     :is(& > *) {
-      --jumi-effect-keyframes: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-slide-in-up;
+      --jumi-slide-in-up-keyframes: var(--jumi-slide-in-up-animation-duration, var(--jumi-animation-duration)) var(--jumi-slide-in-up-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-slide-in-up-animation-delay, var(--jumi-animation-delay)) var(--jumi-slide-in-up-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-slide-in-up-animation-direction, var(--jumi-animation-direction)) var(--jumi-slide-in-up-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-slide-in-up-animation-play-state, var(--jumi-animation-play-state)) jumi-effect-slide-in-up;
     }
   }
   .\*\:effect-zoom-in {
     :is(& > *) {
-      --jumi-effect-keyframes: var(--jumi-animation-duration) var(--jumi-animation-timing-function) var(--jumi-animation-delay) var(--jumi-animation-iteration-count) var(--jumi-animation-direction) var(--jumi-animation-fill-mode) var(--jumi-animation-play-state) jumi-effect-zoom-in;
+      --jumi-zoom-in-keyframes: var(--jumi-zoom-in-animation-duration, var(--jumi-animation-duration)) var(--jumi-zoom-in-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-zoom-in-animation-delay, var(--jumi-animation-delay)) var(--jumi-zoom-in-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-zoom-in-animation-direction, var(--jumi-animation-direction)) var(--jumi-zoom-in-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-zoom-in-animation-play-state, var(--jumi-animation-play-state)) jumi-effect-zoom-in;
     }
   }
   .not-sm\:animate-accent-color-amber-400 {
@@ -864,7 +865,7 @@
   .before\:jumi {
     &::before {
       content: var(--tw-content);
-      animation: var(--jumi-backdrop-filter-keyframes, none), var(--jumi-background-color-keyframes, none), var(--jumi-border-radius-keyframes, none), var(--jumi-color-keyframes, none), var(--jumi-effect-keyframes, none), var(--jumi-fill-keyframes, none), var(--jumi-filter-keyframes, none), var(--jumi-height-keyframes, none), var(--jumi-justify-items-keyframes, none), var(--jumi-opacity-keyframes, none), var(--jumi-rotate-keyframes, none), var(--jumi-scale-keyframes, none), var(--jumi-text-shadow-keyframes, none), var(--jumi-translate-keyframes, none), var(--jumi-width-keyframes, none);
+      animation: var(--jumi-backdrop-filter-keyframes, none), var(--jumi-background-color-keyframes, none), var(--jumi-border-radius-keyframes, none), var(--jumi-bounce-in-keyframes, none), var(--jumi-color-keyframes, none), var(--jumi-fill-keyframes, none), var(--jumi-filter-keyframes, none), var(--jumi-height-keyframes, none), var(--jumi-justify-items-keyframes, none), var(--jumi-opacity-keyframes, none), var(--jumi-rotate-keyframes, none), var(--jumi-scale-keyframes, none), var(--jumi-slide-in-up-keyframes, none), var(--jumi-text-shadow-keyframes, none), var(--jumi-translate-keyframes, none), var(--jumi-width-keyframes, none), var(--jumi-zoom-in-keyframes, none);
       --jumi-animation-composition: replace;
       --jumi-animation-delay: 0s;
       --jumi-animation-direction: normal;
@@ -874,7 +875,7 @@
       --jumi-animation-play-state: running;
       --jumi-animation-timeline-scroller: nearest;
       --jumi-animation-timeline-axis: block;
-      --jumi-animation-timeline-scroll: scroll(var(--jumi-animation-timeline-scroller) var(--jumi-animation-timeline-axis));
+      --jumi-animation-timeline-scroll: scroll(var(--jumi-animation-timeline-axis) var(--jumi-animation-timeline-scroller));
       --jumi-animation-timeline-inset-start: auto;
       --jumi-animation-timeline-inset-end: auto;
       --jumi-animation-timeline-inset: var(--jumi-animation-timeline-inset-start) var(--jumi-animation-timeline-inset-end);
