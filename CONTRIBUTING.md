@@ -12,27 +12,25 @@ Jumi follows a distinct philosophy in naming and structuring utility classes tha
 Utility class names should mirror their corresponding CSS property names as closely as possible.
 
 **✅ Good Examples:**
-- `animate-background-color-red-500` → `background-color: red`
-- `animate-align-content-center` → `align-content: center`
+- `animate-background-color-blue-500` → `background-color: theme(colors.blue.500)`
+- `animate-width-full` → `width: 100%`
 - `animate-backdrop-filter-drop-shadow-blur-md` → `backdrop-filter: drop-shadow(...)`
-- `animate-border-bottom-left-radius-lg` → `border-bottom-left-radius: ...`
+- `animate-border-radius-full` → `border-radius: 9999px`
 
 **❌ Avoid:**
 - `animate-bg-red-500` (abbreviates `background-color`)
 - `animate-items-center` (too abbreviated from `align-items`)
 - `animate-drop-blur-md` (loses the context of `backdrop-filter-drop-shadow`)
 
-#### 2. **Natural Language Over Technical Syntax**
-Jumi prioritizes human-readable class names that express intent in natural language rather than requiring deep CSS knowledge.
+#### 2. **Relationship Selectors with Tailwind v4 Variants**
+Prefer Tailwind v4’s built-in relationship variants for selector logic over custom natural-language variants.
 
-**Philosophy:** CSS selectors and relationships should be expressible in plain English, making the codebase more accessible to developers of all skill levels and reducing the mental overhead of understanding complex selector relationships.
+**Use:**
+- `is-[h1]:...` for matching a child/descendant element
+- `has-[>img]:...` for parent that has a direct child selector
+- `where-[.card]:...` to group selectors without increasing specificity
 
-**Examples:**
-- `if-child-is-h1` instead of requiring knowledge of `& h1`
-- `if-next-sibling-is-p` instead of memorizing `& + p`
-- `if-direct-child-is-button` instead of understanding `& > button`
-
-This approach transforms CSS from a technical requirement into an intuitive, self-documenting language that expresses design intent clearly.
+These keep class names precise while leveraging standardized Tailwind mechanisms.
 
 #### 3. **Minimal Abbreviations**
 Abbreviations should be kept to an absolute minimum, with exceptions only for universally understood conventions.
@@ -64,84 +62,27 @@ Prioritize clarity and semantic meaning over shorter class names.
 <div class="animate-bd-drop-x-4 animate-bd-drop-blue-500">
 ```
 
-#### 6. **Natural Language Patterns**
-When possible, use natural language constructs that read like English sentences, making CSS relationships more intuitive.
+#### 6. **Selector Naming Guidance**
+Use Tailwind’s `is-*`, `has-*`, and `where-*` to express relationships; avoid inventing new natural-language variants.
 
-**✅ Examples from Jumi:**
+**Examples:**
 ```html
-<!-- Reads like: "if child is h1, then apply styles" -->
-<div class="if-child-is-h1:text-blue-500">
-  <h1>This will be blue</h1>
-</div>
-
-<!-- Reads like: "if direct child is button, then apply styles" -->
-<nav class="if-direct-child-is-button:space-x-4">
-  <button>Home</button>
-  <button>About</button>
-</nav>
-
-<!-- Reads like: "if next sibling is p, then apply styles" -->
-<h2 class="if-next-sibling-is-p:mb-2">Title</h2>
-
-<!-- Reads like: "if sibling is img, then apply styles" -->
-<div class="if-sibling-is-img:flex">
-  <p>Text content</p>
-  <img src="..." alt="...">
-</div>
+<div class="is-[h1]:text-blue-500">...</div>
+<nav class="has-[>button]:space-x-4">...</nav>
+<section class="where-[.card]:p-4">...</section>
 ```
-
-**Rationale:** Natural language patterns reduce the cognitive overhead of understanding CSS relationships. Instead of memorizing cryptic selectors like `& > *` or `& + *`, developers can read the class name and immediately understand the relationship being targeted.
-
-**Traditional CSS vs. Natural Language:**
-```css
-/* Traditional approach - requires CSS knowledge */
-.parent > button { /* direct child selector */ }
-.element + p { /* adjacent sibling selector */ }
-.element ~ img { /* general sibling selector */ }
-
-/* Jumi's natural language approach - self-documenting */
-.if-direct-child-is-button { /* immediately clear */ }
-.if-next-sibling-is-p { /* reads like English */ }
-.if-sibling-is-img { /* intuitive relationship */ }
-```
-
-#### Designing New Natural Language Patterns
-
-When creating new variants or utilities that involve relationships or conditions, follow these guidelines:
-
-**Pattern Structure:**
-- Start with a condition word: `if`, `when`, `has`, `not`
-- Follow with the relationship: `child-is`, `parent-is`, `sibling-is`, `ancestor-is`
-- Use descriptive qualifiers: `direct-child`, `next-sibling`, `previous-sibling`
-
-**Examples of Good Patterns:**
-```css
-/* Conditional relationships */
-if-child-is-{element}          /* & {element} */
-if-direct-child-is-{element}   /* & > {element} */
-if-next-sibling-is-{element}   /* & + {element} */
-if-sibling-is-{element}        /* & ~ {element} */
-
-/* State-based patterns (potential future additions) */
-when-hover-has-{element}       /* &:hover {element} */
-if-focus-within-{element}      /* &:focus-within {element} */
-```
-
-**Readability Test:** The class name should read naturally when spoken aloud:
-- ✅ "if child is h1" (clear and natural)
-- ✅ "if direct child is button" (specific and understandable)
-- ❌ "child-h1" (missing context)
-- ❌ "direct-btn" (abbreviated and unclear)
 
 ### Animation-Specific Conventions
 
 #### Effect Animations
-Effect animation names should be descriptive and intuitive:
+Effect animation names should be descriptive, hyphenated, and consistent:
 
-- `bounce-in`, `bounce-out` (not `bounceIn`, `bounceOut`)
-- `slide-in-left`, `slide-out-right` (directional clarity)
-- `zoom-in`, `zoom-out` (not `zoomIn`, `zoomOut`)
-- `fade-in-up`, `fade-out-down` (combined motions)
+- `bounce-in` (not `bounceIn`)
+- `slide-in-{direction}`, `slide-out-{direction}` (e.g., `slide-in-left`)
+- `zoom-in`, `zoom-out`
+- `fade-in`, `fade-out`
+- `arc-top-left`, `arc-bottom-right`
+- `skew-{direction}` (e.g., `skew-left`, `skew-right`)
 
 #### Property Animations
 Property animations follow the pattern: `animate-{css-property}-{value}`
@@ -159,10 +100,10 @@ All utility definitions should follow established patterns:
 'animate-property-name': {
   property: value => ({
     '--jumi-property-name': value,
-    '--jumi-property-name-keyframes': create.animation('property-name'),
+    // register variables and keyframes via the shared creator so both are emitted together
   }),
   type: 'appropriate-type',
-  values: getValues('themeKey'),
+  // prefer theme tokens where applicable (e.g., colors, spacing)
 },
 ```
 
@@ -170,9 +111,9 @@ All utility definitions should follow established patterns:
 Properties must be organized alphabetically within their files to maintain consistency and ease of navigation.
 
 #### Value Mapping
-Use Tailwind's existing theme values when appropriate:
-- Colors: `getValues('colors')`
-- Spacing: `getValues('spacing')`
+Use Tailwind v4 theme tokens when appropriate:
+- Colors (e.g., theme colors)
+- Spacing
 - Timing: `animationDelay`, `animationDuration`
 
 ### File Structure Philosophy
@@ -186,7 +127,7 @@ src/
 │   ├── match.ts       # Main utility definitions
 │   └── add.ts         # Additional utilities
 ├── theme/             # Theme value definitions
-├── variants/          # Custom variants (if-child-is, etc.)
+├── variants/          # Relationship helpers if needed (prefer Tailwind :is() / :has())
 └── variables/         # CSS custom property definitions
 ```
 
@@ -228,15 +169,15 @@ When adding support for new CSS properties:
 'animate-scroll-margin-top': {
   property: value => ({
     '--jumi-scroll-margin-top': value,
-    '--jumi-scroll-margin-top-keyframes': create.animation('scroll-margin-top'),
+    // register scroll-margin-top keyframes via the shared creator
   }),
-  values: getValues('spacing'),
+  // values: spacing tokens or arbitrary values
 },
 ```
 
 #### Adding a New Effect Animation
 ```typescript
-'spring-bounce-in': {
+'bounce-in': {
   '0%': {
     opacity: '0',
     transform: 'scale(0.3) translateY(-100px)',

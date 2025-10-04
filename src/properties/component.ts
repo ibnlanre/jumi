@@ -1,6 +1,7 @@
 import type { GetMatchComponents, MatchComponents } from '@/types'
 
 import { getCreator } from '@/helpers/create'
+import { css } from '@/helpers/css'
 import { count } from '@/theme/count'
 
 export const getMatchComponents: GetMatchComponents = (api) => {
@@ -14,8 +15,8 @@ export const getMatchComponents: GetMatchComponents = (api) => {
 
         return Object.fromEntries(
           Array.from({ length }, (_, index) => [
-            `& > :nth-child(${index + 1})`,
-            { 'animation-delay': `calc(${value} * ${length - index - 1})` },
+            `& > ${css(':nth-child', index + 1)}`,
+            { '--jumi-animation-delay': `calc(${value} * ${length - index - 1})` },
           ]),
         )
       },
@@ -28,8 +29,8 @@ export const getMatchComponents: GetMatchComponents = (api) => {
 
         return Object.fromEntries(
           Array.from({ length }, (_, index) => [
-            `& > :nth-child(${index + 1})`,
-            { 'animation-delay': `calc(${value} * ${index})` },
+            `& > ${css(':nth-child', index + 1)}`,
+            { '--jumi-animation-delay': `calc(${value} * ${index})` },
           ]),
         )
       },

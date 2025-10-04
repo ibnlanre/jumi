@@ -504,6 +504,7 @@ export type CSSFunction
     | ShapeFunction
     | SkewFunction
     | SteppedValueFunction
+    | (string & {})
     | TranslationFunction
     | TreeCountingFunction
     | TrigonometricFunction
@@ -514,7 +515,7 @@ export interface CssInJs extends Partial<KeyframeVariables>, Partial<PropertyVar
 
 export type CSSRuleObject = CssInJs | CssInJs[]
 
-export type CSSValue = (string & {}) | Variable
+export type CSSValue = (number & {}) | (string & {}) | Variable
 
 export type DataType
   = | 'absolute-size'

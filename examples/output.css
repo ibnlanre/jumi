@@ -230,6 +230,9 @@
   .grid {
     display: grid;
   }
+  .h-12 {
+    height: calc(var(--spacing) * 12);
+  }
   .h-16 {
     height: calc(var(--spacing) * 16);
   }
@@ -245,6 +248,9 @@
   .w-1\/5 {
     width: calc(1/5 * 100%);
   }
+  .w-12 {
+    width: calc(var(--spacing) * 12);
+  }
   .w-16 {
     width: calc(var(--spacing) * 16);
   }
@@ -258,7 +264,7 @@
     max-width: var(--container-4xl);
   }
   .jumi {
-    animation: var(--jumi-accent-color-property, none), var(--jumi-backdrop-filter-property, none), var(--jumi-background-color-property, none), var(--jumi-border-radius-property, none), var(--jumi-color-property, none), var(--jumi-fill-property, none), var(--jumi-filter-property, none), var(--jumi-height-property, none), var(--jumi-justify-items-property, none), var(--jumi-opacity-property, none), var(--jumi-rotate-property, none), var(--jumi-scale-property, none), var(--jumi-text-shadow-property, none), var(--jumi-translate-property, none), var(--jumi-width-property, none), var(--jumi-arc-bottom-right-animation, none), var(--jumi-bounce-in-animation, none), var(--jumi-bubble-animation, none), var(--jumi-circle-in-animation, none), var(--jumi-fade-in-animation, none), var(--jumi-fold-in-animation, none), var(--jumi-magnetic-animation, none), var(--jumi-rush-in-right-animation, none), var(--jumi-slide-in-down-animation, none), var(--jumi-slide-in-up-animation, none), var(--jumi-zoom-in-animation, none);
+    animation: var(--jumi-accent-color-property, none), var(--jumi-backdrop-filter-property, none), var(--jumi-background-color-property, none), var(--jumi-border-radius-property, none), var(--jumi-color-property, none), var(--jumi-fill-property, none), var(--jumi-filter-property, none), var(--jumi-height-property, none), var(--jumi-justify-items-property, none), var(--jumi-opacity-property, none), var(--jumi-rotate-property, none), var(--jumi-scale-property, none), var(--jumi-text-shadow-property, none), var(--jumi-translate-property, none), var(--jumi-width-property, none), var(--jumi-arc-bottom-right-animation, none), var(--jumi-bounce-in-animation, none), var(--jumi-bounce-in-down-animation, none), var(--jumi-bounce-in-up-animation, none), var(--jumi-bubble-animation, none), var(--jumi-circle-in-animation, none), var(--jumi-fade-in-animation, none), var(--jumi-fold-in-animation, none), var(--jumi-magnetic-animation, none), var(--jumi-rush-in-right-animation, none), var(--jumi-slide-in-down-animation, none), var(--jumi-slide-in-up-animation, none), var(--jumi-zoom-in-animation, none);
     --jumi-animation-composition: replace;
     --jumi-animation-delay: 0s;
     --jumi-animation-direction: normal;
@@ -527,62 +533,62 @@
   }
   .animation-delay-forward-300\/\[8\] {
     & > :nth-child(1) {
-      animation-delay: calc(300ms * 0);
+      --jumi-animation-delay: calc(300ms * 0);
     }
     & > :nth-child(2) {
-      animation-delay: calc(300ms * 1);
+      --jumi-animation-delay: calc(300ms * 1);
     }
     & > :nth-child(3) {
-      animation-delay: calc(300ms * 2);
+      --jumi-animation-delay: calc(300ms * 2);
     }
     & > :nth-child(4) {
-      animation-delay: calc(300ms * 3);
+      --jumi-animation-delay: calc(300ms * 3);
     }
     & > :nth-child(5) {
-      animation-delay: calc(300ms * 4);
+      --jumi-animation-delay: calc(300ms * 4);
     }
     & > :nth-child(6) {
-      animation-delay: calc(300ms * 5);
+      --jumi-animation-delay: calc(300ms * 5);
     }
     & > :nth-child(7) {
-      animation-delay: calc(300ms * 6);
+      --jumi-animation-delay: calc(300ms * 6);
     }
     & > :nth-child(8) {
-      animation-delay: calc(300ms * 7);
+      --jumi-animation-delay: calc(300ms * 7);
     }
   }
   .animation-delay-backward-150\/5 {
     & > :nth-child(1) {
-      animation-delay: calc(150ms * 4);
+      --jumi-animation-delay: calc(150ms * 4);
     }
     & > :nth-child(2) {
-      animation-delay: calc(150ms * 3);
+      --jumi-animation-delay: calc(150ms * 3);
     }
     & > :nth-child(3) {
-      animation-delay: calc(150ms * 2);
+      --jumi-animation-delay: calc(150ms * 2);
     }
     & > :nth-child(4) {
-      animation-delay: calc(150ms * 1);
+      --jumi-animation-delay: calc(150ms * 1);
     }
     & > :nth-child(5) {
-      animation-delay: calc(150ms * 0);
+      --jumi-animation-delay: calc(150ms * 0);
     }
   }
   .animation-delay-forward-100\/5 {
     & > :nth-child(1) {
-      animation-delay: calc(100ms * 0);
+      --jumi-animation-delay: calc(100ms * 0);
     }
     & > :nth-child(2) {
-      animation-delay: calc(100ms * 1);
+      --jumi-animation-delay: calc(100ms * 1);
     }
     & > :nth-child(3) {
-      animation-delay: calc(100ms * 2);
+      --jumi-animation-delay: calc(100ms * 2);
     }
     & > :nth-child(4) {
-      animation-delay: calc(100ms * 3);
+      --jumi-animation-delay: calc(100ms * 3);
     }
     & > :nth-child(5) {
-      animation-delay: calc(100ms * 4);
+      --jumi-animation-delay: calc(100ms * 4);
     }
   }
   .animate-backdrop-filter-drop-shadow-color-amber-100\/75 {
@@ -731,7 +737,7 @@
   }
   .\*\:jumi {
     :is(& > *) {
-      animation: var(--jumi-bounce-in-animation, none), var(--jumi-slide-in-up-animation, none), var(--jumi-zoom-in-animation, none);
+      animation: var(--jumi-slide-in-up-animation, none), var(--jumi-zoom-in-animation, none);
       --jumi-animation-composition: replace;
       --jumi-animation-delay: 0s;
       --jumi-animation-direction: normal;
@@ -755,11 +761,6 @@
       border-radius: 0.25rem;
     }
   }
-  .\*\:bg-blue-500 {
-    :is(& > *) {
-      background-color: var(--color-blue-500);
-    }
-  }
   .\*\:bg-green-500 {
     :is(& > *) {
       background-color: var(--color-green-500);
@@ -768,11 +769,6 @@
   .\*\:bg-purple-500 {
     :is(& > *) {
       background-color: var(--color-purple-500);
-    }
-  }
-  .\*\:animate-bounce-in {
-    :is(& > *) {
-      --jumi-bounce-in-animation: var(--jumi-bounce-in-animation-duration, var(--jumi-animation-duration)) var(--jumi-bounce-in-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-bounce-in-animation-delay, var(--jumi-animation-delay)) var(--jumi-bounce-in-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-bounce-in-animation-direction, var(--jumi-animation-direction)) var(--jumi-bounce-in-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-bounce-in-animation-play-state, var(--jumi-animation-play-state)) jumi-bounce-in;
     }
   }
   .\*\:animate-slide-in-up {
@@ -793,11 +789,6 @@
   .\*\:animation-duration-1500 {
     :is(& > *) {
       --jumi-animation-duration: 1500ms;
-    }
-  }
-  .\*\:animation-duration-2000 {
-    :is(& > *) {
-      --jumi-animation-duration: 2000ms;
     }
   }
   .\*\:animation-duration-3000 {
@@ -861,7 +852,7 @@
   .before\:jumi {
     &::before {
       content: var(--tw-content);
-      animation: var(--jumi-backdrop-filter-property, none), var(--jumi-background-color-property, none), var(--jumi-border-radius-property, none), var(--jumi-color-property, none), var(--jumi-fill-property, none), var(--jumi-filter-property, none), var(--jumi-height-property, none), var(--jumi-justify-items-property, none), var(--jumi-opacity-property, none), var(--jumi-rotate-property, none), var(--jumi-scale-property, none), var(--jumi-text-shadow-property, none), var(--jumi-translate-property, none), var(--jumi-width-property, none), var(--jumi-arc-bottom-right-animation, none), var(--jumi-bounce-in-animation, none), var(--jumi-bubble-animation, none), var(--jumi-circle-in-animation, none), var(--jumi-fade-in-animation, none), var(--jumi-fold-in-animation, none), var(--jumi-magnetic-animation, none), var(--jumi-rush-in-right-animation, none), var(--jumi-slide-in-down-animation, none), var(--jumi-slide-in-up-animation, none), var(--jumi-zoom-in-animation, none);
+      animation: var(--jumi-backdrop-filter-property, none), var(--jumi-background-color-property, none), var(--jumi-border-radius-property, none), var(--jumi-color-property, none), var(--jumi-fill-property, none), var(--jumi-filter-property, none), var(--jumi-height-property, none), var(--jumi-justify-items-property, none), var(--jumi-opacity-property, none), var(--jumi-rotate-property, none), var(--jumi-scale-property, none), var(--jumi-text-shadow-property, none), var(--jumi-translate-property, none), var(--jumi-width-property, none), var(--jumi-arc-bottom-right-animation, none), var(--jumi-bounce-in-animation, none), var(--jumi-bounce-in-down-animation, none), var(--jumi-bounce-in-up-animation, none), var(--jumi-bubble-animation, none), var(--jumi-circle-in-animation, none), var(--jumi-fade-in-animation, none), var(--jumi-fold-in-animation, none), var(--jumi-magnetic-animation, none), var(--jumi-rush-in-right-animation, none), var(--jumi-slide-in-down-animation, none), var(--jumi-slide-in-up-animation, none), var(--jumi-zoom-in-animation, none);
       --jumi-animation-composition: replace;
       --jumi-animation-delay: 0s;
       --jumi-animation-direction: normal;
@@ -1069,6 +1060,20 @@
       }
     }
   }
+  .\*\:nth-\[even\]\:animate-bounce-in-up {
+    :is(& > *) {
+      &:nth-child(even) {
+        --jumi-bounce-in-up-animation: var(--jumi-bounce-in-up-animation-duration, var(--jumi-animation-duration)) var(--jumi-bounce-in-up-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-bounce-in-up-animation-delay, var(--jumi-animation-delay)) var(--jumi-bounce-in-up-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-bounce-in-up-animation-direction, var(--jumi-animation-direction)) var(--jumi-bounce-in-up-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-bounce-in-up-animation-play-state, var(--jumi-animation-play-state)) jumi-bounce-in-up;
+      }
+    }
+  }
+  .\*\:nth-\[odd\]\:animate-bounce-in-down {
+    :is(& > *) {
+      &:nth-child(odd) {
+        --jumi-bounce-in-down-animation: var(--jumi-bounce-in-down-animation-duration, var(--jumi-animation-duration)) var(--jumi-bounce-in-down-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-bounce-in-down-animation-delay, var(--jumi-animation-delay)) var(--jumi-bounce-in-down-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-bounce-in-down-animation-direction, var(--jumi-animation-direction)) var(--jumi-bounce-in-down-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-bounce-in-down-animation-play-state, var(--jumi-animation-play-state)) jumi-bounce-in-down;
+      }
+    }
+  }
   .md\:grid-cols-2 {
     @media (width >= 48rem) {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1083,79 +1088,6 @@
     @media (width >= 48rem) {
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
-  }
-  .if-child-is-h1\:bg-white {
-    & h1 {
-      background-color: var(--color-white);
-    }
-  }
-  .if-child-is-\[h3\]\:animate-width-16 {
-    & h3 {
-      --jumi-width: 4rem;
-      --jumi-width-property: var(--jumi-width-animation-duration, var(--jumi-animation-duration)) var(--jumi-width-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-width-animation-delay, var(--jumi-animation-delay)) var(--jumi-width-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-width-animation-direction, var(--jumi-animation-direction)) var(--jumi-width-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-width-animation-play-state, var(--jumi-animation-play-state)) jumi-width;
-    }
-  }
-  .if-sibling-is-\[\*\]\:animate-accent-color-amber-500 {
-    & ~ * {
-      --jumi-accent-color: oklch(76.9% 0.188 70.08);
-      --jumi-accent-color-property: var(--jumi-accent-color-animation-duration, var(--jumi-animation-duration)) var(--jumi-accent-color-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-accent-color-animation-delay, var(--jumi-animation-delay)) var(--jumi-accent-color-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-accent-color-animation-direction, var(--jumi-animation-direction)) var(--jumi-accent-color-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-accent-color-animation-play-state, var(--jumi-animation-play-state)) jumi-accent-color;
-    }
-  }
-}
-@layer base {
-  @property --jumi-animation-composition {
-    inherits: false;
-    initial-value: replace;
-    syntax: "replace | add | accumulate";
-  }
-  @property --jumi-animation-delay {
-    inherits: false;
-    initial-value: 0s;
-    syntax: "<time>";
-  }
-  @property --jumi-animation-direction {
-    inherits: false;
-    initial-value: normal;
-    syntax: "normal | reverse | alternate | alternate-reverse";
-  }
-  @property --jumi-animation-duration {
-    inherits: false;
-    initial-value: 1s;
-    syntax: "<time>";
-  }
-  @property --jumi-animation-fill-mode {
-    inherits: false;
-    initial-value: none;
-    syntax: "none | forwards | backwards | both";
-  }
-  @property --jumi-animation-iteration-count {
-    inherits: false;
-    initial-value: 1;
-    syntax: "<number> | infinite";
-  }
-  @property --jumi-animation-play-state {
-    inherits: false;
-    initial-value: running;
-    syntax: "running | paused";
-  }
-  @property --jumi-animation-timing-function {
-    inherits: false;
-    initial-value: ease;
-    syntax: "ease | linear | ease-in | ease-out | ease-in-out | step-start | step-end";
-  }
-}
-@keyframes jumi-bounce-in {
-  0% {
-    opacity: 0;
-    transform: scale3d(0.3, 0.3, 0.3);
-  }
-  50% {
-    opacity: 1;
-    transform: scale3d(1.1, 1.1, 1.1);
-  }
-  100% {
-    opacity: 1;
-    transform: scale3d(1, 1, 1);
   }
 }
 @keyframes jumi-slide-in-up {
@@ -1181,6 +1113,34 @@
   100% {
     opacity: 1;
     transform: scale3d(1, 1, 1);
+  }
+}
+@keyframes jumi-bounce-in-up {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 100px, 0);
+  }
+  50% {
+    opacity: 1;
+    transform: translate3d(0, -10px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes jumi-bounce-in-down {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -100px, 0);
+  }
+  50% {
+    opacity: 1;
+    transform: translate3d(0, 10px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
 }
 @keyframes jumi-arc-bottom-right {
@@ -1212,6 +1172,20 @@
 @keyframes jumi-border-radius {
   to {
     border-radius: var(--jumi-border-radius);
+  }
+}
+@keyframes jumi-bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale3d(0.3, 0.3, 0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale3d(1.1, 1.1, 1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
   }
 }
 @keyframes jumi-bubble {

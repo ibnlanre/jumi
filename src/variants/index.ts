@@ -1,31 +1,22 @@
 import type { MatchVariant } from '@/types'
 
+import { css } from '@/helpers/css'
 import { html } from '@/theme/html'
 
 export const variants: Array<MatchVariant> = [
   {
-    generator: value => `& ${value}`,
-    name: 'if-child-is',
+    generator: value => css(':is', value),
+    name: 'is',
     values: html,
   },
   {
-    generator: value => `& > ${value}`,
-    name: 'if-direct-child-is',
+    generator: value => css(':has', value),
+    name: 'has',
     values: html,
   },
   {
-    generator: value => `& + ${value}`,
-    name: 'if-next-sibling-is',
-    values: html,
-  },
-  {
-    generator: value => `& ~ ${value}`,
-    name: 'if-sibling-is',
-    values: html,
-  },
-  {
-    generator: value => `${value} &`,
-    name: 'if-parent-is',
+    generator: value => css(':where', value),
+    name: 'where',
     values: html,
   },
 ]

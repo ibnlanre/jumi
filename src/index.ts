@@ -16,8 +16,7 @@ import createPlugin from 'tailwindcss/plugin'
 const register = [animationRegister]
 
 const jumi = createPlugin((api) => {
-  const { addBase, matchComponents, matchUtilities, matchVariant } = api
-  register.forEach(addBase)
+  const { matchComponents, matchUtilities, matchVariant } = api
 
   for (const { generator, name, values } of variants) {
     matchVariant(name, generator, { values })

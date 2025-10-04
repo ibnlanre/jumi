@@ -333,12 +333,12 @@
         <!-- Basic Stagger -->
         <div class="mb-6">
           <h3 class="mb-2 font-medium">Basic Stagger (100ms intervals)</h3>
-          <div class="flex gap-2 p-4 bg-gray-100 rounded animation-delay-forward-100/5 *:jumi *:w-12 *:h-12 *:bg-blue-500 *:rounded *:animate-bounce-in *:animation-duration-2000 *:animation-iteration-count-infinite *:animation-direction-alternate">
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
+          <div class="flex gap-2 p-4 bg-gray-100 rounded animation-delay-forward-100/5 *:nth-[even]:animate-bounce-in-up *:nth-[odd]:animate-bounce-in-down animation-duration-2000 animation-iteration-count-infinite animation-direction-alternate">
+            <div class="w-12 h-12 bg-blue-500 rounded jumi"></div>
+            <div class="w-12 h-12 bg-blue-500 rounded jumi"></div>
+            <div class="w-12 h-12 bg-blue-500 rounded jumi"></div>
+            <div class="w-12 h-12 bg-blue-500 rounded jumi"></div>
+            <div class="w-12 h-12 bg-blue-500 rounded jumi"></div>
           </div>
         </div>
 
