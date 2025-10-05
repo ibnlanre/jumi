@@ -1,181 +1,196 @@
 # Contributing to Jumi
 
-Thank you for your interest in contributing to Jumi! This document outlines our development philosophy, coding standards, and contribution guidelines.
+Thank you for your interest in contributing to Jumi! This guide will help you understand our design philosophy and contribution process.
 
-## 🎯 Philosophy of Utility Class Design
+---
 
-Jumi follows a distinct philosophy in naming and structuring utility classes that prioritizes clarity, consistency, and developer experience. Understanding these principles is crucial for maintaining the project's coherence.
+## Design Philosophy
 
-### Core Principles
+Jumi follows clear principles that ensure consistency, clarity, and excellent developer experience. Understanding these principles is essential before contributing.
 
-#### 1. **CSS Property Fidelity**
-Utility class names should mirror their corresponding CSS property names as closely as possible.
+### 1. CSS Property Fidelity
 
-**✅ Good Examples:**
-- `animate-background-color-blue-500` → `background-color: theme(colors.blue.500)`
-- `animate-width-full` → `width: 100%`
-- `animate-backdrop-filter-drop-shadow-blur-md` → `backdrop-filter: drop-shadow(...)`
-- `animate-border-radius-full` → `border-radius: 9999px`
+**Class names mirror their CSS property names as closely as possible.**
 
-**❌ Avoid:**
-- `animate-bg-red-500` (abbreviates `background-color`)
-- `animate-items-center` (too abbreviated from `align-items`)
-- `animate-drop-blur-md` (loses the context of `backdrop-filter-drop-shadow`)
-
-#### 2. **Relationship Selectors with Tailwind v4 Variants**
-Prefer Tailwind v4’s built-in relationship variants for selector logic over custom natural-language variants.
-
-**Use:**
-- `is-[h1]:...` for matching a child/descendant element
-- `has-[>img]:...` for parent that has a direct child selector
-- `where-[.card]:...` to group selectors without increasing specificity
-
-These keep class names precise while leveraging standardized Tailwind mechanisms.
-
-#### 3. **Minimal Abbreviations**
-Abbreviations should be kept to an absolute minimum, with exceptions only for universally understood conventions.
-
-**Acceptable Abbreviations:**
-- `x`, `y`, `z` for spatial axes (e.g., `translate-x`, `offset-y`, `rotate-z`)
-- Established CSS shorthand (e.g., `margin`, `padding` instead of expanding all sides)
-
-**Rationale:** Full names improve code readability, reduce cognitive load, and make the codebase more accessible to developers with varying experience levels.
-
-#### 4. **Hierarchical Naming**
-When CSS properties have sub-properties or variations, maintain the hierarchical relationship in the class name.
-
-**Examples:**
-- `backdrop-filter-drop-shadow` → `backdrop-filter-drop-shadow-blur`, `backdrop-filter-drop-shadow-color`
-- `border-image` → `border-image-outset`, `border-image-repeat`
-- `mask-border` → `mask-border-slice`, `mask-border-width`
-
-#### 5. **Semantic Clarity Over Brevity**
-Prioritize clarity and semantic meaning over shorter class names.
-
-**✅ Preferred:**
 ```html
-<div class="animate-backdrop-filter-drop-shadow-offset-x-4 animate-backdrop-filter-drop-shadow-color-blue-500">
+✅ Good
+<div class="animate-background-color-blue-500">     <!-- background-color -->
+<div class="animate-border-radius-full">            <!-- border-radius -->
+<div class="animate-backdrop-filter-blur-md">       <!-- backdrop-filter -->
+
+❌ Avoid
+<div class="animate-bg-blue-500">                   <!-- abbreviated -->
+<div class="animate-radius-full">                   <!-- loses context -->
+<div class="animate-blur-md">                       <!-- ambiguous property -->
 ```
 
-**❌ Avoid:**
+**Why?** Developers can immediately understand which CSS property is being animated without guessing or memorizing abbreviations.
+
+---
+
+### 2. Minimal Abbreviations
+
+Only use abbreviations that are universally understood or part of CSS conventions.
+
+**Acceptable:**
+- `x`, `y`, `z` for spatial axes (`translate-x`, `rotate-z`)
+- Standard CSS shorthand (`margin`, `padding`)
+
+**Not acceptable:**
+- `bg` for `background-color`
+- `bd` for `border`
+- `pos` for `position`
+
+**Why?** Full names reduce cognitive load and make the codebase accessible to developers at all experience levels.
+
+---
+
+### 3. Hierarchical Naming
+
+Maintain property relationships in class names.
+
 ```html
-<div class="animate-bd-drop-x-4 animate-bd-drop-blue-500">
+✅ Good
+animate-backdrop-filter-drop-shadow-blur-md
+animate-backdrop-filter-drop-shadow-color-blue-500
+animate-border-image-outset-4
+animate-mask-border-width-2
+
+❌ Avoid  
+animate-drop-shadow-blur-md                     <!-- loses parent context -->
+animate-border-outset-4                         <!-- ambiguous -->
 ```
 
-#### 6. **Selector Naming Guidance**
-Use Tailwind’s `is-*`, `has-*`, and `where-*` to express relationships; avoid inventing new natural-language variants.
+**Why?** Hierarchical naming preserves the relationship between parent and child properties, making the API predictable.
 
-**Examples:**
+---
+
+### 4. Semantic Clarity Over Brevity
+
+Prioritize clear, readable class names over shorter alternatives.
+
 ```html
-<div class="is-[h1]:text-blue-500">...</div>
-<nav class="has-[>button]:space-x-4">...</nav>
-<section class="where-[.card]:p-4">...</section>
+✅ Preferred
+<div class="animate-backdrop-filter-drop-shadow-offset-x-4">
+
+❌ Avoid
+<div class="animate-bd-drop-x-4">
 ```
 
-### Animation-Specific Conventions
+**Why?** Self-documenting code is maintainable code. A few extra characters are worth the clarity.
 
-#### Effect Animations
-Effect animation names should be descriptive, hyphenated, and consistent:
+---
 
-- `bounce-in` (not `bounceIn`)
-- `slide-in-{direction}`, `slide-out-{direction}` (e.g., `slide-in-left`)
-- `zoom-in`, `zoom-out`
-- `fade-in`, `fade-out`
-- `arc-top-left`, `arc-bottom-right`
-- `skew-{direction}` (e.g., `skew-left`, `skew-right`)
+### 5. Use Tailwind v4 Relationship Variants
 
-#### Property Animations
-Property animations follow the pattern: `animate-{css-property}-{value}`
+Leverage Tailwind's built-in `:is()`, `:has()`, and `:where()` variants instead of creating custom selector utilities.
 
-- `animate-opacity-50` → animates to `opacity: 0.5`
-- `animate-width-full` → animates to `width: 100%`
-- `animate-background-color-red-500` → animates to `background-color: red`
+```html
+✅ Good - Use Tailwind v4 variants
+<div class="is-[h1]:animate-fade-in">
+<nav class="has-[>button]:animate-scale-110">
+<section class="where-[.card]:animate-slide-in-up">
 
-### Implementation Guidelines
-
-#### TypeScript Patterns
-All utility definitions should follow established patterns:
-
-```typescript
-'animate-property-name': {
-  property: value => ({
-    '--jumi-property-name': value,
-    // register variables and keyframes via the shared creator so both are emitted together
-  }),
-  type: 'appropriate-type',
-  // prefer theme tokens where applicable (e.g., colors, spacing)
-},
+❌ Avoid - Custom natural language variants
+<div class="child-h1:animate-fade-in">
+<nav class="has-button:animate-scale-110">
 ```
 
-#### Alphabetical Organization
-Properties must be organized alphabetically within their files to maintain consistency and ease of navigation.
+**Why?** Tailwind v4 provides standardized, well-documented patterns. No need to reinvent the wheel.
 
-#### Value Mapping
-Use Tailwind v4 theme tokens when appropriate:
-- Colors (e.g., theme colors)
-- Spacing
-- Timing: `animationDelay`, `animationDuration`
+---
 
-### File Structure Philosophy
+## Animation Conventions
+
+### Effect Animations
+
+Effect names use descriptive, hyphenated words following the pattern: `{type}-{direction}-{origin}`
+
+```html
+✅ Good
+bounce-in, bounce-out                     <!-- Clear direction: -in vs -out -->
+slide-in-left, slide-out-right            <!-- Type + direction + axis -->
+fade-in, fade-out                         <!-- Simple directional -->
+arc-top-left, arc-bottom-right            <!-- Hierarchical origin points -->
+zoom-in, zoom-out                         <!-- Descriptive type -->
+skew-left, skew-right-up                  <!-- Compound directions -->
+wipe-in-center, wipe-out-left             <!-- Advanced: type-direction-origin -->
+iris-in-center, iris-out-top-right        <!-- Full pattern -->
+barn-door-in-center, curtain-out-left     <!-- Multi-word types (hyphenated) -->
+
+❌ Avoid
+bounceIn                                  <!-- camelCase -->
+slideLeft                                 <!-- missing -in/-out direction -->
+wipeC                                     <!-- abbreviated origin -->
+fade                                      <!-- missing direction -->
+arcTL                                     <!-- abbreviated -->
+bd-in-c                                   <!-- multiple abbreviations -->
+```
+
+**Why this pattern?**
+- Descriptive names (wipe, iris, box, barn-door) convey intent immediately
+- Consistent direction indicators (-in/-out) make behavior predictable  
+- Hierarchical origins (-center, -top-left) provide precision when needed
+- No abbreviations ensures accessibility for all skill levels
+
+### Property Animations
+
+Follow the pattern: `animate-{css-property}-{value}`
+
+```html
+<div class="animate-opacity-50">                    <!-- opacity: 0.5 -->
+<div class="animate-width-full">                    <!-- width: 100% -->
+<div class="animate-background-color-red-500">      <!-- background-color: red -->
+```
+
+---
+
+## Project Structure
 
 ```
 src/
 ├── keyframes/
-│   ├── effects.ts     # Named effect animations (bounce-in, slide-out, etc.)
-│   └── property.ts    # Property-based keyframes
+│   ├── effects.ts       # Named animations (bounce-in, slide-out, etc.)
+│   └── property.ts      # Property-based keyframes
 ├── properties/
-│   ├── match.ts       # Main utility definitions
-│   └── add.ts         # Additional utilities
-├── theme/             # Theme value definitions
-├── variants/          # Relationship helpers if needed (prefer Tailwind :is() / :has())
-└── variables/         # CSS custom property definitions
+│   ├── match.ts         # Main utility definitions
+│   └── component.ts     # Additional utilities  
+├── theme/               # Theme value definitions
+├── variants/            # Relationship helpers (if needed)
+└── variables/           # CSS custom property definitions
 ```
 
-### Contributing Guidelines
+---
 
-#### Before Contributing
+## How to Contribute
 
-1. **Read the Philosophy**: Ensure you understand our naming conventions
-2. **Check Existing Patterns**: Look for similar implementations in the codebase
-3. **Verify CSS Property Names**: Reference MDN documentation for exact property names
+### Adding a New CSS Property
 
-#### Making Changes
+1. **Verify the CSS property name** on [MDN](https://developer.mozilla.org/en-US/docs/Web/CSS)
+2. **Add to `properties/match.ts`** in alphabetical order
+3. **Use the established pattern:**
 
-1. **Property Additions**: Add new properties in alphabetical order within `match.ts`
-2. **Effect Animations**: Add to `effects.ts` with descriptive, hyphenated names
-3. **Type Definitions**: Update TypeScript types when adding new property categories
-4. **Tests**: Include relevant test cases for new functionality
-
-#### Code Style
-
-- Use consistent indentation (2 spaces)
-- Follow alphabetical ordering
-- Include JSDoc comments for complex functions
-- Maintain TypeScript strict mode compliance
-
-#### Naming New Properties
-
-When adding support for new CSS properties:
-
-1. **Check CSS Specification**: Use the exact property name from CSS specs
-2. **Handle Sub-properties**: Maintain hierarchical relationships
-3. **Consider Logical Groupings**: Group related properties together
-4. **Test Edge Cases**: Ensure arbitrary values work correctly
-
-### Examples of Good Contributions
-
-#### Adding a New CSS Property
 ```typescript
 'animate-scroll-margin-top': {
   property: value => ({
     '--jumi-scroll-margin-top': value,
-    // register scroll-margin-top keyframes via the shared creator
+    // Register keyframes via shared creator
   }),
-  // values: spacing tokens or arbitrary values
+  type: 'spacing', // or appropriate type
 },
 ```
 
-#### Adding a New Effect Animation
+4. **Support Tailwind theme tokens** when applicable (colors, spacing, etc.)
+5. **Test with arbitrary values:** `animate-scroll-margin-top-[24px]`
+
+---
+
+### Adding a New Effect Animation
+
+1. **Choose a descriptive, hyphenated name**
+2. **Add to `keyframes/effects.ts`**
+3. **Follow the keyframe pattern:**
+
 ```typescript
 'bounce-in': {
   '0%': {
@@ -183,7 +198,7 @@ When adding support for new CSS properties:
     transform: 'scale(0.3) translateY(-100px)',
   },
   '50%': {
-    opacity: '1',
+    opacity: '1', 
     transform: 'scale(1.05) translateY(10px)',
   },
   '100%': {
@@ -193,18 +208,122 @@ When adding support for new CSS properties:
 },
 ```
 
-### Quality Standards
+4. **Consider accessibility:** Test with `prefers-reduced-motion`
+5. **Document motion type:** Spring physics, linear, parabolic arc, etc.
 
-- **Consistency**: Follow established patterns without deviation
-- **Documentation**: Include clear examples and use cases
-- **Performance**: Consider the impact on bundle size and runtime performance
-- **Accessibility**: Respect user preferences for reduced motion
-- **Browser Support**: Ensure compatibility with modern browsers
+---
 
-### Getting Help
+### Code Standards
 
-- **Questions**: Open a discussion on GitHub
-- **Bugs**: Create an issue with minimal reproduction case
-- **Features**: Propose new features through issues first
+- **Alphabetical ordering:** Keep properties sorted
+- **2-space indentation**
+- **TypeScript strict mode:** All contributions must pass strict type checking
+- **JSDoc comments:** Add for complex functions
+- **Consistent formatting:** Follow existing patterns
 
-By following these guidelines, we maintain Jumi's high quality and ensure that it remains intuitive and powerful for all developers. Thank you for contributing to making web animations more accessible and enjoyable!
+---
+
+### Before Submitting
+
+- [ ] Read and understand the design philosophy
+- [ ] Verify CSS property names on MDN
+- [ ] Check for similar existing implementations
+- [ ] Add utilities in alphabetical order
+- [ ] Test with arbitrary values
+- [ ] Ensure TypeScript types are correct
+- [ ] Include examples in your PR description
+
+---
+
+## Quality Standards
+
+### Performance
+- Consider bundle size impact
+- Prefer GPU-accelerated transforms
+- Use CSS custom properties efficiently
+
+### Accessibility  
+- Respect `prefers-reduced-motion`
+- Test with screen readers when relevant
+- Provide reduced-motion alternatives for complex animations
+
+### Browser Support
+- Target modern browsers (Chrome 88+, Firefox 89+, Safari 14+)
+- Test cross-browser before submitting
+
+### Documentation
+- Clear examples for new features
+- Update README if adding major functionality
+- Explain the "why" in PR descriptions
+
+---
+
+## Examples of Good Contributions
+
+### ✅ Adding backdrop-filter-hue-rotate
+
+```typescript
+// properties/match.ts (alphabetically placed)
+'animate-backdrop-filter-hue-rotate': {
+  property: value => ({
+    '--jumi-backdrop-filter-hue-rotate': value,
+  }),
+  type: 'angle',
+},
+```
+
+**Why this is good:**
+- Exact CSS property name
+- Maintains hierarchical relationship with `backdrop-filter`
+- Supports arbitrary values: `animate-backdrop-filter-hue-rotate-[45deg]`
+
+### ✅ Adding elastic-bounce effect
+
+```typescript
+// keyframes/effects.ts
+'elastic-bounce': {
+  '0%': {
+    transform: 'scale(0) translateY(100%)',
+    opacity: '0',
+  },
+  '60%': {
+    transform: 'scale(1.1) translateY(-10%)',
+    opacity: '1',
+  },
+  '80%': {
+    transform: 'scale(0.95) translateY(5%)',
+  },
+  '100%': {
+    transform: 'scale(1) translateY(0)',
+    opacity: '1',
+  },
+},
+```
+
+**Why this is good:**
+- Descriptive hyphenated name
+- Natural motion curve with overshoot
+- Includes opacity for entrance effect
+
+---
+
+## Getting Help
+
+- **Questions?** Open a [Discussion](https://github.com/your-repo/discussions)
+- **Found a bug?** Create an [Issue](https://github.com/your-repo/issues) with a minimal reproduction
+- **Feature request?** Propose it in an issue first before implementing
+
+---
+
+## Need Clarification?
+
+If you're unsure about:
+- Whether to abbreviate a name → Don't abbreviate
+- How to name a new property → Use the exact CSS property name
+- Whether to create a custom variant → Use Tailwind's `:is()`, `:has()`, `:where()`
+
+When in doubt, ask! We're here to help.
+
+---
+
+**Thank you for helping make web animations more accessible and delightful!**

@@ -1,471 +1,417 @@
 # Jumi 🎬
 
-All CSS properties are animatable, unless otherwise specified [see list](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_animated_properties).
+**A comprehensive CSS animation library built as a TailwindCSS plugin.**
 
-A comprehensive CSS animation library built as a TailwindCSS plugin. Transform your web interfaces with smooth, physics-based animations powered by CSS custom properties and advanced motion design.
+Transform your interfaces with smooth, physics-based animations powered by CSS custom properties and modern motion design principles.
 
 [![TypeScript](https://badges.frapsoft.com/typescript/code/typescript.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
 
-## ✨ Features
+---
 
-- 🎯 **TailwindCSS Plugin** - Seamlessly integrates with your TailwindCSS workflow
-- 🔧 **TypeScript Support** - Full type definitions and IntelliSense
-- 🎨 **Rich Animation Library** - 200+ pre-built effects with transform, property, and keyframe animations
-- 🌊 **Physics-Based Motion** - Natural parabolic arcs, floating, and realistic motion curves
-- ⚡ **Performance Optimized** - GPU-accelerated transforms and CSS custom properties
-- 🎪 **Composable Architecture** - Mix and match animations for complex effects
-- 📱 **Responsive & Accessible** - Works with TailwindCSS variants and respects motion preferences
-- 🌟 **Tree Shakable** - Only includes the utilities you actually use
-- 🎭 **Modern Animation Patterns** - Stagger animations, directional arcs, and fade-in effects
+## Why Jumi?
 
-## 🚀 Quick Start
+Traditional animation libraries force you to choose between ease-of-use and flexibility. Jumi gives you both:
 
-### Basic Usage
+- **Native TailwindCSS integration** – Works seamlessly with your existing workflow
+- **200+ pre-built animations** – From subtle fades to physics-based arcs
+- **Composable by design** – Combine utilities to create complex effects
+- **Performance first** – GPU-accelerated transforms, tree-shakable output
+- **Accessible** – Respects `prefers-reduced-motion` automatically
 
-```html
-<!-- Modern effect animations -->
-<div class="jumi animate-fade-in animation-duration-1000">Hello World!</div>
-<div class="jumi animate-bounce-in animation-duration-500">Bouncy entrance!</div>
+---
 
-<!-- Physics-based arc animations -->
-<div class="jumi animate-arc-bottom-left animation-duration-2000">
-  Arcs in from bottom-left with natural parabolic motion
-</div>
-<div class="jumi animate-arc-top-right animation-duration-1500">
-  Swoops down from top-right corner
-</div>
-
-<!-- Smooth property animations -->
-<div class="jumi animate-width-full animation-duration-1000">
-  Width grows smoothly to 100%
-</div>
-<div class="jumi animate-background-color-blue-500 animation-duration-750">
-  Background color transitions smoothly
-</div>
-
-<!-- Transform animations with natural timing -->
-<div class="jumi animate-translate-x-[20px] animate-rotate-45 animation-duration-500">
-  Move and rotate simultaneously
-</div>
-
-<!-- Stagger animations for sequential effects -->
-<div class="animation-delay-forward-100/5 jumi animation-duration-300">
-  <div class="jumi animation-duration-300 animate-slide-in-up">Item 1 (0ms delay)</div>
-  <div class="jumi animation-duration-300 animate-slide-in-down">Item 2 (100ms delay)</div>
-  <div class="jumi animation-duration-300 animate-slide-in-up">Item 3 (200ms delay)</div>
-  <div class="jumi animation-duration-300 animate-slide-in-down">Item 4 (300ms delay)</div>
-  <div class="jumi animation-duration-300 animate-slide-in-up">Item 5 (400ms delay)</div>
-</div>
-
-<!-- Hover effects with proper timing -->
-<button class="hover:animate-scale-110 animation-duration-200">
-  Hover for smooth scale
-</button>
-```
-
-## 🎯 Modern Animation Architecture
-
-Jumi provides a flexible animation system using CSS custom properties, delivering smooth motion that feels organic and performant.
-
-### Physics-Based Arc Animations
-
-Experience natural parabolic motion using transform-origin mechanics:
+## Quick Start
 
 ```html
-<!-- Complete directional arc system -->
-<div class="jumi animate-arc-bottom-left animation-duration-2000">
-  Swoops up from bottom-left corner
+<!-- Fade in smoothly -->
+<div class="jumi animate-fade-in animation-duration-1000">
+  Hello World!
 </div>
-<div class="jumi animate-arc-bottom-right animation-duration-2000">
-  Arcs up from bottom-right corner  
+
+<!-- Physics-based arc motion -->
+<div class="jumi animate-arc-bottom-left animation-duration-1500">
+  Swoops in from bottom-left with natural parabolic motion
 </div>
-<div class="jumi animate-arc-top-left animation-duration-2000">
-  Swings down from top-left corner
-</div>
-<div class="jumi animate-arc-top-right animation-duration-2000">
-  Curves down from top-right corner
+
+<!-- Staggered list animations -->
+<div class="animation-delay-forward-100/5">
+  <div class="jumi animate-slide-in-up animation-duration-300">Item 1</div>
+  <div class="jumi animate-slide-in-up animation-duration-300">Item 2</div>
+  <div class="jumi animate-slide-in-up animation-duration-300">Item 3</div>
 </div>
 ```
 
-**How it works:**
-- Uses `transform-origin: bottom/top` for natural pivot points
-- Combines `translateX`, `translateY`, and `rotate` for parabolic curves
-- Fades in during motion for elegant entrance effects
-- GPU-accelerated for smooth 60fps performance
+---
 
-### Intelligent Stagger System
+## Core Concepts
 
-Create sequential animations with automatic timing calculation:
+### 1. Just-in-Time Generation
+Only the animations you actually use get generated. No bloated CSS bundles.
 
+### 2. Millisecond-Based Timing
+Precise control with intuitive millisecond values:
 ```html
-<!-- Forward stagger with CSS calc() -->
-<div class="animation-delay-forward-100/5 *:jumi *:animate-bounce-in">
-  <div>Animates first (0ms)</div>
-  <div>Animates second (100ms)</div>
-  <div>Animates third (200ms)</div>
-  <div>Animates fourth (300ms)</div>
-  <div>Animates fifth (400ms)</div>
-</div>
+<div class="animation-duration-500">Fast</div>
+<div class="animation-duration-1250">Custom</div>
+```
 
-<!-- Reverse stagger -->
-<div class="animation-delay-backward-150/4 *:animate-slide-in-up">
-  <div>Animates fourth (450ms)</div>
-  <div>Animates third (300ms)</div>
-  <div>Animates second (150ms)</div>
-  <div>Animates first (0ms)</div>
-</div>
-
-<!-- Custom arbitrary values -->
-<div class="animation-delay-forward-[250ms]/[3] *:animate-fade-in">
-  <div>0ms delay</div>
-  <div>250ms delay</div>
-  <div>500ms delay</div>
+### 3. Composable Architecture
+Mix and match transforms naturally:
+```html
+<div class="jumi animate-translate-x-[20px] animate-rotate-45 animate-scale-110">
+  Move, rotate, and scale simultaneously
 </div>
 ```
 
-<!-- Relationship-based styling can be expressed using Tailwind's built-in :is() and :has() variants in v4 -->
-<!-- Example (conceptual): is-[p]:animate-width-full, has-[>img]:animate-height-auto -->
-
-### Enhanced Property Animations
-
-Smooth property transitions with intelligent defaults:
-
+### 4. Per-Property Overrides
+Fine-tune individual properties while keeping global defaults:
 ```html
-<!-- Size animations -->
-<div class="jumi animate-width-full animation-duration-1000">
-  Width expands from current to 100%
-</div>
-<div class="jumi animate-height-[300px] animation-duration-750">
-  Height grows to exact 300px
-</div>
-
-<!-- Color transitions -->
-<div class="jumi animate-background-color-red-500 animation-duration-500">
-  Background smoothly transitions to red
-</div>
-<div class="jumi animate-color-blue-600 animation-duration-300">
-  Text color fades to blue
-</div>
-
-<!-- Border animations -->
-<div class="jumi animate-border-radius-full animation-duration-800">
-  Morphs into a perfect circle
+<!-- Rotate at 600ms, everything else at 300ms -->
+<div class="jumi animate-rotate-90 animate-scale-110 animation-duration-600/rotate animation-duration-300">
 </div>
 ```
 
-## 🧠 Concepts at a glance
+---
 
-- Just‑in‑time utilities: only the CSS you use is generated.
-- Millisecond‑based timing: `animation-duration-600`, `animation-delay-150`.
-- Composable by design: combine `animate-translate-*`, `animate-rotate-*`, `animate-scale-*`.
-- Per‑property overrides: `animation-duration-600/rotate` with a global fallback.
-- Prefer Tailwind v4 relationship variants like `is-*`/`has-*` when needed.
-
-### Animation Timing & Control
-
-Precise timing control with natural feeling defaults:
-
-```html
-<!-- Duration (using fractional seconds for precision) -->
-<div class="jumi animate-fade-in animation-duration-500">Quick fade (500ms)</div>
-<div class="jumi animate-bounce-in animation-duration-2000">Slow bounce (2000ms)</div>
-<div class="jumi animate-slide-in-up animation-duration-1250">Custom timing (1250ms)</div>
-
-<!-- Delay for choreographed sequences -->
-<div class="jumi animate-zoom-in animation-delay-500">Delayed zoom</div>
-<div class="jumi animate-slide-in-left animation-delay-1000">Later slide</div>
-
-<!-- Iteration control -->
-<div class="jumi animate-pulsing animation-iteration-count-infinite">Infinite pulse</div>
-<div class="jumi animate-shake animation-iteration-count-3">Shake 3 times</div>
-
-<!-- Direction control -->
-<div class="jumi animate-bounce-in animation-direction-alternate">Bounces back and forth</div>
-<div class="jumi animate-slide-in-up animation-direction-reverse">Reverses motion</div>
-```
+## Animation Types
 
 ### Transform Animations
 
-Smooth, GPU-accelerated movement:
+GPU-accelerated movement with smooth, natural motion:
 
 ```html
-<!-- Single-axis translation -->
-<div class="jumi animate-translate-x-[50px] animation-duration-750">Move right 50px</div>
-<div class="jumi animate-translate-y-[-30px] animation-duration-500">Move up 30px</div>
-
-<!-- Combined transforms (compose naturally) -->
-<div class="jumi animate-translate-x-[20px] animate-rotate-45 animate-scale-110 animation-duration-1000">
-  Move, rotate, and scale together
+<!-- Translation -->
+<div class="jumi animate-translate-x-[50px] animation-duration-750">
+  Slides 50px to the right
 </div>
 
-<!-- Rotation with different units -->
-<div class="jumi animate-rotate-90 animation-duration-500">Quarter turn</div>
-<div class="jumi animate-rotate-[0.25turn] animation-duration-1000">Same as above, turn units</div>
+<!-- Rotation -->
+<div class="jumi animate-rotate-45 animation-duration-500">
+  Rotates 45 degrees
+</div>
 
-<!-- Scaling variations -->
-<div class="jumi animate-scale-125 animation-duration-300">Scale up 25%</div>
-<div class="jumi animate-scale-x-150 animation-duration-800">Scale width only</div>
-<div class="jumi animate-scale-[0.85] animation-duration-600">Scale down to 85%</div>
+<!-- Scaling -->
+<div class="jumi animate-scale-125 animation-duration-300">
+  Grows by 25%
+</div>
+
+<!-- Combined transforms -->
+<div class="jumi animate-translate-y-[-20px] animate-rotate-90 animate-scale-110">
+  Complex motion in one declaration
+</div>
 ```
+
+**Available transforms:**
+- `animate-translate-{axis}-{value}` – Move along X or Y axis
+- `animate-rotate-{angle}` – Rotate by degrees or turns
+- `animate-scale-{value}` – Scale uniformly or per axis (`scale-x`, `scale-y`)
+
+---
 
 ### Effect Animations
 
 Carefully crafted entrance, exit, and attention effects:
 
 ```html
-<!-- Entrance effects with natural motion -->
-<div class="jumi animate-bounce-in animation-duration-800">Bouncy entrance</div>
-<div class="jumi animate-fade-in animation-duration-1000">Gentle fade in</div>
-<div class="jumi animate-slide-in-up animation-duration-600">Slides up from below</div>
-<div class="jumi animate-zoom-in animation-duration-500">Zooms into view</div>
-
-<!-- Modern arc entrances (physics-based) -->
-<div class="jumi animate-arc-bottom-left animation-duration-1500">Swoops from bottom-left</div>
-<div class="jumi animate-arc-top-right animation-duration-1200">Arcs from top-right</div>
-
-<!-- Floating and organic motion -->
-<div class="jumi animate-floating animation-duration-3000 animation-iteration-count-infinite">
-  Gentle floating motion
+<!-- Entrances -->
+<div class="jumi animate-bounce-in animation-duration-800">
+  Bouncy entrance with spring physics
 </div>
 
-<!-- Attention-seeking animations -->
+<div class="jumi animate-slide-in-up animation-duration-600">
+  Slides up from below
+</div>
+
+<!-- Physics-based arcs -->
+<div class="jumi animate-arc-bottom-left animation-duration-1500">
+  Natural parabolic motion from bottom-left corner
+</div>
+
+<!-- Attention-seeking -->
 <div class="jumi animate-shake animation-duration-500 animation-iteration-count-3">
-  Shake for attention
-</div>
-<div class="jumi animate-pulsing animation-duration-2000 animation-iteration-count-infinite">
-  Continuous pulsing
-</div>
-<div class="jumi animate-wobble animation-duration-1000 animation-iteration-count-2">
-  Playful wobble
+  Shakes 3 times to grab attention
 </div>
 
-<!-- Advanced effects -->
-<div class="jumi animate-fold-in animation-duration-1000">Unfolds into view</div>
-<div class="jumi animate-magnetic animation-duration-800">Magnetic attraction effect</div>
-<div class="jumi animate-bubble animation-duration-1500">Bubble burst effect</div>
-
-### Per‑property modifiers (selective tweaks)
-
-You can target specific animated properties with modifiers while keeping a global default.
-
-Syntax: `animation-duration-{ms}/{property}`
-
-Examples:
-
-```html
-<!-- Rotate runs at 600ms, everything else at 300ms -->
-<div class="jumi animate-rotate-90 animate-scale-110 animation-duration-600/rotate animation-duration-300"></div>
-
-<!-- Width at 800ms, global 400ms -->
-<div class="jumi animate-width-full animation-duration-800/width animation-duration-400"></div>
-
-<!-- Works for any animatable property: width, height, color, translate-x, etc. -->
-<div class="jumi animate-height-[200px] animate-translate-x-[24px] animation-duration-500/height animation-duration-300"></div>
+<!-- Organic motion -->
+<div class="jumi animate-floating animation-duration-3000 animation-iteration-count-infinite">
+  Gentle floating suspension
+</div>
 ```
+
+**Popular effects:**
+- **Entrances:** `animate-fade-in`, `animate-bounce-in`, `animate-zoom-in`, `animate-slide-in-{direction}`
+- **Physics arcs:** `animate-arc-bottom-left`, `animate-arc-bottom-right`, `animate-arc-top-left`, `animate-arc-top-right`
+- **Attention:** `animate-shake`, `animate-wobble`, `animate-pulsing`
+- **Organic:** `animate-floating`
+- **Distortions:** `animate-skew-{direction}`, `animate-fold-in`
+
+---
 
 ### Property Animations
 
-Direct CSS property animations with smooth transitions:
+Direct CSS property transitions with intelligent defaults:
 
 ```html
-<!-- Dimensional animations -->
-<div class="jumi animate-width-full animation-duration-1000">Width grows to 100%</div>
-<div class="jumi animate-height-[200px] animation-duration-750">Height to 200px</div>
-<div class="jumi animate-max-width-[500px] animation-duration-1200">Max width constraint</div>
+<!-- Dimensions -->
+<div class="jumi animate-width-full animation-duration-1000">
+  Width expands to 100%
+</div>
 
-<!-- Color transitions -->
+<!-- Colors -->
 <div class="jumi animate-background-color-blue-500 animation-duration-800">
   Background fades to blue
 </div>
-<div class="jumi animate-color-red-600 animation-duration-500">
-  Text color shifts to red
-</div>
-<div class="jumi animate-fill-green-500 animation-duration-750">
-  SVG fill changes to green
-</div>
 
-<!-- Border and shape animations -->
+<!-- Borders -->
 <div class="jumi animate-border-radius-full animation-duration-1000">
-  Morphs into a circle
-</div>
-<div class="jumi animate-border-width-[3px] animation-duration-500">
-  Border grows thicker
+  Morphs into a perfect circle
 </div>
 
-<!-- Shadow and depth -->
-<div class="jumi animate-box-shadow-xl animation-duration-300">
-  Shadow expands dramatically
-</div>
-<div class="jumi animate-text-shadow-md animation-duration-400">
-  Text gains shadow depth
-</div>
-
-<!-- Filter effects -->
+<!-- Effects -->
 <div class="jumi animate-filter-blur-md animation-duration-1500">
   Gradually blurs
 </div>
-<div class="jumi animate-filter-brightness-125 animation-duration-800">
-  Brightens up
+```
+
+**Animatable properties:**
+- **Size:** `width`, `height`, `max-width`, `gap`
+- **Color:** `background-color`, `color`, `fill`
+- **Border:** `border-radius`, `border-width`
+- **Effects:** `opacity`, `box-shadow`, `text-shadow`
+- **Filters:** `filter-blur`, `filter-brightness`, `backdrop-filter-blur`
+
+---
+
+## Advanced Features
+
+### Stagger Animations
+
+Create sequential animations with automatic timing calculation:
+
+```html
+<!-- Children animate one after another -->
+<div class="animation-delay-forward-100/5">
+  <div class="jumi animate-bounce-in animation-duration-300">0ms delay</div>
+  <div class="jumi animate-bounce-in animation-duration-300">100ms delay</div>
+  <div class="jumi animate-bounce-in animation-duration-300">200ms delay</div>
+  <div class="jumi animate-bounce-in animation-duration-300">300ms delay</div>
+  <div class="jumi animate-bounce-in animation-duration-300">400ms delay</div>
+</div>
+
+<!-- Reverse order -->
+<div class="animation-delay-backward-150/4">
+  <!-- Last child animates first -->
+</div>
+
+<!-- Custom arbitrary values -->
+<div class="animation-delay-forward-[250ms]/[3]">
+  <!-- 250ms intervals between 3 items -->
 </div>
 ```
 
-## 🎛️ Usage Notes
+**Pattern:** `animation-delay-{direction}-{interval}/{count}`
 
-- Works out of the box with Tailwind v4 plugin API in this repo. No extra config is required here.
-- Utilities are injected just-in-time: only variables and keyframes you use are emitted.
-- Use arbitrary values for precise control: `animate-width-[320px]`, `animate-rotate-[23deg]`, `animation-duration-[350ms]`.
+---
 
-## 🎯 Advanced Usage
+### Timing & Control
 
-### Arbitrary Values & Custom Properties
-
-Precise control with arbitrary values:
+Precise control over animation behavior:
 
 ```html
-<!-- Custom durations -->
-<div class="jumi animate-fade-in animation-duration-[350ms]">Custom timing</div>
-<div class="jumi animate-bounce-in animation-duration-[1750ms]">Precise duration</div>
+<!-- Duration -->
+<div class="animation-duration-500">Fast (500ms)</div>
+<div class="animation-duration-2000">Slow (2s)</div>
+<div class="animation-duration-[350ms]">Custom</div>
 
-<!-- Custom distances -->
-<div class="jumi animate-translate-x-[150px]">Exact pixel movement</div>
-<div class="jumi animate-translate-y-[calc(100vh-50px)]">Viewport-relative</div>
+<!-- Delay -->
+<div class="animation-delay-500">Starts after 500ms</div>
 
-<!-- Custom rotations -->
-<div class="jumi animate-rotate-[23deg]">Specific angle</div>
-<div class="jumi animate-rotate-[0.15turn]">Turn-based rotation</div>
+<!-- Iteration -->
+<div class="animation-iteration-count-infinite">Loops forever</div>
+<div class="animation-iteration-count-3">Repeats 3 times</div>
 
-<!-- Custom scales -->
-<div class="jumi animate-scale-[1.15]">Precise scaling</div>
-<div class="jumi animate-scale-x-[0.8]">Width-only scaling</div>
+<!-- Direction -->
+<div class="animation-direction-alternate">Bounces back and forth</div>
+<div class="animation-direction-reverse">Plays backward</div>
+
+<!-- Fill mode -->
+<div class="animation-fill-mode-forwards">Stays at end state</div>
+<div class="animation-fill-mode-both">Applies both start and end states</div>
 ```
 
-### Responsive Animation Design
+---
 
-Adaptive animations across breakpoints:
+### Responsive Animations
+
+Adapt animations across breakpoints:
 
 ```html
-<!-- Different effects per breakpoint -->
+<!-- Different effects per screen size -->
 <div class="jumi animate-slide-in-up md:animate-arc-bottom-left lg:animate-fade-in">
-  Mobile: slide up, Tablet: arc motion, Desktop: simple fade
+  Mobile: slide, Tablet: arc, Desktop: fade
 </div>
 
 <!-- Responsive timing -->
 <div class="animation-duration-300 md:animation-duration-600 lg:animation-duration-1000">
-  Faster on mobile, slower on larger screens
+  Faster on mobile, slower on desktop
 </div>
 
 <!-- Conditional animations -->
-<div class="md:animate md:animate-bounce-in">
+<div class="md:jumi md:animate-bounce-in">
   Only animates on medium screens and up
 </div>
 ```
 
-### Motion Preferences & Accessibility
+---
 
-Respect user motion preferences:
+### Accessibility
+
+Respect user motion preferences automatically:
 
 ```html
-<!-- Respect reduced motion preferences -->
-<div class="motion-safe:animate motion-safe:animate-bounce-in">
-  Only animates if user allows motion
+<!-- Only animate if user allows motion -->
+<div class="motion-safe:jumi motion-safe:animate-bounce-in">
+  Respects prefers-reduced-motion
 </div>
 
-<!-- Alternative for reduced motion -->
+<!-- Provide alternative for reduced motion -->
 <div class="motion-safe:animate-slide-in-up motion-reduce:animate-fade-in">
-  Slides normally, fades for reduced motion
+  Slides normally, fades for reduced motion users
 </div>
 
 <!-- Disable animations entirely -->
-<div class="motion-reduce:animation-none animate animate-zoom-in">
-  No animation for reduced motion preference
+<div class="jumi animate-zoom-in motion-reduce:animation-none">
+  No animation for users who prefer reduced motion
 </div>
 ```
 
-<!-- Advanced choreography examples removed for brevity -->
+---
 
-## 🎨 Complete Class Reference
+## Arbitrary Values
 
-### Animation Timing & Control
+Use any custom value for precise control:
 
-| Class Pattern | Description | Example |
-|---------------|-------------|---------|
-| `animation-duration-{ms}` | Set animation duration (milliseconds) | `animation-duration-300`, `animation-duration-1250` |
-| `animation-delay-{ms}` | Set animation delay (milliseconds) | `animation-delay-150`, `animation-delay-800` |
-| `animation-timing-function-{easing}` | Set easing function | `animation-timing-function-ease-in-out` |
-| `animation-iteration-count-{count}` | Set repeat count | `animation-iteration-count-3`, `animation-iteration-count-infinite` |
-| `animation-direction-{direction}` | Control direction | `animation-direction-reverse`, `animation-direction-alternate` |
-| `animation-fill-mode-{mode}` | Set fill mode | `animation-fill-mode-forwards`, `animation-fill-mode-both` |
-| `animation-duration-{ms}/{property}` | Per‑property duration override | `animation-duration-600/rotate`, `animation-duration-800/width` |
-| `animation-delay-{ms}/{property}` | Per‑property delay override | `animation-delay-150/opacity`, `animation-delay-300/translate-x` |
+```html
+<!-- Custom durations -->
+<div class="animation-duration-[350ms]">Exact timing</div>
 
-### Stagger Animation System
+<!-- Custom distances -->
+<div class="jumi animate-translate-x-[150px]">Exact pixels</div>
+<div class="jumi animate-translate-y-[calc(100vh-50px)]">Calculated values</div>
 
-| Class Pattern | Description | Example |
-|---------------|-------------|---------|
-| `animation-delay-forward-{interval}/{count}` | Forward stagger delays | `animation-delay-forward-100/5` |
-| `animation-delay-backward-{interval}/{count}` | Reverse stagger delays | `animation-delay-backward-150/4` |
-| `animation-delay-forward-[{ms}]/[{count}]` | Custom arbitrary stagger | `animation-delay-forward-[250ms]/[6]` |
+<!-- Custom rotations -->
+<div class="jumi animate-rotate-[23deg]">Specific angle</div>
+<div class="jumi animate-rotate-[0.15turn]">Turn-based</div>
+
+<!-- Custom scales -->
+<div class="jumi animate-scale-[1.15]">Precise scaling</div>
+```
+
+---
+
+## Complete Class Reference
+
+### Timing & Control
+
+| Class | Description |
+|-------|-------------|
+| `animation-duration-{ms}` | Set duration in milliseconds |
+| `animation-delay-{ms}` | Delay before animation starts |
+| `animation-timing-function-{easing}` | Easing function |
+| `animation-iteration-count-{count}` | Number of repetitions |
+| `animation-direction-{direction}` | Play direction |
+| `animation-fill-mode-{mode}` | State before/after animation |
+| `animation-duration-{ms}/{property}` | Per-property duration override |
+| `animation-delay-{ms}/{property}` | Per-property delay override |
+
+### Stagger System
+
+| Class | Description |
+|-------|-------------|
+| `animation-delay-forward-{interval}/{count}` | Sequential forward delays |
+| `animation-delay-backward-{interval}/{count}` | Sequential reverse delays |
+| `animation-delay-forward-[{ms}]/[{count}]` | Custom arbitrary stagger |
 
 ### Transform Animations
 
-| Class Pattern | Description | Example |
-|---------------|-------------|---------|
-| `animate-translate-{axis}-{distance}` | Translate along axis | `animate-translate-x-[20px]`, `animate-translate-y-4` |
-| `animate-rotate-{angle}` | Rotate element | `animate-rotate-45`, `animate-rotate-[23deg]` |
-| `animate-scale-{scale}` | Scale uniformly | `animate-scale-110`, `animate-scale-[1.15]` |
-| `animate-scale-{axis}-{scale}` | Scale single axis | `animate-scale-x-125`, `animate-scale-y-[0.8]` |
+| Class | Description |
+|-------|-------------|
+| `animate-translate-{axis}-{value}` | Translate along X or Y axis |
+| `animate-rotate-{angle}` | Rotate element |
+| `animate-scale-{value}` | Scale uniformly |
+| `animate-scale-{axis}-{value}` | Scale single axis |
 
 ### Effect Animations
 
-| Class | Description | Motion Type |
-|-------|-------------|-------------|
-| `animate-fade-in` | Gentle opacity transition | Linear fade |
-| `animate-bounce-in` | Bouncy entrance | Spring physics |
-| `animate-slide-in-{direction}` | Directional slide | Linear motion |
-| `animate-zoom-in` | Scale-based entrance | Uniform growth |
-| `animate-arc-bottom-left` | Parabolic motion from bottom-left | Transform-origin physics |
-| `animate-arc-bottom-right` | Parabolic motion from bottom-right | Transform-origin physics |
-| `animate-arc-top-left` | Parabolic motion from top-left | Transform-origin physics |
-| `animate-arc-top-right` | Parabolic motion from top-right | Transform-origin physics |
-| `animate-floating` | Gentle floating motion | Organic suspension |
-| `animate-shake` | Attention-seeking shake | Rapid oscillation |
-| `animate-wobble` | Playful wobble | Elastic deformation |
-| `animate-pulsing` | Rhythmic pulsing | Scale breathing |
-| `animate-skew-{direction}` | Directional skew (left, right, up, down) | Angular shear |
-| `animate-skew-{diagonal}` | Diagonal skew (left-up, right-down, left-down, right-up) | Angular shear |
+| Class | Motion Type |
+|-------|-------------|
+| `animate-fade-in` | Linear fade |
+| `animate-bounce-in` | Spring physics |
+| `animate-slide-in-{direction}` | Linear motion (up, down, left, right) |
+| `animate-zoom-in` | Uniform growth |
+| `animate-arc-bottom-left` | Transform-origin physics |
+| `animate-arc-bottom-right` | Transform-origin physics |
+| `animate-arc-top-left` | Transform-origin physics |
+| `animate-arc-top-right` | Transform-origin physics |
+| `animate-floating` | Organic suspension |
+| `animate-shake` | Rapid oscillation |
+| `animate-wobble` | Elastic deformation |
+| `animate-pulsing` | Scale breathing |
+| `animate-skew-{direction}` | Angular shear (left, right, up, down) |
+| `animate-skew-{diagonal}` | Diagonal shear (left-up, right-down, etc.) |
+| `animate-fold-in` | Unfold effect |
+| `animate-magnetic` | Magnetic attraction |
+| `animate-bubble` | Bubble burst |
 
 ### Property Animations
 
-| Class Pattern | Description | Example |
-|---------------|-------------|---------|
-| `animate-width-{size}` | Animate width property | `animate-width-full`, `animate-width-[300px]` |
-| `animate-height-{size}` | Animate height property | `animate-height-64`, `animate-height-[200px]` |
-| `animate-max-width-{size}` | Animate max-width constraint | `animate-max-width-[500px]` |
-| `animate-background-color-{color}` | Background color transition | `animate-background-color-blue-500` |
-| `animate-color-{color}` | Text color transition | `animate-color-red-600` |
-| `animate-opacity-{value}` | Opacity transition | `animate-opacity-0`, `animate-opacity-[0.35]` |
-| `animate-gap-{size}` | Grid/flex gap transition | `animate-gap-4`, `animate-gap-[12px]` |
-| `animate-border-radius-{radius}` | Border radius morphing | `animate-border-radius-full` |
-| `animate-border-width-{size}` | Border width animation | `animate-border-width-[3px]` |
-| `animate-box-shadow-{shadow}` | Shadow depth animation | `animate-box-shadow-xl` |
-| `animate-text-shadow-{shadow}` | Text shadow animation | `animate-text-shadow-md` |
-| `animate-filter-{filter}-{value}` | Filter effect animation | `animate-filter-blur-md` |
-| `animate-backdrop-filter-{filter}-{value}` | Backdrop filter animation | `animate-backdrop-filter-blur-md` |
-| `animate-fill-{color}` | SVG fill color transition | `animate-fill-green-500` |
+| Class Pattern | Example |
+|---------------|---------|
+| `animate-width-{size}` | `animate-width-full`, `animate-width-[300px]` |
+| `animate-height-{size}` | `animate-height-64`, `animate-height-[200px]` |
+| `animate-max-width-{size}` | `animate-max-width-[500px]` |
+| `animate-background-color-{color}` | `animate-background-color-blue-500` |
+| `animate-color-{color}` | `animate-color-red-600` |
+| `animate-opacity-{value}` | `animate-opacity-0`, `animate-opacity-[0.35]` |
+| `animate-gap-{size}` | `animate-gap-4`, `animate-gap-[12px]` |
+| `animate-border-radius-{radius}` | `animate-border-radius-full` |
+| `animate-border-width-{size}` | `animate-border-width-[3px]` |
+| `animate-box-shadow-{shadow}` | `animate-box-shadow-xl` |
+| `animate-text-shadow-{shadow}` | `animate-text-shadow-md` |
+| `animate-filter-{filter}-{value}` | `animate-filter-blur-md` |
+| `animate-backdrop-filter-{filter}-{value}` | `animate-backdrop-filter-blur-md` |
+| `animate-fill-{color}` | `animate-fill-green-500` |
 
-<!-- Natural language variants were removed. Prefer Tailwind's :is/:has patterns in v4 (e.g., is-[p]:..., has-[>img]:...) -->
+---
 
-## 🤝 Contributing
+## Browser Support
+
+Jumi uses modern CSS features including CSS Custom Properties and CSS Animations. Supported in all modern browsers:
+
+- Chrome/Edge 88+
+- Firefox 89+
+- Safari 14+
+
+---
+
+## Performance Notes
+
+- **GPU Acceleration**: Transform animations use `translate`, `rotate`, and `scale` for hardware acceleration
+- **Tree Shaking**: Only utilities you use are included in the final CSS bundle
+- **CSS Custom Properties**: Enables dynamic, performant animations without JavaScript
+- **Minimal Runtime**: All animations run purely in CSS
+
+---
+
+## Contributing
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
-## 📝 License
+---
+
+## License
 
 MIT License - see [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Built on top of [TailwindCSS](https://tailwindcss.com/)
 
 ---
 
