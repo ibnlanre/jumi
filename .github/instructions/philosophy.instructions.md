@@ -454,7 +454,7 @@ Always consider accessibility:
 - Add the property alphabetically
 
 ```typescript
-// Find the type file (e.g., types/attributes.ts)
+// Find the type file (e.g., types/index.ts)
 export type AnimatableProperty = 
   | 'existing-property-1'
   | 'existing-property-2'
