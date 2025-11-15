@@ -12,6 +12,6 @@
     "source.removeUnusedImports": "always"
   },
   "prettier.enable": false,
-  "css.customData": [".vscode/tailwind.json"],
+  "css.customData": [".vscode/tailwind.v4.json"],
   "typescript.experimental.useTsgo": false
 }

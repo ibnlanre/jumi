@@ -703,7 +703,7 @@ export const propertyKeyframes: Record<AnimatableStandardPropertyType, Collectio
   'color-interpolation-filters': {
     '@keyframes jumi-color-interpolation-filters': {
       to: {
-        'color-interpolation-filters': css('var', '--jumi-color-interpolation-filters'),
+        'color-interpolation-filters': css('var', '--jumi-color-interpolation-filters') as Property.ColorInterpolationFilters,
       },
     },
   },
@@ -1908,7 +1908,7 @@ export const propertyKeyframes: Record<AnimatableStandardPropertyType, Collectio
   'outline-style': {
     '@keyframes jumi-outline-style': {
       to: {
-        'outline-style': css('var', '--jumi-outline-style'),
+        'outline-style': css('var', '--jumi-outline-style') as Property.OutlineStyle,
       },
     },
   },
@@ -2181,7 +2181,7 @@ export const propertyKeyframes: Record<AnimatableStandardPropertyType, Collectio
   'position-try-order': {
     '@keyframes jumi-position-try-order': {
       to: {
-        'position-try-order': css('var', '--jumi-position-try-order'),
+        'position-try-order': css('var', '--jumi-position-try-order') as Property.PositionTryOrder,
       },
     },
   },
@@ -2244,7 +2244,7 @@ export const propertyKeyframes: Record<AnimatableStandardPropertyType, Collectio
   'ruby-overhang': {
     '@keyframes jumi-ruby-overhang': {
       to: {
-        'ruby-overhang': css('var', '--jumi-ruby-overhang'),
+        'ruby-overhang': css('var', '--jumi-ruby-overhang') as Property.RubyOverhang,
       },
     },
   },
@@ -2608,14 +2608,14 @@ export const propertyKeyframes: Record<AnimatableStandardPropertyType, Collectio
   'text-autospace': {
     '@keyframes jumi-text-autospace': {
       to: {
-        'text-autospace': css('var', '--jumi-text-autospace') as Property.MsTextAutospace,
+        'text-autospace': css('var', '--jumi-text-autospace'),
       },
     },
   },
   'text-box': {
     '@keyframes jumi-text-box': {
       to: {
-        textbox: css('var', '--jumi-text-box'),
+        'text-box': css('var', '--jumi-text-box'),
       },
     },
   },
@@ -2629,7 +2629,7 @@ export const propertyKeyframes: Record<AnimatableStandardPropertyType, Collectio
   'text-box-trim': {
     '@keyframes jumi-text-box-trim': {
       to: {
-        'text-box-trim': css('var', '--jumi-text-box-trim'),
+        'text-box-trim': css('var', '--jumi-text-box-trim') as Property.TextBoxTrim,
       },
     },
   },
@@ -2783,14 +2783,14 @@ export const propertyKeyframes: Record<AnimatableStandardPropertyType, Collectio
   'text-wrap-mode': {
     '@keyframes jumi-text-wrap-mode': {
       to: {
-        'text-wrap-mode': css('var', '--jumi-text-wrap-mode'),
+        'text-wrap-mode': css('var', '--jumi-text-wrap-mode') as Property.TextWrapMode,
       },
     },
   },
   'text-wrap-style': {
     '@keyframes jumi-text-wrap-style': {
       to: {
-        'text-wrap-style': css('var', '--jumi-text-wrap-style'),
+        'text-wrap-style': css('var', '--jumi-text-wrap-style') as Property.TextWrapStyle,
       },
     },
   },

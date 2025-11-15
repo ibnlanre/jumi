@@ -35,7 +35,7 @@ export function AnimationShowcase({
   }, [trigger])
 
   const defaultContent = (
-    <div className="flex items-center justify-center w-24 h-24 text-lg font-bold text-white rounded-lg shadow-lg bg-gradient-to-r from-blue-500 to-purple-600">
+    <div className="flex items-center justify-center w-24 h-24 text-lg font-bold text-white rounded-lg shadow-lg bg-linear-to-r from-blue-500 to-purple-600">
       ✨
     </div>
   )

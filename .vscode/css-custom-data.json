@@ -1,0 +1,66 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vscode-css-languageservice/main/docs/customData.schema.json",
+  "version": 1.1,
+  "atDirectives": [
+    {
+      "name": "@import",
+      "description": "Import CSS files with optional source() function for Tailwind v4",
+      "syntax": "@import <string> [source(<source-type>)]?"
+    },
+    {
+      "name": "@source",
+      "description": "Specify source files for Tailwind content detection"
+    },
+    {
+      "name": "@plugin",
+      "description": "Load Tailwind plugins"
+    },
+    {
+      "name": "@theme",
+      "description": "Define custom design tokens"
+    },
+    {
+      "name": "@utility",
+      "description": "Add custom utilities"
+    },
+    {
+      "name": "@variant",
+      "description": "Apply Tailwind variants"
+    },
+    {
+      "name": "@custom-variant",
+      "description": "Define custom variants"
+    },
+    {
+      "name": "@apply",
+      "description": "Apply utility classes"
+    },
+    {
+      "name": "@reference",
+      "description": "Import theme variables and utilities"
+    },
+    {
+      "name": "@config",
+      "description": "Load legacy JavaScript config"
+    }
+  ],
+  "properties": [
+    {
+      "name": "--spacing",
+      "description": "Tailwind spacing function",
+      "syntax": "--spacing(<number>)"
+    }
+  ],
+  "functions": [
+    {
+      "name": "source",
+      "description": "Controls Tailwind content detection",
+      "syntax": "source(none | auto | <string>)"
+    },
+    {
+      "name": "--spacing",
+      "description": "Access Tailwind spacing scale",
+      "syntax": "--spacing(<number>)"
+    }
+  ]
+}

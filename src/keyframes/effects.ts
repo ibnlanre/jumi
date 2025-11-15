@@ -26,16 +26,14 @@ export const effectKeyframes: Collection = {
       '0%': {
         'opacity': '0',
         'rotate': '90deg',
+        'transform': 'translateX(-45px) translateY(-45px)',
         'transform-origin': 'bottom',
-        'translateX': '-45px',
-        'translateY': '-45px',
       },
       '100%': {
         'opacity': '1',
         'rotate': '0deg',
+        'transform': 'translateX(0px) translateY(0px)',
         'transform-origin': 'bottom',
-        'translateX': '0px',
-        'translateY': '0px',
       },
     },
   },
@@ -44,16 +42,14 @@ export const effectKeyframes: Collection = {
       '0%': {
         'opacity': '0',
         'rotate': '-90deg',
+        'transform': 'translateX(45px) translateY(-45px)',
         'transform-origin': 'bottom',
-        'translateX': '45px',
-        'translateY': '-45px',
       },
       '100%': {
         'opacity': '1',
         'rotate': '0deg',
+        'transform': 'translateX(0px) translateY(0px)',
         'transform-origin': 'bottom',
-        'translateX': '0px',
-        'translateY': '0px',
       },
     },
   },
@@ -62,16 +58,14 @@ export const effectKeyframes: Collection = {
       '0%': {
         'opacity': '0',
         'rotate': '-90deg',
+        'transform': 'translateX(-45px) translateY(45px)',
         'transform-origin': 'top',
-        'translateX': '-45px',
-        'translateY': '45px',
       },
       '100%': {
         'opacity': '1',
         'rotate': '0deg',
+        'transform': 'translateX(0px) translateY(0px)',
         'transform-origin': 'top',
-        'translateX': '0px',
-        'translateY': '0px',
       },
     },
   },
@@ -80,16 +74,14 @@ export const effectKeyframes: Collection = {
       '0%': {
         'opacity': '0',
         'rotate': '90deg',
+        'transform': 'translateX(45px) translateY(45px)',
         'transform-origin': 'top',
-        'translateX': '45px',
-        'translateY': '45px',
       },
       '100%': {
         'opacity': '1',
         'rotate': '0deg',
+        'transform': 'translateX(0px) translateY(0px)',
         'transform-origin': 'top',
-        'translateX': '0px',
-        'translateY': '0px',
       },
     },
   },
@@ -867,32 +859,32 @@ export const effectKeyframes: Collection = {
   'flip-card-x': {
     '@keyframes jumi-flip-card-x': {
       '0%': {
-        backfaceVisibility: 'hidden',
-        transform: 'rotateX(0deg)',
+        'backface-visibility': 'hidden',
+        'transform': 'rotateX(0deg)',
       },
       '50%': {
-        backfaceVisibility: 'hidden',
-        transform: 'rotateX(90deg)',
+        'backface-visibility': 'hidden',
+        'transform': 'rotateX(90deg)',
       },
       '100%': {
-        backfaceVisibility: 'hidden',
-        transform: 'rotateX(180deg)',
+        'backface-visibility': 'hidden',
+        'transform': 'rotateX(180deg)',
       },
     },
   },
   'flip-card-y': {
     '@keyframes jumi-flip-card-y': {
       '0%': {
-        backfaceVisibility: 'hidden',
-        transform: 'rotateY(0deg)',
+        'backface-visibility': 'hidden',
+        'transform': 'rotateY(0deg)',
       },
       '50%': {
-        backfaceVisibility: 'hidden',
-        transform: 'rotateY(90deg)',
+        'backface-visibility': 'hidden',
+        'transform': 'rotateY(90deg)',
       },
       '100%': {
-        backfaceVisibility: 'hidden',
-        transform: 'rotateY(180deg)',
+        'backface-visibility': 'hidden',
+        'transform': 'rotateY(180deg)',
       },
     },
   },
@@ -1590,36 +1582,36 @@ export const effectKeyframes: Collection = {
   'reveal-down': {
     '@keyframes jumi-reveal-down': {
       '0%': {
-        clipPath: 'polygon(0 0, 100% 0, 100% 0, 0 0)',
-        opacity: '0',
+        'clip-path': 'polygon(0 0, 100% 0, 100% 0, 0 0)',
+        'opacity': '0',
       },
       '100%': {
-        clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-        opacity: '1',
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+        'opacity': '1',
       },
     },
   },
   'reveal-left': {
     '@keyframes jumi-reveal-left': {
       '0%': {
-        clipPath: 'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)',
-        opacity: '0',
+        'clip-path': 'polygon(100% 0, 100% 0, 100% 100%, 100% 100%)',
+        'opacity': '0',
       },
       '100%': {
-        clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-        opacity: '1',
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+        'opacity': '1',
       },
     },
   },
   'reveal-right': {
     '@keyframes jumi-reveal-right': {
       '0%': {
-        clipPath: 'polygon(0 0, 0 0, 0 100%, 0 100%)',
-        opacity: '0',
+        'clip-path': 'polygon(0 0, 0 0, 0 100%, 0 100%)',
+        'opacity': '0',
       },
       '100%': {
-        clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-        opacity: '1',
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+        'opacity': '1',
       },
     },
   },
@@ -1645,12 +1637,12 @@ export const effectKeyframes: Collection = {
   'reveal-up': {
     '@keyframes jumi-reveal-up': {
       '0%': {
-        clipPath: 'polygon(0 100%, 100% 100%, 100% 100%, 0 100%)',
-        opacity: '0',
+        'clip-path': 'polygon(0 100%, 100% 100%, 100% 100%, 0 100%)',
+        'opacity': '0',
       },
       '100%': {
-        clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-        opacity: '1',
+        'clip-path': 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
+        'opacity': '1',
       },
     },
   },

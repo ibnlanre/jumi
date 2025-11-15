@@ -1,4 +1,4 @@
-import type { AtRule, StandardPropertiesHyphen, SvgPropertiesHyphen } from 'csstype'
+import type { AtRule, PropertiesHyphen } from 'csstype'
 import type { PluginCreator } from 'tailwindcss/plugin'
 
 export type AddProperty = Collection<CssInJs>
@@ -883,7 +883,7 @@ export type ImageFunction
 
 export type KeyframeDefinition = Collection<Collection<number | string>>
 
-export type Keyframes = Partial<Record<AnimationFrame, PropertiesType>>
+export type Keyframes = Partial<Record<AnimationFrame, PropertiesHyphen>>
 
 export type KeyframesVariableReference = `var(${StandardPropertyKeyframesVariable}, none)`
 
@@ -1125,12 +1125,7 @@ export type NonStandardPropertyType
     | 'translate-3d'
     | 'translate-x'
     | 'translate-y'
-    | 'translate-z'
-
-export interface PropertiesType<TLength = 0 | (string & {}), TTime = string & {}>
-  extends StandardPropertiesType<TLength, TTime>, SvgPropertiesType<TLength, TTime> {
-  [key: string]: unknown
-}
+  | 'translate-z'
 
 export type PropertyType
   = | NonStandardAnimtionPropertyType
@@ -1203,17 +1198,6 @@ export type StandardAnimationPropertyType
     | 'animation-timeline'
     | 'animation-timing-function'
 
-export interface StandardPropertiesType<TLength = 0 | (string & {}), TTime = string & {}>
-  extends StandardPropertiesHyphen<TLength, TTime> {
-  'text-autospace'?: string
-  'text-box-edge'?: string
-  'text-box-trim'?: string
-  'text-wrap-mode'?: string
-  'text-wrap-style'?: string
-  'textbox'?: string
-  'view-transition-class'?: string
-}
-
 export type StandardPropertyKeyframes<Key extends string> = `@keyframes jumi-${Key}`
 
 export type StandardPropertyKeyframesCollection = {
@@ -1230,16 +1214,6 @@ export type SteppedValueFunction
   = | 'mod'
     | 'rem'
     | 'round'
-
-export interface SvgPropertiesType<TLength = 0 | (string & {}), TTime = string & {}>
-  extends SvgPropertiesHyphen<TLength, TTime> {
-  'color-interpolation-filters'?: string
-  'cx'?: string
-  'cy'?: string
-  'd'?: string
-  'x'?: string
-  'y'?: string
-}
 
 export type TailwindTheme
   = | 'accentColor'
@@ -1393,3 +1367,4 @@ export type Variable = PropertyVariable | StandardPropertyKeyframesVariable
 export interface VariablesCollection extends AnimationVariableCollection, KeyframeVariables, PropertyVariableCollection {
   [key: string]: string
 }
+    

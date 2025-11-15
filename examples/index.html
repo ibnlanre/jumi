@@ -16,7 +16,7 @@
           Jumi Animation Plugin
         </h1>
         <p
-          class="text-lg text-gray-600 animation-fade-in if-child-is-h1:bg-white animation-duration-2000 animation-delay-500 animate-color-gray-500 hover:animate-accent-color-amber-100 animation-iteration-count-infinite animate-justify-items-safe-center animate-backdrop-filter-drop-shadow-color-amber-100/75"
+          class="text-lg text-gray-600 animate-wiggle jumi animation-fade-in if-child-is-h1:bg-white animation-duration-2000 animation-delay-500 animate-color-gray-500 hover:animate-accent-color-amber-100 animation-iteration-count-infinite animate-justify-items-safe-center animate-backdrop-filter-drop-shadow-color-amber-100/75"
         >
           A comprehensive TailwindCSS animation library
         </p>
@@ -30,7 +30,7 @@
           <div class="p-4 overflow-hidden text-center bg-blue-100 rounded">
             <h3 class="mb-2 font-medium">Translate</h3>
             <div
-              class="w-16 h-16 mx-auto bg-blue-500 rounded jumi animate-translate-x-[20px] animation-duration-1000 animation-iteration-count-infinite animation-direction-alternate "
+              class="w-16 h-16 mx-auto bg-blue-500 rounded jumi animate-translate-x-5 animation-duration-1000 animation-iteration-count-infinite animation-direction-alternate "
             ></div>
           </div>
 
@@ -76,7 +76,7 @@
           <div class="p-4 overflow-hidden text-center bg-indigo-100 rounded">
             <h3 class="mb-2 font-medium">Fade In</h3>
             <div
-              class="w-16 h-16 mx-auto bg-indigo-500 rounded-full jumi animate-fade-in animation-duration-2000 animation-iteration-count-infinite animation-direction-alternate if-sibling-is-[*]:animate-accent-color-amber-500"
+              class="w-16 h-16 mx-auto bg-indigo-500 rounded-full jumi animate-fade-in animation-duration-2000 animation-iteration-count-infinite animation-direction-alternate"
             ></div>
           </div>
 
@@ -165,7 +165,7 @@
           <div class="p-4 overflow-hidden text-center bg-green-100 rounded">
             <h3 class="mb-2 font-medium">Height</h3>
             <div
-              class="jumi w-16 bg-green-500 rounded mx-auto animate-height-20 animation-duration-2000 animation-iteration-count-infinite animation-direction-alternate h-[2rem]"
+              class="w-16 h-8 mx-auto bg-green-500 rounded jumi animate-height-20 animation-duration-2000 animation-iteration-count-infinite animation-direction-alternate"
             ></div>
           </div>
 
@@ -181,7 +181,7 @@
           <div class="p-4 overflow-hidden text-center bg-red-100 rounded">
             <h3 class="mb-2 font-medium">Border Radius</h3>
             <div
-              class="w-16 h-16 mx-auto bg-red-500 rounded-[0px] jumi animate-border-radius-[20px] animation-duration-2000 animation-iteration-count-infinite animation-direction-alternate"
+              class="w-16 h-16 mx-auto bg-red-500 rounded-none jumi animate-border-radius-5 animation-duration-2000 animation-iteration-count-infinite animation-direction-alternate"
             ></div>
           </div>
         </div>
@@ -210,7 +210,7 @@
           <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
             <h3 class="mb-2 font-medium">Blur</h3>
             <div
-              class="w-16 h-16 mx-auto rounded jumi bg-gradient-to-r from-pink-500 to-yellow-500 blur-[1px] animate-filter-blur-md animation-duration-6000 animation-iteration-count-infinite animation-direction-alternate"
+              class="w-16 h-16 mx-auto rounded jumi bg-linear-to-r from-pink-500 to-yellow-500 blur-[1px] animate-filter-blur-md animation-duration-6000 animation-iteration-count-infinite animation-direction-alternate"
             ></div>
           </div>
 
@@ -316,7 +316,7 @@
           <div class="text-center">
             <h3 class="mb-2 font-medium">Easing</h3>
             <div
-              class="w-16 h-16 mx-auto bg-orange-500 rounded jumi animate-translate-x-[20px] animation-duration-2000 animation-timing-function-ease-in-out-back animation-iteration-count-infinite animation-direction-alternate"
+              class="w-16 h-16 mx-auto bg-orange-500 rounded jumi animate-translate-x-5 animation-duration-2000 animation-timing-function-ease-in-out-back animation-iteration-count-infinite animation-direction-alternate"
             ></div>
             <p class="mt-2 text-sm text-gray-600">Back easing</p>
           </div>
@@ -333,19 +333,19 @@
         <!-- Basic Stagger -->
         <div class="mb-6">
           <h3 class="mb-2 font-medium">Basic Stagger (100ms intervals)</h3>
-          <div class="flex gap-2 p-4 bg-gray-100 rounded animation-delay-forward-100/5 *:nth-[even]:animate-bounce-in-up *:nth-[odd]:animate-bounce-in-down animation-duration-2000 animation-iteration-count-infinite animation-direction-alternate">
-            <div class="w-12 h-12 bg-blue-500 rounded jumi"></div>
-            <div class="w-12 h-12 bg-blue-500 rounded jumi"></div>
-            <div class="w-12 h-12 bg-blue-500 rounded jumi"></div>
-            <div class="w-12 h-12 bg-blue-500 rounded jumi"></div>
-            <div class="w-12 h-12 bg-blue-500 rounded jumi"></div>
+          <div class="flex gap-2 p-4 *:even:bg-blue-500 *:odd:bg-lime-500 *:odd:animate-background-color-yellow-500 *:rounded *:even:animate-background-color-purple-500 *:size-12 *:jumi bg-gray-100 rounded animation-delay-forward-100/5 *:even:animate-bounce-in-up *:odd:animate-bounce-in-down *:animation-duration-2000 *:animation-iteration-count-infinite *:animation-direction-alternate">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
           </div>
         </div>
 
         <!-- Reverse Stagger -->
         <div class="mb-6">
           <h3 class="mb-2 font-medium">Reverse Stagger (150ms intervals)</h3>
-          <div class="flex gap-2 p-4 bg-gray-100 rounded animation-delay-backward-150/5 *:jumi *:w-12 *:h-12 *:bg-green-500 *:rounded *:animate-slide-in-up *:animation-duration-1500 *:animation-iteration-count-infinite *:animation-direction-alternate">
+          <div class="flex gap-2 p-4 bg-gray-100 rounded animation-delay-backward-150/5 *:jumi *:size-12 *:bg-green-500 *:rounded *:animate-slide-in-up *:animation-duration-1500 *:animation-iteration-count-infinite *:animation-direction-alternate">
             <div></div>
             <div></div>
             <div></div>
@@ -357,7 +357,7 @@
         <!-- Custom Stagger with Modifier -->
         <div class="mb-6">
           <h3 class="mb-2 font-medium">Custom Stagger (300ms intervals, 8 children max)</h3>
-          <div class="grid grid-cols-4 gap-2 p-4 bg-gray-100 rounded *:rounded animation-delay-forward-300/[8] *:w-12 *:h-12 *:bg-purple-500 *:jumi *:animate-zoom-in *:animation-duration-3000 *:animation-iteration-count-infinite *:animation-direction-alternate">
+          <div class="grid grid-cols-4 gap-2 p-4 bg-gray-100 rounded *:rounded animation-delay-forward-300/[8] *:size-12 *:bg-purple-500 *:jumi *:animate-zoom-in *:animation-duration-3000 *:animation-iteration-count-infinite *:animation-direction-alternate">
             <div></div>
             <div></div>
             <div></div>

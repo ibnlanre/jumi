@@ -58,7 +58,7 @@ Precise control with intuitive millisecond values:
 ### 3. Composable Architecture
 Mix and match transforms naturally:
 ```html
-<div class="jumi animate-translate-x-[20px] animate-rotate-45 animate-scale-110">
+<div class="jumi animate-translate-x-5 animate-rotate-45 animate-scale-110">
   Move, rotate, and scale simultaneously
 </div>
 ```
@@ -96,7 +96,7 @@ GPU-accelerated movement with smooth, natural motion:
 </div>
 
 <!-- Combined transforms -->
-<div class="jumi animate-translate-y-[-20px] animate-rotate-90 animate-scale-110">
+<div class="jumi -animate-translate-y-5 animate-rotate-90 animate-scale-110">
   Complex motion in one declaration
 </div>
 ```
@@ -204,7 +204,7 @@ Create sequential animations with automatic timing calculation:
 </div>
 
 <!-- Custom arbitrary values -->
-<div class="animation-delay-forward-[250ms]/[3]">
+<div class="animation-delay-forward-250/3">
   <!-- 250ms intervals between 3 items -->
 </div>
 ```
@@ -221,7 +221,7 @@ Precise control over animation behavior:
 <!-- Duration -->
 <div class="animation-duration-500">Fast (500ms)</div>
 <div class="animation-duration-2000">Slow (2s)</div>
-<div class="animation-duration-[350ms]">Custom</div>
+<div class="animation-duration-350">Custom</div>
 
 <!-- Delay -->
 <div class="animation-delay-500">Starts after 500ms</div>
@@ -293,14 +293,14 @@ Use any custom value for precise control:
 
 ```html
 <!-- Custom durations -->
-<div class="animation-duration-[350ms]">Exact timing</div>
+<div class="animation-duration-350">Exact timing</div>
 
 <!-- Custom distances -->
 <div class="jumi animate-translate-x-[150px]">Exact pixels</div>
 <div class="jumi animate-translate-y-[calc(100vh-50px)]">Calculated values</div>
 
 <!-- Custom rotations -->
-<div class="jumi animate-rotate-[23deg]">Specific angle</div>
+<div class="jumi animate-rotate-23">Specific angle</div>
 <div class="jumi animate-rotate-[0.15turn]">Turn-based</div>
 
 <!-- Custom scales -->

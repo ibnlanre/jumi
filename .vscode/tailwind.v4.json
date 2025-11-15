@@ -1,0 +1,109 @@
+{
+  "$schema": "https://unpkg.com/vscode-css-languageservice@5.1.9/docs/customData.schema.json",
+  "version": 1.1,
+  "atDirectives": [
+    {
+      "name": "@import",
+      "description": "Use the `@import` directive to inline import CSS files, including Tailwind itself. Supports `source()` function to control content detection.",
+      "references": [
+        {
+          "name": "Functions and directives",
+          "url": "https://tailwindcss.com/docs/functions-and-directives#import-directive"
+        }
+      ],
+      "descriptors": [
+        "@import <string> [source(<source-type>)]?"
+      ]
+    },
+    {
+      "name": "@theme",
+      "description": "Use the `@theme` directive to define your project's custom design tokens, like fonts, colors, and breakpoints.",
+      "references": [
+        {
+          "name": "Functions and directives",
+          "url": "https://tailwindcss.com/docs/functions-and-directives#theme-directive"
+        }
+      ]
+    },
+    {
+      "name": "@source",
+      "description": "Use the `@source` directive to explicitly specify source files that aren't picked up by Tailwind's automatic content detection.",
+      "references": [
+        {
+          "name": "Functions and directives",
+          "url": "https://tailwindcss.com/docs/functions-and-directives#source-directive"
+        }
+      ]
+    },
+    {
+      "name": "@utility",
+      "description": "Use the `@utility` directive to add custom utilities to your project that work with variants like `hover`, `focus` and `lg`.",
+      "references": [
+        {
+          "name": "Functions and directives",
+          "url": "https://tailwindcss.com/docs/functions-and-directives#utility-directive"
+        }
+      ]
+    },
+    {
+      "name": "@variant",
+      "description": "Use the `@variant` directive to apply a Tailwind variant to styles in your CSS.",
+      "references": [
+        {
+          "name": "Functions and directives",
+          "url": "https://tailwindcss.com/docs/functions-and-directives#variant-directive"
+        }
+      ]
+    },
+    {
+      "name": "@custom-variant",
+      "description": "Use the `@custom-variant` directive to add a custom variant in your project. This lets you write utilities `theme-midnight:bg-black` and `theme-midnight:text-white`.",
+      "references": [
+        {
+          "name": "Functions and directives",
+          "url": "https://tailwindcss.com/docs/functions-and-directives#custom-variant-directive"
+        }
+      ]
+    },
+    {
+      "name": "@apply",
+      "description": "Use the `@apply` directive to inline any existing utility classes into your own custom CSS.",
+      "references": [
+        {
+          "name": "Functions and directives",
+          "url": "https://tailwindcss.com/docs/functions-and-directives#apply-directive"
+        }
+      ]
+    },
+    {
+      "name": "@reference",
+      "description": "If you want to use `@apply` or `@variant` in the `<style>` block of a Vue or Svelte component, or within CSS modules, you will need to import your theme variables, custom utilities, and custom variants to make those values available in that context.",
+      "references": [
+        {
+          "name": "Functions and directives",
+          "url": "https://tailwindcss.com/docs/functions-and-directives#reference-directive"
+        }
+      ]
+    },
+    {
+      "name": "@config",
+      "description": "Use the `@config` directive to load a legacy JavaScript-based configuration file. The `corePlugins`, `safelist`, and `separator` options from the JavaScript-based config are not supported in v4.0. To safelist utilities in v4 use `@source inline()`.",
+      "references": [
+        {
+          "name": "Functions and directives",
+          "url": "https://tailwindcss.com/docs/functions-and-directives#config-directive"
+        }
+      ]
+    },
+    {
+      "name": "@plugin",
+      "description": "Use the `@plugin` directive to load a legacy JavaScript-based plugin. The `@plugin` directive accepts either a package name or a local path.",
+      "references": [
+        {
+          "name": "Functions and directives",
+          "url": "https://tailwindcss.com/docs/functions-and-directives#plugin-directive"
+        }
+      ]
+    }
+  ]
+}
