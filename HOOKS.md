@@ -1,0 +1,28 @@
+Optimized tool selectionCompacted conversationShort answer: Yes — for a JIT-heavy Tailwind plugin like `jumi`, well-designed lifecycle hooks are strongly beneficial.
+
+- **Why:** Hooks let the plugin manage dynamic keyframes and resources at the right times — generation, deduplication, purge, and config/theme updates — improving correctness, performance, and extensibility.
+- **Problems hooks solve:** avoid over-generation, unregister unused keyframes during purge, react to theme/runtime changes without full rebuilds, enable third-party extensions, and expose debugging/inspection points.
+- **Recommended hook points**
+  - **onInit:** once per build/serve startup — initialize state.
+  - **onResolveClass:** when a utility/class is discovered — return needed keyframe names/metadata.
+  - **onGenerateKeyframes:** before emitting keyframes — can alter or cancel emission (ideal for dedupe).
+  - **onThemeChange:** when theme/custom tokens change (dev watch mode).
+  - **onPurge:** when purge runs — give list of used classes so plugin can remove unused keyframes.
+  - **onFinish:** after emit — analytics/logging/cleanup.
+- **Example usage (conceptual):**
+  - Plugin registers a generator:
+    - `hooks.onResolveClass((cls, ctx) => ({ keyframes: ['jumi-wipe-in-top'], meta }))`
+    - `hooks.onGenerateKeyframes((frames, ctx) => frames.filter(dedupe))`
+  - Purge integration: `hooks.onPurge((usedClasses) => unregisterUnused(usedClasses))`
+- **Implementation approaches**
+  - Add a small EventEmitter to your plugin runner and call hooks at lifecycle points in the build/watch pipeline.
+  - Keep hooks optional and backward-compatible — if no hooks registered behave as today.
+  - Use the hook path that runs inside the JIT class scanning stage so you can return keyframe requirements per class (prevents global DEFAULT generation).
+- **Practical benefits for `jumi`**
+  - Makes the Set-based dedupe robust (central place to drop duplicates).
+  - Allows per-class, per-theme keyframe generation (reduces output).
+  - Lets you unregister clip-path/polygon keyframes on purge, preventing CSS bloat.
+- **Caveats**
+  - Adds complexity to the plugin runner; design minimal, well-documented API.
+  - Needs careful ordering so hooks don’t race with Tailwind’s internal passes.
+- Want me to sketch a concrete hook API and a small implementation patch (emitter + hook calls in the plugin runner and an example consumer in effects.ts)?

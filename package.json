@@ -39,7 +39,7 @@
   "author": "Ridwan Olanrewaju",
   "license": "MIT",
   "peerDependencies": {
-    "tailwindcss": ">=3.0.0 || insiders"
+    "tailwindcss": ">=3.0.0"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^4.1.2",
