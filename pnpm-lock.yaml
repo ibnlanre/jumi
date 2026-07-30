@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  tailwindcss: file:../tailwindcss-core/packages/tailwindcss
+
 importers:
 
   .:
@@ -11,6 +14,9 @@ importers:
       glob:
         specifier: ^11.0.3
         version: 11.1.0
+      tailwindcss:
+        specifier: file:../tailwindcss-core/packages/tailwindcss
+        version: file:../tailwindcss-core/packages/tailwindcss
     devDependencies:
       '@chromatic-com/storybook':
         specifier: ^4.1.2
@@ -108,9 +114,6 @@ importers:
       storybook:
         specifier: ^10.0.7
         version: 10.5.4(@types/react@19.2.17)(prettier@3.9.6)(react@19.2.8)
-      tailwindcss:
-        specifier: ^4.1.17
-        version: 4.3.3
       tsup:
         specifier: ^8.5.1
         version: 8.5.1(jiti@2.7.0)(postcss@8.5.23)(typescript@5.9.3)
@@ -2773,8 +2776,8 @@ packages:
     resolution: {integrity: sha512-eNRKgb3z66Yp3D2CixVujOUvXLFUTij/zVnV8KRyvFdQwpz7I5DS8UfRkTeLzb64u+dkzDSdelE24izu+zSSUg==}
     engines: {node: ^14.18.0 || >=16.0.0}
 
-  tailwindcss@4.3.3:
-    resolution: {integrity: sha512-gOhV3P7ufE62QDGg1zVaTgCR+EtPv92k2nIhVcVKcLmxT1sUBsQGhnZj175j+MqRt4zLF7ic+sCYjfhxMxj7YQ==}
+  tailwindcss@file:../tailwindcss-core/packages/tailwindcss:
+    resolution: {directory: ../tailwindcss-core/packages/tailwindcss, type: directory}
 
   tapable@2.3.3:
     resolution: {integrity: sha512-uxc/zpqFg6x7C8vOE7lh6Lbda8eEL9zmVm/PLeTPBRhh1xCgdWaQ+J1CUieGpIfm2HdtsUpRv+HshiasBMcc6A==}
@@ -3906,7 +3909,7 @@ snapshots:
       enhanced-resolve: 5.24.3
       mri: 1.2.0
       picocolors: 1.1.1
-      tailwindcss: 4.3.3
+      tailwindcss: file:../tailwindcss-core/packages/tailwindcss
 
   '@tailwindcss/node@4.3.3':
     dependencies:
@@ -3916,7 +3919,7 @@ snapshots:
       lightningcss: 1.32.0
       magic-string: 0.30.21
       source-map-js: 1.2.1
-      tailwindcss: 4.3.3
+      tailwindcss: file:../tailwindcss-core/packages/tailwindcss
 
   '@tailwindcss/oxide-android-arm64@4.3.3':
     optional: true
@@ -3973,7 +3976,7 @@ snapshots:
     dependencies:
       '@tailwindcss/node': 4.3.3
       '@tailwindcss/oxide': 4.3.3
-      tailwindcss: 4.3.3
+      tailwindcss: file:../tailwindcss-core/packages/tailwindcss
       vite: 7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.32.0)
 
   '@testing-library/dom@10.4.1':
@@ -5399,7 +5402,7 @@ snapshots:
     dependencies:
       '@pkgr/core': 0.3.6
 
-  tailwindcss@4.3.3: {}
+  tailwindcss@file:../tailwindcss-core/packages/tailwindcss: {}
 
   tapable@2.3.3: {}
 

@@ -1,4 +1,7 @@
 allowBuilds:
-  '@parcel/watcher': true
+  "@parcel/watcher": true
   esbuild: true
   unrs-resolver: true
+
+overrides:
+  tailwindcss: file:../tailwindcss-core/packages/tailwindcss

@@ -486,6 +486,14 @@ export type CounterFunction
     | 'counters'
     | 'symbols'
 
+export type Creator = {
+    effect(attribute: string): string;
+    readonly effects: string[];
+    readonly properties: string[];
+    property(attribute: AnimatableStandardPropertyType): string;
+    theme: (key: TailwindTheme, values?: Collection) => Record<string, string>;
+}
+
 export type CSSFunction
   = | AnchorFunction
     | AnimationFunction
@@ -862,9 +870,9 @@ export type FontFunction
     | 'stylistic'
     | 'swash'
 
-export type GetMatchComponents = (api: Api) => Collection<MatchComponentsPropertyValue>
+export type GetMatchComponents = (creator: Creator) => Collection<MatchComponentsPropertyValue>
 
-export type GetMatchUtilities = (api: Api) => Collection<MatchUtilitiesPropertyValue>
+export type GetMatchUtilities = (creator: Creator) => Collection<MatchUtilitiesPropertyValue>
 
 export type GradientFunction
   = | 'conic-gradient'
@@ -1209,11 +1217,11 @@ export type StandardPropertyKeyframesVariable = `--jumi-${AnimatableStandardProp
 export type StandardPropertyType
   = | AnimatableStandardPropertyType
     | NonAnimatableStandardPropertyType
-
-export type SteppedValueFunction
+    
+    export type SteppedValueFunction
   = | 'mod'
     | 'rem'
-    | 'round'
+  | 'round'
 
 export type TailwindTheme
   = | 'accentColor'
@@ -1305,7 +1313,8 @@ export type TailwindTheme
     | 'outlineWidth'
     | 'padding'
     | 'placeholderColor'
-    | 'placeholderOpacity'
+  | 'placeholderOpacity'
+  | 'radius'
     | 'ringColor'
     | 'ringOffsetColor'
     | 'ringOffsetWidth'

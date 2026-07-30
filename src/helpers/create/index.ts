@@ -1,4 +1,4 @@
-import type { AnimatableStandardPropertyType, Api, Collection, Register, TailwindTheme } from '@/types'
+import type { AnimatableStandardPropertyType, Api, Collection, Creator, Register, TailwindTheme } from '@/types'
 
 import { css } from '@/helpers/css'
 import { merge } from '@/helpers/merge'
@@ -7,9 +7,32 @@ import { propertyKeyframes } from '@/keyframes/property'
 
 import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette'
 
-export function getCreator({ addUtilities, theme }: Api) {
+// Theme keys that produce nested palette objects (e.g. { red: { 500: '#f00' } })
+// and must be flattened for matchUtilities. Non-color keys (borderRadius, spacing,
+// opacity, etc.) are already flat and flattenColorPalette would corrupt them by
+// iterating string characters when the compat layer collapses DEFAULT values.
+const COLOR_THEME_KEYS = new Set<string>([
+  'accentColor',
+  'backgroundColor',
+  'borderColor',
+  'boxShadowColor',
+  'caretColor',
+  'colors',
+  'divideColor',
+  'fill',
+  'gradientColorStops',
+  'outlineColor',
+  'placeholderColor',
+  'ringColor',
+  'ringOffsetColor',
+  'stroke',
+  'textColor',
+  'textDecorationColor',
+] satisfies Array<TailwindTheme>)
+
+export function getCreator({ addUtilities, theme }: Api): Creator {
   const effects = new Set<string>()
-  const properties = new Set<string>()
+  const properties = new Set<string>(['animation'])
 
   const create = {
     effect(attribute: string): string {
@@ -47,7 +70,13 @@ export function getCreator({ addUtilities, theme }: Api) {
     },
 
     theme: (key: TailwindTheme, values?: Collection) => {
-      return flattenColorPalette(merge(values, theme(key)))
+      const result = theme(key)
+
+      if (COLOR_THEME_KEYS.has(key)) {
+        return flattenColorPalette(merge(result, values))
+      }
+
+      return merge(result, values)
     },
   }
 

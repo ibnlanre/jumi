@@ -1,7 +1,6 @@
 import type { Collection, CssInJs, GetMatchUtilities, MatchProperty } from '@/types'
 
 import { assemble } from '@/helpers/assemble'
-import { getCreator } from '@/helpers/create'
 import { css } from '@/helpers/css'
 import { join } from '@/helpers/join'
 import { merge } from '@/helpers/merge'
@@ -125,10 +124,9 @@ import { textAlign } from '@/theme/text-align'
 import { transformStyle } from '@/theme/transform-style'
 import { visibility } from '@/theme/visibility'
 
-export const getMatchUtilities: GetMatchUtilities = (api) => {
-  const creator = getCreator(api)
-  const modifiers = merge(cssProperties, cssEffects)
+export const getMatchUtilities: GetMatchUtilities = (creator) => {
   const { effect, property, theme } = creator
+  const modifiers = merge(cssProperties, cssEffects)
 
   const matchProperties: Partial<MatchProperty> = {
     'animate': {
@@ -533,6 +531,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
         '--jumi-border-end-start-radius': value,
         '--jumi-border-radius-property': property('border-radius'),
       }),
+      type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-block-end-width': {
@@ -549,6 +548,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
         '--jumi-border-start-end-radius': value,
         '--jumi-border-start-start-radius': value,
       }),
+      type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-block-start-width': {
@@ -573,6 +573,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
         '--jumi-border-bottom-left-radius': value,
         '--jumi-border-bottom-left-radius-property': property('border-bottom-left-radius'),
       }),
+      type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-bottom-radius': {
@@ -581,6 +582,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
         '--jumi-border-bottom-right-radius': value,
         '--jumi-border-radius-property': property('border-radius'),
       }),
+      type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-bottom-right-radius': {
@@ -588,6 +590,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
         '--jumi-border-bottom-right-radius': value,
         '--jumi-border-bottom-right-radius-property': property('border-bottom-right-radius'),
       }),
+      type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-bottom-width': {
@@ -618,6 +621,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
         '--jumi-border-end-end-radius': value,
         '--jumi-border-end-end-radius-property': property('border-end-end-radius'),
       }),
+      type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-end-start-radius': {
@@ -625,6 +629,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
         '--jumi-border-end-start-radius': value,
         '--jumi-border-end-start-radius-property': property('border-end-start-radius'),
       }),
+      type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-image': {
@@ -720,6 +725,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
         '--jumi-border-radius-property': property('border-radius'),
         '--jumi-border-start-end-radius': value,
       }),
+      type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-inline-end-width': {
@@ -736,6 +742,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
         '--jumi-border-radius-property': property('border-radius'),
         '--jumi-border-start-start-radius': value,
       }),
+      type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-inline-start-width': {
@@ -761,6 +768,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
         '--jumi-border-property': property('border-radius'),
         '--jumi-border-top-left-radius': value,
       }),
+      type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-left-width': {
@@ -776,6 +784,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
         '--jumi-border-radius': value,
         '--jumi-border-radius-property': property('border-radius'),
       }),
+      type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-right-radius': {
@@ -784,6 +793,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
         '--jumi-border-radius-property': property('border-radius'),
         '--jumi-border-top-right-radius': value,
       }),
+      type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-right-width': {
@@ -799,6 +809,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
         '--jumi-border-start-end-radius': value,
         '--jumi-border-start-end-radius-property': property('border-start-end-radius'),
       }),
+      type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-start-start-radius': {
@@ -806,6 +817,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
         '--jumi-border-start-start-radius': value,
         '--jumi-border-start-start-radius-property': property('border-start-start-radius'),
       }),
+      type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-top-left-radius': {
@@ -813,6 +825,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
         '--jumi-border-top-left-radius': value,
         '--jumi-border-top-left-radius-property': property('border-top-left-radius'),
       }),
+      type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-top-radius': {
@@ -821,6 +834,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
         '--jumi-border-top-left-radius': value,
         '--jumi-border-top-right-radius': value,
       }),
+      type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-top-right-radius': {
@@ -828,6 +842,7 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
         '--jumi-border-top-right-radius': value,
         '--jumi-border-top-right-radius-property': property('border-top-right-radius'),
       }),
+      type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-top-width': {
@@ -3374,16 +3389,10 @@ export const getMatchUtilities: GetMatchUtilities = (api) => {
       values: animationTimingFunction,
     },
     'jumi': {
-      property: () => {
-        const properties = creator.properties.map(keyframe('property'))
-        const effects = creator.effects.map(keyframe('animation'))
-        const variables = properties.concat(effects).join(', ')
-
-        return ['animation'].concat(creator.properties).reduce(
-          (acc, attribute) => merge(acc, assemble(attribute)),
-          { animation: variables } as CssInJs,
-        )
-      },
+      property: () => creator.properties.reduce(
+        (acc, attribute) => merge(acc, assemble(attribute)),
+        {} as CssInJs,
+      ),
       values: { DEFAULT: '' },
     },
   }
