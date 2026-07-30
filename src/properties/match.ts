@@ -1,4 +1,4 @@
-import type { Collection, CssInJs, GetMatchUtilities, MatchProperty } from '@/types'
+import type { Collection, GetMatchUtilities, MatchProperty } from '@/types'
 
 import { assemble } from '@/helpers/assemble'
 import { css } from '@/helpers/css'
@@ -122,22 +122,24 @@ import { position } from '@/theme/position'
 import { rotate } from '@/theme/rotate'
 import { textAlign } from '@/theme/text-align'
 import { transformStyle } from '@/theme/transform-style'
+import { transitionBehavior } from '@/theme/transition-behavior'
 import { visibility } from '@/theme/visibility'
 
 export const getMatchUtilities: GetMatchUtilities = (creator) => {
-  const { effect, property, theme } = creator
+  const { effect, property, theme, transition } = creator
   const modifiers = merge(cssProperties, cssEffects)
 
   const matchProperties: Partial<MatchProperty> = {
     'animate': {
       property: value => ({
-        [`--jumi-${value}-animation`]: effect(value),
+        [`--jumi-${value}-effect`]: effect(value),
       }),
       values: cssEffects,
     },
     'animate-accent-color': {
       property: value => ({
         '--jumi-accent-color': value,
+        '--jumi-accent-color-motion': transition('accent-color'),
         '--jumi-accent-color-property': property('accent-color'),
       }),
       type: 'color',
@@ -146,6 +148,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-align-content': {
       property: value => ({
         '--jumi-align-content': value,
+        '--jumi-align-content-motion': transition('align-content'),
         '--jumi-align-content-property': property('align-content'),
       }),
       values: alignContent,
@@ -153,6 +156,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-align-items': {
       property: value => ({
         '--jumi-align-items': value,
+        '--jumi-align-items-motion': transition('align-items'),
         '--jumi-align-items-property': property('align-items'),
       }),
       values: alignItems,
@@ -160,6 +164,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-align-self': {
       property: value => ({
         '--jumi-align-self': value,
+        '--jumi-align-self-motion': transition('align-self'),
         '--jumi-align-self-property': property('align-self'),
       }),
       values: alignSelf,
@@ -167,6 +172,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-alignment-baseline': {
       property: value => ({
         '--jumi-alignment-baseline': value,
+        '--jumi-alignment-baseline-motion': transition('alignment-baseline'),
         '--jumi-alignment-baseline-property': property('alignment-baseline'),
       }),
       values: alignmentBaseline,
@@ -174,6 +180,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-all': {
       property: value => ({
         '--jumi-all': value,
+        '--jumi-all-motion': transition('all'),
         '--jumi-all-property': property('all'),
       }),
       values: all,
@@ -181,6 +188,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-appearance': {
       property: value => ({
         '--jumi-appearance': value,
+        '--jumi-appearance-motion': transition('appearance'),
         '--jumi-appearance-property': property('appearance'),
       }),
       values: appearance,
@@ -188,6 +196,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-aspect-ratio': {
       property: value => ({
         '--jumi-aspect-ratio': value,
+        '--jumi-aspect-ratio-motion': transition('aspect-ratio'),
         '--jumi-aspect-ratio-property': property('aspect-ratio'),
       }),
       type: 'ratio',
@@ -196,6 +205,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-aspect-ratio-height': {
       property: value => ({
         '--jumi-aspect-ratio-height': value,
+        '--jumi-aspect-ratio-motion': transition('aspect-ratio'),
         '--jumi-aspect-ratio-property': property('aspect-ratio'),
       }),
       type: 'ratio',
@@ -203,6 +213,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-aspect-ratio-width': {
       property: value => ({
+        '--jumi-aspect-ratio-motion': transition('aspect-ratio'),
         '--jumi-aspect-ratio-property': property('aspect-ratio'),
         '--jumi-aspect-ratio-width': value,
       }),
@@ -212,6 +223,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-backdrop-filter': {
       property: value => ({
         '--jumi-backdrop-filter': value,
+        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
         '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       values: empty.none,
@@ -219,6 +231,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-backdrop-filter-blur': {
       property: value => ({
         '--jumi-backdrop-filter-blur': css('blur', value),
+        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
         '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: 'length',
@@ -227,6 +240,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-backdrop-filter-brightness': {
       property: value => ({
         '--jumi-backdrop-filter-brightness': css('brightness', value),
+        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
         '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: ['number', 'percentage'],
@@ -235,6 +249,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-backdrop-filter-contrast': {
       property: value => ({
         '--jumi-backdrop-filter-contrast': css('contrast', value),
+        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
         '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: ['number', 'percentage'],
@@ -243,6 +258,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-backdrop-filter-drop-shadow': {
       property: value => ({
         '--jumi-backdrop-filter-drop-shadow': css('drop-shadow', value),
+        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
         '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: ['length', 'shadow', 'any'],
@@ -251,6 +267,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-backdrop-filter-drop-shadow-blur': {
       property: value => ({
         '--jumi-backdrop-filter-drop-shadow-blur': value,
+        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
         '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: ['length', 'percentage'],
@@ -259,6 +276,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-backdrop-filter-drop-shadow-color': {
       property: value => ({
         '--jumi-backdrop-filter-drop-shadow-color': value,
+        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
         '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: 'color',
@@ -267,6 +285,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-backdrop-filter-drop-shadow-offset-x': {
       property: value => ({
         '--jumi-backdrop-filter-drop-shadow-offset-x': value,
+        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
         '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: ['length', 'percentage'],
@@ -275,6 +294,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-backdrop-filter-drop-shadow-offset-y': {
       property: value => ({
         '--jumi-backdrop-filter-drop-shadow-offset-y': value,
+        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
         '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: ['length', 'percentage'],
@@ -283,6 +303,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-backdrop-filter-grayscale': {
       property: value => ({
         '--jumi-backdrop-filter-grayscale': css('grayscale', value),
+        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
         '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: ['number', 'percentage'],
@@ -291,6 +312,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-backdrop-filter-hue-rotate': {
       property: value => ({
         '--jumi-backdrop-filter-hue-rotate': css('hue-rotate', value),
+        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
         '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: 'angle',
@@ -299,6 +321,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-backdrop-filter-invert': {
       property: value => ({
         '--jumi-backdrop-filter-invert': css('invert', value),
+        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
         '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
       type: ['number', 'percentage'],
@@ -306,6 +329,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-backdrop-filter-opacity': {
       property: value => ({
+        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
         '--jumi-backdrop-filter-opacity': css('opacity', value),
         '--jumi-backdrop-filter-property': property('backdrop-filter'),
       }),
@@ -314,6 +338,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-backdrop-filter-saturate': {
       property: value => ({
+        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
         '--jumi-backdrop-filter-property': property('backdrop-filter'),
         '--jumi-backdrop-filter-saturate': css('saturate', value),
       }),
@@ -322,6 +347,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-backdrop-filter-sepia': {
       property: value => ({
+        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
         '--jumi-backdrop-filter-property': property('backdrop-filter'),
         '--jumi-backdrop-filter-sepia': css('sepia', value),
       }),
@@ -330,6 +356,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-backdrop-filter-url': {
       property: value => ({
+        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
         '--jumi-backdrop-filter-property': property('backdrop-filter'),
         '--jumi-backdrop-filter-url': css('url', value),
       }),
@@ -339,6 +366,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-backface-visibility': {
       property: value => ({
         '--jumi-backface-visibility': value,
+        '--jumi-backface-visibility-motion': transition('backface-visibility'),
         '--jumi-backface-visibility-property': property('backface-visibility'),
       }),
       values: backfaceVisibility,
@@ -346,6 +374,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-background': {
       property: value => ({
         '--jumi-background': value,
+        '--jumi-background-motion': transition('background'),
         '--jumi-background-property': property('background'),
       }),
       type: ['color', 'image', 'position', 'url', 'any'],
@@ -354,6 +383,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-background-attachment': {
       property: value => ({
         '--jumi-background-attachment': value,
+        '--jumi-background-attachment-motion': transition('background-attachment'),
         '--jumi-background-attachment-property': property('background-attachment'),
       }),
       values: backgroundAttachment,
@@ -361,6 +391,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-background-blend-mode': {
       property: value => ({
         '--jumi-background-blend-mode': value,
+        '--jumi-background-blend-mode-motion': transition('background-blend-mode'),
         '--jumi-background-blend-mode-property': property('background-blend-mode'),
       }),
       values: mixBlendMode,
@@ -368,6 +399,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-background-clip': {
       property: value => ({
         '--jumi-background-clip': value,
+        '--jumi-background-clip-motion': transition('background-clip'),
         '--jumi-background-clip-property': property('background-clip'),
       }),
       values: backgroundClip,
@@ -375,6 +407,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-background-color': {
       property: value => ({
         '--jumi-background-color': value,
+        '--jumi-background-color-motion': transition('background-color'),
         '--jumi-background-color-property': property('background-color'),
       }),
       type: 'color',
@@ -383,6 +416,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-background-image': {
       property: value => ({
         '--jumi-background-image': value,
+        '--jumi-background-image-motion': transition('background-image'),
         '--jumi-background-image-property': property('background-image'),
       }),
       type: 'image',
@@ -391,6 +425,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-background-origin': {
       property: value => ({
         '--jumi-background-origin': value,
+        '--jumi-background-origin-motion': transition('background-origin'),
         '--jumi-background-origin-property': property('background-origin'),
       }),
       values: backgroundOrigin,
@@ -398,6 +433,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-background-position': {
       property: value => ({
         '--jumi-background-position': value,
+        '--jumi-background-position-motion': transition('background-position'),
         '--jumi-background-position-property': property('background-position'),
       }),
       type: ['position', 'percentage', 'length', 'any'],
@@ -405,6 +441,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-background-position-x': {
       property: value => ({
+        '--jumi-background-position-motion': transition('background-position'),
         '--jumi-background-position-property': property('background-position'),
         '--jumi-background-position-x': value,
       }),
@@ -413,6 +450,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-background-position-x-edge': {
       property: value => ({
+        '--jumi-background-position-motion': transition('background-position'),
         '--jumi-background-position-property': property('background-position'),
         '--jumi-background-position-x-edge': value,
       }),
@@ -421,6 +459,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-background-position-x-offset': {
       property: value => ({
+        '--jumi-background-position-motion': transition('background-position'),
         '--jumi-background-position-property': property('background-position'),
         '--jumi-background-position-x-offset': value,
       }),
@@ -429,6 +468,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-background-position-y': {
       property: value => ({
+        '--jumi-background-position-motion': transition('background-position'),
         '--jumi-background-position-property': property('background-position'),
         '--jumi-background-position-y': value,
       }),
@@ -437,6 +477,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-background-position-y-edge': {
       property: value => ({
+        '--jumi-background-position-motion': transition('background-position'),
         '--jumi-background-position-property': property('background-position'),
         '--jumi-background-position-y-edge': value,
       }),
@@ -445,6 +486,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-background-position-y-offset': {
       property: value => ({
+        '--jumi-background-position-motion': transition('background-position'),
         '--jumi-background-position-property': property('background-position'),
         '--jumi-background-position-y-offset': value,
       }),
@@ -454,12 +496,14 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-background-repeat': {
       property: value => ({
         '--jumi-background-repeat': value,
+        '--jumi-background-repeat-motion': transition('background-repeat'),
         '--jumi-background-repeat-property': property('background-repeat'),
       }),
       values: backgroundRepeat,
     },
     'animate-background-repeat-x': {
       property: value => ({
+        '--jumi-background-repeat-motion': transition('background-repeat'),
         '--jumi-background-repeat-property': property('background-repeat'),
         '--jumi-background-repeat-x': value,
       }),
@@ -467,6 +511,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-background-repeat-y': {
       property: value => ({
+        '--jumi-background-repeat-motion': transition('background-repeat'),
         '--jumi-background-repeat-property': property('background-repeat'),
         '--jumi-background-repeat-y': value,
       }),
@@ -475,6 +520,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-background-size': {
       property: value => ({
         '--jumi-background-size': value,
+        '--jumi-background-size-motion': transition('background-size'),
         '--jumi-background-size-property': property('background-size'),
       }),
       values: theme('backgroundSize'),
@@ -482,6 +528,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-background-size-height': {
       property: value => ({
         '--jumi-background-size-height': value,
+        '--jumi-background-size-motion': transition('background-size'),
         '--jumi-background-size-property': property('background-size'),
       }),
       type: ['length', 'percentage'],
@@ -489,6 +536,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-background-size-width': {
       property: value => ({
+        '--jumi-background-size-motion': transition('background-size'),
         '--jumi-background-size-property': property('background-size'),
         '--jumi-background-size-width': value,
       }),
@@ -498,6 +546,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-block-size': {
       property: value => ({
         '--jumi-block-size': value,
+        '--jumi-block-size-motion': transition('block-size'),
         '--jumi-block-size-property': property('block-size'),
       }),
       type: ['length', 'percentage', 'any'],
@@ -506,6 +555,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border': {
       property: value => ({
         '--jumi-border': value,
+        '--jumi-border-motion': transition('border'),
         '--jumi-border-property': property('border'),
       }),
       type: ['line-width', 'length'],
@@ -514,6 +564,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-block': {
       property: value => ({
         '--jumi-border-block': value,
+        '--jumi-border-block-motion': transition('border-block'),
         '--jumi-border-block-property': property('border-block'),
       }),
       values: theme('borderWidth'),
@@ -529,6 +580,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       property: value => ({
         '--jumi-border-end-end-radius': value,
         '--jumi-border-end-start-radius': value,
+        '--jumi-border-radius-motion': transition('border-radius'),
         '--jumi-border-radius-property': property('border-radius'),
       }),
       type: ['length', 'percentage'],
@@ -537,6 +589,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-block-end-width': {
       property: value => ({
         '--jumi-border-block-end-width': value,
+        '--jumi-border-block-end-width-motion': transition('border-block-end-width'),
         '--jumi-border-block-end-width-property': property('border-block-end-width'),
       }),
       type: ['line-width', 'length'],
@@ -544,6 +597,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-border-block-start-radius': {
       property: value => ({
+        '--jumi-border-radius-motion': transition('border-radius'),
         '--jumi-border-radius-property': property('border-radius'),
         '--jumi-border-start-end-radius': value,
         '--jumi-border-start-start-radius': value,
@@ -554,6 +608,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-block-start-width': {
       property: value => ({
         '--jumi-border-block-start-width': value,
+        '--jumi-border-block-start-width-motion': transition('border-block-start-width'),
         '--jumi-border-block-start-width-property': property('border-block-start-width'),
       }),
       type: ['line-width', 'length'],
@@ -563,6 +618,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       property: value => ({
         '--jumi-border-block-end-width': value,
         '--jumi-border-block-start-width': value,
+        '--jumi-border-block-width-motion': transition('border-block-width'),
         '--jumi-border-block-width-property': property('border-block-width'),
       }),
       type: ['line-width', 'length'],
@@ -571,6 +627,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-bottom-left-radius': {
       property: value => ({
         '--jumi-border-bottom-left-radius': value,
+        '--jumi-border-bottom-left-radius-motion': transition('border-bottom-left-radius'),
         '--jumi-border-bottom-left-radius-property': property('border-bottom-left-radius'),
       }),
       type: ['length', 'percentage'],
@@ -580,6 +637,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       property: value => ({
         '--jumi-border-bottom-left-radius': value,
         '--jumi-border-bottom-right-radius': value,
+        '--jumi-border-radius-motion': transition('border-radius'),
         '--jumi-border-radius-property': property('border-radius'),
       }),
       type: ['length', 'percentage'],
@@ -588,6 +646,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-bottom-right-radius': {
       property: value => ({
         '--jumi-border-bottom-right-radius': value,
+        '--jumi-border-bottom-right-radius-motion': transition('border-bottom-right-radius'),
         '--jumi-border-bottom-right-radius-property': property('border-bottom-right-radius'),
       }),
       type: ['length', 'percentage'],
@@ -596,6 +655,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-bottom-width': {
       property: value => ({
         '--jumi-border-bottom-width': value,
+        '--jumi-border-bottom-width-motion': transition('border-bottom-width'),
         '--jumi-border-bottom-width-property': property('border-bottom-width'),
       }),
       type: ['line-width', 'length'],
@@ -604,6 +664,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-collapse': {
       property: value => ({
         '--jumi-border-collapse': value,
+        '--jumi-border-collapse-motion': transition('border-collapse'),
         '--jumi-border-collapse-property': property('border-collapse'),
       }),
       values: borderCollapse,
@@ -611,6 +672,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-color': {
       property: value => ({
         '--jumi-border-color': value,
+        '--jumi-border-color-motion': transition('border-color'),
         '--jumi-border-color-property': property('border-color'),
       }),
       type: 'color',
@@ -619,6 +681,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-end-end-radius': {
       property: value => ({
         '--jumi-border-end-end-radius': value,
+        '--jumi-border-end-end-radius-motion': transition('border-end-end-radius'),
         '--jumi-border-end-end-radius-property': property('border-end-end-radius'),
       }),
       type: ['length', 'percentage'],
@@ -627,6 +690,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-end-start-radius': {
       property: value => ({
         '--jumi-border-end-start-radius': value,
+        '--jumi-border-end-start-radius-motion': transition('border-end-start-radius'),
         '--jumi-border-end-start-radius-property': property('border-end-start-radius'),
       }),
       type: ['length', 'percentage'],
@@ -635,6 +699,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-image': {
       property: value => ({
         '--jumi-border-image': value,
+        '--jumi-border-image-motion': transition('border-image'),
         '--jumi-border-image-property': property('border-image'),
       }),
       type: 'image',
@@ -643,6 +708,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-image-outset': {
       property: value => ({
         '--jumi-border-image-outset': value,
+        '--jumi-border-image-outset-motion': transition('border-image-outset'),
         '--jumi-border-image-outset-property': property('border-image-outset'),
       }),
       type: ['number', 'length'],
@@ -651,6 +717,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-image-outset-bottom': {
       property: value => ({
         '--jumi-border-image-outset-bottom': value,
+        '--jumi-border-image-outset-motion': transition('border-image-outset'),
         '--jumi-border-image-outset-property': property('border-image-outset'),
       }),
       type: ['number', 'length'],
@@ -659,6 +726,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-image-outset-left': {
       property: value => ({
         '--jumi-border-image-outset-left': value,
+        '--jumi-border-image-outset-motion': transition('border-image-outset'),
         '--jumi-border-image-outset-property': property('border-image-outset'),
       }),
       type: ['number', 'length'],
@@ -666,6 +734,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-border-image-outset-right': {
       property: value => ({
+        '--jumi-border-image-outset-motion': transition('border-image-outset'),
         '--jumi-border-image-outset-property': property('border-image-outset'),
         '--jumi-border-image-outset-right': value,
       }),
@@ -674,6 +743,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-border-image-outset-top': {
       property: value => ({
+        '--jumi-border-image-outset-motion': transition('border-image-outset'),
         '--jumi-border-image-outset-property': property('border-image-outset'),
         '--jumi-border-image-outset-top': value,
       }),
@@ -683,6 +753,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-image-outset-x': {
       property: value => ({
         '--jumi-border-image-outset-left': value,
+        '--jumi-border-image-outset-motion': transition('border-image-outset'),
         '--jumi-border-image-outset-property': property('border-image-outset'),
         '--jumi-border-image-outset-right': value,
       }),
@@ -692,6 +763,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-image-outset-y': {
       property: value => ({
         '--jumi-border-image-outset-bottom': value,
+        '--jumi-border-image-outset-motion': transition('border-image-outset'),
         '--jumi-border-image-outset-property': property('border-image-outset'),
         '--jumi-border-image-outset-top': value,
       }),
@@ -701,12 +773,14 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-image-repeat': {
       property: value => ({
         '--jumi-border-image-repeat': value,
+        '--jumi-border-image-repeat-motion': transition('border-image-repeat'),
         '--jumi-border-image-repeat-property': property('border-image-repeat'),
       }),
       values: borderImageRepeat,
     },
     'animate-border-image-repeat-x': {
       property: value => ({
+        '--jumi-border-image-repeat-motion': transition('border-image-repeat'),
         '--jumi-border-image-repeat-property': property('border-image-repeat'),
         '--jumi-border-image-repeat-x': value,
       }),
@@ -714,6 +788,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-border-image-repeat-y': {
       property: value => ({
+        '--jumi-border-image-repeat-motion': transition('border-image-repeat'),
         '--jumi-border-image-repeat-property': property('border-image-repeat'),
         '--jumi-border-image-repeat-y': value,
       }),
@@ -722,6 +797,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-inline-end-radius': {
       property: value => ({
         '--jumi-border-end-end-radius': value,
+        '--jumi-border-radius-motion': transition('border-radius'),
         '--jumi-border-radius-property': property('border-radius'),
         '--jumi-border-start-end-radius': value,
       }),
@@ -731,6 +807,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-inline-end-width': {
       property: value => ({
         '--jumi-border-inline-end-width': value,
+        '--jumi-border-inline-end-width-motion': transition('border-inline-end-width'),
         '--jumi-border-inline-end-width-property': property('border-inline-end-width'),
       }),
       type: ['line-width', 'length'],
@@ -739,6 +816,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-inline-start-radius': {
       property: value => ({
         '--jumi-border-end-start-radius': value,
+        '--jumi-border-radius-motion': transition('border-radius'),
         '--jumi-border-radius-property': property('border-radius'),
         '--jumi-border-start-start-radius': value,
       }),
@@ -748,6 +826,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-inline-start-width': {
       property: value => ({
         '--jumi-border-inline-start-width': value,
+        '--jumi-border-inline-start-width-motion': transition('border-inline-start-width'),
         '--jumi-border-inline-start-width-property': property('border-inline-start-width'),
       }),
       type: ['line-width', 'length'],
@@ -757,6 +836,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       property: value => ({
         '--jumi-border-inline-end-width': value,
         '--jumi-border-inline-start-width': value,
+        '--jumi-border-inline-width-motion': transition('border-inline-width'),
         '--jumi-border-inline-width-property': property('border-inline-width'),
       }),
       type: ['line-width', 'length'],
@@ -765,6 +845,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-left-radius': {
       property: value => ({
         '--jumi-border-bottom-left-radius': value,
+        '--jumi-border-motion': transition('border-radius'),
         '--jumi-border-property': property('border-radius'),
         '--jumi-border-top-left-radius': value,
       }),
@@ -774,6 +855,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-left-width': {
       property: value => ({
         '--jumi-border-left-width': value,
+        '--jumi-border-left-width-motion': transition('border-left-width'),
         '--jumi-border-left-width-property': property('border-left-width'),
       }),
       type: ['line-width', 'length'],
@@ -782,6 +864,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-radius': {
       property: value => ({
         '--jumi-border-radius': value,
+        '--jumi-border-radius-motion': transition('border-radius'),
         '--jumi-border-radius-property': property('border-radius'),
       }),
       type: ['length', 'percentage'],
@@ -790,6 +873,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-right-radius': {
       property: value => ({
         '--jumi-border-bottom-right-radius': value,
+        '--jumi-border-radius-motion': transition('border-radius'),
         '--jumi-border-radius-property': property('border-radius'),
         '--jumi-border-top-right-radius': value,
       }),
@@ -799,6 +883,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-right-width': {
       property: value => ({
         '--jumi-border-right-width': value,
+        '--jumi-border-right-width-motion': transition('border-right-width'),
         '--jumi-border-right-width-property': property('border-right-width'),
       }),
       type: ['line-width', 'length'],
@@ -807,6 +892,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-start-end-radius': {
       property: value => ({
         '--jumi-border-start-end-radius': value,
+        '--jumi-border-start-end-radius-motion': transition('border-start-end-radius'),
         '--jumi-border-start-end-radius-property': property('border-start-end-radius'),
       }),
       type: ['length', 'percentage'],
@@ -815,6 +901,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-start-start-radius': {
       property: value => ({
         '--jumi-border-start-start-radius': value,
+        '--jumi-border-start-start-radius-motion': transition('border-start-start-radius'),
         '--jumi-border-start-start-radius-property': property('border-start-start-radius'),
       }),
       type: ['length', 'percentage'],
@@ -823,6 +910,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-top-left-radius': {
       property: value => ({
         '--jumi-border-top-left-radius': value,
+        '--jumi-border-top-left-radius-motion': transition('border-top-left-radius'),
         '--jumi-border-top-left-radius-property': property('border-top-left-radius'),
       }),
       type: ['length', 'percentage'],
@@ -830,6 +918,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-border-top-radius': {
       property: value => ({
+        '--jumi-border-radius-motion': transition('border-radius'),
         '--jumi-border-radius-property': property('border-radius'),
         '--jumi-border-top-left-radius': value,
         '--jumi-border-top-right-radius': value,
@@ -840,6 +929,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-top-right-radius': {
       property: value => ({
         '--jumi-border-top-right-radius': value,
+        '--jumi-border-top-right-radius-motion': transition('border-top-right-radius'),
         '--jumi-border-top-right-radius-property': property('border-top-right-radius'),
       }),
       type: ['length', 'percentage'],
@@ -848,6 +938,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-top-width': {
       property: value => ({
         '--jumi-border-top-width': value,
+        '--jumi-border-top-width-motion': transition('border-top-width'),
         '--jumi-border-top-width-property': property('border-top-width'),
       }),
       type: ['line-width', 'length'],
@@ -856,6 +947,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-border-width': {
       property: value => ({
         '--jumi-border-width': value,
+        '--jumi-border-width-motion': transition('border-width'),
         '--jumi-border-width-property': property('border-width'),
       }),
       type: ['line-width', 'length'],
@@ -864,6 +956,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-bottom': {
       property: value => ({
         '--jumi-bottom': value,
+        '--jumi-bottom-motion': transition('bottom'),
         '--jumi-bottom-property': property('bottom'),
       }),
       supportsNegativeValues: true,
@@ -873,6 +966,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-box-decoration-break': {
       property: value => ({
         '--jumi-box-decoration-break': value,
+        '--jumi-box-decoration-break-motion': transition('box-decoration-break'),
         '--jumi-box-decoration-break-property': property('box-decoration-break'),
       }),
       values: boxDecorationBreak,
@@ -880,6 +974,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-box-shadow': {
       property: value => ({
         '--jumi-box-shadow': value,
+        '--jumi-box-shadow-motion': transition('box-shadow'),
         '--jumi-box-shadow-property': property('box-shadow'),
       }),
       type: ['length', 'shadow', 'any'],
@@ -888,6 +983,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-box-shadow-blur': {
       property: value => ({
         '--jumi-box-shadow-blur': value,
+        '--jumi-box-shadow-motion': transition('box-shadow'),
         '--jumi-box-shadow-property': property('box-shadow'),
       }),
       type: ['length', 'percentage'],
@@ -896,6 +992,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-box-shadow-color': {
       property: value => ({
         '--jumi-box-shadow-color': value,
+        '--jumi-box-shadow-motion': transition('box-shadow'),
         '--jumi-box-shadow-property': property('box-shadow'),
       }),
       type: 'color',
@@ -903,6 +1000,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-box-shadow-offset-x': {
       property: value => ({
+        '--jumi-box-shadow-motion': transition('box-shadow'),
         '--jumi-box-shadow-offset-x': value,
         '--jumi-box-shadow-property': property('box-shadow'),
       }),
@@ -911,6 +1009,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-box-shadow-offset-y': {
       property: value => ({
+        '--jumi-box-shadow-motion': transition('box-shadow'),
         '--jumi-box-shadow-offset-y': value,
         '--jumi-box-shadow-property': property('box-shadow'),
       }),
@@ -919,6 +1018,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-box-shadow-spread': {
       property: value => ({
+        '--jumi-box-shadow-motion': transition('box-shadow'),
         '--jumi-box-shadow-property': property('box-shadow'),
         '--jumi-box-shadow-spread': value,
       }),
@@ -928,6 +1028,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-box-sizing': {
       property: value => ({
         '--jumi-box-sizing': value,
+        '--jumi-box-sizing-motion': transition('box-sizing'),
         '--jumi-box-sizing-property': property('box-sizing'),
       }),
       values: boxSizing,
@@ -935,6 +1036,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-break-after': {
       property: value => ({
         '--jumi-break-after': value,
+        '--jumi-break-after-motion': transition('break-after'),
         '--jumi-break-after-property': property('break-after'),
       }),
       values: breakAfter,
@@ -942,6 +1044,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-break-before': {
       property: value => ({
         '--jumi-break-before': value,
+        '--jumi-break-before-motion': transition('break-before'),
         '--jumi-break-before-property': property('break-before'),
       }),
       values: breakBefore,
@@ -949,6 +1052,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-break-inside': {
       property: value => ({
         '--jumi-break-inside': value,
+        '--jumi-break-inside-motion': transition('break-inside'),
         '--jumi-break-inside-property': property('break-inside'),
       }),
       values: breakInside,
@@ -956,6 +1060,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-caption-side': {
       property: value => ({
         '--jumi-caption-side': value,
+        '--jumi-caption-side-motion': transition('caption-side'),
         '--jumi-caption-side-property': property('caption-side'),
       }),
       values: captionSide,
@@ -963,6 +1068,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-caret-color': {
       property: value => ({
         '--jumi-caret-color': value,
+        '--jumi-caret-color-motion': transition('caret-color'),
         '--jumi-caret-color-property': property('caret-color'),
       }),
       type: 'color',
@@ -971,6 +1077,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-clear': {
       property: value => ({
         '--jumi-clear': value,
+        '--jumi-clear-motion': transition('clear'),
         '--jumi-clear-property': property('clear'),
       }),
       values: clear,
@@ -978,6 +1085,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-clip-path': {
       property: value => ({
         '--jumi-clip-path': value,
+        '--jumi-clip-path-motion': transition('clip-path'),
         '--jumi-clip-path-property': property('clip-path'),
       }),
       values: clipPath,
@@ -985,6 +1093,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-clip-rule': {
       property: value => ({
         '--jumi-clip-rule': value,
+        '--jumi-clip-rule-motion': transition('clip-rule'),
         '--jumi-clip-rule-property': property('clip-rule'),
       }),
       values: clipRule,
@@ -992,6 +1101,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-color': {
       property: value => ({
         '--jumi-color': value,
+        '--jumi-color-motion': transition('color'),
         '--jumi-color-property': property('color'),
       }),
       type: 'color',
@@ -1000,6 +1110,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-color-interpolation': {
       property: value => ({
         '--jumi-color-interpolation': value,
+        '--jumi-color-interpolation-motion': transition('color-interpolation'),
         '--jumi-color-interpolation-property': property('color-interpolation'),
       }),
       values: colorInterpolation,
@@ -1007,6 +1118,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-color-interpolation-filters': {
       property: value => ({
         '--jumi-color-interpolation-filters': value,
+        '--jumi-color-interpolation-filters-motion': transition('color-interpolation-filters'),
         '--jumi-color-interpolation-filters-property': property('color-interpolation-filters'),
       }),
       values: colorInterpolation,
@@ -1014,6 +1126,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-color-scheme': {
       property: value => ({
         '--jumi-color-scheme': value,
+        '--jumi-color-scheme-motion': transition('color-scheme'),
         '--jumi-color-scheme-property': property('color-scheme'),
       }),
       values: colorScheme,
@@ -1021,6 +1134,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-column-count': {
       property: value => ({
         '--jumi-column-count': value,
+        '--jumi-column-count-motion': transition('column-count'),
         '--jumi-column-count-property': property('column-count'),
       }),
       type: 'integer',
@@ -1029,6 +1143,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-column-fill': {
       property: value => ({
         '--jumi-column-fill': value,
+        '--jumi-column-fill-motion': transition('column-fill'),
         '--jumi-column-fill-property': property('column-fill'),
       }),
       values: columnFill,
@@ -1036,6 +1151,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-column-gap': {
       property: value => ({
         '--jumi-column-gap': value,
+        '--jumi-gap-motion': transition('gap'),
         '--jumi-gap-property': property('gap'),
       }),
       type: ['length', 'percentage'],
@@ -1044,6 +1160,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-column-rule': {
       property: value => ({
         '--jumi-column-rule': value,
+        '--jumi-column-rule-motion': transition('column-rule'),
         '--jumi-column-rule-property': property('column-rule'),
       }),
       type: ['line-width', 'length'],
@@ -1052,6 +1169,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-column-rule-color': {
       property: value => ({
         '--jumi-column-rule-color': value,
+        '--jumi-column-rule-color-motion': transition('column-rule-color'),
         '--jumi-column-rule-color-property': property('column-rule-color'),
       }),
       type: 'color',
@@ -1060,6 +1178,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-column-rule-style': {
       property: value => ({
         '--jumi-column-rule-style': value,
+        '--jumi-column-rule-style-motion': transition('column-rule-style'),
         '--jumi-column-rule-style-property': property('column-rule-style'),
       }),
       values: columnRuleStyle,
@@ -1067,6 +1186,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-column-rule-width': {
       property: value => ({
         '--jumi-column-rule-width': value,
+        '--jumi-column-rule-width-motion': transition('column-rule-width'),
         '--jumi-column-rule-width-property': property('column-rule-width'),
       }),
       type: ['line-width', 'length'],
@@ -1075,6 +1195,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-column-span': {
       property: value => ({
         '--jumi-column-span': value,
+        '--jumi-column-span-motion': transition('column-span'),
         '--jumi-column-span-property': property('column-span'),
       }),
       type: 'integer',
@@ -1083,6 +1204,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-column-width': {
       property: value => ({
         '--jumi-column-width': value,
+        '--jumi-column-width-motion': transition('column-width'),
         '--jumi-column-width-property': property('column-width'),
       }),
       type: ['length', 'percentage'],
@@ -1091,6 +1213,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-columns': {
       property: value => ({
         '--jumi-columns': value,
+        '--jumi-columns-motion': transition('columns'),
         '--jumi-columns-property': property('columns'),
       }),
       type: ['line-width', 'length', 'integer'],
@@ -1099,6 +1222,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-contain': {
       property: value => ({
         '--jumi-contain': value,
+        '--jumi-contain-motion': transition('contain'),
         '--jumi-contain-property': property('contain'),
       }),
       values: contain,
@@ -1106,6 +1230,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-contain-intrinsic-block-size': {
       property: value => ({
         '--jumi-contain-intrinsic-block-size': value,
+        '--jumi-contain-intrinsic-block-size-motion': transition('contain-intrinsic-block-size'),
         '--jumi-contain-intrinsic-block-size-property': property('contain-intrinsic-block-size'),
       }),
       type: 'length',
@@ -1114,6 +1239,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-contain-intrinsic-height': {
       property: value => ({
         '--jumi-contain-intrinsic-height': value,
+        '--jumi-contain-intrinsic-height-motion': transition('contain-intrinsic-height'),
         '--jumi-contain-intrinsic-height-property': property('contain-intrinsic-height'),
       }),
       type: 'length',
@@ -1122,6 +1248,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-contain-intrinsic-inline-size': {
       property: value => ({
         '--jumi-contain-intrinsic-inline-size': value,
+        '--jumi-contain-intrinsic-inline-size-motion': transition('contain-intrinsic-inline-size'),
         '--jumi-contain-intrinsic-inline-size-property': property('contain-intrinsic-inline-size'),
       }),
       type: 'length',
@@ -1130,6 +1257,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-contain-intrinsic-size': {
       property: value => ({
         '--jumi-contain-intrinsic-size': value,
+        '--jumi-contain-intrinsic-size-motion': transition('contain-intrinsic-size'),
         '--jumi-contain-intrinsic-size-property': property('contain-intrinsic-size'),
       }),
       type: 'length',
@@ -1138,6 +1266,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-contain-intrinsic-width': {
       property: value => ({
         '--jumi-contain-intrinsic-width': value,
+        '--jumi-contain-intrinsic-width-motion': transition('contain-intrinsic-width'),
         '--jumi-contain-intrinsic-width-property': property('contain-intrinsic-width'),
       }),
       type: 'length',
@@ -1146,6 +1275,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-content': {
       property: value => ({
         '--jumi-content': value,
+        '--jumi-content-motion': transition('content'),
         '--jumi-content-property': property('content'),
       }),
       type: ['image', 'any'],
@@ -1154,6 +1284,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-content-visibility': {
       property: value => ({
         '--jumi-content-visibility': value,
+        '--jumi-content-visibility-motion': transition('content-visibility'),
         '--jumi-content-visibility-property': property('content-visibility'),
       }),
       values: contentVisibility,
@@ -1161,6 +1292,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-counter-increment': {
       property: value => ({
         '--jumi-counter-increment': value,
+        '--jumi-counter-increment-motion': transition('counter-increment'),
         '--jumi-counter-increment-property': property('counter-increment'),
       }),
       type: ['integer', 'any'],
@@ -1169,6 +1301,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-counter-reset': {
       property: value => ({
         '--jumi-counter-reset': value,
+        '--jumi-counter-reset-motion': transition('counter-reset'),
         '--jumi-counter-reset-property': property('counter-reset'),
       }),
       type: ['integer', 'any'],
@@ -1177,6 +1310,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-counter-set': {
       property: value => ({
         '--jumi-counter-set': value,
+        '--jumi-counter-set-motion': transition('counter-set'),
         '--jumi-counter-set-property': property('counter-set'),
       }),
       type: ['integer', 'any'],
@@ -1185,6 +1319,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-cursor': {
       property: value => ({
         '--jumi-cursor': value,
+        '--jumi-cursor-motion': transition('cursor'),
         '--jumi-cursor-property': property('cursor'),
       }),
       values: cursor,
@@ -1192,6 +1327,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-cx': {
       property: value => ({
         '--jumi-cx': value,
+        '--jumi-cx-motion': transition('cx'),
         '--jumi-cx-property': property('cx'),
       }),
       type: ['length', 'percentage'],
@@ -1200,6 +1336,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-cy': {
       property: value => ({
         '--jumi-cy': value,
+        '--jumi-cy-motion': transition('cy'),
         '--jumi-cy-property': property('cy'),
       }),
       type: ['length', 'percentage'],
@@ -1208,6 +1345,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-d': {
       property: value => ({
         '--jumi-d': value,
+        '--jumi-d-motion': transition('d'),
         '--jumi-d-property': property('d'),
       }),
       values: empty.none,
@@ -1215,6 +1353,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-display': {
       property: value => ({
         '--jumi-display': value,
+        '--jumi-display-motion': transition('display'),
         '--jumi-display-property': property('display'),
       }),
       values: display,
@@ -1223,6 +1362,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       modifiers: displayOutside,
       property: (value, { modifier }) => ({
         '--jumi-display-inside': modifier ? join([modifier, value]) : value,
+        '--jumi-display-motion': transition('display'),
         '--jumi-display-property': property('display'),
       }),
       values: displayInside,
@@ -1230,6 +1370,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-display-outside': {
       modifiers: displayInside,
       property: (value, { modifier }) => ({
+        '--jumi-display-motion': transition('display'),
         '--jumi-display-outside': modifier ? join([value, modifier]) : value,
         '--jumi-display-property': property('display'),
       }),
@@ -1238,6 +1379,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-dominant-baseline': {
       property: value => ({
         '--jumi-dominant-baseline': value,
+        '--jumi-dominant-baseline-motion': transition('dominant-baseline'),
         '--jumi-dominant-baseline-property': property('dominant-baseline'),
       }),
       values: dominantBaseline,
@@ -1245,6 +1387,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-empty-cells': {
       property: value => ({
         '--jumi-empty-cells': value,
+        '--jumi-empty-cells-motion': transition('empty-cells'),
         '--jumi-empty-cells-property': property('empty-cells'),
       }),
       values: emptyCells,
@@ -1252,6 +1395,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-fill': {
       property: value => ({
         '--jumi-fill': value,
+        '--jumi-fill-motion': transition('fill'),
         '--jumi-fill-property': property('fill'),
       }),
       type: ['color', 'url', 'any'],
@@ -1260,6 +1404,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-fill-opacity': {
       property: value => ({
         '--jumi-fill-opacity': value,
+        '--jumi-fill-opacity-motion': transition('fill-opacity'),
         '--jumi-fill-opacity-property': property('fill-opacity'),
       }),
       type: ['number', 'percentage'],
@@ -1268,6 +1413,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-fill-rule': {
       property: value => ({
         '--jumi-fill-rule': value,
+        '--jumi-fill-rule-motion': transition('fill-rule'),
         '--jumi-fill-rule-property': property('fill-rule'),
       }),
       values: fillRule,
@@ -1275,6 +1421,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-filter': {
       property: value => ({
         '--jumi-filter': value,
+        '--jumi-filter-motion': transition('filter'),
         '--jumi-filter-property': property('filter'),
       }),
       values: empty.none,
@@ -1282,6 +1429,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-filter-blur': {
       property: value => ({
         '--jumi-filter-blur': css('blur', value),
+        '--jumi-filter-motion': transition('filter'),
         '--jumi-filter-property': property('filter'),
       }),
       type: 'length',
@@ -1290,6 +1438,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-filter-brightness': {
       property: value => ({
         '--jumi-filter-brightness': css('brightness', value),
+        '--jumi-filter-motion': transition('filter'),
         '--jumi-filter-property': property('filter'),
       }),
       type: ['number', 'percentage'],
@@ -1298,6 +1447,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-filter-contrast': {
       property: value => ({
         '--jumi-filter-contrast': css('contrast', value),
+        '--jumi-filter-motion': transition('filter'),
         '--jumi-filter-property': property('filter'),
       }),
       type: ['number', 'percentage'],
@@ -1306,6 +1456,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-filter-drop-shadow': {
       property: value => ({
         '--jumi-filter-drop-shadow': css('drop-shadow', value),
+        '--jumi-filter-motion': transition('filter'),
         '--jumi-filter-property': property('filter'),
       }),
       type: ['length', 'shadow', 'any'],
@@ -1314,6 +1465,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-filter-drop-shadow-blur': {
       property: value => ({
         '--jumi-filter-drop-shadow-blur': value,
+        '--jumi-filter-motion': transition('filter'),
         '--jumi-filter-property': property('filter'),
       }),
       type: ['length', 'percentage'],
@@ -1322,6 +1474,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-filter-drop-shadow-color': {
       property: value => ({
         '--jumi-filter-drop-shadow-color': value,
+        '--jumi-filter-motion': transition('filter'),
         '--jumi-filter-property': property('filter'),
       }),
       type: 'color',
@@ -1330,6 +1483,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-filter-drop-shadow-offset-x': {
       property: value => ({
         '--jumi-filter-drop-shadow-offset-x': value,
+        '--jumi-filter-motion': transition('filter'),
         '--jumi-filter-property': property('filter'),
       }),
       type: ['length', 'percentage'],
@@ -1338,6 +1492,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-filter-drop-shadow-offset-y': {
       property: value => ({
         '--jumi-filter-drop-shadow-offset-y': value,
+        '--jumi-filter-motion': transition('filter'),
         '--jumi-filter-property': property('filter'),
       }),
       type: ['length', 'percentage'],
@@ -1346,6 +1501,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-filter-grayscale': {
       property: value => ({
         '--jumi-filter-grayscale': css('grayscale', value),
+        '--jumi-filter-motion': transition('filter'),
         '--jumi-filter-property': property('filter'),
       }),
       type: ['number', 'percentage'],
@@ -1354,6 +1510,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-filter-hue-rotate': {
       property: value => ({
         '--jumi-filter-hue-rotate': 'hue-rotate(' + value + ')',
+        '--jumi-filter-motion': transition('filter'),
         '--jumi-filter-property': property('filter'),
       }),
       type: 'angle',
@@ -1362,6 +1519,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-filter-invert': {
       property: value => ({
         '--jumi-filter-invert': css('invert', value),
+        '--jumi-filter-motion': transition('filter'),
         '--jumi-filter-property': property('filter'),
       }),
       type: ['number', 'percentage'],
@@ -1369,6 +1527,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-filter-opacity': {
       property: value => ({
+        '--jumi-filter-motion': transition('filter'),
         '--jumi-filter-opacity': css('opacity', value),
         '--jumi-filter-property': property('filter'),
       }),
@@ -1377,6 +1536,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-filter-saturate': {
       property: value => ({
+        '--jumi-filter-motion': transition('filter'),
         '--jumi-filter-property': property('filter'),
         '--jumi-filter-saturate': css('saturate', value),
       }),
@@ -1385,6 +1545,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-filter-sepia': {
       property: value => ({
+        '--jumi-filter-motion': transition('filter'),
         '--jumi-filter-property': property('filter'),
         '--jumi-filter-sepia': css('sepia', value),
       }),
@@ -1393,6 +1554,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-filter-url': {
       property: value => ({
+        '--jumi-filter-motion': transition('filter'),
         '--jumi-filter-property': property('filter'),
         '--jumi-filter-url': css('url', value),
       }),
@@ -1402,6 +1564,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-flex': {
       property: value => ({
         '--jumi-flex': value,
+        '--jumi-flex-motion': transition('flex'),
         '--jumi-flex-property': property('flex'),
       }),
       values: theme('flex'),
@@ -1409,6 +1572,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-flex-basis': {
       property: value => ({
         '--jumi-flex-basis': value,
+        '--jumi-flex-basis-motion': transition('flex-basis'),
         '--jumi-flex-basis-property': property('flex-basis'),
       }),
       values: theme('flexBasis'),
@@ -1416,6 +1580,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-flex-direction': {
       property: value => ({
         '--jumi-flex-direction': value,
+        '--jumi-flex-direction-motion': transition('flex-direction'),
         '--jumi-flex-direction-property': property('flex-direction'),
       }),
       values: flexDirection,
@@ -1423,6 +1588,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-flex-flow': {
       property: value => ({
         '--jumi-flex-flow': value,
+        '--jumi-flex-flow-motion': transition('flex-flow'),
         '--jumi-flex-flow-property': property('flex-flow'),
       }),
       values: empty.string,
@@ -1430,6 +1596,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-flex-grow': {
       property: value => ({
         '--jumi-flex-grow': value,
+        '--jumi-flex-grow-motion': transition('flex-grow'),
         '--jumi-flex-grow-property': property('flex-grow'),
       }),
       values: theme('flexGrow'),
@@ -1437,6 +1604,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-flex-shrink': {
       property: value => ({
         '--jumi-flex-shrink': value,
+        '--jumi-flex-shrink-motion': transition('flex-shrink'),
         '--jumi-flex-shrink-property': property('flex-shrink'),
       }),
       values: theme('flexShrink'),
@@ -1444,6 +1612,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-flex-wrap': {
       property: value => ({
         '--jumi-flex-wrap': value,
+        '--jumi-flex-wrap-motion': transition('flex-wrap'),
         '--jumi-flex-wrap-property': property('flex-wrap'),
       }),
       values: flexWrap,
@@ -1451,6 +1620,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-float': {
       property: value => ({
         '--jumi-float': value,
+        '--jumi-float-motion': transition('float'),
         '--jumi-float-property': property('float'),
       }),
       values: float,
@@ -1458,6 +1628,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-flood-color': {
       property: value => ({
         '--jumi-flood-color': value,
+        '--jumi-flood-color-motion': transition('flood-color'),
         '--jumi-flood-color-property': property('flood-color'),
       }),
       type: 'color',
@@ -1466,6 +1637,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-flood-opacity': {
       property: value => ({
         '--jumi-flood-opacity': value,
+        '--jumi-flood-opacity-motion': transition('flood-opacity'),
         '--jumi-flood-opacity-property': property('flood-opacity'),
       }),
       type: ['number', 'percentage'],
@@ -1474,6 +1646,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-font-family': {
       property: value => ({
         '--jumi-font-family': value,
+        '--jumi-font-family-motion': transition('font-family'),
         '--jumi-font-family-property': property('font-family'),
       }),
       type: ['generic-name', 'family-name'],
@@ -1482,6 +1655,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-font-feature-settings': {
       property: value => ({
         '--jumi-font-feature-settings': value,
+        '--jumi-font-feature-settings-motion': transition('font-feature-settings'),
         '--jumi-font-feature-settings-property': property('font-feature-settings'),
       }),
       type: ['integer', 'any'],
@@ -1490,6 +1664,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-font-kerning': {
       property: value => ({
         '--jumi-font-kerning': value,
+        '--jumi-font-kerning-motion': transition('font-kerning'),
         '--jumi-font-kerning-property': property('font-kerning'),
       }),
       values: fontKerning,
@@ -1497,6 +1672,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-font-size': {
       property: value => ({
         '--jumi-font-size': value,
+        '--jumi-font-size-motion': transition('font-size'),
         '--jumi-font-size-property': property('font-size'),
       }),
       values: fontSize,
@@ -1505,6 +1681,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       modifiers: fontSizeAdjustMetric,
       property: (value, { modifier }) => ({
         '--jumi-font-size-adjust': modifier ? join([value, modifier]) : value,
+        '--jumi-font-size-adjust-motion': transition('font-size-adjust'),
         '--jumi-font-size-adjust-property': property('font-size-adjust'),
       }),
       type: ['number', 'any'],
@@ -1513,6 +1690,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-font-style': {
       property: (value, { modifier }) => ({
         '--jumi-font-style': modifier ? join([value, modifier]) : value,
+        '--jumi-font-style-motion': transition('font-style'),
         '--jumi-font-style-property': property('font-style'),
       }),
       values: fontStyle,
@@ -1520,6 +1698,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-font-synthesis': {
       property: value => ({
         '--jumi-font-synthesis': value,
+        '--jumi-font-synthesis-motion': transition('font-synthesis'),
         '--jumi-font-synthesis-property': property('font-synthesis'),
       }),
       values: empty.none,
@@ -1527,6 +1706,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-font-synthesis-small-caps': {
       property: value => ({
         '--jumi-font-synthesis-small-caps': value,
+        '--jumi-font-synthesis-small-caps-motion': transition('font-synthesis-small-caps'),
         '--jumi-font-synthesis-small-caps-property': property('font-synthesis-small-caps'),
       }),
       values: fontSynthesisSmallCaps,
@@ -1534,6 +1714,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-font-synthesis-style': {
       property: value => ({
         '--jumi-font-synthesis-style': value,
+        '--jumi-font-synthesis-style-motion': transition('font-synthesis-style'),
         '--jumi-font-synthesis-style-property': property('font-synthesis-style'),
       }),
       values: fontSynthesisStyle,
@@ -1541,6 +1722,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-font-synthesis-weight': {
       property: value => ({
         '--jumi-font-synthesis-weight': value,
+        '--jumi-font-synthesis-weight-motion': transition('font-synthesis-weight'),
         '--jumi-font-synthesis-weight-property': property('font-synthesis-weight'),
       }),
       values: fontSynthesisWeight,
@@ -1548,6 +1730,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-font-variant': {
       property: value => ({
         '--jumi-font-variant': value,
+        '--jumi-font-variant-motion': transition('font-variant'),
         '--jumi-font-variant-property': property('font-variant'),
       }),
       values: empty.string,
@@ -1555,6 +1738,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-font-variant-alternates': {
       property: value => ({
         '--jumi-font-variant-alternates': value,
+        '--jumi-font-variant-alternates-motion': transition('font-variant-alternates'),
         '--jumi-font-variant-alternates-property': property('font-variant-alternates'),
       }),
       values: fontVariantAlternates,
@@ -1562,6 +1746,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-font-variant-caps': {
       property: value => ({
         '--jumi-font-variant-caps': value,
+        '--jumi-font-variant-caps-motion': transition('font-variant-caps'),
         '--jumi-font-variant-caps-property': property('font-variant-caps'),
       }),
       values: fontVariantCaps,
@@ -1570,6 +1755,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       modifiers: fontVariantEastAsianWidth,
       property: (value, { modifier }) => ({
         '--jumi-font-variant-east-asian': modifier ? join([value, modifier]) : value,
+        '--jumi-font-variant-east-asian-motion': transition('font-variant-east-asian'),
         '--jumi-font-variant-east-asian-property': property('font-variant-east-asian'),
       }),
       values: fontVariantEastAsian,
@@ -1577,6 +1763,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-font-variant-ligatures': {
       property: value => ({
         '--jumi-font-variant-ligatures': value,
+        '--jumi-font-variant-ligatures-motion': transition('font-variant-ligatures'),
         '--jumi-font-variant-ligatures-property': property('font-variant-ligatures'),
       }),
       values: fontVariantLigatures,
@@ -1584,6 +1771,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-font-variant-numeric': {
       property: value => ({
         '--jumi-font-variant-numeric': value,
+        '--jumi-font-variant-numeric-motion': transition('font-variant-numeric'),
         '--jumi-font-variant-numeric-property': property('font-variant-numeric'),
       }),
       values: fontVariantNumeric,
@@ -1591,6 +1779,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-font-variant-position': {
       property: value => ({
         '--jumi-font-variant-position': value,
+        '--jumi-font-variant-position-motion': transition('font-variant-position'),
         '--jumi-font-variant-position-property': property('font-variant-position'),
       }),
       values: fontVariantPosition,
@@ -1598,6 +1787,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-font-variation-settings': {
       property: value => ({
         '--jumi-font-variation-settings': value,
+        '--jumi-font-variation-settings-motion': transition('font-variation-settings'),
         '--jumi-font-variation-settings-property': property('font-variation-settings'),
       }),
       type: ['number', 'any'],
@@ -1606,6 +1796,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-font-weight': {
       property: value => ({
         '--jumi-font-weight': value,
+        '--jumi-font-weight-motion': transition('font-weight'),
         '--jumi-font-weight-property': property('font-weight'),
       }),
       type: 'number',
@@ -1614,6 +1805,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-forced-color-adjust': {
       property: value => ({
         '--jumi-forced-color-adjust': value,
+        '--jumi-forced-color-adjust-motion': transition('forced-color-adjust'),
         '--jumi-forced-color-adjust-property': property('forced-color-adjust'),
       }),
       values: forcedColorAdjust,
@@ -1621,6 +1813,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-gap': {
       property: value => ({
         '--jumi-gap': value,
+        '--jumi-gap-motion': transition('gap'),
         '--jumi-gap-property': property('gap'),
       }),
       values: theme('gap'),
@@ -1628,6 +1821,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-grid': {
       property: value => ({
         '--jumi-grid': value,
+        '--jumi-grid-motion': transition('grid'),
         '--jumi-grid-property': property('grid'),
       }),
       values: empty.string,
@@ -1635,6 +1829,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-grid-auto-columns': {
       property: value => ({
         '--jumi-grid-auto-columns': value,
+        '--jumi-grid-auto-columns-motion': transition('grid-auto-columns'),
         '--jumi-grid-auto-columns-property': property('grid-auto-columns'),
       }),
       values: theme('gridAutoColumns'),
@@ -1643,6 +1838,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       modifiers: gridAutoFlowPacking,
       property: (value, { modifier }) => ({
         '--jumi-grid-auto-flow': modifier ? join([value, modifier]) : value,
+        '--jumi-grid-auto-flow-motion': transition('grid-auto-flow'),
         '--jumi-grid-auto-flow-property': property('grid-auto-flow'),
       }),
       values: gridAutoFlow,
@@ -1650,6 +1846,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-grid-auto-rows': {
       property: value => ({
         '--jumi-grid-auto-rows': value,
+        '--jumi-grid-auto-rows-motion': transition('grid-auto-rows'),
         '--jumi-grid-auto-rows-property': property('grid-auto-rows'),
       }),
       values: theme('gridAutoRows'),
@@ -1657,6 +1854,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-grid-column': {
       property: value => ({
         '--jumi-grid-column': value,
+        '--jumi-grid-column-motion': transition('grid-column'),
         '--jumi-grid-column-property': property('grid-column'),
       }),
       values: theme('gridColumn'),
@@ -1664,6 +1862,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-grid-column-end': {
       property: (value, { modifier }) => ({
         '--jumi-grid-column-end': modifier ? join([modifier, value]) : value,
+        '--jumi-grid-column-end-motion': transition('grid-column-end'),
         '--jumi-grid-column-end-property': property('grid-column-end'),
       }),
       values: theme('gridColumnEnd'),
@@ -1671,6 +1870,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-grid-column-start': {
       property: (value, { modifier }) => ({
         '--jumi-grid-column-start': modifier ? join([modifier, value]) : value,
+        '--jumi-grid-column-start-motion': transition('grid-column-start'),
         '--jumi-grid-column-start-property': property('grid-column-start'),
       }),
       values: theme('gridColumnStart'),
@@ -1678,6 +1878,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-grid-row': {
       property: value => ({
         '--jumi-grid-row': value,
+        '--jumi-grid-row-motion': transition('grid-row'),
         '--jumi-grid-row-property': property('grid-row'),
       }),
       values: theme('gridRow'),
@@ -1686,6 +1887,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       modifiers: gridSize,
       property: (value, { modifier }) => ({
         '--jumi-grid-row-end': modifier ? join([modifier, value]) : value,
+        '--jumi-grid-row-end-motion': transition('grid-row-end'),
         '--jumi-grid-row-end-property': property('grid-row-end'),
       }),
       values: theme('gridRowEnd'),
@@ -1694,6 +1896,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       modifiers: gridSize,
       property: (value, { modifier }) => ({
         '--jumi-grid-row-start': modifier ? join([modifier, value]) : value,
+        '--jumi-grid-row-start-motion': transition('grid-row-start'),
         '--jumi-grid-row-start-property': property('grid-row-start'),
       }),
       values: theme('gridRowStart'),
@@ -1701,6 +1904,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-grid-template-areas': {
       property: value => ({
         '--jumi-grid-template-areas': value,
+        '--jumi-grid-template-areas-motion': transition('grid-template-areas'),
         '--jumi-grid-template-areas-property': property('grid-template-areas'),
       }),
       values: empty.none,
@@ -1708,6 +1912,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-grid-template-columns': {
       property: value => ({
         '--jumi-grid-template-columns': value,
+        '--jumi-grid-template-columns-motion': transition('grid-template-columns'),
         '--jumi-grid-template-columns-property': property('grid-template-columns'),
       }),
       values: theme('gridTemplateColumns'),
@@ -1715,6 +1920,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-grid-template-rows': {
       property: value => ({
         '--jumi-grid-template-rows': value,
+        '--jumi-grid-template-rows-motion': transition('grid-template-rows'),
         '--jumi-grid-template-rows-property': property('grid-template-rows'),
       }),
       values: theme('gridTemplateRows'),
@@ -1722,6 +1928,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-hanging-punctuation': {
       property: value => ({
         '--jumi-hanging-punctuation': value,
+        '--jumi-hanging-punctuation-motion': transition('hanging-punctuation'),
         '--jumi-hanging-punctuation-property': property('hanging-punctuation'),
       }),
       values: hangingPunctuation,
@@ -1729,6 +1936,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-height': {
       property: value => ({
         '--jumi-height': value,
+        '--jumi-height-motion': transition('height'),
         '--jumi-height-property': property('height'),
       }),
       supportsNegativeValues: true,
@@ -1738,6 +1946,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-hyphenate-character': {
       property: value => ({
         '--jumi-hyphenate-character': value,
+        '--jumi-hyphenate-character-motion': transition('hyphenate-character'),
         '--jumi-hyphenate-character-property': property('hyphenate-character'),
       }),
       values: empty.auto,
@@ -1746,6 +1955,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       modifiers: hyphenateLimitCharsProperties,
       property: (value) => {
         const hyphenateLimitChars: Collection<string> = {
+          '--jumi-hyphenate-limit-chars-motion': transition('hyphenate-limit-chars'),
           '--jumi-hyphenate-limit-chars-property': property('hyphenate-limit-chars'),
         }
 
@@ -1778,6 +1988,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-hyphens': {
       property: value => ({
         '--jumi-hyphens': value,
+        '--jumi-hyphens-motion': transition('hyphens'),
         '--jumi-hyphens-property': property('hyphens'),
       }),
       values: hyphens,
@@ -1785,6 +1996,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-image-orientation': {
       property: value => ({
         '--jumi-image-orientation': value,
+        '--jumi-image-orientation-motion': transition('image-orientation'),
         '--jumi-image-orientation-property': property('image-orientation'),
       }),
       type: ['angle', 'any'],
@@ -1793,6 +2005,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-image-rendering': {
       property: value => ({
         '--jumi-image-rendering': value,
+        '--jumi-image-rendering-motion': transition('image-rendering'),
         '--jumi-image-rendering-property': property('image-rendering'),
       }),
       values: imageRendering,
@@ -1801,6 +2014,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       modifiers: initialLetterPosition,
       property: (value, { modifier }) => ({
         '--jumi-initial-letter': modifier ? join([value, modifier]) : value,
+        '--jumi-initial-letter-motion': transition('initial-letter'),
         '--jumi-initial-letter-property': property('initial-letter'),
       }),
       type: ['number', 'integer', 'any'],
@@ -1809,6 +2023,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-inline-size': {
       property: value => ({
         '--jumi-inline-size': value,
+        '--jumi-inline-size-motion': transition('inline-size'),
         '--jumi-inline-size-property': property('inline-size'),
       }),
       supportsNegativeValues: true,
@@ -1818,6 +2033,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-inset': {
       property: value => ({
         '--jumi-inset': value,
+        '--jumi-inset-motion': transition('inset'),
         '--jumi-inset-property': property('inset'),
       }),
       supportsNegativeValues: true,
@@ -1827,6 +2043,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-inset-block': {
       property: value => ({
         '--jumi-inset-block': value,
+        '--jumi-inset-block-motion': transition('inset-block'),
         '--jumi-inset-block-property': property('inset-block'),
       }),
       supportsNegativeValues: true,
@@ -1836,6 +2053,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-inset-block-end': {
       property: value => ({
         '--jumi-inset-block-end': value,
+        '--jumi-inset-block-end-motion': transition('inset-block-end'),
         '--jumi-inset-block-end-property': property('inset-block-end'),
       }),
       supportsNegativeValues: true,
@@ -1845,6 +2063,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-inset-block-start': {
       property: value => ({
         '--jumi-inset-block-start': value,
+        '--jumi-inset-block-start-motion': transition('inset-block-start'),
         '--jumi-inset-block-start-property': property('inset-block-start'),
       }),
       supportsNegativeValues: true,
@@ -1854,6 +2073,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-inset-inline': {
       property: value => ({
         '--jumi-inset-inline': value,
+        '--jumi-inset-inline-motion': transition('inset-inline'),
         '--jumi-inset-inline-property': property('inset-inline'),
       }),
       supportsNegativeValues: true,
@@ -1863,6 +2083,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-inset-inline-end': {
       property: value => ({
         '--jumi-inset-inline-end': value,
+        '--jumi-inset-inline-end-motion': transition('inset-inline-end'),
         '--jumi-inset-inline-end-property': property('inset-inline-end'),
       }),
       supportsNegativeValues: true,
@@ -1872,6 +2093,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-inset-inline-start': {
       property: value => ({
         '--jumi-inset-inline-start': value,
+        '--jumi-inset-inline-start-motion': transition('inset-inline-start'),
         '--jumi-inset-inline-start-property': property('inset-inline-start'),
       }),
       supportsNegativeValues: true,
@@ -1881,6 +2103,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-justify-content': {
       property: value => ({
         '--jumi-justify-content': value,
+        '--jumi-justify-content-motion': transition('justify-content'),
         '--jumi-justify-content-property': property('justify-content'),
       }),
       values: justifyContent,
@@ -1888,6 +2111,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-justify-items': {
       property: value => ({
         '--jumi-justify-items': value,
+        '--jumi-justify-items-motion': transition('justify-items'),
         '--jumi-justify-items-property': property('justify-items'),
       }),
       values: justifyItems,
@@ -1895,6 +2119,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-justify-self': {
       property: value => ({
         '--jumi-justify-self': value,
+        '--jumi-justify-self-motion': transition('justify-self'),
         '--jumi-justify-self-property': property('justify-self'),
       }),
       values: justifySelf,
@@ -1902,6 +2127,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-left': {
       property: value => ({
         '--jumi-left': value,
+        '--jumi-left-motion': transition('left'),
         '--jumi-left-property': property('left'),
       }),
       supportsNegativeValues: true,
@@ -1911,6 +2137,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-letter-spacing': {
       property: value => ({
         '--jumi-letter-spacing': value,
+        '--jumi-letter-spacing-motion': transition('letter-spacing'),
         '--jumi-letter-spacing-property': property('letter-spacing'),
       }),
       type: ['length', 'percentage'],
@@ -1919,6 +2146,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-lighting-color': {
       property: value => ({
         '--jumi-lighting-color': value,
+        '--jumi-lighting-color-motion': transition('lighting-color'),
         '--jumi-lighting-color-property': property('lighting-color'),
       }),
       type: 'color',
@@ -1927,6 +2155,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-line-break': {
       property: value => ({
         '--jumi-line-break': value,
+        '--jumi-line-break-motion': transition('line-break'),
         '--jumi-line-break-property': property('line-break'),
       }),
       values: lineBreak,
@@ -1934,6 +2163,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-line-clamp': {
       property: value => ({
         '--jumi-line-clamp': value,
+        '--jumi-line-clamp-motion': transition('line-clamp'),
         '--jumi-line-clamp-property': property('line-clamp'),
       }),
       type: ['number', 'any'],
@@ -1942,6 +2172,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-line-height': {
       property: value => ({
         '--jumi-line-height': value,
+        '--jumi-line-height-motion': transition('line-height'),
         '--jumi-line-height-property': property('line-height'),
       }),
       type: ['number', 'length', 'percentage'],
@@ -1950,6 +2181,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-list-style': {
       property: value => ({
         '--jumi-list-style': value,
+        '--jumi-list-style-motion': transition('list-style'),
         '--jumi-list-style-property': property('list-style'),
       }),
       values: empty.none,
@@ -1957,6 +2189,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-list-style-image': {
       property: value => ({
         '--jumi-list-style-image': value,
+        '--jumi-list-style-image-motion': transition('list-style-image'),
         '--jumi-list-style-image-property': property('list-style-image'),
       }),
       type: ['url', 'image', 'any'],
@@ -1965,6 +2198,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-list-style-position': {
       property: value => ({
         '--jumi-list-style-position': value,
+        '--jumi-list-style-position-motion': transition('list-style-position'),
         '--jumi-list-style-position-property': property('list-style-position'),
       }),
       values: listStylePosition,
@@ -1972,6 +2206,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-list-style-type': {
       property: value => ({
         '--jumi-list-style-type': value,
+        '--jumi-list-style-type-motion': transition('list-style-type'),
         '--jumi-list-style-type-property': property('list-style-type'),
       }),
       values: listStyleType,
@@ -1979,6 +2214,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-margin': {
       property: value => ({
         '--jumi-margin': value,
+        '--jumi-margin-motion': transition('margin'),
         '--jumi-margin-property': property('margin'),
       }),
       supportsNegativeValues: true,
@@ -1987,6 +2223,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-margin-block': {
       property: value => ({
         '--jumi-margin-block': value,
+        '--jumi-margin-block-motion': transition('margin-block'),
         '--jumi-margin-block-property': property('margin-block'),
       }),
       supportsNegativeValues: true,
@@ -1995,6 +2232,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-margin-block-end': {
       property: value => ({
         '--jumi-margin-block-end': value,
+        '--jumi-margin-block-end-motion': transition('margin-block-end'),
         '--jumi-margin-block-end-property': property('margin-block-end'),
       }),
       supportsNegativeValues: true,
@@ -2003,6 +2241,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-margin-block-start': {
       property: value => ({
         '--jumi-margin-block-start': value,
+        '--jumi-margin-block-start-motion': transition('margin-block-start'),
         '--jumi-margin-block-start-property': property('margin-block-start'),
       }),
       supportsNegativeValues: true,
@@ -2011,6 +2250,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-margin-bottom': {
       property: value => ({
         '--jumi-margin-bottom': value,
+        '--jumi-margin-bottom-motion': transition('margin-bottom'),
         '--jumi-margin-bottom-property': property('margin-bottom'),
       }),
       supportsNegativeValues: true,
@@ -2019,6 +2259,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-margin-inline': {
       property: value => ({
         '--jumi-margin-inline': value,
+        '--jumi-margin-inline-motion': transition('margin-inline'),
         '--jumi-margin-inline-property': property('margin-inline'),
       }),
       supportsNegativeValues: true,
@@ -2027,6 +2268,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-margin-inline-end': {
       property: value => ({
         '--jumi-margin-inline-end': value,
+        '--jumi-margin-inline-end-motion': transition('margin-inline-end'),
         '--jumi-margin-inline-end-property': property('margin-inline-end'),
       }),
       supportsNegativeValues: true,
@@ -2035,6 +2277,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-margin-inline-start': {
       property: value => ({
         '--jumi-margin-inline-start': value,
+        '--jumi-margin-inline-start-motion': transition('margin-inline-start'),
         '--jumi-margin-inline-start-property': property('margin-inline-start'),
       }),
       supportsNegativeValues: true,
@@ -2043,6 +2286,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-margin-left': {
       property: value => ({
         '--jumi-margin-left': value,
+        '--jumi-margin-left-motion': transition('margin-left'),
         '--jumi-margin-left-property': property('margin-left'),
       }),
       supportsNegativeValues: true,
@@ -2051,6 +2295,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-margin-right': {
       property: value => ({
         '--jumi-margin-right': value,
+        '--jumi-margin-right-motion': transition('margin-right'),
         '--jumi-margin-right-property': property('margin-right'),
       }),
       supportsNegativeValues: true,
@@ -2059,6 +2304,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-margin-top': {
       property: value => ({
         '--jumi-margin-top': value,
+        '--jumi-margin-top-motion': transition('margin-top'),
         '--jumi-margin-top-property': property('margin-top'),
       }),
       supportsNegativeValues: true,
@@ -2067,6 +2313,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-marker': {
       property: value => ({
         '--jumi-marker': value,
+        '--jumi-marker-motion': transition('marker'),
         '--jumi-marker-property': property('marker'),
       }),
       values: empty.none,
@@ -2074,6 +2321,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-marker-end': {
       property: value => ({
         '--jumi-marker-end': value,
+        '--jumi-marker-end-motion': transition('marker-end'),
         '--jumi-marker-end-property': property('marker-end'),
       }),
       values: empty.none,
@@ -2081,6 +2329,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-marker-mid': {
       property: value => ({
         '--jumi-marker-mid': value,
+        '--jumi-marker-mid-motion': transition('marker-mid'),
         '--jumi-marker-mid-property': property('marker-mid'),
       }),
       values: empty.none,
@@ -2088,6 +2337,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-marker-start': {
       property: value => ({
         '--jumi-marker-start': value,
+        '--jumi-marker-start-motion': transition('marker-start'),
         '--jumi-marker-start-property': property('marker-start'),
       }),
       values: empty.none,
@@ -2095,6 +2345,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask': {
       property: value => ({
         '--jumi-mask': value,
+        '--jumi-mask-motion': transition('mask'),
         '--jumi-mask-property': property('mask'),
       }),
       values: empty.none,
@@ -2102,6 +2353,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-border': {
       property: value => ({
         '--jumi-mask-border': value,
+        '--jumi-mask-border-motion': transition('mask-border'),
         '--jumi-mask-border-property': property('mask-border'),
       }),
       values: empty.none,
@@ -2109,6 +2361,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-border-mode': {
       property: value => ({
         '--jumi-mask-border-mode': value,
+        '--jumi-mask-border-mode-motion': transition('mask-border-mode'),
         '--jumi-mask-border-mode-property': property('mask-border-mode'),
       }),
       values: maskType,
@@ -2116,6 +2369,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-border-outset': {
       property: value => ({
         '--jumi-mask-border-outset': value,
+        '--jumi-mask-border-outset-motion': transition('mask-border-outset'),
         '--jumi-mask-border-outset-property': property('mask-border-outset'),
       }),
       supportsNegativeValues: true,
@@ -2125,6 +2379,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-border-outset-bottom': {
       property: value => ({
         '--jumi-mask-border-outset-bottom': value,
+        '--jumi-mask-border-outset-motion': transition('mask-border-outset'),
         '--jumi-mask-border-outset-property': property('mask-border-outset'),
       }),
       supportsNegativeValues: true,
@@ -2134,6 +2389,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-border-outset-left': {
       property: value => ({
         '--jumi-mask-border-outset-left': value,
+        '--jumi-mask-border-outset-motion': transition('mask-border-outset'),
         '--jumi-mask-border-outset-property': property('mask-border-outset'),
       }),
       supportsNegativeValues: true,
@@ -2142,6 +2398,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-mask-border-outset-right': {
       property: value => ({
+        '--jumi-mask-border-outset-motion': transition('mask-border-outset'),
         '--jumi-mask-border-outset-property': property('mask-border-outset'),
         '--jumi-mask-border-outset-right': value,
       }),
@@ -2151,6 +2408,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-mask-border-outset-top': {
       property: value => ({
+        '--jumi-mask-border-outset-motion': transition('mask-border-outset'),
         '--jumi-mask-border-outset-property': property('mask-border-outset'),
         '--jumi-mask-border-outset-top': value,
       }),
@@ -2161,6 +2419,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-border-outset-x': {
       property: value => ({
         '--jumi-mask-border-outset-left': value,
+        '--jumi-mask-border-outset-motion': transition('mask-border-outset'),
         '--jumi-mask-border-outset-property': property('mask-border-outset'),
         '--jumi-mask-border-outset-right': value,
       }),
@@ -2171,6 +2430,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-border-outset-y': {
       property: value => ({
         '--jumi-mask-border-outset-bottom': value,
+        '--jumi-mask-border-outset-motion': transition('mask-border-outset'),
         '--jumi-mask-border-outset-property': property('mask-border-outset'),
         '--jumi-mask-border-outset-top': value,
       }),
@@ -2181,6 +2441,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-border-repeat': {
       property: value => ({
         '--jumi-mask-border-repeat': value,
+        '--jumi-mask-border-repeat-motion': transition('mask-border-repeat'),
         '--jumi-mask-border-repeat-property': property('mask-border-repeat'),
       }),
       values: maskBorderRepeat,
@@ -2188,6 +2449,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-border-slice': {
       property: value => ({
         '--jumi-mask-border-slice': value,
+        '--jumi-mask-border-slice-motion': transition('mask-border-slice'),
         '--jumi-mask-border-slice-property': property('mask-border-slice'),
       }),
       type: ['number', 'percentage', 'any'],
@@ -2196,6 +2458,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-border-slice-bottom': {
       property: value => ({
         '--jumi-mask-border-slice-bottom': value,
+        '--jumi-mask-border-slice-motion': transition('mask-border-slice'),
         '--jumi-mask-border-slice-property': property('mask-border-slice'),
       }),
       type: ['number', 'percentage', 'any'],
@@ -2204,6 +2467,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-border-slice-left': {
       property: value => ({
         '--jumi-mask-border-slice-left': value,
+        '--jumi-mask-border-slice-motion': transition('mask-border-slice'),
         '--jumi-mask-border-slice-property': property('mask-border-slice'),
       }),
       type: ['number', 'percentage', 'any'],
@@ -2211,6 +2475,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-mask-border-slice-right': {
       property: value => ({
+        '--jumi-mask-border-slice-motion': transition('mask-border-slice'),
         '--jumi-mask-border-slice-property': property('mask-border-slice'),
         '--jumi-mask-border-slice-right': value,
       }),
@@ -2219,6 +2484,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-mask-border-slice-top': {
       property: value => ({
+        '--jumi-mask-border-slice-motion': transition('mask-border-slice'),
         '--jumi-mask-border-slice-property': property('mask-border-slice'),
         '--jumi-mask-border-slice-top': value,
       }),
@@ -2228,6 +2494,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-border-slice-x': {
       property: value => ({
         '--jumi-mask-border-slice-left': value,
+        '--jumi-mask-border-slice-motion': transition('mask-border-slice'),
         '--jumi-mask-border-slice-property': property('mask-border-slice'),
         '--jumi-mask-border-slice-right': value,
       }),
@@ -2237,6 +2504,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-border-slice-y': {
       property: value => ({
         '--jumi-mask-border-slice-bottom': value,
+        '--jumi-mask-border-slice-motion': transition('mask-border-slice'),
         '--jumi-mask-border-slice-property': property('mask-border-slice'),
         '--jumi-mask-border-slice-top': value,
       }),
@@ -2246,6 +2514,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-border-source': {
       property: value => ({
         '--jumi-mask-border-source': value,
+        '--jumi-mask-border-source-motion': transition('mask-border-source'),
         '--jumi-mask-border-source-property': property('mask-border-source'),
       }),
       type: ['url', 'image', 'any'],
@@ -2254,6 +2523,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-border-width': {
       property: value => ({
         '--jumi-mask-border-width': value,
+        '--jumi-mask-border-width-motion': transition('mask-border-width'),
         '--jumi-mask-border-width-property': property('mask-border-width'),
       }),
       supportsNegativeValues: true,
@@ -2263,6 +2533,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-clip': {
       property: value => ({
         '--jumi-mask-clip': value,
+        '--jumi-mask-clip-motion': transition('mask-clip'),
         '--jumi-mask-clip-property': property('mask-clip'),
       }),
       values: maskClip,
@@ -2270,6 +2541,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-composite': {
       property: value => ({
         '--jumi-mask-composite': value,
+        '--jumi-mask-composite-motion': transition('mask-composite'),
         '--jumi-mask-composite-property': property('mask-composite'),
       }),
       values: maskComposite,
@@ -2277,6 +2549,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-image': {
       property: value => ({
         '--jumi-mask-image': value,
+        '--jumi-mask-image-motion': transition('mask-image'),
         '--jumi-mask-image-property': property('mask-image'),
       }),
       type: ['url', 'image', 'any'],
@@ -2285,6 +2558,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-mode': {
       property: value => ({
         '--jumi-mask-mode': value,
+        '--jumi-mask-mode-motion': transition('mask-mode'),
         '--jumi-mask-mode-property': property('mask-mode'),
       }),
       values: maskMode,
@@ -2292,6 +2566,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-origin': {
       property: value => ({
         '--jumi-mask-origin': value,
+        '--jumi-mask-origin-motion': transition('mask-origin'),
         '--jumi-mask-origin-property': property('mask-origin'),
       }),
       values: maskOrigin,
@@ -2299,6 +2574,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-position': {
       property: value => ({
         '--jumi-mask-position': value,
+        '--jumi-mask-position-motion': transition('mask-position'),
         '--jumi-mask-position-property': property('mask-position'),
       }),
       type: ['length', 'percentage', 'position'],
@@ -2306,6 +2582,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-repeat': {
       property: value => ({
         '--jumi-mask-repeat': value,
+        '--jumi-mask-repeat-motion': transition('mask-repeat'),
         '--jumi-mask-repeat-property': property('mask-repeat'),
       }),
       values: backgroundRepeat,
@@ -2313,6 +2590,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-size': {
       property: value => ({
         '--jumi-mask-size': value,
+        '--jumi-mask-size-motion': transition('mask-size'),
         '--jumi-mask-size-property': property('mask-size'),
       }),
       type: ['length', 'percentage'],
@@ -2321,6 +2599,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mask-type': {
       property: value => ({
         '--jumi-mask-type': value,
+        '--jumi-mask-type-motion': transition('mask-type'),
         '--jumi-mask-type-property': property('mask-type'),
       }),
       values: maskType,
@@ -2328,6 +2607,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-math-depth': {
       property: value => ({
         '--jumi-math-depth': value,
+        '--jumi-math-depth-motion': transition('math-depth'),
         '--jumi-math-depth-property': property('math-depth'),
       }),
       supportsNegativeValues: true,
@@ -2337,6 +2617,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-math-depth-add': {
       property: value => ({
         '--jumi-math-depth': `add(${value})`,
+        '--jumi-math-depth-motion': transition('math-depth'),
         '--jumi-math-depth-property': property('math-depth'),
       }),
       supportsNegativeValues: true,
@@ -2346,6 +2627,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-math-style': {
       property: value => ({
         '--jumi-math-style': value,
+        '--jumi-math-style-motion': transition('math-style'),
         '--jumi-math-style-property': property('math-style'),
       }),
       values: mathStyle,
@@ -2353,6 +2635,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-max-block-size': {
       property: value => ({
         '--jumi-max-block-size': value,
+        '--jumi-max-block-size-motion': transition('max-block-size'),
         '--jumi-max-block-size-property': property('max-block-size'),
       }),
       supportsNegativeValues: true,
@@ -2362,6 +2645,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-max-height': {
       property: value => ({
         '--jumi-max-height': value,
+        '--jumi-max-height-motion': transition('max-height'),
         '--jumi-max-height-property': property('max-height'),
       }),
       supportsNegativeValues: true,
@@ -2371,6 +2655,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-max-inline-size': {
       property: value => ({
         '--jumi-max-inline-size': value,
+        '--jumi-max-inline-size-motion': transition('max-inline-size'),
         '--jumi-max-inline-size-property': property('max-inline-size'),
       }),
       supportsNegativeValues: true,
@@ -2380,6 +2665,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-max-width': {
       property: value => ({
         '--jumi-max-width': value,
+        '--jumi-max-width-motion': transition('max-width'),
         '--jumi-max-width-property': property('max-width'),
       }),
       supportsNegativeValues: true,
@@ -2389,6 +2675,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-min-block-size': {
       property: value => ({
         '--jumi-min-block-size': value,
+        '--jumi-min-block-size-motion': transition('min-block-size'),
         '--jumi-min-block-size-property': property('min-block-size'),
       }),
       supportsNegativeValues: true,
@@ -2398,6 +2685,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-min-height': {
       property: value => ({
         '--jumi-min-height': value,
+        '--jumi-min-height-motion': transition('min-height'),
         '--jumi-min-height-property': property('min-height'),
       }),
       supportsNegativeValues: true,
@@ -2407,6 +2695,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-min-inline-size': {
       property: value => ({
         '--jumi-min-inline-size': value,
+        '--jumi-min-inline-size-motion': transition('min-inline-size'),
         '--jumi-min-inline-size-property': property('min-inline-size'),
       }),
       supportsNegativeValues: true,
@@ -2416,6 +2705,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-min-width': {
       property: value => ({
         '--jumi-min-width': value,
+        '--jumi-min-width-motion': transition('min-width'),
         '--jumi-min-width-property': property('min-width'),
       }),
       supportsNegativeValues: true,
@@ -2425,6 +2715,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-mix-blend-mode': {
       property: value => ({
         '--jumi-mix-blend-mode': value,
+        '--jumi-mix-blend-mode-motion': transition('mix-blend-mode'),
         '--jumi-mix-blend-mode-property': property('mix-blend-mode'),
       }),
       values: mixBlendMode,
@@ -2432,6 +2723,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-object-fit': {
       property: value => ({
         '--jumi-object-fit': value,
+        '--jumi-object-fit-motion': transition('object-fit'),
         '--jumi-object-fit-property': property('object-fit'),
       }),
       values: objectFit,
@@ -2439,6 +2731,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-object-position': {
       property: value => ({
         '--jumi-object-position': value,
+        '--jumi-object-position-motion': transition('object-position'),
         '--jumi-object-position-property': property('object-position'),
       }),
       type: ['length', 'percentage', 'position', 'any'],
@@ -2446,6 +2739,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-object-position-x': {
       property: value => ({
+        '--jumi-object-position-motion': transition('object-position'),
         '--jumi-object-position-property': property('object-position'),
         '--jumi-object-position-x': value,
       }),
@@ -2454,6 +2748,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-object-position-x-edge': {
       property: value => ({
+        '--jumi-object-position-motion': transition('object-position'),
         '--jumi-object-position-property': property('object-position'),
         '--jumi-object-position-x-edge': value,
       }),
@@ -2462,6 +2757,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-object-position-x-offset': {
       property: value => ({
+        '--jumi-object-position-motion': transition('object-position'),
         '--jumi-object-position-property': property('object-position'),
         '--jumi-object-position-x-offset': value,
       }),
@@ -2470,6 +2766,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-object-position-y': {
       property: value => ({
+        '--jumi-object-position-motion': transition('object-position'),
         '--jumi-object-position-property': property('object-position'),
         '--jumi-object-position-y': value,
       }),
@@ -2478,6 +2775,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-object-position-y-edge': {
       property: value => ({
+        '--jumi-object-position-motion': transition('object-position'),
         '--jumi-object-position-property': property('object-position'),
         '--jumi-object-position-y-edge': value,
       }),
@@ -2486,6 +2784,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-object-position-y-offset': {
       property: value => ({
+        '--jumi-object-position-motion': transition('object-position'),
         '--jumi-object-position-property': property('object-position'),
         '--jumi-object-position-y-offset': value,
       }),
@@ -2495,6 +2794,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-offset': {
       property: value => ({
         '--jumi-offset': value,
+        '--jumi-offset-motion': transition('offset'),
         '--jumi-offset-property': property('offset'),
       }),
       type: ['length', 'percentage', 'position', 'any'],
@@ -2503,6 +2803,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-offset-anchor': {
       property: value => ({
         '--jumi-offset-anchor': value,
+        '--jumi-offset-anchor-motion': transition('offset-anchor'),
         '--jumi-offset-anchor-property': property('offset-anchor'),
       }),
       type: ['length', 'percentage', 'position', 'any'],
@@ -2510,6 +2811,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-offset-anchor-x': {
       property: value => ({
+        '--jumi-offset-anchor-motion': transition('offset-anchor'),
         '--jumi-offset-anchor-property': property('offset-anchor'),
         '--jumi-offset-anchor-x': value,
       }),
@@ -2518,6 +2820,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-offset-anchor-x-edge': {
       property: value => ({
+        '--jumi-offset-anchor-motion': transition('offset-anchor'),
         '--jumi-offset-anchor-property': property('offset-anchor'),
         '--jumi-offset-anchor-x-edge': value,
       }),
@@ -2526,6 +2829,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-offset-anchor-x-offset': {
       property: value => ({
+        '--jumi-offset-anchor-motion': transition('offset-anchor'),
         '--jumi-offset-anchor-property': property('offset-anchor'),
         '--jumi-offset-anchor-x-offset': value,
       }),
@@ -2534,6 +2838,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-offset-anchor-y': {
       property: value => ({
+        '--jumi-offset-anchor-motion': transition('offset-anchor'),
         '--jumi-offset-anchor-property': property('offset-anchor'),
         '--jumi-offset-anchor-y': value,
       }),
@@ -2542,6 +2847,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-offset-anchor-y-edge': {
       property: value => ({
+        '--jumi-offset-anchor-motion': transition('offset-anchor'),
         '--jumi-offset-anchor-property': property('offset-anchor'),
         '--jumi-offset-anchor-y-edge': value,
       }),
@@ -2550,6 +2856,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-offset-anchor-y-offset': {
       property: value => ({
+        '--jumi-offset-anchor-motion': transition('offset-anchor'),
         '--jumi-offset-anchor-property': property('offset-anchor'),
         '--jumi-offset-anchor-y-offset': value,
       }),
@@ -2559,6 +2866,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-offset-distance': {
       property: value => ({
         '--jumi-offset-distance': value,
+        '--jumi-offset-distance-motion': transition('offset-distance'),
         '--jumi-offset-distance-property': property('offset-distance'),
       }),
       type: ['length', 'percentage'],
@@ -2567,6 +2875,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-offset-path': {
       property: value => ({
         '--jumi-offset-path': value,
+        '--jumi-offset-path-motion': transition('offset-path'),
         '--jumi-offset-path-property': property('offset-path'),
       }),
       values: offsetPath,
@@ -2574,6 +2883,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-offset-position': {
       property: value => ({
         '--jumi-offset-position': value,
+        '--jumi-offset-position-motion': transition('offset-position'),
         '--jumi-offset-position-property': property('offset-position'),
       }),
       type: ['length', 'percentage', 'position', 'any'],
@@ -2581,6 +2891,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-offset-position-x': {
       property: value => ({
+        '--jumi-offset-position-motion': transition('offset-position'),
         '--jumi-offset-position-property': property('offset-position'),
         '--jumi-offset-position-x': value,
       }),
@@ -2589,6 +2900,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-offset-position-x-edge': {
       property: value => ({
+        '--jumi-offset-position-motion': transition('offset-position'),
         '--jumi-offset-position-property': property('offset-position'),
         '--jumi-offset-position-x-edge': value,
       }),
@@ -2597,6 +2909,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-offset-position-x-offset': {
       property: value => ({
+        '--jumi-offset-position-motion': transition('offset-position'),
         '--jumi-offset-position-property': property('offset-position'),
         '--jumi-offset-position-x-offset': value,
       }),
@@ -2605,6 +2918,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-offset-position-y': {
       property: value => ({
+        '--jumi-offset-position-motion': transition('offset-position'),
         '--jumi-offset-position-property': property('offset-position'),
         '--jumi-offset-position-y': value,
       }),
@@ -2613,6 +2927,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-offset-position-y-edge': {
       property: value => ({
+        '--jumi-offset-position-motion': transition('offset-position'),
         '--jumi-offset-position-property': property('offset-position'),
         '--jumi-offset-position-y-edge': value,
       }),
@@ -2621,6 +2936,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-offset-position-y-offset': {
       property: value => ({
+        '--jumi-offset-position-motion': transition('offset-position'),
         '--jumi-offset-position-property': property('offset-position'),
         '--jumi-offset-position-y-offset': value,
       }),
@@ -2630,6 +2946,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-offset-rotate': {
       property: value => ({
         '--jumi-offset-rotate': value,
+        '--jumi-offset-rotate-motion': transition('offset-rotate'),
         '--jumi-offset-rotate-property': property('offset-rotate'),
       }),
       type: ['angle', 'any'],
@@ -2638,6 +2955,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-opacity': {
       property: value => ({
         '--jumi-opacity': value,
+        '--jumi-opacity-motion': transition('opacity'),
         '--jumi-opacity-property': property('opacity'),
       }),
       type: ['number', 'percentage'],
@@ -2646,6 +2964,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-order': {
       property: value => ({
         '--jumi-order': value,
+        '--jumi-order-motion': transition('order'),
         '--jumi-order-property': property('order'),
       }),
       supportsNegativeValues: true,
@@ -2655,6 +2974,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-orphans': {
       property: value => ({
         '--jumi-orphans': value,
+        '--jumi-orphans-motion': transition('orphans'),
         '--jumi-orphans-property': property('orphans'),
       }),
       type: 'integer',
@@ -2663,6 +2983,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-outline': {
       property: value => ({
         '--jumi-outline': value,
+        '--jumi-outline-motion': transition('outline'),
         '--jumi-outline-property': property('outline'),
       }),
       type: ['line-width', 'length', 'color', 'any'],
@@ -2671,6 +2992,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-outline-color': {
       property: value => ({
         '--jumi-outline-color': value,
+        '--jumi-outline-motion': transition('outline'),
         '--jumi-outline-property': property('outline'),
       }),
       type: 'color',
@@ -2678,6 +3000,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-outline-offset': {
       property: value => ({
+        '--jumi-outline-motion': transition('outline'),
         '--jumi-outline-offset': value,
         '--jumi-outline-property': property('outline'),
       }),
@@ -2686,6 +3009,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-outline-style': {
       property: value => ({
+        '--jumi-outline-motion': transition('outline'),
         '--jumi-outline-property': property('outline'),
         '--jumi-outline-style': value,
       }),
@@ -2693,6 +3017,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-outline-width': {
       property: value => ({
+        '--jumi-outline-motion': transition('outline'),
         '--jumi-outline-property': property('outline'),
         '--jumi-outline-width': value,
       }),
@@ -2702,6 +3027,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-overflow': {
       property: value => ({
         '--jumi-overflow': value,
+        '--jumi-overflow-motion': transition('overflow'),
         '--jumi-overflow-property': property('overflow'),
       }),
       values: overflow,
@@ -2709,6 +3035,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-overflow-anchor': {
       property: value => ({
         '--jumi-overflow-anchor': value,
+        '--jumi-overflow-anchor-motion': transition('overflow-anchor'),
         '--jumi-overflow-anchor-property': property('overflow-anchor'),
       }),
       values: overflowAnchor,
@@ -2716,6 +3043,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-overflow-block': {
       property: value => ({
         '--jumi-overflow-block': value,
+        '--jumi-overflow-block-motion': transition('overflow-block'),
         '--jumi-overflow-block-property': property('overflow-block'),
       }),
       values: overflow,
@@ -2723,6 +3051,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-overflow-clip-margin': {
       property: value => ({
         '--jumi-overflow-clip-margin': value,
+        '--jumi-overflow-clip-margin-motion': transition('overflow-clip-margin'),
         '--jumi-overflow-clip-margin-property': property('overflow-clip-margin'),
       }),
       supportsNegativeValues: true,
@@ -2732,6 +3061,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-overflow-inline': {
       property: value => ({
         '--jumi-overflow-inline': value,
+        '--jumi-overflow-inline-motion': transition('overflow-inline'),
         '--jumi-overflow-inline-property': property('overflow-inline'),
       }),
       values: overflow,
@@ -2739,12 +3069,14 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-overflow-wrap': {
       property: value => ({
         '--jumi-overflow-wrap': value,
+        '--jumi-overflow-wrap-motion': transition('overflow-wrap'),
         '--jumi-overflow-wrap-property': property('overflow-wrap'),
       }),
       values: overflowWrap,
     },
     'animate-overflow-x': {
       property: value => ({
+        '--jumi-overflow-motion': transition('overflow'),
         '--jumi-overflow-property': property('overflow'),
         '--jumi-overflow-x': value,
       }),
@@ -2752,6 +3084,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-overflow-y': {
       property: value => ({
+        '--jumi-overflow-motion': transition('overflow'),
         '--jumi-overflow-property': property('overflow'),
         '--jumi-overflow-y': value,
       }),
@@ -2760,6 +3093,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-overscroll-behavior': {
       property: value => ({
         '--jumi-overscroll-behavior': value,
+        '--jumi-overscroll-behavior-motion': transition('overscroll-behavior'),
         '--jumi-overscroll-behavior-property': property('overscroll-behavior'),
       }),
       values: empty.auto,
@@ -2767,6 +3101,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-overscroll-behavior-block': {
       property: value => ({
         '--jumi-overscroll-behavior-block': value,
+        '--jumi-overscroll-behavior-block-motion': transition('overscroll-behavior-block'),
         '--jumi-overscroll-behavior-block-property': property('overscroll-behavior-block'),
       }),
       values: overscrollBehavior,
@@ -2774,6 +3109,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-overscroll-behavior-inline': {
       property: value => ({
         '--jumi-overscroll-behavior-inline': value,
+        '--jumi-overscroll-behavior-inline-motion': transition('overscroll-behavior-inline'),
         '--jumi-overscroll-behavior-inline-property': property('overscroll-behavior-inline'),
       }),
       values: overscrollBehavior,
@@ -2781,6 +3117,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-overscroll-behavior-x': {
       property: value => ({
         '--jumi-overscroll-behavior-x': value,
+        '--jumi-overscroll-behavior-x-motion': transition('overscroll-behavior-x'),
         '--jumi-overscroll-behavior-x-property': property('overscroll-behavior-x'),
       }),
       values: overscrollBehavior,
@@ -2788,6 +3125,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-overscroll-behavior-y': {
       property: value => ({
         '--jumi-overscroll-behavior-y': value,
+        '--jumi-overscroll-behavior-y-motion': transition('overscroll-behavior-y'),
         '--jumi-overscroll-behavior-y-property': property('overscroll-behavior-y'),
       }),
       values: overscrollBehavior,
@@ -2795,6 +3133,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-padding': {
       property: value => ({
         '--jumi-padding': value,
+        '--jumi-padding-motion': transition('padding'),
         '--jumi-padding-property': property('padding'),
       }),
       supportsNegativeValues: true,
@@ -2803,6 +3142,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-padding-block': {
       property: value => ({
         '--jumi-padding-block': value,
+        '--jumi-padding-block-motion': transition('padding-block'),
         '--jumi-padding-block-property': property('padding-block'),
       }),
       supportsNegativeValues: true,
@@ -2811,6 +3151,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-padding-block-end': {
       property: value => ({
         '--jumi-padding-block-end': value,
+        '--jumi-padding-block-end-motion': transition('padding-block-end'),
         '--jumi-padding-block-end-property': property('padding-block-end'),
       }),
       supportsNegativeValues: true,
@@ -2819,6 +3160,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-padding-block-start': {
       property: value => ({
         '--jumi-padding-block-start': value,
+        '--jumi-padding-block-start-motion': transition('padding-block-start'),
         '--jumi-padding-block-start-property': property('padding-block-start'),
       }),
       supportsNegativeValues: true,
@@ -2827,6 +3169,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-padding-bottom': {
       property: value => ({
         '--jumi-padding-bottom': value,
+        '--jumi-padding-bottom-motion': transition('padding-bottom'),
         '--jumi-padding-bottom-property': property('padding-bottom'),
       }),
       supportsNegativeValues: true,
@@ -2835,6 +3178,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-padding-inline': {
       property: value => ({
         '--jumi-padding-inline': value,
+        '--jumi-padding-inline-motion': transition('padding-inline'),
         '--jumi-padding-inline-property': property('padding-inline'),
       }),
       supportsNegativeValues: true,
@@ -2843,6 +3187,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-padding-inline-end': {
       property: value => ({
         '--jumi-padding-inline-end': value,
+        '--jumi-padding-inline-end-motion': transition('padding-inline-end'),
         '--jumi-padding-inline-end-property': property('padding-inline-end'),
       }),
       supportsNegativeValues: true,
@@ -2851,6 +3196,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-padding-inline-start': {
       property: value => ({
         '--jumi-padding-inline-start': value,
+        '--jumi-padding-inline-start-motion': transition('padding-inline-start'),
         '--jumi-padding-inline-start-property': property('padding-inline-start'),
       }),
       supportsNegativeValues: true,
@@ -2859,6 +3205,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-padding-left': {
       property: value => ({
         '--jumi-padding-left': value,
+        '--jumi-padding-left-motion': transition('padding-left'),
         '--jumi-padding-left-property': property('padding-left'),
       }),
       supportsNegativeValues: true,
@@ -2867,6 +3214,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-padding-right': {
       property: value => ({
         '--jumi-padding-right': value,
+        '--jumi-padding-right-motion': transition('padding-right'),
         '--jumi-padding-right-property': property('padding-right'),
       }),
       supportsNegativeValues: true,
@@ -2875,6 +3223,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-padding-top': {
       property: value => ({
         '--jumi-padding-top': value,
+        '--jumi-padding-top-motion': transition('padding-top'),
         '--jumi-padding-top-property': property('padding-top'),
       }),
       supportsNegativeValues: true,
@@ -2883,6 +3232,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-page': {
       property: value => ({
         '--jumi-page': value,
+        '--jumi-page-motion': transition('page'),
         '--jumi-page-property': property('page'),
       }),
       values: empty.auto,
@@ -2890,6 +3240,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-paint-order': {
       property: value => ({
         '--jumi-paint-order': value,
+        '--jumi-paint-order-motion': transition('paint-order'),
         '--jumi-paint-order-property': property('paint-order'),
       }),
       values: paintOrder,
@@ -2897,6 +3248,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-position': {
       property: value => ({
         '--jumi-position': value,
+        '--jumi-position-motion': transition('position'),
         '--jumi-position-property': property('position'),
       }),
       values: position,
@@ -2904,6 +3256,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-right': {
       property: value => ({
         '--jumi-right': value,
+        '--jumi-right-motion': transition('right'),
         '--jumi-right-property': property('right'),
       }),
       supportsNegativeValues: true,
@@ -2913,6 +3266,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-rotate': {
       property: value => ({
         '--jumi-rotate': value,
+        '--jumi-rotate-motion': transition('rotate'),
         '--jumi-rotate-property': property('rotate'),
       }),
       supportsNegativeValues: true,
@@ -2922,6 +3276,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-rotate-3d': {
       property: value => ({
         '--jumi-rotate-3d': css('rotate3d', value),
+        '--jumi-transform-motion': transition('transform'),
         '--jumi-transform-property': property('transform'),
       }),
       values: empty.string,
@@ -2929,6 +3284,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-rotate-angle': {
       property: value => ({
         '--jumi-rotate-angle': value,
+        '--jumi-rotate-motion': transition('rotate'),
         '--jumi-rotate-property': property('rotate'),
       }),
       supportsNegativeValues: true,
@@ -2937,6 +3293,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-rotate-x': {
       property: value => ({
+        '--jumi-rotate-motion': transition('rotate'),
         '--jumi-rotate-property': property('rotate'),
         '--jumi-rotate-x': value,
       }),
@@ -2946,6 +3303,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-rotate-y': {
       property: value => ({
+        '--jumi-rotate-motion': transition('rotate'),
         '--jumi-rotate-property': property('rotate'),
         '--jumi-rotate-y': value,
       }),
@@ -2955,6 +3313,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-rotate-z': {
       property: value => ({
+        '--jumi-rotate-motion': transition('rotate'),
         '--jumi-rotate-property': property('rotate'),
         '--jumi-rotate-z': value,
       }),
@@ -2964,6 +3323,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-row-gap': {
       property: value => ({
+        '--jumi-gap-motion': transition('gap'),
         '--jumi-gap-property': property('gap'),
         '--jumi-row-gap': value,
       }),
@@ -2973,6 +3333,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       property: (value) => {
         return {
           '--jumi-scale': value,
+          '--jumi-scale-motion': transition('scale'),
           '--jumi-scale-property': property('scale'),
         }
       },
@@ -2982,6 +3343,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-scale-x': {
       property: value => ({
+        '--jumi-scale-motion': transition('scale'),
         '--jumi-scale-property': property('scale'),
         '--jumi-scale-x': value,
       }),
@@ -2991,6 +3353,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-scale-y': {
       property: value => ({
+        '--jumi-scale-motion': transition('scale'),
         '--jumi-scale-property': property('scale'),
         '--jumi-scale-y': value,
       }),
@@ -3000,6 +3363,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-scale-z': {
       property: value => ({
+        '--jumi-scale-motion': transition('scale'),
         '--jumi-scale-property': property('scale'),
         '--jumi-scale-z': value,
       }),
@@ -3013,6 +3377,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         return {
           '--jumi-skew-x': x ?? value,
           '--jumi-skew-y': y ?? x ?? value,
+          '--jumi-transform-motion': transition('transform'),
           '--jumi-transform-property': property('transform'),
         }
       },
@@ -3022,6 +3387,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-skew-x': {
       property: value => ({
         '--jumi-skew-x': value,
+        '--jumi-transform-motion': transition('transform'),
         '--jumi-transform-property': property('transform'),
       }),
       supportsNegativeValues: true,
@@ -3030,6 +3396,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-skew-y': {
       property: value => ({
         '--jumi-skew-y': value,
+        '--jumi-transform-motion': transition('transform'),
         '--jumi-transform-property': property('transform'),
       }),
       supportsNegativeValues: true,
@@ -3038,6 +3405,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-stroke': {
       property: value => ({
         '--jumi-stroke': value,
+        '--jumi-stroke-motion': transition('stroke'),
         '--jumi-stroke-property': property('stroke'),
       }),
       values: theme('colors'),
@@ -3045,6 +3413,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-stroke-width': {
       property: value => ({
         '--jumi-stroke-width': value,
+        '--jumi-stroke-width-motion': transition('stroke-width'),
         '--jumi-stroke-width-property': property('stroke-width'),
       }),
       values: theme('strokeWidth'),
@@ -3052,6 +3421,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-text-align': {
       property: value => ({
         '--jumi-text-align': value,
+        '--jumi-text-align-motion': transition('text-align'),
         '--jumi-text-align-property': property('text-align'),
       }),
       values: textAlign,
@@ -3059,6 +3429,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-text-shadow': {
       property: value => ({
         '--jumi-text-shadow': value,
+        '--jumi-text-shadow-motion': transition('text-shadow'),
         '--jumi-text-shadow-property': property('text-shadow'),
       }),
       values: theme('dropShadow'),
@@ -3066,6 +3437,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-text-shadow-blur': {
       property: value => ({
         '--jumi-text-shadow-blur-radius': value,
+        '--jumi-text-shadow-motion': transition('text-shadow'),
         '--jumi-text-shadow-property': property('text-shadow'),
       }),
       supportsNegativeValues: true,
@@ -3075,6 +3447,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-text-shadow-color': {
       property: value => ({
         '--jumi-text-shadow-color': value,
+        '--jumi-text-shadow-motion': transition('text-shadow'),
         '--jumi-text-shadow-property': property('text-shadow'),
       }),
       type: 'color',
@@ -3082,6 +3455,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-text-shadow-offset-x': {
       property: value => ({
+        '--jumi-text-shadow-motion': transition('text-shadow'),
         '--jumi-text-shadow-offset-x': value,
         '--jumi-text-shadow-property': property('text-shadow'),
       }),
@@ -3091,6 +3465,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-text-shadow-offset-y': {
       property: value => ({
+        '--jumi-text-shadow-motion': transition('text-shadow'),
         '--jumi-text-shadow-offset-y': value,
         '--jumi-text-shadow-property': property('text-shadow'),
       }),
@@ -3101,6 +3476,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-top': {
       property: value => ({
         '--jumi-top': value,
+        '--jumi-top-motion': transition('top'),
         '--jumi-top-property': property('top'),
       }),
       supportsNegativeValues: true,
@@ -3110,6 +3486,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-transform': {
       property: value => ({
         '--jumi-transform': value,
+        '--jumi-transform-motion': transition('transform'),
         '--jumi-transform-property': property('transform'),
       }),
       values: empty.string,
@@ -3117,6 +3494,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-transform-origin': {
       property: value => ({
         '--jumi-transform-origin': value,
+        '--jumi-transform-origin-motion': transition('transform-origin'),
         '--jumi-transform-origin-property': property('transform-origin'),
       }),
       type: ['length', 'percentage', 'position', 'any'],
@@ -3124,6 +3502,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-transform-origin-x': {
       property: value => ({
+        '--jumi-transform-origin-motion': transition('transform-origin'),
         '--jumi-transform-origin-property': property('transform-origin'),
         '--jumi-transform-origin-x': value,
       }),
@@ -3132,6 +3511,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-transform-origin-y': {
       property: value => ({
+        '--jumi-transform-origin-motion': transition('transform-origin'),
         '--jumi-transform-origin-property': property('transform-origin'),
         '--jumi-transform-origin-y': value,
       }),
@@ -3140,6 +3520,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-transform-origin-z': {
       property: value => ({
+        '--jumi-transform-origin-motion': transition('transform-origin'),
         '--jumi-transform-origin-property': property('transform-origin'),
         '--jumi-transform-origin-z': value,
       }),
@@ -3149,6 +3530,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-transform-style': {
       property: value => ({
+        '--jumi-transform-motion': transition('transform'),
         '--jumi-transform-property': property('transform'),
         '--jumi-transform-style': value,
       }),
@@ -3158,6 +3540,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       property: (value) => {
         return {
           '--jumi-translate': value,
+          '--jumi-translate-motion': transition('translate'),
           '--jumi-translate-property': property('translate'),
         }
       },
@@ -3166,6 +3549,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-translate-3d': {
       property: value => ({
+        '--jumi-transform-motion': transition('transform'),
         '--jumi-transform-property': property('transform'),
         '--jumi-translate-3d': css('translate3d', value),
       }),
@@ -3174,6 +3558,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-translate-x': {
       property: value => ({
+        '--jumi-translate-motion': transition('translate'),
         '--jumi-translate-property': property('translate'),
         '--jumi-translate-x': value,
       }),
@@ -3183,6 +3568,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-translate-y': {
       property: value => ({
+        '--jumi-translate-motion': transition('translate'),
         '--jumi-translate-property': property('translate'),
         '--jumi-translate-y': value,
       }),
@@ -3192,6 +3578,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-translate-z': {
       property: value => ({
+        '--jumi-translate-motion': transition('translate'),
         '--jumi-translate-property': property('translate'),
         '--jumi-translate-z': value,
       }),
@@ -3202,6 +3589,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-visibility': {
       property: value => ({
         '--jumi-visibility': value,
+        '--jumi-visibility-motion': transition('visibility'),
         '--jumi-visibility-property': property('visibility'),
       }),
       values: visibility,
@@ -3209,6 +3597,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-width': {
       property: value => ({
         '--jumi-width': value,
+        '--jumi-width-motion': transition('width'),
         '--jumi-width-property': property('width'),
       }),
       supportsNegativeValues: true,
@@ -3217,6 +3606,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-x': {
       property: value => ({
+        '--jumi-transform-motion': transition('x'),
         '--jumi-transform-property': property('x'),
         '--jumi-x': value,
       }),
@@ -3226,6 +3616,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animate-y': {
       property: value => ({
+        '--jumi-transform-motion': transition('y'),
         '--jumi-transform-property': property('y'),
         '--jumi-y': value,
       }),
@@ -3236,6 +3627,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     'animate-z-index': {
       property: value => ({
         '--jumi-z-index': value,
+        '--jumi-z-index-motion': transition('z-index'),
         '--jumi-z-index-property': property('z-index'),
       }),
       values: theme('zIndex'),
@@ -3389,20 +3781,53 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       values: animationTimingFunction,
     },
     'jumi': {
-      property: () => creator.properties.reduce(
-        (acc, attribute) => merge(acc, assemble(attribute)),
-        {} as CssInJs,
-      ),
+      property: () => {
+        const animationVariables = creator.properties.reduce(
+          (acc, attribute) => merge(acc, assemble(attribute)),
+          assemble('animation'),
+        )
+        return merge(animationVariables, assemble('transition'))
+      },
       values: { DEFAULT: '' },
+    },
+    'transition-behavior': {
+      property: value => ({
+        '--jumi-transition-behavior': value,
+      }),
+      values: transitionBehavior,
+    },
+    'transition-delay': {
+      property: value => ({
+        '--jumi-transition-delay': value,
+      }),
+      values: theme('transitionDelay'),
+    },
+    'transition-duration': {
+      property: value => ({
+        '--jumi-transition-duration': value,
+      }),
+      values: theme('transitionDuration'),
+    },
+    'transition-property': {
+      property: value => ({
+        '--jumi-transition-property': value,
+      }),
+      values: theme('transitionProperty'),
+    },
+    'transition-timing-function': {
+      property: value => ({
+        '--jumi-transition-timing-function': value,
+      }),
+      values: animationTimingFunction,
     },
   }
 
   return matchProperties
 }
 
-export function keyframe(type: 'animation' | 'property') {
+export function keyframe(type: 'effect' | 'motion' | 'property', property: 'animation' | 'transition') {
   return (attribute: string) => {
     const variable = join(['--jumi', attribute, type], '-')
-    return css('var', variable, 'none')
+    return css('var', variable, `var(--jumi-${property})`)
   }
 }

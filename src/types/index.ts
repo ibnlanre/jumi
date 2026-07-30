@@ -492,6 +492,8 @@ export type Creator = {
     readonly properties: string[];
     property(attribute: AnimatableStandardPropertyType): string;
     theme: (key: TailwindTheme, values?: Collection) => Record<string, string>;
+    transition(attribute: string): string;
+    readonly transitions: string[];
 }
 
 export type CSSFunction
@@ -916,7 +918,7 @@ export interface MatchUtilitiesOptions {
 
 export type MatchUtilitiesPropertyFunction = (value: string, extra: { modifier: null | string }) => CSSRuleObject
 
-export type MatchUtilitiesPropertyKey = 'animate' | 'jumi' | `animate-${AnimatableStandardPropertyType}` | `animate-${NonStandardPropertyType}` | AnimationPropertyType
+export type MatchUtilitiesPropertyKey = 'animate' | 'jumi' | `animate-${AnimatableStandardPropertyType}` | `animate-${NonStandardPropertyType}` | AnimationPropertyType | TransitionPropertyType
 
 export interface MatchUtilitiesPropertyValue extends Partial<MatchUtilitiesOptions> {
   property: MatchUtilitiesPropertyFunction
@@ -1206,7 +1208,7 @@ export type StandardAnimationPropertyType
     | 'animation-timeline'
     | 'animation-timing-function'
 
-export type StandardPropertyKeyframes<Key extends string> = `@keyframes jumi-${Key}`
+    export type StandardPropertyKeyframes<Key extends string> = `@keyframes jumi-${Key}`
 
 export type StandardPropertyKeyframesCollection = {
   [Key in AnimatableStandardPropertyType]: Record<StandardPropertyKeyframes<Key>, Keyframes>
@@ -1217,13 +1219,13 @@ export type StandardPropertyKeyframesVariable = `--jumi-${AnimatableStandardProp
 export type StandardPropertyType
   = | AnimatableStandardPropertyType
     | NonAnimatableStandardPropertyType
-    
-    export type SteppedValueFunction
+
+export type SteppedValueFunction
   = | 'mod'
     | 'rem'
   | 'round'
-
-export type TailwindTheme
+    
+    export type TailwindTheme
   = | 'accentColor'
     | 'animation'
     | 'aspectRatio'
@@ -1350,6 +1352,8 @@ export type TailwindTheme
     | 'x'
     | 'y'
     | 'zIndex'
+
+export type TransitionPropertyType = 'transition' | 'transition-behavior' | 'transition-delay' | 'transition-duration' | 'transition-property' | 'transition-timing-function'
 
 export type TranslationFunction
   = | 'translate3d'

@@ -136,6 +136,7 @@ export const propertyVariables: DependencyGraph = {
       'animation-timeline',
       'animation-timing-function',
     ],
+    value: 'none',
     variable: '--jumi-animation',
   },
   'animation-composition': {

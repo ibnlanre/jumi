@@ -30,12 +30,31 @@ const jumi = createPlugin((api) => {
     const rules = ruleMap.get('jumi')
     if (!rules) return
 
-    const properties = creator.properties.map(keyframe('property'))
-    const effects = creator.effects.map(keyframe('animation'))
-    const value = properties.concat(effects).join(', ')
+    const properties = creator.properties.map(keyframe('property', 'animation'))
+    const effects = creator.effects.map(keyframe('effect', 'animation'))
+    const transitions = creator.transitions.map(keyframe('motion', 'transition'))
+
+    const animation = properties.concat(effects).join(', ')
+    const transition = transitions.join(', ')
 
     for (const rule of rules) {
-      appendDeclaration(rule, { important: false, kind: 'declaration', property: 'animation', value })
+      if (animation) {
+        appendDeclaration(rule, {
+          important: false,
+          kind: 'declaration',
+          property: 'animation',
+          value: animation,
+        })
+      }
+
+      if (transition) {
+        appendDeclaration(rule, {
+          important: false,
+          kind: 'declaration',
+          property: 'transition',
+          value: transition,
+        })
+      }
     }
   })
 })

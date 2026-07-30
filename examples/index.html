@@ -371,11 +371,11 @@
       </section>
 
 
-      <!-- Hover Animations -->
+      <!-- Hover Transitions -->
       <section class="p-6 bg-white rounded-lg shadow-lg">
-        <h2 class="mb-4 text-2xl font-semibold">Hover Animations</h2>
+        <h2 class="mb-4 text-2xl font-semibold">Hover Transitions</h2>
         <p class="mb-4 text-gray-600">
-          Trigger Jumi animations on hover using Tailwind's built-in <code class="px-1 text-sm bg-gray-200 rounded">hover:</code> and <code class="px-1 text-sm bg-gray-200 rounded">group-hover:</code> variants
+          Smooth both-ways hover with CSS transitions via <code class="px-1 text-sm bg-gray-200 rounded">jumi</code> + Tailwind's state variants
         </p>
 
         <!-- Transform Hover Effects -->
@@ -384,36 +384,36 @@
           <div class="p-4 overflow-hidden text-center bg-blue-100 rounded">
             <h3 class="mb-2 font-medium">Scale Up</h3>
             <div
-              class="w-16 h-16 mx-auto transition-all duration-300 bg-blue-500 rounded jumi hover:animate-scale-125 animation-fill-mode-both animation-direction-alternate"
+              class="w-16 h-16 mx-auto transition-all duration-300 bg-blue-500 rounded hover:scale-125"
             ></div>
-            <p class="mt-2 text-sm text-gray-600">hover:animate-scale-125</p>
+            <p class="mt-2 text-sm text-gray-600">jumi + hover:scale-125</p>
           </div>
 
           <!-- Rotate on Hover -->
           <div class="p-4 overflow-hidden text-center bg-green-100 rounded">
             <h3 class="mb-2 font-medium">Rotate</h3>
             <div
-              class="w-16 h-16 mx-auto transition-all duration-300 bg-green-500 rounded jumi hover:animate-rotate-180 animation-fill-mode-both animation-direction-alternate"
+              class="w-16 h-16 mx-auto bg-green-500 rounded jumi transition-duration-300 hover:rotate-180"
             ></div>
-            <p class="mt-2 text-sm text-gray-600">hover:animate-rotate-180</p>
+            <p class="mt-2 text-sm text-gray-600">jumi + hover:rotate-180</p>
           </div>
 
           <!-- Slide on Hover -->
           <div class="p-4 overflow-hidden text-center bg-purple-100 rounded">
             <h3 class="mb-2 font-medium">Slide</h3>
             <div
-              class="w-16 h-16 mx-auto transition-all duration-300 bg-purple-500 rounded jumi hover:animate-translate-x-8 animation-fill-mode-both animation-direction-alternate"
+              class="w-16 h-16 mx-auto bg-purple-500 rounded jumi transition-duration-300 hover:translate-x-8"
             ></div>
-            <p class="mt-2 text-sm text-gray-600">hover:animate-translate-x-8</p>
+            <p class="mt-2 text-sm text-gray-600">jumi + hover:translate-x-8</p>
           </div>
 
           <!-- Combined Transform -->
           <div class="p-4 overflow-hidden text-center bg-red-100 rounded">
             <h3 class="mb-2 font-medium">Combined</h3>
             <div
-              class="w-16 h-16 mx-auto transition-all duration-300 bg-red-500 rounded jumi hover:animate-scale-110 hover:animate-rotate-45 animation-fill-mode-both animation-direction-alternate"
+              class="w-16 h-16 mx-auto bg-red-500 rounded jumi transition-duration-300 hover:scale-110 hover:rotate-45"
             ></div>
-            <p class="mt-2 text-sm text-gray-600">scale + rotate</p>
+            <p class="mt-2 text-sm text-gray-600">scale + rotate together</p>
           </div>
         </div>
 
@@ -423,113 +423,239 @@
           <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
             <h3 class="mb-2 font-medium">Background Color</h3>
             <div
-              class="w-16 h-16 mx-auto transition-all duration-500 bg-blue-500 rounded jumi hover:animate-background-color-purple-500 animation-fill-mode-both animation-direction-alternate"
+              class="w-16 h-16 mx-auto bg-blue-500 rounded jumi transition-duration-500 hover:bg-purple-500"
             ></div>
-            <p class="mt-2 text-sm text-gray-600">hover:animate-background-color-purple-500</p>
+            <p class="mt-2 text-sm text-gray-600">jumi + hover:bg-purple-500</p>
           </div>
 
           <!-- Box Shadow on Hover -->
           <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
             <h3 class="mb-2 font-medium">Box Shadow</h3>
             <div
-              class="w-16 h-16 mx-auto transition-all duration-300 bg-orange-500 rounded jumi hover:animate-box-shadow-xl animation-fill-mode-both animation-direction-alternate"
+              class="w-16 h-16 mx-auto bg-orange-500 rounded jumi transition-duration-300 hover:shadow-xl"
             ></div>
-            <p class="mt-2 text-sm text-gray-600">hover:animate-box-shadow-xl</p>
+            <p class="mt-2 text-sm text-gray-600">jumi + hover:shadow-xl</p>
           </div>
 
           <!-- Border Radius on Hover -->
           <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
             <h3 class="mb-2 font-medium">Border Radius</h3>
             <div
-              class="w-16 h-16 mx-auto transition-all duration-500 bg-teal-500 rounded-full jumi hover:animate-border-radius-none animation-fill-mode-both animation-direction-alternate"
+              class="w-16 h-16 mx-auto bg-teal-500 rounded-3xl jumi transition-duration-500 hover:rounded-none"
             ></div>
-            <p class="mt-2 text-sm text-gray-600">hover:animate-border-radius-none</p>
+            <p class="mt-2 text-sm text-gray-600">jumi + hover:rounded-none</p>
           </div>
 
           <!-- Opacity on Hover -->
           <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
             <h3 class="mb-2 font-medium">Opacity</h3>
             <div
-              class="w-16 h-16 mx-auto transition-all duration-300 bg-pink-500 rounded jumi hover:animate-opacity-40 animation-fill-mode-both animation-direction-alternate"
+              class="w-16 h-16 mx-auto bg-pink-500 rounded jumi transition-duration-300 hover:opacity-40"
             ></div>
-            <p class="mt-2 text-sm text-gray-600">hover:animate-opacity-40</p>
+            <p class="mt-2 text-sm text-gray-600">jumi + hover:opacity-40</p>
           </div>
         </div>
 
-        <!-- Effect Animations on Hover -->
-        <h3 class="mb-3 text-lg font-medium">Effect Animations on Hover</h3>
+        <!-- Custom Easing & Delay -->
+        <h3 class="mb-3 text-lg font-medium">Custom Easing &amp; Delay</h3>
+        <p class="mb-3 text-sm text-gray-600">Jumi's easing curves via <code class="px-1 text-sm bg-gray-200 rounded">transition-timing-function-*</code></p>
         <div class="grid grid-cols-2 gap-4 mb-6 md:grid-cols-4">
-          <!-- Bounce In on Hover -->
+          <!-- Ease Out Back -->
           <div class="p-4 overflow-hidden text-center bg-yellow-100 rounded">
-            <h3 class="mb-2 font-medium">Bounce In</h3>
+            <h3 class="mb-2 font-medium">Back Easing</h3>
             <div
-              class="w-16 h-16 mx-auto transition-all duration-300 bg-yellow-500 rounded-full jumi hover:animate-bounce-in animation-fill-mode-both animation-direction-alternate"
+              class="w-16 h-16 mx-auto bg-yellow-500 rounded jumi transition-duration-500 transition-timing-function-ease-out-back hover:scale-125"
             ></div>
-            <p class="mt-2 text-sm text-gray-600">hover:animate-bounce-in</p>
+            <p class="mt-2 text-sm text-gray-600">ease-out-back</p>
           </div>
 
-          <!-- Pulse on Hover -->
+          <!-- Elastic Easing -->
           <div class="p-4 overflow-hidden text-center bg-indigo-100 rounded">
-            <h3 class="mb-2 font-medium">Pulse</h3>
+            <h3 class="mb-2 font-medium">Elastic Easing</h3>
             <div
-              class="w-16 h-16 mx-auto transition-all duration-300 bg-indigo-500 rounded jumi hover:animate-pulse animation-fill-mode-both animation-direction-alternate"
+              class="w-16 h-16 mx-auto bg-indigo-500 rounded jumi transition-duration-500 transition-timing-function-ease-elastic hover:scale-125"
             ></div>
-            <p class="mt-2 text-sm text-gray-600">hover:animate-pulse</p>
+            <p class="mt-2 text-sm text-gray-600">ease-elastic</p>
           </div>
 
-          <!-- Wiggle on Hover -->
+          <!-- Bounce Easing -->
           <div class="p-4 overflow-hidden text-center bg-pink-100 rounded">
-            <h3 class="mb-2 font-medium">Wiggle</h3>
+            <h3 class="mb-2 font-medium">Bounce Easing</h3>
             <div
-              class="w-16 h-16 mx-auto transition-all duration-300 bg-pink-500 rounded jumi hover:animate-wiggle animation-fill-mode-both animation-direction-alternate"
+              class="w-16 h-16 mx-auto bg-pink-500 rounded jumi transition-duration-500 transition-timing-function-ease-bounce-out hover:scale-125"
             ></div>
-            <p class="mt-2 text-sm text-gray-600">hover:animate-wiggle</p>
+            <p class="mt-2 text-sm text-gray-600">ease-bounce-out</p>
           </div>
 
-          <!-- Glow on Hover -->
+          <!-- With Delay -->
           <div class="p-4 overflow-hidden text-center rounded bg-cyan-100">
-            <h3 class="mb-2 font-medium">Glow</h3>
+            <h3 class="mb-2 font-medium">With Delay</h3>
             <div
-              class="w-16 h-16 mx-auto transition-all duration-300 rounded bg-cyan-500 jumi hover:animate-glow animation-fill-mode-both animation-direction-alternate"
+              class="w-16 h-16 mx-auto rounded bg-cyan-500 jumi transition-duration-300 transition-delay-200 hover:scale-125"
             ></div>
-            <p class="mt-2 text-sm text-gray-600">hover:animate-glow</p>
+            <p class="mt-2 text-sm text-gray-600">delay-200</p>
           </div>
         </div>
 
-        <!-- Group Hover Effects -->
-        <h3 class="mb-3 text-lg font-medium">Group Hover</h3>
-        <p class="mb-3 text-sm text-gray-600">Hover the card to trigger child animations</p>
+        <!-- Transition-property scoping -->
+        <h3 class="mb-3 text-lg font-medium">Scoped Transitions</h3>
+        <p class="mb-3 text-sm text-gray-600">Only specified properties transition; others snap instantly</p>
+        <div class="grid grid-cols-2 gap-4 mb-6 md:grid-cols-4">
+          <!-- Scoped: color only -->
+          <div class="p-4 overflow-hidden text-center bg-blue-100 rounded">
+            <h3 class="mb-2 font-medium">Color Only</h3>
+            <div
+              class="w-16 h-16 mx-auto bg-blue-500 rounded jumi transition-property-colors transition-duration-500 hover:bg-purple-500 hover:scale-125 hover:rotate-45"
+            ></div>
+            <p class="mt-2 text-sm text-gray-600">only bg transitions</p>
+          </div>
+
+          <!-- Scoped: transform only -->
+          <div class="p-4 overflow-hidden text-center bg-green-100 rounded">
+            <h3 class="mb-2 font-medium">Transform Only</h3>
+            <div
+              class="w-16 h-16 mx-auto bg-green-500 rounded jumi transition-property-transform transition-duration-500 hover:bg-purple-500 hover:scale-125 hover:rotate-45"
+            ></div>
+            <p class="mt-2 text-sm text-gray-600">only transform transitions</p>
+          </div>
+
+          <!-- Scoped: arbitrary property -->
+          <div class="p-4 overflow-hidden text-center bg-purple-100 rounded">
+            <h3 class="mb-2 font-medium">Arbitrary Property</h3>
+            <div
+              class="w-16 h-16 mx-auto bg-purple-500 rounded-sm jumi transition-property-[border-radius] transition-duration-500 hover:rounded-full hover:bg-pink-500 hover:scale-125"
+            ></div>
+            <p class="mt-2 text-sm text-gray-600">only border-radius transitions</p>
+          </div>
+
+          <!-- All properties -->
+          <div class="p-4 overflow-hidden text-center bg-red-100 rounded">
+            <h3 class="mb-2 font-medium">All Properties</h3>
+            <div
+              class="w-16 h-16 mx-auto bg-red-500 rounded-sm jumi transition-duration-500 hover:rounded-full hover:bg-pink-500 hover:scale-125 hover:rotate-45"
+            ></div>
+            <p class="mt-2 text-sm text-gray-600">everything transitions</p>
+          </div>
+        </div>
+
+        <!-- Combined: Effect Animation + Transition -->
+        <h3 class="mb-3 text-lg font-medium">Animation + Transition</h3>
+        <p class="mb-3 text-sm text-gray-600">Jumi effect animation on load + transition on hover</p>
+        <div class="grid grid-cols-2 gap-4 mb-6 md:grid-cols-4">
+          <div class="p-4 overflow-hidden text-center bg-blue-100 rounded">
+            <h3 class="mb-2 font-medium">Bounce In + Color</h3>
+            <div
+              class="w-16 h-16 mx-auto bg-blue-500 rounded jumi animate-bounce-in animation-duration-1000 transition-duration-500 hover:bg-purple-500 hover:scale-125"
+            ></div>
+          </div>
+
+          <div class="p-4 overflow-hidden text-center bg-green-100 rounded">
+            <h3 class="mb-2 font-medium">Fade In + Shadow</h3>
+            <div
+              class="w-16 h-16 mx-auto bg-green-500 rounded jumi animate-fade-in animation-duration-1500 transition-duration-500 hover:shadow-xl hover:scale-110"
+            ></div>
+          </div>
+
+          <div class="p-4 overflow-hidden text-center bg-purple-100 rounded">
+            <h3 class="mb-2 font-medium">Spring In + Rotate</h3>
+            <div
+              class="w-16 h-16 mx-auto bg-purple-500 rounded jumi animate-spring-up animation-duration-1000 transition-duration-500 hover:rotate-180 hover:bg-pink-500"
+            ></div>
+          </div>
+
+          <div class="p-4 overflow-hidden text-center bg-pink-100 rounded">
+            <h3 class="mb-2 font-medium">Slide In + Scale</h3>
+            <div
+              class="w-16 h-16 mx-auto bg-pink-500 rounded jumi animate-slide-in-up animation-duration-800 transition-duration-300 hover:scale-125"
+            ></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Static + Animation + Transition -->
+      <section class="p-6 bg-white rounded-lg shadow-lg">
+        <h2 class="mb-4 text-2xl font-semibold">Static + Animation + Transition</h2>
+        <p class="mb-4 text-gray-600">
+          One element, three layers: static style, entrance animation with per-property timing, and hover transition — all via <code class="px-1 text-sm bg-gray-200 rounded">jumi</code>
+        </p>
+
+        <div class="grid grid-cols-2 gap-4 mb-6 md:grid-cols-4">
+          <!-- Background Color -->
+          <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
+            <h3 class="mb-2 font-medium">Background Color</h3>
+            <div
+              class="w-16 h-16 mx-auto bg-gray-300 rounded jumi animate-background-color-blue-500 animation-duration-1500 transition-duration-500 hover:bg-purple-500"
+            ></div>
+            <p class="mt-2 text-xs text-gray-500">bg → blue (anim) → purple (hover)</p>
+          </div>
+
+          <!-- Width -->
+          <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
+            <h3 class="mb-2 font-medium">Width</h3>
+            <div
+              class="w-8 h-16 mx-auto bg-teal-500 rounded jumi animate-width-32 animation-duration-2000 transition-duration-500 hover:animate-width-8"
+            ></div>
+            <p class="mt-2 text-xs text-gray-500">w-8 → w-32 (anim) → w-8 (hover)</p>
+          </div>
+
+          <!-- Opacity -->
+          <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
+            <h3 class="mb-2 font-medium">Opacity + Color</h3>
+            <div
+              class="w-16 h-16 mx-auto bg-indigo-500 rounded jumi animate-opacity-20 animation-duration-2000 transition-duration-500 hover:animate-opacity-100 hover:animate-background-color-pink-500"
+            ></div>
+            <p class="mt-2 text-xs text-gray-500">fades to 20%, hover restores + color</p>
+          </div>
+
+          <!-- Scale + BG -->
+          <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
+            <h3 class="mb-2 font-medium">Scale + Background</h3>
+            <div
+              class="w-16 h-16 mx-auto bg-orange-500 rounded jumi animate-scale-50 animate-background-color-yellow-500 animation-duration-2000 animation-delay-500/background-color transition-duration-500 hover:animate-scale-125 hover:animate-background-color-red-500"
+            ></div>
+            <p class="mt-2 text-xs text-gray-500">scale down + yellow (anim), scale up + red (hover)</p>
+          </div>
+        </div>
+
         <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
-          <!-- Group Hover Scale -->
-          <div class="p-4 transition-all duration-300 bg-blue-100 rounded cursor-pointer group hover:bg-blue-200">
-            <h3 class="mb-2 font-medium">Child Scale</h3>
+          <!-- Border Radius -->
+          <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
+            <h3 class="mb-2 font-medium">Border Radius</h3>
             <div
-              class="w-16 h-16 mx-auto transition-all duration-300 bg-blue-500 rounded jumi group-hover:animate-scale-125"
+              class="w-16 h-16 mx-auto rounded-sm bg-cyan-500 jumi animate-border-radius-3xl animation-duration-2000 transition-duration-500 hover:animate-border-radius-sm"
             ></div>
+            <p class="mt-2 text-xs text-gray-500">rounded-sm → 3xl (anim) → rounded-sm (hover)</p>
           </div>
 
-          <!-- Group Hover Rotate -->
-          <div class="p-4 transition-all duration-300 bg-green-100 rounded cursor-pointer group hover:bg-green-200">
-            <h3 class="mb-2 font-medium">Child Rotate</h3>
+          <!-- Box Shadow -->
+          <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
+            <h3 class="mb-2 font-medium">Box Shadow</h3>
             <div
-              class="w-16 h-16 mx-auto transition-all duration-300 bg-green-500 rounded-sm jumi group-hover:animate-rotate-360"
+              class="w-16 h-16 mx-auto rounded bg-rose-500 jumi animate-box-shadow-xl animation-duration-1500 transition-duration-500 hover:animate-shadow-none"
             ></div>
+            <p class="mt-2 text-xs text-gray-500">shadow appears (anim), disappears (hover)</p>
           </div>
 
-          <!-- Group Hover Slide + Color -->
-          <div class="p-4 transition-all duration-300 bg-purple-100 rounded cursor-pointer group hover:bg-purple-200">
-            <h3 class="mb-2 font-medium">Child Slide &amp; Color</h3>
+          <!-- Transform -->
+          <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
+            <h3 class="mb-2 font-medium">Transform Combo</h3>
             <div
-              class="w-16 h-16 mx-auto transition-all duration-300 bg-purple-500 rounded jumi group-hover:animate-translate-x-6 group-hover:animate-background-color-pink-500"
+              class="w-16 h-16 mx-auto rounded bg-violet-500 jumi animate-translate-x-8 animate-rotate-45 animation-duration-2000 animation-delay-1000/rotate transition-duration-500 hover:animate-translate-x-0 hover:animate-rotate-0"
             ></div>
+            <p class="mt-2 text-xs text-gray-500">slide + rotate (anim), reset (hover)</p>
           </div>
 
-          <!-- Group Hover Effect -->
-          <div class="p-4 transition-all duration-300 bg-red-100 rounded cursor-pointer group hover:bg-red-200">
-            <h3 class="mb-2 font-medium">Child Bounce</h3>
-            <div
-              class="w-16 h-16 mx-auto transition-all duration-300 bg-red-500 rounded-full jumi group-hover:animate-bounce-in"
-            ></div>
+          <!-- Fill (SVG) -->
+          <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
+            <h3 class="mb-2 font-medium">SVG Fill</h3>
+            <svg class="w-16 h-16 mx-auto" viewBox="0 0 24 24">
+              <path
+                class="jumi animate-fill-blue-500 animation-duration-2000 transition-duration-500 hover:animate-fill-red-500"
+                d="M12 2L3.09 8.26L4 21L12 17L20 21L20.91 8.26L12 2Z"
+                fill="currentColor"
+              />
+            </svg>
+            <p class="mt-2 text-xs text-gray-500">fill animates blue, hover transitions red</p>
           </div>
         </div>
       </section>

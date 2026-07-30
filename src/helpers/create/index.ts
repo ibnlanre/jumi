@@ -1,6 +1,7 @@
 import type { AnimatableStandardPropertyType, Api, Collection, Creator, Register, TailwindTheme } from '@/types'
 
 import { css } from '@/helpers/css'
+import { join } from '@/helpers/join'
 import { merge } from '@/helpers/merge'
 import { effectKeyframes } from '@/keyframes/effects'
 import { propertyKeyframes } from '@/keyframes/property'
@@ -32,7 +33,8 @@ const COLOR_THEME_KEYS = new Set<string>([
 
 export function getCreator({ addUtilities, theme }: Api): Creator {
   const effects = new Set<string>()
-  const properties = new Set<string>(['animation'])
+  const properties = new Set<string>()
+  const transitions = new Set<string>()
 
   const create = {
     effect(attribute: string): string {
@@ -78,6 +80,28 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
 
       return merge(result, values)
     },
+
+    transition(attribute: string): string {
+      transitions.add(attribute)
+      return join([
+        css('var', `--jumi-${attribute}-transition-duration`, css('var', '--jumi-transition-duration')),
+        css('var', `--jumi-${attribute}-transition-timing-function`, css('var', '--jumi-transition-timing-function')),
+        css('var', `--jumi-${attribute}-transition-delay`, css('var', '--jumi-transition-delay')),
+        attribute,
+      ], ' ')
+    },
+
+    /**
+     * This set tracks transition sub-properties that have been used by
+     * transition utilities. Unlike properties/effects, transitions don't
+     * need @keyframes — they compose into the CSS `transition` shorthand
+     * via custom properties.
+     *
+     * When a transition sub-property is used for the first time, it is
+     * recorded in this set. On subsequent uses, the presence of the
+     * sub-property in this set prevents duplicate tracking.
+     */
+    get transitions() { return Array.from(transitions).sort() },
   }
 
   const variables = (attribute: string, name = `jumi-${attribute}`) => {
