@@ -569,6 +569,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
           '--jumi-background-size-animation-name': property('background-size', value),
         })
       },
+      type: ['length', 'percentage', 'any'],
       values: theme('backgroundSize'),
     },
     'animate-background-size-height': {
@@ -1742,6 +1743,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
           '--jumi-flex-basis-animation-name': property('flex-basis', value),
         })
       },
+      type: ['length', 'percentage', 'any'],
       values: theme('flexBasis'),
     },
     'animate-flex-direction': {
@@ -1769,6 +1771,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
           '--jumi-flex-grow-animation-name': property('flex-grow', value),
         })
       },
+      type: ['number', 'any'],
       values: theme('flexGrow'),
     },
     'animate-flex-shrink': {
@@ -1778,6 +1781,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
           '--jumi-flex-shrink-animation-name': property('flex-shrink', value),
         })
       },
+      type: ['number', 'any'],
       values: theme('flexShrink'),
     },
     'animate-flex-wrap': {
@@ -1854,6 +1858,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
           '--jumi-font-size-animation-name': property('font-size', value),
         })
       },
+      type: ['absolute-size', 'relative-size', 'length', 'percentage', 'any'],
       values: fontSize,
     },
     'animate-font-size-adjust': {
@@ -2012,6 +2017,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
           '--jumi-gap-animation-name': property('gap', value),
         })
       },
+      type: ['length', 'percentage', 'any'],
       values: theme('gap'),
     },
     'animate-grid': {
@@ -2030,6 +2036,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
           '--jumi-grid-auto-columns-animation-name': property('grid-auto-columns', value),
         })
       },
+      type: ['length', 'percentage', 'any'],
       values: theme('gridAutoColumns'),
     },
     'animate-grid-auto-flow': {
@@ -2049,6 +2056,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
           '--jumi-grid-auto-rows-animation-name': property('grid-auto-rows', value),
         })
       },
+      type: ['length', 'percentage', 'any'],
       values: theme('gridAutoRows'),
     },
     'animate-grid-column': {
@@ -2123,6 +2131,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
           '--jumi-grid-template-columns-animation-name': property('grid-template-columns', value),
         })
       },
+      type: ['any'],
       values: theme('gridTemplateColumns'),
     },
     'animate-grid-template-rows': {
@@ -2132,6 +2141,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
           '--jumi-grid-template-rows-animation-name': property('grid-template-rows', value),
         })
       },
+      type: ['any'],
       values: theme('gridTemplateRows'),
     },
     'animate-hanging-punctuation': {
@@ -2455,6 +2465,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('margin'),
     },
     'animate-margin-block': {
@@ -2465,6 +2476,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('margin'),
     },
     'animate-margin-block-end': {
@@ -2475,6 +2487,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('margin'),
     },
     'animate-margin-block-start': {
@@ -2485,6 +2498,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('margin'),
     },
     'animate-margin-bottom': {
@@ -2495,6 +2509,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('margin'),
     },
     'animate-margin-inline': {
@@ -2505,6 +2520,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('margin'),
     },
     'animate-margin-inline-end': {
@@ -2515,6 +2531,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('margin'),
     },
     'animate-margin-inline-start': {
@@ -2525,6 +2542,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('margin'),
     },
     'animate-margin-left': {
@@ -2535,6 +2553,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('margin'),
     },
     'animate-margin-right': {
@@ -2545,6 +2564,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('margin'),
     },
     'animate-margin-top': {
@@ -2555,6 +2575,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('margin'),
     },
     'animate-marker': {
@@ -3477,6 +3498,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('padding'),
     },
     'animate-padding-block': {
@@ -3487,6 +3509,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('padding'),
     },
     'animate-padding-block-end': {
@@ -3497,6 +3520,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('padding'),
     },
     'animate-padding-block-start': {
@@ -3507,6 +3531,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('padding'),
     },
     'animate-padding-bottom': {
@@ -3517,6 +3542,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('padding'),
     },
     'animate-padding-inline': {
@@ -3527,6 +3553,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('padding'),
     },
     'animate-padding-inline-end': {
@@ -3537,6 +3564,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('padding'),
     },
     'animate-padding-inline-start': {
@@ -3547,6 +3575,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('padding'),
     },
     'animate-padding-left': {
@@ -3557,6 +3586,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('padding'),
     },
     'animate-padding-right': {
@@ -3567,6 +3597,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('padding'),
     },
     'animate-padding-top': {
@@ -3577,6 +3608,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('padding'),
     },
     'animate-page': {
@@ -3688,6 +3720,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
           '--jumi-row-gap': value,
         })
       },
+      type: ['length', 'percentage', 'any'],
       values: empty.number,
     },
     'animate-scale': {
@@ -3744,6 +3777,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         }
       },
       supportsNegativeValues: true,
+      type: ['angle', 'any'],
       values: theme('skew'),
     },
     'animate-skew-x': {
@@ -3754,6 +3788,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['angle', 'any'],
       values: theme('skew'),
     },
     'animate-skew-y': {
@@ -3764,6 +3799,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
         })
       },
       supportsNegativeValues: true,
+      type: ['angle', 'any'],
       values: theme('skew'),
     },
     'animate-stroke': {
@@ -3782,6 +3818,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
           '--jumi-stroke-width-animation-name': property('stroke-width', value),
         })
       },
+      type: ['length', 'percentage', 'number', 'any'],
       values: theme('strokeWidth'),
     },
     'animate-text-align': {
