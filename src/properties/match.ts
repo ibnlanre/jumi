@@ -1,6 +1,5 @@
 import type { Collection, GetMatchUtilities, MatchProperty } from '@/types'
 
-import { assemble } from '@/helpers/assemble'
 import { css } from '@/helpers/css'
 import { join } from '@/helpers/join'
 import { merge } from '@/helpers/merge'
@@ -126,1837 +125,2048 @@ import { transitionBehavior } from '@/theme/transition-behavior'
 import { visibility } from '@/theme/visibility'
 
 export const getMatchUtilities: GetMatchUtilities = (creator) => {
-  const { effect, property, theme, transition } = creator
+  const { effect, motion, property, theme } = creator
   const modifiers = merge(cssProperties, cssEffects)
 
   const matchProperties: Partial<MatchProperty> = {
     'animate': {
-      property: value => ({
-        [`--jumi-${value}-effect`]: effect(value),
-      }),
+      fn: (value) => {
+        return ({
+          [`--jumi-${value}-animation-name`]: effect(value),
+        })
+      },
       values: cssEffects,
     },
     'animate-accent-color': {
-      property: value => ({
-        '--jumi-accent-color': value,
-        '--jumi-accent-color-motion': transition('accent-color'),
-        '--jumi-accent-color-property': property('accent-color'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-accent-color': value,
+          '--jumi-accent-color-animation-name': property('accent-color', value),
+        })
+      },
       type: 'color',
       values: theme('accentColor'),
     },
     'animate-align-content': {
-      property: value => ({
-        '--jumi-align-content': value,
-        '--jumi-align-content-motion': transition('align-content'),
-        '--jumi-align-content-property': property('align-content'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-align-content': value,
+          '--jumi-align-content-animation-name': property('align-content', value),
+        })
+      },
       values: alignContent,
     },
     'animate-align-items': {
-      property: value => ({
-        '--jumi-align-items': value,
-        '--jumi-align-items-motion': transition('align-items'),
-        '--jumi-align-items-property': property('align-items'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-align-items': value,
+          '--jumi-align-items-animation-name': property('align-items', value),
+        })
+      },
       values: alignItems,
     },
     'animate-align-self': {
-      property: value => ({
-        '--jumi-align-self': value,
-        '--jumi-align-self-motion': transition('align-self'),
-        '--jumi-align-self-property': property('align-self'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-align-self': value,
+          '--jumi-align-self-animation-name': property('align-self', value),
+        })
+      },
       values: alignSelf,
     },
     'animate-alignment-baseline': {
-      property: value => ({
-        '--jumi-alignment-baseline': value,
-        '--jumi-alignment-baseline-motion': transition('alignment-baseline'),
-        '--jumi-alignment-baseline-property': property('alignment-baseline'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-alignment-baseline': value,
+          '--jumi-alignment-baseline-animation-name': property('alignment-baseline', value),
+        })
+      },
       values: alignmentBaseline,
     },
     'animate-all': {
-      property: value => ({
-        '--jumi-all': value,
-        '--jumi-all-motion': transition('all'),
-        '--jumi-all-property': property('all'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-all': value,
+          '--jumi-all-animation-name': property('all', value),
+        })
+      },
       values: all,
     },
     'animate-appearance': {
-      property: value => ({
-        '--jumi-appearance': value,
-        '--jumi-appearance-motion': transition('appearance'),
-        '--jumi-appearance-property': property('appearance'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-appearance': value,
+          '--jumi-appearance-animation-name': property('appearance', value),
+        })
+      },
       values: appearance,
     },
     'animate-aspect-ratio': {
-      property: value => ({
-        '--jumi-aspect-ratio': value,
-        '--jumi-aspect-ratio-motion': transition('aspect-ratio'),
-        '--jumi-aspect-ratio-property': property('aspect-ratio'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-aspect-ratio': value,
+          '--jumi-aspect-ratio-animation-name': property('aspect-ratio', value),
+        })
+      },
       type: 'ratio',
       values: empty.auto,
     },
     'animate-aspect-ratio-height': {
-      property: value => ({
-        '--jumi-aspect-ratio-height': value,
-        '--jumi-aspect-ratio-motion': transition('aspect-ratio'),
-        '--jumi-aspect-ratio-property': property('aspect-ratio'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-aspect-ratio-animation-name': property('aspect-ratio', value),
+          '--jumi-aspect-ratio-height': value,
+        })
+      },
       type: 'ratio',
       values: empty.auto,
     },
     'animate-aspect-ratio-width': {
-      property: value => ({
-        '--jumi-aspect-ratio-motion': transition('aspect-ratio'),
-        '--jumi-aspect-ratio-property': property('aspect-ratio'),
-        '--jumi-aspect-ratio-width': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-aspect-ratio-animation-name': property('aspect-ratio', value),
+          '--jumi-aspect-ratio-width': value,
+        })
+      },
       type: 'ratio',
       values: empty.auto,
     },
     'animate-backdrop-filter': {
-      property: value => ({
-        '--jumi-backdrop-filter': value,
-        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
-        '--jumi-backdrop-filter-property': property('backdrop-filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-backdrop-filter': value,
+          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+        })
+      },
       values: empty.none,
     },
     'animate-backdrop-filter-blur': {
-      property: value => ({
-        '--jumi-backdrop-filter-blur': css('blur', value),
-        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
-        '--jumi-backdrop-filter-property': property('backdrop-filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          '--jumi-backdrop-filter-blur': css('blur', value),
+        })
+      },
       type: 'length',
       values: theme('backdropBlur'),
     },
     'animate-backdrop-filter-brightness': {
-      property: value => ({
-        '--jumi-backdrop-filter-brightness': css('brightness', value),
-        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
-        '--jumi-backdrop-filter-property': property('backdrop-filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          '--jumi-backdrop-filter-brightness': css('brightness', value),
+        })
+      },
       type: ['number', 'percentage'],
       values: theme('backdropBrightness'),
     },
     'animate-backdrop-filter-contrast': {
-      property: value => ({
-        '--jumi-backdrop-filter-contrast': css('contrast', value),
-        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
-        '--jumi-backdrop-filter-property': property('backdrop-filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          '--jumi-backdrop-filter-contrast': css('contrast', value),
+        })
+      },
       type: ['number', 'percentage'],
       values: theme('backdropContrast'),
     },
     'animate-backdrop-filter-drop-shadow': {
-      property: value => ({
-        '--jumi-backdrop-filter-drop-shadow': css('drop-shadow', value),
-        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
-        '--jumi-backdrop-filter-property': property('backdrop-filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          '--jumi-backdrop-filter-drop-shadow': css('drop-shadow', value),
+        })
+      },
       type: ['length', 'shadow', 'any'],
       values: theme('dropShadow'),
     },
     'animate-backdrop-filter-drop-shadow-blur': {
-      property: value => ({
-        '--jumi-backdrop-filter-drop-shadow-blur': value,
-        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
-        '--jumi-backdrop-filter-property': property('backdrop-filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          '--jumi-backdrop-filter-drop-shadow-blur': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
     },
     'animate-backdrop-filter-drop-shadow-color': {
-      property: value => ({
-        '--jumi-backdrop-filter-drop-shadow-color': value,
-        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
-        '--jumi-backdrop-filter-property': property('backdrop-filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          '--jumi-backdrop-filter-drop-shadow-color': value,
+        })
+      },
       type: 'color',
       values: theme('boxShadowColor'),
     },
     'animate-backdrop-filter-drop-shadow-offset-x': {
-      property: value => ({
-        '--jumi-backdrop-filter-drop-shadow-offset-x': value,
-        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
-        '--jumi-backdrop-filter-property': property('backdrop-filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          '--jumi-backdrop-filter-drop-shadow-offset-x': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
     },
     'animate-backdrop-filter-drop-shadow-offset-y': {
-      property: value => ({
-        '--jumi-backdrop-filter-drop-shadow-offset-y': value,
-        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
-        '--jumi-backdrop-filter-property': property('backdrop-filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          '--jumi-backdrop-filter-drop-shadow-offset-y': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
     },
     'animate-backdrop-filter-grayscale': {
-      property: value => ({
-        '--jumi-backdrop-filter-grayscale': css('grayscale', value),
-        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
-        '--jumi-backdrop-filter-property': property('backdrop-filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          '--jumi-backdrop-filter-grayscale': css('grayscale', value),
+        })
+      },
       type: ['number', 'percentage'],
       values: theme('backdropGrayscale'),
     },
     'animate-backdrop-filter-hue-rotate': {
-      property: value => ({
-        '--jumi-backdrop-filter-hue-rotate': css('hue-rotate', value),
-        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
-        '--jumi-backdrop-filter-property': property('backdrop-filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          '--jumi-backdrop-filter-hue-rotate': css('hue-rotate', value),
+        })
+      },
       type: 'angle',
       values: theme('backdropHueRotate'),
     },
     'animate-backdrop-filter-invert': {
-      property: value => ({
-        '--jumi-backdrop-filter-invert': css('invert', value),
-        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
-        '--jumi-backdrop-filter-property': property('backdrop-filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          '--jumi-backdrop-filter-invert': css('invert', value),
+        })
+      },
       type: ['number', 'percentage'],
       values: theme('backdropInvert'),
     },
     'animate-backdrop-filter-opacity': {
-      property: value => ({
-        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
-        '--jumi-backdrop-filter-opacity': css('opacity', value),
-        '--jumi-backdrop-filter-property': property('backdrop-filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          '--jumi-backdrop-filter-opacity': css('opacity', value),
+        })
+      },
       type: ['number', 'percentage'],
       values: theme('backdropOpacity'),
     },
     'animate-backdrop-filter-saturate': {
-      property: value => ({
-        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
-        '--jumi-backdrop-filter-property': property('backdrop-filter'),
-        '--jumi-backdrop-filter-saturate': css('saturate', value),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          '--jumi-backdrop-filter-saturate': css('saturate', value),
+        })
+      },
       type: ['number', 'percentage'],
       values: theme('backdropSaturate'),
     },
     'animate-backdrop-filter-sepia': {
-      property: value => ({
-        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
-        '--jumi-backdrop-filter-property': property('backdrop-filter'),
-        '--jumi-backdrop-filter-sepia': css('sepia', value),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          '--jumi-backdrop-filter-sepia': css('sepia', value),
+        })
+      },
       type: ['number', 'percentage'],
       values: theme('backdropSepia'),
     },
     'animate-backdrop-filter-url': {
-      property: value => ({
-        '--jumi-backdrop-filter-motion': transition('backdrop-filter'),
-        '--jumi-backdrop-filter-property': property('backdrop-filter'),
-        '--jumi-backdrop-filter-url': css('url', value),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          '--jumi-backdrop-filter-url': css('url', value),
+        })
+      },
       type: 'url',
       values: empty.string,
     },
     'animate-backface-visibility': {
-      property: value => ({
-        '--jumi-backface-visibility': value,
-        '--jumi-backface-visibility-motion': transition('backface-visibility'),
-        '--jumi-backface-visibility-property': property('backface-visibility'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-backface-visibility': value,
+          '--jumi-backface-visibility-animation-name': property('backface-visibility', value),
+        })
+      },
       values: backfaceVisibility,
     },
     'animate-background': {
-      property: value => ({
-        '--jumi-background': value,
-        '--jumi-background-motion': transition('background'),
-        '--jumi-background-property': property('background'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-background': value,
+          '--jumi-background-animation-name': property('background', value),
+        })
+      },
       type: ['color', 'image', 'position', 'url', 'any'],
       values: empty.none,
     },
     'animate-background-attachment': {
-      property: value => ({
-        '--jumi-background-attachment': value,
-        '--jumi-background-attachment-motion': transition('background-attachment'),
-        '--jumi-background-attachment-property': property('background-attachment'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-background-attachment': value,
+          '--jumi-background-attachment-animation-name': property('background-attachment', value),
+        })
+      },
       values: backgroundAttachment,
     },
     'animate-background-blend-mode': {
-      property: value => ({
-        '--jumi-background-blend-mode': value,
-        '--jumi-background-blend-mode-motion': transition('background-blend-mode'),
-        '--jumi-background-blend-mode-property': property('background-blend-mode'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-background-blend-mode': value,
+          '--jumi-background-blend-mode-animation-name': property('background-blend-mode', value),
+        })
+      },
       values: mixBlendMode,
     },
     'animate-background-clip': {
-      property: value => ({
-        '--jumi-background-clip': value,
-        '--jumi-background-clip-motion': transition('background-clip'),
-        '--jumi-background-clip-property': property('background-clip'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-background-clip': value,
+          '--jumi-background-clip-animation-name': property('background-clip', value),
+        })
+      },
       values: backgroundClip,
     },
     'animate-background-color': {
-      property: value => ({
-        '--jumi-background-color': value,
-        '--jumi-background-color-motion': transition('background-color'),
-        '--jumi-background-color-property': property('background-color'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-background-color': value,
+          '--jumi-background-color-animation-name': property('background-color', value),
+        })
+      },
       type: 'color',
       values: theme('backgroundColor'),
     },
     'animate-background-image': {
-      property: value => ({
-        '--jumi-background-image': value,
-        '--jumi-background-image-motion': transition('background-image'),
-        '--jumi-background-image-property': property('background-image'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-background-image': value,
+          '--jumi-background-image-animation-name': property('background-image', value),
+        })
+      },
       type: 'image',
       values: theme('backgroundImage'),
     },
     'animate-background-origin': {
-      property: value => ({
-        '--jumi-background-origin': value,
-        '--jumi-background-origin-motion': transition('background-origin'),
-        '--jumi-background-origin-property': property('background-origin'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-background-origin': value,
+          '--jumi-background-origin-animation-name': property('background-origin', value),
+        })
+      },
       values: backgroundOrigin,
     },
     'animate-background-position': {
-      property: value => ({
-        '--jumi-background-position': value,
-        '--jumi-background-position-motion': transition('background-position'),
-        '--jumi-background-position-property': property('background-position'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-background-position': value,
+          '--jumi-background-position-animation-name': property('background-position', value),
+        })
+      },
       type: ['position', 'percentage', 'length', 'any'],
       values: theme('backgroundPosition'),
     },
     'animate-background-position-x': {
-      property: value => ({
-        '--jumi-background-position-motion': transition('background-position'),
-        '--jumi-background-position-property': property('background-position'),
-        '--jumi-background-position-x': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-background-position-animation-name': property('background-position', value),
+          '--jumi-background-position-x': value,
+        })
+      },
       type: ['position', 'percentage', 'length', 'any'],
       values: empty.position,
     },
     'animate-background-position-x-edge': {
-      property: value => ({
-        '--jumi-background-position-motion': transition('background-position'),
-        '--jumi-background-position-property': property('background-position'),
-        '--jumi-background-position-x-edge': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-background-position-animation-name': property('background-position', value),
+          '--jumi-background-position-x-edge': value,
+        })
+      },
       type: 'position',
       values: objectPosition,
     },
     'animate-background-position-x-offset': {
-      property: value => ({
-        '--jumi-background-position-motion': transition('background-position'),
-        '--jumi-background-position-property': property('background-position'),
-        '--jumi-background-position-x-offset': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-background-position-animation-name': property('background-position', value),
+          '--jumi-background-position-x-offset': value,
+        })
+      },
       type: ['percentage', 'length'],
       values: percentage,
     },
     'animate-background-position-y': {
-      property: value => ({
-        '--jumi-background-position-motion': transition('background-position'),
-        '--jumi-background-position-property': property('background-position'),
-        '--jumi-background-position-y': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-background-position-animation-name': property('background-position', value),
+          '--jumi-background-position-y': value,
+        })
+      },
       type: ['position', 'percentage', 'length', 'any'],
       values: merge(objectPosition, percentage),
     },
     'animate-background-position-y-edge': {
-      property: value => ({
-        '--jumi-background-position-motion': transition('background-position'),
-        '--jumi-background-position-property': property('background-position'),
-        '--jumi-background-position-y-edge': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-background-position-animation-name': property('background-position', value),
+          '--jumi-background-position-y-edge': value,
+        })
+      },
       type: 'position',
       values: objectPosition,
     },
     'animate-background-position-y-offset': {
-      property: value => ({
-        '--jumi-background-position-motion': transition('background-position'),
-        '--jumi-background-position-property': property('background-position'),
-        '--jumi-background-position-y-offset': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-background-position-animation-name': property('background-position', value),
+          '--jumi-background-position-y-offset': value,
+        })
+      },
       type: ['percentage', 'length'],
       values: percentage,
     },
     'animate-background-repeat': {
-      property: value => ({
-        '--jumi-background-repeat': value,
-        '--jumi-background-repeat-motion': transition('background-repeat'),
-        '--jumi-background-repeat-property': property('background-repeat'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-background-repeat': value,
+          '--jumi-background-repeat-animation-name': property('background-repeat', value),
+        })
+      },
       values: backgroundRepeat,
     },
     'animate-background-repeat-x': {
-      property: value => ({
-        '--jumi-background-repeat-motion': transition('background-repeat'),
-        '--jumi-background-repeat-property': property('background-repeat'),
-        '--jumi-background-repeat-x': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-background-repeat-animation-name': property('background-repeat', value),
+          '--jumi-background-repeat-x': value,
+        })
+      },
       values: backgroundRepeatAxis,
     },
     'animate-background-repeat-y': {
-      property: value => ({
-        '--jumi-background-repeat-motion': transition('background-repeat'),
-        '--jumi-background-repeat-property': property('background-repeat'),
-        '--jumi-background-repeat-y': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-background-repeat-animation-name': property('background-repeat', value),
+          '--jumi-background-repeat-y': value,
+        })
+      },
       values: backgroundRepeatAxis,
     },
     'animate-background-size': {
-      property: value => ({
-        '--jumi-background-size': value,
-        '--jumi-background-size-motion': transition('background-size'),
-        '--jumi-background-size-property': property('background-size'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-background-size': value,
+          '--jumi-background-size-animation-name': property('background-size', value),
+        })
+      },
       values: theme('backgroundSize'),
     },
     'animate-background-size-height': {
-      property: value => ({
-        '--jumi-background-size-height': value,
-        '--jumi-background-size-motion': transition('background-size'),
-        '--jumi-background-size-property': property('background-size'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-background-size-animation-name': property('background-size', value),
+          '--jumi-background-size-height': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('backgroundSize'),
     },
     'animate-background-size-width': {
-      property: value => ({
-        '--jumi-background-size-motion': transition('background-size'),
-        '--jumi-background-size-property': property('background-size'),
-        '--jumi-background-size-width': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-background-size-animation-name': property('background-size', value),
+          '--jumi-background-size-width': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('backgroundSize'),
     },
     'animate-block-size': {
-      property: value => ({
-        '--jumi-block-size': value,
-        '--jumi-block-size-motion': transition('block-size'),
-        '--jumi-block-size-property': property('block-size'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-block-size': value,
+          '--jumi-block-size-animation-name': property('block-size', value),
+        })
+      },
       type: ['length', 'percentage', 'any'],
       values: empty.auto,
     },
     'animate-border': {
-      property: value => ({
-        '--jumi-border': value,
-        '--jumi-border-motion': transition('border'),
-        '--jumi-border-property': property('border'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border': value,
+          '--jumi-border-animation-name': property('border', value),
+        })
+      },
       type: ['line-width', 'length'],
       values: empty.none,
     },
     'animate-border-block': {
-      property: value => ({
-        '--jumi-border-block': value,
-        '--jumi-border-block-motion': transition('border-block'),
-        '--jumi-border-block-property': property('border-block'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-block': value,
+          '--jumi-border-block-animation-name': property('border-block', value),
+        })
+      },
       values: theme('borderWidth'),
     },
     'animate-border-block-color': {
-      property: value => ({
-        '--jumi-border-block-color': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-block-animation-name': property('border-block-color', value),
+          '--jumi-border-block-color': value,
+        })
+      },
       type: 'color',
       values: theme('borderColor'),
     },
     'animate-border-block-end-radius': {
-      property: value => ({
-        '--jumi-border-end-end-radius': value,
-        '--jumi-border-end-start-radius': value,
-        '--jumi-border-radius-motion': transition('border-radius'),
-        '--jumi-border-radius-property': property('border-radius'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-end-end-radius': value,
+          '--jumi-border-end-start-radius': value,
+          '--jumi-border-radius-animation-name': property('border-radius', value),
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-block-end-width': {
-      property: value => ({
-        '--jumi-border-block-end-width': value,
-        '--jumi-border-block-end-width-motion': transition('border-block-end-width'),
-        '--jumi-border-block-end-width-property': property('border-block-end-width'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-block-end-width': value,
+          '--jumi-border-block-end-width-animation-name': property('border-block-end-width', value),
+        })
+      },
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-border-block-start-radius': {
-      property: value => ({
-        '--jumi-border-radius-motion': transition('border-radius'),
-        '--jumi-border-radius-property': property('border-radius'),
-        '--jumi-border-start-end-radius': value,
-        '--jumi-border-start-start-radius': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-radius-animation-name': property('border-radius', value),
+          '--jumi-border-start-end-radius': value,
+          '--jumi-border-start-start-radius': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-block-start-width': {
-      property: value => ({
-        '--jumi-border-block-start-width': value,
-        '--jumi-border-block-start-width-motion': transition('border-block-start-width'),
-        '--jumi-border-block-start-width-property': property('border-block-start-width'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-block-start-width': value,
+          '--jumi-border-block-start-width-animation-name': property('border-block-start-width', value),
+        })
+      },
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-border-block-width': {
-      property: value => ({
-        '--jumi-border-block-end-width': value,
-        '--jumi-border-block-start-width': value,
-        '--jumi-border-block-width-motion': transition('border-block-width'),
-        '--jumi-border-block-width-property': property('border-block-width'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-block-end-width': value,
+          '--jumi-border-block-start-width': value,
+          '--jumi-border-block-width-animation-name': property('border-block-width', value),
+        })
+      },
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-border-bottom-left-radius': {
-      property: value => ({
-        '--jumi-border-bottom-left-radius': value,
-        '--jumi-border-bottom-left-radius-motion': transition('border-bottom-left-radius'),
-        '--jumi-border-bottom-left-radius-property': property('border-bottom-left-radius'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-bottom-left-radius': value,
+          '--jumi-border-bottom-left-radius-animation-name': property('border-bottom-left-radius', value),
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-bottom-radius': {
-      property: value => ({
-        '--jumi-border-bottom-left-radius': value,
-        '--jumi-border-bottom-right-radius': value,
-        '--jumi-border-radius-motion': transition('border-radius'),
-        '--jumi-border-radius-property': property('border-radius'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-bottom-left-radius': value,
+          '--jumi-border-bottom-right-radius': value,
+          '--jumi-border-radius-animation-name': property('border-radius', value),
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-bottom-right-radius': {
-      property: value => ({
-        '--jumi-border-bottom-right-radius': value,
-        '--jumi-border-bottom-right-radius-motion': transition('border-bottom-right-radius'),
-        '--jumi-border-bottom-right-radius-property': property('border-bottom-right-radius'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-bottom-right-radius': value,
+          '--jumi-border-bottom-right-radius-animation-name': property('border-bottom-right-radius', value),
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-bottom-width': {
-      property: value => ({
-        '--jumi-border-bottom-width': value,
-        '--jumi-border-bottom-width-motion': transition('border-bottom-width'),
-        '--jumi-border-bottom-width-property': property('border-bottom-width'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-bottom-width': value,
+          '--jumi-border-bottom-width-animation-name': property('border-bottom-width', value),
+        })
+      },
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-border-collapse': {
-      property: value => ({
-        '--jumi-border-collapse': value,
-        '--jumi-border-collapse-motion': transition('border-collapse'),
-        '--jumi-border-collapse-property': property('border-collapse'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-collapse': value,
+          '--jumi-border-collapse-animation-name': property('border-collapse', value),
+        })
+      },
       values: borderCollapse,
     },
     'animate-border-color': {
-      property: value => ({
-        '--jumi-border-color': value,
-        '--jumi-border-color-motion': transition('border-color'),
-        '--jumi-border-color-property': property('border-color'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-color': value,
+          '--jumi-border-color-animation-name': property('border-color', value),
+        })
+      },
       type: 'color',
       values: theme('borderColor'),
     },
     'animate-border-end-end-radius': {
-      property: value => ({
-        '--jumi-border-end-end-radius': value,
-        '--jumi-border-end-end-radius-motion': transition('border-end-end-radius'),
-        '--jumi-border-end-end-radius-property': property('border-end-end-radius'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-end-end-radius': value,
+          '--jumi-border-end-end-radius-animation-name': property('border-end-end-radius', value),
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-end-start-radius': {
-      property: value => ({
-        '--jumi-border-end-start-radius': value,
-        '--jumi-border-end-start-radius-motion': transition('border-end-start-radius'),
-        '--jumi-border-end-start-radius-property': property('border-end-start-radius'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-end-start-radius': value,
+          '--jumi-border-end-start-radius-animation-name': property('border-end-start-radius', value),
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-image': {
-      property: value => ({
-        '--jumi-border-image': value,
-        '--jumi-border-image-motion': transition('border-image'),
-        '--jumi-border-image-property': property('border-image'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-image': value,
+          '--jumi-border-image-animation-name': property('border-image', value),
+        })
+      },
       type: 'image',
       values: empty.none,
     },
     'animate-border-image-outset': {
-      property: value => ({
-        '--jumi-border-image-outset': value,
-        '--jumi-border-image-outset-motion': transition('border-image-outset'),
-        '--jumi-border-image-outset-property': property('border-image-outset'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-image-outset': value,
+          '--jumi-border-image-outset-animation-name': property('border-image-outset', value),
+        })
+      },
       type: ['number', 'length'],
       values: empty.number,
     },
     'animate-border-image-outset-bottom': {
-      property: value => ({
-        '--jumi-border-image-outset-bottom': value,
-        '--jumi-border-image-outset-motion': transition('border-image-outset'),
-        '--jumi-border-image-outset-property': property('border-image-outset'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-image-outset-animation-name': property('border-image-outset', value),
+          '--jumi-border-image-outset-bottom': value,
+        })
+      },
       type: ['number', 'length'],
       values: empty.number,
     },
     'animate-border-image-outset-left': {
-      property: value => ({
-        '--jumi-border-image-outset-left': value,
-        '--jumi-border-image-outset-motion': transition('border-image-outset'),
-        '--jumi-border-image-outset-property': property('border-image-outset'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-image-outset-animation-name': property('border-image-outset', value),
+          '--jumi-border-image-outset-left': value,
+        })
+      },
       type: ['number', 'length'],
       values: empty.number,
     },
     'animate-border-image-outset-right': {
-      property: value => ({
-        '--jumi-border-image-outset-motion': transition('border-image-outset'),
-        '--jumi-border-image-outset-property': property('border-image-outset'),
-        '--jumi-border-image-outset-right': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-image-outset-animation-name': property('border-image-outset', value),
+          '--jumi-border-image-outset-right': value,
+        })
+      },
       type: ['number', 'length'],
       values: empty.number,
     },
     'animate-border-image-outset-top': {
-      property: value => ({
-        '--jumi-border-image-outset-motion': transition('border-image-outset'),
-        '--jumi-border-image-outset-property': property('border-image-outset'),
-        '--jumi-border-image-outset-top': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-image-outset-animation-name': property('border-image-outset', value),
+          '--jumi-border-image-outset-top': value,
+        })
+      },
       type: ['number', 'length'],
       values: empty.number,
     },
     'animate-border-image-outset-x': {
-      property: value => ({
-        '--jumi-border-image-outset-left': value,
-        '--jumi-border-image-outset-motion': transition('border-image-outset'),
-        '--jumi-border-image-outset-property': property('border-image-outset'),
-        '--jumi-border-image-outset-right': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-image-outset-animation-name': property('border-image-outset', value),
+          '--jumi-border-image-outset-left': value,
+          '--jumi-border-image-outset-right': value,
+        })
+      },
       type: ['number', 'length'],
       values: empty.number,
     },
     'animate-border-image-outset-y': {
-      property: value => ({
-        '--jumi-border-image-outset-bottom': value,
-        '--jumi-border-image-outset-motion': transition('border-image-outset'),
-        '--jumi-border-image-outset-property': property('border-image-outset'),
-        '--jumi-border-image-outset-top': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-image-outset-animation-name': property('border-image-outset', value),
+          '--jumi-border-image-outset-bottom': value,
+          '--jumi-border-image-outset-top': value,
+        })
+      },
       type: ['number', 'length'],
       values: empty.number,
     },
     'animate-border-image-repeat': {
-      property: value => ({
-        '--jumi-border-image-repeat': value,
-        '--jumi-border-image-repeat-motion': transition('border-image-repeat'),
-        '--jumi-border-image-repeat-property': property('border-image-repeat'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-image-repeat': value,
+          '--jumi-border-image-repeat-animation-name': property('border-image-repeat', value),
+        })
+      },
       values: borderImageRepeat,
     },
     'animate-border-image-repeat-x': {
-      property: value => ({
-        '--jumi-border-image-repeat-motion': transition('border-image-repeat'),
-        '--jumi-border-image-repeat-property': property('border-image-repeat'),
-        '--jumi-border-image-repeat-x': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-image-repeat-animation-name': property('border-image-repeat', value),
+          '--jumi-border-image-repeat-x': value,
+        })
+      },
       values: borderImageRepeat,
     },
     'animate-border-image-repeat-y': {
-      property: value => ({
-        '--jumi-border-image-repeat-motion': transition('border-image-repeat'),
-        '--jumi-border-image-repeat-property': property('border-image-repeat'),
-        '--jumi-border-image-repeat-y': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-image-repeat-animation-name': property('border-image-repeat', value),
+          '--jumi-border-image-repeat-y': value,
+        })
+      },
       values: borderImageRepeat,
     },
     'animate-border-inline-end-radius': {
-      property: value => ({
-        '--jumi-border-end-end-radius': value,
-        '--jumi-border-radius-motion': transition('border-radius'),
-        '--jumi-border-radius-property': property('border-radius'),
-        '--jumi-border-start-end-radius': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-end-end-radius': value,
+          '--jumi-border-radius-animation-name': property('border-radius', value),
+          '--jumi-border-start-end-radius': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-inline-end-width': {
-      property: value => ({
-        '--jumi-border-inline-end-width': value,
-        '--jumi-border-inline-end-width-motion': transition('border-inline-end-width'),
-        '--jumi-border-inline-end-width-property': property('border-inline-end-width'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-inline-end-width': value,
+          '--jumi-border-inline-end-width-animation-name': property('border-inline-end-width', value),
+        })
+      },
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-border-inline-start-radius': {
-      property: value => ({
-        '--jumi-border-end-start-radius': value,
-        '--jumi-border-radius-motion': transition('border-radius'),
-        '--jumi-border-radius-property': property('border-radius'),
-        '--jumi-border-start-start-radius': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-end-start-radius': value,
+          '--jumi-border-radius-animation-name': property('border-radius', value),
+          '--jumi-border-start-start-radius': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-inline-start-width': {
-      property: value => ({
-        '--jumi-border-inline-start-width': value,
-        '--jumi-border-inline-start-width-motion': transition('border-inline-start-width'),
-        '--jumi-border-inline-start-width-property': property('border-inline-start-width'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-inline-start-width': value,
+          '--jumi-border-inline-start-width-animation-name': property('border-inline-start-width', value),
+        })
+      },
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-border-inline-width': {
-      property: value => ({
-        '--jumi-border-inline-end-width': value,
-        '--jumi-border-inline-start-width': value,
-        '--jumi-border-inline-width-motion': transition('border-inline-width'),
-        '--jumi-border-inline-width-property': property('border-inline-width'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-inline-end-width': value,
+          '--jumi-border-inline-start-width': value,
+          '--jumi-border-inline-width-animation-name': property('border-inline-width', value),
+        })
+      },
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-border-left-radius': {
-      property: value => ({
-        '--jumi-border-bottom-left-radius': value,
-        '--jumi-border-motion': transition('border-radius'),
-        '--jumi-border-property': property('border-radius'),
-        '--jumi-border-top-left-radius': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-bottom-left-radius': value,
+          '--jumi-border-radius-animation-name': property('border-radius', value),
+          '--jumi-border-top-left-radius': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-left-width': {
-      property: value => ({
-        '--jumi-border-left-width': value,
-        '--jumi-border-left-width-motion': transition('border-left-width'),
-        '--jumi-border-left-width-property': property('border-left-width'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-left-width': value,
+          '--jumi-border-left-width-animation-name': property('border-left-width', value),
+        })
+      },
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-border-radius': {
-      property: value => ({
-        '--jumi-border-radius': value,
-        '--jumi-border-radius-motion': transition('border-radius'),
-        '--jumi-border-radius-property': property('border-radius'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-radius': value,
+          '--jumi-border-radius-animation-name': property('border-radius', value),
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-right-radius': {
-      property: value => ({
-        '--jumi-border-bottom-right-radius': value,
-        '--jumi-border-radius-motion': transition('border-radius'),
-        '--jumi-border-radius-property': property('border-radius'),
-        '--jumi-border-top-right-radius': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-bottom-right-radius': value,
+          '--jumi-border-radius-animation-name': property('border-radius', value),
+          '--jumi-border-top-right-radius': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-right-width': {
-      property: value => ({
-        '--jumi-border-right-width': value,
-        '--jumi-border-right-width-motion': transition('border-right-width'),
-        '--jumi-border-right-width-property': property('border-right-width'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-right-width': value,
+          '--jumi-border-right-width-animation-name': property('border-right-width', value),
+        })
+      },
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-border-start-end-radius': {
-      property: value => ({
-        '--jumi-border-start-end-radius': value,
-        '--jumi-border-start-end-radius-motion': transition('border-start-end-radius'),
-        '--jumi-border-start-end-radius-property': property('border-start-end-radius'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-start-end-radius': value,
+          '--jumi-border-start-end-radius-animation-name': property('border-start-end-radius', value),
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-start-start-radius': {
-      property: value => ({
-        '--jumi-border-start-start-radius': value,
-        '--jumi-border-start-start-radius-motion': transition('border-start-start-radius'),
-        '--jumi-border-start-start-radius-property': property('border-start-start-radius'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-start-start-radius': value,
+          '--jumi-border-start-start-radius-animation-name': property('border-start-start-radius', value),
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-top-left-radius': {
-      property: value => ({
-        '--jumi-border-top-left-radius': value,
-        '--jumi-border-top-left-radius-motion': transition('border-top-left-radius'),
-        '--jumi-border-top-left-radius-property': property('border-top-left-radius'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-top-left-radius': value,
+          '--jumi-border-top-left-radius-animation-name': property('border-top-left-radius', value),
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-top-radius': {
-      property: value => ({
-        '--jumi-border-radius-motion': transition('border-radius'),
-        '--jumi-border-radius-property': property('border-radius'),
-        '--jumi-border-top-left-radius': value,
-        '--jumi-border-top-right-radius': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-radius-animation-name': property('border-radius', value),
+          '--jumi-border-top-left-radius': value,
+          '--jumi-border-top-right-radius': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-top-right-radius': {
-      property: value => ({
-        '--jumi-border-top-right-radius': value,
-        '--jumi-border-top-right-radius-motion': transition('border-top-right-radius'),
-        '--jumi-border-top-right-radius-property': property('border-top-right-radius'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-top-right-radius': value,
+          '--jumi-border-top-right-radius-animation-name': property('border-top-right-radius', value),
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-top-width': {
-      property: value => ({
-        '--jumi-border-top-width': value,
-        '--jumi-border-top-width-motion': transition('border-top-width'),
-        '--jumi-border-top-width-property': property('border-top-width'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-top-width': value,
+          '--jumi-border-top-width-animation-name': property('border-top-width', value),
+        })
+      },
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-border-width': {
-      property: value => ({
-        '--jumi-border-width': value,
-        '--jumi-border-width-motion': transition('border-width'),
-        '--jumi-border-width-property': property('border-width'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-border-width': value,
+          '--jumi-border-width-animation-name': property('border-width', value),
+        })
+      },
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-bottom': {
-      property: value => ({
-        '--jumi-bottom': value,
-        '--jumi-bottom-motion': transition('bottom'),
-        '--jumi-bottom-property': property('bottom'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-bottom': value,
+          '--jumi-bottom-animation-name': property('bottom', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['number', 'length', 'percentage'],
       values: theme('inset', inset),
     },
     'animate-box-decoration-break': {
-      property: value => ({
-        '--jumi-box-decoration-break': value,
-        '--jumi-box-decoration-break-motion': transition('box-decoration-break'),
-        '--jumi-box-decoration-break-property': property('box-decoration-break'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-box-decoration-break': value,
+          '--jumi-box-decoration-break-animation-name': property('box-decoration-break', value),
+        })
+      },
       values: boxDecorationBreak,
     },
     'animate-box-shadow': {
-      property: value => ({
-        '--jumi-box-shadow': value,
-        '--jumi-box-shadow-motion': transition('box-shadow'),
-        '--jumi-box-shadow-property': property('box-shadow'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-box-shadow': value,
+          '--jumi-box-shadow-animation-name': property('box-shadow', value),
+        })
+      },
       type: ['length', 'shadow', 'any'],
       values: theme('boxShadow'),
     },
     'animate-box-shadow-blur': {
-      property: value => ({
-        '--jumi-box-shadow-blur': value,
-        '--jumi-box-shadow-motion': transition('box-shadow'),
-        '--jumi-box-shadow-property': property('box-shadow'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-box-shadow-animation-name': property('box-shadow', value),
+          '--jumi-box-shadow-blur': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('blur'),
     },
     'animate-box-shadow-color': {
-      property: value => ({
-        '--jumi-box-shadow-color': value,
-        '--jumi-box-shadow-motion': transition('box-shadow'),
-        '--jumi-box-shadow-property': property('box-shadow'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-box-shadow-animation-name': property('box-shadow', value),
+          '--jumi-box-shadow-color': value,
+        })
+      },
       type: 'color',
       values: theme('boxShadowColor'),
     },
     'animate-box-shadow-offset-x': {
-      property: value => ({
-        '--jumi-box-shadow-motion': transition('box-shadow'),
-        '--jumi-box-shadow-offset-x': value,
-        '--jumi-box-shadow-property': property('box-shadow'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-box-shadow-animation-name': property('box-shadow', value),
+          '--jumi-box-shadow-offset-x': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
     },
     'animate-box-shadow-offset-y': {
-      property: value => ({
-        '--jumi-box-shadow-motion': transition('box-shadow'),
-        '--jumi-box-shadow-offset-y': value,
-        '--jumi-box-shadow-property': property('box-shadow'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-box-shadow-animation-name': property('box-shadow', value),
+          '--jumi-box-shadow-offset-y': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
     },
     'animate-box-shadow-spread': {
-      property: value => ({
-        '--jumi-box-shadow-motion': transition('box-shadow'),
-        '--jumi-box-shadow-property': property('box-shadow'),
-        '--jumi-box-shadow-spread': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-box-shadow-animation-name': property('box-shadow', value),
+          '--jumi-box-shadow-spread': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: empty.number,
     },
     'animate-box-sizing': {
-      property: value => ({
-        '--jumi-box-sizing': value,
-        '--jumi-box-sizing-motion': transition('box-sizing'),
-        '--jumi-box-sizing-property': property('box-sizing'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-box-sizing': value,
+          '--jumi-box-sizing-animation-name': property('box-sizing', value),
+        })
+      },
       values: boxSizing,
     },
     'animate-break-after': {
-      property: value => ({
-        '--jumi-break-after': value,
-        '--jumi-break-after-motion': transition('break-after'),
-        '--jumi-break-after-property': property('break-after'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-break-after': value,
+          '--jumi-break-after-animation-name': property('break-after', value),
+        })
+      },
       values: breakAfter,
     },
     'animate-break-before': {
-      property: value => ({
-        '--jumi-break-before': value,
-        '--jumi-break-before-motion': transition('break-before'),
-        '--jumi-break-before-property': property('break-before'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-break-before': value,
+          '--jumi-break-before-animation-name': property('break-before', value),
+        })
+      },
       values: breakBefore,
     },
     'animate-break-inside': {
-      property: value => ({
-        '--jumi-break-inside': value,
-        '--jumi-break-inside-motion': transition('break-inside'),
-        '--jumi-break-inside-property': property('break-inside'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-break-inside': value,
+          '--jumi-break-inside-animation-name': property('break-inside', value),
+        })
+      },
       values: breakInside,
     },
     'animate-caption-side': {
-      property: value => ({
-        '--jumi-caption-side': value,
-        '--jumi-caption-side-motion': transition('caption-side'),
-        '--jumi-caption-side-property': property('caption-side'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-caption-side': value,
+          '--jumi-caption-side-animation-name': property('caption-side', value),
+        })
+      },
       values: captionSide,
     },
     'animate-caret-color': {
-      property: value => ({
-        '--jumi-caret-color': value,
-        '--jumi-caret-color-motion': transition('caret-color'),
-        '--jumi-caret-color-property': property('caret-color'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-caret-color': value,
+          '--jumi-caret-color-animation-name': property('caret-color', value),
+        })
+      },
       type: 'color',
       values: theme('caretColor'),
     },
     'animate-clear': {
-      property: value => ({
-        '--jumi-clear': value,
-        '--jumi-clear-motion': transition('clear'),
-        '--jumi-clear-property': property('clear'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-clear': value,
+          '--jumi-clear-animation-name': property('clear', value),
+        })
+      },
       values: clear,
     },
     'animate-clip-path': {
-      property: value => ({
-        '--jumi-clip-path': value,
-        '--jumi-clip-path-motion': transition('clip-path'),
-        '--jumi-clip-path-property': property('clip-path'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-clip-path': value,
+          '--jumi-clip-path-animation-name': property('clip-path', value),
+        })
+      },
       values: clipPath,
     },
     'animate-clip-rule': {
-      property: value => ({
-        '--jumi-clip-rule': value,
-        '--jumi-clip-rule-motion': transition('clip-rule'),
-        '--jumi-clip-rule-property': property('clip-rule'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-clip-rule': value,
+          '--jumi-clip-rule-animation-name': property('clip-rule', value),
+        })
+      },
       values: clipRule,
     },
     'animate-color': {
-      property: value => ({
-        '--jumi-color': value,
-        '--jumi-color-motion': transition('color'),
-        '--jumi-color-property': property('color'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-color': value,
+          '--jumi-color-animation-name': property('color', value),
+        })
+      },
       type: 'color',
       values: theme('colors'),
     },
     'animate-color-interpolation': {
-      property: value => ({
-        '--jumi-color-interpolation': value,
-        '--jumi-color-interpolation-motion': transition('color-interpolation'),
-        '--jumi-color-interpolation-property': property('color-interpolation'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-color-interpolation': value,
+          '--jumi-color-interpolation-animation-name': property('color-interpolation', value),
+        })
+      },
       values: colorInterpolation,
     },
     'animate-color-interpolation-filters': {
-      property: value => ({
-        '--jumi-color-interpolation-filters': value,
-        '--jumi-color-interpolation-filters-motion': transition('color-interpolation-filters'),
-        '--jumi-color-interpolation-filters-property': property('color-interpolation-filters'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-color-interpolation-filters': value,
+          '--jumi-color-interpolation-filters-animation-name': property('color-interpolation-filters', value),
+        })
+      },
       values: colorInterpolation,
     },
     'animate-color-scheme': {
-      property: value => ({
-        '--jumi-color-scheme': value,
-        '--jumi-color-scheme-motion': transition('color-scheme'),
-        '--jumi-color-scheme-property': property('color-scheme'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-color-scheme': value,
+          '--jumi-color-scheme-animation-name': property('color-scheme', value),
+        })
+      },
       values: colorScheme,
     },
     'animate-column-count': {
-      property: value => ({
-        '--jumi-column-count': value,
-        '--jumi-column-count-motion': transition('column-count'),
-        '--jumi-column-count-property': property('column-count'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-column-count': value,
+          '--jumi-column-count-animation-name': property('column-count', value),
+        })
+      },
       type: 'integer',
       values: empty.auto,
     },
     'animate-column-fill': {
-      property: value => ({
-        '--jumi-column-fill': value,
-        '--jumi-column-fill-motion': transition('column-fill'),
-        '--jumi-column-fill-property': property('column-fill'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-column-fill': value,
+          '--jumi-column-fill-animation-name': property('column-fill', value),
+        })
+      },
       values: columnFill,
     },
     'animate-column-gap': {
-      property: value => ({
-        '--jumi-column-gap': value,
-        '--jumi-gap-motion': transition('gap'),
-        '--jumi-gap-property': property('gap'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-column-gap': value,
+          '--jumi-gap-animation-name': property('gap', value),
+        })
+      },
       type: ['length', 'percentage'],
       values: empty.number,
     },
     'animate-column-rule': {
-      property: value => ({
-        '--jumi-column-rule': value,
-        '--jumi-column-rule-motion': transition('column-rule'),
-        '--jumi-column-rule-property': property('column-rule'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-column-rule': value,
+          '--jumi-column-rule-animation-name': property('column-rule', value),
+        })
+      },
       type: ['line-width', 'length'],
       values: empty.none,
     },
     'animate-column-rule-color': {
-      property: value => ({
-        '--jumi-column-rule-color': value,
-        '--jumi-column-rule-color-motion': transition('column-rule-color'),
-        '--jumi-column-rule-color-property': property('column-rule-color'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-column-rule-color': value,
+          '--jumi-column-rule-color-animation-name': property('column-rule-color', value),
+        })
+      },
       type: 'color',
       values: theme('borderColor'),
     },
     'animate-column-rule-style': {
-      property: value => ({
-        '--jumi-column-rule-style': value,
-        '--jumi-column-rule-style-motion': transition('column-rule-style'),
-        '--jumi-column-rule-style-property': property('column-rule-style'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-column-rule-style': value,
+          '--jumi-column-rule-style-animation-name': property('column-rule-style', value),
+        })
+      },
       values: columnRuleStyle,
     },
     'animate-column-rule-width': {
-      property: value => ({
-        '--jumi-column-rule-width': value,
-        '--jumi-column-rule-width-motion': transition('column-rule-width'),
-        '--jumi-column-rule-width-property': property('column-rule-width'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-column-rule-width': value,
+          '--jumi-column-rule-width-animation-name': property('column-rule-width', value),
+        })
+      },
       type: ['line-width', 'length'],
       values: columnRuleWidth,
     },
     'animate-column-span': {
-      property: value => ({
-        '--jumi-column-span': value,
-        '--jumi-column-span-motion': transition('column-span'),
-        '--jumi-column-span-property': property('column-span'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-column-span': value,
+          '--jumi-column-span-animation-name': property('column-span', value),
+        })
+      },
       type: 'integer',
       values: columnSpan,
     },
     'animate-column-width': {
-      property: value => ({
-        '--jumi-column-width': value,
-        '--jumi-column-width-motion': transition('column-width'),
-        '--jumi-column-width-property': property('column-width'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-column-width': value,
+          '--jumi-column-width-animation-name': property('column-width', value),
+        })
+      },
       type: ['length', 'percentage'],
       values: columnWidth,
     },
     'animate-columns': {
-      property: value => ({
-        '--jumi-columns': value,
-        '--jumi-columns-motion': transition('columns'),
-        '--jumi-columns-property': property('columns'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-columns': value,
+          '--jumi-columns-animation-name': property('columns', value),
+        })
+      },
       type: ['line-width', 'length', 'integer'],
       values: empty.auto,
     },
     'animate-contain': {
-      property: value => ({
-        '--jumi-contain': value,
-        '--jumi-contain-motion': transition('contain'),
-        '--jumi-contain-property': property('contain'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-contain': value,
+          '--jumi-contain-animation-name': property('contain', value),
+        })
+      },
       values: contain,
     },
     'animate-contain-intrinsic-block-size': {
-      property: value => ({
-        '--jumi-contain-intrinsic-block-size': value,
-        '--jumi-contain-intrinsic-block-size-motion': transition('contain-intrinsic-block-size'),
-        '--jumi-contain-intrinsic-block-size-property': property('contain-intrinsic-block-size'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-contain-intrinsic-block-size': value,
+          '--jumi-contain-intrinsic-block-size-animation-name': property('contain-intrinsic-block-size', value),
+        })
+      },
       type: 'length',
       values: containIntrinsic,
     },
     'animate-contain-intrinsic-height': {
-      property: value => ({
-        '--jumi-contain-intrinsic-height': value,
-        '--jumi-contain-intrinsic-height-motion': transition('contain-intrinsic-height'),
-        '--jumi-contain-intrinsic-height-property': property('contain-intrinsic-height'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-contain-intrinsic-height': value,
+          '--jumi-contain-intrinsic-height-animation-name': property('contain-intrinsic-height', value),
+        })
+      },
       type: 'length',
       values: containIntrinsic,
     },
     'animate-contain-intrinsic-inline-size': {
-      property: value => ({
-        '--jumi-contain-intrinsic-inline-size': value,
-        '--jumi-contain-intrinsic-inline-size-motion': transition('contain-intrinsic-inline-size'),
-        '--jumi-contain-intrinsic-inline-size-property': property('contain-intrinsic-inline-size'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-contain-intrinsic-inline-size': value,
+          '--jumi-contain-intrinsic-inline-size-animation-name': property('contain-intrinsic-inline-size', value),
+        })
+      },
       type: 'length',
       values: containIntrinsic,
     },
     'animate-contain-intrinsic-size': {
-      property: value => ({
-        '--jumi-contain-intrinsic-size': value,
-        '--jumi-contain-intrinsic-size-motion': transition('contain-intrinsic-size'),
-        '--jumi-contain-intrinsic-size-property': property('contain-intrinsic-size'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-contain-intrinsic-size': value,
+          '--jumi-contain-intrinsic-size-animation-name': property('contain-intrinsic-size', value),
+        })
+      },
       type: 'length',
       values: empty.none,
     },
     'animate-contain-intrinsic-width': {
-      property: value => ({
-        '--jumi-contain-intrinsic-width': value,
-        '--jumi-contain-intrinsic-width-motion': transition('contain-intrinsic-width'),
-        '--jumi-contain-intrinsic-width-property': property('contain-intrinsic-width'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-contain-intrinsic-width': value,
+          '--jumi-contain-intrinsic-width-animation-name': property('contain-intrinsic-width', value),
+        })
+      },
       type: 'length',
       values: containIntrinsic,
     },
     'animate-content': {
-      property: value => ({
-        '--jumi-content': value,
-        '--jumi-content-motion': transition('content'),
-        '--jumi-content-property': property('content'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-content': value,
+          '--jumi-content-animation-name': property('content', value),
+        })
+      },
       type: ['image', 'any'],
       values: content,
     },
     'animate-content-visibility': {
-      property: value => ({
-        '--jumi-content-visibility': value,
-        '--jumi-content-visibility-motion': transition('content-visibility'),
-        '--jumi-content-visibility-property': property('content-visibility'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-content-visibility': value,
+          '--jumi-content-visibility-animation-name': property('content-visibility', value),
+        })
+      },
       values: contentVisibility,
     },
     'animate-counter-increment': {
-      property: value => ({
-        '--jumi-counter-increment': value,
-        '--jumi-counter-increment-motion': transition('counter-increment'),
-        '--jumi-counter-increment-property': property('counter-increment'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-counter-increment': value,
+          '--jumi-counter-increment-animation-name': property('counter-increment', value),
+        })
+      },
       type: ['integer', 'any'],
       values: empty.none,
     },
     'animate-counter-reset': {
-      property: value => ({
-        '--jumi-counter-reset': value,
-        '--jumi-counter-reset-motion': transition('counter-reset'),
-        '--jumi-counter-reset-property': property('counter-reset'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-counter-reset': value,
+          '--jumi-counter-reset-animation-name': property('counter-reset', value),
+        })
+      },
       type: ['integer', 'any'],
       values: empty.none,
     },
     'animate-counter-set': {
-      property: value => ({
-        '--jumi-counter-set': value,
-        '--jumi-counter-set-motion': transition('counter-set'),
-        '--jumi-counter-set-property': property('counter-set'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-counter-set': value,
+          '--jumi-counter-set-animation-name': property('counter-set', value),
+        })
+      },
       type: ['integer', 'any'],
       values: empty.none,
     },
     'animate-cursor': {
-      property: value => ({
-        '--jumi-cursor': value,
-        '--jumi-cursor-motion': transition('cursor'),
-        '--jumi-cursor-property': property('cursor'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-cursor': value,
+          '--jumi-cursor-animation-name': property('cursor', value),
+        })
+      },
       values: cursor,
     },
     'animate-cx': {
-      property: value => ({
-        '--jumi-cx': value,
-        '--jumi-cx-motion': transition('cx'),
-        '--jumi-cx-property': property('cx'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-cx': value,
+          '--jumi-cx-animation-name': property('cx', value),
+        })
+      },
       type: ['length', 'percentage'],
       values: empty.number,
     },
     'animate-cy': {
-      property: value => ({
-        '--jumi-cy': value,
-        '--jumi-cy-motion': transition('cy'),
-        '--jumi-cy-property': property('cy'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-cy': value,
+          '--jumi-cy-animation-name': property('cy', value),
+        })
+      },
       type: ['length', 'percentage'],
       values: empty.number,
     },
     'animate-d': {
-      property: value => ({
-        '--jumi-d': value,
-        '--jumi-d-motion': transition('d'),
-        '--jumi-d-property': property('d'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-d': value,
+          '--jumi-d-animation-name': property('d', value),
+        })
+      },
       values: empty.none,
     },
     'animate-display': {
-      property: value => ({
-        '--jumi-display': value,
-        '--jumi-display-motion': transition('display'),
-        '--jumi-display-property': property('display'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-display': value,
+          '--jumi-display-animation-name': property('display', value),
+        })
+      },
       values: display,
     },
     'animate-display-inside': {
+      fn: (value, { modifier = '' }) => {
+        return ({
+          '--jumi-display-animation-name': property('display', value),
+          '--jumi-display-inside': modifier ? join([modifier, value]) : value,
+        })
+      },
       modifiers: displayOutside,
-      property: (value, { modifier }) => ({
-        '--jumi-display-inside': modifier ? join([modifier, value]) : value,
-        '--jumi-display-motion': transition('display'),
-        '--jumi-display-property': property('display'),
-      }),
       values: displayInside,
     },
     'animate-display-outside': {
+      fn: (value, { modifier = '' }) => {
+        return ({
+          '--jumi-display-animation-name': property('display', value),
+          '--jumi-display-outside': modifier ? join([value, modifier]) : value,
+        })
+      },
       modifiers: displayInside,
-      property: (value, { modifier }) => ({
-        '--jumi-display-motion': transition('display'),
-        '--jumi-display-outside': modifier ? join([value, modifier]) : value,
-        '--jumi-display-property': property('display'),
-      }),
       values: displayOutside,
     },
     'animate-dominant-baseline': {
-      property: value => ({
-        '--jumi-dominant-baseline': value,
-        '--jumi-dominant-baseline-motion': transition('dominant-baseline'),
-        '--jumi-dominant-baseline-property': property('dominant-baseline'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-dominant-baseline': value,
+          '--jumi-dominant-baseline-animation-name': property('dominant-baseline', value),
+        })
+      },
       values: dominantBaseline,
     },
     'animate-empty-cells': {
-      property: value => ({
-        '--jumi-empty-cells': value,
-        '--jumi-empty-cells-motion': transition('empty-cells'),
-        '--jumi-empty-cells-property': property('empty-cells'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-empty-cells': value,
+          '--jumi-empty-cells-animation-name': property('empty-cells', value),
+        })
+      },
       values: emptyCells,
     },
     'animate-fill': {
-      property: value => ({
-        '--jumi-fill': value,
-        '--jumi-fill-motion': transition('fill'),
-        '--jumi-fill-property': property('fill'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-fill': value,
+          '--jumi-fill-animation-name': property('fill', value),
+        })
+      },
       type: ['color', 'url', 'any'],
       values: theme('colors', fill),
     },
     'animate-fill-opacity': {
-      property: value => ({
-        '--jumi-fill-opacity': value,
-        '--jumi-fill-opacity-motion': transition('fill-opacity'),
-        '--jumi-fill-opacity-property': property('fill-opacity'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-fill-opacity': value,
+          '--jumi-fill-opacity-animation-name': property('fill-opacity', value),
+        })
+      },
       type: ['number', 'percentage'],
       values: theme('opacity'),
     },
     'animate-fill-rule': {
-      property: value => ({
-        '--jumi-fill-rule': value,
-        '--jumi-fill-rule-motion': transition('fill-rule'),
-        '--jumi-fill-rule-property': property('fill-rule'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-fill-rule': value,
+          '--jumi-fill-rule-animation-name': property('fill-rule', value),
+        })
+      },
       values: fillRule,
     },
     'animate-filter': {
-      property: value => ({
-        '--jumi-filter': value,
-        '--jumi-filter-motion': transition('filter'),
-        '--jumi-filter-property': property('filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-filter': value,
+          '--jumi-filter-animation-name': property('filter', value),
+        })
+      },
       values: empty.none,
     },
     'animate-filter-blur': {
-      property: value => ({
-        '--jumi-filter-blur': css('blur', value),
-        '--jumi-filter-motion': transition('filter'),
-        '--jumi-filter-property': property('filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-filter-animation-name': property('filter', value),
+          '--jumi-filter-blur': css('blur', value),
+        })
+      },
       type: 'length',
       values: theme('blur'),
     },
     'animate-filter-brightness': {
-      property: value => ({
-        '--jumi-filter-brightness': css('brightness', value),
-        '--jumi-filter-motion': transition('filter'),
-        '--jumi-filter-property': property('filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-filter-animation-name': property('filter', value),
+          '--jumi-filter-brightness': css('brightness', value),
+        })
+      },
       type: ['number', 'percentage'],
       values: theme('brightness'),
     },
     'animate-filter-contrast': {
-      property: value => ({
-        '--jumi-filter-contrast': css('contrast', value),
-        '--jumi-filter-motion': transition('filter'),
-        '--jumi-filter-property': property('filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-filter-animation-name': property('filter', value),
+          '--jumi-filter-contrast': css('contrast', value),
+        })
+      },
       type: ['number', 'percentage'],
       values: theme('contrast'),
     },
     'animate-filter-drop-shadow': {
-      property: value => ({
-        '--jumi-filter-drop-shadow': css('drop-shadow', value),
-        '--jumi-filter-motion': transition('filter'),
-        '--jumi-filter-property': property('filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-filter-animation-name': property('filter', value),
+          '--jumi-filter-drop-shadow': css('drop-shadow', value),
+        })
+      },
       type: ['length', 'shadow', 'any'],
       values: theme('dropShadow'),
     },
     'animate-filter-drop-shadow-blur': {
-      property: value => ({
-        '--jumi-filter-drop-shadow-blur': value,
-        '--jumi-filter-motion': transition('filter'),
-        '--jumi-filter-property': property('filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-filter-animation-name': property('filter', value),
+          '--jumi-filter-drop-shadow-blur': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('blur'),
     },
     'animate-filter-drop-shadow-color': {
-      property: value => ({
-        '--jumi-filter-drop-shadow-color': value,
-        '--jumi-filter-motion': transition('filter'),
-        '--jumi-filter-property': property('filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-filter-animation-name': property('filter', value),
+          '--jumi-filter-drop-shadow-color': value,
+        })
+      },
       type: 'color',
       values: theme('boxShadowColor'),
     },
     'animate-filter-drop-shadow-offset-x': {
-      property: value => ({
-        '--jumi-filter-drop-shadow-offset-x': value,
-        '--jumi-filter-motion': transition('filter'),
-        '--jumi-filter-property': property('filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-filter-animation-name': property('filter', value),
+          '--jumi-filter-drop-shadow-offset-x': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
     },
     'animate-filter-drop-shadow-offset-y': {
-      property: value => ({
-        '--jumi-filter-drop-shadow-offset-y': value,
-        '--jumi-filter-motion': transition('filter'),
-        '--jumi-filter-property': property('filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-filter-animation-name': property('filter', value),
+          '--jumi-filter-drop-shadow-offset-y': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
     },
     'animate-filter-grayscale': {
-      property: value => ({
-        '--jumi-filter-grayscale': css('grayscale', value),
-        '--jumi-filter-motion': transition('filter'),
-        '--jumi-filter-property': property('filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-filter-animation-name': property('filter', value),
+          '--jumi-filter-grayscale': css('grayscale', value),
+        })
+      },
       type: ['number', 'percentage'],
       values: theme('grayscale'),
     },
     'animate-filter-hue-rotate': {
-      property: value => ({
-        '--jumi-filter-hue-rotate': 'hue-rotate(' + value + ')',
-        '--jumi-filter-motion': transition('filter'),
-        '--jumi-filter-property': property('filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-filter-animation-name': property('filter', value),
+          '--jumi-filter-hue-rotate': 'hue-rotate(' + value + ')',
+        })
+      },
       type: 'angle',
       values: theme('hueRotate'),
     },
     'animate-filter-invert': {
-      property: value => ({
-        '--jumi-filter-invert': css('invert', value),
-        '--jumi-filter-motion': transition('filter'),
-        '--jumi-filter-property': property('filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-filter-animation-name': property('filter', value),
+          '--jumi-filter-invert': css('invert', value),
+        })
+      },
       type: ['number', 'percentage'],
       values: theme('invert'),
     },
     'animate-filter-opacity': {
-      property: value => ({
-        '--jumi-filter-motion': transition('filter'),
-        '--jumi-filter-opacity': css('opacity', value),
-        '--jumi-filter-property': property('filter'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-filter-animation-name': property('filter', value),
+          '--jumi-filter-opacity': css('opacity', value),
+        })
+      },
       type: ['number', 'percentage'],
       values: theme('opacity'),
     },
     'animate-filter-saturate': {
-      property: value => ({
-        '--jumi-filter-motion': transition('filter'),
-        '--jumi-filter-property': property('filter'),
-        '--jumi-filter-saturate': css('saturate', value),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-filter-animation-name': property('filter', value),
+          '--jumi-filter-saturate': css('saturate', value),
+        })
+      },
       type: ['number', 'percentage'],
       values: theme('saturate'),
     },
     'animate-filter-sepia': {
-      property: value => ({
-        '--jumi-filter-motion': transition('filter'),
-        '--jumi-filter-property': property('filter'),
-        '--jumi-filter-sepia': css('sepia', value),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-filter-animation-name': property('filter', value),
+          '--jumi-filter-sepia': css('sepia', value),
+        })
+      },
       type: ['number', 'percentage'],
       values: theme('sepia'),
     },
     'animate-filter-url': {
-      property: value => ({
-        '--jumi-filter-motion': transition('filter'),
-        '--jumi-filter-property': property('filter'),
-        '--jumi-filter-url': css('url', value),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-filter-animation-name': property('filter', value),
+          '--jumi-filter-url': css('url', value),
+        })
+      },
       type: 'url',
       values: empty.string,
     },
     'animate-flex': {
-      property: value => ({
-        '--jumi-flex': value,
-        '--jumi-flex-motion': transition('flex'),
-        '--jumi-flex-property': property('flex'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-flex': value,
+          '--jumi-flex-animation-name': property('flex', value),
+        })
+      },
       values: theme('flex'),
     },
     'animate-flex-basis': {
-      property: value => ({
-        '--jumi-flex-basis': value,
-        '--jumi-flex-basis-motion': transition('flex-basis'),
-        '--jumi-flex-basis-property': property('flex-basis'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-flex-basis': value,
+          '--jumi-flex-basis-animation-name': property('flex-basis', value),
+        })
+      },
       values: theme('flexBasis'),
     },
     'animate-flex-direction': {
-      property: value => ({
-        '--jumi-flex-direction': value,
-        '--jumi-flex-direction-motion': transition('flex-direction'),
-        '--jumi-flex-direction-property': property('flex-direction'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-flex-direction': value,
+          '--jumi-flex-direction-animation-name': property('flex-direction', value),
+        })
+      },
       values: flexDirection,
     },
     'animate-flex-flow': {
-      property: value => ({
-        '--jumi-flex-flow': value,
-        '--jumi-flex-flow-motion': transition('flex-flow'),
-        '--jumi-flex-flow-property': property('flex-flow'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-flex-flow': value,
+          '--jumi-flex-flow-animation-name': property('flex-flow', value),
+        })
+      },
       values: empty.string,
     },
     'animate-flex-grow': {
-      property: value => ({
-        '--jumi-flex-grow': value,
-        '--jumi-flex-grow-motion': transition('flex-grow'),
-        '--jumi-flex-grow-property': property('flex-grow'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-flex-grow': value,
+          '--jumi-flex-grow-animation-name': property('flex-grow', value),
+        })
+      },
       values: theme('flexGrow'),
     },
     'animate-flex-shrink': {
-      property: value => ({
-        '--jumi-flex-shrink': value,
-        '--jumi-flex-shrink-motion': transition('flex-shrink'),
-        '--jumi-flex-shrink-property': property('flex-shrink'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-flex-shrink': value,
+          '--jumi-flex-shrink-animation-name': property('flex-shrink', value),
+        })
+      },
       values: theme('flexShrink'),
     },
     'animate-flex-wrap': {
-      property: value => ({
-        '--jumi-flex-wrap': value,
-        '--jumi-flex-wrap-motion': transition('flex-wrap'),
-        '--jumi-flex-wrap-property': property('flex-wrap'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-flex-wrap': value,
+          '--jumi-flex-wrap-animation-name': property('flex-wrap', value),
+        })
+      },
       values: flexWrap,
     },
     'animate-float': {
-      property: value => ({
-        '--jumi-float': value,
-        '--jumi-float-motion': transition('float'),
-        '--jumi-float-property': property('float'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-float': value,
+          '--jumi-float-animation-name': property('float', value),
+        })
+      },
       values: float,
     },
     'animate-flood-color': {
-      property: value => ({
-        '--jumi-flood-color': value,
-        '--jumi-flood-color-motion': transition('flood-color'),
-        '--jumi-flood-color-property': property('flood-color'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-flood-color': value,
+          '--jumi-flood-color-animation-name': property('flood-color', value),
+        })
+      },
       type: 'color',
       values: theme('colors'),
     },
     'animate-flood-opacity': {
-      property: value => ({
-        '--jumi-flood-opacity': value,
-        '--jumi-flood-opacity-motion': transition('flood-opacity'),
-        '--jumi-flood-opacity-property': property('flood-opacity'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-flood-opacity': value,
+          '--jumi-flood-opacity-animation-name': property('flood-opacity', value),
+        })
+      },
       type: ['number', 'percentage'],
       values: theme('opacity'),
     },
     'animate-font-family': {
-      property: value => ({
-        '--jumi-font-family': value,
-        '--jumi-font-family-motion': transition('font-family'),
-        '--jumi-font-family-property': property('font-family'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-font-family': value,
+          '--jumi-font-family-animation-name': property('font-family', value),
+        })
+      },
       type: ['generic-name', 'family-name'],
       values: fontFamily,
     },
     'animate-font-feature-settings': {
-      property: value => ({
-        '--jumi-font-feature-settings': value,
-        '--jumi-font-feature-settings-motion': transition('font-feature-settings'),
-        '--jumi-font-feature-settings-property': property('font-feature-settings'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-font-feature-settings': value,
+          '--jumi-font-feature-settings-animation-name': property('font-feature-settings', value),
+        })
+      },
       type: ['integer', 'any'],
       values: fontFeatureSettings,
     },
     'animate-font-kerning': {
-      property: value => ({
-        '--jumi-font-kerning': value,
-        '--jumi-font-kerning-motion': transition('font-kerning'),
-        '--jumi-font-kerning-property': property('font-kerning'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-font-kerning': value,
+          '--jumi-font-kerning-animation-name': property('font-kerning', value),
+        })
+      },
       values: fontKerning,
     },
     'animate-font-size': {
-      property: value => ({
-        '--jumi-font-size': value,
-        '--jumi-font-size-motion': transition('font-size'),
-        '--jumi-font-size-property': property('font-size'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-font-size': value,
+          '--jumi-font-size-animation-name': property('font-size', value),
+        })
+      },
       values: fontSize,
     },
     'animate-font-size-adjust': {
+      fn: (value, { modifier = '' }) => {
+        return ({
+          '--jumi-font-size-adjust': modifier ? join([value, modifier]) : value,
+          '--jumi-font-size-adjust-animation-name': property('font-size-adjust', value),
+        })
+      },
       modifiers: fontSizeAdjustMetric,
-      property: (value, { modifier }) => ({
-        '--jumi-font-size-adjust': modifier ? join([value, modifier]) : value,
-        '--jumi-font-size-adjust-motion': transition('font-size-adjust'),
-        '--jumi-font-size-adjust-property': property('font-size-adjust'),
-      }),
       type: ['number', 'any'],
       values: fontSizeAdjust,
     },
     'animate-font-style': {
-      property: (value, { modifier }) => ({
-        '--jumi-font-style': modifier ? join([value, modifier]) : value,
-        '--jumi-font-style-motion': transition('font-style'),
-        '--jumi-font-style-property': property('font-style'),
-      }),
+      fn: (value, { modifier = '' }) => {
+        return ({
+          '--jumi-font-style': modifier ? join([value, modifier]) : value,
+          '--jumi-font-style-animation-name': property('font-style', value),
+        })
+      },
       values: fontStyle,
     },
     'animate-font-synthesis': {
-      property: value => ({
-        '--jumi-font-synthesis': value,
-        '--jumi-font-synthesis-motion': transition('font-synthesis'),
-        '--jumi-font-synthesis-property': property('font-synthesis'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-font-synthesis': value,
+          '--jumi-font-synthesis-animation-name': property('font-synthesis', value),
+        })
+      },
       values: empty.none,
     },
     'animate-font-synthesis-small-caps': {
-      property: value => ({
-        '--jumi-font-synthesis-small-caps': value,
-        '--jumi-font-synthesis-small-caps-motion': transition('font-synthesis-small-caps'),
-        '--jumi-font-synthesis-small-caps-property': property('font-synthesis-small-caps'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-font-synthesis-small-caps': value,
+          '--jumi-font-synthesis-small-caps-animation-name': property('font-synthesis-small-caps', value),
+        })
+      },
       values: fontSynthesisSmallCaps,
     },
     'animate-font-synthesis-style': {
-      property: value => ({
-        '--jumi-font-synthesis-style': value,
-        '--jumi-font-synthesis-style-motion': transition('font-synthesis-style'),
-        '--jumi-font-synthesis-style-property': property('font-synthesis-style'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-font-synthesis-style': value,
+          '--jumi-font-synthesis-style-animation-name': property('font-synthesis-style', value),
+        })
+      },
       values: fontSynthesisStyle,
     },
     'animate-font-synthesis-weight': {
-      property: value => ({
-        '--jumi-font-synthesis-weight': value,
-        '--jumi-font-synthesis-weight-motion': transition('font-synthesis-weight'),
-        '--jumi-font-synthesis-weight-property': property('font-synthesis-weight'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-font-synthesis-weight': value,
+          '--jumi-font-synthesis-weight-animation-name': property('font-synthesis-weight', value),
+        })
+      },
       values: fontSynthesisWeight,
     },
     'animate-font-variant': {
-      property: value => ({
-        '--jumi-font-variant': value,
-        '--jumi-font-variant-motion': transition('font-variant'),
-        '--jumi-font-variant-property': property('font-variant'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-font-variant': value,
+          '--jumi-font-variant-animation-name': property('font-variant', value),
+        })
+      },
       values: empty.string,
     },
     'animate-font-variant-alternates': {
-      property: value => ({
-        '--jumi-font-variant-alternates': value,
-        '--jumi-font-variant-alternates-motion': transition('font-variant-alternates'),
-        '--jumi-font-variant-alternates-property': property('font-variant-alternates'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-font-variant-alternates': value,
+          '--jumi-font-variant-alternates-animation-name': property('font-variant-alternates', value),
+        })
+      },
       values: fontVariantAlternates,
     },
     'animate-font-variant-caps': {
-      property: value => ({
-        '--jumi-font-variant-caps': value,
-        '--jumi-font-variant-caps-motion': transition('font-variant-caps'),
-        '--jumi-font-variant-caps-property': property('font-variant-caps'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-font-variant-caps': value,
+          '--jumi-font-variant-caps-animation-name': property('font-variant-caps', value),
+        })
+      },
       values: fontVariantCaps,
     },
     'animate-font-variant-east-asian': {
+      fn: (value, { modifier = '' }) => {
+        return ({
+          '--jumi-font-variant-east-asian': modifier ? join([value, modifier]) : value,
+          '--jumi-font-variant-east-asian-animation-name': property('font-variant-east-asian', value),
+        })
+      },
       modifiers: fontVariantEastAsianWidth,
-      property: (value, { modifier }) => ({
-        '--jumi-font-variant-east-asian': modifier ? join([value, modifier]) : value,
-        '--jumi-font-variant-east-asian-motion': transition('font-variant-east-asian'),
-        '--jumi-font-variant-east-asian-property': property('font-variant-east-asian'),
-      }),
       values: fontVariantEastAsian,
     },
     'animate-font-variant-ligatures': {
-      property: value => ({
-        '--jumi-font-variant-ligatures': value,
-        '--jumi-font-variant-ligatures-motion': transition('font-variant-ligatures'),
-        '--jumi-font-variant-ligatures-property': property('font-variant-ligatures'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-font-variant-ligatures': value,
+          '--jumi-font-variant-ligatures-animation-name': property('font-variant-ligatures', value),
+        })
+      },
       values: fontVariantLigatures,
     },
     'animate-font-variant-numeric': {
-      property: value => ({
-        '--jumi-font-variant-numeric': value,
-        '--jumi-font-variant-numeric-motion': transition('font-variant-numeric'),
-        '--jumi-font-variant-numeric-property': property('font-variant-numeric'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-font-variant-numeric': value,
+          '--jumi-font-variant-numeric-animation-name': property('font-variant-numeric', value),
+        })
+      },
       values: fontVariantNumeric,
     },
     'animate-font-variant-position': {
-      property: value => ({
-        '--jumi-font-variant-position': value,
-        '--jumi-font-variant-position-motion': transition('font-variant-position'),
-        '--jumi-font-variant-position-property': property('font-variant-position'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-font-variant-position': value,
+          '--jumi-font-variant-position-animation-name': property('font-variant-position', value),
+        })
+      },
       values: fontVariantPosition,
     },
     'animate-font-variation-settings': {
-      property: value => ({
-        '--jumi-font-variation-settings': value,
-        '--jumi-font-variation-settings-motion': transition('font-variation-settings'),
-        '--jumi-font-variation-settings-property': property('font-variation-settings'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-font-variation-settings': value,
+          '--jumi-font-variation-settings-animation-name': property('font-variation-settings', value),
+        })
+      },
       type: ['number', 'any'],
       values: empty.string,
     },
     'animate-font-weight': {
-      property: value => ({
-        '--jumi-font-weight': value,
-        '--jumi-font-weight-motion': transition('font-weight'),
-        '--jumi-font-weight-property': property('font-weight'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-font-weight': value,
+          '--jumi-font-weight-animation-name': property('font-weight', value),
+        })
+      },
       type: 'number',
       values: fontWeight,
     },
     'animate-forced-color-adjust': {
-      property: value => ({
-        '--jumi-forced-color-adjust': value,
-        '--jumi-forced-color-adjust-motion': transition('forced-color-adjust'),
-        '--jumi-forced-color-adjust-property': property('forced-color-adjust'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-forced-color-adjust': value,
+          '--jumi-forced-color-adjust-animation-name': property('forced-color-adjust', value),
+        })
+      },
       values: forcedColorAdjust,
     },
     'animate-gap': {
-      property: value => ({
-        '--jumi-gap': value,
-        '--jumi-gap-motion': transition('gap'),
-        '--jumi-gap-property': property('gap'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-gap': value,
+          '--jumi-gap-animation-name': property('gap', value),
+        })
+      },
       values: theme('gap'),
     },
     'animate-grid': {
-      property: value => ({
-        '--jumi-grid': value,
-        '--jumi-grid-motion': transition('grid'),
-        '--jumi-grid-property': property('grid'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-grid': value,
+          '--jumi-grid-animation-name': property('grid', value),
+        })
+      },
       values: empty.string,
     },
     'animate-grid-auto-columns': {
-      property: value => ({
-        '--jumi-grid-auto-columns': value,
-        '--jumi-grid-auto-columns-motion': transition('grid-auto-columns'),
-        '--jumi-grid-auto-columns-property': property('grid-auto-columns'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-grid-auto-columns': value,
+          '--jumi-grid-auto-columns-animation-name': property('grid-auto-columns', value),
+        })
+      },
       values: theme('gridAutoColumns'),
     },
     'animate-grid-auto-flow': {
+      fn: (value, { modifier = '' }) => {
+        return ({
+          '--jumi-grid-auto-flow': modifier ? join([value, modifier]) : value,
+          '--jumi-grid-auto-flow-animation-name': property('grid-auto-flow', value),
+        })
+      },
       modifiers: gridAutoFlowPacking,
-      property: (value, { modifier }) => ({
-        '--jumi-grid-auto-flow': modifier ? join([value, modifier]) : value,
-        '--jumi-grid-auto-flow-motion': transition('grid-auto-flow'),
-        '--jumi-grid-auto-flow-property': property('grid-auto-flow'),
-      }),
       values: gridAutoFlow,
     },
     'animate-grid-auto-rows': {
-      property: value => ({
-        '--jumi-grid-auto-rows': value,
-        '--jumi-grid-auto-rows-motion': transition('grid-auto-rows'),
-        '--jumi-grid-auto-rows-property': property('grid-auto-rows'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-grid-auto-rows': value,
+          '--jumi-grid-auto-rows-animation-name': property('grid-auto-rows', value),
+        })
+      },
       values: theme('gridAutoRows'),
     },
     'animate-grid-column': {
-      property: value => ({
-        '--jumi-grid-column': value,
-        '--jumi-grid-column-motion': transition('grid-column'),
-        '--jumi-grid-column-property': property('grid-column'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-grid-column': value,
+          '--jumi-grid-column-animation-name': property('grid-column', value),
+        })
+      },
       values: theme('gridColumn'),
     },
     'animate-grid-column-end': {
-      property: (value, { modifier }) => ({
-        '--jumi-grid-column-end': modifier ? join([modifier, value]) : value,
-        '--jumi-grid-column-end-motion': transition('grid-column-end'),
-        '--jumi-grid-column-end-property': property('grid-column-end'),
-      }),
+      fn: (value, { modifier = '' }) => {
+        return ({
+          '--jumi-grid-column-end': modifier ? join([modifier, value]) : value,
+          '--jumi-grid-column-end-animation-name': property('grid-column-end', value),
+        })
+      },
       values: theme('gridColumnEnd'),
     },
     'animate-grid-column-start': {
-      property: (value, { modifier }) => ({
-        '--jumi-grid-column-start': modifier ? join([modifier, value]) : value,
-        '--jumi-grid-column-start-motion': transition('grid-column-start'),
-        '--jumi-grid-column-start-property': property('grid-column-start'),
-      }),
+      fn: (value, { modifier = '' }) => {
+        return ({
+          '--jumi-grid-column-start': modifier ? join([modifier, value]) : value,
+          '--jumi-grid-column-start-animation-name': property('grid-column-start', value),
+        })
+      },
       values: theme('gridColumnStart'),
     },
     'animate-grid-row': {
-      property: value => ({
-        '--jumi-grid-row': value,
-        '--jumi-grid-row-motion': transition('grid-row'),
-        '--jumi-grid-row-property': property('grid-row'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-grid-row': value,
+          '--jumi-grid-row-animation-name': property('grid-row', value),
+        })
+      },
       values: theme('gridRow'),
     },
     'animate-grid-row-end': {
+      fn: (value, { modifier = '' }) => {
+        return ({
+          '--jumi-grid-row-end': modifier ? join([modifier, value]) : value,
+          '--jumi-grid-row-end-animation-name': property('grid-row-end', value),
+        })
+      },
       modifiers: gridSize,
-      property: (value, { modifier }) => ({
-        '--jumi-grid-row-end': modifier ? join([modifier, value]) : value,
-        '--jumi-grid-row-end-motion': transition('grid-row-end'),
-        '--jumi-grid-row-end-property': property('grid-row-end'),
-      }),
       values: theme('gridRowEnd'),
     },
     'animate-grid-row-start': {
+      fn: (value, { modifier = '' }) => {
+        return ({
+          '--jumi-grid-row-start': modifier ? join([modifier, value]) : value,
+          '--jumi-grid-row-start-animation-name': property('grid-row-start', value),
+        })
+      },
       modifiers: gridSize,
-      property: (value, { modifier }) => ({
-        '--jumi-grid-row-start': modifier ? join([modifier, value]) : value,
-        '--jumi-grid-row-start-motion': transition('grid-row-start'),
-        '--jumi-grid-row-start-property': property('grid-row-start'),
-      }),
       values: theme('gridRowStart'),
     },
     'animate-grid-template-areas': {
-      property: value => ({
-        '--jumi-grid-template-areas': value,
-        '--jumi-grid-template-areas-motion': transition('grid-template-areas'),
-        '--jumi-grid-template-areas-property': property('grid-template-areas'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-grid-template-areas': value,
+          '--jumi-grid-template-areas-animation-name': property('grid-template-areas', value),
+        })
+      },
       values: empty.none,
     },
     'animate-grid-template-columns': {
-      property: value => ({
-        '--jumi-grid-template-columns': value,
-        '--jumi-grid-template-columns-motion': transition('grid-template-columns'),
-        '--jumi-grid-template-columns-property': property('grid-template-columns'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-grid-template-columns': value,
+          '--jumi-grid-template-columns-animation-name': property('grid-template-columns', value),
+        })
+      },
       values: theme('gridTemplateColumns'),
     },
     'animate-grid-template-rows': {
-      property: value => ({
-        '--jumi-grid-template-rows': value,
-        '--jumi-grid-template-rows-motion': transition('grid-template-rows'),
-        '--jumi-grid-template-rows-property': property('grid-template-rows'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-grid-template-rows': value,
+          '--jumi-grid-template-rows-animation-name': property('grid-template-rows', value),
+        })
+      },
       values: theme('gridTemplateRows'),
     },
     'animate-hanging-punctuation': {
-      property: value => ({
-        '--jumi-hanging-punctuation': value,
-        '--jumi-hanging-punctuation-motion': transition('hanging-punctuation'),
-        '--jumi-hanging-punctuation-property': property('hanging-punctuation'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-hanging-punctuation': value,
+          '--jumi-hanging-punctuation-animation-name': property('hanging-punctuation', value),
+        })
+      },
       values: hangingPunctuation,
     },
     'animate-height': {
-      property: value => ({
-        '--jumi-height': value,
-        '--jumi-height-motion': transition('height'),
-        '--jumi-height-property': property('height'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-height': value,
+          '--jumi-height-animation-name': property('height', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
       values: theme('height'),
     },
     'animate-hyphenate-character': {
-      property: value => ({
-        '--jumi-hyphenate-character': value,
-        '--jumi-hyphenate-character-motion': transition('hyphenate-character'),
-        '--jumi-hyphenate-character-property': property('hyphenate-character'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-hyphenate-character': value,
+          '--jumi-hyphenate-character-animation-name': property('hyphenate-character', value),
+        })
+      },
       values: empty.auto,
     },
     'animate-hyphenate-limit-chars': {
-      modifiers: hyphenateLimitCharsProperties,
-      property: (value) => {
+      fn: (value) => {
         const hyphenateLimitChars: Collection<string> = {
-          '--jumi-hyphenate-limit-chars-motion': transition('hyphenate-limit-chars'),
-          '--jumi-hyphenate-limit-chars-property': property('hyphenate-limit-chars'),
+          '--jumi-hyphenate-limit-chars-animation-name': property('hyphenate-limit-chars', value),
         }
 
         switch (value) {
@@ -1982,1359 +2192,1509 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
           }
         }
       },
+      modifiers: hyphenateLimitCharsProperties,
       type: ['number', 'any'],
       values: hyphenateLimitChars,
     },
     'animate-hyphens': {
-      property: value => ({
-        '--jumi-hyphens': value,
-        '--jumi-hyphens-motion': transition('hyphens'),
-        '--jumi-hyphens-property': property('hyphens'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-hyphens': value,
+          '--jumi-hyphens-animation-name': property('hyphens', value),
+        })
+      },
       values: hyphens,
     },
     'animate-image-orientation': {
-      property: value => ({
-        '--jumi-image-orientation': value,
-        '--jumi-image-orientation-motion': transition('image-orientation'),
-        '--jumi-image-orientation-property': property('image-orientation'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-image-orientation': value,
+          '--jumi-image-orientation-animation-name': property('image-orientation', value),
+        })
+      },
       type: ['angle', 'any'],
       values: imageOrientation,
     },
     'animate-image-rendering': {
-      property: value => ({
-        '--jumi-image-rendering': value,
-        '--jumi-image-rendering-motion': transition('image-rendering'),
-        '--jumi-image-rendering-property': property('image-rendering'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-image-rendering': value,
+          '--jumi-image-rendering-animation-name': property('image-rendering', value),
+        })
+      },
       values: imageRendering,
     },
     'animate-initial-letter': {
+      fn: (value, { modifier = '' }) => {
+        return ({
+          '--jumi-initial-letter': modifier ? join([value, modifier]) : value,
+          '--jumi-initial-letter-animation-name': property('initial-letter', value),
+        })
+      },
       modifiers: initialLetterPosition,
-      property: (value, { modifier }) => ({
-        '--jumi-initial-letter': modifier ? join([value, modifier]) : value,
-        '--jumi-initial-letter-motion': transition('initial-letter'),
-        '--jumi-initial-letter-property': property('initial-letter'),
-      }),
       type: ['number', 'integer', 'any'],
       values: initialLetter,
     },
     'animate-inline-size': {
-      property: value => ({
-        '--jumi-inline-size': value,
-        '--jumi-inline-size-motion': transition('inline-size'),
-        '--jumi-inline-size-property': property('inline-size'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-inline-size': value,
+          '--jumi-inline-size-animation-name': property('inline-size', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: inlineSize,
     },
     'animate-inset': {
-      property: value => ({
-        '--jumi-inset': value,
-        '--jumi-inset-motion': transition('inset'),
-        '--jumi-inset-property': property('inset'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-inset': value,
+          '--jumi-inset-animation-name': property('inset', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('inset', inset),
     },
     'animate-inset-block': {
-      property: value => ({
-        '--jumi-inset-block': value,
-        '--jumi-inset-block-motion': transition('inset-block'),
-        '--jumi-inset-block-property': property('inset-block'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-inset-block': value,
+          '--jumi-inset-block-animation-name': property('inset-block', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('inset', inset),
     },
     'animate-inset-block-end': {
-      property: value => ({
-        '--jumi-inset-block-end': value,
-        '--jumi-inset-block-end-motion': transition('inset-block-end'),
-        '--jumi-inset-block-end-property': property('inset-block-end'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-inset-block-end': value,
+          '--jumi-inset-block-end-animation-name': property('inset-block-end', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('inset', inset),
     },
     'animate-inset-block-start': {
-      property: value => ({
-        '--jumi-inset-block-start': value,
-        '--jumi-inset-block-start-motion': transition('inset-block-start'),
-        '--jumi-inset-block-start-property': property('inset-block-start'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-inset-block-start': value,
+          '--jumi-inset-block-start-animation-name': property('inset-block-start', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('inset', inset),
     },
     'animate-inset-inline': {
-      property: value => ({
-        '--jumi-inset-inline': value,
-        '--jumi-inset-inline-motion': transition('inset-inline'),
-        '--jumi-inset-inline-property': property('inset-inline'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-inset-inline': value,
+          '--jumi-inset-inline-animation-name': property('inset-inline', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('inset', inset),
     },
     'animate-inset-inline-end': {
-      property: value => ({
-        '--jumi-inset-inline-end': value,
-        '--jumi-inset-inline-end-motion': transition('inset-inline-end'),
-        '--jumi-inset-inline-end-property': property('inset-inline-end'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-inset-inline-end': value,
+          '--jumi-inset-inline-end-animation-name': property('inset-inline-end', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('inset', inset),
     },
     'animate-inset-inline-start': {
-      property: value => ({
-        '--jumi-inset-inline-start': value,
-        '--jumi-inset-inline-start-motion': transition('inset-inline-start'),
-        '--jumi-inset-inline-start-property': property('inset-inline-start'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-inset-inline-start': value,
+          '--jumi-inset-inline-start-animation-name': property('inset-inline-start', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('inset', inset),
     },
     'animate-justify-content': {
-      property: value => ({
-        '--jumi-justify-content': value,
-        '--jumi-justify-content-motion': transition('justify-content'),
-        '--jumi-justify-content-property': property('justify-content'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-justify-content': value,
+          '--jumi-justify-content-animation-name': property('justify-content', value),
+        })
+      },
       values: justifyContent,
     },
     'animate-justify-items': {
-      property: value => ({
-        '--jumi-justify-items': value,
-        '--jumi-justify-items-motion': transition('justify-items'),
-        '--jumi-justify-items-property': property('justify-items'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-justify-items': value,
+          '--jumi-justify-items-animation-name': property('justify-items', value),
+        })
+      },
       values: justifyItems,
     },
     'animate-justify-self': {
-      property: value => ({
-        '--jumi-justify-self': value,
-        '--jumi-justify-self-motion': transition('justify-self'),
-        '--jumi-justify-self-property': property('justify-self'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-justify-self': value,
+          '--jumi-justify-self-animation-name': property('justify-self', value),
+        })
+      },
       values: justifySelf,
     },
     'animate-left': {
-      property: value => ({
-        '--jumi-left': value,
-        '--jumi-left-motion': transition('left'),
-        '--jumi-left-property': property('left'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-left': value,
+          '--jumi-left-animation-name': property('left', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('inset', inset),
     },
     'animate-letter-spacing': {
-      property: value => ({
-        '--jumi-letter-spacing': value,
-        '--jumi-letter-spacing-motion': transition('letter-spacing'),
-        '--jumi-letter-spacing-property': property('letter-spacing'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-letter-spacing': value,
+          '--jumi-letter-spacing-animation-name': property('letter-spacing', value),
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('letterSpacing'),
     },
     'animate-lighting-color': {
-      property: value => ({
-        '--jumi-lighting-color': value,
-        '--jumi-lighting-color-motion': transition('lighting-color'),
-        '--jumi-lighting-color-property': property('lighting-color'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-lighting-color': value,
+          '--jumi-lighting-color-animation-name': property('lighting-color', value),
+        })
+      },
       type: 'color',
       values: theme('colors'),
     },
     'animate-line-break': {
-      property: value => ({
-        '--jumi-line-break': value,
-        '--jumi-line-break-motion': transition('line-break'),
-        '--jumi-line-break-property': property('line-break'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-line-break': value,
+          '--jumi-line-break-animation-name': property('line-break', value),
+        })
+      },
       values: lineBreak,
     },
     'animate-line-clamp': {
-      property: value => ({
-        '--jumi-line-clamp': value,
-        '--jumi-line-clamp-motion': transition('line-clamp'),
-        '--jumi-line-clamp-property': property('line-clamp'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-line-clamp': value,
+          '--jumi-line-clamp-animation-name': property('line-clamp', value),
+        })
+      },
       type: ['number', 'any'],
       values: empty.none,
     },
     'animate-line-height': {
-      property: value => ({
-        '--jumi-line-height': value,
-        '--jumi-line-height-motion': transition('line-height'),
-        '--jumi-line-height-property': property('line-height'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-line-height': value,
+          '--jumi-line-height-animation-name': property('line-height', value),
+        })
+      },
       type: ['number', 'length', 'percentage'],
       values: theme('lineHeight'),
     },
     'animate-list-style': {
-      property: value => ({
-        '--jumi-list-style': value,
-        '--jumi-list-style-motion': transition('list-style'),
-        '--jumi-list-style-property': property('list-style'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-list-style': value,
+          '--jumi-list-style-animation-name': property('list-style', value),
+        })
+      },
       values: empty.none,
     },
     'animate-list-style-image': {
-      property: value => ({
-        '--jumi-list-style-image': value,
-        '--jumi-list-style-image-motion': transition('list-style-image'),
-        '--jumi-list-style-image-property': property('list-style-image'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-list-style-image': value,
+          '--jumi-list-style-image-animation-name': property('list-style-image', value),
+        })
+      },
       type: ['url', 'image', 'any'],
       values: empty.none,
     },
     'animate-list-style-position': {
-      property: value => ({
-        '--jumi-list-style-position': value,
-        '--jumi-list-style-position-motion': transition('list-style-position'),
-        '--jumi-list-style-position-property': property('list-style-position'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-list-style-position': value,
+          '--jumi-list-style-position-animation-name': property('list-style-position', value),
+        })
+      },
       values: listStylePosition,
     },
     'animate-list-style-type': {
-      property: value => ({
-        '--jumi-list-style-type': value,
-        '--jumi-list-style-type-motion': transition('list-style-type'),
-        '--jumi-list-style-type-property': property('list-style-type'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-list-style-type': value,
+          '--jumi-list-style-type-animation-name': property('list-style-type', value),
+        })
+      },
       values: listStyleType,
     },
     'animate-margin': {
-      property: value => ({
-        '--jumi-margin': value,
-        '--jumi-margin-motion': transition('margin'),
-        '--jumi-margin-property': property('margin'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-margin': value,
+          '--jumi-margin-animation-name': property('margin', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('margin'),
     },
     'animate-margin-block': {
-      property: value => ({
-        '--jumi-margin-block': value,
-        '--jumi-margin-block-motion': transition('margin-block'),
-        '--jumi-margin-block-property': property('margin-block'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-margin-block': value,
+          '--jumi-margin-block-animation-name': property('margin-block', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('margin'),
     },
     'animate-margin-block-end': {
-      property: value => ({
-        '--jumi-margin-block-end': value,
-        '--jumi-margin-block-end-motion': transition('margin-block-end'),
-        '--jumi-margin-block-end-property': property('margin-block-end'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-margin-block-end': value,
+          '--jumi-margin-block-end-animation-name': property('margin-block-end', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('margin'),
     },
     'animate-margin-block-start': {
-      property: value => ({
-        '--jumi-margin-block-start': value,
-        '--jumi-margin-block-start-motion': transition('margin-block-start'),
-        '--jumi-margin-block-start-property': property('margin-block-start'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-margin-block-start': value,
+          '--jumi-margin-block-start-animation-name': property('margin-block-start', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('margin'),
     },
     'animate-margin-bottom': {
-      property: value => ({
-        '--jumi-margin-bottom': value,
-        '--jumi-margin-bottom-motion': transition('margin-bottom'),
-        '--jumi-margin-bottom-property': property('margin-bottom'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-margin-bottom': value,
+          '--jumi-margin-bottom-animation-name': property('margin-bottom', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('margin'),
     },
     'animate-margin-inline': {
-      property: value => ({
-        '--jumi-margin-inline': value,
-        '--jumi-margin-inline-motion': transition('margin-inline'),
-        '--jumi-margin-inline-property': property('margin-inline'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-margin-inline': value,
+          '--jumi-margin-inline-animation-name': property('margin-inline', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('margin'),
     },
     'animate-margin-inline-end': {
-      property: value => ({
-        '--jumi-margin-inline-end': value,
-        '--jumi-margin-inline-end-motion': transition('margin-inline-end'),
-        '--jumi-margin-inline-end-property': property('margin-inline-end'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-margin-inline-end': value,
+          '--jumi-margin-inline-end-animation-name': property('margin-inline-end', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('margin'),
     },
     'animate-margin-inline-start': {
-      property: value => ({
-        '--jumi-margin-inline-start': value,
-        '--jumi-margin-inline-start-motion': transition('margin-inline-start'),
-        '--jumi-margin-inline-start-property': property('margin-inline-start'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-margin-inline-start': value,
+          '--jumi-margin-inline-start-animation-name': property('margin-inline-start', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('margin'),
     },
     'animate-margin-left': {
-      property: value => ({
-        '--jumi-margin-left': value,
-        '--jumi-margin-left-motion': transition('margin-left'),
-        '--jumi-margin-left-property': property('margin-left'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-margin-left': value,
+          '--jumi-margin-left-animation-name': property('margin-left', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('margin'),
     },
     'animate-margin-right': {
-      property: value => ({
-        '--jumi-margin-right': value,
-        '--jumi-margin-right-motion': transition('margin-right'),
-        '--jumi-margin-right-property': property('margin-right'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-margin-right': value,
+          '--jumi-margin-right-animation-name': property('margin-right', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('margin'),
     },
     'animate-margin-top': {
-      property: value => ({
-        '--jumi-margin-top': value,
-        '--jumi-margin-top-motion': transition('margin-top'),
-        '--jumi-margin-top-property': property('margin-top'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-margin-top': value,
+          '--jumi-margin-top-animation-name': property('margin-top', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('margin'),
     },
     'animate-marker': {
-      property: value => ({
-        '--jumi-marker': value,
-        '--jumi-marker-motion': transition('marker'),
-        '--jumi-marker-property': property('marker'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-marker': value,
+          '--jumi-marker-animation-name': property('marker', value),
+        })
+      },
       values: empty.none,
     },
     'animate-marker-end': {
-      property: value => ({
-        '--jumi-marker-end': value,
-        '--jumi-marker-end-motion': transition('marker-end'),
-        '--jumi-marker-end-property': property('marker-end'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-marker-end': value,
+          '--jumi-marker-end-animation-name': property('marker-end', value),
+        })
+      },
       values: empty.none,
     },
     'animate-marker-mid': {
-      property: value => ({
-        '--jumi-marker-mid': value,
-        '--jumi-marker-mid-motion': transition('marker-mid'),
-        '--jumi-marker-mid-property': property('marker-mid'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-marker-mid': value,
+          '--jumi-marker-mid-animation-name': property('marker-mid', value),
+        })
+      },
       values: empty.none,
     },
     'animate-marker-start': {
-      property: value => ({
-        '--jumi-marker-start': value,
-        '--jumi-marker-start-motion': transition('marker-start'),
-        '--jumi-marker-start-property': property('marker-start'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-marker-start': value,
+          '--jumi-marker-start-animation-name': property('marker-start', value),
+        })
+      },
       values: empty.none,
     },
     'animate-mask': {
-      property: value => ({
-        '--jumi-mask': value,
-        '--jumi-mask-motion': transition('mask'),
-        '--jumi-mask-property': property('mask'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask': value,
+          '--jumi-mask-animation-name': property('mask', value),
+        })
+      },
       values: empty.none,
     },
     'animate-mask-border': {
-      property: value => ({
-        '--jumi-mask-border': value,
-        '--jumi-mask-border-motion': transition('mask-border'),
-        '--jumi-mask-border-property': property('mask-border'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-border': value,
+          '--jumi-mask-border-animation-name': property('mask-border', value),
+        })
+      },
       values: empty.none,
     },
     'animate-mask-border-mode': {
-      property: value => ({
-        '--jumi-mask-border-mode': value,
-        '--jumi-mask-border-mode-motion': transition('mask-border-mode'),
-        '--jumi-mask-border-mode-property': property('mask-border-mode'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-border-mode': value,
+          '--jumi-mask-border-mode-animation-name': property('mask-border-mode', value),
+        })
+      },
       values: maskType,
     },
     'animate-mask-border-outset': {
-      property: value => ({
-        '--jumi-mask-border-outset': value,
-        '--jumi-mask-border-outset-motion': transition('mask-border-outset'),
-        '--jumi-mask-border-outset-property': property('mask-border-outset'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-border-outset': value,
+          '--jumi-mask-border-outset-animation-name': property('mask-border-outset', value),
+        })
+      },
       supportsNegativeValues: true,
       type: 'length',
       values: theme('inset'),
     },
     'animate-mask-border-outset-bottom': {
-      property: value => ({
-        '--jumi-mask-border-outset-bottom': value,
-        '--jumi-mask-border-outset-motion': transition('mask-border-outset'),
-        '--jumi-mask-border-outset-property': property('mask-border-outset'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-border-outset-animation-name': property('mask-border-outset', value),
+          '--jumi-mask-border-outset-bottom': value,
+        })
+      },
       supportsNegativeValues: true,
       type: 'length',
       values: theme('inset'),
     },
     'animate-mask-border-outset-left': {
-      property: value => ({
-        '--jumi-mask-border-outset-left': value,
-        '--jumi-mask-border-outset-motion': transition('mask-border-outset'),
-        '--jumi-mask-border-outset-property': property('mask-border-outset'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-border-outset-animation-name': property('mask-border-outset', value),
+          '--jumi-mask-border-outset-left': value,
+        })
+      },
       supportsNegativeValues: true,
       type: 'length',
       values: theme('inset'),
     },
     'animate-mask-border-outset-right': {
-      property: value => ({
-        '--jumi-mask-border-outset-motion': transition('mask-border-outset'),
-        '--jumi-mask-border-outset-property': property('mask-border-outset'),
-        '--jumi-mask-border-outset-right': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-border-outset-animation-name': property('mask-border-outset', value),
+          '--jumi-mask-border-outset-right': value,
+        })
+      },
       supportsNegativeValues: true,
       type: 'length',
       values: theme('inset'),
     },
     'animate-mask-border-outset-top': {
-      property: value => ({
-        '--jumi-mask-border-outset-motion': transition('mask-border-outset'),
-        '--jumi-mask-border-outset-property': property('mask-border-outset'),
-        '--jumi-mask-border-outset-top': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-border-outset-animation-name': property('mask-border-outset', value),
+          '--jumi-mask-border-outset-top': value,
+        })
+      },
       supportsNegativeValues: true,
       type: 'length',
       values: theme('inset'),
     },
     'animate-mask-border-outset-x': {
-      property: value => ({
-        '--jumi-mask-border-outset-left': value,
-        '--jumi-mask-border-outset-motion': transition('mask-border-outset'),
-        '--jumi-mask-border-outset-property': property('mask-border-outset'),
-        '--jumi-mask-border-outset-right': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-border-outset-animation-name': property('mask-border-outset', value),
+          '--jumi-mask-border-outset-left': value,
+          '--jumi-mask-border-outset-right': value,
+        })
+      },
       supportsNegativeValues: true,
       type: 'length',
       values: theme('inset'),
     },
     'animate-mask-border-outset-y': {
-      property: value => ({
-        '--jumi-mask-border-outset-bottom': value,
-        '--jumi-mask-border-outset-motion': transition('mask-border-outset'),
-        '--jumi-mask-border-outset-property': property('mask-border-outset'),
-        '--jumi-mask-border-outset-top': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-border-outset-animation-name': property('mask-border-outset', value),
+          '--jumi-mask-border-outset-bottom': value,
+          '--jumi-mask-border-outset-top': value,
+        })
+      },
       supportsNegativeValues: true,
       type: 'length',
       values: theme('inset'),
     },
     'animate-mask-border-repeat': {
-      property: value => ({
-        '--jumi-mask-border-repeat': value,
-        '--jumi-mask-border-repeat-motion': transition('mask-border-repeat'),
-        '--jumi-mask-border-repeat-property': property('mask-border-repeat'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-border-repeat': value,
+          '--jumi-mask-border-repeat-animation-name': property('mask-border-repeat', value),
+        })
+      },
       values: maskBorderRepeat,
     },
     'animate-mask-border-slice': {
-      property: value => ({
-        '--jumi-mask-border-slice': value,
-        '--jumi-mask-border-slice-motion': transition('mask-border-slice'),
-        '--jumi-mask-border-slice-property': property('mask-border-slice'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-border-slice': value,
+          '--jumi-mask-border-slice-animation-name': property('mask-border-slice', value),
+        })
+      },
       type: ['number', 'percentage', 'any'],
       values: theme('inset', maskBorderSlice),
     },
     'animate-mask-border-slice-bottom': {
-      property: value => ({
-        '--jumi-mask-border-slice-bottom': value,
-        '--jumi-mask-border-slice-motion': transition('mask-border-slice'),
-        '--jumi-mask-border-slice-property': property('mask-border-slice'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-border-slice-animation-name': property('mask-border-slice', value),
+          '--jumi-mask-border-slice-bottom': value,
+        })
+      },
       type: ['number', 'percentage', 'any'],
       values: theme('inset', maskBorderSlice),
     },
     'animate-mask-border-slice-left': {
-      property: value => ({
-        '--jumi-mask-border-slice-left': value,
-        '--jumi-mask-border-slice-motion': transition('mask-border-slice'),
-        '--jumi-mask-border-slice-property': property('mask-border-slice'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-border-slice-animation-name': property('mask-border-slice', value),
+          '--jumi-mask-border-slice-left': value,
+        })
+      },
       type: ['number', 'percentage', 'any'],
       values: theme('inset', maskBorderSlice),
     },
     'animate-mask-border-slice-right': {
-      property: value => ({
-        '--jumi-mask-border-slice-motion': transition('mask-border-slice'),
-        '--jumi-mask-border-slice-property': property('mask-border-slice'),
-        '--jumi-mask-border-slice-right': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-border-slice-animation-name': property('mask-border-slice', value),
+          '--jumi-mask-border-slice-right': value,
+        })
+      },
       type: ['number', 'percentage', 'any'],
       values: theme('inset', maskBorderSlice),
     },
     'animate-mask-border-slice-top': {
-      property: value => ({
-        '--jumi-mask-border-slice-motion': transition('mask-border-slice'),
-        '--jumi-mask-border-slice-property': property('mask-border-slice'),
-        '--jumi-mask-border-slice-top': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-border-slice-animation-name': property('mask-border-slice', value),
+          '--jumi-mask-border-slice-top': value,
+        })
+      },
       type: ['number', 'percentage', 'any'],
       values: theme('inset', maskBorderSlice),
     },
     'animate-mask-border-slice-x': {
-      property: value => ({
-        '--jumi-mask-border-slice-left': value,
-        '--jumi-mask-border-slice-motion': transition('mask-border-slice'),
-        '--jumi-mask-border-slice-property': property('mask-border-slice'),
-        '--jumi-mask-border-slice-right': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-border-slice-animation-name': property('mask-border-slice', value),
+          '--jumi-mask-border-slice-left': value,
+          '--jumi-mask-border-slice-right': value,
+        })
+      },
       type: ['number', 'percentage', 'any'],
       values: theme('inset', maskBorderSlice),
     },
     'animate-mask-border-slice-y': {
-      property: value => ({
-        '--jumi-mask-border-slice-bottom': value,
-        '--jumi-mask-border-slice-motion': transition('mask-border-slice'),
-        '--jumi-mask-border-slice-property': property('mask-border-slice'),
-        '--jumi-mask-border-slice-top': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-border-slice-animation-name': property('mask-border-slice', value),
+          '--jumi-mask-border-slice-bottom': value,
+          '--jumi-mask-border-slice-top': value,
+        })
+      },
       type: ['number', 'percentage', 'any'],
       values: theme('inset', maskBorderSlice),
     },
     'animate-mask-border-source': {
-      property: value => ({
-        '--jumi-mask-border-source': value,
-        '--jumi-mask-border-source-motion': transition('mask-border-source'),
-        '--jumi-mask-border-source-property': property('mask-border-source'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-border-source': value,
+          '--jumi-mask-border-source-animation-name': property('mask-border-source', value),
+        })
+      },
       type: ['url', 'image', 'any'],
       values: empty.none,
     },
     'animate-mask-border-width': {
-      property: value => ({
-        '--jumi-mask-border-width': value,
-        '--jumi-mask-border-width-motion': transition('mask-border-width'),
-        '--jumi-mask-border-width-property': property('mask-border-width'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-border-width': value,
+          '--jumi-mask-border-width-animation-name': property('mask-border-width', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('borderWidth'),
     },
     'animate-mask-clip': {
-      property: value => ({
-        '--jumi-mask-clip': value,
-        '--jumi-mask-clip-motion': transition('mask-clip'),
-        '--jumi-mask-clip-property': property('mask-clip'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-clip': value,
+          '--jumi-mask-clip-animation-name': property('mask-clip', value),
+        })
+      },
       values: maskClip,
     },
     'animate-mask-composite': {
-      property: value => ({
-        '--jumi-mask-composite': value,
-        '--jumi-mask-composite-motion': transition('mask-composite'),
-        '--jumi-mask-composite-property': property('mask-composite'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-composite': value,
+          '--jumi-mask-composite-animation-name': property('mask-composite', value),
+        })
+      },
       values: maskComposite,
     },
     'animate-mask-image': {
-      property: value => ({
-        '--jumi-mask-image': value,
-        '--jumi-mask-image-motion': transition('mask-image'),
-        '--jumi-mask-image-property': property('mask-image'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-image': value,
+          '--jumi-mask-image-animation-name': property('mask-image', value),
+        })
+      },
       type: ['url', 'image', 'any'],
       values: empty.none,
     },
     'animate-mask-mode': {
-      property: value => ({
-        '--jumi-mask-mode': value,
-        '--jumi-mask-mode-motion': transition('mask-mode'),
-        '--jumi-mask-mode-property': property('mask-mode'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-mode': value,
+          '--jumi-mask-mode-animation-name': property('mask-mode', value),
+        })
+      },
       values: maskMode,
     },
     'animate-mask-origin': {
-      property: value => ({
-        '--jumi-mask-origin': value,
-        '--jumi-mask-origin-motion': transition('mask-origin'),
-        '--jumi-mask-origin-property': property('mask-origin'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-origin': value,
+          '--jumi-mask-origin-animation-name': property('mask-origin', value),
+        })
+      },
       values: maskOrigin,
     },
     'animate-mask-position': {
-      property: value => ({
-        '--jumi-mask-position': value,
-        '--jumi-mask-position-motion': transition('mask-position'),
-        '--jumi-mask-position-property': property('mask-position'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-position': value,
+          '--jumi-mask-position-animation-name': property('mask-position', value),
+        })
+      },
       type: ['length', 'percentage', 'position'],
     },
     'animate-mask-repeat': {
-      property: value => ({
-        '--jumi-mask-repeat': value,
-        '--jumi-mask-repeat-motion': transition('mask-repeat'),
-        '--jumi-mask-repeat-property': property('mask-repeat'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-repeat': value,
+          '--jumi-mask-repeat-animation-name': property('mask-repeat', value),
+        })
+      },
       values: backgroundRepeat,
     },
     'animate-mask-size': {
-      property: value => ({
-        '--jumi-mask-size': value,
-        '--jumi-mask-size-motion': transition('mask-size'),
-        '--jumi-mask-size-property': property('mask-size'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-size': value,
+          '--jumi-mask-size-animation-name': property('mask-size', value),
+        })
+      },
       type: ['length', 'percentage'],
       values: theme('backgroundSize'),
     },
     'animate-mask-type': {
-      property: value => ({
-        '--jumi-mask-type': value,
-        '--jumi-mask-type-motion': transition('mask-type'),
-        '--jumi-mask-type-property': property('mask-type'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mask-type': value,
+          '--jumi-mask-type-animation-name': property('mask-type', value),
+        })
+      },
       values: maskType,
     },
     'animate-math-depth': {
-      property: value => ({
-        '--jumi-math-depth': value,
-        '--jumi-math-depth-motion': transition('math-depth'),
-        '--jumi-math-depth-property': property('math-depth'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-math-depth': value,
+          '--jumi-math-depth-animation-name': property('math-depth', value),
+        })
+      },
       supportsNegativeValues: true,
       type: 'integer',
       values: mathDepth,
     },
     'animate-math-depth-add': {
-      property: value => ({
-        '--jumi-math-depth': `add(${value})`,
-        '--jumi-math-depth-motion': transition('math-depth'),
-        '--jumi-math-depth-property': property('math-depth'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-math-depth': `add(${value})`,
+          '--jumi-math-depth-animation-name': property('math-depth', value),
+        })
+      },
       supportsNegativeValues: true,
       type: 'integer',
       values: empty.number,
     },
     'animate-math-style': {
-      property: value => ({
-        '--jumi-math-style': value,
-        '--jumi-math-style-motion': transition('math-style'),
-        '--jumi-math-style-property': property('math-style'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-math-style': value,
+          '--jumi-math-style-animation-name': property('math-style', value),
+        })
+      },
       values: mathStyle,
     },
     'animate-max-block-size': {
-      property: value => ({
-        '--jumi-max-block-size': value,
-        '--jumi-max-block-size-motion': transition('max-block-size'),
-        '--jumi-max-block-size-property': property('max-block-size'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-max-block-size': value,
+          '--jumi-max-block-size-animation-name': property('max-block-size', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('maxHeight'),
     },
     'animate-max-height': {
-      property: value => ({
-        '--jumi-max-height': value,
-        '--jumi-max-height-motion': transition('max-height'),
-        '--jumi-max-height-property': property('max-height'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-max-height': value,
+          '--jumi-max-height-animation-name': property('max-height', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('maxHeight'),
     },
     'animate-max-inline-size': {
-      property: value => ({
-        '--jumi-max-inline-size': value,
-        '--jumi-max-inline-size-motion': transition('max-inline-size'),
-        '--jumi-max-inline-size-property': property('max-inline-size'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-max-inline-size': value,
+          '--jumi-max-inline-size-animation-name': property('max-inline-size', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('maxWidth'),
     },
     'animate-max-width': {
-      property: value => ({
-        '--jumi-max-width': value,
-        '--jumi-max-width-motion': transition('max-width'),
-        '--jumi-max-width-property': property('max-width'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-max-width': value,
+          '--jumi-max-width-animation-name': property('max-width', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('maxWidth'),
     },
     'animate-min-block-size': {
-      property: value => ({
-        '--jumi-min-block-size': value,
-        '--jumi-min-block-size-motion': transition('min-block-size'),
-        '--jumi-min-block-size-property': property('min-block-size'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-min-block-size': value,
+          '--jumi-min-block-size-animation-name': property('min-block-size', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('minHeight'),
     },
     'animate-min-height': {
-      property: value => ({
-        '--jumi-min-height': value,
-        '--jumi-min-height-motion': transition('min-height'),
-        '--jumi-min-height-property': property('min-height'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-min-height': value,
+          '--jumi-min-height-animation-name': property('min-height', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('minHeight'),
     },
     'animate-min-inline-size': {
-      property: value => ({
-        '--jumi-min-inline-size': value,
-        '--jumi-min-inline-size-motion': transition('min-inline-size'),
-        '--jumi-min-inline-size-property': property('min-inline-size'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-min-inline-size': value,
+          '--jumi-min-inline-size-animation-name': property('min-inline-size', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('minWidth'),
     },
     'animate-min-width': {
-      property: value => ({
-        '--jumi-min-width': value,
-        '--jumi-min-width-motion': transition('min-width'),
-        '--jumi-min-width-property': property('min-width'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-min-width': value,
+          '--jumi-min-width-animation-name': property('min-width', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('minWidth'),
     },
     'animate-mix-blend-mode': {
-      property: value => ({
-        '--jumi-mix-blend-mode': value,
-        '--jumi-mix-blend-mode-motion': transition('mix-blend-mode'),
-        '--jumi-mix-blend-mode-property': property('mix-blend-mode'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-mix-blend-mode': value,
+          '--jumi-mix-blend-mode-animation-name': property('mix-blend-mode', value),
+        })
+      },
       values: mixBlendMode,
     },
     'animate-object-fit': {
-      property: value => ({
-        '--jumi-object-fit': value,
-        '--jumi-object-fit-motion': transition('object-fit'),
-        '--jumi-object-fit-property': property('object-fit'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-object-fit': value,
+          '--jumi-object-fit-animation-name': property('object-fit', value),
+        })
+      },
       values: objectFit,
     },
     'animate-object-position': {
-      property: value => ({
-        '--jumi-object-position': value,
-        '--jumi-object-position-motion': transition('object-position'),
-        '--jumi-object-position-property': property('object-position'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-object-position': value,
+          '--jumi-object-position-animation-name': property('object-position', value),
+        })
+      },
       type: ['length', 'percentage', 'position', 'any'],
       values: theme('objectPosition'),
     },
     'animate-object-position-x': {
-      property: value => ({
-        '--jumi-object-position-motion': transition('object-position'),
-        '--jumi-object-position-property': property('object-position'),
-        '--jumi-object-position-x': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-object-position-animation-name': property('object-position', value),
+          '--jumi-object-position-x': value,
+        })
+      },
       type: ['length', 'percentage', 'position'],
       values: empty.position,
     },
     'animate-object-position-x-edge': {
-      property: value => ({
-        '--jumi-object-position-motion': transition('object-position'),
-        '--jumi-object-position-property': property('object-position'),
-        '--jumi-object-position-x-edge': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-object-position-animation-name': property('object-position', value),
+          '--jumi-object-position-x-edge': value,
+        })
+      },
       type: 'position',
       values: objectPosition,
     },
     'animate-object-position-x-offset': {
-      property: value => ({
-        '--jumi-object-position-motion': transition('object-position'),
-        '--jumi-object-position-property': property('object-position'),
-        '--jumi-object-position-x-offset': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-object-position-animation-name': property('object-position', value),
+          '--jumi-object-position-x-offset': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: percentage,
     },
     'animate-object-position-y': {
-      property: value => ({
-        '--jumi-object-position-motion': transition('object-position'),
-        '--jumi-object-position-property': property('object-position'),
-        '--jumi-object-position-y': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-object-position-animation-name': property('object-position', value),
+          '--jumi-object-position-y': value,
+        })
+      },
       type: ['length', 'percentage', 'position'],
       values: empty.position,
     },
     'animate-object-position-y-edge': {
-      property: value => ({
-        '--jumi-object-position-motion': transition('object-position'),
-        '--jumi-object-position-property': property('object-position'),
-        '--jumi-object-position-y-edge': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-object-position-animation-name': property('object-position', value),
+          '--jumi-object-position-y-edge': value,
+        })
+      },
       type: 'position',
       values: objectPosition,
     },
     'animate-object-position-y-offset': {
-      property: value => ({
-        '--jumi-object-position-motion': transition('object-position'),
-        '--jumi-object-position-property': property('object-position'),
-        '--jumi-object-position-y-offset': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-object-position-animation-name': property('object-position', value),
+          '--jumi-object-position-y-offset': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: percentage,
     },
     'animate-offset': {
-      property: value => ({
-        '--jumi-offset': value,
-        '--jumi-offset-motion': transition('offset'),
-        '--jumi-offset-property': property('offset'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-offset': value,
+          '--jumi-offset-animation-name': property('offset', value),
+        })
+      },
       type: ['length', 'percentage', 'position', 'any'],
       values: offsetAnchor,
     },
     'animate-offset-anchor': {
-      property: value => ({
-        '--jumi-offset-anchor': value,
-        '--jumi-offset-anchor-motion': transition('offset-anchor'),
-        '--jumi-offset-anchor-property': property('offset-anchor'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-offset-anchor': value,
+          '--jumi-offset-anchor-animation-name': property('offset-anchor', value),
+        })
+      },
       type: ['length', 'percentage', 'position', 'any'],
       values: theme('objectPosition', empty.auto),
     },
     'animate-offset-anchor-x': {
-      property: value => ({
-        '--jumi-offset-anchor-motion': transition('offset-anchor'),
-        '--jumi-offset-anchor-property': property('offset-anchor'),
-        '--jumi-offset-anchor-x': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-offset-anchor-animation-name': property('offset-anchor', value),
+          '--jumi-offset-anchor-x': value,
+        })
+      },
       type: ['length', 'percentage', 'position'],
       values: empty.position,
     },
     'animate-offset-anchor-x-edge': {
-      property: value => ({
-        '--jumi-offset-anchor-motion': transition('offset-anchor'),
-        '--jumi-offset-anchor-property': property('offset-anchor'),
-        '--jumi-offset-anchor-x-edge': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-offset-anchor-animation-name': property('offset-anchor', value),
+          '--jumi-offset-anchor-x-edge': value,
+        })
+      },
       type: 'position',
       values: objectPosition,
     },
     'animate-offset-anchor-x-offset': {
-      property: value => ({
-        '--jumi-offset-anchor-motion': transition('offset-anchor'),
-        '--jumi-offset-anchor-property': property('offset-anchor'),
-        '--jumi-offset-anchor-x-offset': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-offset-anchor-animation-name': property('offset-anchor', value),
+          '--jumi-offset-anchor-x-offset': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: percentage,
     },
     'animate-offset-anchor-y': {
-      property: value => ({
-        '--jumi-offset-anchor-motion': transition('offset-anchor'),
-        '--jumi-offset-anchor-property': property('offset-anchor'),
-        '--jumi-offset-anchor-y': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-offset-anchor-animation-name': property('offset-anchor', value),
+          '--jumi-offset-anchor-y': value,
+        })
+      },
       type: ['length', 'percentage', 'position'],
       values: empty.position,
     },
     'animate-offset-anchor-y-edge': {
-      property: value => ({
-        '--jumi-offset-anchor-motion': transition('offset-anchor'),
-        '--jumi-offset-anchor-property': property('offset-anchor'),
-        '--jumi-offset-anchor-y-edge': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-offset-anchor-animation-name': property('offset-anchor', value),
+          '--jumi-offset-anchor-y-edge': value,
+        })
+      },
       type: 'position',
       values: objectPosition,
     },
     'animate-offset-anchor-y-offset': {
-      property: value => ({
-        '--jumi-offset-anchor-motion': transition('offset-anchor'),
-        '--jumi-offset-anchor-property': property('offset-anchor'),
-        '--jumi-offset-anchor-y-offset': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-offset-anchor-animation-name': property('offset-anchor', value),
+          '--jumi-offset-anchor-y-offset': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: percentage,
     },
     'animate-offset-distance': {
-      property: value => ({
-        '--jumi-offset-distance': value,
-        '--jumi-offset-distance-motion': transition('offset-distance'),
-        '--jumi-offset-distance-property': property('offset-distance'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-offset-distance': value,
+          '--jumi-offset-distance-animation-name': property('offset-distance', value),
+        })
+      },
       type: ['length', 'percentage'],
       values: percentage,
     },
     'animate-offset-path': {
-      property: value => ({
-        '--jumi-offset-path': value,
-        '--jumi-offset-path-motion': transition('offset-path'),
-        '--jumi-offset-path-property': property('offset-path'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-offset-path': value,
+          '--jumi-offset-path-animation-name': property('offset-path', value),
+        })
+      },
       values: offsetPath,
     },
     'animate-offset-position': {
-      property: value => ({
-        '--jumi-offset-position': value,
-        '--jumi-offset-position-motion': transition('offset-position'),
-        '--jumi-offset-position-property': property('offset-position'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-offset-position': value,
+          '--jumi-offset-position-animation-name': property('offset-position', value),
+        })
+      },
       type: ['length', 'percentage', 'position', 'any'],
       values: theme('objectPosition', offsetPosition),
     },
     'animate-offset-position-x': {
-      property: value => ({
-        '--jumi-offset-position-motion': transition('offset-position'),
-        '--jumi-offset-position-property': property('offset-position'),
-        '--jumi-offset-position-x': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-offset-position-animation-name': property('offset-position', value),
+          '--jumi-offset-position-x': value,
+        })
+      },
       type: ['length', 'percentage', 'position'],
       values: empty.position,
     },
     'animate-offset-position-x-edge': {
-      property: value => ({
-        '--jumi-offset-position-motion': transition('offset-position'),
-        '--jumi-offset-position-property': property('offset-position'),
-        '--jumi-offset-position-x-edge': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-offset-position-animation-name': property('offset-position', value),
+          '--jumi-offset-position-x-edge': value,
+        })
+      },
       type: 'position',
       values: objectPosition,
     },
     'animate-offset-position-x-offset': {
-      property: value => ({
-        '--jumi-offset-position-motion': transition('offset-position'),
-        '--jumi-offset-position-property': property('offset-position'),
-        '--jumi-offset-position-x-offset': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-offset-position-animation-name': property('offset-position', value),
+          '--jumi-offset-position-x-offset': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: percentage,
     },
     'animate-offset-position-y': {
-      property: value => ({
-        '--jumi-offset-position-motion': transition('offset-position'),
-        '--jumi-offset-position-property': property('offset-position'),
-        '--jumi-offset-position-y': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-offset-position-animation-name': property('offset-position', value),
+          '--jumi-offset-position-y': value,
+        })
+      },
       type: ['length', 'percentage', 'position'],
       values: empty.position,
     },
     'animate-offset-position-y-edge': {
-      property: value => ({
-        '--jumi-offset-position-motion': transition('offset-position'),
-        '--jumi-offset-position-property': property('offset-position'),
-        '--jumi-offset-position-y-edge': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-offset-position-animation-name': property('offset-position', value),
+          '--jumi-offset-position-y-edge': value,
+        })
+      },
       type: 'position',
       values: objectPosition,
     },
     'animate-offset-position-y-offset': {
-      property: value => ({
-        '--jumi-offset-position-motion': transition('offset-position'),
-        '--jumi-offset-position-property': property('offset-position'),
-        '--jumi-offset-position-y-offset': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-offset-position-animation-name': property('offset-position', value),
+          '--jumi-offset-position-y-offset': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: percentage,
     },
     'animate-offset-rotate': {
-      property: value => ({
-        '--jumi-offset-rotate': value,
-        '--jumi-offset-rotate-motion': transition('offset-rotate'),
-        '--jumi-offset-rotate-property': property('offset-rotate'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-offset-rotate': value,
+          '--jumi-offset-rotate-animation-name': property('offset-rotate', value),
+        })
+      },
       type: ['angle', 'any'],
       values: theme('rotate', offsetRotate),
     },
     'animate-opacity': {
-      property: value => ({
-        '--jumi-opacity': value,
-        '--jumi-opacity-motion': transition('opacity'),
-        '--jumi-opacity-property': property('opacity'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-opacity': value,
+          '--jumi-opacity-animation-name': property('opacity', value),
+        })
+      },
       type: ['number', 'percentage'],
       values: theme('opacity'),
     },
     'animate-order': {
-      property: value => ({
-        '--jumi-order': value,
-        '--jumi-order-motion': transition('order'),
-        '--jumi-order-property': property('order'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-order': value,
+          '--jumi-order-animation-name': property('order', value),
+        })
+      },
       supportsNegativeValues: true,
       type: 'integer',
       values: theme('order'),
     },
     'animate-orphans': {
-      property: value => ({
-        '--jumi-orphans': value,
-        '--jumi-orphans-motion': transition('orphans'),
-        '--jumi-orphans-property': property('orphans'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-orphans': value,
+          '--jumi-orphans-animation-name': property('orphans', value),
+        })
+      },
       type: 'integer',
       values: empty.number,
     },
     'animate-outline': {
-      property: value => ({
-        '--jumi-outline': value,
-        '--jumi-outline-motion': transition('outline'),
-        '--jumi-outline-property': property('outline'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-outline': value,
+          '--jumi-outline-animation-name': property('outline', value),
+        })
+      },
       type: ['line-width', 'length', 'color', 'any'],
       values: empty.none,
     },
     'animate-outline-color': {
-      property: value => ({
-        '--jumi-outline-color': value,
-        '--jumi-outline-motion': transition('outline'),
-        '--jumi-outline-property': property('outline'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-outline-animation-name': property('outline', value),
+          '--jumi-outline-color': value,
+        })
+      },
       type: 'color',
       values: theme('outlineColor'),
     },
     'animate-outline-offset': {
-      property: value => ({
-        '--jumi-outline-motion': transition('outline'),
-        '--jumi-outline-offset': value,
-        '--jumi-outline-property': property('outline'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-outline-animation-name': property('outline', value),
+          '--jumi-outline-offset': value,
+        })
+      },
       type: 'length',
       values: theme('outlineOffset'),
     },
     'animate-outline-style': {
-      property: value => ({
-        '--jumi-outline-motion': transition('outline'),
-        '--jumi-outline-property': property('outline'),
-        '--jumi-outline-style': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-outline-animation-name': property('outline', value),
+          '--jumi-outline-style': value,
+        })
+      },
       values: outlineStyle,
     },
     'animate-outline-width': {
-      property: value => ({
-        '--jumi-outline-motion': transition('outline'),
-        '--jumi-outline-property': property('outline'),
-        '--jumi-outline-width': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-outline-animation-name': property('outline', value),
+          '--jumi-outline-width': value,
+        })
+      },
       type: ['line-width'],
       values: theme('outlineWidth'),
     },
     'animate-overflow': {
-      property: value => ({
-        '--jumi-overflow': value,
-        '--jumi-overflow-motion': transition('overflow'),
-        '--jumi-overflow-property': property('overflow'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-overflow': value,
+          '--jumi-overflow-animation-name': property('overflow', value),
+        })
+      },
       values: overflow,
     },
     'animate-overflow-anchor': {
-      property: value => ({
-        '--jumi-overflow-anchor': value,
-        '--jumi-overflow-anchor-motion': transition('overflow-anchor'),
-        '--jumi-overflow-anchor-property': property('overflow-anchor'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-overflow-anchor': value,
+          '--jumi-overflow-anchor-animation-name': property('overflow-anchor', value),
+        })
+      },
       values: overflowAnchor,
     },
     'animate-overflow-block': {
-      property: value => ({
-        '--jumi-overflow-block': value,
-        '--jumi-overflow-block-motion': transition('overflow-block'),
-        '--jumi-overflow-block-property': property('overflow-block'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-overflow-block': value,
+          '--jumi-overflow-block-animation-name': property('overflow-block', value),
+        })
+      },
       values: overflow,
     },
     'animate-overflow-clip-margin': {
-      property: value => ({
-        '--jumi-overflow-clip-margin': value,
-        '--jumi-overflow-clip-margin-motion': transition('overflow-clip-margin'),
-        '--jumi-overflow-clip-margin-property': property('overflow-clip-margin'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-overflow-clip-margin': value,
+          '--jumi-overflow-clip-margin-animation-name': property('overflow-clip-margin', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'any'],
       values: overflowClipMargin,
     },
     'animate-overflow-inline': {
-      property: value => ({
-        '--jumi-overflow-inline': value,
-        '--jumi-overflow-inline-motion': transition('overflow-inline'),
-        '--jumi-overflow-inline-property': property('overflow-inline'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-overflow-inline': value,
+          '--jumi-overflow-inline-animation-name': property('overflow-inline', value),
+        })
+      },
       values: overflow,
     },
     'animate-overflow-wrap': {
-      property: value => ({
-        '--jumi-overflow-wrap': value,
-        '--jumi-overflow-wrap-motion': transition('overflow-wrap'),
-        '--jumi-overflow-wrap-property': property('overflow-wrap'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-overflow-wrap': value,
+          '--jumi-overflow-wrap-animation-name': property('overflow-wrap', value),
+        })
+      },
       values: overflowWrap,
     },
     'animate-overflow-x': {
-      property: value => ({
-        '--jumi-overflow-motion': transition('overflow'),
-        '--jumi-overflow-property': property('overflow'),
-        '--jumi-overflow-x': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-overflow-animation-name': property('overflow', value),
+          '--jumi-overflow-x': value,
+        })
+      },
       values: overflow,
     },
     'animate-overflow-y': {
-      property: value => ({
-        '--jumi-overflow-motion': transition('overflow'),
-        '--jumi-overflow-property': property('overflow'),
-        '--jumi-overflow-y': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-overflow-animation-name': property('overflow', value),
+          '--jumi-overflow-y': value,
+        })
+      },
       values: overflow,
     },
     'animate-overscroll-behavior': {
-      property: value => ({
-        '--jumi-overscroll-behavior': value,
-        '--jumi-overscroll-behavior-motion': transition('overscroll-behavior'),
-        '--jumi-overscroll-behavior-property': property('overscroll-behavior'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-overscroll-behavior': value,
+          '--jumi-overscroll-behavior-animation-name': property('overscroll-behavior', value),
+        })
+      },
       values: empty.auto,
     },
     'animate-overscroll-behavior-block': {
-      property: value => ({
-        '--jumi-overscroll-behavior-block': value,
-        '--jumi-overscroll-behavior-block-motion': transition('overscroll-behavior-block'),
-        '--jumi-overscroll-behavior-block-property': property('overscroll-behavior-block'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-overscroll-behavior-block': value,
+          '--jumi-overscroll-behavior-block-animation-name': property('overscroll-behavior-block', value),
+        })
+      },
       values: overscrollBehavior,
     },
     'animate-overscroll-behavior-inline': {
-      property: value => ({
-        '--jumi-overscroll-behavior-inline': value,
-        '--jumi-overscroll-behavior-inline-motion': transition('overscroll-behavior-inline'),
-        '--jumi-overscroll-behavior-inline-property': property('overscroll-behavior-inline'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-overscroll-behavior-inline': value,
+          '--jumi-overscroll-behavior-inline-animation-name': property('overscroll-behavior-inline', value),
+        })
+      },
       values: overscrollBehavior,
     },
     'animate-overscroll-behavior-x': {
-      property: value => ({
-        '--jumi-overscroll-behavior-x': value,
-        '--jumi-overscroll-behavior-x-motion': transition('overscroll-behavior-x'),
-        '--jumi-overscroll-behavior-x-property': property('overscroll-behavior-x'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-overscroll-behavior-x': value,
+          '--jumi-overscroll-behavior-x-animation-name': property('overscroll-behavior-x', value),
+        })
+      },
       values: overscrollBehavior,
     },
     'animate-overscroll-behavior-y': {
-      property: value => ({
-        '--jumi-overscroll-behavior-y': value,
-        '--jumi-overscroll-behavior-y-motion': transition('overscroll-behavior-y'),
-        '--jumi-overscroll-behavior-y-property': property('overscroll-behavior-y'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-overscroll-behavior-y': value,
+          '--jumi-overscroll-behavior-y-animation-name': property('overscroll-behavior-y', value),
+        })
+      },
       values: overscrollBehavior,
     },
     'animate-padding': {
-      property: value => ({
-        '--jumi-padding': value,
-        '--jumi-padding-motion': transition('padding'),
-        '--jumi-padding-property': property('padding'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-padding': value,
+          '--jumi-padding-animation-name': property('padding', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('padding'),
     },
     'animate-padding-block': {
-      property: value => ({
-        '--jumi-padding-block': value,
-        '--jumi-padding-block-motion': transition('padding-block'),
-        '--jumi-padding-block-property': property('padding-block'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-padding-block': value,
+          '--jumi-padding-block-animation-name': property('padding-block', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('padding'),
     },
     'animate-padding-block-end': {
-      property: value => ({
-        '--jumi-padding-block-end': value,
-        '--jumi-padding-block-end-motion': transition('padding-block-end'),
-        '--jumi-padding-block-end-property': property('padding-block-end'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-padding-block-end': value,
+          '--jumi-padding-block-end-animation-name': property('padding-block-end', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('padding'),
     },
     'animate-padding-block-start': {
-      property: value => ({
-        '--jumi-padding-block-start': value,
-        '--jumi-padding-block-start-motion': transition('padding-block-start'),
-        '--jumi-padding-block-start-property': property('padding-block-start'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-padding-block-start': value,
+          '--jumi-padding-block-start-animation-name': property('padding-block-start', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('padding'),
     },
     'animate-padding-bottom': {
-      property: value => ({
-        '--jumi-padding-bottom': value,
-        '--jumi-padding-bottom-motion': transition('padding-bottom'),
-        '--jumi-padding-bottom-property': property('padding-bottom'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-padding-bottom': value,
+          '--jumi-padding-bottom-animation-name': property('padding-bottom', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('padding'),
     },
     'animate-padding-inline': {
-      property: value => ({
-        '--jumi-padding-inline': value,
-        '--jumi-padding-inline-motion': transition('padding-inline'),
-        '--jumi-padding-inline-property': property('padding-inline'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-padding-inline': value,
+          '--jumi-padding-inline-animation-name': property('padding-inline', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('padding'),
     },
     'animate-padding-inline-end': {
-      property: value => ({
-        '--jumi-padding-inline-end': value,
-        '--jumi-padding-inline-end-motion': transition('padding-inline-end'),
-        '--jumi-padding-inline-end-property': property('padding-inline-end'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-padding-inline-end': value,
+          '--jumi-padding-inline-end-animation-name': property('padding-inline-end', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('padding'),
     },
     'animate-padding-inline-start': {
-      property: value => ({
-        '--jumi-padding-inline-start': value,
-        '--jumi-padding-inline-start-motion': transition('padding-inline-start'),
-        '--jumi-padding-inline-start-property': property('padding-inline-start'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-padding-inline-start': value,
+          '--jumi-padding-inline-start-animation-name': property('padding-inline-start', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('padding'),
     },
     'animate-padding-left': {
-      property: value => ({
-        '--jumi-padding-left': value,
-        '--jumi-padding-left-motion': transition('padding-left'),
-        '--jumi-padding-left-property': property('padding-left'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-padding-left': value,
+          '--jumi-padding-left-animation-name': property('padding-left', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('padding'),
     },
     'animate-padding-right': {
-      property: value => ({
-        '--jumi-padding-right': value,
-        '--jumi-padding-right-motion': transition('padding-right'),
-        '--jumi-padding-right-property': property('padding-right'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-padding-right': value,
+          '--jumi-padding-right-animation-name': property('padding-right', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('padding'),
     },
     'animate-padding-top': {
-      property: value => ({
-        '--jumi-padding-top': value,
-        '--jumi-padding-top-motion': transition('padding-top'),
-        '--jumi-padding-top-property': property('padding-top'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-padding-top': value,
+          '--jumi-padding-top-animation-name': property('padding-top', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('padding'),
     },
     'animate-page': {
-      property: value => ({
-        '--jumi-page': value,
-        '--jumi-page-motion': transition('page'),
-        '--jumi-page-property': property('page'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-page': value,
+          '--jumi-page-animation-name': property('page', value),
+        })
+      },
       values: empty.auto,
     },
     'animate-paint-order': {
-      property: value => ({
-        '--jumi-paint-order': value,
-        '--jumi-paint-order-motion': transition('paint-order'),
-        '--jumi-paint-order-property': property('paint-order'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-paint-order': value,
+          '--jumi-paint-order-animation-name': property('paint-order', value),
+        })
+      },
       values: paintOrder,
     },
     'animate-position': {
-      property: value => ({
-        '--jumi-position': value,
-        '--jumi-position-motion': transition('position'),
-        '--jumi-position-property': property('position'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-position': value,
+          '--jumi-position-animation-name': property('position', value),
+        })
+      },
       values: position,
     },
     'animate-right': {
-      property: value => ({
-        '--jumi-right': value,
-        '--jumi-right-motion': transition('right'),
-        '--jumi-right-property': property('right'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-right': value,
+          '--jumi-right-animation-name': property('right', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('inset', inset),
     },
     'animate-rotate': {
-      property: value => ({
-        '--jumi-rotate': value,
-        '--jumi-rotate-motion': transition('rotate'),
-        '--jumi-rotate-property': property('rotate'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-rotate': value,
+          '--jumi-rotate-animation-name': property('rotate', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['angle', 'any'],
       values: theme('rotate'),
     },
     'animate-rotate-3d': {
-      property: value => ({
-        '--jumi-rotate-3d': css('rotate3d', value),
-        '--jumi-transform-motion': transition('transform'),
-        '--jumi-transform-property': property('transform'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-rotate-3d': css('rotate3d', value),
+          '--jumi-transform-animation-name': property('transform', value),
+        })
+      },
       values: empty.string,
     },
     'animate-rotate-angle': {
-      property: value => ({
-        '--jumi-rotate-angle': value,
-        '--jumi-rotate-motion': transition('rotate'),
-        '--jumi-rotate-property': property('rotate'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-rotate-angle': value,
+          '--jumi-rotate-animation-name': property('rotate', value),
+        })
+      },
       supportsNegativeValues: true,
       type: 'angle',
       values: theme('rotate'),
     },
     'animate-rotate-x': {
-      property: value => ({
-        '--jumi-rotate-motion': transition('rotate'),
-        '--jumi-rotate-property': property('rotate'),
-        '--jumi-rotate-x': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-rotate-animation-name': property('rotate', value),
+          '--jumi-rotate-x': value,
+        })
+      },
       supportsNegativeValues: true,
       type: 'number',
       values: rotate,
     },
     'animate-rotate-y': {
-      property: value => ({
-        '--jumi-rotate-motion': transition('rotate'),
-        '--jumi-rotate-property': property('rotate'),
-        '--jumi-rotate-y': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-rotate-animation-name': property('rotate', value),
+          '--jumi-rotate-y': value,
+        })
+      },
       supportsNegativeValues: true,
       type: 'number',
       values: rotate,
     },
     'animate-rotate-z': {
-      property: value => ({
-        '--jumi-rotate-motion': transition('rotate'),
-        '--jumi-rotate-property': property('rotate'),
-        '--jumi-rotate-z': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-rotate-animation-name': property('rotate', value),
+          '--jumi-rotate-z': value,
+        })
+      },
       supportsNegativeValues: true,
       type: 'number',
       values: rotate,
     },
     'animate-row-gap': {
-      property: value => ({
-        '--jumi-gap-motion': transition('gap'),
-        '--jumi-gap-property': property('gap'),
-        '--jumi-row-gap': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-gap-animation-name': property('gap', value),
+          '--jumi-row-gap': value,
+        })
+      },
       values: empty.number,
     },
     'animate-scale': {
-      property: (value) => {
+      fn: (value) => {
         return {
           '--jumi-scale': value,
-          '--jumi-scale-motion': transition('scale'),
-          '--jumi-scale-property': property('scale'),
+          '--jumi-scale-animation-name': property('scale', value),
         }
       },
       supportsNegativeValues: true,
@@ -3342,492 +3702,548 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       values: theme('scale'),
     },
     'animate-scale-x': {
-      property: value => ({
-        '--jumi-scale-motion': transition('scale'),
-        '--jumi-scale-property': property('scale'),
-        '--jumi-scale-x': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-scale-animation-name': property('scale', value),
+          '--jumi-scale-x': value,
+        })
+      },
       supportsNegativeValues: true,
       type: 'number',
       values: theme('scale'),
     },
     'animate-scale-y': {
-      property: value => ({
-        '--jumi-scale-motion': transition('scale'),
-        '--jumi-scale-property': property('scale'),
-        '--jumi-scale-y': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-scale-animation-name': property('scale', value),
+          '--jumi-scale-y': value,
+        })
+      },
       supportsNegativeValues: true,
       type: 'number',
       values: theme('scale'),
     },
     'animate-scale-z': {
-      property: value => ({
-        '--jumi-scale-motion': transition('scale'),
-        '--jumi-scale-property': property('scale'),
-        '--jumi-scale-z': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-scale-animation-name': property('scale', value),
+          '--jumi-scale-z': value,
+        })
+      },
       supportsNegativeValues: true,
       type: 'number',
       values: theme('scale'),
     },
     'animate-skew': {
-      property: (value) => {
+      fn: (value) => {
         const [x, y] = value.split(/\s+/)
         return {
+          '--jumi-skew-animation-name': property('transform', value),
           '--jumi-skew-x': x ?? value,
           '--jumi-skew-y': y ?? x ?? value,
-          '--jumi-transform-motion': transition('transform'),
-          '--jumi-transform-property': property('transform'),
         }
       },
       supportsNegativeValues: true,
       values: theme('skew'),
     },
     'animate-skew-x': {
-      property: value => ({
-        '--jumi-skew-x': value,
-        '--jumi-transform-motion': transition('transform'),
-        '--jumi-transform-property': property('transform'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-skew-x': value,
+          '--jumi-transform-animation-name': property('transform', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('skew'),
     },
     'animate-skew-y': {
-      property: value => ({
-        '--jumi-skew-y': value,
-        '--jumi-transform-motion': transition('transform'),
-        '--jumi-transform-property': property('transform'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-skew-y': value,
+          '--jumi-transform-animation-name': property('transform', value),
+        })
+      },
       supportsNegativeValues: true,
       values: theme('skew'),
     },
     'animate-stroke': {
-      property: value => ({
-        '--jumi-stroke': value,
-        '--jumi-stroke-motion': transition('stroke'),
-        '--jumi-stroke-property': property('stroke'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-stroke': value,
+          '--jumi-stroke-animation-name': property('stroke', value),
+        })
+      },
       values: theme('colors'),
     },
     'animate-stroke-width': {
-      property: value => ({
-        '--jumi-stroke-width': value,
-        '--jumi-stroke-width-motion': transition('stroke-width'),
-        '--jumi-stroke-width-property': property('stroke-width'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-stroke-width': value,
+          '--jumi-stroke-width-animation-name': property('stroke-width', value),
+        })
+      },
       values: theme('strokeWidth'),
     },
     'animate-text-align': {
-      property: value => ({
-        '--jumi-text-align': value,
-        '--jumi-text-align-motion': transition('text-align'),
-        '--jumi-text-align-property': property('text-align'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-text-align': value,
+          '--jumi-text-align-animation-name': property('text-align', value),
+        })
+      },
       values: textAlign,
     },
     'animate-text-shadow': {
-      property: value => ({
-        '--jumi-text-shadow': value,
-        '--jumi-text-shadow-motion': transition('text-shadow'),
-        '--jumi-text-shadow-property': property('text-shadow'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-text-shadow': value,
+          '--jumi-text-shadow-animation-name': property('text-shadow', value),
+        })
+      },
       values: theme('dropShadow'),
     },
     'animate-text-shadow-blur': {
-      property: value => ({
-        '--jumi-text-shadow-blur-radius': value,
-        '--jumi-text-shadow-motion': transition('text-shadow'),
-        '--jumi-text-shadow-property': property('text-shadow'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-text-shadow-animation-name': property('text-shadow', value),
+          '--jumi-text-shadow-blur-radius': value,
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
       values: theme('blur'),
     },
     'animate-text-shadow-color': {
-      property: value => ({
-        '--jumi-text-shadow-color': value,
-        '--jumi-text-shadow-motion': transition('text-shadow'),
-        '--jumi-text-shadow-property': property('text-shadow'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-text-shadow-animation-name': property('text-shadow', value),
+          '--jumi-text-shadow-color': value,
+        })
+      },
       type: 'color',
       values: theme('boxShadowColor'),
     },
     'animate-text-shadow-offset-x': {
-      property: value => ({
-        '--jumi-text-shadow-motion': transition('text-shadow'),
-        '--jumi-text-shadow-offset-x': value,
-        '--jumi-text-shadow-property': property('text-shadow'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-text-shadow-animation-name': property('text-shadow', value),
+          '--jumi-text-shadow-offset-x': value,
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
     },
     'animate-text-shadow-offset-y': {
-      property: value => ({
-        '--jumi-text-shadow-motion': transition('text-shadow'),
-        '--jumi-text-shadow-offset-y': value,
-        '--jumi-text-shadow-property': property('text-shadow'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-text-shadow-animation-name': property('text-shadow', value),
+          '--jumi-text-shadow-offset-y': value,
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
     },
     'animate-top': {
-      property: value => ({
-        '--jumi-top': value,
-        '--jumi-top-motion': transition('top'),
-        '--jumi-top-property': property('top'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-top': value,
+          '--jumi-top-animation-name': property('top', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('inset', inset),
     },
     'animate-transform': {
-      property: value => ({
-        '--jumi-transform': value,
-        '--jumi-transform-motion': transition('transform'),
-        '--jumi-transform-property': property('transform'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-transform': value,
+          '--jumi-transform-animation-name': property('transform', value),
+        })
+      },
       values: empty.string,
     },
     'animate-transform-origin': {
-      property: value => ({
-        '--jumi-transform-origin': value,
-        '--jumi-transform-origin-motion': transition('transform-origin'),
-        '--jumi-transform-origin-property': property('transform-origin'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-transform-origin': value,
+          '--jumi-transform-origin-animation-name': property('transform-origin', value),
+        })
+      },
       type: ['length', 'percentage', 'position', 'any'],
       values: theme('transformOrigin'),
     },
     'animate-transform-origin-x': {
-      property: value => ({
-        '--jumi-transform-origin-motion': transition('transform-origin'),
-        '--jumi-transform-origin-property': property('transform-origin'),
-        '--jumi-transform-origin-x': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-transform-origin-animation-name': property('transform-origin', value),
+          '--jumi-transform-origin-x': value,
+        })
+      },
       type: ['length', 'percentage', 'position'],
       values: originX,
     },
     'animate-transform-origin-y': {
-      property: value => ({
-        '--jumi-transform-origin-motion': transition('transform-origin'),
-        '--jumi-transform-origin-property': property('transform-origin'),
-        '--jumi-transform-origin-y': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-transform-origin-animation-name': property('transform-origin', value),
+          '--jumi-transform-origin-y': value,
+        })
+      },
       type: ['length', 'percentage', 'position'],
       values: originY,
     },
     'animate-transform-origin-z': {
-      property: value => ({
-        '--jumi-transform-origin-motion': transition('transform-origin'),
-        '--jumi-transform-origin-property': property('transform-origin'),
-        '--jumi-transform-origin-z': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-transform-origin-animation-name': property('transform-origin', value),
+          '--jumi-transform-origin-z': value,
+        })
+      },
       supportsNegativeValues: true,
       type: ['length'],
       values: empty.number,
     },
     'animate-transform-style': {
-      property: value => ({
-        '--jumi-transform-motion': transition('transform'),
-        '--jumi-transform-property': property('transform'),
-        '--jumi-transform-style': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-transform-animation-name': property('transform', value),
+          '--jumi-transform-style': value,
+        })
+      },
       values: transformStyle,
     },
     'animate-translate': {
-      property: (value) => {
+      fn: (value) => {
         return {
           '--jumi-translate': value,
-          '--jumi-translate-motion': transition('translate'),
-          '--jumi-translate-property': property('translate'),
+          '--jumi-translate-animation-name': property('translate', value),
         }
       },
       supportsNegativeValues: true,
       values: theme('translate'),
     },
     'animate-translate-3d': {
-      property: value => ({
-        '--jumi-transform-motion': transition('transform'),
-        '--jumi-transform-property': property('transform'),
-        '--jumi-translate-3d': css('translate3d', value),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-transform-animation-name': property('transform', value),
+          '--jumi-translate-3d': css('translate3d', value),
+        })
+      },
       type: ['length', 'percentage', 'any'],
       values: empty.string,
     },
     'animate-translate-x': {
-      property: value => ({
-        '--jumi-translate-motion': transition('translate'),
-        '--jumi-translate-property': property('translate'),
-        '--jumi-translate-x': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-translate-animation-name': property('translate', value),
+          '--jumi-translate-x': value,
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
       values: theme('translate'),
     },
     'animate-translate-y': {
-      property: value => ({
-        '--jumi-translate-motion': transition('translate'),
-        '--jumi-translate-property': property('translate'),
-        '--jumi-translate-y': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-translate-animation-name': property('translate', value),
+          '--jumi-translate-y': value,
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
       values: theme('translate'),
     },
     'animate-translate-z': {
-      property: value => ({
-        '--jumi-translate-motion': transition('translate'),
-        '--jumi-translate-property': property('translate'),
-        '--jumi-translate-z': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-translate-animation-name': property('translate', value),
+          '--jumi-translate-z': value,
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
       values: theme('translate'),
     },
     'animate-visibility': {
-      property: value => ({
-        '--jumi-visibility': value,
-        '--jumi-visibility-motion': transition('visibility'),
-        '--jumi-visibility-property': property('visibility'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-visibility': value,
+          '--jumi-visibility-animation-name': property('visibility', value),
+        })
+      },
       values: visibility,
     },
     'animate-width': {
-      property: value => ({
-        '--jumi-width': value,
-        '--jumi-width-motion': transition('width'),
-        '--jumi-width-property': property('width'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-width': value,
+          '--jumi-width-animation-name': property('width', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('width'),
     },
     'animate-x': {
-      property: value => ({
-        '--jumi-transform-motion': transition('x'),
-        '--jumi-transform-property': property('x'),
-        '--jumi-x': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-x': value,
+          '--jumi-x-animation-name': property('x', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
       values: empty.number,
     },
     'animate-y': {
-      property: value => ({
-        '--jumi-transform-motion': transition('y'),
-        '--jumi-transform-property': property('y'),
-        '--jumi-y': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-y': value,
+          '--jumi-y-animation-name': property('y', value),
+        })
+      },
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
       values: empty.number,
     },
     'animate-z-index': {
-      property: value => ({
-        '--jumi-z-index': value,
-        '--jumi-z-index-motion': transition('z-index'),
-        '--jumi-z-index-property': property('z-index'),
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-z-index': value,
+          '--jumi-z-index-animation-name': property('z-index', value),
+        })
+      },
       values: theme('zIndex'),
     },
     'animation-composition': {
-      property: value => ({
-        '--jumi-animation-composition': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-animation-composition': value,
+        })
+      },
       values: animationComposition,
     },
     'animation-delay': {
-      modifiers,
-      property: (value, { modifier }) => {
+      fn: (value, { modifier = '' }) => {
         if (!modifier) return { '--jumi-animation-delay': value }
         return { [`--jumi-${modifier}-animation-delay`]: value }
       },
+      modifiers,
       values: theme('transitionDelay'),
     },
     'animation-direction': {
-      modifiers,
-      property: (value, { modifier }) => {
+      fn: (value, { modifier = '' }) => {
         if (!modifier) return { '--jumi-animation-direction': value }
         return { [`--jumi-${modifier}-animation-direction`]: value }
       },
+      modifiers,
       values: animationDirection,
     },
     'animation-duration': {
-      modifiers,
-      property: (value, { modifier }) => {
+      fn: (value, { modifier = '' }) => {
         if (!modifier) return { '--jumi-animation-duration': value }
         return { [`--jumi-${modifier}-animation-duration`]: value }
       },
+      modifiers,
       values: theme('transitionDuration'),
     },
     'animation-fill-mode': {
-      modifiers,
-      property: (value, { modifier }) => {
+      fn: (value, { modifier = '' }) => {
         if (!modifier) return { '--jumi-animation-fill-mode': value }
         return { [`--jumi-${modifier}-animation-fill-mode`]: value }
       },
+      modifiers,
       values: animationFillMode,
     },
     'animation-iteration-count': {
-      modifiers,
-      property: (value, { modifier }) => {
+      fn: (value, { modifier = '' }) => {
         if (!modifier) return { '--jumi-animation-iteration-count': value }
         return { [`--jumi-${modifier}-animation-iteration-count`]: value }
       },
+      modifiers,
       type: 'number',
       values: animationIterationCount,
     },
     'animation-name': {
-      property: value => ({
-        '--jumi-animation-name': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-animation-name': value,
+        })
+      },
       values: empty.none,
     },
     'animation-play-state': {
-      modifiers,
-      property: (value, { modifier }) => {
+      fn: (value, { modifier = '' }) => {
         if (!modifier) return { '--jumi-animation-play-state': value }
         return { [`--jumi-${modifier}-animation-play-state`]: value }
       },
+      modifiers,
       values: animationPlayState,
     },
     'animation-range': {
-      property: value => ({
-        '--jumi-animation-range': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-animation-range': value,
+        })
+      },
       values: animationRange,
     },
     'animation-range-end': {
-      property: value => ({
-        '--jumi-animation-range-end': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-animation-range-end': value,
+        })
+      },
       type: ['length', 'percentage', 'any'],
       values: animationRange,
     },
     'animation-range-end-offset': {
-      property: value => ({
-        '--jumi-animation-range-end-offset': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-animation-range-end-offset': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: percentage,
     },
     'animation-range-end-timeline': {
-      property: value => ({
-        '--jumi-animation-range-end-timeline': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-animation-range-end-timeline': value,
+        })
+      },
       values: animationRangeTimeline,
     },
     'animation-range-start': {
-      property: value => ({
-        '--jumi-animation-range-start': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-animation-range-start': value,
+        })
+      },
       type: ['length', 'percentage', 'any'],
       values: animationRange,
     },
     'animation-range-start-offset': {
-      property: value => ({
-        '--jumi-animation-range-start-offset': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-animation-range-start-offset': value,
+        })
+      },
       type: ['length', 'percentage'],
       values: percentage,
     },
     'animation-range-start-timeline': {
-      property: value => ({
-        '--jumi-animation-range-start-timeline': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-animation-range-start-timeline': value,
+        })
+      },
       values: animationRangeTimeline,
     },
     'animation-timeline': {
-      property: value => ({
-        '--jumi-animation-timeline': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-animation-timeline': value,
+        })
+      },
       values: animationTimeline,
     },
     'animation-timeline-axis': {
-      property: value => ({
-        '--jumi-animation-timeline-axis': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-animation-timeline-axis': value,
+        })
+      },
       values: animationTimelineAxis,
     },
     'animation-timeline-inset-end': {
-      property: value => ({
-        '--jumi-animation-timeline-inset-end': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-animation-timeline-inset-end': value,
+        })
+      },
       type: 'length',
       values: animationTimelineInset,
     },
     'animation-timeline-inset-start': {
-      property: value => ({
-        '--jumi-animation-timeline-inset-start': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-animation-timeline-inset-start': value,
+        })
+      },
       type: 'length',
       values: animationTimelineInset,
     },
     'animation-timeline-scroller': {
-      property: value => ({
-        '--jumi-animation-timeline-scroller': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-animation-timeline-scroller': value,
+        })
+      },
       type: 'length',
       values: animationTimelineScroller,
     },
     'animation-timing-function': {
-      modifiers,
-      property: (value, { modifier }) => {
+      fn: (value, { modifier = '' }) => {
         if (!modifier) return { '--jumi-animation-timing-function': value }
         return { [`--jumi-${modifier}-animation-timing-function`]: value }
       },
+      modifiers,
       values: animationTimingFunction,
     },
-    'jumi': {
-      property: () => {
-        const animationVariables = creator.properties.reduce(
-          (acc, attribute) => merge(acc, assemble(attribute)),
-          assemble('animation'),
-        )
-        return merge(animationVariables, assemble('transition'))
-      },
+    'animations': {
+      fn: () => creator.animations,
       values: { DEFAULT: '' },
     },
     'transition-behavior': {
-      property: value => ({
-        '--jumi-transition-behavior': value,
-      }),
+      fn: (value) => {
+        return ({
+          '--jumi-transition-behavior': value,
+        })
+      },
       values: transitionBehavior,
     },
     'transition-delay': {
-      property: value => ({
-        '--jumi-transition-delay': value,
-      }),
+      fn: (value, { modifier = '' }) => {
+        if (!modifier) return { ...(value && { '--jumi-transition-delay': value }) }
+        return { [`--jumi-${modifier}-transition-delay`]: value }
+      },
+      modifiers: cssProperties,
       values: theme('transitionDelay'),
     },
     'transition-duration': {
-      property: value => ({
-        '--jumi-transition-duration': value,
-      }),
+      fn: (value, { modifier = '' }) => {
+        if (!modifier) return { ...(value && { '--jumi-transition-duration': value }) }
+        return { [`--jumi-${modifier}-transition-duration`]: value }
+      },
+      modifiers: cssProperties,
       values: theme('transitionDuration'),
     },
     'transition-property': {
-      property: value => ({
-        '--jumi-transition-property': value,
-      }),
-      values: theme('transitionProperty'),
+      fn: (value, { modifier = '' }) => {
+        if (!modifier) return { ...(value && { '--jumi-transition-property': value }) }
+        return { [`--jumi-${modifier}-transition-property`]: motion(modifier) }
+      },
+      modifiers: cssProperties,
+      values: { DEFAULT: '' },
     },
     'transition-timing-function': {
-      property: value => ({
-        '--jumi-transition-timing-function': value,
-      }),
+      fn: (value, { modifier = '' }) => {
+        if (!modifier) return { ...(value && { '--jumi-transition-timing-function': value }) }
+        return { [`--jumi-${modifier}-transition-timing-function`]: value }
+      },
+      modifiers: cssProperties,
       values: animationTimingFunction,
+    },
+    'transitions': {
+      fn: () => creator.transitions,
+      values: { DEFAULT: '' },
     },
   }
 
   return matchProperties
-}
-
-export function keyframe(type: 'effect' | 'motion' | 'property', property: 'animation' | 'transition') {
-  return (attribute: string) => {
-    const variable = join(['--jumi', attribute, type], '-')
-    return css('var', variable, `var(--jumi-${property})`)
-  }
 }

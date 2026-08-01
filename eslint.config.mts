@@ -180,7 +180,7 @@ const stylisticConfig = defineConfig({
 })
 
 const storybookConfig = defineConfig({
-  extends: storybookPlugin.configs['flat/recommended'],
+  extends: storybookPlugin.configs['flat/recommended'] as any,
   files: [EXT.STORYBOOK],
   languageOptions: {
     globals: globals.browser,

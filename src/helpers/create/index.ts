@@ -1,46 +1,46 @@
-import type { AnimatableStandardPropertyType, Api, Collection, Creator, Register, TailwindTheme } from '@/types'
+import type { AnimatableStandardPropertyType, Api, Collection, Creator, CssInJs, Register, TailwindTheme } from '@/types'
 
 import { css } from '@/helpers/css'
 import { join } from '@/helpers/join'
 import { merge } from '@/helpers/merge'
+import { shortId } from '@/helpers/short-id'
 import { effectKeyframes } from '@/keyframes/effects'
 import { propertyKeyframes } from '@/keyframes/property'
 
-import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette'
+import { assemble } from '../assemble'
 
-// Theme keys that produce nested palette objects (e.g. { red: { 500: '#f00' } })
-// and must be flattened for matchUtilities. Non-color keys (borderRadius, spacing,
-// opacity, etc.) are already flat and flattenColorPalette would corrupt them by
-// iterating string characters when the compat layer collapses DEFAULT values.
-const COLOR_THEME_KEYS = new Set<string>([
-  'accentColor',
-  'backgroundColor',
-  'borderColor',
-  'boxShadowColor',
-  'caretColor',
-  'colors',
-  'divideColor',
-  'fill',
-  'gradientColorStops',
-  'outlineColor',
-  'placeholderColor',
-  'ringColor',
-  'ringOffsetColor',
-  'stroke',
-  'textColor',
-  'textDecorationColor',
-] satisfies Array<TailwindTheme>)
+import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette'
 
 export function getCreator({ addUtilities, theme }: Api): Creator {
   const effects = new Set<string>()
   const properties = new Set<string>()
-  const transitions = new Set<string>()
+  const motions = new Set<string>()
+  const keyframeNames = new Set<string>()
 
-  const create = {
+  const creator = {
+    get animations() {
+      const properties = creator.properties.reduce((acc, attribute) => {
+        acc[`--jumi-${attribute}-animation`] = animationVariables(attribute)
+        return merge(acc, assemble(attribute))
+      }, {} as CssInJs)
+
+      const effects = creator.effects.reduce((acc, attribute) => {
+        acc[`--jumi-${attribute}-effect`] = animationVariables(attribute)
+        return merge(acc, assemble(attribute))
+      }, {} as CssInJs)
+
+      const animation = [
+        ...creator.properties.map(variables('animation')),
+        ...creator.effects.map(variables('effect')),
+      ].join(', ') || css('var', '--jumi-animation')
+
+      return merge({ animation }, properties, effects, assemble('animation'))
+    },
+
     effect(attribute: string): string {
       const keyframes = effectKeyframes[attribute]
-      register(effects, { attribute, keyframes })
-      return variables(attribute)
+      register(effects, { animationName: `jumi-${attribute}`, attribute, keyframes })
+      return `jumi-${attribute}`
     },
 
     /**
@@ -54,41 +54,9 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
      */
     get effects() { return Array.from(effects).sort() },
 
-    /**
-     * This set tracks properties that have already had their keyframes and
-     * CSS custom properties (variables) added to the base styles.
-     *
-     * When a property is used for the first time, its keyframes are added and
-     * the property is recorded in this set. On subsequent uses, the presence
-     * of the property in this set indicates that its keyframes have already
-     * been added, preventing duplicate additions.
-     */
-    get properties() { return Array.from(properties).sort() },
-
-    property(attribute: AnimatableStandardPropertyType): string {
-      const keyframes = propertyKeyframes[attribute]
-      register(properties, { attribute, keyframes })
-      return variables(attribute)
-    },
-
-    theme: (key: TailwindTheme, values?: Collection) => {
-      const result = theme(key)
-
-      if (COLOR_THEME_KEYS.has(key)) {
-        return flattenColorPalette(merge(result, values))
-      }
-
-      return merge(result, values)
-    },
-
-    transition(attribute: string): string {
-      transitions.add(attribute)
-      return join([
-        css('var', `--jumi-${attribute}-transition-duration`, css('var', '--jumi-transition-duration')),
-        css('var', `--jumi-${attribute}-transition-timing-function`, css('var', '--jumi-transition-timing-function')),
-        css('var', `--jumi-${attribute}-transition-delay`, css('var', '--jumi-transition-delay')),
-        attribute,
-      ], ' ')
+    motion(attribute: string): string {
+      motions.add(attribute)
+      return attribute
     },
 
     /**
@@ -101,11 +69,47 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
      * recorded in this set. On subsequent uses, the presence of the
      * sub-property in this set prevents duplicate tracking.
      */
-    get transitions() { return Array.from(transitions).sort() },
+    get motions() { return Array.from(motions).sort() },
+
+    /**
+     * This set tracks properties that have already had their keyframes and
+     * CSS custom properties (variables) added to the base styles.
+     *
+     * When a property is used for the first time, its keyframes are added and
+     * the property is recorded in this set. On subsequent uses, the presence
+     * of the property in this set indicates that its keyframes have already
+     * been added, preventing duplicate additions.
+     */
+    get properties() { return Array.from(properties).sort() },
+
+    property(attribute: AnimatableStandardPropertyType, value: string): string {
+      const animationName = join(['jumi', attribute, shortId(value)], '-')
+      const keyframes = propertyKeyframes[attribute](animationName)
+      register(properties, { animationName, attribute, keyframes })
+      return animationName
+    },
+
+    theme: (key: TailwindTheme, values?: Collection) => {
+      return flattenColorPalette(merge(theme(key), values))
+    },
+
+    get transitions() {
+      const motions = creator.motions.reduce((acc, attribute) => {
+        acc[`--jumi-${attribute}-transition`] = transitionVariables(attribute)
+        return acc
+      }, {} as CssInJs)
+
+      const transition
+        = creator.motions.map(variables('transition')).join(', ')
+          || css('var', '--jumi-transition')
+
+      return merge({ transition }, motions, assemble('transition'))
+    },
   }
 
-  const variables = (attribute: string, name = `jumi-${attribute}`) => {
+  function animationVariables(attribute: string) {
     return [
+      css('var', `--jumi-${attribute}-animation-name`, css('var', '--jumi-animation-name')),
       css('var', `--jumi-${attribute}-animation-duration`, css('var', '--jumi-animation-duration')),
       css('var', `--jumi-${attribute}-animation-timing-function`, css('var', '--jumi-animation-timing-function')),
       css('var', `--jumi-${attribute}-animation-delay`, css('var', '--jumi-animation-delay')),
@@ -113,13 +117,29 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
       css('var', `--jumi-${attribute}-animation-direction`, css('var', '--jumi-animation-direction')),
       css('var', `--jumi-${attribute}-animation-fill-mode`, css('var', '--jumi-animation-fill-mode')),
       css('var', `--jumi-${attribute}-animation-play-state`, css('var', '--jumi-animation-play-state')),
-      name,
     ].join(' ')
   }
 
-  const register: Register = (registry, { attribute, keyframes }) => {
-    if (registry.has(attribute)) return
+  function transitionVariables(attribute: string): string {
+    return join([
+      css('var', `--jumi-${attribute}-transition-property`, attribute),
+      css('var', `--jumi-${attribute}-transition-duration`, css('var', '--jumi-transition-duration')),
+      css('var', `--jumi-${attribute}-transition-timing-function`, css('var', '--jumi-transition-timing-function')),
+      css('var', `--jumi-${attribute}-transition-delay`, css('var', '--jumi-transition-delay')),
+    ], ' ')
+  }
+
+  function variables(type: 'animation' | 'effect' | 'transition') {
+    return (attribute: string) => {
+      const variable = join(['--jumi', attribute, type], '-')
+      return css('var', variable)
+    }
+  }
+
+  const register: Register = (registry, { animationName, attribute, keyframes }) => {
     registry.add(attribute)
+    if (keyframeNames.has(animationName)) return
+    keyframeNames.add(animationName)
 
     /**
      * Utility classes and animation properties.
@@ -132,5 +152,5 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
     addUtilities(keyframes)
   }
 
-  return create
+  return creator
 }

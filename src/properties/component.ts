@@ -8,8 +8,7 @@ export const getMatchComponents: GetMatchComponents = (creator) => {
 
   const matchComponent: MatchComponents = {
     'animation-delay-backward': {
-      modifiers: count,
-      property: (value, { modifier }) => {
+      fn: (value, { modifier }) => {
         const length = modifier ? parseInt(modifier) : 3
 
         return Object.fromEntries(
@@ -19,11 +18,11 @@ export const getMatchComponents: GetMatchComponents = (creator) => {
           ]),
         )
       },
+      modifiers: count,
       values: theme('transitionDelay'),
     },
     'animation-delay-forward': {
-      modifiers: count,
-      property: (value, { modifier }) => {
+      fn: (value, { modifier }) => {
         const length = modifier ? parseInt(modifier) : 3
 
         return Object.fromEntries(
@@ -33,6 +32,7 @@ export const getMatchComponents: GetMatchComponents = (creator) => {
           ]),
         )
       },
+      modifiers: count,
       values: theme('transitionDelay'),
     },
   }
