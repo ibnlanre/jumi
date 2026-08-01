@@ -505,18 +505,18 @@
           <div class="p-4 overflow-hidden text-center bg-teal-100 rounded">
             <h3 class="mb-2 font-medium">Slow Color, Fast Rest</h3>
             <div
-              class="w-16 h-16 mx-auto bg-teal-500 rounded transitions transition-property/color transition-duration-2000/color transition-property/all transition-duration-200/all hover:scale-125 hover:bg-pink-500 hover:rotate-45"
+              class="w-16 h-16 mx-auto bg-teal-500 rounded transitions transition-property/background-color transition-duration-2000/background-color transition-property/scale transition-duration-200/scale hover:scale-125 hover:bg-pink-500"
             ></div>
-            <p class="mt-2 text-xs text-gray-500">color 2000ms · transform 200ms</p>
+            <p class="mt-2 text-xs text-gray-500">background-color 2000ms · scale 200ms</p>
           </div>
 
           <!-- Per-property duration + delay -->
           <div class="p-4 overflow-hidden text-center bg-indigo-100 rounded">
             <h3 class="mb-2 font-medium">Staggered Delay + Duration</h3>
             <div
-              class="w-16 h-16 mx-auto bg-indigo-500 rounded transitions transition-property/all transition-duration-500/all transition-delay-300/all hover:translate-x-8 hover:rotate-45 hover:scale-125"
+              class="w-16 h-16 mx-auto bg-indigo-500 rounded transitions transition-property/translate transition-duration-200/translate transition-delay-300/translate transition-property/rotate transition-duration-100/rotate hover:translate-x-8 hover:rotate-45"
             ></div>
-            <p class="mt-2 text-xs text-gray-500">transform: 200ms, waits 300ms</p>
+            <p class="mt-2 text-xs text-gray-500">translate 200ms @300ms · rotate 100ms</p>
           </div>
 
           <!-- Per-property delay + duration + ease -->
@@ -525,16 +525,16 @@
             <div
               class="w-16 h-16 mx-auto bg-yellow-500 rounded transitions transition-property/box-shadow transition-duration-600/box-shadow transition-delay-500/box-shadow transition-timing-function-ease-out-back/box-shadow transition-property/scale transition-duration-300/scale hover:shadow-xl hover:scale-125"
             ></div>
-            <p class="mt-2 text-xs text-gray-500">shadow 600ms @500ms; transform 300ms</p>
+            <p class="mt-2 text-xs text-gray-500">shadow 600ms @500ms; scale 300ms</p>
           </div>
 
           <!-- Cascade: background, radius, transform all different -->
           <div class="p-4 overflow-hidden text-center rounded bg-rose-100">
             <h3 class="mb-2 font-medium">Full Cascade</h3>
             <div
-              class="w-16 h-16 mx-auto rounded-sm bg-rose-500 transitions transition-property/color transition-duration-300/color transition-delay-200/color transition-property/border-radius transition-duration-700/border-radius transition-delay-500/border-radius transition-property/scale transition-duration-1000/scale transition-delay-800/scale hover:rounded-4xl hover:bg-pink-500 hover:scale-125 hover:rotate-180"
+              class="w-16 h-16 mx-auto rounded-sm bg-rose-500 transitions transition-property/background-color transition-duration-300/background-color transition-delay-200/background-color transition-property/border-radius transition-duration-700/border-radius transition-delay-500/border-radius transition-property/translate transition-duration-1000/translate transition-delay-800/translate transition-property/rotate transition-duration-1000/rotate transition-delay-800/rotate hover:rounded-4xl hover:bg-pink-500 hover:translate-x-8 hover:rotate-45"
             ></div>
-            <p class="mt-2 text-xs text-gray-500">bg 300@200 · radius 700@500 · transform 1000@800</p>
+            <p class="mt-2 text-xs text-gray-500">bg 300@200 · radius 700@500 · translate/rotate 1000@800</p>
           </div>
         </div>
 
@@ -634,7 +634,7 @@
           <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
             <h3 class="mb-2 font-medium">Width</h3>
             <div
-              class="w-8 h-16 mx-auto bg-teal-500 rounded animations transitions animate-width-32 animation-duration-2000 transition-duration-500 hover:animate-width-8"
+              class="w-8 h-16 mx-auto bg-teal-500 rounded animations animation-duration-2000 hover:animate-width-8 transitions animation-delay-2000 animate-width-16 hover:animation-delay-0"
             ></div>
             <p class="mt-2 text-xs text-gray-500">w-8 → w-32 (anim) → w-8 (hover)</p>
           </div>

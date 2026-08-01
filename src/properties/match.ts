@@ -4020,11 +4020,11 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       values: theme('zIndex'),
     },
     'animation-composition': {
-      fn: (value) => {
-        return ({
-          '--jumi-animation-composition': value,
-        })
+      fn: (value, { modifier = '' }) => {
+        if (!modifier) return { '--jumi-animation-composition': value }
+        return { [`--jumi-${modifier}-animation-composition`]: value }
       },
+      modifiers,
       values: animationComposition,
     },
     'animation-delay': {
@@ -4145,11 +4145,11 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       values: animationRangeTimeline,
     },
     'animation-timeline': {
-      fn: (value) => {
-        return ({
-          '--jumi-animation-timeline': value,
-        })
+      fn: (value, { modifier = '' }) => {
+        if (!modifier) return { '--jumi-animation-timeline': value }
+        return { [`--jumi-${modifier}-animation-timeline`]: value }
       },
+      modifiers,
       values: animationTimeline,
     },
     'animation-timeline-axis': {

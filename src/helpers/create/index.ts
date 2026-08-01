@@ -19,22 +19,36 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
 
   const creator = {
     get animations() {
-      const properties = creator.properties.reduce((acc, attribute) => {
-        acc[`--jumi-${attribute}-animation`] = animationVariables(attribute)
-        return merge(acc, assemble(attribute))
-      }, {} as CssInJs)
+      const properties = creator.properties.reduce((acc, attribute) =>
+        merge(acc, assemble(attribute)), {} as CssInJs)
 
-      const effects = creator.effects.reduce((acc, attribute) => {
-        acc[`--jumi-${attribute}-effect`] = animationVariables(attribute)
-        return merge(acc, assemble(attribute))
-      }, {} as CssInJs)
+      const attributes = creator.properties.concat(creator.effects)
 
-      const animation = [
-        ...creator.properties.map(variables('animation')),
-        ...creator.effects.map(variables('effect')),
-      ].join(', ') || css('var', '--jumi-animation')
+      const longhand = (constituent: string) => {
+        return attributes.map((attribute) => {
+          const variable = `--jumi-${attribute}-animation-${constituent}`
+          const fallback = css('var', `--jumi-animation-${constituent}`)
 
-      return merge({ animation }, properties, effects, assemble('animation'))
+          return css('var', variable, fallback)
+        }).join(', ') || css('var', `--jumi-animation-${constituent}`)
+      }
+
+      const animation = attributes.length
+        ? {
+            'animation-composition': longhand('composition'),
+            'animation-delay': longhand('delay'),
+            'animation-direction': longhand('direction'),
+            'animation-duration': longhand('duration'),
+            'animation-fill-mode': longhand('fill-mode'),
+            'animation-iteration-count': longhand('iteration-count'),
+            'animation-name': longhand('name'),
+            'animation-play-state': longhand('play-state'),
+            'animation-timeline': longhand('timeline'),
+            'animation-timing-function': longhand('timing-function'),
+          }
+        : { animation: css('var', '--jumi-animation') }
+
+      return merge(animation, properties, assemble('animation'))
     },
 
     effect(attribute: string): string {
@@ -105,19 +119,6 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
 
       return merge({ transition }, motions, assemble('transition'))
     },
-  }
-
-  function animationVariables(attribute: string) {
-    return [
-      css('var', `--jumi-${attribute}-animation-name`, css('var', '--jumi-animation-name')),
-      css('var', `--jumi-${attribute}-animation-duration`, css('var', '--jumi-animation-duration')),
-      css('var', `--jumi-${attribute}-animation-timing-function`, css('var', '--jumi-animation-timing-function')),
-      css('var', `--jumi-${attribute}-animation-delay`, css('var', '--jumi-animation-delay')),
-      css('var', `--jumi-${attribute}-animation-iteration-count`, css('var', '--jumi-animation-iteration-count')),
-      css('var', `--jumi-${attribute}-animation-direction`, css('var', '--jumi-animation-direction')),
-      css('var', `--jumi-${attribute}-animation-fill-mode`, css('var', '--jumi-animation-fill-mode')),
-      css('var', `--jumi-${attribute}-animation-play-state`, css('var', '--jumi-animation-play-state')),
-    ].join(' ')
   }
 
   function transitionVariables(attribute: string): string {

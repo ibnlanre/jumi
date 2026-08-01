@@ -92,7 +92,7 @@ import { css } from '@/helpers/css'
 type DependencyGraph = Record<PropertyType, DependencyNode>
 type DependencyNode = {
   dependencies?: Array<PropertyType>
-  value?: string
+  value: string
   variable: PropertyVariable
 }
 

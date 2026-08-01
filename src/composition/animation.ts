@@ -2,6 +2,7 @@ import { css } from '@/helpers/css'
 import { join } from '@/helpers/join'
 
 export const animation = join([
+  css('var', '--jumi-animation-name'),
   css('var', '--jumi-animation-duration'),
   css('var', '--jumi-animation-timing-function'),
   css('var', '--jumi-animation-delay'),
