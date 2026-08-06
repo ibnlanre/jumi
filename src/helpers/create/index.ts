@@ -1,11 +1,9 @@
-import type { AnimatableStandardPropertyType, Api, Collection, Creator, CssInJs, Register, TailwindTheme } from '@/types'
+import type { AnimatableStandardPropertyType, Api, Collection, Creator, CssInJs, TailwindTheme } from '@/types'
 
 import { css } from '@/helpers/css'
 import { join } from '@/helpers/join'
 import { merge } from '@/helpers/merge'
-import { shortId } from '@/helpers/short-id'
 import { effectKeyframes } from '@/keyframes/effects'
-import { propertyKeyframes } from '@/keyframes/property'
 
 import { assemble } from '../assemble'
 
@@ -15,7 +13,10 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
   const effects = new Set<string>()
   const properties = new Set<string>()
   const motions = new Set<string>()
-  const keyframeNames = new Set<string>()
+  const seen = new Set<string>()
+
+  const keyframes = new Map<string, Collection<CssInJs>>()
+  const timelines = new Map<AnimatableStandardPropertyType, Set<string>>()
 
   const creator = {
     get animations() {
@@ -23,49 +24,19 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
         merge(acc, assemble(attribute)), {} as CssInJs)
 
       const attributes = creator.properties.concat(creator.effects)
+      const animation = computeAnimationVariable(attributes)
 
-      const longhand = (constituent: string) => {
-        return attributes.map((attribute) => {
-          const variable = `--jumi-${attribute}-animation-${constituent}`
-          const fallback = css('var', `--jumi-animation-${constituent}`)
-
-          return css('var', variable, fallback)
-        }).join(', ') || css('var', `--jumi-animation-${constituent}`)
-      }
-
-      const animation = attributes.length
-        ? {
-            'animation-composition': longhand('composition'),
-            'animation-delay': longhand('delay'),
-            'animation-direction': longhand('direction'),
-            'animation-duration': longhand('duration'),
-            'animation-fill-mode': longhand('fill-mode'),
-            'animation-iteration-count': longhand('iteration-count'),
-            'animation-name': longhand('name'),
-            'animation-play-state': longhand('play-state'),
-            'animation-timeline': longhand('timeline'),
-            'animation-timing-function': longhand('timing-function'),
-          }
-        : { animation: css('var', '--jumi-animation') }
-
+      computePropertyKeyframes()
+      computeEffectKeyframes()
       return merge(animation, properties, assemble('animation'))
     },
 
     effect(attribute: string): string {
-      const keyframes = effectKeyframes[attribute]
-      register(effects, { animationName: `jumi-${attribute}`, attribute, keyframes })
+      effects.add(attribute)
+      keyframes.set(attribute, effectKeyframes[attribute])
       return `jumi-${attribute}`
     },
 
-    /**
-     * This set tracks effects that have already had their keyframes added to
-     * the base styles.
-     *
-     * When an effect is used for the first time, its keyframes are added and
-     * the effect is recorded in this set. On subsequent uses, the presence of
-     * the effect in this set indicates that its keyframes have already been
-     * added, preventing duplicate additions.
-     */
     get effects() { return Array.from(effects).sort() },
 
     motion(attribute: string): string {
@@ -73,34 +44,30 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
       return attribute
     },
 
-    /**
-     * This set tracks transition sub-properties that have been used by
-     * transition utilities. Unlike properties/effects, transitions don't
-     * need @keyframes — they compose into the CSS `transition` shorthand
-     * via custom properties.
-     *
-     * When a transition sub-property is used for the first time, it is
-     * recorded in this set. On subsequent uses, the presence of the
-     * sub-property in this set prevents duplicate tracking.
-     */
     get motions() { return Array.from(motions).sort() },
 
-    /**
-     * This set tracks properties that have already had their keyframes and
-     * CSS custom properties (variables) added to the base styles.
-     *
-     * When a property is used for the first time, its keyframes are added and
-     * the property is recorded in this set. On subsequent uses, the presence
-     * of the property in this set indicates that its keyframes have already
-     * been added, preventing duplicate additions.
-     */
     get properties() { return Array.from(properties).sort() },
 
-    property(attribute: AnimatableStandardPropertyType, value: string): string {
-      const animationName = join(['jumi', attribute, shortId(value)], '-')
-      const keyframes = propertyKeyframes[attribute](animationName)
-      register(properties, { animationName, attribute, keyframes })
-      return animationName
+    property(attribute: AnimatableStandardPropertyType, modifier: null | string, value: string): CssInJs {
+      properties.add(attribute)
+
+      if (modifier) {
+        let stops = timelines.get(attribute)
+
+        if (!stops) {
+          stops = new Set<string>()
+          timelines.set(attribute, stops)
+        }
+
+        stops.add(modifier)
+      }
+
+      const variable = modifier ? `--jumi-${attribute}-${modifier}` : `--jumi-${attribute}`
+
+      return {
+        [`--jumi-${attribute}-animation-name`]: `jumi-${attribute}`,
+        [variable]: value,
+      }
     },
 
     theme: (key: TailwindTheme, values?: Collection) => {
@@ -121,6 +88,54 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
     },
   }
 
+  function computePropertyKeyframes() {
+    timelines.forEach((stops, attribute) => {
+      if (seen.has(attribute)) return
+
+      const animationName = `jumi-${attribute}`
+      const fallback = css('var', `--jumi-${attribute}`)
+
+      const blocks = stops.size
+        ? Array.from(stops).reduce((acc, stop) => {
+            const variable = `--jumi-${attribute}-${stop}`
+            acc[`${stop}%`] = { [attribute]: css('var', variable, fallback) }
+            return acc
+          }, {} as CssInJs)
+        : { to: { [attribute]: fallback } }
+
+      seen.add(attribute)
+      addUtilities({ [`@keyframes ${animationName}`]: blocks })
+    })
+  }
+
+  function computeAnimationVariable(attributes: string[]): CssInJs {
+    const longhand = (constituent: string) => {
+      return attributes.map((attribute) => {
+        const variable = `--jumi-${attribute}-animation-${constituent}`
+        const fallback = css('var', `--jumi-animation-${constituent}`)
+
+        return css('var', variable, fallback)
+      }).join(', ') || css('var', `--jumi-animation-${constituent}`)
+    }
+
+    const animation = attributes.length
+      ? {
+          'animation-composition': longhand('composition'),
+          'animation-delay': longhand('delay'),
+          'animation-direction': longhand('direction'),
+          'animation-duration': longhand('duration'),
+          'animation-fill-mode': longhand('fill-mode'),
+          'animation-iteration-count': longhand('iteration-count'),
+          'animation-name': longhand('name'),
+          'animation-play-state': longhand('play-state'),
+          'animation-timeline': longhand('timeline'),
+          'animation-timing-function': longhand('timing-function'),
+        }
+      : { animation: css('var', '--jumi-animation') }
+
+    return animation
+  }
+
   function transitionVariables(attribute: string): string {
     return join([
       css('var', `--jumi-${attribute}-transition-property`, attribute),
@@ -137,20 +152,12 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
     }
   }
 
-  const register: Register = (registry, { animationName, attribute, keyframes }) => {
-    registry.add(attribute)
-    if (keyframeNames.has(animationName)) return
-    keyframeNames.add(animationName)
-
-    /**
-     * Utility classes and animation properties.
-     *
-     * These are placed in the @utilities layer because:
-     * - They are meant to be applied to specific elements as needed
-     * - They should have appropriate specificity for overriding defaults
-     * - They work alongside the variables to create the complete animation system
-     */
-    addUtilities(keyframes)
+  function computeEffectKeyframes() {
+    keyframes.forEach((timelines, attribute) => {
+      if (seen.has(attribute)) return
+      seen.add(attribute)
+      addUtilities(timelines)
+    })
   }
 
   return creator

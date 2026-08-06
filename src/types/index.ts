@@ -493,7 +493,7 @@ export type Creator = {
     motion(attribute: string): string;
     readonly motions: string[];
     readonly properties: string[];
-    property(attribute: AnimatableStandardPropertyType, value: string): string;
+    property(attribute: AnimatableStandardPropertyType, modifier: null | string, value: string): CssInJs;
     theme: (key: TailwindTheme, values?: Collection) => Record<string, string>;
     readonly transitions: CssInJs;
 }
@@ -912,7 +912,6 @@ export interface MatchComponentsPropertyValue extends Partial<MatchUtilitiesOpti
 export type MatchProperty = Record<MatchUtilitiesPropertyKey, MatchUtilitiesPropertyValue>
 
 export interface MatchUtilitiesOptions {
-  group: AnimatableStandardPropertyType;
   modifiers: Collection<string>
   supportsNegativeValues: boolean
   type: Array<DataType> | DataType

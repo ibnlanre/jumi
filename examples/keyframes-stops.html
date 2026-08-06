@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jumi — Multi-stop Keyframe Variables Prototype</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 0;
+        padding: 40px;
+        background: #f3f4f6;
+        color: #111827;
+      }
+      h1 { margin-top: 0; }
+      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 900px; }
+      .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+      .card h3 { margin: 0 0 4px; }
+      .card p.desc { margin: 0 0 16px; color: #6b7280; font-size: 13px; }
+      .stage { display: flex; align-items: center; gap: 16px; min-height: 120px; }
+      .box { width: 48px; height: 48px; border-radius: 8px; background: #6366f1; flex: none; }
+      .badge { font-size: 11px; font-family: ui-monospace, monospace; color: #374151; }
+      code { background: #e5e7eb; padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+    </style>
+
+    <!--
+      =====================================================================
+      Pure-CSS validation of the multi-stop keyframe + per-stop variable idea.
+
+      The plugin will generate keyframes like `@keyframes jumi-width` that read
+      dedicated per-stop variables. The `.frame-*` classes populate those
+      variables. Everything below is hand-written CSS equivalent of what the
+      plugin should emit — no Tailwind, no plugin, to isolate the mechanism.
+      =====================================================================
+    -->
+
+    <!-- Generated keyframe: every stop reads its own variable, falling back to the target var -->
+    <style>
+      @keyframes jumi-width {
+        0%   { width: var(--jumi-width-0,   var(--jumi-width)); }
+        50%  { width: var(--jumi-width-50,  var(--jumi-width)); }
+        100% { width: var(--jumi-width-100, var(--jumi-width)); }
+      }
+
+      /* Populate per-stop variables (what Jumi utilities/variants will emit) */
+      .frame-0   { --jumi-width-0: 24px; }
+      .frame-50  { --jumi-width-50: 96px; }
+      .frame-100 { --jumi-width-100: 48px; }
+
+      /* Base target var (what a plain animate-width-* sets today) */
+      .base { --jumi-width: 48px; }
+
+      /* Attach the multi-stop animation */
+      .run {
+        width: var(--jumi-width);
+        animation: jumi-width 2s ease-in-out infinite alternate;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Multi-stop keyframe variables</h1>
+    <div class="grid">
+      <div class="card">
+        <h3>A. Default (no stops set)</h3>
+        <p class="desc">Only <code>--jumi-width</code> populated &rarr; holds at the value (opts in to static target).</p>
+        <div class="stage">
+          <div class="box base run"></div>
+          <span class="badge">width: var(--jumi-width) = 48px everywhere</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>B. Three stops populated</h3>
+        <p class="desc"><code>--jumi-width-*</code> set for 0/50/100 &rarr; smooth 24&rarr;96&rarr;48 loop.</p>
+        <div class="stage">
+          <div class="box base frame-0 frame-50 frame-100 run"></div>
+          <span class="badge">24px &rarr; 96px &rarr; 48px</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>C. Partial stops</h3>
+        <p class="desc">Only 50% populated; 0 &amp; 100 fall back to <code>--jumi-width</code>.</p>
+        <div class="stage">
+          <div class="box base frame-50 run"></div>
+          <span class="badge">48 &rarr; 96 &rarr; 48</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>D. Start pinned</h3>
+        <p class="desc"><code>--jumi-width-0</code> pinned while target changes &rarr; no snap. The hover-handoff case.</p>
+        <div class="stage">
+          <div class="box base frame-0 frame-100 run"></div>
+          <span class="badge">from 24 (pinned) &rarr; 48</span>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

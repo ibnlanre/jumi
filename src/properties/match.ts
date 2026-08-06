@@ -1,4 +1,4 @@
-import type { Collection, GetMatchUtilities, MatchProperty } from '@/types'
+import type { CssInJs, GetMatchUtilities, MatchProperty } from '@/types'
 
 import { css } from '@/helpers/css'
 import { join } from '@/helpers/join'
@@ -22,6 +22,7 @@ import { animationTimelineInset } from '@/theme/animation-timeline-inset'
 import { animationTimelineScroller } from '@/theme/animation-timeline-scroller'
 import { animationTimingFunction } from '@/theme/animation-timing-function'
 import { appearance } from '@/theme/appearance'
+import { atStops } from '@/theme/at-stops'
 import { backfaceVisibility } from '@/theme/backface-visibility'
 import { backgroundAttachment } from '@/theme/background-attachment'
 import { backgroundClip } from '@/theme/background-clip'
@@ -138,2045 +139,2247 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       values: cssEffects,
     },
     'animate-accent-color': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-accent-color': value,
-          '--jumi-accent-color-animation-name': property('accent-color', value),
+          ...property('accent-color', modifier, value),
         })
       },
+      modifiers: atStops,
       type: 'color',
       values: theme('accentColor'),
     },
     'animate-align-content': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-align-content': value,
-          '--jumi-align-content-animation-name': property('align-content', value),
+          ...property('align-content', modifier, value),
         })
       },
+      modifiers: atStops,
       values: alignContent,
     },
     'animate-align-items': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-align-items': value,
-          '--jumi-align-items-animation-name': property('align-items', value),
+          ...property('align-items', modifier, value),
         })
       },
+      modifiers: atStops,
       values: alignItems,
     },
     'animate-align-self': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-align-self': value,
-          '--jumi-align-self-animation-name': property('align-self', value),
+          ...property('align-self', modifier, value),
         })
       },
+      modifiers: atStops,
       values: alignSelf,
     },
     'animate-alignment-baseline': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-alignment-baseline': value,
-          '--jumi-alignment-baseline-animation-name': property('alignment-baseline', value),
+          ...property('alignment-baseline', modifier, value),
         })
       },
+      modifiers: atStops,
       values: alignmentBaseline,
     },
     'animate-all': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-all': value,
-          '--jumi-all-animation-name': property('all', value),
+          ...property('all', modifier, value),
         })
       },
+      modifiers: atStops,
       values: all,
     },
     'animate-appearance': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-appearance': value,
-          '--jumi-appearance-animation-name': property('appearance', value),
+          ...property('appearance', modifier, value),
         })
       },
+      modifiers: atStops,
       values: appearance,
     },
     'animate-aspect-ratio': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-aspect-ratio': value,
-          '--jumi-aspect-ratio-animation-name': property('aspect-ratio', value),
+          ...property('aspect-ratio', modifier, value),
         })
       },
+      modifiers: atStops,
       type: 'ratio',
       values: empty.auto,
     },
     'animate-aspect-ratio-height': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-aspect-ratio-animation-name': property('aspect-ratio', value),
+          ...property('aspect-ratio', modifier, value),
           '--jumi-aspect-ratio-height': value,
         })
       },
+      modifiers: atStops,
       type: 'ratio',
       values: empty.auto,
     },
     'animate-aspect-ratio-width': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-aspect-ratio-animation-name': property('aspect-ratio', value),
+          ...property('aspect-ratio', modifier, value),
           '--jumi-aspect-ratio-width': value,
         })
       },
+      modifiers: atStops,
       type: 'ratio',
       values: empty.auto,
     },
     'animate-backdrop-filter': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-backdrop-filter': value,
-          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          ...property('backdrop-filter', modifier, value),
         })
       },
+      modifiers: atStops,
       values: empty.none,
     },
     'animate-backdrop-filter-blur': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          ...property('backdrop-filter', modifier, value),
           '--jumi-backdrop-filter-blur': css('blur', value),
         })
       },
+      modifiers: atStops,
       type: 'length',
       values: theme('backdropBlur'),
     },
     'animate-backdrop-filter-brightness': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          ...property('backdrop-filter', modifier, value),
           '--jumi-backdrop-filter-brightness': css('brightness', value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage'],
       values: theme('backdropBrightness'),
     },
     'animate-backdrop-filter-contrast': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          ...property('backdrop-filter', modifier, value),
           '--jumi-backdrop-filter-contrast': css('contrast', value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage'],
       values: theme('backdropContrast'),
     },
     'animate-backdrop-filter-drop-shadow': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          ...property('backdrop-filter', modifier, value),
           '--jumi-backdrop-filter-drop-shadow': css('drop-shadow', value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'shadow', 'any'],
       values: theme('dropShadow'),
     },
     'animate-backdrop-filter-drop-shadow-blur': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          ...property('backdrop-filter', modifier, value),
           '--jumi-backdrop-filter-drop-shadow-blur': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
     },
     'animate-backdrop-filter-drop-shadow-color': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          ...property('backdrop-filter', modifier, value),
           '--jumi-backdrop-filter-drop-shadow-color': value,
         })
       },
+      modifiers: atStops,
       type: 'color',
       values: theme('boxShadowColor'),
     },
     'animate-backdrop-filter-drop-shadow-offset-x': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          ...property('backdrop-filter', modifier, value),
           '--jumi-backdrop-filter-drop-shadow-offset-x': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
     },
     'animate-backdrop-filter-drop-shadow-offset-y': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          ...property('backdrop-filter', modifier, value),
           '--jumi-backdrop-filter-drop-shadow-offset-y': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
     },
     'animate-backdrop-filter-grayscale': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          ...property('backdrop-filter', modifier, value),
           '--jumi-backdrop-filter-grayscale': css('grayscale', value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage'],
       values: theme('backdropGrayscale'),
     },
     'animate-backdrop-filter-hue-rotate': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          ...property('backdrop-filter', modifier, value),
           '--jumi-backdrop-filter-hue-rotate': css('hue-rotate', value),
         })
       },
+      modifiers: atStops,
       type: 'angle',
       values: theme('backdropHueRotate'),
     },
     'animate-backdrop-filter-invert': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          ...property('backdrop-filter', modifier, value),
           '--jumi-backdrop-filter-invert': css('invert', value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage'],
       values: theme('backdropInvert'),
     },
     'animate-backdrop-filter-opacity': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          ...property('backdrop-filter', modifier, value),
           '--jumi-backdrop-filter-opacity': css('opacity', value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage'],
       values: theme('backdropOpacity'),
     },
     'animate-backdrop-filter-saturate': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          ...property('backdrop-filter', modifier, value),
           '--jumi-backdrop-filter-saturate': css('saturate', value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage'],
       values: theme('backdropSaturate'),
     },
     'animate-backdrop-filter-sepia': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          ...property('backdrop-filter', modifier, value),
           '--jumi-backdrop-filter-sepia': css('sepia', value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage'],
       values: theme('backdropSepia'),
     },
     'animate-backdrop-filter-url': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-backdrop-filter-animation-name': property('backdrop-filter', value),
+          ...property('backdrop-filter', modifier, value),
           '--jumi-backdrop-filter-url': css('url', value),
         })
       },
+      modifiers: atStops,
       type: 'url',
       values: empty.string,
     },
     'animate-backface-visibility': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-backface-visibility': value,
-          '--jumi-backface-visibility-animation-name': property('backface-visibility', value),
+          ...property('backface-visibility', modifier, value),
         })
       },
+      modifiers: atStops,
       values: backfaceVisibility,
     },
     'animate-background': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-background': value,
-          '--jumi-background-animation-name': property('background', value),
+          ...property('background', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['color', 'image', 'position', 'url', 'any'],
       values: empty.none,
     },
     'animate-background-attachment': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-background-attachment': value,
-          '--jumi-background-attachment-animation-name': property('background-attachment', value),
+          ...property('background-attachment', modifier, value),
         })
       },
+      modifiers: atStops,
       values: backgroundAttachment,
     },
     'animate-background-blend-mode': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-background-blend-mode': value,
-          '--jumi-background-blend-mode-animation-name': property('background-blend-mode', value),
+          ...property('background-blend-mode', modifier, value),
         })
       },
+      modifiers: atStops,
       values: mixBlendMode,
     },
     'animate-background-clip': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-background-clip': value,
-          '--jumi-background-clip-animation-name': property('background-clip', value),
+          ...property('background-clip', modifier, value),
         })
       },
+      modifiers: atStops,
       values: backgroundClip,
     },
     'animate-background-color': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-background-color': value,
-          '--jumi-background-color-animation-name': property('background-color', value),
+          ...property('background-color', modifier, value),
         })
       },
+      modifiers: atStops,
       type: 'color',
       values: theme('backgroundColor'),
     },
     'animate-background-image': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-background-image': value,
-          '--jumi-background-image-animation-name': property('background-image', value),
+          ...property('background-image', modifier, value),
         })
       },
+      modifiers: atStops,
       type: 'image',
       values: theme('backgroundImage'),
     },
     'animate-background-origin': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-background-origin': value,
-          '--jumi-background-origin-animation-name': property('background-origin', value),
+          ...property('background-origin', modifier, value),
         })
       },
+      modifiers: atStops,
       values: backgroundOrigin,
     },
     'animate-background-position': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-background-position': value,
-          '--jumi-background-position-animation-name': property('background-position', value),
+          ...property('background-position', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['position', 'percentage', 'length', 'any'],
       values: theme('backgroundPosition'),
     },
     'animate-background-position-x': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-background-position-animation-name': property('background-position', value),
+          ...property('background-position', modifier, value),
           '--jumi-background-position-x': value,
         })
       },
+      modifiers: atStops,
       type: ['position', 'percentage', 'length', 'any'],
       values: empty.position,
     },
     'animate-background-position-x-edge': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-background-position-animation-name': property('background-position', value),
+          ...property('background-position', modifier, value),
           '--jumi-background-position-x-edge': value,
         })
       },
+      modifiers: atStops,
       type: 'position',
       values: objectPosition,
     },
     'animate-background-position-x-offset': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-background-position-animation-name': property('background-position', value),
+          ...property('background-position', modifier, value),
           '--jumi-background-position-x-offset': value,
         })
       },
+      modifiers: atStops,
       type: ['percentage', 'length'],
       values: percentage,
     },
     'animate-background-position-y': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-background-position-animation-name': property('background-position', value),
+          ...property('background-position', modifier, value),
           '--jumi-background-position-y': value,
         })
       },
+      modifiers: atStops,
       type: ['position', 'percentage', 'length', 'any'],
       values: merge(objectPosition, percentage),
     },
     'animate-background-position-y-edge': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-background-position-animation-name': property('background-position', value),
+          ...property('background-position', modifier, value),
           '--jumi-background-position-y-edge': value,
         })
       },
+      modifiers: atStops,
       type: 'position',
       values: objectPosition,
     },
     'animate-background-position-y-offset': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-background-position-animation-name': property('background-position', value),
+          ...property('background-position', modifier, value),
           '--jumi-background-position-y-offset': value,
         })
       },
+      modifiers: atStops,
       type: ['percentage', 'length'],
       values: percentage,
     },
     'animate-background-repeat': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-background-repeat': value,
-          '--jumi-background-repeat-animation-name': property('background-repeat', value),
+          ...property('background-repeat', modifier, value),
         })
       },
+      modifiers: atStops,
       values: backgroundRepeat,
     },
     'animate-background-repeat-x': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-background-repeat-animation-name': property('background-repeat', value),
+          ...property('background-repeat', modifier, value),
           '--jumi-background-repeat-x': value,
         })
       },
+      modifiers: atStops,
       values: backgroundRepeatAxis,
     },
     'animate-background-repeat-y': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-background-repeat-animation-name': property('background-repeat', value),
+          ...property('background-repeat', modifier, value),
           '--jumi-background-repeat-y': value,
         })
       },
+      modifiers: atStops,
       values: backgroundRepeatAxis,
     },
     'animate-background-size': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-background-size': value,
-          '--jumi-background-size-animation-name': property('background-size', value),
+          ...property('background-size', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'any'],
       values: theme('backgroundSize'),
     },
     'animate-background-size-height': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-background-size-animation-name': property('background-size', value),
+          ...property('background-size', modifier, value),
           '--jumi-background-size-height': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('backgroundSize'),
     },
     'animate-background-size-width': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-background-size-animation-name': property('background-size', value),
+          ...property('background-size', modifier, value),
           '--jumi-background-size-width': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('backgroundSize'),
     },
     'animate-block-size': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-block-size': value,
-          '--jumi-block-size-animation-name': property('block-size', value),
+          ...property('block-size', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'any'],
       values: empty.auto,
     },
     'animate-border': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border': value,
-          '--jumi-border-animation-name': property('border', value),
+          ...property('border', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['line-width', 'length'],
       values: empty.none,
     },
     'animate-border-block': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-block': value,
-          '--jumi-border-block-animation-name': property('border-block', value),
+          ...property('border-block', modifier, value),
         })
       },
+      modifiers: atStops,
       values: theme('borderWidth'),
     },
     'animate-border-block-color': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-border-block-animation-name': property('border-block-color', value),
+          ...property('border-block-color', modifier, value),
           '--jumi-border-block-color': value,
         })
       },
+      modifiers: atStops,
       type: 'color',
       values: theme('borderColor'),
     },
     'animate-border-block-end-radius': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-end-end-radius': value,
           '--jumi-border-end-start-radius': value,
-          '--jumi-border-radius-animation-name': property('border-radius', value),
+          ...property('border-radius', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-block-end-width': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-block-end-width': value,
-          '--jumi-border-block-end-width-animation-name': property('border-block-end-width', value),
+          ...property('border-block-end-width', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-border-block-start-radius': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-border-radius-animation-name': property('border-radius', value),
+          ...property('border-radius', modifier, value),
           '--jumi-border-start-end-radius': value,
           '--jumi-border-start-start-radius': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-block-start-width': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-block-start-width': value,
-          '--jumi-border-block-start-width-animation-name': property('border-block-start-width', value),
+          ...property('border-block-start-width', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-border-block-width': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-block-end-width': value,
           '--jumi-border-block-start-width': value,
-          '--jumi-border-block-width-animation-name': property('border-block-width', value),
+          ...property('border-block-width', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-border-bottom-left-radius': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-bottom-left-radius': value,
-          '--jumi-border-bottom-left-radius-animation-name': property('border-bottom-left-radius', value),
+          ...property('border-bottom-left-radius', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-bottom-radius': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-bottom-left-radius': value,
           '--jumi-border-bottom-right-radius': value,
-          '--jumi-border-radius-animation-name': property('border-radius', value),
+          ...property('border-radius', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-bottom-right-radius': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-bottom-right-radius': value,
-          '--jumi-border-bottom-right-radius-animation-name': property('border-bottom-right-radius', value),
+          ...property('border-bottom-right-radius', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-bottom-width': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-bottom-width': value,
-          '--jumi-border-bottom-width-animation-name': property('border-bottom-width', value),
+          ...property('border-bottom-width', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-border-collapse': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-collapse': value,
-          '--jumi-border-collapse-animation-name': property('border-collapse', value),
+          ...property('border-collapse', modifier, value),
         })
       },
+      modifiers: atStops,
       values: borderCollapse,
     },
     'animate-border-color': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-color': value,
-          '--jumi-border-color-animation-name': property('border-color', value),
+          ...property('border-color', modifier, value),
         })
       },
+      modifiers: atStops,
       type: 'color',
       values: theme('borderColor'),
     },
     'animate-border-end-end-radius': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-end-end-radius': value,
-          '--jumi-border-end-end-radius-animation-name': property('border-end-end-radius', value),
+          ...property('border-end-end-radius', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-end-start-radius': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-end-start-radius': value,
-          '--jumi-border-end-start-radius-animation-name': property('border-end-start-radius', value),
+          ...property('border-end-start-radius', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-image': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-image': value,
-          '--jumi-border-image-animation-name': property('border-image', value),
+          ...property('border-image', modifier, value),
         })
       },
+      modifiers: atStops,
       type: 'image',
       values: empty.none,
     },
     'animate-border-image-outset': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-image-outset': value,
-          '--jumi-border-image-outset-animation-name': property('border-image-outset', value),
+          ...property('border-image-outset', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'length'],
       values: empty.number,
     },
     'animate-border-image-outset-bottom': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-border-image-outset-animation-name': property('border-image-outset', value),
+          ...property('border-image-outset', modifier, value),
           '--jumi-border-image-outset-bottom': value,
         })
       },
+      modifiers: atStops,
       type: ['number', 'length'],
       values: empty.number,
     },
     'animate-border-image-outset-left': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-border-image-outset-animation-name': property('border-image-outset', value),
+          ...property('border-image-outset', modifier, value),
           '--jumi-border-image-outset-left': value,
         })
       },
+      modifiers: atStops,
       type: ['number', 'length'],
       values: empty.number,
     },
     'animate-border-image-outset-right': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-border-image-outset-animation-name': property('border-image-outset', value),
+          ...property('border-image-outset', modifier, value),
           '--jumi-border-image-outset-right': value,
         })
       },
+      modifiers: atStops,
       type: ['number', 'length'],
       values: empty.number,
     },
     'animate-border-image-outset-top': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-border-image-outset-animation-name': property('border-image-outset', value),
+          ...property('border-image-outset', modifier, value),
           '--jumi-border-image-outset-top': value,
         })
       },
+      modifiers: atStops,
       type: ['number', 'length'],
       values: empty.number,
     },
     'animate-border-image-outset-x': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-border-image-outset-animation-name': property('border-image-outset', value),
+          ...property('border-image-outset', modifier, value),
           '--jumi-border-image-outset-left': value,
           '--jumi-border-image-outset-right': value,
         })
       },
+      modifiers: atStops,
       type: ['number', 'length'],
       values: empty.number,
     },
     'animate-border-image-outset-y': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-border-image-outset-animation-name': property('border-image-outset', value),
+          ...property('border-image-outset', modifier, value),
           '--jumi-border-image-outset-bottom': value,
           '--jumi-border-image-outset-top': value,
         })
       },
+      modifiers: atStops,
       type: ['number', 'length'],
       values: empty.number,
     },
     'animate-border-image-repeat': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-image-repeat': value,
-          '--jumi-border-image-repeat-animation-name': property('border-image-repeat', value),
+          ...property('border-image-repeat', modifier, value),
         })
       },
+      modifiers: atStops,
       values: borderImageRepeat,
     },
     'animate-border-image-repeat-x': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-border-image-repeat-animation-name': property('border-image-repeat', value),
+          ...property('border-image-repeat', modifier, value),
           '--jumi-border-image-repeat-x': value,
         })
       },
+      modifiers: atStops,
       values: borderImageRepeat,
     },
     'animate-border-image-repeat-y': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-border-image-repeat-animation-name': property('border-image-repeat', value),
+          ...property('border-image-repeat', modifier, value),
           '--jumi-border-image-repeat-y': value,
         })
       },
+      modifiers: atStops,
       values: borderImageRepeat,
     },
     'animate-border-inline-end-radius': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-end-end-radius': value,
-          '--jumi-border-radius-animation-name': property('border-radius', value),
+          ...property('border-radius', modifier, value),
           '--jumi-border-start-end-radius': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-inline-end-width': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-inline-end-width': value,
-          '--jumi-border-inline-end-width-animation-name': property('border-inline-end-width', value),
+          ...property('border-inline-end-width', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-border-inline-start-radius': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-end-start-radius': value,
-          '--jumi-border-radius-animation-name': property('border-radius', value),
+          ...property('border-radius', modifier, value),
           '--jumi-border-start-start-radius': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-inline-start-width': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-inline-start-width': value,
-          '--jumi-border-inline-start-width-animation-name': property('border-inline-start-width', value),
+          ...property('border-inline-start-width', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-border-inline-width': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-inline-end-width': value,
           '--jumi-border-inline-start-width': value,
-          '--jumi-border-inline-width-animation-name': property('border-inline-width', value),
+          ...property('border-inline-width', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-border-left-radius': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-bottom-left-radius': value,
-          '--jumi-border-radius-animation-name': property('border-radius', value),
+          ...property('border-radius', modifier, value),
           '--jumi-border-top-left-radius': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-left-width': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-left-width': value,
-          '--jumi-border-left-width-animation-name': property('border-left-width', value),
+          ...property('border-left-width', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-border-radius': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-radius': value,
-          '--jumi-border-radius-animation-name': property('border-radius', value),
+          ...property('border-radius', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-right-radius': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-bottom-right-radius': value,
-          '--jumi-border-radius-animation-name': property('border-radius', value),
+          ...property('border-radius', modifier, value),
           '--jumi-border-top-right-radius': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-right-width': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-right-width': value,
-          '--jumi-border-right-width-animation-name': property('border-right-width', value),
+          ...property('border-right-width', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-border-start-end-radius': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-start-end-radius': value,
-          '--jumi-border-start-end-radius-animation-name': property('border-start-end-radius', value),
+          ...property('border-start-end-radius', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-start-start-radius': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-start-start-radius': value,
-          '--jumi-border-start-start-radius-animation-name': property('border-start-start-radius', value),
+          ...property('border-start-start-radius', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-top-left-radius': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-top-left-radius': value,
-          '--jumi-border-top-left-radius-animation-name': property('border-top-left-radius', value),
+          ...property('border-top-left-radius', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-top-radius': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-border-radius-animation-name': property('border-radius', value),
+          ...property('border-radius', modifier, value),
           '--jumi-border-top-left-radius': value,
           '--jumi-border-top-right-radius': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-top-right-radius': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-top-right-radius': value,
-          '--jumi-border-top-right-radius-animation-name': property('border-top-right-radius', value),
+          ...property('border-top-right-radius', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
     'animate-border-top-width': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-top-width': value,
-          '--jumi-border-top-width-animation-name': property('border-top-width', value),
+          ...property('border-top-width', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-border-width': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-border-width': value,
-          '--jumi-border-width-animation-name': property('border-width', value),
+          ...property('border-width', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-bottom': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-bottom': value,
-          '--jumi-bottom-animation-name': property('bottom', value),
+          ...property('bottom', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['number', 'length', 'percentage'],
       values: theme('inset', inset),
     },
     'animate-box-decoration-break': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-box-decoration-break': value,
-          '--jumi-box-decoration-break-animation-name': property('box-decoration-break', value),
+          ...property('box-decoration-break', modifier, value),
         })
       },
+      modifiers: atStops,
       values: boxDecorationBreak,
     },
     'animate-box-shadow': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-box-shadow': value,
-          '--jumi-box-shadow-animation-name': property('box-shadow', value),
+          ...property('box-shadow', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'shadow', 'any'],
       values: theme('boxShadow'),
     },
     'animate-box-shadow-blur': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-box-shadow-animation-name': property('box-shadow', value),
+          ...property('box-shadow', modifier, value),
           '--jumi-box-shadow-blur': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('blur'),
     },
     'animate-box-shadow-color': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-box-shadow-animation-name': property('box-shadow', value),
+          ...property('box-shadow', modifier, value),
           '--jumi-box-shadow-color': value,
         })
       },
+      modifiers: atStops,
       type: 'color',
       values: theme('boxShadowColor'),
     },
     'animate-box-shadow-offset-x': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-box-shadow-animation-name': property('box-shadow', value),
+          ...property('box-shadow', modifier, value),
           '--jumi-box-shadow-offset-x': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
     },
     'animate-box-shadow-offset-y': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-box-shadow-animation-name': property('box-shadow', value),
+          ...property('box-shadow', modifier, value),
           '--jumi-box-shadow-offset-y': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
     },
     'animate-box-shadow-spread': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-box-shadow-animation-name': property('box-shadow', value),
+          ...property('box-shadow', modifier, value),
           '--jumi-box-shadow-spread': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: empty.number,
     },
     'animate-box-sizing': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-box-sizing': value,
-          '--jumi-box-sizing-animation-name': property('box-sizing', value),
+          ...property('box-sizing', modifier, value),
         })
       },
+      modifiers: atStops,
       values: boxSizing,
     },
     'animate-break-after': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-break-after': value,
-          '--jumi-break-after-animation-name': property('break-after', value),
+          ...property('break-after', modifier, value),
         })
       },
+      modifiers: atStops,
       values: breakAfter,
     },
     'animate-break-before': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-break-before': value,
-          '--jumi-break-before-animation-name': property('break-before', value),
+          ...property('break-before', modifier, value),
         })
       },
+      modifiers: atStops,
       values: breakBefore,
     },
     'animate-break-inside': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-break-inside': value,
-          '--jumi-break-inside-animation-name': property('break-inside', value),
+          ...property('break-inside', modifier, value),
         })
       },
+      modifiers: atStops,
       values: breakInside,
     },
     'animate-caption-side': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-caption-side': value,
-          '--jumi-caption-side-animation-name': property('caption-side', value),
+          ...property('caption-side', modifier, value),
         })
       },
+      modifiers: atStops,
       values: captionSide,
     },
     'animate-caret-color': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-caret-color': value,
-          '--jumi-caret-color-animation-name': property('caret-color', value),
+          ...property('caret-color', modifier, value),
         })
       },
+      modifiers: atStops,
       type: 'color',
       values: theme('caretColor'),
     },
     'animate-clear': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-clear': value,
-          '--jumi-clear-animation-name': property('clear', value),
+          ...property('clear', modifier, value),
         })
       },
+      modifiers: atStops,
       values: clear,
     },
     'animate-clip-path': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-clip-path': value,
-          '--jumi-clip-path-animation-name': property('clip-path', value),
+          ...property('clip-path', modifier, value),
         })
       },
+      modifiers: atStops,
       values: clipPath,
     },
     'animate-clip-rule': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-clip-rule': value,
-          '--jumi-clip-rule-animation-name': property('clip-rule', value),
+          ...property('clip-rule', modifier, value),
         })
       },
+      modifiers: atStops,
       values: clipRule,
     },
     'animate-color': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-color': value,
-          '--jumi-color-animation-name': property('color', value),
+          ...property('color', modifier, value),
         })
       },
+      modifiers: atStops,
       type: 'color',
       values: theme('colors'),
     },
     'animate-color-interpolation': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-color-interpolation': value,
-          '--jumi-color-interpolation-animation-name': property('color-interpolation', value),
+          ...property('color-interpolation', modifier, value),
         })
       },
+      modifiers: atStops,
       values: colorInterpolation,
     },
     'animate-color-interpolation-filters': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-color-interpolation-filters': value,
-          '--jumi-color-interpolation-filters-animation-name': property('color-interpolation-filters', value),
+          ...property('color-interpolation-filters', modifier, value),
         })
       },
+      modifiers: atStops,
       values: colorInterpolation,
     },
     'animate-color-scheme': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-color-scheme': value,
-          '--jumi-color-scheme-animation-name': property('color-scheme', value),
+          ...property('color-scheme', modifier, value),
         })
       },
+      modifiers: atStops,
       values: colorScheme,
     },
     'animate-column-count': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-column-count': value,
-          '--jumi-column-count-animation-name': property('column-count', value),
+          ...property('column-count', modifier, value),
         })
       },
+      modifiers: atStops,
       type: 'integer',
       values: empty.auto,
     },
     'animate-column-fill': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-column-fill': value,
-          '--jumi-column-fill-animation-name': property('column-fill', value),
+          ...property('column-fill', modifier, value),
         })
       },
+      modifiers: atStops,
       values: columnFill,
     },
     'animate-column-gap': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-column-gap': value,
-          '--jumi-gap-animation-name': property('gap', value),
+          ...property('gap', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: empty.number,
     },
     'animate-column-rule': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-column-rule': value,
-          '--jumi-column-rule-animation-name': property('column-rule', value),
+          ...property('column-rule', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['line-width', 'length'],
       values: empty.none,
     },
     'animate-column-rule-color': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-column-rule-color': value,
-          '--jumi-column-rule-color-animation-name': property('column-rule-color', value),
+          ...property('column-rule-color', modifier, value),
         })
       },
+      modifiers: atStops,
       type: 'color',
       values: theme('borderColor'),
     },
     'animate-column-rule-style': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-column-rule-style': value,
-          '--jumi-column-rule-style-animation-name': property('column-rule-style', value),
+          ...property('column-rule-style', modifier, value),
         })
       },
+      modifiers: atStops,
       values: columnRuleStyle,
     },
     'animate-column-rule-width': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-column-rule-width': value,
-          '--jumi-column-rule-width-animation-name': property('column-rule-width', value),
+          ...property('column-rule-width', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['line-width', 'length'],
       values: columnRuleWidth,
     },
     'animate-column-span': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-column-span': value,
-          '--jumi-column-span-animation-name': property('column-span', value),
+          ...property('column-span', modifier, value),
         })
       },
+      modifiers: atStops,
       type: 'integer',
       values: columnSpan,
     },
     'animate-column-width': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-column-width': value,
-          '--jumi-column-width-animation-name': property('column-width', value),
+          ...property('column-width', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: columnWidth,
     },
     'animate-columns': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-columns': value,
-          '--jumi-columns-animation-name': property('columns', value),
+          ...property('columns', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['line-width', 'length', 'integer'],
       values: empty.auto,
     },
     'animate-contain': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-contain': value,
-          '--jumi-contain-animation-name': property('contain', value),
+          ...property('contain', modifier, value),
         })
       },
+      modifiers: atStops,
       values: contain,
     },
     'animate-contain-intrinsic-block-size': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-contain-intrinsic-block-size': value,
-          '--jumi-contain-intrinsic-block-size-animation-name': property('contain-intrinsic-block-size', value),
+          ...property('contain-intrinsic-block-size', modifier, value),
         })
       },
+      modifiers: atStops,
       type: 'length',
       values: containIntrinsic,
     },
     'animate-contain-intrinsic-height': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-contain-intrinsic-height': value,
-          '--jumi-contain-intrinsic-height-animation-name': property('contain-intrinsic-height', value),
+          ...property('contain-intrinsic-height', modifier, value),
         })
       },
+      modifiers: atStops,
       type: 'length',
       values: containIntrinsic,
     },
     'animate-contain-intrinsic-inline-size': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-contain-intrinsic-inline-size': value,
-          '--jumi-contain-intrinsic-inline-size-animation-name': property('contain-intrinsic-inline-size', value),
+          ...property('contain-intrinsic-inline-size', modifier, value),
         })
       },
+      modifiers: atStops,
       type: 'length',
       values: containIntrinsic,
     },
     'animate-contain-intrinsic-size': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-contain-intrinsic-size': value,
-          '--jumi-contain-intrinsic-size-animation-name': property('contain-intrinsic-size', value),
+          ...property('contain-intrinsic-size', modifier, value),
         })
       },
+      modifiers: atStops,
       type: 'length',
       values: empty.none,
     },
     'animate-contain-intrinsic-width': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-contain-intrinsic-width': value,
-          '--jumi-contain-intrinsic-width-animation-name': property('contain-intrinsic-width', value),
+          ...property('contain-intrinsic-width', modifier, value),
         })
       },
+      modifiers: atStops,
       type: 'length',
       values: containIntrinsic,
     },
     'animate-content': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-content': value,
-          '--jumi-content-animation-name': property('content', value),
+          ...property('content', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['image', 'any'],
       values: content,
     },
     'animate-content-visibility': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-content-visibility': value,
-          '--jumi-content-visibility-animation-name': property('content-visibility', value),
+          ...property('content-visibility', modifier, value),
         })
       },
+      modifiers: atStops,
       values: contentVisibility,
     },
     'animate-counter-increment': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-counter-increment': value,
-          '--jumi-counter-increment-animation-name': property('counter-increment', value),
+          ...property('counter-increment', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['integer', 'any'],
       values: empty.none,
     },
     'animate-counter-reset': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-counter-reset': value,
-          '--jumi-counter-reset-animation-name': property('counter-reset', value),
+          ...property('counter-reset', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['integer', 'any'],
       values: empty.none,
     },
     'animate-counter-set': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-counter-set': value,
-          '--jumi-counter-set-animation-name': property('counter-set', value),
+          ...property('counter-set', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['integer', 'any'],
       values: empty.none,
     },
     'animate-cursor': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-cursor': value,
-          '--jumi-cursor-animation-name': property('cursor', value),
+          ...property('cursor', modifier, value),
         })
       },
+      modifiers: atStops,
       values: cursor,
     },
     'animate-cx': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-cx': value,
-          '--jumi-cx-animation-name': property('cx', value),
+          ...property('cx', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: empty.number,
     },
     'animate-cy': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-cy': value,
-          '--jumi-cy-animation-name': property('cy', value),
+          ...property('cy', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: empty.number,
     },
     'animate-d': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-d': value,
-          '--jumi-d-animation-name': property('d', value),
+          ...property('d', modifier, value),
         })
       },
+      modifiers: atStops,
       values: empty.none,
     },
     'animate-display': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-display': value,
-          '--jumi-display-animation-name': property('display', value),
+          ...property('display', modifier, value),
         })
       },
+      modifiers: atStops,
       values: display,
     },
     'animate-display-inside': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-display-animation-name': property('display', value),
+          ...property('display', modifier, value),
           '--jumi-display-inside': modifier ? join([modifier, value]) : value,
         })
       },
-      modifiers: displayOutside,
+      modifiers: merge(displayOutside, atStops),
       values: displayInside,
     },
     'animate-display-outside': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-display-animation-name': property('display', value),
+          ...property('display', modifier, value),
           '--jumi-display-outside': modifier ? join([value, modifier]) : value,
         })
       },
-      modifiers: displayInside,
+      modifiers: merge(displayInside, atStops),
       values: displayOutside,
     },
     'animate-dominant-baseline': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-dominant-baseline': value,
-          '--jumi-dominant-baseline-animation-name': property('dominant-baseline', value),
+          ...property('dominant-baseline', modifier, value),
         })
       },
+      modifiers: atStops,
       values: dominantBaseline,
     },
     'animate-empty-cells': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-empty-cells': value,
-          '--jumi-empty-cells-animation-name': property('empty-cells', value),
+          ...property('empty-cells', modifier, value),
         })
       },
+      modifiers: atStops,
       values: emptyCells,
     },
     'animate-fill': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-fill': value,
-          '--jumi-fill-animation-name': property('fill', value),
+          ...property('fill', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['color', 'url', 'any'],
       values: theme('colors', fill),
     },
     'animate-fill-opacity': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-fill-opacity': value,
-          '--jumi-fill-opacity-animation-name': property('fill-opacity', value),
+          ...property('fill-opacity', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage'],
       values: theme('opacity'),
     },
     'animate-fill-rule': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-fill-rule': value,
-          '--jumi-fill-rule-animation-name': property('fill-rule', value),
+          ...property('fill-rule', modifier, value),
         })
       },
+      modifiers: atStops,
       values: fillRule,
     },
     'animate-filter': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-filter': value,
-          '--jumi-filter-animation-name': property('filter', value),
+          ...property('filter', modifier, value),
         })
       },
+      modifiers: atStops,
       values: empty.none,
     },
     'animate-filter-blur': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-filter-animation-name': property('filter', value),
+          ...property('filter', modifier, value),
           '--jumi-filter-blur': css('blur', value),
         })
       },
+      modifiers: atStops,
       type: 'length',
       values: theme('blur'),
     },
     'animate-filter-brightness': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-filter-animation-name': property('filter', value),
+          ...property('filter', modifier, value),
           '--jumi-filter-brightness': css('brightness', value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage'],
       values: theme('brightness'),
     },
     'animate-filter-contrast': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-filter-animation-name': property('filter', value),
+          ...property('filter', modifier, value),
           '--jumi-filter-contrast': css('contrast', value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage'],
       values: theme('contrast'),
     },
     'animate-filter-drop-shadow': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-filter-animation-name': property('filter', value),
+          ...property('filter', modifier, value),
           '--jumi-filter-drop-shadow': css('drop-shadow', value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'shadow', 'any'],
       values: theme('dropShadow'),
     },
     'animate-filter-drop-shadow-blur': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-filter-animation-name': property('filter', value),
+          ...property('filter', modifier, value),
           '--jumi-filter-drop-shadow-blur': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('blur'),
     },
     'animate-filter-drop-shadow-color': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-filter-animation-name': property('filter', value),
+          ...property('filter', modifier, value),
           '--jumi-filter-drop-shadow-color': value,
         })
       },
+      modifiers: atStops,
       type: 'color',
       values: theme('boxShadowColor'),
     },
     'animate-filter-drop-shadow-offset-x': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-filter-animation-name': property('filter', value),
+          ...property('filter', modifier, value),
           '--jumi-filter-drop-shadow-offset-x': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
     },
     'animate-filter-drop-shadow-offset-y': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-filter-animation-name': property('filter', value),
+          ...property('filter', modifier, value),
           '--jumi-filter-drop-shadow-offset-y': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
     },
     'animate-filter-grayscale': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-filter-animation-name': property('filter', value),
+          ...property('filter', modifier, value),
           '--jumi-filter-grayscale': css('grayscale', value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage'],
       values: theme('grayscale'),
     },
     'animate-filter-hue-rotate': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-filter-animation-name': property('filter', value),
+          ...property('filter', modifier, value),
           '--jumi-filter-hue-rotate': 'hue-rotate(' + value + ')',
         })
       },
+      modifiers: atStops,
       type: 'angle',
       values: theme('hueRotate'),
     },
     'animate-filter-invert': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-filter-animation-name': property('filter', value),
+          ...property('filter', modifier, value),
           '--jumi-filter-invert': css('invert', value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage'],
       values: theme('invert'),
     },
     'animate-filter-opacity': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-filter-animation-name': property('filter', value),
+          ...property('filter', modifier, value),
           '--jumi-filter-opacity': css('opacity', value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage'],
       values: theme('opacity'),
     },
     'animate-filter-saturate': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-filter-animation-name': property('filter', value),
+          ...property('filter', modifier, value),
           '--jumi-filter-saturate': css('saturate', value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage'],
       values: theme('saturate'),
     },
     'animate-filter-sepia': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-filter-animation-name': property('filter', value),
+          ...property('filter', modifier, value),
           '--jumi-filter-sepia': css('sepia', value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage'],
       values: theme('sepia'),
     },
     'animate-filter-url': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-filter-animation-name': property('filter', value),
+          ...property('filter', modifier, value),
           '--jumi-filter-url': css('url', value),
         })
       },
+      modifiers: atStops,
       type: 'url',
       values: empty.string,
     },
     'animate-flex': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-flex': value,
-          '--jumi-flex-animation-name': property('flex', value),
+          ...property('flex', modifier, value),
         })
       },
+      modifiers: atStops,
       values: theme('flex'),
     },
     'animate-flex-basis': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-flex-basis': value,
-          '--jumi-flex-basis-animation-name': property('flex-basis', value),
+          ...property('flex-basis', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'any'],
       values: theme('flexBasis'),
     },
     'animate-flex-direction': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-flex-direction': value,
-          '--jumi-flex-direction-animation-name': property('flex-direction', value),
+          ...property('flex-direction', modifier, value),
         })
       },
+      modifiers: atStops,
       values: flexDirection,
     },
     'animate-flex-flow': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-flex-flow': value,
-          '--jumi-flex-flow-animation-name': property('flex-flow', value),
+          ...property('flex-flow', modifier, value),
         })
       },
+      modifiers: atStops,
       values: empty.string,
     },
     'animate-flex-grow': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-flex-grow': value,
-          '--jumi-flex-grow-animation-name': property('flex-grow', value),
+          ...property('flex-grow', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'any'],
       values: theme('flexGrow'),
     },
     'animate-flex-shrink': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-flex-shrink': value,
-          '--jumi-flex-shrink-animation-name': property('flex-shrink', value),
+          ...property('flex-shrink', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'any'],
       values: theme('flexShrink'),
     },
     'animate-flex-wrap': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-flex-wrap': value,
-          '--jumi-flex-wrap-animation-name': property('flex-wrap', value),
+          ...property('flex-wrap', modifier, value),
         })
       },
+      modifiers: atStops,
       values: flexWrap,
     },
     'animate-float': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-float': value,
-          '--jumi-float-animation-name': property('float', value),
+          ...property('float', modifier, value),
         })
       },
+      modifiers: atStops,
       values: float,
     },
     'animate-flood-color': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-flood-color': value,
-          '--jumi-flood-color-animation-name': property('flood-color', value),
+          ...property('flood-color', modifier, value),
         })
       },
+      modifiers: atStops,
       type: 'color',
       values: theme('colors'),
     },
     'animate-flood-opacity': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-flood-opacity': value,
-          '--jumi-flood-opacity-animation-name': property('flood-opacity', value),
+          ...property('flood-opacity', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage'],
       values: theme('opacity'),
     },
     'animate-font-family': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-font-family': value,
-          '--jumi-font-family-animation-name': property('font-family', value),
+          ...property('font-family', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['generic-name', 'family-name'],
       values: fontFamily,
     },
     'animate-font-feature-settings': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-font-feature-settings': value,
-          '--jumi-font-feature-settings-animation-name': property('font-feature-settings', value),
+          ...property('font-feature-settings', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['integer', 'any'],
       values: fontFeatureSettings,
     },
     'animate-font-kerning': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-font-kerning': value,
-          '--jumi-font-kerning-animation-name': property('font-kerning', value),
+          ...property('font-kerning', modifier, value),
         })
       },
+      modifiers: atStops,
       values: fontKerning,
     },
     'animate-font-size': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-font-size': value,
-          '--jumi-font-size-animation-name': property('font-size', value),
+          ...property('font-size', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['absolute-size', 'relative-size', 'length', 'percentage', 'any'],
       values: fontSize,
     },
     'animate-font-size-adjust': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-font-size-adjust': modifier ? join([value, modifier]) : value,
-          '--jumi-font-size-adjust-animation-name': property('font-size-adjust', value),
+          ...property('font-size-adjust', modifier, value),
         })
       },
-      modifiers: fontSizeAdjustMetric,
+      modifiers: merge(fontSizeAdjustMetric, atStops),
       type: ['number', 'any'],
       values: fontSizeAdjust,
     },
     'animate-font-style': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-font-style': modifier ? join([value, modifier]) : value,
-          '--jumi-font-style-animation-name': property('font-style', value),
+          ...property('font-style', modifier, value),
         })
       },
+      modifiers: atStops,
       values: fontStyle,
     },
     'animate-font-synthesis': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-font-synthesis': value,
-          '--jumi-font-synthesis-animation-name': property('font-synthesis', value),
+          ...property('font-synthesis', modifier, value),
         })
       },
+      modifiers: atStops,
       values: empty.none,
     },
     'animate-font-synthesis-small-caps': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-font-synthesis-small-caps': value,
-          '--jumi-font-synthesis-small-caps-animation-name': property('font-synthesis-small-caps', value),
+          ...property('font-synthesis-small-caps', modifier, value),
         })
       },
+      modifiers: atStops,
       values: fontSynthesisSmallCaps,
     },
     'animate-font-synthesis-style': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-font-synthesis-style': value,
-          '--jumi-font-synthesis-style-animation-name': property('font-synthesis-style', value),
+          ...property('font-synthesis-style', modifier, value),
         })
       },
+      modifiers: atStops,
       values: fontSynthesisStyle,
     },
     'animate-font-synthesis-weight': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-font-synthesis-weight': value,
-          '--jumi-font-synthesis-weight-animation-name': property('font-synthesis-weight', value),
+          ...property('font-synthesis-weight', modifier, value),
         })
       },
+      modifiers: atStops,
       values: fontSynthesisWeight,
     },
     'animate-font-variant': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-font-variant': value,
-          '--jumi-font-variant-animation-name': property('font-variant', value),
+          ...property('font-variant', modifier, value),
         })
       },
+      modifiers: atStops,
       values: empty.string,
     },
     'animate-font-variant-alternates': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-font-variant-alternates': value,
-          '--jumi-font-variant-alternates-animation-name': property('font-variant-alternates', value),
+          ...property('font-variant-alternates', modifier, value),
         })
       },
+      modifiers: atStops,
       values: fontVariantAlternates,
     },
     'animate-font-variant-caps': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-font-variant-caps': value,
-          '--jumi-font-variant-caps-animation-name': property('font-variant-caps', value),
+          ...property('font-variant-caps', modifier, value),
         })
       },
+      modifiers: atStops,
       values: fontVariantCaps,
     },
     'animate-font-variant-east-asian': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-font-variant-east-asian': modifier ? join([value, modifier]) : value,
-          '--jumi-font-variant-east-asian-animation-name': property('font-variant-east-asian', value),
+          ...property('font-variant-east-asian', modifier, value),
         })
       },
-      modifiers: fontVariantEastAsianWidth,
+      modifiers: merge(fontVariantEastAsianWidth, atStops),
       values: fontVariantEastAsian,
     },
     'animate-font-variant-ligatures': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-font-variant-ligatures': value,
-          '--jumi-font-variant-ligatures-animation-name': property('font-variant-ligatures', value),
+          ...property('font-variant-ligatures', modifier, value),
         })
       },
+      modifiers: atStops,
       values: fontVariantLigatures,
     },
     'animate-font-variant-numeric': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-font-variant-numeric': value,
-          '--jumi-font-variant-numeric-animation-name': property('font-variant-numeric', value),
+          ...property('font-variant-numeric', modifier, value),
         })
       },
+      modifiers: atStops,
       values: fontVariantNumeric,
     },
     'animate-font-variant-position': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-font-variant-position': value,
-          '--jumi-font-variant-position-animation-name': property('font-variant-position', value),
+          ...property('font-variant-position', modifier, value),
         })
       },
+      modifiers: atStops,
       values: fontVariantPosition,
     },
     'animate-font-variation-settings': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-font-variation-settings': value,
-          '--jumi-font-variation-settings-animation-name': property('font-variation-settings', value),
+          ...property('font-variation-settings', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'any'],
       values: empty.string,
     },
     'animate-font-weight': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-font-weight': value,
-          '--jumi-font-weight-animation-name': property('font-weight', value),
+          ...property('font-weight', modifier, value),
         })
       },
+      modifiers: atStops,
       type: 'number',
       values: fontWeight,
     },
     'animate-forced-color-adjust': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-forced-color-adjust': value,
-          '--jumi-forced-color-adjust-animation-name': property('forced-color-adjust', value),
+          ...property('forced-color-adjust', modifier, value),
         })
       },
+      modifiers: atStops,
       values: forcedColorAdjust,
     },
     'animate-gap': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-gap': value,
-          '--jumi-gap-animation-name': property('gap', value),
+          ...property('gap', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'any'],
       values: theme('gap'),
     },
     'animate-grid': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-grid': value,
-          '--jumi-grid-animation-name': property('grid', value),
+          ...property('grid', modifier, value),
         })
       },
+      modifiers: atStops,
       values: empty.string,
     },
     'animate-grid-auto-columns': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-grid-auto-columns': value,
-          '--jumi-grid-auto-columns-animation-name': property('grid-auto-columns', value),
+          ...property('grid-auto-columns', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'any'],
       values: theme('gridAutoColumns'),
     },
     'animate-grid-auto-flow': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-grid-auto-flow': modifier ? join([value, modifier]) : value,
-          '--jumi-grid-auto-flow-animation-name': property('grid-auto-flow', value),
+          ...property('grid-auto-flow', modifier, value),
         })
       },
-      modifiers: gridAutoFlowPacking,
+      modifiers: merge(gridAutoFlowPacking, atStops),
       values: gridAutoFlow,
     },
     'animate-grid-auto-rows': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-grid-auto-rows': value,
-          '--jumi-grid-auto-rows-animation-name': property('grid-auto-rows', value),
+          ...property('grid-auto-rows', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'any'],
       values: theme('gridAutoRows'),
     },
     'animate-grid-column': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-grid-column': value,
-          '--jumi-grid-column-animation-name': property('grid-column', value),
+          ...property('grid-column', modifier, value),
         })
       },
+      modifiers: atStops,
       values: theme('gridColumn'),
     },
     'animate-grid-column-end': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-grid-column-end': modifier ? join([modifier, value]) : value,
-          '--jumi-grid-column-end-animation-name': property('grid-column-end', value),
+          ...property('grid-column-end', modifier, value),
         })
       },
+      modifiers: atStops,
       values: theme('gridColumnEnd'),
     },
     'animate-grid-column-start': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-grid-column-start': modifier ? join([modifier, value]) : value,
-          '--jumi-grid-column-start-animation-name': property('grid-column-start', value),
+          ...property('grid-column-start', modifier, value),
         })
       },
+      modifiers: atStops,
       values: theme('gridColumnStart'),
     },
     'animate-grid-row': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-grid-row': value,
-          '--jumi-grid-row-animation-name': property('grid-row', value),
+          ...property('grid-row', modifier, value),
         })
       },
+      modifiers: atStops,
       values: theme('gridRow'),
     },
     'animate-grid-row-end': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-grid-row-end': modifier ? join([modifier, value]) : value,
-          '--jumi-grid-row-end-animation-name': property('grid-row-end', value),
+          ...property('grid-row-end', modifier, value),
         })
       },
-      modifiers: gridSize,
+      modifiers: merge(gridSize, atStops),
       values: theme('gridRowEnd'),
     },
     'animate-grid-row-start': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-grid-row-start': modifier ? join([modifier, value]) : value,
-          '--jumi-grid-row-start-animation-name': property('grid-row-start', value),
+          ...property('grid-row-start', modifier, value),
         })
       },
-      modifiers: gridSize,
+      modifiers: merge(gridSize, atStops),
       values: theme('gridRowStart'),
     },
     'animate-grid-template-areas': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-grid-template-areas': value,
-          '--jumi-grid-template-areas-animation-name': property('grid-template-areas', value),
+          ...property('grid-template-areas', modifier, value),
         })
       },
+      modifiers: atStops,
       values: empty.none,
     },
     'animate-grid-template-columns': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-grid-template-columns': value,
-          '--jumi-grid-template-columns-animation-name': property('grid-template-columns', value),
+          ...property('grid-template-columns', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['any'],
       values: theme('gridTemplateColumns'),
     },
     'animate-grid-template-rows': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-grid-template-rows': value,
-          '--jumi-grid-template-rows-animation-name': property('grid-template-rows', value),
+          ...property('grid-template-rows', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['any'],
       values: theme('gridTemplateRows'),
     },
     'animate-hanging-punctuation': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-hanging-punctuation': value,
-          '--jumi-hanging-punctuation-animation-name': property('hanging-punctuation', value),
+          ...property('hanging-punctuation', modifier, value),
         })
       },
+      modifiers: atStops,
       values: hangingPunctuation,
     },
     'animate-height': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-height': value,
-          '--jumi-height-animation-name': property('height', value),
+          ...property('height', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
       values: theme('height'),
     },
     'animate-hyphenate-character': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-hyphenate-character': value,
-          '--jumi-hyphenate-character-animation-name': property('hyphenate-character', value),
+          ...property('hyphenate-character', modifier, value),
         })
       },
+      modifiers: atStops,
       values: empty.auto,
     },
     'animate-hyphenate-limit-chars': {
-      fn: (value) => {
-        const hyphenateLimitChars: Collection<string> = {
-          '--jumi-hyphenate-limit-chars-animation-name': property('hyphenate-limit-chars', value),
+      fn: (value, { modifier }) => {
+        const hyphenateLimitChars: CssInJs = {
+          ...property('hyphenate-limit-chars', modifier, value),
         }
 
         switch (value) {
@@ -2202,1862 +2405,2043 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
           }
         }
       },
-      modifiers: hyphenateLimitCharsProperties,
+      modifiers: merge(hyphenateLimitCharsProperties, atStops),
       type: ['number', 'any'],
       values: hyphenateLimitChars,
     },
     'animate-hyphens': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-hyphens': value,
-          '--jumi-hyphens-animation-name': property('hyphens', value),
+          ...property('hyphens', modifier, value),
         })
       },
+      modifiers: atStops,
       values: hyphens,
     },
     'animate-image-orientation': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-image-orientation': value,
-          '--jumi-image-orientation-animation-name': property('image-orientation', value),
+          ...property('image-orientation', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['angle', 'any'],
       values: imageOrientation,
     },
     'animate-image-rendering': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-image-rendering': value,
-          '--jumi-image-rendering-animation-name': property('image-rendering', value),
+          ...property('image-rendering', modifier, value),
         })
       },
+      modifiers: atStops,
       values: imageRendering,
     },
     'animate-initial-letter': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-initial-letter': modifier ? join([value, modifier]) : value,
-          '--jumi-initial-letter-animation-name': property('initial-letter', value),
+          ...property('initial-letter', modifier, value),
         })
       },
-      modifiers: initialLetterPosition,
+      modifiers: merge(initialLetterPosition, atStops),
       type: ['number', 'integer', 'any'],
       values: initialLetter,
     },
     'animate-inline-size': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-inline-size': value,
-          '--jumi-inline-size-animation-name': property('inline-size', value),
+          ...property('inline-size', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: inlineSize,
     },
     'animate-inset': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-inset': value,
-          '--jumi-inset-animation-name': property('inset', value),
+          ...property('inset', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('inset', inset),
     },
     'animate-inset-block': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-inset-block': value,
-          '--jumi-inset-block-animation-name': property('inset-block', value),
+          ...property('inset-block', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('inset', inset),
     },
     'animate-inset-block-end': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-inset-block-end': value,
-          '--jumi-inset-block-end-animation-name': property('inset-block-end', value),
+          ...property('inset-block-end', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('inset', inset),
     },
     'animate-inset-block-start': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-inset-block-start': value,
-          '--jumi-inset-block-start-animation-name': property('inset-block-start', value),
+          ...property('inset-block-start', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('inset', inset),
     },
     'animate-inset-inline': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-inset-inline': value,
-          '--jumi-inset-inline-animation-name': property('inset-inline', value),
+          ...property('inset-inline', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('inset', inset),
     },
     'animate-inset-inline-end': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-inset-inline-end': value,
-          '--jumi-inset-inline-end-animation-name': property('inset-inline-end', value),
+          ...property('inset-inline-end', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('inset', inset),
     },
     'animate-inset-inline-start': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-inset-inline-start': value,
-          '--jumi-inset-inline-start-animation-name': property('inset-inline-start', value),
+          ...property('inset-inline-start', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('inset', inset),
     },
     'animate-justify-content': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-justify-content': value,
-          '--jumi-justify-content-animation-name': property('justify-content', value),
+          ...property('justify-content', modifier, value),
         })
       },
+      modifiers: atStops,
       values: justifyContent,
     },
     'animate-justify-items': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-justify-items': value,
-          '--jumi-justify-items-animation-name': property('justify-items', value),
+          ...property('justify-items', modifier, value),
         })
       },
+      modifiers: atStops,
       values: justifyItems,
     },
     'animate-justify-self': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-justify-self': value,
-          '--jumi-justify-self-animation-name': property('justify-self', value),
+          ...property('justify-self', modifier, value),
         })
       },
+      modifiers: atStops,
       values: justifySelf,
     },
     'animate-left': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-left': value,
-          '--jumi-left-animation-name': property('left', value),
+          ...property('left', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('inset', inset),
     },
     'animate-letter-spacing': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-letter-spacing': value,
-          '--jumi-letter-spacing-animation-name': property('letter-spacing', value),
+          ...property('letter-spacing', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('letterSpacing'),
     },
     'animate-lighting-color': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-lighting-color': value,
-          '--jumi-lighting-color-animation-name': property('lighting-color', value),
+          ...property('lighting-color', modifier, value),
         })
       },
+      modifiers: atStops,
       type: 'color',
       values: theme('colors'),
     },
     'animate-line-break': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-line-break': value,
-          '--jumi-line-break-animation-name': property('line-break', value),
+          ...property('line-break', modifier, value),
         })
       },
+      modifiers: atStops,
       values: lineBreak,
     },
     'animate-line-clamp': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-line-clamp': value,
-          '--jumi-line-clamp-animation-name': property('line-clamp', value),
+          ...property('line-clamp', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'any'],
       values: empty.none,
     },
     'animate-line-height': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-line-height': value,
-          '--jumi-line-height-animation-name': property('line-height', value),
+          ...property('line-height', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'length', 'percentage'],
       values: theme('lineHeight'),
     },
     'animate-list-style': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-list-style': value,
-          '--jumi-list-style-animation-name': property('list-style', value),
+          ...property('list-style', modifier, value),
         })
       },
+      modifiers: atStops,
       values: empty.none,
     },
     'animate-list-style-image': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-list-style-image': value,
-          '--jumi-list-style-image-animation-name': property('list-style-image', value),
+          ...property('list-style-image', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['url', 'image', 'any'],
       values: empty.none,
     },
     'animate-list-style-position': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-list-style-position': value,
-          '--jumi-list-style-position-animation-name': property('list-style-position', value),
+          ...property('list-style-position', modifier, value),
         })
       },
+      modifiers: atStops,
       values: listStylePosition,
     },
     'animate-list-style-type': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-list-style-type': value,
-          '--jumi-list-style-type-animation-name': property('list-style-type', value),
+          ...property('list-style-type', modifier, value),
         })
       },
+      modifiers: atStops,
       values: listStyleType,
     },
     'animate-margin': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-margin': value,
-          '--jumi-margin-animation-name': property('margin', value),
+          ...property('margin', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('margin'),
     },
     'animate-margin-block': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-margin-block': value,
-          '--jumi-margin-block-animation-name': property('margin-block', value),
+          ...property('margin-block', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('margin'),
     },
     'animate-margin-block-end': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-margin-block-end': value,
-          '--jumi-margin-block-end-animation-name': property('margin-block-end', value),
+          ...property('margin-block-end', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('margin'),
     },
     'animate-margin-block-start': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-margin-block-start': value,
-          '--jumi-margin-block-start-animation-name': property('margin-block-start', value),
+          ...property('margin-block-start', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('margin'),
     },
     'animate-margin-bottom': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-margin-bottom': value,
-          '--jumi-margin-bottom-animation-name': property('margin-bottom', value),
+          ...property('margin-bottom', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('margin'),
     },
     'animate-margin-inline': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-margin-inline': value,
-          '--jumi-margin-inline-animation-name': property('margin-inline', value),
+          ...property('margin-inline', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('margin'),
     },
     'animate-margin-inline-end': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-margin-inline-end': value,
-          '--jumi-margin-inline-end-animation-name': property('margin-inline-end', value),
+          ...property('margin-inline-end', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('margin'),
     },
     'animate-margin-inline-start': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-margin-inline-start': value,
-          '--jumi-margin-inline-start-animation-name': property('margin-inline-start', value),
+          ...property('margin-inline-start', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('margin'),
     },
     'animate-margin-left': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-margin-left': value,
-          '--jumi-margin-left-animation-name': property('margin-left', value),
+          ...property('margin-left', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('margin'),
     },
     'animate-margin-right': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-margin-right': value,
-          '--jumi-margin-right-animation-name': property('margin-right', value),
+          ...property('margin-right', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('margin'),
     },
     'animate-margin-top': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-margin-top': value,
-          '--jumi-margin-top-animation-name': property('margin-top', value),
+          ...property('margin-top', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('margin'),
     },
     'animate-marker': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-marker': value,
-          '--jumi-marker-animation-name': property('marker', value),
+          ...property('marker', modifier, value),
         })
       },
+      modifiers: atStops,
       values: empty.none,
     },
     'animate-marker-end': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-marker-end': value,
-          '--jumi-marker-end-animation-name': property('marker-end', value),
+          ...property('marker-end', modifier, value),
         })
       },
+      modifiers: atStops,
       values: empty.none,
     },
     'animate-marker-mid': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-marker-mid': value,
-          '--jumi-marker-mid-animation-name': property('marker-mid', value),
+          ...property('marker-mid', modifier, value),
         })
       },
+      modifiers: atStops,
       values: empty.none,
     },
     'animate-marker-start': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-marker-start': value,
-          '--jumi-marker-start-animation-name': property('marker-start', value),
+          ...property('marker-start', modifier, value),
         })
       },
+      modifiers: atStops,
       values: empty.none,
     },
     'animate-mask': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-mask': value,
-          '--jumi-mask-animation-name': property('mask', value),
+          ...property('mask', modifier, value),
         })
       },
+      modifiers: atStops,
       values: empty.none,
     },
     'animate-mask-border': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-mask-border': value,
-          '--jumi-mask-border-animation-name': property('mask-border', value),
+          ...property('mask-border', modifier, value),
         })
       },
+      modifiers: atStops,
       values: empty.none,
     },
     'animate-mask-border-mode': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-mask-border-mode': value,
-          '--jumi-mask-border-mode-animation-name': property('mask-border-mode', value),
+          ...property('mask-border-mode', modifier, value),
         })
       },
+      modifiers: atStops,
       values: maskType,
     },
     'animate-mask-border-outset': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-mask-border-outset': value,
-          '--jumi-mask-border-outset-animation-name': property('mask-border-outset', value),
+          ...property('mask-border-outset', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: 'length',
       values: theme('inset'),
     },
     'animate-mask-border-outset-bottom': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-mask-border-outset-animation-name': property('mask-border-outset', value),
+          ...property('mask-border-outset', modifier, value),
           '--jumi-mask-border-outset-bottom': value,
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: 'length',
       values: theme('inset'),
     },
     'animate-mask-border-outset-left': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-mask-border-outset-animation-name': property('mask-border-outset', value),
+          ...property('mask-border-outset', modifier, value),
           '--jumi-mask-border-outset-left': value,
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: 'length',
       values: theme('inset'),
     },
     'animate-mask-border-outset-right': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-mask-border-outset-animation-name': property('mask-border-outset', value),
+          ...property('mask-border-outset', modifier, value),
           '--jumi-mask-border-outset-right': value,
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: 'length',
       values: theme('inset'),
     },
     'animate-mask-border-outset-top': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-mask-border-outset-animation-name': property('mask-border-outset', value),
+          ...property('mask-border-outset', modifier, value),
           '--jumi-mask-border-outset-top': value,
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: 'length',
       values: theme('inset'),
     },
     'animate-mask-border-outset-x': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-mask-border-outset-animation-name': property('mask-border-outset', value),
+          ...property('mask-border-outset', modifier, value),
           '--jumi-mask-border-outset-left': value,
           '--jumi-mask-border-outset-right': value,
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: 'length',
       values: theme('inset'),
     },
     'animate-mask-border-outset-y': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-mask-border-outset-animation-name': property('mask-border-outset', value),
+          ...property('mask-border-outset', modifier, value),
           '--jumi-mask-border-outset-bottom': value,
           '--jumi-mask-border-outset-top': value,
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: 'length',
       values: theme('inset'),
     },
     'animate-mask-border-repeat': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-mask-border-repeat': value,
-          '--jumi-mask-border-repeat-animation-name': property('mask-border-repeat', value),
+          ...property('mask-border-repeat', modifier, value),
         })
       },
+      modifiers: atStops,
       values: maskBorderRepeat,
     },
     'animate-mask-border-slice': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-mask-border-slice': value,
-          '--jumi-mask-border-slice-animation-name': property('mask-border-slice', value),
+          ...property('mask-border-slice', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage', 'any'],
       values: theme('inset', maskBorderSlice),
     },
     'animate-mask-border-slice-bottom': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-mask-border-slice-animation-name': property('mask-border-slice', value),
+          ...property('mask-border-slice', modifier, value),
           '--jumi-mask-border-slice-bottom': value,
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage', 'any'],
       values: theme('inset', maskBorderSlice),
     },
     'animate-mask-border-slice-left': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-mask-border-slice-animation-name': property('mask-border-slice', value),
+          ...property('mask-border-slice', modifier, value),
           '--jumi-mask-border-slice-left': value,
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage', 'any'],
       values: theme('inset', maskBorderSlice),
     },
     'animate-mask-border-slice-right': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-mask-border-slice-animation-name': property('mask-border-slice', value),
+          ...property('mask-border-slice', modifier, value),
           '--jumi-mask-border-slice-right': value,
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage', 'any'],
       values: theme('inset', maskBorderSlice),
     },
     'animate-mask-border-slice-top': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-mask-border-slice-animation-name': property('mask-border-slice', value),
+          ...property('mask-border-slice', modifier, value),
           '--jumi-mask-border-slice-top': value,
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage', 'any'],
       values: theme('inset', maskBorderSlice),
     },
     'animate-mask-border-slice-x': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-mask-border-slice-animation-name': property('mask-border-slice', value),
+          ...property('mask-border-slice', modifier, value),
           '--jumi-mask-border-slice-left': value,
           '--jumi-mask-border-slice-right': value,
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage', 'any'],
       values: theme('inset', maskBorderSlice),
     },
     'animate-mask-border-slice-y': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-mask-border-slice-animation-name': property('mask-border-slice', value),
+          ...property('mask-border-slice', modifier, value),
           '--jumi-mask-border-slice-bottom': value,
           '--jumi-mask-border-slice-top': value,
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage', 'any'],
       values: theme('inset', maskBorderSlice),
     },
     'animate-mask-border-source': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-mask-border-source': value,
-          '--jumi-mask-border-source-animation-name': property('mask-border-source', value),
+          ...property('mask-border-source', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['url', 'image', 'any'],
       values: empty.none,
     },
     'animate-mask-border-width': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-mask-border-width': value,
-          '--jumi-mask-border-width-animation-name': property('mask-border-width', value),
+          ...property('mask-border-width', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('borderWidth'),
     },
     'animate-mask-clip': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-mask-clip': value,
-          '--jumi-mask-clip-animation-name': property('mask-clip', value),
+          ...property('mask-clip', modifier, value),
         })
       },
+      modifiers: atStops,
       values: maskClip,
     },
     'animate-mask-composite': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-mask-composite': value,
-          '--jumi-mask-composite-animation-name': property('mask-composite', value),
+          ...property('mask-composite', modifier, value),
         })
       },
+      modifiers: atStops,
       values: maskComposite,
     },
     'animate-mask-image': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-mask-image': value,
-          '--jumi-mask-image-animation-name': property('mask-image', value),
+          ...property('mask-image', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['url', 'image', 'any'],
       values: empty.none,
     },
     'animate-mask-mode': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-mask-mode': value,
-          '--jumi-mask-mode-animation-name': property('mask-mode', value),
+          ...property('mask-mode', modifier, value),
         })
       },
+      modifiers: atStops,
       values: maskMode,
     },
     'animate-mask-origin': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-mask-origin': value,
-          '--jumi-mask-origin-animation-name': property('mask-origin', value),
+          ...property('mask-origin', modifier, value),
         })
       },
+      modifiers: atStops,
       values: maskOrigin,
     },
     'animate-mask-position': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-mask-position': value,
-          '--jumi-mask-position-animation-name': property('mask-position', value),
+          ...property('mask-position', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'position'],
     },
     'animate-mask-repeat': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-mask-repeat': value,
-          '--jumi-mask-repeat-animation-name': property('mask-repeat', value),
+          ...property('mask-repeat', modifier, value),
         })
       },
+      modifiers: atStops,
       values: backgroundRepeat,
     },
     'animate-mask-size': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-mask-size': value,
-          '--jumi-mask-size-animation-name': property('mask-size', value),
+          ...property('mask-size', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: theme('backgroundSize'),
     },
     'animate-mask-type': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-mask-type': value,
-          '--jumi-mask-type-animation-name': property('mask-type', value),
+          ...property('mask-type', modifier, value),
         })
       },
+      modifiers: atStops,
       values: maskType,
     },
     'animate-math-depth': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-math-depth': value,
-          '--jumi-math-depth-animation-name': property('math-depth', value),
+          ...property('math-depth', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: 'integer',
       values: mathDepth,
     },
     'animate-math-depth-add': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-math-depth': `add(${value})`,
-          '--jumi-math-depth-animation-name': property('math-depth', value),
+          ...property('math-depth', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: 'integer',
       values: empty.number,
     },
     'animate-math-style': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-math-style': value,
-          '--jumi-math-style-animation-name': property('math-style', value),
+          ...property('math-style', modifier, value),
         })
       },
+      modifiers: atStops,
       values: mathStyle,
     },
     'animate-max-block-size': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-max-block-size': value,
-          '--jumi-max-block-size-animation-name': property('max-block-size', value),
+          ...property('max-block-size', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('maxHeight'),
     },
     'animate-max-height': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-max-height': value,
-          '--jumi-max-height-animation-name': property('max-height', value),
+          ...property('max-height', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('maxHeight'),
     },
     'animate-max-inline-size': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-max-inline-size': value,
-          '--jumi-max-inline-size-animation-name': property('max-inline-size', value),
+          ...property('max-inline-size', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('maxWidth'),
     },
     'animate-max-width': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-max-width': value,
-          '--jumi-max-width-animation-name': property('max-width', value),
+          ...property('max-width', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('maxWidth'),
     },
     'animate-min-block-size': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-min-block-size': value,
-          '--jumi-min-block-size-animation-name': property('min-block-size', value),
+          ...property('min-block-size', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('minHeight'),
     },
     'animate-min-height': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-min-height': value,
-          '--jumi-min-height-animation-name': property('min-height', value),
+          ...property('min-height', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('minHeight'),
     },
     'animate-min-inline-size': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-min-inline-size': value,
-          '--jumi-min-inline-size-animation-name': property('min-inline-size', value),
+          ...property('min-inline-size', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('minWidth'),
     },
     'animate-min-width': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-min-width': value,
-          '--jumi-min-width-animation-name': property('min-width', value),
+          ...property('min-width', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('minWidth'),
     },
     'animate-mix-blend-mode': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-mix-blend-mode': value,
-          '--jumi-mix-blend-mode-animation-name': property('mix-blend-mode', value),
+          ...property('mix-blend-mode', modifier, value),
         })
       },
+      modifiers: atStops,
       values: mixBlendMode,
     },
     'animate-object-fit': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-object-fit': value,
-          '--jumi-object-fit-animation-name': property('object-fit', value),
+          ...property('object-fit', modifier, value),
         })
       },
+      modifiers: atStops,
       values: objectFit,
     },
     'animate-object-position': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-object-position': value,
-          '--jumi-object-position-animation-name': property('object-position', value),
+          ...property('object-position', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'position', 'any'],
       values: theme('objectPosition'),
     },
     'animate-object-position-x': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-object-position-animation-name': property('object-position', value),
+          ...property('object-position', modifier, value),
           '--jumi-object-position-x': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'position'],
       values: empty.position,
     },
     'animate-object-position-x-edge': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-object-position-animation-name': property('object-position', value),
+          ...property('object-position', modifier, value),
           '--jumi-object-position-x-edge': value,
         })
       },
+      modifiers: atStops,
       type: 'position',
       values: objectPosition,
     },
     'animate-object-position-x-offset': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-object-position-animation-name': property('object-position', value),
+          ...property('object-position', modifier, value),
           '--jumi-object-position-x-offset': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: percentage,
     },
     'animate-object-position-y': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-object-position-animation-name': property('object-position', value),
+          ...property('object-position', modifier, value),
           '--jumi-object-position-y': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'position'],
       values: empty.position,
     },
     'animate-object-position-y-edge': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-object-position-animation-name': property('object-position', value),
+          ...property('object-position', modifier, value),
           '--jumi-object-position-y-edge': value,
         })
       },
+      modifiers: atStops,
       type: 'position',
       values: objectPosition,
     },
     'animate-object-position-y-offset': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-object-position-animation-name': property('object-position', value),
+          ...property('object-position', modifier, value),
           '--jumi-object-position-y-offset': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: percentage,
     },
     'animate-offset': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-offset': value,
-          '--jumi-offset-animation-name': property('offset', value),
+          ...property('offset', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'position', 'any'],
       values: offsetAnchor,
     },
     'animate-offset-anchor': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-offset-anchor': value,
-          '--jumi-offset-anchor-animation-name': property('offset-anchor', value),
+          ...property('offset-anchor', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'position', 'any'],
       values: theme('objectPosition', empty.auto),
     },
     'animate-offset-anchor-x': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-offset-anchor-animation-name': property('offset-anchor', value),
+          ...property('offset-anchor', modifier, value),
           '--jumi-offset-anchor-x': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'position'],
       values: empty.position,
     },
     'animate-offset-anchor-x-edge': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-offset-anchor-animation-name': property('offset-anchor', value),
+          ...property('offset-anchor', modifier, value),
           '--jumi-offset-anchor-x-edge': value,
         })
       },
+      modifiers: atStops,
       type: 'position',
       values: objectPosition,
     },
     'animate-offset-anchor-x-offset': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-offset-anchor-animation-name': property('offset-anchor', value),
+          ...property('offset-anchor', modifier, value),
           '--jumi-offset-anchor-x-offset': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: percentage,
     },
     'animate-offset-anchor-y': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-offset-anchor-animation-name': property('offset-anchor', value),
+          ...property('offset-anchor', modifier, value),
           '--jumi-offset-anchor-y': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'position'],
       values: empty.position,
     },
     'animate-offset-anchor-y-edge': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-offset-anchor-animation-name': property('offset-anchor', value),
+          ...property('offset-anchor', modifier, value),
           '--jumi-offset-anchor-y-edge': value,
         })
       },
+      modifiers: atStops,
       type: 'position',
       values: objectPosition,
     },
     'animate-offset-anchor-y-offset': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-offset-anchor-animation-name': property('offset-anchor', value),
+          ...property('offset-anchor', modifier, value),
           '--jumi-offset-anchor-y-offset': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: percentage,
     },
     'animate-offset-distance': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-offset-distance': value,
-          '--jumi-offset-distance-animation-name': property('offset-distance', value),
+          ...property('offset-distance', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: percentage,
     },
     'animate-offset-path': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-offset-path': value,
-          '--jumi-offset-path-animation-name': property('offset-path', value),
+          ...property('offset-path', modifier, value),
         })
       },
+      modifiers: atStops,
       values: offsetPath,
     },
     'animate-offset-position': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-offset-position': value,
-          '--jumi-offset-position-animation-name': property('offset-position', value),
+          ...property('offset-position', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'position', 'any'],
       values: theme('objectPosition', offsetPosition),
     },
     'animate-offset-position-x': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-offset-position-animation-name': property('offset-position', value),
+          ...property('offset-position', modifier, value),
           '--jumi-offset-position-x': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'position'],
       values: empty.position,
     },
     'animate-offset-position-x-edge': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-offset-position-animation-name': property('offset-position', value),
+          ...property('offset-position', modifier, value),
           '--jumi-offset-position-x-edge': value,
         })
       },
+      modifiers: atStops,
       type: 'position',
       values: objectPosition,
     },
     'animate-offset-position-x-offset': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-offset-position-animation-name': property('offset-position', value),
+          ...property('offset-position', modifier, value),
           '--jumi-offset-position-x-offset': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: percentage,
     },
     'animate-offset-position-y': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-offset-position-animation-name': property('offset-position', value),
+          ...property('offset-position', modifier, value),
           '--jumi-offset-position-y': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'position'],
       values: empty.position,
     },
     'animate-offset-position-y-edge': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-offset-position-animation-name': property('offset-position', value),
+          ...property('offset-position', modifier, value),
           '--jumi-offset-position-y-edge': value,
         })
       },
+      modifiers: atStops,
       type: 'position',
       values: objectPosition,
     },
     'animate-offset-position-y-offset': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-offset-position-animation-name': property('offset-position', value),
+          ...property('offset-position', modifier, value),
           '--jumi-offset-position-y-offset': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage'],
       values: percentage,
     },
     'animate-offset-rotate': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-offset-rotate': value,
-          '--jumi-offset-rotate-animation-name': property('offset-rotate', value),
+          ...property('offset-rotate', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['angle', 'any'],
       values: theme('rotate', offsetRotate),
     },
     'animate-opacity': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-opacity': value,
-          '--jumi-opacity-animation-name': property('opacity', value),
+          ...property('opacity', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['number', 'percentage'],
       values: theme('opacity'),
     },
     'animate-order': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-order': value,
-          '--jumi-order-animation-name': property('order', value),
+          ...property('order', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: 'integer',
       values: theme('order'),
     },
     'animate-orphans': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-orphans': value,
-          '--jumi-orphans-animation-name': property('orphans', value),
+          ...property('orphans', modifier, value),
         })
       },
+      modifiers: atStops,
       type: 'integer',
       values: empty.number,
     },
     'animate-outline': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-outline': value,
-          '--jumi-outline-animation-name': property('outline', value),
+          ...property('outline', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['line-width', 'length', 'color', 'any'],
       values: empty.none,
     },
     'animate-outline-color': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-outline-animation-name': property('outline', value),
+          ...property('outline', modifier, value),
           '--jumi-outline-color': value,
         })
       },
+      modifiers: atStops,
       type: 'color',
       values: theme('outlineColor'),
     },
     'animate-outline-offset': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-outline-animation-name': property('outline', value),
+          ...property('outline', modifier, value),
           '--jumi-outline-offset': value,
         })
       },
+      modifiers: atStops,
       type: 'length',
       values: theme('outlineOffset'),
     },
     'animate-outline-style': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-outline-animation-name': property('outline', value),
+          ...property('outline', modifier, value),
           '--jumi-outline-style': value,
         })
       },
+      modifiers: atStops,
       values: outlineStyle,
     },
     'animate-outline-width': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-outline-animation-name': property('outline', value),
+          ...property('outline', modifier, value),
           '--jumi-outline-width': value,
         })
       },
+      modifiers: atStops,
       type: ['line-width'],
       values: theme('outlineWidth'),
     },
     'animate-overflow': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-overflow': value,
-          '--jumi-overflow-animation-name': property('overflow', value),
+          ...property('overflow', modifier, value),
         })
       },
+      modifiers: atStops,
       values: overflow,
     },
     'animate-overflow-anchor': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-overflow-anchor': value,
-          '--jumi-overflow-anchor-animation-name': property('overflow-anchor', value),
+          ...property('overflow-anchor', modifier, value),
         })
       },
+      modifiers: atStops,
       values: overflowAnchor,
     },
     'animate-overflow-block': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-overflow-block': value,
-          '--jumi-overflow-block-animation-name': property('overflow-block', value),
+          ...property('overflow-block', modifier, value),
         })
       },
+      modifiers: atStops,
       values: overflow,
     },
     'animate-overflow-clip-margin': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-overflow-clip-margin': value,
-          '--jumi-overflow-clip-margin-animation-name': property('overflow-clip-margin', value),
+          ...property('overflow-clip-margin', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'any'],
       values: overflowClipMargin,
     },
     'animate-overflow-inline': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-overflow-inline': value,
-          '--jumi-overflow-inline-animation-name': property('overflow-inline', value),
+          ...property('overflow-inline', modifier, value),
         })
       },
+      modifiers: atStops,
       values: overflow,
     },
     'animate-overflow-wrap': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-overflow-wrap': value,
-          '--jumi-overflow-wrap-animation-name': property('overflow-wrap', value),
+          ...property('overflow-wrap', modifier, value),
         })
       },
+      modifiers: atStops,
       values: overflowWrap,
     },
     'animate-overflow-x': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-overflow-animation-name': property('overflow', value),
+          ...property('overflow', modifier, value),
           '--jumi-overflow-x': value,
         })
       },
+      modifiers: atStops,
       values: overflow,
     },
     'animate-overflow-y': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-overflow-animation-name': property('overflow', value),
+          ...property('overflow', modifier, value),
           '--jumi-overflow-y': value,
         })
       },
+      modifiers: atStops,
       values: overflow,
     },
     'animate-overscroll-behavior': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-overscroll-behavior': value,
-          '--jumi-overscroll-behavior-animation-name': property('overscroll-behavior', value),
+          ...property('overscroll-behavior', modifier, value),
         })
       },
+      modifiers: atStops,
       values: empty.auto,
     },
     'animate-overscroll-behavior-block': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-overscroll-behavior-block': value,
-          '--jumi-overscroll-behavior-block-animation-name': property('overscroll-behavior-block', value),
+          ...property('overscroll-behavior-block', modifier, value),
         })
       },
+      modifiers: atStops,
       values: overscrollBehavior,
     },
     'animate-overscroll-behavior-inline': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-overscroll-behavior-inline': value,
-          '--jumi-overscroll-behavior-inline-animation-name': property('overscroll-behavior-inline', value),
+          ...property('overscroll-behavior-inline', modifier, value),
         })
       },
+      modifiers: atStops,
       values: overscrollBehavior,
     },
     'animate-overscroll-behavior-x': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-overscroll-behavior-x': value,
-          '--jumi-overscroll-behavior-x-animation-name': property('overscroll-behavior-x', value),
+          ...property('overscroll-behavior-x', modifier, value),
         })
       },
+      modifiers: atStops,
       values: overscrollBehavior,
     },
     'animate-overscroll-behavior-y': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-overscroll-behavior-y': value,
-          '--jumi-overscroll-behavior-y-animation-name': property('overscroll-behavior-y', value),
+          ...property('overscroll-behavior-y', modifier, value),
         })
       },
+      modifiers: atStops,
       values: overscrollBehavior,
     },
     'animate-padding': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-padding': value,
-          '--jumi-padding-animation-name': property('padding', value),
+          ...property('padding', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('padding'),
     },
     'animate-padding-block': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-padding-block': value,
-          '--jumi-padding-block-animation-name': property('padding-block', value),
+          ...property('padding-block', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('padding'),
     },
     'animate-padding-block-end': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-padding-block-end': value,
-          '--jumi-padding-block-end-animation-name': property('padding-block-end', value),
+          ...property('padding-block-end', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('padding'),
     },
     'animate-padding-block-start': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-padding-block-start': value,
-          '--jumi-padding-block-start-animation-name': property('padding-block-start', value),
+          ...property('padding-block-start', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('padding'),
     },
     'animate-padding-bottom': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-padding-bottom': value,
-          '--jumi-padding-bottom-animation-name': property('padding-bottom', value),
+          ...property('padding-bottom', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('padding'),
     },
     'animate-padding-inline': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-padding-inline': value,
-          '--jumi-padding-inline-animation-name': property('padding-inline', value),
+          ...property('padding-inline', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('padding'),
     },
     'animate-padding-inline-end': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-padding-inline-end': value,
-          '--jumi-padding-inline-end-animation-name': property('padding-inline-end', value),
+          ...property('padding-inline-end', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('padding'),
     },
     'animate-padding-inline-start': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-padding-inline-start': value,
-          '--jumi-padding-inline-start-animation-name': property('padding-inline-start', value),
+          ...property('padding-inline-start', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('padding'),
     },
     'animate-padding-left': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-padding-left': value,
-          '--jumi-padding-left-animation-name': property('padding-left', value),
+          ...property('padding-left', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('padding'),
     },
     'animate-padding-right': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-padding-right': value,
-          '--jumi-padding-right-animation-name': property('padding-right', value),
+          ...property('padding-right', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('padding'),
     },
     'animate-padding-top': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-padding-top': value,
-          '--jumi-padding-top-animation-name': property('padding-top', value),
+          ...property('padding-top', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('padding'),
     },
     'animate-page': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-page': value,
-          '--jumi-page-animation-name': property('page', value),
+          ...property('page', modifier, value),
         })
       },
+      modifiers: atStops,
       values: empty.auto,
     },
     'animate-paint-order': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-paint-order': value,
-          '--jumi-paint-order-animation-name': property('paint-order', value),
+          ...property('paint-order', modifier, value),
         })
       },
+      modifiers: atStops,
       values: paintOrder,
     },
     'animate-position': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-position': value,
-          '--jumi-position-animation-name': property('position', value),
+          ...property('position', modifier, value),
         })
       },
+      modifiers: atStops,
       values: position,
     },
     'animate-right': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-right': value,
-          '--jumi-right-animation-name': property('right', value),
+          ...property('right', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('inset', inset),
     },
     'animate-rotate': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-rotate': value,
-          '--jumi-rotate-animation-name': property('rotate', value),
+          ...property('rotate', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['angle', 'any'],
       values: theme('rotate'),
     },
     'animate-rotate-3d': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-rotate-3d': css('rotate3d', value),
-          '--jumi-transform-animation-name': property('transform', value),
+          ...property('transform', modifier, value),
         })
       },
+      modifiers: atStops,
       values: empty.string,
     },
     'animate-rotate-angle': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-rotate-angle': value,
-          '--jumi-rotate-animation-name': property('rotate', value),
+          ...property('rotate', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: 'angle',
       values: theme('rotate'),
     },
     'animate-rotate-x': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-rotate-animation-name': property('rotate', value),
+          ...property('rotate', modifier, value),
           '--jumi-rotate-x': value,
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: 'number',
       values: rotate,
     },
     'animate-rotate-y': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-rotate-animation-name': property('rotate', value),
+          ...property('rotate', modifier, value),
           '--jumi-rotate-y': value,
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: 'number',
       values: rotate,
     },
     'animate-rotate-z': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-rotate-animation-name': property('rotate', value),
+          ...property('rotate', modifier, value),
           '--jumi-rotate-z': value,
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: 'number',
       values: rotate,
     },
     'animate-row-gap': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-gap-animation-name': property('gap', value),
+          ...property('gap', modifier, value),
           '--jumi-row-gap': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'any'],
       values: empty.number,
     },
     'animate-scale': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return {
           '--jumi-scale': value,
-          '--jumi-scale-animation-name': property('scale', value),
+          ...property('scale', modifier, value),
         }
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: 'number',
       values: theme('scale'),
     },
     'animate-scale-x': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-scale-animation-name': property('scale', value),
+          ...property('scale', modifier, value),
           '--jumi-scale-x': value,
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: 'number',
       values: theme('scale'),
     },
     'animate-scale-y': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-scale-animation-name': property('scale', value),
+          ...property('scale', modifier, value),
           '--jumi-scale-y': value,
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: 'number',
       values: theme('scale'),
     },
     'animate-scale-z': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-scale-animation-name': property('scale', value),
+          ...property('scale', modifier, value),
           '--jumi-scale-z': value,
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: 'number',
       values: theme('scale'),
     },
     'animate-skew': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         const [x, y] = value.split(/\s+/)
         return {
-          '--jumi-skew-animation-name': property('transform', value),
+          ...property('transform', modifier, value),
           '--jumi-skew-x': x ?? value,
           '--jumi-skew-y': y ?? x ?? value,
         }
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['angle', 'any'],
       values: theme('skew'),
     },
     'animate-skew-x': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-skew-x': value,
-          '--jumi-transform-animation-name': property('transform', value),
+          ...property('transform', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['angle', 'any'],
       values: theme('skew'),
     },
     'animate-skew-y': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-skew-y': value,
-          '--jumi-transform-animation-name': property('transform', value),
+          ...property('transform', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['angle', 'any'],
       values: theme('skew'),
     },
     'animate-stroke': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-stroke': value,
-          '--jumi-stroke-animation-name': property('stroke', value),
+          ...property('stroke', modifier, value),
         })
       },
+      modifiers: atStops,
       values: theme('colors'),
     },
     'animate-stroke-width': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-stroke-width': value,
-          '--jumi-stroke-width-animation-name': property('stroke-width', value),
+          ...property('stroke-width', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'number', 'any'],
       values: theme('strokeWidth'),
     },
     'animate-text-align': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-text-align': value,
-          '--jumi-text-align-animation-name': property('text-align', value),
+          ...property('text-align', modifier, value),
         })
       },
+      modifiers: atStops,
       values: textAlign,
     },
     'animate-text-shadow': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-text-shadow': value,
-          '--jumi-text-shadow-animation-name': property('text-shadow', value),
+          ...property('text-shadow', modifier, value),
         })
       },
+      modifiers: atStops,
       values: theme('dropShadow'),
     },
     'animate-text-shadow-blur': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-text-shadow-animation-name': property('text-shadow', value),
+          ...property('text-shadow', modifier, value),
           '--jumi-text-shadow-blur-radius': value,
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
       values: theme('blur'),
     },
     'animate-text-shadow-color': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-text-shadow-animation-name': property('text-shadow', value),
+          ...property('text-shadow', modifier, value),
           '--jumi-text-shadow-color': value,
         })
       },
+      modifiers: atStops,
       type: 'color',
       values: theme('boxShadowColor'),
     },
     'animate-text-shadow-offset-x': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-text-shadow-animation-name': property('text-shadow', value),
+          ...property('text-shadow', modifier, value),
           '--jumi-text-shadow-offset-x': value,
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
     },
     'animate-text-shadow-offset-y': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-text-shadow-animation-name': property('text-shadow', value),
+          ...property('text-shadow', modifier, value),
           '--jumi-text-shadow-offset-y': value,
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
       values: theme('outlineOffset'),
     },
     'animate-top': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-top': value,
-          '--jumi-top-animation-name': property('top', value),
+          ...property('top', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('inset', inset),
     },
     'animate-transform': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-transform': value,
-          '--jumi-transform-animation-name': property('transform', value),
+          ...property('transform', modifier, value),
         })
       },
+      modifiers: atStops,
       values: empty.string,
     },
     'animate-transform-origin': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-transform-origin': value,
-          '--jumi-transform-origin-animation-name': property('transform-origin', value),
+          ...property('transform-origin', modifier, value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'position', 'any'],
       values: theme('transformOrigin'),
     },
     'animate-transform-origin-x': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-transform-origin-animation-name': property('transform-origin', value),
+          ...property('transform-origin', modifier, value),
           '--jumi-transform-origin-x': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'position'],
       values: originX,
     },
     'animate-transform-origin-y': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-transform-origin-animation-name': property('transform-origin', value),
+          ...property('transform-origin', modifier, value),
           '--jumi-transform-origin-y': value,
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'position'],
       values: originY,
     },
     'animate-transform-origin-z': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-transform-origin-animation-name': property('transform-origin', value),
+          ...property('transform-origin', modifier, value),
           '--jumi-transform-origin-z': value,
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length'],
       values: empty.number,
     },
     'animate-transform-style': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-transform-animation-name': property('transform', value),
+          ...property('transform', modifier, value),
           '--jumi-transform-style': value,
         })
       },
+      modifiers: atStops,
       values: transformStyle,
     },
     'animate-translate': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return {
           '--jumi-translate': value,
-          '--jumi-translate-animation-name': property('translate', value),
+          ...property('translate', modifier, value),
         }
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       values: theme('translate'),
     },
     'animate-translate-3d': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-transform-animation-name': property('transform', value),
+          ...property('transform', modifier, value),
           '--jumi-translate-3d': css('translate3d', value),
         })
       },
+      modifiers: atStops,
       type: ['length', 'percentage', 'any'],
       values: empty.string,
     },
     'animate-translate-x': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-translate-animation-name': property('translate', value),
+          ...property('translate', modifier, value),
           '--jumi-translate-x': value,
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
       values: theme('translate'),
     },
     'animate-translate-y': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-translate-animation-name': property('translate', value),
+          ...property('translate', modifier, value),
           '--jumi-translate-y': value,
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
       values: theme('translate'),
     },
     'animate-translate-z': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
-          '--jumi-translate-animation-name': property('translate', value),
+          ...property('translate', modifier, value),
           '--jumi-translate-z': value,
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
       values: theme('translate'),
     },
     'animate-visibility': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-visibility': value,
-          '--jumi-visibility-animation-name': property('visibility', value),
+          ...property('visibility', modifier, value),
         })
       },
+      modifiers: atStops,
       values: visibility,
     },
     'animate-width': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-width': value,
-          '--jumi-width-animation-name': property('width', value),
+          ...property('width', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
       values: theme('width'),
     },
     'animate-x': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-x': value,
-          '--jumi-x-animation-name': property('x', value),
+          ...property('x', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
       values: empty.number,
     },
     'animate-y': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-y': value,
-          '--jumi-y-animation-name': property('y', value),
+          ...property('y', modifier, value),
         })
       },
+      modifiers: atStops,
       supportsNegativeValues: true,
       type: ['length', 'percentage'],
       values: empty.number,
     },
     'animate-z-index': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         return ({
           '--jumi-z-index': value,
-          '--jumi-z-index-animation-name': property('z-index', value),
+          ...property('z-index', modifier, value),
         })
       },
+      modifiers: atStops,
       values: theme('zIndex'),
     },
     'animation-composition': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-composition': value }
         return { [`--jumi-${modifier}-animation-composition`]: value }
       },
@@ -4065,7 +4449,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       values: animationComposition,
     },
     'animation-delay': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-delay': value }
         return { [`--jumi-${modifier}-animation-delay`]: value }
       },
@@ -4073,7 +4457,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       values: theme('transitionDelay'),
     },
     'animation-direction': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-direction': value }
         return { [`--jumi-${modifier}-animation-direction`]: value }
       },
@@ -4081,7 +4465,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       values: animationDirection,
     },
     'animation-duration': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-duration': value }
         return { [`--jumi-${modifier}-animation-duration`]: value }
       },
@@ -4089,7 +4473,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       values: theme('transitionDuration'),
     },
     'animation-fill-mode': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-fill-mode': value }
         return { [`--jumi-${modifier}-animation-fill-mode`]: value }
       },
@@ -4097,7 +4481,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       values: animationFillMode,
     },
     'animation-iteration-count': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-iteration-count': value }
         return { [`--jumi-${modifier}-animation-iteration-count`]: value }
       },
@@ -4114,7 +4498,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       values: empty.none,
     },
     'animation-play-state': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-play-state': value }
         return { [`--jumi-${modifier}-animation-play-state`]: value }
       },
@@ -4182,7 +4566,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       values: animationRangeTimeline,
     },
     'animation-timeline': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-timeline': value }
         return { [`--jumi-${modifier}-animation-timeline`]: value }
       },
@@ -4225,7 +4609,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       values: animationTimelineScroller,
     },
     'animation-timing-function': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-timing-function': value }
         return { [`--jumi-${modifier}-animation-timing-function`]: value }
       },
@@ -4234,7 +4618,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'animations': {
       fn: () => creator.animations,
-      values: { DEFAULT: '' },
+      values: empty.string,
     },
     'transition-behavior': {
       fn: (value) => {
@@ -4245,7 +4629,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       values: transitionBehavior,
     },
     'transition-delay': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         if (!modifier) return { ...(value && { '--jumi-transition-delay': value }) }
         return { [`--jumi-${modifier}-transition-delay`]: value }
       },
@@ -4253,7 +4637,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       values: theme('transitionDelay'),
     },
     'transition-duration': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         if (!modifier) return { ...(value && { '--jumi-transition-duration': value }) }
         return { [`--jumi-${modifier}-transition-duration`]: value }
       },
@@ -4261,15 +4645,15 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
       values: theme('transitionDuration'),
     },
     'transition-property': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         if (!modifier) return { ...(value && { '--jumi-transition-property': value }) }
         return { [`--jumi-${modifier}-transition-property`]: motion(modifier) }
       },
       modifiers: cssProperties,
-      values: { DEFAULT: '' },
+      values: empty.string,
     },
     'transition-timing-function': {
-      fn: (value, { modifier = '' }) => {
+      fn: (value, { modifier }) => {
         if (!modifier) return { ...(value && { '--jumi-transition-timing-function': value }) }
         return { [`--jumi-${modifier}-transition-timing-function`]: value }
       },
@@ -4278,7 +4662,7 @@ export const getMatchUtilities: GetMatchUtilities = (creator) => {
     },
     'transitions': {
       fn: () => creator.transitions,
-      values: { DEFAULT: '' },
+      values: empty.string,
     },
   }
 
