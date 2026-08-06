@@ -486,6 +486,18 @@ export type CounterFunction
     | 'counters'
     | 'symbols'
 
+export type Creator = {
+    readonly animations: CssInJs;
+    effect(attribute: string): string;
+    readonly effects: string[];
+    motion(attribute: string): string;
+    readonly motions: string[];
+    readonly properties: string[];
+    property(attribute: AnimatableStandardPropertyType, modifier: null | string, value: string): CssInJs;
+    theme: (key: TailwindTheme, values?: Collection) => Record<string, string>;
+    readonly transitions: CssInJs;
+}
+
 export type CSSFunction
   = | AnchorFunction
     | AnimationFunction
@@ -862,9 +874,9 @@ export type FontFunction
     | 'stylistic'
     | 'swash'
 
-export type GetMatchComponents = (api: Api) => Collection<MatchComponentsPropertyValue>
+export type GetMatchComponents = (creator: Creator) => Collection<MatchComponentsPropertyValue>
 
-export type GetMatchUtilities = (api: Api) => Collection<MatchUtilitiesPropertyValue>
+export type GetMatchUtilities = (creator: Creator) => Collection<MatchUtilitiesPropertyValue>
 
 export type GradientFunction
   = | 'conic-gradient'
@@ -894,7 +906,7 @@ export type MatchComponents = Record<ComponentKey, MatchComponentsPropertyValue>
 export type MatchComponentsPropertyFunction = (value: string, extra: { modifier: null | string }) => CssInJs
 
 export interface MatchComponentsPropertyValue extends Partial<MatchUtilitiesOptions> {
-  property: MatchComponentsPropertyFunction
+  fn: MatchComponentsPropertyFunction
 }
 
 export type MatchProperty = Record<MatchUtilitiesPropertyKey, MatchUtilitiesPropertyValue>
@@ -908,10 +920,10 @@ export interface MatchUtilitiesOptions {
 
 export type MatchUtilitiesPropertyFunction = (value: string, extra: { modifier: null | string }) => CSSRuleObject
 
-export type MatchUtilitiesPropertyKey = 'animate' | 'jumi' | `animate-${AnimatableStandardPropertyType}` | `animate-${NonStandardPropertyType}` | AnimationPropertyType
+export type MatchUtilitiesPropertyKey = 'animate' | 'animations' | 'transitions' | `animate-${AnimatableStandardPropertyType}` | `animate-${NonStandardPropertyType}` | AnimationPropertyType | TransitionPropertyType
 
 export interface MatchUtilitiesPropertyValue extends Partial<MatchUtilitiesOptions> {
-  property: MatchUtilitiesPropertyFunction
+  fn: MatchUtilitiesPropertyFunction
 }
 
 export interface MatchVariant {
@@ -1147,6 +1159,7 @@ export type ReferenceFunction
     | 'var'
 
 export type Register = (register: Set<string>, options: {
+  animationName: string
   attribute: string
   keyframes: Collection<CssInJs>
 }) => void
@@ -1198,11 +1211,11 @@ export type StandardAnimationPropertyType
     | 'animation-timeline'
     | 'animation-timing-function'
 
+export type StandardPropertyKeyframeCollection = (animationName: string) => Collection<CssInJs>
+
 export type StandardPropertyKeyframes<Key extends string> = `@keyframes jumi-${Key}`
 
-export type StandardPropertyKeyframesCollection = {
-  [Key in AnimatableStandardPropertyType]: Record<StandardPropertyKeyframes<Key>, Keyframes>
-}
+export type StandardPropertyKeyframesCollection = Record< AnimatableStandardPropertyType, StandardPropertyKeyframeCollection>
 
 export type StandardPropertyKeyframesVariable = `--jumi-${AnimatableStandardPropertyType}-keyframes`
 
@@ -1214,8 +1227,8 @@ export type SteppedValueFunction
   = | 'mod'
     | 'rem'
     | 'round'
-
-export type TailwindTheme
+    
+    export type TailwindTheme
   = | 'accentColor'
     | 'animation'
     | 'aspectRatio'
@@ -1305,7 +1318,8 @@ export type TailwindTheme
     | 'outlineWidth'
     | 'padding'
     | 'placeholderColor'
-    | 'placeholderOpacity'
+  | 'placeholderOpacity'
+  | 'radius'
     | 'ringColor'
     | 'ringOffsetColor'
     | 'ringOffsetWidth'
@@ -1341,6 +1355,8 @@ export type TailwindTheme
     | 'x'
     | 'y'
     | 'zIndex'
+
+export type TransitionPropertyType = 'transition' | 'transition-behavior' | 'transition-delay' | 'transition-duration' | 'transition-property' | 'transition-timing-function'
 
 export type TranslationFunction
   = | 'translate3d'

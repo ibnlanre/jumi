@@ -1,5 +1,6 @@
 import type { PropertyType, PropertyVariable } from '@/types'
 
+import { animation } from '@/composition/animation'
 import {
   animationRange,
   animationRangeEnd,
@@ -91,7 +92,7 @@ import { css } from '@/helpers/css'
 type DependencyGraph = Record<PropertyType, DependencyNode>
 type DependencyNode = {
   dependencies?: Array<PropertyType>
-  value?: string
+  value: string
   variable: PropertyVariable
 }
 
@@ -126,16 +127,18 @@ export const propertyVariables: DependencyGraph = {
   },
   'animation': {
     dependencies: [
-      'animation-composition',
-      'animation-delay',
-      'animation-direction',
+      'animation-name',
       'animation-duration',
-      'animation-fill-mode',
+      'animation-timing-function',
+      'animation-delay',
       'animation-iteration-count',
+      'animation-direction',
+      'animation-fill-mode',
       'animation-play-state',
       'animation-timeline',
-      'animation-timing-function',
+      'animation-composition',
     ],
+    value: animation,
     variable: '--jumi-animation',
   },
   'animation-composition': {
@@ -2694,6 +2697,7 @@ export const propertyVariables: DependencyGraph = {
       'transition-duration',
       'transition-timing-function',
       'transition-delay',
+      'transition-behavior',
     ],
     value: transition,
     variable: '--jumi-transition',

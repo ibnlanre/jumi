@@ -1,16 +1,14 @@
 import type { GetMatchComponents, MatchComponents } from '@/types'
 
-import { getCreator } from '@/helpers/create'
 import { css } from '@/helpers/css'
 import { count } from '@/theme/count'
 
-export const getMatchComponents: GetMatchComponents = (api) => {
-  const { theme } = getCreator(api)
+export const getMatchComponents: GetMatchComponents = (creator) => {
+  const { theme } = creator
 
   const matchComponent: MatchComponents = {
     'animation-delay-backward': {
-      modifiers: count,
-      property: (value, { modifier }) => {
+      fn: (value, { modifier }) => {
         const length = modifier ? parseInt(modifier) : 3
 
         return Object.fromEntries(
@@ -20,11 +18,11 @@ export const getMatchComponents: GetMatchComponents = (api) => {
           ]),
         )
       },
+      modifiers: count,
       values: theme('transitionDelay'),
     },
     'animation-delay-forward': {
-      modifiers: count,
-      property: (value, { modifier }) => {
+      fn: (value, { modifier }) => {
         const length = modifier ? parseInt(modifier) : 3
 
         return Object.fromEntries(
@@ -34,6 +32,7 @@ export const getMatchComponents: GetMatchComponents = (api) => {
           ]),
         )
       },
+      modifiers: count,
       values: theme('transitionDelay'),
     },
   }

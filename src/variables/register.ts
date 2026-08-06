@@ -1,4 +1,4 @@
-import type { AnimationPropertyRegisterCollection, CssInJs } from '@/types'
+import type { CssInJs } from '@/types'
 
 export const animationRegister: CssInJs = {
   '@property --jumi-animation-composition': {
@@ -41,4 +41,32 @@ export const animationRegister: CssInJs = {
     'initial-value': 'ease',
     'syntax': '"ease | linear | ease-in | ease-out | ease-in-out | step-start | step-end"',
   },
-} satisfies AnimationPropertyRegisterCollection
+}
+
+export const transitionRegister: CssInJs = {
+  '@property --jumi-transition-behavior': {
+    'inherits': 'false',
+    'initial-value': 'normal',
+    'syntax': '"normal | allow-discrete"',
+  },
+  '@property --jumi-transition-delay': {
+    'inherits': 'false',
+    'initial-value': '0s',
+    'syntax': '"<time>"',
+  },
+  '@property --jumi-transition-duration': {
+    'inherits': 'false',
+    'initial-value': '0s',
+    'syntax': '"<time>"',
+  },
+  '@property --jumi-transition-property': {
+    'inherits': 'false',
+    'initial-value': 'all',
+    'syntax': '"*"',
+  },
+  '@property --jumi-transition-timing-function': {
+    'inherits': 'false',
+    'initial-value': 'ease',
+    'syntax': '"<easing-function>"',
+  },
+}
