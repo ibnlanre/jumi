@@ -1,6 +1,10 @@
 import { getCreator } from '@/helpers/create'
+import { merge } from '@/helpers/merge'
 import { getMatchComponents } from '@/properties/component'
-import { getMatchUtilities } from '@/properties/match'
+import { getMatchControls } from '@/properties/controls'
+import { getMatchTailwindUtilities } from '@/properties/tailwind'
+import { getMatchTween } from '@/properties/tween'
+import { atStops } from '@/theme/at-stops'
 import { variants } from '@/variants'
 
 import createPlugin from 'tailwindcss/plugin'
@@ -14,11 +18,23 @@ const jumi = createPlugin((api) => {
 
   const creator = getCreator(api)
 
-  const utilities = getMatchUtilities(creator)
-  for (const name in utilities) {
-    const { fn, ...options } = utilities[name]
-    matchUtilities({ [name]: fn }, options)
+  const registerTween = (utilities: ReturnType<typeof getMatchTween>) => {
+    for (const name in utilities) {
+      const { fn, modifiers = {}, ...options } = utilities[name]
+      matchUtilities({ [name]: fn }, { ...options, modifiers: merge(atStops, modifiers) })
+    }
   }
+
+  const registerControls = (utilities: ReturnType<typeof getMatchControls>) => {
+    for (const name in utilities) {
+      const { fn, ...options } = utilities[name]
+      matchUtilities({ [name]: fn }, options)
+    }
+  }
+
+  registerTween(getMatchTween(creator))
+  registerControls(getMatchControls(creator))
+  registerControls(getMatchTailwindUtilities(creator))
 
   const components = getMatchComponents(creator)
   for (const name in components) {

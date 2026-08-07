@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shared keyframe + interpolate-size + calc-size</title>
+    <style>
+      * { box-sizing: border-box; }
+      body { font-family: system-ui, sans-serif; margin: 40px; background: #f3f4f6; color: #111827; }
+      .row { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 24px; }
+      .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.1); min-width: 260px; }
+      .card h3 { margin: 0 0 4px; font-size: 15px; }
+      .card p.desc { margin: 0 0 12px; color: #6b7280; font-size: 12px; }
+      .box { height: 48px; border-radius: 8px; background: #6366f1; width: 40px; }
+      .out { margin-top: 8px; font-family: ui-monospace, monospace; font-size: 12px; color: #374151; }
+    </style>
+
+    <style>
+      /*
+        Stops expressed through calc-size(). Basis is the per-stop var, falling
+        back to `auto` when unset, then `size` = the resolved basis. Combined
+        with interpolate-size on the boxes.
+      */
+      @keyframes jumi-width {
+        5%   { width: calc-size(var(--jumi-width-5, auto), size); }
+        100% { width: calc-size(var(--jumi-width-100, auto), size); }
+      }
+
+      .a, .b, .c, .d { interpolate-size: allow-keywords; }
+
+      .a { width: 40px; --jumi-width-100: 100px; animation: jumi-width 4s linear infinite; }
+      .b { width: 40px; --jumi-width-5: 20px;   animation: jumi-width 4s linear infinite; }
+      .c { width: 40px; --jumi-width-5: 20px; --jumi-width-100: 100px; animation: jumi-width 4s linear infinite; }
+      .d { width: 40px; animation: jumi-width 4s linear infinite; }
+    </style>
+  </head>
+  <body>
+    <h1>Unset stop + <code>interpolate-size</code> + <code>calc-size()</code></h1>
+    <div class="row">
+      <div class="card"><h3>A — 100% only</h3><div class="box a"></div><div class="out" id="out-a"></div></div>
+      <div class="card"><h3>B — 5% only</h3><div class="box b"></div><div class="out" id="out-b"></div></div>
+      <div class="card"><h3>C — both (control)</h3><div class="box c"></div><div class="out" id="out-c"></div></div>
+      <div class="card"><h3>D — neither</h3><div class="box d"></div><div class="out" id="out-d"></div></div>
+    </div>
+
+    <script>
+      const classes = { a: 'A', b: 'B', c: 'C', d: 'D' }
+      const out = {}
+
+      async function measure() {
+        for (const [cls, label] of Object.entries(classes)) {
+          const el = document.querySelector('.' + cls)
+          el.style.animation = 'none'
+          void el.offsetWidth
+          el.style.animation = ''
+          await new Promise(r => setTimeout(r, 60))
+          const anim = el.getAnimations()[0]
+          const series = []
+          for (let i = 0; i <= 40; i++) {
+            const target = (i / 40) * 4000
+            let guard = 0
+            while (anim && anim.currentTime < target - 5 && guard < 600) {
+              await new Promise(r => setTimeout(r, 5))
+              guard++
+            }
+            series.push(Math.round(parseFloat(getComputedStyle(el).width) * 10) / 10)
+          }
+          out[label] = series.join(' → ')
+          el.style.animation = 'none'
+        }
+        return out
+      }
+
+      window.__run = measure
+    </script>
+  </body>
+</html>

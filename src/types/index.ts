@@ -486,16 +486,16 @@ export type CounterFunction
     | 'counters'
     | 'symbols'
 
-export type Creator = {
-    readonly animations: CssInJs;
-    effect(attribute: string): string;
-    readonly effects: string[];
-    motion(attribute: string): string;
-    readonly motions: string[];
-    readonly properties: string[];
-    property(attribute: AnimatableStandardPropertyType, modifier: null | string, value: string): CssInJs;
-    theme: (key: TailwindTheme, values?: Collection) => Record<string, string>;
-    readonly transitions: CssInJs;
+export interface Creator {
+  get animations(): CssInJs;
+  effect(attribute: string): string;
+  readonly effects: string[];
+  motion(attribute: string): string;
+  readonly motions: string[];
+  readonly properties: string[];
+  property(attribute: AnimatableStandardPropertyType, parts?: PropertyParts): MatchUtilitiesPropertyFunction;
+  theme: (key: TailwindTheme, values?: Collection) => Record<string, string>;
+  get transitions(): CssInJs;
 }
 
 export type CSSFunction
@@ -907,6 +907,7 @@ export type MatchComponentsPropertyFunction = (value: string, extra: { modifier:
 
 export interface MatchComponentsPropertyValue extends Partial<MatchUtilitiesOptions> {
   fn: MatchComponentsPropertyFunction
+  values: Collection<string>
 }
 
 export type MatchProperty = Record<MatchUtilitiesPropertyKey, MatchUtilitiesPropertyValue>
@@ -915,15 +916,15 @@ export interface MatchUtilitiesOptions {
   modifiers: Collection<string>
   supportsNegativeValues: boolean
   type: Array<DataType> | DataType
-  values: Collection<string>
 }
 
 export type MatchUtilitiesPropertyFunction = (value: string, extra: { modifier: null | string }) => CSSRuleObject
 
-export type MatchUtilitiesPropertyKey = 'animate' | 'animations' | 'transitions' | `animate-${AnimatableStandardPropertyType}` | `animate-${NonStandardPropertyType}` | AnimationPropertyType | TransitionPropertyType
+export type MatchUtilitiesPropertyKey = 'animate' | 'animations' | 'transitions' | `animate-${AnimatableStandardPropertyType}` | `animate-${NonStandardPropertyType}` | AnimationPropertyType | TailwindPropertyType | TransitionPropertyType
 
 export interface MatchUtilitiesPropertyValue extends Partial<MatchUtilitiesOptions> {
   fn: MatchUtilitiesPropertyFunction
+    values: Collection<string>
 }
 
 export interface MatchVariant {
@@ -950,6 +951,7 @@ export type NonAnimatableStandardPropertyType
     | 'container'
     | 'container-name'
     | 'direction'
+    | 'interpolate-size'
     | 'isolation'
     | 'scroll-behavior'
     | 'scroll-timeline'
@@ -1051,9 +1053,9 @@ export type NonStandardPropertyType
     | 'filter-sepia'
     | 'filter-url'
     | 'font-smooth'
-    | 'hyphenate-limit-minimum-characters-after'
-    | 'hyphenate-limit-minimum-characters-before'
-    | 'hyphenate-limit-minimum-word-length'
+    | 'hyphenate-limit-chars-minimum-characters-after'
+    | 'hyphenate-limit-chars-minimum-characters-before'
+    | 'hyphenate-limit-chars-minimum-word-length'
     | 'mask-border-outset-bottom'
     | 'mask-border-outset-left'
     | 'mask-border-outset-right'
@@ -1128,6 +1130,7 @@ export type NonStandardPropertyType
     | 'skew-x'
     | 'skew-y'
     | 'text-shadow-blur'
+    | 'text-shadow-blur-radius'
     | 'text-shadow-color'
     | 'text-shadow-offset-x'
     | 'text-shadow-offset-y'
@@ -1138,6 +1141,12 @@ export type NonStandardPropertyType
     | 'translate-x'
     | 'translate-y'
   | 'translate-z'
+
+export type PropertyPart
+  = | [PropertyType, (value: string) => string]
+    | PropertyType
+
+export type PropertyParts = readonly PropertyPart[]
 
 export type PropertyType
   = | NonStandardAnimtionPropertyType
@@ -1227,10 +1236,188 @@ export type SteppedValueFunction
   = | 'mod'
     | 'rem'
     | 'round'
+
+export type TailwindPropertyType
+  = | 'accent'
+    | 'aspect'
+    | 'auto-cols'
+    | 'auto-rows'
+    | 'backdrop-blur'
+    | 'backdrop-brightness'
+    | 'backdrop-contrast'
+    | 'backdrop-grayscale'
+    | 'backdrop-hue-rotate'
+    | 'backdrop-invert'
+    | 'backdrop-opacity'
+    | 'backdrop-saturate'
+    | 'backdrop-sepia'
+    | 'basis'
+    | 'bg'
+    | 'bg-position'
+    | 'bg-size'
+    | 'blur'
+    | 'border'
+    | 'border-b'
+    | 'border-be'
+    | 'border-bs'
+    | 'border-e'
+    | 'border-l'
+    | 'border-r'
+    | 'border-s'
+    | 'border-spacing'
+    | 'border-spacing-x'
+    | 'border-spacing-y'
+    | 'border-t'
+    | 'border-x'
+    | 'border-y'
+    | 'bottom'
+    | 'brightness'
+    | 'caret'
+    | 'col'
+    | 'col-end'
+    | 'col-span'
+    | 'col-start'
+    | 'columns'
+    | 'contain'
+    | 'content'
+    | 'contrast'
+    | 'cursor'
+    | 'decoration'
+    | 'drop-shadow'
+    | 'fill'
+    | 'flex'
+    | 'font'
+    | 'gap'
+    | 'gap-x'
+    | 'gap-y'
+    | 'grayscale'
+    | 'grid-cols'
+    | 'grid-rows'
+    | 'grow'
+    | 'h'
+    | 'hue-rotate'
+    | 'indent'
+    | 'inset'
+    | 'inset-be'
+    | 'inset-bs'
+    | 'inset-e'
+    | 'inset-s'
+    | 'inset-x'
+    | 'inset-y'
+    | 'invert'
+    | 'left'
+    | 'line-clamp'
+    | 'list'
+    | 'list-image'
+    | 'm'
+    | 'mask'
+    | 'mask-conic'
+    | 'mask-linear'
+    | 'mask-position'
+    | 'mask-radial'
+    | 'mask-radial-at'
+    | 'mask-size'
+    | 'max-h'
+    | 'max-w'
+    | 'mb'
+    | 'mbe'
+    | 'mbs'
+    | 'me'
+    | 'min-h'
+    | 'min-w'
+    | 'ml'
+    | 'mr'
+    | 'ms'
+    | 'mt'
+    | 'mx'
+    | 'my'
+    | 'object'
+    | 'opacity'
+    | 'order'
+    | 'origin'
+    | 'outline'
+    | 'outline-offset'
+    | 'p'
+    | 'pb'
+    | 'pbe'
+    | 'pbs'
+    | 'pe'
+    | 'perspective'
+    | 'perspective-origin'
+    | 'pl'
+    | 'pr'
+    | 'ps'
+    | 'pt'
+    | 'px'
+    | 'py'
+    | 'right'
+    | 'ring'
+    | 'ring-offset'
+    | 'rotate'
+    | 'rotate-x'
+    | 'rotate-y'
+    | 'rotate-z'
+    | 'row'
+    | 'row-end'
+    | 'row-span'
+    | 'row-start'
+    | 'saturate'
+    | 'scale'
+    | 'scale-x'
+    | 'scale-y'
+    | 'scale-z'
+    | 'scroll-m'
+    | 'scroll-mb'
+    | 'scroll-mbe'
+    | 'scroll-mbs'
+    | 'scroll-me'
+    | 'scroll-ml'
+    | 'scroll-mr'
+    | 'scroll-ms'
+    | 'scroll-mt'
+    | 'scroll-mx'
+    | 'scroll-my'
+    | 'scroll-p'
+    | 'scroll-pb'
+    | 'scroll-pbe'
+    | 'scroll-pbs'
+    | 'scroll-pe'
+    | 'scroll-pl'
+    | 'scroll-pr'
+    | 'scroll-ps'
+    | 'scroll-pt'
+    | 'scroll-px'
+    | 'scroll-py'
+    | 'sepia'
+    | 'shadow'
+    | 'shrink'
+    | 'size'
+    | 'skew'
+    | 'skew-x'
+    | 'skew-y'
+    | 'space-x'
+    | 'space-y'
+    | 'stroke'
+    | 'tab'
+    | 'text'
+    | 'text-shadow'
+    | 'top'
+    | 'tracking'
+    | 'translate'
+    | 'translate-x'
+    | 'translate-y'
+    | 'translate-z'
+    | 'underline-offset'
+    | 'w'
+    | 'will-change'
+    | 'z'
+    | 'zoom'
     
     export type TailwindTheme
   = | 'accentColor'
+    | 'animate'
     | 'animation'
+    | 'aspect'
     | 'aspectRatio'
     | 'backdropBlur'
     | 'backdropBrightness'
@@ -1254,28 +1441,23 @@ export type SteppedValueFunction
     | 'borderWidth'
     | 'boxShadow'
     | 'boxShadowColor'
+    | 'breakpoint'
     | 'brightness'
     | 'caretColor'
     | 'colors'
-    | 'column-count'
-    | 'column-fill'
-    | 'column-gap'
-    | 'column-rule'
-    | 'column-rule-color'
-    | 'column-rule-style'
-    | 'column-rule-width'
-    | 'column-span'
-    | 'column-width'
     | 'columns'
-    | 'container'
     | 'content'
     | 'contrast'
     | 'cursor'
-    | 'data'
+    | 'defaultFontFamily'
+    | 'defaultMonoFontFamily'
+    | 'defaultTransition'
     | 'divideColor'
     | 'divideOpacity'
     | 'divideWidth'
+    | 'drop'
     | 'dropShadow'
+    | 'ease'
     | 'fill'
     | 'flex'
     | 'flexBasis'
@@ -1300,10 +1482,13 @@ export type SteppedValueFunction
     | 'height'
     | 'hueRotate'
     | 'inset'
+    | 'insetShadow'
     | 'invert'
     | 'keyframes'
+    | 'leading'
     | 'letterSpacing'
     | 'lineHeight'
+    | 'listStyleImage'
     | 'listStyleType'
     | 'margin'
     | 'maxHeight'
@@ -1317,9 +1502,10 @@ export type SteppedValueFunction
     | 'outlineOffset'
     | 'outlineWidth'
     | 'padding'
+    | 'perspective'
     | 'placeholderColor'
-  | 'placeholderOpacity'
-  | 'radius'
+    | 'placeholderOpacity'
+    | 'radius'
     | 'ringColor'
     | 'ringOffsetColor'
     | 'ringOffsetWidth'
@@ -1336,12 +1522,12 @@ export type SteppedValueFunction
     | 'spacing'
     | 'stroke'
     | 'strokeWidth'
-    | 'supports'
     | 'textColor'
     | 'textDecorationColor'
     | 'textDecorationThickness'
     | 'textIndent'
     | 'textOpacity'
+    | 'textShadow'
     | 'textUnderlineOffset'
     | 'transformOrigin'
     | 'transitionDelay'
@@ -1349,11 +1535,8 @@ export type SteppedValueFunction
     | 'transitionProperty'
     | 'transitionTimingFunction'
     | 'translate'
-    | 'whiteSpace'
     | 'width'
     | 'willChange'
-    | 'x'
-    | 'y'
     | 'zIndex'
 
 export type TransitionPropertyType = 'transition' | 'transition-behavior' | 'transition-delay' | 'transition-duration' | 'transition-property' | 'transition-timing-function'

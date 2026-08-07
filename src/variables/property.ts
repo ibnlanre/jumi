@@ -59,6 +59,7 @@ import { maskBorderOutset, maskBorderOutsetX, maskBorderOutsetY } from '@/compos
 import { maskBorderRepeat } from '@/composition/mask-border-repeat'
 import { maskBorderSlice, maskBorderSliceX, maskBorderSliceY } from '@/composition/mask-border-slice'
 import { maskPosition } from '@/composition/mask-position'
+import { mathDepth } from '@/composition/math-depth'
 import { objectPosition, objectPositionX, objectPositionY } from '@/composition/object-position'
 import { offsetAnchor, offsetAnchorX, offsetAnchorY } from '@/composition/offset-anchor'
 import { offsePosition, offsetPositionX, offsetPositionY } from '@/composition/offset-position'
@@ -137,6 +138,7 @@ export const propertyVariables: DependencyGraph = {
       'animation-play-state',
       'animation-timeline',
       'animation-composition',
+      'interpolate-size',
     ],
     value: animation,
     variable: '--jumi-animation',
@@ -1378,24 +1380,24 @@ export const propertyVariables: DependencyGraph = {
   },
   'hyphenate-limit-chars': {
     dependencies: [
-      'hyphenate-limit-minimum-word-length',
-      'hyphenate-limit-minimum-characters-before',
-      'hyphenate-limit-minimum-characters-after',
+      'hyphenate-limit-chars-minimum-word-length',
+      'hyphenate-limit-chars-minimum-characters-before',
+      'hyphenate-limit-chars-minimum-characters-after',
     ],
     value: hyphenateLimitChars,
     variable: '--jumi-hyphenate-limit-chars',
   },
-  'hyphenate-limit-minimum-characters-after': {
+  'hyphenate-limit-chars-minimum-characters-after': {
     value: 'auto',
-    variable: '--jumi-hyphenate-limit-minimum-characters-after',
+    variable: '--jumi-hyphenate-limit-chars-minimum-characters-after',
   },
-  'hyphenate-limit-minimum-characters-before': {
+  'hyphenate-limit-chars-minimum-characters-before': {
     value: 'auto',
-    variable: '--jumi-hyphenate-limit-minimum-characters-before',
+    variable: '--jumi-hyphenate-limit-chars-minimum-characters-before',
   },
-  'hyphenate-limit-minimum-word-length': {
+  'hyphenate-limit-chars-minimum-word-length': {
     value: 'auto',
-    variable: '--jumi-hyphenate-limit-minimum-word-length',
+    variable: '--jumi-hyphenate-limit-chars-minimum-word-length',
   },
   'hyphens': {
     value: 'manual',
@@ -1447,6 +1449,10 @@ export const propertyVariables: DependencyGraph = {
   'inset-inline-start': {
     value: 'auto',
     variable: '--jumi-inset-inline-start',
+  },
+  'interpolate-size': {
+    value: 'allow-keywords',
+    variable: '--jumi-interpolate-size',
   },
   'isolation': {
     value: 'auto',
@@ -1720,7 +1726,8 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-mask-type',
   },
   'math-depth': {
-    value: '0',
+    dependencies: ['math-depth-add'],
+    value: mathDepth,
     variable: '--jumi-math-depth',
   },
   'math-depth-add': {
@@ -2596,7 +2603,7 @@ export const propertyVariables: DependencyGraph = {
     dependencies: [
       'text-shadow-offset-x',
       'text-shadow-offset-y',
-      'text-shadow-blur',
+      'text-shadow-blur-radius',
       'text-shadow-color',
     ],
     value: textShadow,
@@ -2605,6 +2612,10 @@ export const propertyVariables: DependencyGraph = {
   'text-shadow-blur': {
     value: '0',
     variable: '--jumi-text-shadow-blur',
+  },
+  'text-shadow-blur-radius': {
+    value: '0',
+    variable: '--jumi-text-shadow-blur-radius',
   },
   'text-shadow-color': {
     value: 'currentColor',

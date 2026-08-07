@@ -1,9 +1,3 @@
-export const hyphenateLimitCharsProperties = {
-  'minimum-characters-after': 'minimum-characters-after',
-  'minimum-characters-before': 'minimum-characters-before',
-  'minimum-word-length': 'minimum-word-length',
-} as const
-
 export const hyphenateLimitChars = {
   0: '0',
   1: '1',

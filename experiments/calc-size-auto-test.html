@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>calc-size fallback, base var = auto (plugin-realistic)</title>
+    <style>
+      * { box-sizing: border-box; }
+      body { font-family: system-ui, sans-serif; margin: 40px; background: #f3f4f6; color: #111827; }
+      .row { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 24px; }
+      .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.1); min-width: 300px; }
+      .card h3 { margin: 0 0 4px; font-size: 15px; }
+      .card p.desc { margin: 0 0 12px; color: #6b7280; font-size: 12px; }
+      .box { height: 48px; border-radius: 8px; background: #6366f1; width: 80px; }
+      .out { margin-top: 8px; font-family: ui-monospace, monospace; font-size: 12px; color: #374151; }
+      .flag { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 999px; background: #e5e7eb; }
+    </style>
+
+    <style>
+      /* base var is AUTO (plugin default). Element width comes from a class (w-80 → 80px). */
+      @keyframes jumi-width {
+        5%   { width: var(--jumi-width-5,   calc-size(var(--jumi-width), size)); }
+        100% { width: var(--jumi-width-100, calc-size(var(--jumi-width), size)); }
+      }
+
+      /* Group 1: NO interpolate-size */
+      .g1-a { width: 80px; --jumi-width-100: 100px; animation: jumi-width 4s linear infinite; }
+      .g1-b { width: 80px; --jumi-width-5: 20px;    animation: jumi-width 4s linear infinite; }
+      .g1-d { width: 80px;                          animation: jumi-width 4s linear infinite; }
+
+      /* Group 2: WITH interpolate-size */
+      .g2-a, .g2-b, .g2-d { interpolate-size: allow-keywords; }
+      .g2-a { width: 80px; --jumi-width-100: 100px; animation: jumi-width 4s linear infinite; }
+      .g2-b { width: 80px; --jumi-width-5: 20px;    animation: jumi-width 4s linear infinite; }
+      .g2-d { width: 80px;                          animation: jumi-width 4s linear infinite; }
+    </style>
+  </head>
+  <body>
+    <h1>base var = <code>auto</code> — calc-size fallback, with/without interpolate-size</h1>
+    <div class="row">
+      <div class="card">
+        <h3>G1-A <span class="flag">no interpolate-size</span> 100% only</h3>
+        <div class="box g1-a"></div><div class="out" id="out-g1-a"></div>
+      </div>
+      <div class="card">
+        <h3>G1-B <span class="flag">no interpolate-size</span> 5% only</h3>
+        <div class="box g1-b"></div><div class="out" id="out-g1-b"></div>
+      </div>
+      <div class="card">
+        <h3>G1-D <span class="flag">no interpolate-size</span> neither</h3>
+        <div class="box g1-d"></div><div class="out" id="out-g1-d"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="card">
+        <h3>G2-A <span class="flag">interpolate-size</span> 100% only</h3>
+        <div class="box g2-a"></div><div class="out" id="out-g2-a"></div>
+      </div>
+      <div class="card">
+        <h3>G2-B <span class="flag">interpolate-size</span> 5% only</h3>
+        <div class="box g2-b"></div><div class="out" id="out-g2-b"></div>
+      </div>
+      <div class="card">
+        <h3>G2-D <span class="flag">interpolate-size</span> neither</h3>
+        <div class="box g2-d"></div><div class="out" id="out-g2-d"></div>
+      </div>
+    </div>
+
+    <script>
+      const targets = {
+        'g1-a': 'G1-A', 'g1-b': 'G1-B', 'g1-d': 'G1-D',
+        'g2-a': 'G2-A', 'g2-b': 'G2-B', 'g2-d': 'G2-D',
+      }
+      const out = {}
+
+      async function measure() {
+        for (const [cls, label] of Object.entries(targets)) {
+          const el = document.querySelector('.' + cls)
+          el.style.animation = 'none'
+          void el.offsetWidth
+          el.style.animation = ''
+          await new Promise(r => setTimeout(r, 60))
+          const anim = el.getAnimations()[0]
+          const series = []
+          for (let i = 0; i <= 30; i++) {
+            const target = (i / 30) * 4000
+            let guard = 0
+            while (anim && anim.currentTime < target - 5 && guard < 600) {
+              await new Promise(r => setTimeout(r, 5))
+              guard++
+            }
+            series.push(Math.round(parseFloat(getComputedStyle(el).width) * 10) / 10)
+          }
+          out[label] = series.join(' → ')
+          el.style.animation = 'none'
+        }
+        return out
+      }
+      window.__run = measure
+    </script>
+  </body>
+</html>

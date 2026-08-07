@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shared-keyframe unset-stop behavior</title>
+    <style>
+      * { box-sizing: border-box; }
+      body { font-family: system-ui, sans-serif; margin: 40px; background: #f3f4f6; color: #111827; }
+      .row { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 24px; }
+      .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.1); min-width: 260px; }
+      .card h3 { margin: 0 0 4px; font-size: 15px; }
+      .card p.desc { margin: 0 0 12px; color: #6b7280; font-size: 12px; }
+      .box { height: 48px; border-radius: 8px; background: #6366f1; width: 40px; }
+      .out { margin-top: 8px; font-family: ui-monospace, monospace; font-size: 12px; color: #374151; }
+    </style>
+
+    <!--
+      ONE shared keyframe, used by many elements.
+      5% and 100% stops read per-stop vars with NO fallback.
+      Each box sets a DIFFERENT subset of stops.
+    -->
+    <style>
+      @keyframes jumi-width {
+        5%   { width: var(--jumi-width-5); }
+        100% { width: var(--jumi-width-100); }
+      }
+
+      /* Box A: base 40px, pins ONLY 100% -> should ignore the foreign 5% stop */
+      .a {
+        width: 40px;
+        --jumi-width-100: 100px;
+        animation: jumi-width 4s linear infinite;
+      }
+      /* Box B: base 40px, pins ONLY 5% -> should ignore the foreign 100% stop */
+      .b {
+        width: 40px;
+        --jumi-width-5: 20px;
+        animation: jumi-width 4s linear infinite;
+      }
+      /* Box C: pins BOTH stops */
+      .c {
+        width: 40px;
+        --jumi-width-5: 20px;
+        --jumi-width-100: 100px;
+        animation: jumi-width 4s linear infinite;
+      }
+      /* Box D: pins NEITHER -> all stops unset */
+      .d {
+        width: 40px;
+        animation: jumi-width 4s linear infinite;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Unset stop in a shared keyframe (no fallback)</h1>
+    <div class="row">
+      <div class="card">
+        <h3>A — pins 100% only</h3>
+        <p class="desc">5% stop is foreign. If dropped → smooth 40→100. If coerced → jump at 5%.</p>
+        <div class="box a"></div>
+        <div class="out" id="out-a"></div>
+      </div>
+      <div class="card">
+        <h3>B — pins 5% only</h3>
+        <p class="desc">100% stop is foreign. If dropped → 20→40-ish. If coerced → jump at 100%.</p>
+        <div class="box b"></div>
+        <div class="out" id="out-b"></div>
+      </div>
+      <div class="card">
+        <h3>C — pins both</h3>
+        <p class="desc">Control: real two-stop 20→100 curve.</p>
+        <div class="box c"></div>
+        <div class="out" id="out-c"></div>
+      </div>
+      <div class="card">
+        <h3>D — pins neither</h3>
+        <p class="desc">All stops unset. Expect static-ish / auto.</p>
+        <div class="box d"></div>
+        <div class="out" id="out-d"></div>
+      </div>
+    </div>
+
+    <script>
+      const targets = { a: 'A', b: 'B', c: 'C', d: 'D' }
+      const samples = []
+
+      async function measure() {
+        const at = (el) => Math.round(parseFloat(getComputedStyle(el).width) * 10) / 10
+        const row = { t: performance.now() / 1000 }
+        for (const [cls, label] of Object.entries(targets)) {
+          row[label] = at(document.querySelector('.' + cls))
+        }
+        samples.push(row)
+      }
+
+      // Sample over two full 4s cycles at fine granularity around the stops
+      const points = []
+      for (let i = 0; i <= 40; i++) points.push((i / 40) * 4) // 0..4s every 0.1s
+
+      ;(async () => {
+        const t0 = performance.now()
+        for (const p of points) {
+          const target = t0 + p * 1000
+          while (performance.now() < target) await new Promise(r => setTimeout(r, 4))
+          await measure()
+        }
+        for (const [cls, label] of Object.entries(targets)) {
+          const series = samples.map(s => s[label])
+          document.getElementById('out-' + cls).textContent =
+            label + ': ' + series.join(' → ')
+        }
+      })()
+    </script>
+  </body>
+</html>
