@@ -10,6 +10,4 @@ export const animation = join([
   css('var', '--jumi-animation-direction'),
   css('var', '--jumi-animation-fill-mode'),
   css('var', '--jumi-animation-play-state'),
-  css('var', '--jumi-animation-timeline'),
-  css('var', '--jumi-animation-composition'),
 ], ' ')

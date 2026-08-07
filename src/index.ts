@@ -2,7 +2,6 @@ import { getCreator } from '@/helpers/create'
 import { merge } from '@/helpers/merge'
 import { getMatchComponents } from '@/properties/component'
 import { getMatchControls } from '@/properties/controls'
-import { getMatchTailwindUtilities } from '@/properties/tailwind'
 import { getMatchTween } from '@/properties/tween'
 import { atStops } from '@/theme/at-stops'
 import { variants } from '@/variants'
@@ -34,7 +33,6 @@ const jumi = createPlugin((api) => {
 
   registerTween(getMatchTween(creator))
   registerControls(getMatchControls(creator))
-  registerControls(getMatchTailwindUtilities(creator))
 
   const components = getMatchComponents(creator)
   for (const name in components) {

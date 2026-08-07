@@ -2,6 +2,8 @@ import type { Api } from '@/types'
 
 import { describe, expect, it, vi } from 'vitest'
 
+import shorthash2 from 'shorthash2'
+
 import { getCreator } from '@/helpers/create'
 import { css } from '@/helpers/css'
 
@@ -28,14 +30,15 @@ function setup() {
 }
 
 describe('property curry', () => {
-  it('writes the flat variable for a simple property', () => {
+  it('writes a per-value keyframe name and target var for a simple property', () => {
     const { creator } = setup()
 
     const result = creator.property('opacity')('50', { modifier: null })
+    const id = shorthash2('50')
 
     expect(result).toEqual({
-      '--jumi-opacity': '50',
-      '--jumi-opacity-animation-name': 'jumi-opacity',
+      [`--jumi-opacity-${id}`]: '50',
+      [`--jumi-opacity-${id}-animation-name`]: `jumi-opacity-${id}`,
     })
   })
 
@@ -46,7 +49,7 @@ describe('property curry', () => {
 
     expect(result).toEqual({
       '--jumi-opacity-25': '0',
-      '--jumi-opacity-animation-name': 'jumi-opacity',
+      '--jumi-opacity-animation-name': 'jumi-opacity-stops',
     })
   })
 
@@ -79,7 +82,7 @@ describe('property curry', () => {
     const result = creator.property('filter', [['filter-blur', value => css('blur', value)]])('8px', { modifier: '50' })
 
     expect(result).toEqual({
-      '--jumi-filter-animation-name': 'jumi-filter',
+      '--jumi-filter-animation-name': 'jumi-filter-stops',
       '--jumi-filter-blur-50': 'blur(8px)',
     })
   })
@@ -91,10 +94,11 @@ describe('keyframe emission', () => {
 
     creator.property('opacity')('50', { modifier: null })
     creator.animations
+    const id = shorthash2('50')
 
     expect(addUtilities).toHaveBeenCalledWith({
-      '@keyframes jumi-opacity': {
-        to: { opacity: 'var(--jumi-opacity)' },
+      [`@keyframes jumi-opacity-${id}`]: {
+        to: { opacity: `var(--jumi-opacity-${id})` },
       },
     })
   })
@@ -105,8 +109,10 @@ describe('keyframe emission', () => {
     creator.property('opacity')('0', { modifier: '25' })
     creator.animations
 
-    expect(addUtilities).toHaveBeenCalledWith({
-      '@keyframes jumi-opacity': {
+    const utilities = addUtilities.mock.calls.map(([u]) => u)
+
+    expect(utilities).toContainEqual({
+      '@keyframes jumi-opacity-stops': {
         '25%': { opacity: 'var(--jumi-opacity-25, var(--jumi-opacity))' },
       },
     })
@@ -120,11 +126,11 @@ describe('keyframe emission', () => {
 
     const keyframes = addUtilities.mock.calls
       .map(([utilities]) => utilities)
-      .find(utilities => '@keyframes jumi-filter' in utilities)
+      .find(utilities => '@keyframes jumi-filter-stops' in utilities)
 
     expect(keyframes).toBeDefined()
 
-    const filter = keyframes['@keyframes jumi-filter']['50%'].filter
+    const filter = keyframes['@keyframes jumi-filter-stops']['50%'].filter
     expect(filter).toContain('var(--jumi-filter-50,')
     expect(filter).toContain('var(--jumi-filter-blur-50, var(--jumi-filter-blur))')
   })

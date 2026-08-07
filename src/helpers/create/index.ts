@@ -8,49 +8,66 @@ import { propertyVariables } from '@/variables/property'
 
 import { assemble } from '../assemble'
 
+import shorthash2 from 'shorthash2'
 import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette'
+
 export function getCreator({ addUtilities, theme }: Api): Creator {
   const effects = new Set<string>()
   const properties = new Set<string>()
   const motions = new Set<string>()
   const seen = new Set<string>()
-  const sizing = new Set<AnimatableStandardPropertyType>([
-    'block-size',
-    'flex-basis',
-    'height',
-    'inline-size',
-    'max-block-size',
-    'max-height',
-    'max-inline-size',
-    'max-width',
-    'min-block-size',
-    'min-height',
-    'min-inline-size',
-    'min-width',
-    'width',
-  ])
 
   const keyframes = new Map<string, Collection<CssInJs>>()
   const timelines = new Map<AnimatableStandardPropertyType, Set<string>>()
+  const values = new Map<AnimatableStandardPropertyType, Set<string>>()
+  const composed = new Set<AnimatableStandardPropertyType>()
+
+  // Deterministic alphabetical ordering for Sets of attribute/effect names.
+  // Per-value keyframe slots are deliberately NOT sorted: they rely on
+  // registration order so base values stay ahead of variant (hover) values.
+  const sorted = <T extends string>(set: Set<T>): T[] => Array.from(set).sort()
 
   function computePropertyKeyframes() {
-    timelines.forEach((stops, attribute) => {
-      if (seen.has(attribute)) return
+    // Per-value (no-stop) keyframes: a unique keyframe per value lets base and
+    // hover keyframes coexist in the animation-name list (smooth transitions),
+    // while a `to`-only body derives the from-state from the element's current
+    // computed value, so native classes like `w-8` act as the resting state.
+    // Note: no `calc-size` wrapper here — `interpolate-size: allow-keywords`
+    // (set by `.animations`) already enables smooth `auto`→length tweens, and
+    // wrapping the target in `calc-size(var(...), size)` actually snaps them.
+    values.forEach((ids, attribute) => {
+      ids.forEach((id) => {
+        const animationName = `jumi-${attribute}-${id}`
+        if (seen.has(animationName)) return
+        seen.add(animationName)
 
+        const base = css('var', `--jumi-${attribute}-${id}`)
+        addUtilities({ [`@keyframes ${animationName}`]: { to: { [attribute]: base } } })
+      })
+    })
+
+    // Composed (parts) keyframes: a shared `to`-only keyframe reading the
+    // composed attribute variable.
+    composed.forEach((attribute) => {
       const animationName = `jumi-${attribute}`
+      if (seen.has(animationName)) return
+      seen.add(animationName)
+
       const base = css('var', `--jumi-${attribute}`)
-      const fallback = sizing.has(attribute)
-        ? css('calc-size', base, 'size')
-        : base
+      addUtilities({ [`@keyframes ${animationName}`]: { to: { [attribute]: base } } })
+    })
 
-      const blocks = stops.size
-        ? Array.from(stops).reduce((acc, stop) => {
-            acc[`${stop}%`] = { [attribute]: propertyKeyframeValue(attribute, stop, fallback) }
-            return acc
-          }, {} as CssInJs)
-        : { to: { [attribute]: fallback } }
+    // Stop usage: explicit `{stop}%` blocks reading the per-stop variables.
+    timelines.forEach((stops, attribute) => {
+      const animationName = `jumi-${attribute}-stops`
+      if (!stops.size || seen.has(animationName)) return
+      seen.add(animationName)
 
-      seen.add(attribute)
+      const base = css('var', `--jumi-${attribute}`)
+      const blocks = Array.from(stops).reduce((acc, stop) => {
+        acc[`${stop}%`] = { [attribute]: propertyKeyframeValue(attribute, stop, base) }
+        return acc
+      }, {} as CssInJs)
       addUtilities({ [`@keyframes ${animationName}`]: blocks })
     })
   }
@@ -69,36 +86,77 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
     return css('var', variable, expanded)
   }
 
-  function computeAnimationVariable(attributes: string[]): CssInJs {
-    const longhand = (constituent: string) => {
-      return attributes.map((attribute) => {
-        const variable = `--jumi-${attribute}-animation-${constituent}`
-        const fallback = css('var', `--jumi-animation-${constituent}`)
+  function animationVariables(attribute: string, nameVar?: string): string {
+    return join([
+      css('var', nameVar ?? `--jumi-${attribute}-animation-name`, css('var', '--jumi-animation-name')),
+      css('var', `--jumi-${attribute}-animation-duration`, css('var', '--jumi-animation-duration')),
+      css('var', `--jumi-${attribute}-animation-timing-function`, css('var', '--jumi-animation-timing-function')),
+      css('var', `--jumi-${attribute}-animation-delay`, css('var', '--jumi-animation-delay')),
+      css('var', `--jumi-${attribute}-animation-iteration-count`, css('var', '--jumi-animation-iteration-count')),
+      css('var', `--jumi-${attribute}-animation-direction`, css('var', '--jumi-animation-direction')),
+      css('var', `--jumi-${attribute}-animation-fill-mode`, css('var', '--jumi-animation-fill-mode')),
+      css('var', `--jumi-${attribute}-animation-play-state`, css('var', '--jumi-animation-play-state')),
+    ], ' ')
+  }
 
-        return css('var', variable, fallback)
-      }).join(', ') || css('var', `--jumi-animation-${constituent}`)
-    }
+  function computeAnimationVariable(): CssInJs {
+    const slots: Array<{ attribute: string, nameVar?: string, variable: string }> = []
+    const shared = new Set<string>()
 
-    const animation = attributes.length
+    // Per-value slots: one full animation cycle per registered value, so base
+    // and hover values coexist in the animation-name list. Registration order
+    // (base utilities are matched before variant utilities) puts base values
+    // first and variant values last, so the active/hover keyframe wins under
+    // `replace` composition.
+    values.forEach((ids, attribute) => {
+      Array.from(ids).forEach((id) => {
+        slots.push({
+          attribute,
+          nameVar: `--jumi-${attribute}-${id}-animation-name`,
+          variable: `--jumi-${attribute}-${id}-animation`,
+        })
+      })
+    })
+
+    // Shared slots for composed attributes (parts-based values).
+    sorted(composed).forEach((attribute) => {
+      shared.add(attribute)
+    })
+
+    // Shared slots for stop-based attributes.
+    timelines.forEach((stops, attribute) => {
+      if (stops.size) shared.add(attribute)
+    })
+
+    sorted(shared).forEach((attribute) => {
+      slots.push({ attribute, variable: `--jumi-${attribute}-animation` })
+    })
+
+    // Effect slots (each effect is its own full cycle).
+    sorted(effects).forEach((attribute) => {
+      slots.push({ attribute, variable: `--jumi-${attribute}-animation` })
+    })
+
+    const animations = slots.reduce((acc, { attribute, nameVar, variable }) => {
+      acc[variable] = animationVariables(attribute, nameVar)
+      return acc
+    }, {} as CssInJs)
+
+    const animation = slots.length
       ? {
-          'animation-composition': longhand('composition'),
-          'animation-delay': longhand('delay'),
-          'animation-direction': longhand('direction'),
-          'animation-duration': longhand('duration'),
-          'animation-fill-mode': longhand('fill-mode'),
-          'animation-iteration-count': longhand('iteration-count'),
-          'animation-name': longhand('name'),
-          'animation-play-state': longhand('play-state'),
-          'animation-timeline': longhand('timeline'),
-          'animation-timing-function': longhand('timing-function'),
+          'animation': slots.map(({ variable }) => css('var', variable)).join(', '),
+          'animation-composition': css('var', '--jumi-animation-composition'),
+          'animation-timeline': css('var', '--jumi-animation-timeline'),
           'interpolate-size': css('var', '--jumi-interpolate-size'),
         }
       : {
           'animation': css('var', '--jumi-animation'),
+          'animation-composition': css('var', '--jumi-animation-composition'),
+          'animation-timeline': css('var', '--jumi-animation-timeline'),
           'interpolate-size': css('var', '--jumi-interpolate-size'),
         }
 
-    return animation
+    return merge(animation, animations)
   }
 
   function transitionVariables(attribute: string): string {
@@ -130,13 +188,19 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
       const properties = creator.properties.reduce((acc, attribute) =>
         merge(acc, assemble(attribute)), {} as CssInJs)
 
-      const attributes = creator.properties.concat(creator.effects)
-      const animation = computeAnimationVariable(attributes)
+      const animation = computeAnimationVariable()
 
       computePropertyKeyframes()
       computeEffectKeyframes()
 
-      return merge(animation, properties, assemble('animation'))
+      return merge(
+        animation,
+        properties,
+        assemble('animation'),
+        assemble('animation-composition'),
+        assemble('animation-timeline'),
+        assemble('interpolate-size'),
+      )
     },
 
     effect(attribute): string {
@@ -145,16 +209,16 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
       return `jumi-${attribute}`
     },
 
-    get effects(): string[] { return Array.from(effects).sort() },
+    get effects(): string[] { return sorted(effects) },
 
     motion(attribute): string {
       motions.add(attribute)
       return attribute
     },
 
-    get motions(): string[] { return Array.from(motions).sort() },
+    get motions(): string[] { return sorted(motions) },
 
-    get properties(): string[] { return Array.from(properties).sort() },
+    get properties(): string[] { return sorted(properties) },
 
     property: (attribute, parts = []): MatchUtilitiesPropertyFunction => {
       const register = (modifier: null | string) => {
@@ -172,6 +236,27 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
       return (value, { modifier }) => {
         register(modifier)
 
+        // Simple (no parts, no modifier): a per-value keyframe + target var, so
+        // base and hover values coexist with independent keyframes.
+        if (!parts.length && !modifier) {
+          const id = shorthash2(value)
+          let ids = values.get(attribute)
+
+          if (!ids) {
+            ids = new Set<string>()
+            values.set(attribute, ids)
+          }
+
+          ids.add(id)
+
+          return {
+            [`--jumi-${attribute}-${id}-animation-name`]: `jumi-${attribute}-${id}`,
+            [`--jumi-${attribute}-${id}`]: value,
+          }
+        }
+
+        if (parts.length && !modifier) composed.add(attribute)
+
         const variable = (name: string) => {
           return modifier ? `--jumi-${name}-${modifier}` : `--jumi-${name}`
         }
@@ -186,7 +271,7 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
           : { [variable(attribute)]: value }
 
         return {
-          [`--jumi-${attribute}-animation-name`]: `jumi-${attribute}`,
+          [`--jumi-${attribute}-animation-name`]: modifier ? `jumi-${attribute}-stops` : `jumi-${attribute}`,
           ...variables,
         }
       }

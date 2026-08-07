@@ -9,6 +9,7 @@ import { alignSelf } from '@/theme/align-self'
 import { alignmentBaseline } from '@/theme/alignment-baseline'
 import { all } from '@/theme/all'
 import { appearance } from '@/theme/appearance'
+import { atStops } from '@/theme/at-stops'
 import { backfaceVisibility } from '@/theme/backface-visibility'
 import { backgroundAttachment } from '@/theme/background-attachment'
 import { backgroundClip } from '@/theme/background-clip'
@@ -150,6 +151,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-align-content': {
       fn: property('align-content'),
+      modifiers: atStops,
       values: alignContent,
     },
     'animate-align-items': {
