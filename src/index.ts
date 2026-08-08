@@ -1,9 +1,9 @@
+import type { GetMatchComponents, GetMatchUtilities } from './types'
+
 import { getCreator } from '@/helpers/create'
-import { merge } from '@/helpers/merge'
 import { getMatchComponents } from '@/properties/component'
 import { getMatchControls } from '@/properties/controls'
 import { getMatchTween } from '@/properties/tween'
-import { atStops } from '@/theme/at-stops'
 import { variants } from '@/variants'
 
 import createPlugin from 'tailwindcss/plugin'
@@ -17,28 +17,24 @@ const jumi = createPlugin((api) => {
 
   const creator = getCreator(api)
 
-  const registerTween = (utilities: ReturnType<typeof getMatchTween>) => {
-    for (const name in utilities) {
-      const { fn, modifiers = {}, ...options } = utilities[name]
-      matchUtilities({ [name]: fn }, { ...options, modifiers: merge(atStops, modifiers) })
-    }
-  }
-
-  const registerControls = (utilities: ReturnType<typeof getMatchControls>) => {
+  const registerUtilities = (utilities: ReturnType<GetMatchUtilities>) => {
     for (const name in utilities) {
       const { fn, ...options } = utilities[name]
-      matchUtilities({ [name]: fn }, options)
+      const { modifiers = {}, supportsNegativeValues = false, type = 'any', values } = options
+      matchUtilities({ [name]: fn }, { modifiers, supportsNegativeValues, type, values })
+    }
+  }
+  const registerComponents = (utilities: ReturnType<GetMatchComponents>) => {
+    for (const name in utilities) {
+      const { fn, ...options } = utilities[name]
+      const { modifiers = {}, supportsNegativeValues = false, type = 'any', values } = options
+      matchComponents({ [name]: fn }, { modifiers, supportsNegativeValues, type, values })
     }
   }
 
-  registerTween(getMatchTween(creator))
-  registerControls(getMatchControls(creator))
-
-  const components = getMatchComponents(creator)
-  for (const name in components) {
-    const { fn, ...options } = components[name]
-    matchComponents({ [name]: fn }, options)
-  }
+  registerUtilities(getMatchTween(creator))
+  registerUtilities(getMatchControls(creator))
+  registerComponents(getMatchComponents(creator))
 })
 
 export default jumi as ReturnType<typeof createPlugin>

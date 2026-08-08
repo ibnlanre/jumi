@@ -9,7 +9,6 @@ import { alignSelf } from '@/theme/align-self'
 import { alignmentBaseline } from '@/theme/alignment-baseline'
 import { all } from '@/theme/all'
 import { appearance } from '@/theme/appearance'
-import { atStops } from '@/theme/at-stops'
 import { backfaceVisibility } from '@/theme/backface-visibility'
 import { backgroundAttachment } from '@/theme/background-attachment'
 import { backgroundClip } from '@/theme/background-clip'
@@ -107,12 +106,13 @@ import { paintOrder } from '@/theme/paint-order'
 import { percentage } from '@/theme/percentage'
 import { position } from '@/theme/position'
 import { rotate } from '@/theme/rotate'
+import { stroke } from '@/theme/stroke'
 import { textAlign } from '@/theme/text-align'
 import { transformStyle } from '@/theme/transform-style'
 import { visibility } from '@/theme/visibility'
 
 export const getMatchTween: GetMatchUtilities = (creator) => {
-  const { property, theme } = creator
+  const { color, property, theme } = creator
 
   /**
    * Consume the keyword modifier into the value (e.g. `/block`, `/span`,
@@ -145,33 +145,38 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
 
   const matchTween: Partial<MatchProperty> = {
     'animate-accent-color': {
-      fn: property('accent-color'),
+      fn: color('accent-color'),
       type: 'color',
       values: theme('accentColor'),
     },
     'animate-align-content': {
       fn: property('align-content'),
-      modifiers: atStops,
+      type: ['any'],
       values: alignContent,
     },
     'animate-align-items': {
       fn: property('align-items'),
+      type: ['any'],
       values: alignItems,
     },
     'animate-align-self': {
       fn: property('align-self'),
+      type: ['any'],
       values: alignSelf,
     },
     'animate-alignment-baseline': {
       fn: property('alignment-baseline'),
+      type: ['any'],
       values: alignmentBaseline,
     },
     'animate-all': {
       fn: property('all'),
+      type: ['any'],
       values: all,
     },
     'animate-appearance': {
       fn: property('appearance'),
+      type: ['any'],
       values: appearance,
     },
     'animate-aspect-ratio': {
@@ -191,6 +196,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-backdrop-filter': {
       fn: property('backdrop-filter'),
+      type: ['any'],
       values: empty.none,
     },
     'animate-backdrop-filter-blur': {
@@ -219,7 +225,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
       values: theme('outlineOffset'),
     },
     'animate-backdrop-filter-drop-shadow-color': {
-      fn: property('backdrop-filter', ['backdrop-filter-drop-shadow-color']),
+      fn: color('backdrop-filter', ['backdrop-filter-drop-shadow-color']),
       type: 'color',
       values: theme('boxShadowColor'),
     },
@@ -270,27 +276,31 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-backface-visibility': {
       fn: property('backface-visibility'),
+      type: ['any'],
       values: backfaceVisibility,
     },
     'animate-background': {
-      fn: property('background'),
+      fn: color('background'),
       type: ['color', 'image', 'position', 'url', 'any'],
       values: empty.none,
     },
     'animate-background-attachment': {
       fn: property('background-attachment'),
+      type: ['any'],
       values: backgroundAttachment,
     },
     'animate-background-blend-mode': {
       fn: property('background-blend-mode'),
+      type: ['any'],
       values: mixBlendMode,
     },
     'animate-background-clip': {
       fn: property('background-clip'),
+      type: ['any'],
       values: backgroundClip,
     },
     'animate-background-color': {
-      fn: property('background-color'),
+      fn: color('background-color'),
       type: 'color',
       values: theme('backgroundColor'),
     },
@@ -301,6 +311,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-background-origin': {
       fn: property('background-origin'),
+      type: ['any'],
       values: backgroundOrigin,
     },
     'animate-background-position': {
@@ -340,14 +351,17 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-background-repeat': {
       fn: property('background-repeat'),
+      type: ['any'],
       values: backgroundRepeat,
     },
     'animate-background-repeat-x': {
       fn: property('background-repeat', ['background-repeat-x']),
+      type: ['any'],
       values: backgroundRepeatAxis,
     },
     'animate-background-repeat-y': {
       fn: property('background-repeat', ['background-repeat-y']),
+      type: ['any'],
       values: backgroundRepeatAxis,
     },
     'animate-background-size': {
@@ -377,10 +391,11 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-border-block': {
       fn: property('border-block'),
+      type: ['line-width', 'length', 'any'],
       values: theme('borderWidth'),
     },
     'animate-border-block-color': {
-      fn: property('border-block-color', ['border-block-color']),
+      fn: color('border-block-color', ['border-block-color']),
       type: 'color',
       values: theme('borderColor'),
     },
@@ -431,10 +446,11 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-border-collapse': {
       fn: property('border-collapse'),
+      type: ['any'],
       values: borderCollapse,
     },
     'animate-border-color': {
-      fn: property('border-color'),
+      fn: color('border-color'),
       type: 'color',
       values: theme('borderColor'),
     },
@@ -490,14 +506,17 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-border-image-repeat': {
       fn: property('border-image-repeat'),
+      type: ['any'],
       values: borderImageRepeat,
     },
     'animate-border-image-repeat-x': {
       fn: property('border-image-repeat', ['border-image-repeat-x']),
+      type: ['any'],
       values: borderImageRepeat,
     },
     'animate-border-image-repeat-y': {
       fn: property('border-image-repeat', ['border-image-repeat-y']),
+      type: ['any'],
       values: borderImageRepeat,
     },
     'animate-border-inline-end-radius': {
@@ -593,6 +612,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-box-decoration-break': {
       fn: property('box-decoration-break'),
+      type: ['any'],
       values: boxDecorationBreak,
     },
     'animate-box-shadow': {
@@ -606,7 +626,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
       values: theme('blur'),
     },
     'animate-box-shadow-color': {
-      fn: property('box-shadow', ['box-shadow-color']),
+      fn: color('box-shadow', ['box-shadow-color']),
       type: 'color',
       values: theme('boxShadowColor'),
     },
@@ -627,56 +647,67 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-box-sizing': {
       fn: property('box-sizing'),
+      type: ['any'],
       values: boxSizing,
     },
     'animate-break-after': {
       fn: property('break-after'),
+      type: ['any'],
       values: breakAfter,
     },
     'animate-break-before': {
       fn: property('break-before'),
+      type: ['any'],
       values: breakBefore,
     },
     'animate-break-inside': {
       fn: property('break-inside'),
+      type: ['any'],
       values: breakInside,
     },
     'animate-caption-side': {
       fn: property('caption-side'),
+      type: ['any'],
       values: captionSide,
     },
     'animate-caret-color': {
-      fn: property('caret-color'),
+      fn: color('caret-color'),
       type: 'color',
       values: theme('caretColor'),
     },
     'animate-clear': {
       fn: property('clear'),
+      type: ['any'],
       values: clear,
     },
     'animate-clip-path': {
       fn: property('clip-path'),
+      type: ['any'],
       values: clipPath,
     },
     'animate-clip-rule': {
       fn: property('clip-rule'),
+      type: ['any'],
       values: clipRule,
     },
     'animate-color': {
-      fn: property('color'),
+      fn: color('color'),
       type: 'color',
       values: theme('colors'),
     },
     'animate-color-interpolation': {
       fn: property('color-interpolation'),
+      type: ['any'],
       values: colorInterpolation,
     },
     'animate-color-interpolation-filters': {
       fn: property('color-interpolation-filters'),
+      type: ['any'],
       values: colorInterpolation,
     },
     'animate-color-scheme': {
       fn: property('color-scheme'),
+      type: ['any'],
       values: colorScheme,
     },
     'animate-column-count': {
@@ -686,6 +717,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-column-fill': {
       fn: property('column-fill'),
+      type: ['any'],
       values: columnFill,
     },
     'animate-column-gap': {
@@ -699,12 +731,13 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
       values: empty.none,
     },
     'animate-column-rule-color': {
-      fn: property('column-rule-color'),
+      fn: color('column-rule-color'),
       type: 'color',
       values: theme('borderColor'),
     },
     'animate-column-rule-style': {
       fn: property('column-rule-style'),
+      type: ['any'],
       values: columnRuleStyle,
     },
     'animate-column-rule-width': {
@@ -729,6 +762,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-contain': {
       fn: property('contain'),
+      type: ['any'],
       values: contain,
     },
     'animate-contain-intrinsic-block-size': {
@@ -763,6 +797,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-content-visibility': {
       fn: property('content-visibility'),
+      type: ['any'],
       values: contentVisibility,
     },
     'animate-counter-increment': {
@@ -782,6 +817,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-cursor': {
       fn: property('cursor'),
+      type: ['url', 'any'],
       values: cursor,
     },
     'animate-cx': {
@@ -796,32 +832,38 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-d': {
       fn: property('d'),
+      type: ['any'],
       values: empty.none,
     },
     'animate-display': {
       fn: property('display'),
+      type: ['any'],
       values: display,
     },
     'animate-display-inside': {
       fn: token('display', 'prepend'),
       modifiers: displayOutside,
+      type: ['any'],
       values: displayInside,
     },
     'animate-display-outside': {
       fn: token('display'),
       modifiers: displayInside,
+      type: ['any'],
       values: displayOutside,
     },
     'animate-dominant-baseline': {
       fn: property('dominant-baseline'),
+      type: ['any'],
       values: dominantBaseline,
     },
     'animate-empty-cells': {
       fn: property('empty-cells'),
+      type: ['any'],
       values: emptyCells,
     },
     'animate-fill': {
-      fn: property('fill'),
+      fn: color('fill'),
       type: ['color', 'url', 'any'],
       values: theme('colors', fill),
     },
@@ -832,10 +874,12 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-fill-rule': {
       fn: property('fill-rule'),
+      type: ['any'],
       values: fillRule,
     },
     'animate-filter': {
       fn: property('filter'),
+      type: ['any'],
       values: empty.none,
     },
     'animate-filter-blur': {
@@ -864,7 +908,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
       values: theme('blur'),
     },
     'animate-filter-drop-shadow-color': {
-      fn: property('filter', ['filter-drop-shadow-color']),
+      fn: color('filter', ['filter-drop-shadow-color']),
       type: 'color',
       values: theme('boxShadowColor'),
     },
@@ -915,6 +959,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-flex': {
       fn: property('flex'),
+      type: ['number', 'length', 'percentage', 'any'],
       values: theme('flex'),
     },
     'animate-flex-basis': {
@@ -924,10 +969,12 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-flex-direction': {
       fn: property('flex-direction'),
+      type: ['any'],
       values: flexDirection,
     },
     'animate-flex-flow': {
       fn: property('flex-flow'),
+      type: ['any'],
       values: empty.string,
     },
     'animate-flex-grow': {
@@ -942,14 +989,16 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-flex-wrap': {
       fn: property('flex-wrap'),
+      type: ['any'],
       values: flexWrap,
     },
     'animate-float': {
       fn: property('float'),
+      type: ['any'],
       values: float,
     },
     'animate-flood-color': {
-      fn: property('flood-color'),
+      fn: color('flood-color'),
       type: 'color',
       values: theme('colors'),
     },
@@ -970,6 +1019,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-font-kerning': {
       fn: property('font-kerning'),
+      type: ['any'],
       values: fontKerning,
     },
     'animate-font-size': {
@@ -985,51 +1035,64 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-font-style': {
       fn: token('font-style'),
+      modifiers: 'any',
+      type: ['any'],
       values: fontStyle,
     },
     'animate-font-synthesis': {
       fn: property('font-synthesis'),
+      type: ['any'],
       values: empty.none,
     },
     'animate-font-synthesis-small-caps': {
       fn: property('font-synthesis-small-caps'),
+      type: ['any'],
       values: fontSynthesisSmallCaps,
     },
     'animate-font-synthesis-style': {
       fn: property('font-synthesis-style'),
+      type: ['any'],
       values: fontSynthesisStyle,
     },
     'animate-font-synthesis-weight': {
       fn: property('font-synthesis-weight'),
+      type: ['any'],
       values: fontSynthesisWeight,
     },
     'animate-font-variant': {
       fn: property('font-variant'),
+      type: ['any'],
       values: empty.string,
     },
     'animate-font-variant-alternates': {
       fn: property('font-variant-alternates'),
+      type: ['any'],
       values: fontVariantAlternates,
     },
     'animate-font-variant-caps': {
       fn: property('font-variant-caps'),
+      type: ['any'],
       values: fontVariantCaps,
     },
     'animate-font-variant-east-asian': {
       fn: token('font-variant-east-asian'),
       modifiers: fontVariantEastAsianWidth,
+      type: ['any'],
       values: fontVariantEastAsian,
     },
     'animate-font-variant-ligatures': {
       fn: property('font-variant-ligatures'),
+      type: ['any'],
       values: fontVariantLigatures,
     },
     'animate-font-variant-numeric': {
       fn: property('font-variant-numeric'),
+      type: ['any'],
       values: fontVariantNumeric,
     },
     'animate-font-variant-position': {
       fn: property('font-variant-position'),
+      type: ['any'],
       values: fontVariantPosition,
     },
     'animate-font-variation-settings': {
@@ -1044,6 +1107,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-forced-color-adjust': {
       fn: property('forced-color-adjust'),
+      type: ['any'],
       values: forcedColorAdjust,
     },
     'animate-gap': {
@@ -1053,6 +1117,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-grid': {
       fn: property('grid'),
+      type: ['any'],
       values: empty.string,
     },
     'animate-grid-auto-columns': {
@@ -1063,6 +1128,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     'animate-grid-auto-flow': {
       fn: token('grid-auto-flow'),
       modifiers: gridAutoFlowPacking,
+      type: ['any'],
       values: gridAutoFlow,
     },
     'animate-grid-auto-rows': {
@@ -1072,32 +1138,41 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-grid-column': {
       fn: property('grid-column'),
+      type: ['any'],
       values: theme('gridColumn'),
     },
     'animate-grid-column-end': {
       fn: token('grid-column-end', 'prepend'),
+      modifiers: 'any',
+      type: ['any'],
       values: theme('gridColumnEnd'),
     },
     'animate-grid-column-start': {
       fn: token('grid-column-start', 'prepend'),
+      modifiers: 'any',
+      type: ['any'],
       values: theme('gridColumnStart'),
     },
     'animate-grid-row': {
       fn: property('grid-row'),
+      type: ['any'],
       values: theme('gridRow'),
     },
     'animate-grid-row-end': {
       fn: token('grid-row-end', 'prepend'),
       modifiers: gridSize,
+      type: ['any'],
       values: theme('gridRowEnd'),
     },
     'animate-grid-row-start': {
       fn: token('grid-row-start', 'prepend'),
       modifiers: gridSize,
+      type: ['any'],
       values: theme('gridRowStart'),
     },
     'animate-grid-template-areas': {
       fn: property('grid-template-areas'),
+      type: ['any'],
       values: empty.none,
     },
     'animate-grid-template-columns': {
@@ -1112,6 +1187,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-hanging-punctuation': {
       fn: property('hanging-punctuation'),
+      type: ['any'],
       values: hangingPunctuation,
     },
     'animate-height': {
@@ -1122,6 +1198,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-hyphenate-character': {
       fn: property('hyphenate-character'),
+      type: ['any'],
       values: empty.auto,
     },
     'animate-hyphenate-limit-chars': {
@@ -1146,6 +1223,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-hyphens': {
       fn: property('hyphens'),
+      type: ['any'],
       values: hyphens,
     },
     'animate-image-orientation': {
@@ -1155,6 +1233,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-image-rendering': {
       fn: property('image-rendering'),
+      type: ['any'],
       values: imageRendering,
     },
     'animate-initial-letter': {
@@ -1213,14 +1292,17 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-justify-content': {
       fn: property('justify-content'),
+      type: ['any'],
       values: justifyContent,
     },
     'animate-justify-items': {
       fn: property('justify-items'),
+      type: ['any'],
       values: justifyItems,
     },
     'animate-justify-self': {
       fn: property('justify-self'),
+      type: ['any'],
       values: justifySelf,
     },
     'animate-left': {
@@ -1235,12 +1317,13 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
       values: theme('letterSpacing'),
     },
     'animate-lighting-color': {
-      fn: property('lighting-color'),
+      fn: color('lighting-color'),
       type: 'color',
       values: theme('colors'),
     },
     'animate-line-break': {
       fn: property('line-break'),
+      type: ['any'],
       values: lineBreak,
     },
     'animate-line-clamp': {
@@ -1255,6 +1338,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-list-style': {
       fn: property('list-style'),
+      type: ['any'],
       values: empty.none,
     },
     'animate-list-style-image': {
@@ -1264,10 +1348,12 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-list-style-position': {
       fn: property('list-style-position'),
+      type: ['any'],
       values: listStylePosition,
     },
     'animate-list-style-type': {
       fn: property('list-style-type'),
+      type: ['any'],
       values: listStyleType,
     },
     'animate-margin': {
@@ -1338,30 +1424,37 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-marker': {
       fn: property('marker'),
+      type: ['url', 'any'],
       values: empty.none,
     },
     'animate-marker-end': {
       fn: property('marker-end'),
+      type: ['url', 'any'],
       values: empty.none,
     },
     'animate-marker-mid': {
       fn: property('marker-mid'),
+      type: ['url', 'any'],
       values: empty.none,
     },
     'animate-marker-start': {
       fn: property('marker-start'),
+      type: ['url', 'any'],
       values: empty.none,
     },
     'animate-mask': {
       fn: property('mask'),
+      type: ['any'],
       values: empty.none,
     },
     'animate-mask-border': {
       fn: property('mask-border'),
+      type: ['any'],
       values: empty.none,
     },
     'animate-mask-border-mode': {
       fn: property('mask-border-mode'),
+      type: ['any'],
       values: maskType,
     },
     'animate-mask-border-outset': {
@@ -1408,6 +1501,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-mask-border-repeat': {
       fn: property('mask-border-repeat'),
+      type: ['any'],
       values: maskBorderRepeat,
     },
     'animate-mask-border-slice': {
@@ -1458,10 +1552,12 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-mask-clip': {
       fn: property('mask-clip'),
+      type: ['any'],
       values: maskClip,
     },
     'animate-mask-composite': {
       fn: property('mask-composite'),
+      type: ['any'],
       values: maskComposite,
     },
     'animate-mask-image': {
@@ -1471,10 +1567,12 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-mask-mode': {
       fn: property('mask-mode'),
+      type: ['any'],
       values: maskMode,
     },
     'animate-mask-origin': {
       fn: property('mask-origin'),
+      type: ['any'],
       values: maskOrigin,
     },
     'animate-mask-position': {
@@ -1484,6 +1582,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-mask-repeat': {
       fn: property('mask-repeat'),
+      type: ['any'],
       values: backgroundRepeat,
     },
     'animate-mask-size': {
@@ -1493,6 +1592,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-mask-type': {
       fn: property('mask-type'),
+      type: ['any'],
       values: maskType,
     },
     'animate-math-depth': {
@@ -1509,6 +1609,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-math-style': {
       fn: property('math-style'),
+      type: ['any'],
       values: mathStyle,
     },
     'animate-max-block-size': {
@@ -1561,10 +1662,12 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-mix-blend-mode': {
       fn: property('mix-blend-mode'),
+      type: ['any'],
       values: mixBlendMode,
     },
     'animate-object-fit': {
       fn: property('object-fit'),
+      type: ['any'],
       values: objectFit,
     },
     'animate-object-position': {
@@ -1649,6 +1752,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-offset-path': {
       fn: property('offset-path'),
+      type: ['any'],
       values: offsetPath,
     },
     'animate-offset-position': {
@@ -1708,12 +1812,12 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
       values: empty.number,
     },
     'animate-outline': {
-      fn: property('outline'),
+      fn: color('outline'),
       type: ['line-width', 'length', 'color', 'any'],
       values: empty.none,
     },
     'animate-outline-color': {
-      fn: property('outline', ['outline-color']),
+      fn: color('outline', ['outline-color']),
       type: 'color',
       values: theme('outlineColor'),
     },
@@ -1724,6 +1828,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-outline-style': {
       fn: property('outline', ['outline-style']),
+      type: ['any'],
       values: outlineStyle,
     },
     'animate-outline-width': {
@@ -1733,14 +1838,17 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-overflow': {
       fn: property('overflow'),
+      type: ['any'],
       values: overflow,
     },
     'animate-overflow-anchor': {
       fn: property('overflow-anchor'),
+      type: ['any'],
       values: overflowAnchor,
     },
     'animate-overflow-block': {
       fn: property('overflow-block'),
+      type: ['any'],
       values: overflow,
     },
     'animate-overflow-clip-margin': {
@@ -1751,38 +1859,47 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-overflow-inline': {
       fn: property('overflow-inline'),
+      type: ['any'],
       values: overflow,
     },
     'animate-overflow-wrap': {
       fn: property('overflow-wrap'),
+      type: ['any'],
       values: overflowWrap,
     },
     'animate-overflow-x': {
       fn: property('overflow', ['overflow-x']),
+      type: ['any'],
       values: overflow,
     },
     'animate-overflow-y': {
       fn: property('overflow', ['overflow-y']),
+      type: ['any'],
       values: overflow,
     },
     'animate-overscroll-behavior': {
       fn: property('overscroll-behavior'),
+      type: ['any'],
       values: empty.auto,
     },
     'animate-overscroll-behavior-block': {
       fn: property('overscroll-behavior-block'),
+      type: ['any'],
       values: overscrollBehavior,
     },
     'animate-overscroll-behavior-inline': {
       fn: property('overscroll-behavior-inline'),
+      type: ['any'],
       values: overscrollBehavior,
     },
     'animate-overscroll-behavior-x': {
       fn: property('overscroll-behavior-x'),
+      type: ['any'],
       values: overscrollBehavior,
     },
     'animate-overscroll-behavior-y': {
       fn: property('overscroll-behavior-y'),
+      type: ['any'],
       values: overscrollBehavior,
     },
     'animate-padding': {
@@ -1853,14 +1970,17 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-page': {
       fn: property('page'),
+      type: ['any'],
       values: empty.auto,
     },
     'animate-paint-order': {
       fn: property('paint-order'),
+      type: ['any'],
       values: paintOrder,
     },
     'animate-position': {
       fn: property('position'),
+      type: ['any'],
       values: position,
     },
     'animate-right': {
@@ -1877,6 +1997,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-rotate-3d': {
       fn: property('transform', [['rotate-3d', args('rotate3d')]]),
+      type: ['angle', 'number', 'any'],
       values: empty.string,
     },
     'animate-rotate-angle': {
@@ -1951,8 +2072,9 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
       values: theme('skew'),
     },
     'animate-stroke': {
-      fn: property('stroke'),
-      values: theme('colors'),
+      fn: color('stroke'),
+      type: ['color', 'url', 'any'],
+      values: theme('colors', stroke),
     },
     'animate-stroke-width': {
       fn: property('stroke-width'),
@@ -1961,10 +2083,12 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-text-align': {
       fn: property('text-align'),
+      type: ['any'],
       values: textAlign,
     },
     'animate-text-shadow': {
       fn: property('text-shadow'),
+      type: ['length', 'shadow', 'any'],
       values: theme('dropShadow'),
     },
     'animate-text-shadow-blur': {
@@ -1974,7 +2098,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
       values: theme('blur'),
     },
     'animate-text-shadow-color': {
-      fn: property('text-shadow', ['text-shadow-color']),
+      fn: color('text-shadow', ['text-shadow-color']),
       type: 'color',
       values: theme('boxShadowColor'),
     },
@@ -1998,6 +2122,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-transform': {
       fn: property('transform'),
+      type: ['any'],
       values: empty.string,
     },
     'animate-transform-origin': {
@@ -2023,11 +2148,13 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-transform-style': {
       fn: property('transform', ['transform-style']),
+      type: ['any'],
       values: transformStyle,
     },
     'animate-translate': {
       fn: property('translate'),
       supportsNegativeValues: true,
+      type: ['length', 'percentage', 'any'],
       values: theme('translate'),
     },
     'animate-translate-3d': {
@@ -2055,6 +2182,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-visibility': {
       fn: property('visibility'),
+      type: ['any'],
       values: visibility,
     },
     'animate-width': {
@@ -2077,6 +2205,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
     },
     'animate-z-index': {
       fn: property('z-index'),
+      type: ['integer', 'any'],
       values: theme('zIndex'),
     },
   }

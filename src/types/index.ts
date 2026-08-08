@@ -488,6 +488,7 @@ export type CounterFunction
 
 export interface Creator {
   get animations(): CssInJs;
+  color(attribute: AnimatableStandardPropertyType, parts?: PropertyParts): MatchUtilitiesPropertyFunction;
   effect(attribute: string): string;
   readonly effects: string[];
   motion(attribute: string): string;
@@ -905,26 +906,25 @@ export type MatchComponents = Record<ComponentKey, MatchComponentsPropertyValue>
 
 export type MatchComponentsPropertyFunction = (value: string, extra: { modifier: null | string }) => CssInJs
 
-export interface MatchComponentsPropertyValue extends Partial<MatchUtilitiesOptions> {
+export interface MatchComponentsPropertyValue extends MatchUtilitiesOptions {
   fn: MatchComponentsPropertyFunction
-  values: Collection<string>
 }
 
 export type MatchProperty = Record<MatchUtilitiesPropertyKey, MatchUtilitiesPropertyValue>
 
 export interface MatchUtilitiesOptions {
-  modifiers: Collection<string>
-  supportsNegativeValues: boolean
-  type: Array<DataType> | DataType
+  modifiers?: 'any' | Collection<string>
+  supportsNegativeValues?: boolean
+  type?: Array<DataType> | DataType
+  values: Collection<string>
 }
 
 export type MatchUtilitiesPropertyFunction = (value: string, extra: { modifier: null | string }) => CSSRuleObject
 
 export type MatchUtilitiesPropertyKey = 'animate' | 'animations' | 'transitions' | `animate-${AnimatableStandardPropertyType}` | `animate-${NonStandardPropertyType}` | AnimationPropertyType | TailwindPropertyType | TransitionPropertyType
 
-export interface MatchUtilitiesPropertyValue extends Partial<MatchUtilitiesOptions> {
+export interface MatchUtilitiesPropertyValue extends MatchUtilitiesOptions {
   fn: MatchUtilitiesPropertyFunction
-    values: Collection<string>
 }
 
 export interface MatchVariant {

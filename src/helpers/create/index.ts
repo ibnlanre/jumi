@@ -27,6 +27,26 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
   // registration order so base values stay ahead of variant (hover) values.
   const sorted = <T extends string>(set: Set<T>): T[] => Array.from(set).sort()
 
+  // Per-value (no-stop) emission: a unique keyframe per value + target var, so
+  // base and hover values coexist with independent keyframes. Used by the
+  // simple (no parts, no modifier) branch of `property()`.
+  const perValue = (attribute: AnimatableStandardPropertyType, value: string): CssInJs => {
+    const id = shorthash2(value)
+    let ids = values.get(attribute)
+
+    if (!ids) {
+      ids = new Set<string>()
+      values.set(attribute, ids)
+    }
+
+    ids.add(id)
+
+    return {
+      [`--jumi-${attribute}-${id}-animation-name`]: `jumi-${attribute}-${id}`,
+      [`--jumi-${attribute}-${id}`]: value,
+    }
+  }
+
   function computePropertyKeyframes() {
     // Per-value (no-stop) keyframes: a unique keyframe per value lets base and
     // hover keyframes coexist in the animation-name list (smooth transitions),
@@ -60,6 +80,7 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
     // Stop usage: explicit `{stop}%` blocks reading the per-stop variables.
     timelines.forEach((stops, attribute) => {
       const animationName = `jumi-${attribute}-stops`
+
       if (!stops.size || seen.has(animationName)) return
       seen.add(animationName)
 
@@ -68,6 +89,7 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
         acc[`${stop}%`] = { [attribute]: propertyKeyframeValue(attribute, stop, base) }
         return acc
       }, {} as CssInJs)
+
       addUtilities({ [`@keyframes ${animationName}`]: blocks })
     })
   }
@@ -159,6 +181,18 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
     return merge(animation, animations)
   }
 
+  const register = (attribute: AnimatableStandardPropertyType, modifier: null | string) => {
+    properties.add(attribute)
+    let stops = timelines.get(attribute)
+
+    if (!stops) {
+      stops = new Set<string>()
+      timelines.set(attribute, stops)
+    }
+
+    if (modifier) stops.add(modifier)
+  }
+
   function transitionVariables(attribute: string): string {
     return join([
       css('var', `--jumi-${attribute}-transition-property`, attribute),
@@ -203,6 +237,15 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
       )
     },
 
+    color: (attribute, parts = []): MatchUtilitiesPropertyFunction => {
+      // Colors always animate per-value: their modifier (if any) is a Tailwind
+      // opacity fraction already baked into the value via `color-mix()`, never
+      // a keyframe stop. Reuse `property()` with the modifier forced to `null`
+      // so the stop path is unreachable and the composed/per-value paths apply.
+      const fn = creator.property(attribute, parts)
+      return value => fn(value, { modifier: null })
+    },
+
     effect(attribute): string {
       effects.add(attribute)
       keyframes.set(attribute, effectKeyframes[attribute])
@@ -221,39 +264,19 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
     get properties(): string[] { return sorted(properties) },
 
     property: (attribute, parts = []): MatchUtilitiesPropertyFunction => {
-      const register = (modifier: null | string) => {
-        properties.add(attribute)
-        let stops = timelines.get(attribute)
-
-        if (!stops) {
-          stops = new Set<string>()
-          timelines.set(attribute, stops)
-        }
-
-        if (modifier) stops.add(modifier)
-      }
-
       return (value, { modifier }) => {
-        register(modifier)
+        // A modifier on a non-color property is a keyframe stop: an arbitrary
+        // `/[N]` modifier (e.g. `/[12]`) flows straight through Tailwind as the
+        // bare number, producing a `12%` keyframe block. Colors never reach
+        // this path: they use the dedicated `color()` creator, which forces
+        // the modifier to `null` (Tailwind resolves color modifiers to opacity
+        // fractions baked into the value via `color-mix()`, never keyframe
+        // stops).
+        register(attribute, modifier)
 
         // Simple (no parts, no modifier): a per-value keyframe + target var, so
         // base and hover values coexist with independent keyframes.
-        if (!parts.length && !modifier) {
-          const id = shorthash2(value)
-          let ids = values.get(attribute)
-
-          if (!ids) {
-            ids = new Set<string>()
-            values.set(attribute, ids)
-          }
-
-          ids.add(id)
-
-          return {
-            [`--jumi-${attribute}-${id}-animation-name`]: `jumi-${attribute}-${id}`,
-            [`--jumi-${attribute}-${id}`]: value,
-          }
-        }
+        if (!parts.length && !modifier) return perValue(attribute, value)
 
         if (parts.length && !modifier) composed.add(attribute)
 

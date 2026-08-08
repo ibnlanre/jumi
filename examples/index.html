@@ -16,7 +16,7 @@
           Jumi Animation Plugin
         </h1>
         <p
-          class="text-lg text-gray-600 animate-wiggle animations animation-fade-in if-child-is-h1:bg-white animation-duration-2000 animation-delay-500 animate-color-gray-500 hover:animate-accent-color-amber-100 animation-iteration-count-infinite animate-justify-items-safe-center animate-backdrop-filter-drop-shadow-color-amber-100/75"
+          class="text-lg text-gray-600 animate-wiggle animations animation-fade-in if-child-is-h1:bg-white animation-duration-2000 animation-delay-500 animate-color-gray-500 hover:animate-accent-color-amber-100 animation-iteration-count-infinite animate-justify-items-safe-center animate-backdrop-filter-drop-shadow-color-amber-100"
         >
           A comprehensive TailwindCSS animation library
         </p>
@@ -716,13 +716,16 @@
         </div>
       </section>
 
-      <!-- Multi-stop keyframe stops via /at-{stop} modifier -->
+      <!-- Multi-stop keyframe stops via /[N] arbitrary modifier -->
       <section class="p-6 bg-white rounded-lg shadow-lg">
-        <h2 class="mb-4 text-2xl font-semibold">Multi-stop /at-{stop} Keyframes</h2>
+        <h2 class="mb-4 text-2xl font-semibold">Multi-stop /[N] Keyframes</h2>
         <p class="mb-6 text-gray-600">
-          Pin a property's value at timeline stops. Each stop writes its own
+          Pin a property's value at an arbitrary timeline stop with the
+          <code class="px-1 text-sm bg-gray-200 rounded">/[...]</code> modifier
+          (e.g. <code class="px-1 text-sm bg-gray-200 rounded">animate-width-8/[25]</code>).
+          Each stop writes its own
           <code class="px-1 text-sm bg-gray-200 rounded">--jumi-{attr}-{stop}</code>
-          variable; the shared <code class="px-1 text-sm bg-gray-200 rounded">jumi-{attr}-timeline</code>
+          variable; the shared <code class="px-1 text-sm bg-gray-200 rounded">jumi-{attr}-stops</code>
           keyframe interpolates between the pinned stops.
         </p>
         <div class="grid grid-cols-2 gap-6 md:grid-cols-4">
@@ -730,7 +733,7 @@
           <div class="p-4 overflow-hidden text-center bg-blue-100 rounded">
             <h3 class="mb-2 font-medium">0% → 100%</h3>
             <div
-              class="mx-auto bg-blue-600 size-8 animations animate-width-8/0 animate-width-32/100 animation-duration-3000 animation-iteration-count-infinite animation-direction-alternate"
+              class="mx-auto bg-blue-600 size-8 animations animate-width-8/[0] animate-width-32/[100] animation-duration-3000 animation-iteration-count-infinite animation-direction-alternate"
             ></div>
             <p class="mt-2 text-xs text-gray-500">32px → 128px</p>
           </div>
@@ -739,7 +742,7 @@
           <div class="p-4 overflow-hidden text-center bg-green-100 rounded">
             <h3 class="mb-2 font-medium">Pinned start (handoff)</h3>
             <div
-              class="mx-auto bg-green-600 size-8 animations animate-width-8/0 animate-width-24/100 animation-duration-3000 animation-iteration-count-infinite animation-direction-alternate"
+              class="mx-auto bg-green-600 size-8 animations animate-width-8/[0] animate-width-24/[100] animation-duration-3000 animation-iteration-count-infinite animation-direction-alternate"
             ></div>
             <p class="mt-2 text-xs text-gray-500">32px → 96px, start pinned</p>
           </div>
@@ -748,18 +751,18 @@
           <div class="p-4 overflow-hidden text-center bg-purple-100 rounded">
             <h3 class="mb-2 font-medium">Pseudo-element stops</h3>
             <div
-              class="relative mx-auto bg-purple-600 size-8 before:animations before:absolute before:inset-0 before:bg-yellow-400 before:animate-opacity-0/0 before:animate-opacity-100/100 before:animation-duration-3000 before:animation-iteration-count-infinite before:animation-direction-alternate"
+              class="relative mx-auto bg-purple-600 size-8 before:animations before:absolute before:inset-0 before:bg-yellow-400 before:animate-opacity-0/[0] before:animate-opacity-100/[100] before:animation-duration-3000 before:animation-iteration-count-infinite before:animation-direction-alternate"
             ></div>
             <p class="mt-2 text-xs text-gray-500">opacity 0 → 100 on ::before</p>
           </div>
 
-          <!-- Color two-stop -->
+          <!-- Two-stop non-color -->
           <div class="p-4 overflow-hidden text-center rounded bg-rose-100">
-            <h3 class="mb-2 font-medium">Color stops</h3>
+            <h3 class="mb-2 font-medium">Two-stop</h3>
             <div
-              class="mx-auto bg-rose-600 size-8 animations animate-background-color-rose-600/0 animate-background-color-amber-400/100 animation-duration-3000 animation-iteration-count-infinite animation-direction-alternate"
+              class="mx-auto bg-rose-600 size-8 animations animate-scale-50/[0] animate-scale-150/[100] animation-duration-3000 animation-iteration-count-infinite animation-direction-alternate"
             ></div>
-            <p class="mt-2 text-xs text-gray-500">rose → amber</p>
+            <p class="mt-2 text-xs text-gray-500">scale 50% → 150%</p>
           </div>
         </div>
       </section>
