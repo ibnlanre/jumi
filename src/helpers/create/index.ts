@@ -1,4 +1,4 @@
-import type { AnimatableStandardPropertyType, Api, Collection, Creator, CssInJs, MatchUtilitiesPropertyFunction } from '@/types'
+import type { AnimatableStandardPropertyType, Api, Collection, Creator, CssInJs, MatchComponentsPropertyFunction, MatchUtilitiesPropertyFunction } from '@/types'
 
 import { css } from '@/helpers/css'
 import { join } from '@/helpers/join'
@@ -98,7 +98,11 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
     const variable = `--jumi-${attribute}-${stop}`
     const { dependencies = [], value } = propertyVariables[attribute]
 
-    if (!dependencies.length) return css('var', variable, fallback)
+    // No `var(--jumi-{attribute})` fallback: an unset stop variable makes this
+    // declaration invalid at computed-value time, so a stop block belonging to
+    // ANOTHER element sharing the keyframe is dropped instead of snapping to
+    // the `auto` base.
+    if (!dependencies.length) return css('var', variable)
 
     const expanded = dependencies.reduce((result, dependency) => {
       const part = propertyVariables[dependency]?.variable ?? `--jumi-${dependency}`
@@ -237,7 +241,7 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
       )
     },
 
-    color: (attribute, parts = []): MatchUtilitiesPropertyFunction => {
+    color: (attribute, parts = []): MatchComponentsPropertyFunction => {
       // Colors always animate per-value: their modifier (if any) is a Tailwind
       // opacity fraction already baked into the value via `color-mix()`, never
       // a keyframe stop. Reuse `property()` with the modifier forced to `null`
@@ -263,7 +267,7 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
 
     get properties(): string[] { return sorted(properties) },
 
-    property: (attribute, parts = []): MatchUtilitiesPropertyFunction => {
+    property: (attribute, parts = []): MatchComponentsPropertyFunction => {
       return (value, { modifier }) => {
         // A modifier on a non-color property is a keyframe stop: an arbitrary
         // `/[N]` modifier (e.g. `/[12]`) flows straight through Tailwind as the

@@ -1,8 +1,9 @@
-import type { AnimatableStandardPropertyType, GetMatchUtilities, MatchProperty, MatchUtilitiesPropertyFunction } from '@/types'
+import type { AnimatableStandardPropertyType, GetMatchComponents, MatchComponents, MatchComponentsPropertyFunction } from '@/types'
 
 import { css } from '@/helpers/css'
 import { join } from '@/helpers/join'
 import { merge } from '@/helpers/merge'
+import { cssEffects } from '@/keyframes/effects'
 import { alignContent } from '@/theme/align-content'
 import { alignItems } from '@/theme/align-items'
 import { alignSelf } from '@/theme/align-self'
@@ -111,8 +112,8 @@ import { textAlign } from '@/theme/text-align'
 import { transformStyle } from '@/theme/transform-style'
 import { visibility } from '@/theme/visibility'
 
-export const getMatchTween: GetMatchUtilities = (creator) => {
-  const { color, property, theme } = creator
+export const getMatchTween: GetMatchComponents = (creator) => {
+  const { color, effect, property, theme } = creator
 
   /**
    * Consume the keyword modifier into the value (e.g. `/block`, `/span`,
@@ -123,7 +124,7 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
   const token = (
     attribute: AnimatableStandardPropertyType,
     order: 'append' | 'prepend' = 'append',
-  ): MatchUtilitiesPropertyFunction => {
+  ): MatchComponentsPropertyFunction => {
     const matcher = property(attribute)
 
     return (value, { modifier }) => {
@@ -143,7 +144,15 @@ export const getMatchTween: GetMatchUtilities = (creator) => {
    */
   const args = (name: string) => (value: string) => css(name, value.split(/\s+/).join(', '))
 
-  const matchTween: Partial<MatchProperty> = {
+  const matchTween: Partial<MatchComponents> = {
+    'animate': {
+      fn: (value) => {
+        return ({
+          [`--jumi-${value}-animation-name`]: effect(value),
+        })
+      },
+      values: cssEffects,
+    },
     'animate-accent-color': {
       fn: color('accent-color'),
       type: 'color',

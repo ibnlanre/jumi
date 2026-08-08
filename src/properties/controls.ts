@@ -1,5 +1,6 @@
 import type { GetMatchUtilities, MatchProperty } from '@/types'
 
+import { css } from '@/helpers/css'
 import { merge } from '@/helpers/merge'
 import { cssEffects } from '@/keyframes/effects'
 import { cssProperties } from '@/keyframes/property'
@@ -14,23 +15,16 @@ import { animationTimelineAxis } from '@/theme/animation-timeline-axis'
 import { animationTimelineInset } from '@/theme/animation-timeline-inset'
 import { animationTimelineScroller } from '@/theme/animation-timeline-scroller'
 import { animationTimingFunction } from '@/theme/animation-timing-function'
+import { count } from '@/theme/count'
 import { empty } from '@/theme/empty'
 import { percentage } from '@/theme/percentage'
 import { transitionBehavior } from '@/theme/transition-behavior'
 
 export const getMatchControls: GetMatchUtilities = (creator) => {
-  const { effect, motion, theme } = creator
+  const { motion, theme } = creator
   const modifiers = merge(cssProperties, cssEffects)
 
   const matchControls: Partial<MatchProperty> = {
-    'animate': {
-      fn: (value) => {
-        return ({
-          [`--jumi-${value}-animation-name`]: effect(value),
-        })
-      },
-      values: cssEffects,
-    },
     'animation-composition': {
       fn: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-composition': value }
@@ -45,6 +39,34 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
         return { [`--jumi-${modifier}-animation-delay`]: value }
       },
       modifiers,
+      values: theme('transitionDelay'),
+    },
+    'animation-delay-backward': {
+      fn: (value, { modifier }) => {
+        const length = modifier ? parseInt(modifier) : 3
+
+        return Object.fromEntries(
+          Array.from({ length }, (_, index) => [
+            `& > ${css(':nth-child', index + 1)}`,
+            { '--jumi-animation-delay': `calc(${value} * ${length - index - 1})` },
+          ]),
+        )
+      },
+      modifiers: count,
+      values: theme('transitionDelay'),
+    },
+    'animation-delay-forward': {
+      fn: (value, { modifier }) => {
+        const length = modifier ? parseInt(modifier) : 3
+
+        return Object.fromEntries(
+          Array.from({ length }, (_, index) => [
+            `& > ${css(':nth-child', index + 1)}`,
+            { '--jumi-animation-delay': `calc(${value} * ${index})` },
+          ]),
+        )
+      },
+      modifiers: count,
       values: theme('transitionDelay'),
     },
     'animation-direction': {

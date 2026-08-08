@@ -1901,13 +1901,13 @@
 }
 @keyframes jumi-width-stops {
   100% {
-    width: var(--jumi-width-100, var(--jumi-width));
+    width: var(--jumi-width-100);
   }
   0% {
-    width: var(--jumi-width-0, var(--jumi-width));
+    width: var(--jumi-width-0);
   }
   25% {
-    width: var(--jumi-width-25, var(--jumi-width));
+    width: var(--jumi-width-25);
   }
 }
 @keyframes jumi-arc-bottom-right {
@@ -2075,10 +2075,10 @@
 }
 @keyframes jumi-opacity-stops {
   0% {
-    opacity: var(--jumi-opacity-0, var(--jumi-opacity));
+    opacity: var(--jumi-opacity-0);
   }
   100% {
-    opacity: var(--jumi-opacity-100, var(--jumi-opacity));
+    opacity: var(--jumi-opacity-100);
   }
 }
 @keyframes jumi-background-color-Z2lUbIs {

@@ -477,10 +477,6 @@ export type ComparisonFunction
     | 'max'
     | 'min'
 
-export type ComponentKey
-  = | 'animation-delay-backward'
-    | 'animation-delay-forward'
-
 export type CounterFunction
   = | 'counter'
     | 'counters'
@@ -488,13 +484,13 @@ export type CounterFunction
 
 export interface Creator {
   get animations(): CssInJs;
-  color(attribute: AnimatableStandardPropertyType, parts?: PropertyParts): MatchUtilitiesPropertyFunction;
+  color(attribute: AnimatableStandardPropertyType, parts?: PropertyParts): MatchComponentsPropertyFunction;
   effect(attribute: string): string;
   readonly effects: string[];
   motion(attribute: string): string;
   readonly motions: string[];
   readonly properties: string[];
-  property(attribute: AnimatableStandardPropertyType, parts?: PropertyParts): MatchUtilitiesPropertyFunction;
+  property(attribute: AnimatableStandardPropertyType, parts?: PropertyParts): MatchComponentsPropertyFunction;
   theme: (key: TailwindTheme, values?: Collection) => Record<string, string>;
   get transitions(): CssInJs;
 }
@@ -902,9 +898,12 @@ export type KeyframesVariableReference = `var(${StandardPropertyKeyframesVariabl
 
 export type KeyframeVariables = Record<StandardPropertyKeyframesVariable, string>
 
-export type MatchComponents = Record<ComponentKey, MatchComponentsPropertyValue>
+export type MatchComponents = Record<MatchComponentsPropertyKey, MatchComponentsPropertyValue>
 
 export type MatchComponentsPropertyFunction = (value: string, extra: { modifier: null | string }) => CssInJs
+
+export type MatchComponentsPropertyKey
+  = | 'animate' | `animate-${AnimatableStandardPropertyType}` | `animate-${NonStandardPropertyType}`
 
 export interface MatchComponentsPropertyValue extends MatchUtilitiesOptions {
   fn: MatchComponentsPropertyFunction
@@ -921,7 +920,9 @@ export interface MatchUtilitiesOptions {
 
 export type MatchUtilitiesPropertyFunction = (value: string, extra: { modifier: null | string }) => CSSRuleObject
 
-export type MatchUtilitiesPropertyKey = 'animate' | 'animations' | 'transitions' | `animate-${AnimatableStandardPropertyType}` | `animate-${NonStandardPropertyType}` | AnimationPropertyType | TailwindPropertyType | TransitionPropertyType
+export type MatchUtilitiesPropertyKey =
+  | 'animation-delay-backward' | 'animation-delay-forward' | 'animations'
+  | 'transitions' | AnimationPropertyType | TransitionPropertyType
 
 export interface MatchUtilitiesPropertyValue extends MatchUtilitiesOptions {
   fn: MatchUtilitiesPropertyFunction

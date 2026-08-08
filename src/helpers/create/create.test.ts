@@ -113,7 +113,7 @@ describe('keyframe emission', () => {
 
     expect(utilities).toContainEqual({
       '@keyframes jumi-opacity-stops': {
-        '25%': { opacity: 'var(--jumi-opacity-25, var(--jumi-opacity))' },
+        '25%': { opacity: 'var(--jumi-opacity-25)' },
       },
     })
   })
