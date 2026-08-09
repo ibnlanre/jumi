@@ -34,7 +34,7 @@ Traditional animation libraries force you to choose between ease-of-use and flex
 </div>
 
 <!-- Staggered list animations -->
-<div class="animation-delay-forward-100/5">
+<div class="animate-stagger-forward-100">
   <div class="jumi animate-slide-in-up animation-duration-300">Item 1</div>
   <div class="jumi animate-slide-in-up animation-duration-300">Item 2</div>
   <div class="jumi animate-slide-in-up animation-duration-300">Item 3</div>
@@ -186,11 +186,13 @@ Direct CSS property transitions with intelligent defaults:
 
 ### Stagger Animations
 
-Create sequential animations with automatic timing calculation:
+Create sequential animations with automatic timing calculation. Without a count
+the stagger is **count-free** — one rule driven by `sibling-index()` /
+`sibling-count()` (Chrome, Edge, Safari) that adapts to any number of children:
 
 ```html
-<!-- Children animate one after another -->
-<div class="animation-delay-forward-100/5">
+<!-- Count-free: adapts to any list length -->
+<div class="animate-stagger-forward-100">
   <div class="jumi animate-bounce-in animation-duration-300">0ms delay</div>
   <div class="jumi animate-bounce-in animation-duration-300">100ms delay</div>
   <div class="jumi animate-bounce-in animation-duration-300">200ms delay</div>
@@ -199,17 +201,23 @@ Create sequential animations with automatic timing calculation:
 </div>
 
 <!-- Reverse order -->
-<div class="animation-delay-backward-150/4">
+<div class="animate-stagger-backward-150">
   <!-- Last child animates first -->
 </div>
+```
 
-<!-- Custom arbitrary values -->
-<div class="animation-delay-forward-250/3">
+Firefox lacks `sibling-index()`/`sibling-count()`, so add a `/[count]` modifier
+to emit a `:nth-child` fallback that works everywhere (supporting browsers still
+prefer the adaptive rule):
+
+```html
+<!-- Firefox-compatible fallback with an explicit count -->
+<div class="animate-stagger-forward-250/3">
   <!-- 250ms intervals between 3 items -->
 </div>
 ```
 
-**Pattern:** `animation-delay-{direction}-{interval}/{count}`
+**Pattern:** `animate-stagger-{direction}-{interval}` · `animate-stagger-{direction}-{interval}/[{count}]`
 
 ---
 
@@ -328,9 +336,10 @@ Use any custom value for precise control:
 
 | Class | Description |
 |-------|-------------|
-| `animation-delay-forward-{interval}/{count}` | Sequential forward delays |
-| `animation-delay-backward-{interval}/{count}` | Sequential reverse delays |
-| `animation-delay-forward-[{ms}]/[{count}]` | Custom arbitrary stagger |
+| `animate-stagger-forward-{interval}` | Count-free forward stagger via `sibling-index()` (Chrome/Edge/Safari) |
+| `animate-stagger-backward-{interval}` | Count-free reverse stagger via `sibling-count()` |
+| `animate-stagger-forward-{interval}/[{count}]` | `:nth-child` fallback for Firefox |
+| `animate-stagger-backward-{interval}/[{count}]` | Reverse `:nth-child` fallback for Firefox |
 
 ### Transform Animations
 

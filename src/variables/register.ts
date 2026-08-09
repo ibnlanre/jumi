@@ -41,6 +41,11 @@ export const animationRegister: CssInJs = {
     'initial-value': 'ease',
     'syntax': '"ease | linear | ease-in | ease-out | ease-in-out | step-start | step-end"',
   },
+  '@property --jumi-stagger-animation-delay': {
+    'inherits': 'false',
+    'initial-value': '0s',
+    'syntax': '"<time>"',
+  },
 }
 
 export const transitionRegister: CssInJs = {

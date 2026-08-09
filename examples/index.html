@@ -327,13 +327,13 @@
       <section class="p-6 bg-white rounded-lg shadow-lg">
         <h2 class="mb-4 text-2xl font-semibold">Stagger Animations</h2>
         <p class="mb-4 text-gray-600">
-          Sequential animations with automatic delay calculation using CSS calc()
+          Sequential animations with automatic delay calculation using CSS calc() and sibling-index()
         </p>
         
         <!-- Basic Stagger -->
         <div class="mb-6">
           <h3 class="mb-2 font-medium">Basic Stagger (100ms intervals)</h3>
-          <div class="flex gap-2 p-4 *:even:bg-blue-500 *:odd:bg-lime-500 *:odd:animate-background-color-yellow-500 *:rounded *:even:animate-background-color-purple-500 *:size-12 *:even:animations *:odd:animations bg-gray-100 rounded animation-delay-forward-100/5 *:even:animate-bounce-in-up *:odd:animate-bounce-in-down *:animation-duration-2000 *:animation-iteration-count-infinite *:animation-direction-alternate">
+          <div class="flex gap-2 p-4 *:even:bg-blue-500 *:odd:bg-lime-500 *:odd:animate-background-color-yellow-500 *:rounded *:even:animate-background-color-purple-500 *:size-12 *:animations bg-gray-100 rounded animate-stagger-forward-100 even:animate-bounce-in-up *:odd:animate-bounce-in-down *:animation-duration-2000 *:animation-iteration-count-infinite *:animation-direction-alternate">
             <div></div>
             <div></div>
             <div></div>
@@ -345,7 +345,7 @@
         <!-- Reverse Stagger -->
         <div class="mb-6">
           <h3 class="mb-2 font-medium">Reverse Stagger (150ms intervals)</h3>
-          <div class="flex gap-2 p-4 bg-gray-100 rounded animation-delay-backward-150/5 *:animations *:size-12 *:bg-green-500 *:rounded *:animate-slide-in-up *:animation-duration-1500 *:animation-iteration-count-infinite *:animation-direction-alternate">
+          <div class="flex gap-2 p-4 bg-gray-100 rounded animate-stagger-backward-150 *:animations *:size-12 *:bg-green-500 *:rounded *:animate-slide-in-up *:animation-duration-1500 *:animation-iteration-count-infinite *:animation-direction-alternate">
             <div></div>
             <div></div>
             <div></div>
@@ -357,7 +357,7 @@
         <!-- Custom Stagger with Modifier -->
         <div class="mb-6">
           <h3 class="mb-2 font-medium">Custom Stagger (300ms intervals, 8 children max)</h3>
-          <div class="grid grid-cols-4 gap-2 p-4 bg-gray-100 rounded *:rounded animation-delay-forward-300/[8] *:size-12 *:bg-purple-500 *:animations *:animate-zoom-in *:animation-duration-3000 *:animation-iteration-count-infinite *:animation-direction-alternate">
+          <div class="grid grid-cols-4 gap-2 p-4 bg-gray-100 rounded *:rounded animate-stagger-forward-300/8 *:size-12 *:bg-purple-500 *:animations *:animate-zoom-in *:animation-duration-3000 *:animation-iteration-count-infinite *:animation-direction-alternate">
             <div></div>
             <div></div>
             <div></div>
@@ -625,7 +625,7 @@
           <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
             <h3 class="mb-2 font-medium">Background Color</h3>
             <div
-              class="mx-auto bg-gray-300 rounded size-16 animations transitions animate-background-color-blue-500 animation-duration-1500 transition-duration-500 hover:bg-purple-500"
+              class="mx-auto bg-gray-300 rounded size-16 animations hover:animations transitions animate-background-color-blue-500 animation-duration-1500 transition-duration-500 hover:animate-background-color-purple-500"
             ></div>
             <p class="mt-2 text-xs text-gray-500">bg → blue (anim) → purple (hover)</p>
           </div>
@@ -663,7 +663,7 @@
           <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
             <h3 class="mb-2 font-medium">Border Radius</h3>
             <div
-              class="mx-auto rounded-sm size-16 bg-cyan-500 animations transitions animate-border-radius-4xl animation-duration-2000 transition-duration-500 hover:animate-border-radius-sm"
+              class="mx-auto rounded-sm size-16 bg-cyan-500 animations hover:animations transitions animate-border-radius-4xl animation-duration-2000 transition-duration-500 hover:animate-border-radius-sm"
             ></div>
             <p class="mt-2 text-xs text-gray-500">rounded-sm → 3xl (anim) → rounded-sm (hover)</p>
           </div>
@@ -672,7 +672,7 @@
           <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
             <h3 class="mb-2 font-medium">Box Shadow</h3>
             <div
-              class="mx-auto rounded size-16 bg-rose-500 animations transitions animate-box-shadow-xl animation-duration-1500 transition-duration-500 hover:animate-shadow-none"
+              class="mx-auto rounded size-16 bg-rose-500 animations hover:animations transitions animate-box-shadow-xl animation-duration-1500 transition-duration-500 hover:animate-box-shadow-none"
             ></div>
             <p class="mt-2 text-xs text-gray-500">shadow appears (anim), disappears (hover)</p>
           </div>
@@ -681,7 +681,7 @@
           <div class="p-4 overflow-hidden text-center bg-gray-100 rounded">
             <h3 class="mb-2 font-medium">Transform Combo</h3>
             <div
-              class="mx-auto rounded size-16 bg-violet-500 animations transitions animate-translate-x-8 animate-rotate-45 animation-duration-2000 animation-delay-1000/rotate transition-duration-500 hover:animate-translate-x-0 hover:animate-rotate-0"
+              class="mx-auto rounded size-16 bg-violet-500 animations hover:animations transitions animate-translate-8 animate-rotate-45 animation-duration-2000 animation-delay-1000/rotate transition-duration-500 hover:animate-translate-0 hover:animate-rotate-0 hover:animation-delay-0/rotate hover:animation-duration-500"
             ></div>
             <p class="mt-2 text-xs text-gray-500">slide + rotate (anim), reset (hover)</p>
           </div>
@@ -691,7 +691,7 @@
             <h3 class="mb-2 font-medium">SVG Fill</h3>
             <svg class="mx-auto size-16" viewBox="0 0 24 24">
               <path
-                class="animations transitions animate-fill-blue-500 animation-duration-2000 transition-duration-500 hover:animate-fill-red-500"
+                class="animations hover:animations transitions animate-fill-blue-500 animation-duration-2000 transition-duration-500 hover:animate-fill-red-500"
                 d="M12 2L3.09 8.26L4 21L12 17L20 21L20.91 8.26L12 2Z"
                 fill="currentColor"
               />
@@ -716,53 +716,55 @@
         </div>
       </section>
 
-      <!-- Multi-stop keyframe stops via /[N] arbitrary modifier -->
+      <!-- Aliased /[N] Animations -->
       <section class="p-6 bg-white rounded-lg shadow-lg">
-        <h2 class="mb-4 text-2xl font-semibold">Multi-stop /[N] Keyframes</h2>
+        <h2 class="mb-4 text-2xl font-semibold">Aliased /[N] Animations</h2>
         <p class="mb-6 text-gray-600">
-          Pin a property's value at an arbitrary timeline stop with the
+          Give a per-value animation a NAME — not a percentage — with the
           <code class="px-1 text-sm bg-gray-200 rounded">/[...]</code> modifier
-          (e.g. <code class="px-1 text-sm bg-gray-200 rounded">animate-width-8/[25]</code>).
-          Each stop writes its own
-          <code class="px-1 text-sm bg-gray-200 rounded">--jumi-{attr}-{stop}</code>
-          variable; the shared <code class="px-1 text-sm bg-gray-200 rounded">jumi-{attr}-stops</code>
-          keyframe interpolates between the pinned stops.
+          (e.g. <code class="px-1 text-sm bg-gray-200 rounded">animate-width-32/[1]</code>
+          → keyframe <code class="px-1 text-sm bg-gray-200 rounded">jumi-width-1</code>).
+          Aliases replace the opaque auto-generated id, so several animations on the
+          same element coexist as independent self-timed slots, each timed with
+          <code class="px-1 text-sm bg-gray-200 rounded">animation-delay-{ms}/[{attr}.{N}]</code> and
+          <code class="px-1 text-sm bg-gray-200 rounded">animation-duration-{ms}/[{attr}.{N}]</code>.
+          A delayed alias takes over its property when it fires, so aliases chain into a sequence.
         </p>
         <div class="grid grid-cols-2 gap-6 md:grid-cols-4">
-          <!-- Two stops: 0% → 100% -->
+          <!-- Aliased blend: two aliases on width chain via per-alias delay -->
           <div class="p-4 overflow-hidden text-center bg-blue-100 rounded">
-            <h3 class="mb-2 font-medium">0% → 100%</h3>
+            <h3 class="mb-2 font-medium">Aliased blend</h3>
             <div
-              class="mx-auto bg-blue-600 size-8 animations animate-width-8/[0] animate-width-32/[100] animation-duration-3000 animation-iteration-count-infinite animation-direction-alternate"
+              class="mx-auto bg-blue-600 size-8 animations animate-width-24/[1] animate-width-32/[2] animation-duration-2000 animation-delay-500/[width.2] animation-direction-alternate animation-iteration-count-infinite"
             ></div>
-            <p class="mt-2 text-xs text-gray-500">32px → 128px</p>
+            <p class="mt-2 text-xs text-gray-500">width 24 then 32; [2] takes over at 500ms</p>
           </div>
 
-          <!-- Pinned start + end (handoff) -->
+          <!-- Per-alias delay scopes a single alias -->
           <div class="p-4 overflow-hidden text-center bg-green-100 rounded">
-            <h3 class="mb-2 font-medium">Pinned start (handoff)</h3>
+            <h3 class="mb-2 font-medium">Per-alias delay</h3>
             <div
-              class="mx-auto bg-green-600 size-8 animations animate-width-8/[0] animate-width-24/[100] animation-duration-3000 animation-iteration-count-infinite animation-direction-alternate"
+              class="mx-auto bg-green-600 size-8 animations animate-scale-125/[1] animation-duration-2000 animation-delay-1000/[scale.1] animation-direction-alternate animation-iteration-count-infinite"
             ></div>
-            <p class="mt-2 text-xs text-gray-500">32px → 96px, start pinned</p>
+            <p class="mt-2 text-xs text-gray-500">scale.1 delayed 1000ms</p>
           </div>
 
-          <!-- Nested pseudo-element stops -->
+          <!-- Per-alias duration scopes a single alias -->
           <div class="p-4 overflow-hidden text-center bg-purple-100 rounded">
-            <h3 class="mb-2 font-medium">Pseudo-element stops</h3>
+            <h3 class="mb-2 font-medium">Per-alias duration</h3>
             <div
-              class="relative mx-auto bg-purple-600 size-8 before:animations before:absolute before:inset-0 before:bg-yellow-400 before:animate-opacity-0/[0] before:animate-opacity-100/[100] before:animation-duration-3000 before:animation-iteration-count-infinite before:animation-direction-alternate"
+              class="mx-auto bg-purple-600 size-8 animations animate-rotate-90/[1] animation-duration-3000/[rotate.1] animation-direction-alternate animation-iteration-count-infinite"
             ></div>
-            <p class="mt-2 text-xs text-gray-500">opacity 0 → 100 on ::before</p>
+            <p class="mt-2 text-xs text-gray-500">rotate.1 runs 3000ms</p>
           </div>
 
-          <!-- Two-stop non-color -->
+          <!-- Same alias id is scoped per property -->
           <div class="p-4 overflow-hidden text-center rounded bg-rose-100">
-            <h3 class="mb-2 font-medium">Two-stop</h3>
+            <h3 class="mb-2 font-medium">Same alias, per property</h3>
             <div
-              class="mx-auto bg-rose-600 size-8 animations animate-scale-50/[0] animate-scale-150/[100] animation-duration-3000 animation-iteration-count-infinite animation-direction-alternate"
+              class="mx-auto bg-rose-600 size-8 animations animate-width-24/[1] animate-scale-125/[1] animate-rotate-45/[1] animation-duration-2000 animation-direction-alternate animation-iteration-count-infinite"
             ></div>
-            <p class="mt-2 text-xs text-gray-500">scale 50% → 150%</p>
+            <p class="mt-2 text-xs text-gray-500">[1] is scoped per property</p>
           </div>
         </div>
       </section>

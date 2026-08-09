@@ -1,6 +1,5 @@
 import type { GetMatchUtilities, MatchProperty } from '@/types'
 
-import { css } from '@/helpers/css'
 import { merge } from '@/helpers/merge'
 import { cssEffects } from '@/keyframes/effects'
 import { cssProperties } from '@/keyframes/property'
@@ -15,16 +14,41 @@ import { animationTimelineAxis } from '@/theme/animation-timeline-axis'
 import { animationTimelineInset } from '@/theme/animation-timeline-inset'
 import { animationTimelineScroller } from '@/theme/animation-timeline-scroller'
 import { animationTimingFunction } from '@/theme/animation-timing-function'
-import { count } from '@/theme/count'
 import { empty } from '@/theme/empty'
 import { percentage } from '@/theme/percentage'
 import { transitionBehavior } from '@/theme/transition-behavior'
 
 export const getMatchControls: GetMatchUtilities = (creator) => {
-  const { motion, theme } = creator
+  const { scope, stagger, theme, transition } = creator
   const modifiers = merge(cssProperties, cssEffects)
 
   const matchControls: Partial<MatchProperty> = {
+    // Stagger: distributes the stagger input across direct children at
+    // `interval` steps — forward (0, 1×, 2×, …) or backward ((count-1)×, …, 1×,
+    // 0). Each direction is just an expression over `{ value, length, index }`:
+    // `index` is `null` for the count-free adaptive form (dynamic
+    // `sibling-index()`/`sibling-count()`, Chrome/Edge/Safari) and a 0-based
+    // number for the `:nth-child` Firefox fallback. `stagger` supplies the
+    // `--jumi-stagger-animation-delay` variable, the `@supports` layering, and
+    // the adaptive-rule preference.
+    'animate-stagger-backward': {
+      fn: stagger('animation-delay', ({ index, length, value }) =>
+        index === null
+          ? `calc((sibling-count() - sibling-index()) * ${value})`
+          : `calc(${value} * ${length - 1 - index})`,
+      ),
+      modifiers: 'any',
+      values: theme('transitionDelay'),
+    },
+    'animate-stagger-forward': {
+      fn: stagger('animation-delay', ({ index, value }) =>
+        index === null
+          ? `calc((sibling-index() - 1) * ${value})`
+          : `calc(${value} * ${index})`,
+      ),
+      modifiers: 'any',
+      values: theme('transitionDelay'),
+    },
     'animation-composition': {
       fn: (value, { modifier }) => {
         if (!modifier) return { '--jumi-animation-composition': value }
@@ -34,70 +58,27 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
       values: animationComposition,
     },
     'animation-delay': {
-      fn: (value, { modifier }) => {
-        if (!modifier) return { '--jumi-animation-delay': value }
-        return { [`--jumi-${modifier}-animation-delay`]: value }
-      },
+      fn: scope('animation-delay'),
       modifiers,
       values: theme('transitionDelay'),
     },
-    'animation-delay-backward': {
-      fn: (value, { modifier }) => {
-        const length = modifier ? parseInt(modifier) : 3
-
-        return Object.fromEntries(
-          Array.from({ length }, (_, index) => [
-            `& > ${css(':nth-child', index + 1)}`,
-            { '--jumi-animation-delay': `calc(${value} * ${length - index - 1})` },
-          ]),
-        )
-      },
-      modifiers: count,
-      values: theme('transitionDelay'),
-    },
-    'animation-delay-forward': {
-      fn: (value, { modifier }) => {
-        const length = modifier ? parseInt(modifier) : 3
-
-        return Object.fromEntries(
-          Array.from({ length }, (_, index) => [
-            `& > ${css(':nth-child', index + 1)}`,
-            { '--jumi-animation-delay': `calc(${value} * ${index})` },
-          ]),
-        )
-      },
-      modifiers: count,
-      values: theme('transitionDelay'),
-    },
     'animation-direction': {
-      fn: (value, { modifier }) => {
-        if (!modifier) return { '--jumi-animation-direction': value }
-        return { [`--jumi-${modifier}-animation-direction`]: value }
-      },
+      fn: scope('animation-direction'),
       modifiers,
       values: animationDirection,
     },
     'animation-duration': {
-      fn: (value, { modifier }) => {
-        if (!modifier) return { '--jumi-animation-duration': value }
-        return { [`--jumi-${modifier}-animation-duration`]: value }
-      },
+      fn: scope('animation-duration'),
       modifiers,
       values: theme('transitionDuration'),
     },
     'animation-fill-mode': {
-      fn: (value, { modifier }) => {
-        if (!modifier) return { '--jumi-animation-fill-mode': value }
-        return { [`--jumi-${modifier}-animation-fill-mode`]: value }
-      },
+      fn: scope('animation-fill-mode'),
       modifiers,
       values: animationFillMode,
     },
     'animation-iteration-count': {
-      fn: (value, { modifier }) => {
-        if (!modifier) return { '--jumi-animation-iteration-count': value }
-        return { [`--jumi-${modifier}-animation-iteration-count`]: value }
-      },
+      fn: scope('animation-iteration-count'),
       modifiers,
       type: 'number',
       values: animationIterationCount,
@@ -111,10 +92,7 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
       values: empty.none,
     },
     'animation-play-state': {
-      fn: (value, { modifier }) => {
-        if (!modifier) return { '--jumi-animation-play-state': value }
-        return { [`--jumi-${modifier}-animation-play-state`]: value }
-      },
+      fn: scope('animation-play-state'),
       modifiers,
       values: animationPlayState,
     },
@@ -222,10 +200,7 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
       values: animationTimelineScroller,
     },
     'animation-timing-function': {
-      fn: (value, { modifier }) => {
-        if (!modifier) return { '--jumi-animation-timing-function': value }
-        return { [`--jumi-${modifier}-animation-timing-function`]: value }
-      },
+      fn: scope('animation-timing-function'),
       modifiers,
       values: animationTimingFunction,
     },
@@ -242,34 +217,22 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
       values: transitionBehavior,
     },
     'transition-delay': {
-      fn: (value, { modifier }) => {
-        if (!modifier) return { ...(value && { '--jumi-transition-delay': value }) }
-        return { [`--jumi-${modifier}-transition-delay`]: value }
-      },
+      fn: transition('delay'),
       modifiers: cssProperties,
       values: theme('transitionDelay'),
     },
     'transition-duration': {
-      fn: (value, { modifier }) => {
-        if (!modifier) return { ...(value && { '--jumi-transition-duration': value }) }
-        return { [`--jumi-${modifier}-transition-duration`]: value }
-      },
+      fn: transition('duration'),
       modifiers: cssProperties,
       values: theme('transitionDuration'),
     },
     'transition-property': {
-      fn: (value, { modifier }) => {
-        if (!modifier) return { ...(value && { '--jumi-transition-property': value }) }
-        return { [`--jumi-${modifier}-transition-property`]: motion(modifier) }
-      },
+      fn: transition('property'),
       modifiers: cssProperties,
       values: empty.string,
     },
     'transition-timing-function': {
-      fn: (value, { modifier }) => {
-        if (!modifier) return { ...(value && { '--jumi-transition-timing-function': value }) }
-        return { [`--jumi-${modifier}-transition-timing-function`]: value }
-      },
+      fn: transition('timing-function'),
       modifiers: cssProperties,
       values: animationTimingFunction,
     },

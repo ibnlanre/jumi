@@ -53,12 +53,15 @@
     "@stylistic/eslint-plugin": "^5.5.0",
     "@tailwindcss/cli": "^4.1.17",
     "@tailwindcss/vite": "^4.1.17",
+    "@types/css.escape": "^1.5.2",
+    "@types/culori": "^4.0.1",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@typescript-eslint/parser": "^8.46.4",
     "@vitest/coverage-v8": "4.0.9",
     "@vitest/eslint-plugin": "^1.4.2",
+    "css.escape": "^1.5.1",
     "csstype": "^3.2.1",
     "eslint": "^9.39.1",
     "eslint-import-resolver-typescript": "^4.4.4",
@@ -90,6 +93,7 @@
     "url": "https://github.com/ibnlanre/jumi"
   },
   "dependencies": {
+    "culori": "^4.0.2",
     "glob": "^11.0.3",
     "shorthash2": "^1.0.5"
   }

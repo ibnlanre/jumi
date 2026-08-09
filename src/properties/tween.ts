@@ -872,7 +872,7 @@ export const getMatchTween: GetMatchComponents = (creator) => {
       values: emptyCells,
     },
     'animate-fill': {
-      fn: color('fill'),
+      fn: color('fill', [], { paint: true }),
       type: ['color', 'url', 'any'],
       values: theme('colors', fill),
     },
@@ -2081,7 +2081,7 @@ export const getMatchTween: GetMatchComponents = (creator) => {
       values: theme('skew'),
     },
     'animate-stroke': {
-      fn: color('stroke'),
+      fn: color('stroke', [], { paint: true }),
       type: ['color', 'url', 'any'],
       values: theme('colors', stroke),
     },

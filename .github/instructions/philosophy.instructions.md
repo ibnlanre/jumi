@@ -333,23 +333,47 @@ Support per-property timing overrides:
 
 ## Stagger Animation System
 
-Implement stagger with CSS calc():
+Stagger distributes the stagger property's delay slot
+`--jumi-stagger-animation-delay` across direct children at `interval` steps —
+forward (0, 1×, 2×, …) or backward ((count-1)×, …, 1×, 0). It follows the
+standard `--jumi-{property}-animation-delay` slot shape — 'stagger' is just the
+property, like `rotate` in `--jumi-rotate-animation-delay`. The base delay reads
+it via `var(--jumi-stagger-animation-delay, 0s)`, so the stagger composes with,
+rather than overwrites, `--jumi-animation-delay`; and the same
+`--jumi-stagger-animation-{part}` shape can feed any animation part (delay
+today; duration, timing-function, … later).
+
+**Count-free (primary):** no modifier emits a single adaptive rule using the
+numeric `sibling-index()` / `sibling-count()` functions (Chrome/Edge/Safari).
+It adapts to any list length — no count is needed:
+
+```css
+.animate-stagger-forward-100 > * {
+  --jumi-stagger-animation-delay: calc((sibling-index() - 1) * 100ms);
+}
+.animate-stagger-backward-150 > * {
+  --jumi-stagger-animation-delay: calc((sibling-count() - sibling-index()) * 150ms);
+}
+```
+
+**`/[count]` fallback (Firefox):** Firefox lacks the `sibling-*` functions, so a
+`/[count]` modifier emits `:nth-child` enumeration. Supporting engines still
+prefer the adaptive rule via `@supports`, so the count is a compatibility hint,
+not a hard limit:
 
 ```typescript
-// Forward stagger pattern
-'animation-delay-forward-{interval}/{count}': {
-  // Creates delays: 0ms, interval*1, interval*2, ..., interval*(count-1)
-  // Example: animation-delay-forward-100/5
-  // Child 1: 0ms, Child 2: 100ms, Child 3: 200ms, Child 4: 300ms, Child 5: 400ms
-},
-
-// Backward stagger pattern
-'animation-delay-backward-{interval}/{count}': {
-  // Creates delays in reverse: interval*(count-1), ..., interval*1, 0ms
-  // Example: animation-delay-backward-150/4
-  // Child 1: 450ms, Child 2: 300ms, Child 3: 150ms, Child 4: 0ms
+// Forward stagger pattern with Firefox fallback
+'animate-stagger-forward-{interval}/[{count}]': {
+  // Emits the adaptive sibling-index() rule, plus an `:nth-child` fallback
+  // wrapped in `@supports not (animation-delay: calc(sibling-index() * 1ms))`
+  // for Firefox. Example: animate-stagger-forward-100/5
+  // Chrome/Edge/Safari: all children, adaptive. Firefox: child N gets
+  // calc(100ms * (N-1)) for N in 1..5.
 },
 ```
+
+Prefer count-free (`animate-stagger-{direction}-{interval}`); add `/{count}`
+only when Firefox support is required.
 
 ## Tailwind v4 Integration
 

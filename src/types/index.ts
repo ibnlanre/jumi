@@ -484,14 +484,17 @@ export type CounterFunction
 
 export interface Creator {
   get animations(): CssInJs;
-  color(attribute: AnimatableStandardPropertyType, parts?: PropertyParts): MatchComponentsPropertyFunction;
+  color(attribute: AnimatableStandardPropertyType, parts?: PropertyParts, options?: { paint?: boolean }): MatchComponentsPropertyFunction;
   effect(attribute: string): string;
   readonly effects: string[];
   motion(attribute: string): string;
   readonly motions: string[];
   readonly properties: string[];
   property(attribute: AnimatableStandardPropertyType, parts?: PropertyParts): MatchComponentsPropertyFunction;
+  scope(part: string): MatchUtilitiesPropertyFunction;
+  stagger(part: string, expression: (context: StaggerContext) => string): MatchUtilitiesPropertyFunction;
   theme: (key: TailwindTheme, values?: Collection) => Record<string, string>;
+  transition(part: string): MatchUtilitiesPropertyFunction;
   get transitions(): CssInJs;
 }
 
@@ -918,10 +921,13 @@ export interface MatchUtilitiesOptions {
   values: Collection<string>
 }
 
-export type MatchUtilitiesPropertyFunction = (value: string, extra: { modifier: null | string }) => CSSRuleObject
+export type MatchUtilitiesPropertyFunction = (
+  value: string,
+  extra: { modifier: null | string },
+) => CssInJs | CssInJs[]
 
 export type MatchUtilitiesPropertyKey =
-  | 'animation-delay-backward' | 'animation-delay-forward' | 'animations'
+  | 'animate-stagger-backward' | 'animate-stagger-forward' | 'animations'
   | 'transitions' | AnimationPropertyType | TransitionPropertyType
 
 export interface MatchUtilitiesPropertyValue extends MatchUtilitiesOptions {
@@ -1204,6 +1210,13 @@ export type SkewFunction
   = | 'skew'
     | 'skewX'
     | 'skewY'
+
+// Stagger expression context: `index`/`length` are `null` for the count-free
+// adaptive form (dynamic `sibling-index()`/`sibling-count()`) and 0-based
+// numbers for the `:nth-child` Firefox fallback.
+export type StaggerContext =
+  | { index: null; length: null; value: string; }
+  | { index: number; length: number; value: string; }
 
 export type StandardAnimationPropertyType
   = | 'animation'

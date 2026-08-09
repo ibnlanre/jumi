@@ -145,7 +145,12 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-animation-composition',
   },
   'animation-delay': {
-    value: '0s',
+    // Base delay reads the stagger property's delay slot
+    // (`--jumi-stagger-animation-delay`, the standard `--jumi-{property}-animation-delay`
+    // shape), so `animate-stagger-*` can drive children's delays without
+    // overwriting `--jumi-animation-delay` itself. This is the single
+    // consumption point — the per-slot builders stay generic.
+    value: 'var(--jumi-stagger-animation-delay, 0s)',
     variable: '--jumi-animation-delay',
   },
   'animation-direction': {
