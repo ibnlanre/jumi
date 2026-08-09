@@ -2,15 +2,3 @@
 
 @source "./index.html";
 @plugin '../dist/index.js';
-
-@theme {
-  @keyframes jumi-wiggle {
-    0%,
-    100% {
-      transform: rotate(-3deg);
-    }
-    50% {
-      transform: rotate(3deg);
-    }
-  }
-}
