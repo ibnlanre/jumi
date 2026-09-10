@@ -1,0 +1,914 @@
+[
+  {
+    "name": "accordion",
+    "className": "animate-accordion"
+  },
+  {
+    "name": "arc-bottom-left",
+    "className": "animate-arc-bottom-left"
+  },
+  {
+    "name": "arc-bottom-right",
+    "className": "animate-arc-bottom-right"
+  },
+  {
+    "name": "arc-top-left",
+    "className": "animate-arc-top-left"
+  },
+  {
+    "name": "arc-top-right",
+    "className": "animate-arc-top-right"
+  },
+  {
+    "name": "back-in",
+    "className": "animate-back-in"
+  },
+  {
+    "name": "back-in-down",
+    "className": "animate-back-in-down"
+  },
+  {
+    "name": "back-in-left",
+    "className": "animate-back-in-left"
+  },
+  {
+    "name": "back-in-right",
+    "className": "animate-back-in-right"
+  },
+  {
+    "name": "back-in-up",
+    "className": "animate-back-in-up"
+  },
+  {
+    "name": "blink",
+    "className": "animate-blink"
+  },
+  {
+    "name": "blur-in",
+    "className": "animate-blur-in"
+  },
+  {
+    "name": "blur-out",
+    "className": "animate-blur-out"
+  },
+  {
+    "name": "bounce-in",
+    "className": "animate-bounce-in"
+  },
+  {
+    "name": "bounce-in-down",
+    "className": "animate-bounce-in-down"
+  },
+  {
+    "name": "bounce-in-left",
+    "className": "animate-bounce-in-left"
+  },
+  {
+    "name": "bounce-in-right",
+    "className": "animate-bounce-in-right"
+  },
+  {
+    "name": "bounce-in-up",
+    "className": "animate-bounce-in-up"
+  },
+  {
+    "name": "bounce-out",
+    "className": "animate-bounce-out"
+  },
+  {
+    "name": "bounce-out-down",
+    "className": "animate-bounce-out-down"
+  },
+  {
+    "name": "bounce-out-left",
+    "className": "animate-bounce-out-left"
+  },
+  {
+    "name": "bounce-out-right",
+    "className": "animate-bounce-out-right"
+  },
+  {
+    "name": "bounce-out-up",
+    "className": "animate-bounce-out-up"
+  },
+  {
+    "name": "bubble",
+    "className": "animate-bubble"
+  },
+  {
+    "name": "circle-in",
+    "className": "animate-circle-in"
+  },
+  {
+    "name": "circle-in-bottom-left",
+    "className": "animate-circle-in-bottom-left"
+  },
+  {
+    "name": "circle-in-bottom-right",
+    "className": "animate-circle-in-bottom-right"
+  },
+  {
+    "name": "circle-in-top-left",
+    "className": "animate-circle-in-top-left"
+  },
+  {
+    "name": "circle-in-top-right",
+    "className": "animate-circle-in-top-right"
+  },
+  {
+    "name": "circle-out",
+    "className": "animate-circle-out"
+  },
+  {
+    "name": "circle-out-bottom-left",
+    "className": "animate-circle-out-bottom-left"
+  },
+  {
+    "name": "circle-out-bottom-right",
+    "className": "animate-circle-out-bottom-right"
+  },
+  {
+    "name": "circle-out-top-left",
+    "className": "animate-circle-out-top-left"
+  },
+  {
+    "name": "circle-out-top-right",
+    "className": "animate-circle-out-top-right"
+  },
+  {
+    "name": "diamond-in",
+    "className": "animate-diamond-in"
+  },
+  {
+    "name": "diamond-out",
+    "className": "animate-diamond-out"
+  },
+  {
+    "name": "distort",
+    "className": "animate-distort"
+  },
+  {
+    "name": "drip",
+    "className": "animate-drip"
+  },
+  {
+    "name": "elastic",
+    "className": "animate-elastic"
+  },
+  {
+    "name": "expand-down",
+    "className": "animate-expand-down"
+  },
+  {
+    "name": "expand-left",
+    "className": "animate-expand-left"
+  },
+  {
+    "name": "expand-right",
+    "className": "animate-expand-right"
+  },
+  {
+    "name": "expand-up",
+    "className": "animate-expand-up"
+  },
+  {
+    "name": "explode",
+    "className": "animate-explode"
+  },
+  {
+    "name": "fade-in",
+    "className": "animate-fade-in"
+  },
+  {
+    "name": "fade-in-down",
+    "className": "animate-fade-in-down"
+  },
+  {
+    "name": "fade-in-left",
+    "className": "animate-fade-in-left"
+  },
+  {
+    "name": "fade-in-right",
+    "className": "animate-fade-in-right"
+  },
+  {
+    "name": "fade-in-up",
+    "className": "animate-fade-in-up"
+  },
+  {
+    "name": "fade-out",
+    "className": "animate-fade-out"
+  },
+  {
+    "name": "fade-out-down",
+    "className": "animate-fade-out-down"
+  },
+  {
+    "name": "fade-out-left",
+    "className": "animate-fade-out-left"
+  },
+  {
+    "name": "fade-out-right",
+    "className": "animate-fade-out-right"
+  },
+  {
+    "name": "fade-out-up",
+    "className": "animate-fade-out-up"
+  },
+  {
+    "name": "fall-down",
+    "className": "animate-fall-down"
+  },
+  {
+    "name": "fall-left",
+    "className": "animate-fall-left"
+  },
+  {
+    "name": "fall-right",
+    "className": "animate-fall-right"
+  },
+  {
+    "name": "fall-up",
+    "className": "animate-fall-up"
+  },
+  {
+    "name": "figure-eight",
+    "className": "animate-figure-eight"
+  },
+  {
+    "name": "flicker",
+    "className": "animate-flicker"
+  },
+  {
+    "name": "flip-card-x",
+    "className": "animate-flip-card-x"
+  },
+  {
+    "name": "flip-card-y",
+    "className": "animate-flip-card-y"
+  },
+  {
+    "name": "flip-diagonal",
+    "className": "animate-flip-diagonal"
+  },
+  {
+    "name": "flip-in-bottom",
+    "className": "animate-flip-in-bottom"
+  },
+  {
+    "name": "flip-in-left",
+    "className": "animate-flip-in-left"
+  },
+  {
+    "name": "flip-in-right",
+    "className": "animate-flip-in-right"
+  },
+  {
+    "name": "flip-in-top",
+    "className": "animate-flip-in-top"
+  },
+  {
+    "name": "flip-in-x",
+    "className": "animate-flip-in-x"
+  },
+  {
+    "name": "flip-in-y",
+    "className": "animate-flip-in-y"
+  },
+  {
+    "name": "flip-wobble-x",
+    "className": "animate-flip-wobble-x"
+  },
+  {
+    "name": "flip-wobble-y",
+    "className": "animate-flip-wobble-y"
+  },
+  {
+    "name": "flip-x",
+    "className": "animate-flip-x"
+  },
+  {
+    "name": "flip-x-elastic",
+    "className": "animate-flip-x-elastic"
+  },
+  {
+    "name": "flip-y",
+    "className": "animate-flip-y"
+  },
+  {
+    "name": "flip-y-elastic",
+    "className": "animate-flip-y-elastic"
+  },
+  {
+    "name": "flip-zoom-x",
+    "className": "animate-flip-zoom-x"
+  },
+  {
+    "name": "flip-zoom-y",
+    "className": "animate-flip-zoom-y"
+  },
+  {
+    "name": "floating",
+    "className": "animate-floating"
+  },
+  {
+    "name": "fold-in",
+    "className": "animate-fold-in"
+  },
+  {
+    "name": "fold-out",
+    "className": "animate-fold-out"
+  },
+  {
+    "name": "glitch",
+    "className": "animate-glitch"
+  },
+  {
+    "name": "glow",
+    "className": "animate-glow"
+  },
+  {
+    "name": "heart-beat",
+    "className": "animate-heart-beat"
+  },
+  {
+    "name": "hue-shift",
+    "className": "animate-hue-shift"
+  },
+  {
+    "name": "implode",
+    "className": "animate-implode"
+  },
+  {
+    "name": "jello",
+    "className": "animate-jello"
+  },
+  {
+    "name": "letter-space-in",
+    "className": "animate-letter-space-in"
+  },
+  {
+    "name": "letter-space-out",
+    "className": "animate-letter-space-out"
+  },
+  {
+    "name": "lift",
+    "className": "animate-lift"
+  },
+  {
+    "name": "magnetic",
+    "className": "animate-magnetic"
+  },
+  {
+    "name": "mask-bottom",
+    "className": "animate-mask-bottom"
+  },
+  {
+    "name": "mask-bottom-left",
+    "className": "animate-mask-bottom-left"
+  },
+  {
+    "name": "mask-bottom-right",
+    "className": "animate-mask-bottom-right"
+  },
+  {
+    "name": "mask-center",
+    "className": "animate-mask-center"
+  },
+  {
+    "name": "mask-left",
+    "className": "animate-mask-left"
+  },
+  {
+    "name": "mask-right",
+    "className": "animate-mask-right"
+  },
+  {
+    "name": "mask-top",
+    "className": "animate-mask-top"
+  },
+  {
+    "name": "mask-top-left",
+    "className": "animate-mask-top-left"
+  },
+  {
+    "name": "mask-top-right",
+    "className": "animate-mask-top-right"
+  },
+  {
+    "name": "melt",
+    "className": "animate-melt"
+  },
+  {
+    "name": "morph",
+    "className": "animate-morph"
+  },
+  {
+    "name": "neon",
+    "className": "animate-neon"
+  },
+  {
+    "name": "power-off",
+    "className": "animate-power-off"
+  },
+  {
+    "name": "power-on",
+    "className": "animate-power-on"
+  },
+  {
+    "name": "pulsing",
+    "className": "animate-pulsing"
+  },
+  {
+    "name": "reveal-down",
+    "className": "animate-reveal-down"
+  },
+  {
+    "name": "reveal-left",
+    "className": "animate-reveal-left"
+  },
+  {
+    "name": "reveal-right",
+    "className": "animate-reveal-right"
+  },
+  {
+    "name": "reveal-swipe",
+    "className": "animate-reveal-swipe"
+  },
+  {
+    "name": "reveal-up",
+    "className": "animate-reveal-up"
+  },
+  {
+    "name": "ripple",
+    "className": "animate-ripple"
+  },
+  {
+    "name": "rotate-left",
+    "className": "animate-rotate-left"
+  },
+  {
+    "name": "rotate-right",
+    "className": "animate-rotate-right"
+  },
+  {
+    "name": "rush-in-down",
+    "className": "animate-rush-in-down"
+  },
+  {
+    "name": "rush-in-left",
+    "className": "animate-rush-in-left"
+  },
+  {
+    "name": "rush-in-right",
+    "className": "animate-rush-in-right"
+  },
+  {
+    "name": "rush-in-up",
+    "className": "animate-rush-in-up"
+  },
+  {
+    "name": "rush-out-down",
+    "className": "animate-rush-out-down"
+  },
+  {
+    "name": "rush-out-left",
+    "className": "animate-rush-out-left"
+  },
+  {
+    "name": "rush-out-right",
+    "className": "animate-rush-out-right"
+  },
+  {
+    "name": "rush-out-up",
+    "className": "animate-rush-out-up"
+  },
+  {
+    "name": "scatter",
+    "className": "animate-scatter"
+  },
+  {
+    "name": "shadow",
+    "className": "animate-shadow"
+  },
+  {
+    "name": "shake",
+    "className": "animate-shake"
+  },
+  {
+    "name": "shimmer",
+    "className": "animate-shimmer"
+  },
+  {
+    "name": "skew-down",
+    "className": "animate-skew-down"
+  },
+  {
+    "name": "skew-in",
+    "className": "animate-skew-in"
+  },
+  {
+    "name": "skew-left",
+    "className": "animate-skew-left"
+  },
+  {
+    "name": "skew-left-down",
+    "className": "animate-skew-left-down"
+  },
+  {
+    "name": "skew-left-up",
+    "className": "animate-skew-left-up"
+  },
+  {
+    "name": "skew-out",
+    "className": "animate-skew-out"
+  },
+  {
+    "name": "skew-right",
+    "className": "animate-skew-right"
+  },
+  {
+    "name": "skew-right-down",
+    "className": "animate-skew-right-down"
+  },
+  {
+    "name": "skew-right-up",
+    "className": "animate-skew-right-up"
+  },
+  {
+    "name": "skew-up",
+    "className": "animate-skew-up"
+  },
+  {
+    "name": "slide-in-down",
+    "className": "animate-slide-in-down"
+  },
+  {
+    "name": "slide-in-down-elastic",
+    "className": "animate-slide-in-down-elastic"
+  },
+  {
+    "name": "slide-in-left",
+    "className": "animate-slide-in-left"
+  },
+  {
+    "name": "slide-in-right",
+    "className": "animate-slide-in-right"
+  },
+  {
+    "name": "slide-in-up",
+    "className": "animate-slide-in-up"
+  },
+  {
+    "name": "slide-in-up-elastic",
+    "className": "animate-slide-in-up-elastic"
+  },
+  {
+    "name": "slide-in-up-left",
+    "className": "animate-slide-in-up-left"
+  },
+  {
+    "name": "slide-in-up-right",
+    "className": "animate-slide-in-up-right"
+  },
+  {
+    "name": "slide-out-down",
+    "className": "animate-slide-out-down"
+  },
+  {
+    "name": "slide-out-left",
+    "className": "animate-slide-out-left"
+  },
+  {
+    "name": "slide-out-right",
+    "className": "animate-slide-out-right"
+  },
+  {
+    "name": "slide-out-up",
+    "className": "animate-slide-out-up"
+  },
+  {
+    "name": "slide-peek-down",
+    "className": "animate-slide-peek-down"
+  },
+  {
+    "name": "slide-peek-left",
+    "className": "animate-slide-peek-left"
+  },
+  {
+    "name": "slide-peek-right",
+    "className": "animate-slide-peek-right"
+  },
+  {
+    "name": "slide-peek-up",
+    "className": "animate-slide-peek-up"
+  },
+  {
+    "name": "slide-stack",
+    "className": "animate-slide-stack"
+  },
+  {
+    "name": "spin",
+    "className": "animate-spin"
+  },
+  {
+    "name": "spiral",
+    "className": "animate-spiral"
+  },
+  {
+    "name": "spiral-back-in",
+    "className": "animate-spiral-back-in"
+  },
+  {
+    "name": "spiral-back-out",
+    "className": "animate-spiral-back-out"
+  },
+  {
+    "name": "spiral-in",
+    "className": "animate-spiral-in"
+  },
+  {
+    "name": "spiral-out",
+    "className": "animate-spiral-out"
+  },
+  {
+    "name": "spiral-path",
+    "className": "animate-spiral-path"
+  },
+  {
+    "name": "splash",
+    "className": "animate-splash"
+  },
+  {
+    "name": "spring-down",
+    "className": "animate-spring-down"
+  },
+  {
+    "name": "spring-left",
+    "className": "animate-spring-left"
+  },
+  {
+    "name": "spring-right",
+    "className": "animate-spring-right"
+  },
+  {
+    "name": "spring-up",
+    "className": "animate-spring-up"
+  },
+  {
+    "name": "square-in",
+    "className": "animate-square-in"
+  },
+  {
+    "name": "square-in-bottom-left",
+    "className": "animate-square-in-bottom-left"
+  },
+  {
+    "name": "square-in-bottom-right",
+    "className": "animate-square-in-bottom-right"
+  },
+  {
+    "name": "square-in-top-left",
+    "className": "animate-square-in-top-left"
+  },
+  {
+    "name": "square-in-top-right",
+    "className": "animate-square-in-top-right"
+  },
+  {
+    "name": "square-out",
+    "className": "animate-square-out"
+  },
+  {
+    "name": "square-out-bottom-left",
+    "className": "animate-square-out-bottom-left"
+  },
+  {
+    "name": "square-out-bottom-right",
+    "className": "animate-square-out-bottom-right"
+  },
+  {
+    "name": "square-out-top-left",
+    "className": "animate-square-out-top-left"
+  },
+  {
+    "name": "square-out-top-right",
+    "className": "animate-square-out-top-right"
+  },
+  {
+    "name": "swing",
+    "className": "animate-swing"
+  },
+  {
+    "name": "tada",
+    "className": "animate-tada"
+  },
+  {
+    "name": "throw-down",
+    "className": "animate-throw-down"
+  },
+  {
+    "name": "throw-left",
+    "className": "animate-throw-left"
+  },
+  {
+    "name": "throw-right",
+    "className": "animate-throw-right"
+  },
+  {
+    "name": "throw-up",
+    "className": "animate-throw-up"
+  },
+  {
+    "name": "tilt",
+    "className": "animate-tilt"
+  },
+  {
+    "name": "triangle-in",
+    "className": "animate-triangle-in"
+  },
+  {
+    "name": "triangle-in-bottom-left",
+    "className": "animate-triangle-in-bottom-left"
+  },
+  {
+    "name": "triangle-in-bottom-right",
+    "className": "animate-triangle-in-bottom-right"
+  },
+  {
+    "name": "triangle-in-top-left",
+    "className": "animate-triangle-in-top-left"
+  },
+  {
+    "name": "triangle-in-top-right",
+    "className": "animate-triangle-in-top-right"
+  },
+  {
+    "name": "triangle-out",
+    "className": "animate-triangle-out"
+  },
+  {
+    "name": "triangle-out-bottom-left",
+    "className": "animate-triangle-out-bottom-left"
+  },
+  {
+    "name": "triangle-out-bottom-right",
+    "className": "animate-triangle-out-bottom-right"
+  },
+  {
+    "name": "triangle-out-top-left",
+    "className": "animate-triangle-out-top-left"
+  },
+  {
+    "name": "triangle-out-top-right",
+    "className": "animate-triangle-out-top-right"
+  },
+  {
+    "name": "twist",
+    "className": "animate-twist"
+  },
+  {
+    "name": "twist-in",
+    "className": "animate-twist-in"
+  },
+  {
+    "name": "twist-out",
+    "className": "animate-twist-out"
+  },
+  {
+    "name": "typing",
+    "className": "animate-typing"
+  },
+  {
+    "name": "unfold-x",
+    "className": "animate-unfold-x"
+  },
+  {
+    "name": "unfold-y",
+    "className": "animate-unfold-y"
+  },
+  {
+    "name": "unmask",
+    "className": "animate-unmask"
+  },
+  {
+    "name": "unmask-bottom",
+    "className": "animate-unmask-bottom"
+  },
+  {
+    "name": "unmask-bottom-left",
+    "className": "animate-unmask-bottom-left"
+  },
+  {
+    "name": "unmask-bottom-right",
+    "className": "animate-unmask-bottom-right"
+  },
+  {
+    "name": "unmask-left",
+    "className": "animate-unmask-left"
+  },
+  {
+    "name": "unmask-right",
+    "className": "animate-unmask-right"
+  },
+  {
+    "name": "unmask-top",
+    "className": "animate-unmask-top"
+  },
+  {
+    "name": "unmask-top-left",
+    "className": "animate-unmask-top-left"
+  },
+  {
+    "name": "unmask-top-right",
+    "className": "animate-unmask-top-right"
+  },
+  {
+    "name": "wave",
+    "className": "animate-wave"
+  },
+  {
+    "name": "wiggle",
+    "className": "animate-wiggle"
+  },
+  {
+    "name": "wobble",
+    "className": "animate-wobble"
+  },
+  {
+    "name": "wobbling",
+    "className": "animate-wobbling"
+  },
+  {
+    "name": "word-slide",
+    "className": "animate-word-slide"
+  },
+  {
+    "name": "zoom-in",
+    "className": "animate-zoom-in"
+  },
+  {
+    "name": "zoom-in-down",
+    "className": "animate-zoom-in-down"
+  },
+  {
+    "name": "zoom-in-elastic",
+    "className": "animate-zoom-in-elastic"
+  },
+  {
+    "name": "zoom-in-left",
+    "className": "animate-zoom-in-left"
+  },
+  {
+    "name": "zoom-in-right",
+    "className": "animate-zoom-in-right"
+  },
+  {
+    "name": "zoom-in-up",
+    "className": "animate-zoom-in-up"
+  },
+  {
+    "name": "zoom-out",
+    "className": "animate-zoom-out"
+  },
+  {
+    "name": "zoom-out-down",
+    "className": "animate-zoom-out-down"
+  },
+  {
+    "name": "zoom-out-elastic",
+    "className": "animate-zoom-out-elastic"
+  },
+  {
+    "name": "zoom-out-left",
+    "className": "animate-zoom-out-left"
+  },
+  {
+    "name": "zoom-out-right",
+    "className": "animate-zoom-out-right"
+  },
+  {
+    "name": "zoom-out-up",
+    "className": "animate-zoom-out-up"
+  },
+  {
+    "name": "zoom-pulse",
+    "className": "animate-zoom-pulse"
+  },
+  {
+    "name": "zoom-pulse-grow",
+    "className": "animate-zoom-pulse-grow"
+  },
+  {
+    "name": "zoom-pulse-shrink",
+    "className": "animate-zoom-pulse-shrink"
+  },
+  {
+    "name": "zoom-tilt-in",
+    "className": "animate-zoom-tilt-in"
+  },
+  {
+    "name": "zoom-tilt-out",
+    "className": "animate-zoom-tilt-out"
+  }
+]

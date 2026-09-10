@@ -1,0 +1,55 @@
+---
+import '../styles/global.css';
+const { title = 'Jumi — Motion, atom by atom.', description = 'A composable animation library for Tailwind CSS. Make the web move with Jumi.', docs = false } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#171915" />
+    <title>{title}</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="header">
+      <a class="logo" href="/" aria-label="Jumi home">jumi<span>✳</span></a>
+      <span class="version">FOR TAILWIND CSS <b>V2.0</b></span>
+      <nav aria-label="Main navigation">
+        <a aria-current={docs ? 'page' : undefined} href="/docs/">Documentation</a>
+        <a href="/effects/">Effects <span>228</span></a>
+        <a href="https://github.com/ibnlanre/jumi">GitHub ↗</a>
+      </nav>
+      <button class="motion-toggle" aria-pressed="false" aria-label="Pause animations">Ⅱ <span>Pause motion</span></button>
+    </header>
+    <slot />
+    <footer><a class="logo" href="/">jumi<span>✳</span></a><p>Made to move. Free to make your own.</p><a href="https://github.com/ibnlanre/jumi">Open source · MIT ↗</a></footer>
+    <script>
+      const toggle = document.querySelector<HTMLButtonElement>('.motion-toggle');
+      toggle?.addEventListener('click', () => {
+        const paused = document.body.classList.toggle('motion-paused');
+        toggle.setAttribute('aria-pressed', String(paused));
+        toggle.setAttribute('aria-label', paused ? 'Resume animations' : 'Pause animations');
+        toggle.innerHTML = paused ? '▷ <span>Resume motion</span>' : 'Ⅱ <span>Pause motion</span>';
+      });
+      document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach(button => {
+        button.addEventListener('click', async () => {
+          const value = button.dataset.copy || button.closest('.code-block')?.querySelector('code')?.textContent || '';
+          try { await navigator.clipboard.writeText(value); button.textContent = 'Copied!'; }
+          catch { button.textContent = 'Select code to copy'; }
+          setTimeout(() => button.textContent = 'Copy', 1800);
+        });
+      });
+      document.querySelectorAll<HTMLButtonElement>('[data-replay]').forEach(button => {
+        button.addEventListener('click', () => {
+          const surface = button.closest('[data-demo]');
+          const items = surface?.querySelectorAll<HTMLElement>('.animations');
+          items?.forEach(item => item.style.animation = 'none');
+          requestAnimationFrame(() => requestAnimationFrame(() => items?.forEach(item => item.style.removeProperty('animation'))));
+        });
+      });
+    </script>
+  </body>
+</html>

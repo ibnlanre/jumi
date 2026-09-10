@@ -12,6 +12,10 @@
     "LICENSE"
   ],
   "scripts": {
+    "docs:prepare": "pnpm run bundle && node scripts/prepare-docs.mjs",
+    "docs:dev": "pnpm run docs:prepare && astro dev --root docs",
+    "docs:build": "pnpm run docs:prepare && astro build --root docs",
+    "docs:preview": "astro preview --root docs",
     "lint": "eslint --fix .",
     "bundle": "tsup src/index.ts --format cjs,esm --dts",
     "watch-bundle": "tsup src/index.ts --format cjs,esm --dts --watch",
@@ -61,6 +65,7 @@
     "@typescript-eslint/parser": "^8.46.4",
     "@vitest/coverage-v8": "4.0.9",
     "@vitest/eslint-plugin": "^1.4.2",
+    "astro": "^5.18.2",
     "css.escape": "^1.5.1",
     "csstype": "^3.2.1",
     "eslint": "^9.39.1",

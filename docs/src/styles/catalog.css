@@ -1,0 +1,4 @@
+@import 'tailwindcss' source(none);
+@source '../pages/effects.astro';
+@source '../data/effects.json';
+@plugin '../../vendor/jumi.js';

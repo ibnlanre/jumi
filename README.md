@@ -1,146 +1,139 @@
 # Jumi
 
-A comprehensive CSS animation library for Tailwind CSS. Declarative, composable,
-and generated just-in-time — only the utilities you actually use end up in your
-CSS.
+### Big motion. Small classes.
 
-## Install
+Give your interface life with a composable animation library for Tailwind CSS.
+Choose from **228 effects**, animate property targets, give each its own rhythm,
+and stagger motion across children—all from your markup.
 
-```bash
+**[Start here](docs/src/pages/docs/installation.md)** ·
+**[Learn to compose](docs/src/pages/docs/properties.md)** ·
+**[Explore the effects](documentation/effects.md)** ·
+**[Run the docs site](#the-documentation-site)**
+
+```html
+<div class="motion-safe:animations animate-bounce-in animation-duration-800">
+  Make your move.
+</div>
+```
+
+Jumi generates CSS through Tailwind at build time. There is no Jumi animation
+runtime to ship to the browser.
+
+## Start moving
+
+Install Jumi in a project with Tailwind CSS configured:
+
+```sh
 pnpm add jumi
 ```
 
-Register the plugin in your CSS (Tailwind CSS v4):
+Register it in your main stylesheet (Tailwind CSS v4):
 
 ```css
 @import "tailwindcss";
 @plugin "jumi";
 ```
 
-## What you can animate
-
-| Capability | Utility | What it does |
-|-----------|---------|--------------|
-| **Effects** | `animate-{effect}` | 200+ named keyframe animations — fades, bounces, slides, arcs, flips, reveals |
-| **Properties** | `animate-{css-property}-{value}` | Animate any CSS property — color, size, transform, filter, border, layout |
-| **Controls** | `animation-{control}-{value}` | Tune timing, easing, iteration, direction, fill-mode, timeline, range |
-| **Transitions** | `transition-{part}-{value}` | CSS transitions for hover and state changes |
-
-Plus `animate-stagger-*` to sequence a motion across direct children. Every
-motion is materialized on its element by the `animations` opt-in (and
-transitions by `transitions`):
+Add `animations` to activate motion, then choose an effect:
 
 ```html
-<div class="animations animate-bounce-in animation-duration-800">
-  Hello World!
+<div class="animations animate-reveal-swipe animation-duration-900">
+  A little class. A lot of character.
 </div>
 ```
 
-## Effects — `animate-{effect}`
+Use `motion-safe:animations` for decorative motion that respects the visitor's
+reduced-motion preference. Keep the element visible in its unanimated state.
 
-Keyframe animations organized by intent — entrances, exits, attention (looping),
-emphasis (one-shot), and presentation (masks / clip-paths):
+## Motion, atom by atom
 
-```html
-<div class="animations animate-slide-in-up animation-duration-600">Entrance</div>
-<div class="animations animate-shake animation-iteration-count-3">Attention</div>
-<div class="animations animate-reveal-swipe animation-duration-800">Clip-path reveal</div>
-```
-
-See [the full effect catalog](documentation/effects.md).
-
-## Properties — `animate-{css-property}-{value}`
-
-Animate any CSS property — color, size, transform, filter, border, layout, and
-more — using Tailwind's theme values or arbitrary values:
+Effects are a starting point. Property utilities let you author your own motion:
 
 ```html
-<div class="animations animate-color-red-600 animation-duration-800">Color</div>
-<div class="animations animate-width-full animation-duration-1000">Size</div>
-<div class="animations animate-rotate-45 animate-scale-110 animation-duration-500">Transform</div>
-<div class="animations animate-filter-blur-md animation-duration-1500">Filter</div>
-<div class="animations animate-border-radius-full animation-duration-1000">Border</div>
-```
-
-Arbitrary values give full precision:
-
-```html
-<div class="animations animate-translate-x-[50px] animate-rotate-[0.15turn] animate-scale-[1.15]">
-```
-
-Transforms compose through CSS custom properties, so translate, rotate, and
-scale combine naturally in one declaration.
-
-## Controls — `animation-{control}-{value}`
-
-Tune any motion with `duration`, `delay`, `timing-function`, `iteration-count`,
-`direction`, `fill-mode`, `play-state`, `composition`, `timeline`, and `range`:
-
-```html
-<div class="animations animate-rotate-45 animation-duration-500 animation-delay-100 animation-iteration-count-infinite animation-direction-alternate">
-```
-
-Controls accept a `/{property}` modifier to target a single property's slot:
-
-```html
-<!-- rotate animates at 600ms; everything else at 300ms -->
-<div class="animations animate-rotate-90 animate-scale-110 animation-duration-600/rotate animation-duration-300">
-```
-
-## Stagger — `animate-stagger-{direction}-{interval}[/{count}]`
-
-Sequentially distribute a motion across direct children:
-
-```html
-<div class="animate-stagger-forward-100">
-  <div class="animations animate-bounce-in animation-duration-300">1</div>
-  <div class="animations animate-bounce-in animation-duration-300">2</div>
-  <div class="animations animate-bounce-in animation-duration-300">3</div>
+<div class="animations animate-rotate-45 animate-scale-110 animation-duration-800/rotate animation-duration-1200/scale animation-direction-alternate animation-iteration-count-infinite">
+  Two rhythms. One element.
 </div>
 ```
 
-Count-free by default — one rule driven by `sibling-index()` / `sibling-count()`
-that adapts to any list length (Chrome, Edge, Safari). Firefox lacks those
-functions, so append `/[{count}]` for an `:nth-child` fallback:
+Here, rotation takes 800ms and scale takes 1200ms. The `/rotate` and `/scale`
+modifiers scope a control to that property's animation slot.
+
+| Piece | Example | What it does |
+| --- | --- | --- |
+| Activate | `animations` | Assemble animations on an element |
+| Effects | `animate-bounce-in` | Apply a named keyframe effect |
+| Properties | `animate-rotate-[0.25turn]` | Animate a property toward a target |
+| Controls | `animation-duration-[800ms]/rotate` | Give a property its own timing |
+| Stagger | `animate-stagger-forward-[100ms]/3` | Sequence direct children |
+| Transitions | `transitions transition-property/scale` | Animate a change of state |
+
+Theme values and arbitrary values work together. Compound properties such as
+filters and transforms are assembled from custom properties; their parts share
+the timing of the compound property's slot.
+
+## Start a chain reaction
 
 ```html
-<div class="animate-stagger-backward-150/3">…</div>
+<div class="animate-stagger-forward-120/3">
+  <div class="animations animate-fade-in-up">One</div>
+  <div class="animations animate-fade-in-up">Two</div>
+  <div class="animations animate-fade-in-up">Three</div>
+</div>
 ```
 
-## Transitions — `transition-{part}-{value}`
+The parent sets the rhythm; each direct child owns its motion. The `/3` count
+provides an `:nth-child` fallback for browsers without CSS sibling functions.
+Omit the count when targeting browsers that support `sibling-index()` and
+`sibling-count()`.
 
-CSS transitions for hover and state changes, with per-property scoping:
+## Make state changes feel considered
 
 ```html
-<div class="transitions transition-property/all transition-duration-300 hover:scale-125">
+<button class="transitions transition-property/scale transition-duration-300 hover:scale-110 focus-visible:scale-110">
+  Take a closer look.
+</button>
 ```
 
-Scope any part (`property`, `duration`, `delay`, `timing-function`) to a single
-property:
+Scope transition duration, delay, and easing with the same `/property` syntax.
 
-```html
-<div class="transitions transition-property/background-color transition-duration-500 hover:bg-purple-500">
+## Know the boundaries
+
+- Write complete class names so Tailwind can discover them at build time.
+- CSS determines whether a property interpolates, changes discretely, or cannot animate.
+- Effects that write the same property can compete. Nest elements for independent layers of motion.
+- Advanced timeline and composition controls require browser support. Keep essential behavior independent of them.
+- Respect reduced motion and offer a pause control for persistent decorative loops.
+
+## The documentation site
+
+The Astro site in `docs/` is a working showcase: a kinetic landing page, seven
+guides, and a searchable catalog with previews of all 228 effects. Its animation
+examples use Jumi itself.
+
+```sh
+pnpm install
+pnpm run docs:dev
 ```
 
-## Accessibility
+To generate the static site:
 
-Respect user motion preferences with Tailwind's built-in variants:
-
-```html
-<div class="motion-safe:animations motion-safe:animate-bounce-in">…</div>
-<div class="motion-reduce:animate-fade-in">…</div>
+```sh
+pnpm run docs:build
+pnpm run docs:preview
 ```
 
-## Browser support
+The preparation step builds the library, copies its plugin into the docs build,
+and generates the effect inventory directly from the source catalog. The landing
+page and catalog use separate animation stylesheets so visitors do not download
+the full effect collection just to read the introduction.
 
-Modern evergreen browsers. Count-free stagger relies on
-`sibling-index()` / `sibling-count()` (Chrome, Edge, Safari); Firefox uses the
-`/[{count}]` fallback.
+## Development
 
-## Contributing
+```sh
+pnpm run test:run
+pnpm run check-types
+pnpm run bundle
+```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## License
-
-MIT — see [LICENSE](LICENSE).
+Created by [Ridwan Olanrewaju](https://github.com/ibnlanre). Package license: MIT.
