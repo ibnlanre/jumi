@@ -49,4 +49,4 @@ Each property can have its own duration. This element rotates over 800 milliseco
 3. [Compose properties](/docs/properties/) and [tune their timing](/docs/controls/).
 4. [Respect motion preferences](/docs/accessibility/) before you ship.
 
-This documentation site uses Astro, Tailwind CSS, and the same Jumi plugin. The rotating hero, breathing petals, and staggered bars are all examples of its atomic animation utilities.
+This documentation site uses Astro, Tailwind CSS, and the same Jumi plugin. The rotating hero, its unfurling petals, and the staggered bars are all examples of its atomic animation utilities.

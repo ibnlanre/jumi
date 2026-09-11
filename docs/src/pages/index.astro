@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import '../styles/motion.css';
+import effects from '../data/effects.json';
 ---
 <Layout>
   <main id="main">
@@ -10,14 +11,14 @@ import '../styles/motion.css';
       <div class="hero-bottom"><p>Big motion. Small classes.<br />Compose expressive animations right in your markup, with the Tailwind CSS you already know.</p><a class="button lime" href="/docs/">Start moving <span>↗</span></a></div>
       <div class="hero-art" aria-hidden="true">
         <div class="orbit animations animate-rotate-[360deg] animation-duration-[24s] animation-timing-function-linear animation-iteration-count-infinite">
-          {Array.from({length: 12}, (_, i) => <div class="petal-position" style={`--angle:${i * 30}deg`}><div class="petal animations animate-scale-[0.72] animation-duration-[2400ms] animation-direction-alternate animation-iteration-count-infinite animation-timing-function-ease-in-out" style={`--jumi-animation-delay:${i * -180}ms`}></div></div>)}
+          {Array.from({length: 12}, (_, i) => <div class="petal-position" style={`--angle:${i * 30}deg`}><div class="petal animations animate-rotate-[45deg] animation-duration-[4200ms] animation-direction-alternate-reverse animation-timing-function-[cubic-bezier(.85,0,.15,1)] animation-iteration-count-infinite" style={`--jumi-animation-delay:${i * -90}ms`}></div></div>)}
           <span class="orbit-core"></span>
         </div>
         <span class="art-coordinate top">FIG. 01 / COMPOSITION</span><span class="art-coordinate bottom">12 PARTS. ONE SHARED RHYTHM.</span>
       </div>
       <div class="hero-index">01 — A LITTLE CLASS. A LOT OF CHARACTER.</div>
     </section>
-    <div class="ticker"><span>228 effects</span><i>✳</i><span>Composable by nature</span><i>✳</i><span>No animation runtime</span><i>✳</i><span>Powered by CSS</span><i>✳</i></div>
+    <div class="ticker"><span>{effects.length} effects</span><i>✳</i><span>Composable by nature</span><i>✳</i><span>No animation runtime</span><i>✳</i><span>Powered by CSS</span><i>✳</i></div>
     <section class="studies section">
       <div class="section-heading"><div><p class="eyebrow">MOTION STUDIES / 001—003</p><h2>Less setup.<br />More <em>expression.</em></h2></div><p>Pick an effect. Give it a rhythm.<br />Make something that feels like you.</p></div>
       <div class="study-grid">
@@ -25,7 +26,7 @@ import '../styles/motion.css';
         <article class="study" data-demo><div class="study-label"><span>02 / COMPOSITION</span><button data-replay aria-label="Replay composition">↻</button></div><div class="stage lilac"><div class="tile-stack animations animate-rotate-[180deg] animation-duration-[6s] animation-direction-alternate animation-iteration-count-infinite animation-timing-function-ease-in-out"><i></i><i></i><i></i><i></i><i></i></div></div><div class="study-caption"><h3>Find your rhythm.</h3><code>animate-rotate-[180deg]</code></div></article>
         <article class="study" data-demo><div class="study-label"><span>03 / STAGGER</span><button data-replay aria-label="Replay stagger">↻</button></div><div class="stage green"><div class="bars animate-stagger-forward-[120ms]/7">{Array.from({length:7},()=> <i class="animations animate-scale-y-[0.2] animation-duration-[1100ms] animation-direction-alternate animation-iteration-count-infinite animation-timing-function-ease-in-out"></i>)}</div></div><div class="study-caption"><h3>Start a chain reaction.</h3><code>animate-stagger-forward-[120ms]/7</code></div></article>
       </div>
-      <a class="text-link" href="/effects/">Meet all 228 effects <span>↗</span></a>
+      <a class="text-link" href="/effects/">Meet all {effects.length} effects <span>↗</span></a>
     </section>
     <section class="anatomy section">
       <div><p class="eyebrow">SMALL PIECES. INFINITE PERSONALITY.</p><h2>Motion,<br /><em>atom by atom.</em></h2><p class="body-copy">An effect is only the beginning. Layer properties, give each one its own timing, and let Jumi assemble the CSS.</p><a class="text-link" href="/docs/properties/">Learn to compose ↗</a></div>

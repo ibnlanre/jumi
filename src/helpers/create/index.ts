@@ -1,12 +1,12 @@
 import type {
-  AnimatableStandardPropertyType,
-  Api,
-  Collection,
-  Creator,
-  CssInJs,
-  MatchComponentsPropertyFunction,
-  MatchUtilitiesPropertyFunction,
-  StaggerContext,
+    AnimatableStandardPropertyType,
+    Api,
+    Collection,
+    Creator,
+    CssInJs,
+    MatchComponentsPropertyFunction,
+    MatchUtilitiesPropertyFunction,
+    StaggerContext,
 } from '@/types'
 
 import { css } from '@/helpers/css'
@@ -22,7 +22,7 @@ import cssEscape from 'css.escape'
 import shorthash2 from 'shorthash2'
 import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette'
 
-export function getCreator({ addUtilities, theme }: Api): Creator {
+export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
   const effects = new Set<string>()
   const properties = new Set<string>(['animation', 'animation-composition', 'animation-timeline', 'interpolate-size'])
   const motions = new Set<string>()
@@ -104,7 +104,7 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
     return css('var', variable, expanded)
   }
 
-  function animationVariables(attribute: string, nameVar?: string, stop?: string): string {
+  function animationParts(attribute: string, nameVar?: string, stop?: string): CssInJs {
     const timing = (part: string) => {
       const perAttribute = `--jumi-${attribute}-${part}`
       if (stop) {
@@ -118,20 +118,53 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
       ? css('var', cssEscape(`--jumi-${attribute}-${stop}-animation-name`), 'none')
       : css('var', nameVar ?? `--jumi-${attribute}-animation-name`, css('var', '--jumi-animation-name'))
 
-    return join([
-      name,
-      timing('animation-duration'),
-      timing('animation-timing-function'),
-      timing('animation-delay'),
-      timing('animation-iteration-count'),
-      timing('animation-direction'),
-      timing('animation-fill-mode'),
-      timing('animation-play-state'),
-    ], ' ')
+    return {
+      'animation-delay': timing('animation-delay'),
+      'animation-direction': timing('animation-direction'),
+      'animation-duration': timing('animation-duration'),
+      'animation-fill-mode': timing('animation-fill-mode'),
+      'animation-iteration-count': timing('animation-iteration-count'),
+      'animation-name': name,
+      'animation-play-state': timing('animation-play-state'),
+      'animation-timing-function': timing('animation-timing-function'),
+    }
+  }
+
+  /**
+   * Register every slot's activation variable as non-inheriting.
+   *
+   * `.animate-*` utilities declare their animation name on the element itself
+   * (`--jumi-{attribute}-{id}-animation-name`), but custom properties inherit by
+   * default. Without this, any descendant that also opts into `animations`
+   * resolves an ANCESTOR's name and re-runs its animation with the descendant's
+   * own timing — e.g. the hero orbit's `animate-rotate-[360deg]` leaking into
+   * nested petals, which then spun at the petal's 2400ms duration instead of the
+   * orbit's 24s. Activation is element-local, so the name slots are registered
+   * with `inherits: false`; an unset name still resolves to the `var()` fallback
+   * each slot already declares.
+   *
+   * The shared `--jumi-animation-name` control is deliberately left inheritable,
+   * so a parent can still cascade one named animation into its subtree.
+   */
+  function computeAnimationRegister(slots: Array<{ attribute: string, nameVar?: string, stop?: string }>) {
+    const names = new Set<string>()
+
+    for (const { attribute, nameVar, stop } of slots) {
+      if (nameVar) names.add(nameVar)
+      else if (stop) names.add(cssEscape(`--jumi-${attribute}-${stop}-animation-name`))
+      else names.add(`--jumi-${attribute}-animation-name`)
+    }
+
+    const register = sorted(names).reduce((acc, name) => {
+      acc[`@property ${name}`] = { inherits: 'false', syntax: '"*"' }
+      return acc
+    }, {} as Record<string, CssInJs>)
+
+    if (Object.keys(register).length) addBase(register)
   }
 
   function computeAnimationVariable(): CssInJs {
-    const slots: Array<{ attribute: string, nameVar?: string, stop?: string, variable: string }> = []
+    const slots: Array<{ attribute: string, nameVar?: string, stop?: string }> = []
     const shared = new Set<string>()
 
     for (const [attribute, ids] of values) {
@@ -139,7 +172,6 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
         slots.push({
           attribute,
           nameVar: `--jumi-${attribute}-${id}-animation-name`,
-          variable: `--jumi-${attribute}-${id}-animation`,
         })
       }
     }
@@ -149,24 +181,47 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
     }
 
     for (const attribute of sorted(shared)) {
-      slots.push({ attribute, variable: `--jumi-${attribute}-animation` })
+      slots.push({ attribute })
     }
 
     for (const [attribute, stops] of timelines) {
       if (!stops.size) continue
       for (const stop of stops) {
-        slots.push({ attribute, stop, variable: cssEscape(`--jumi-${attribute}-${stop}-animation`) })
+        slots.push({ attribute, stop })
       }
     }
 
     for (const attribute of sorted(effects)) {
-      slots.push({ attribute, variable: `--jumi-${attribute}-animation` })
+      slots.push({ attribute })
     }
 
-    const animations = slots.reduce((acc, { attribute, nameVar, stop, variable }) => {
-      acc[variable] = animationVariables(attribute, nameVar, stop)
-      return acc
-    }, {} as CssInJs)
+    computeAnimationRegister(slots)
+
+    // One animation per slot, written as longhand sub-property LISTS. Chromium
+    // re-parses the `animation` shorthand when var() chains resolve inside it,
+    // and shuffles values between slots: a fill-mode keyword lands in
+    // `animation-name` (the `forwards, forwards, …` you see in the inspector)
+    // and slots get dropped. Longhand lists keep every slot bound to its own
+    // var chain. The `--jumi-animation-*` defaults the chains fall back to come
+    // from `assemble('animation')` at the end of `.animations`.
+    const animation = slots.length
+      ? slots.reduce((acc, { attribute, nameVar, stop }) => {
+          const parts = animationParts(attribute, nameVar, stop)
+          for (const part in parts) {
+            acc[part] = acc[part] ? `${acc[part]}, ${parts[part]}` : parts[part]
+          }
+          return acc
+        }, {} as CssInJs)
+      : {
+          'animation-delay': css('var', '--jumi-animation-delay'),
+          'animation-direction': css('var', '--jumi-animation-direction'),
+          'animation-duration': css('var', '--jumi-animation-duration'),
+          'animation-fill-mode': css('var', '--jumi-animation-fill-mode'),
+          'animation-iteration-count': css('var', '--jumi-animation-iteration-count'),
+          'animation-name': css('var', '--jumi-animation-name'),
+          'animation-play-state': css('var', '--jumi-animation-play-state'),
+          'animation-timing-function': css('var', '--jumi-animation-timing-function'),
+        }
 
     const baseAnimationVars = {
       'animation-composition': css('var', '--jumi-animation-composition'),
@@ -174,17 +229,7 @@ export function getCreator({ addUtilities, theme }: Api): Creator {
       'interpolate-size': css('var', '--jumi-interpolate-size'),
     }
 
-    const animation = slots.length
-      ? {
-          animation: slots.map(({ variable }) => css('var', variable)).join(', '),
-          ...baseAnimationVars,
-        }
-      : {
-          animation: css('var', '--jumi-animation'),
-          ...baseAnimationVars,
-        }
-
-    return merge(animation, animations)
+    return merge(animation, baseAnimationVars)
   }
 
   const register = (attribute: AnimatableStandardPropertyType, modifier: null | string) => {

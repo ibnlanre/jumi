@@ -4,11 +4,11 @@ import '../styles/catalog.css';
 import effects from '../data/effects.json';
 const category = (name: string) => /out|exit/.test(name) ? 'Exit' : /in|entrance/.test(name) ? 'Entrance' : /reveal|mask|clip/.test(name) ? 'Reveal' : 'Emphasis';
 ---
-<Layout title="The motion collection — Jumi" description="Explore 228 Jumi effects. Preview an animation and copy its Tailwind CSS classes.">
+<Layout title="The motion collection — Jumi" description={`Explore ${effects.length} Jumi effects. Preview an animation and copy its Tailwind CSS classes.`}>
   <main id="main" class="catalog section">
-    <p class="eyebrow">THE MOTION COLLECTION / 228 EFFECTS</p>
+    <p class="eyebrow">THE MOTION COLLECTION / {effects.length} EFFECTS</p>
     <div class="section-heading"><h1>A feeling for<br /><em>every interface.</em></h1><p>Find your starting point.<br />Press play. Copy the classes. Make it yours.</p></div>
-    <div class="catalog-tools"><label><span>Find an effect</span><input id="effect-search" type="search" placeholder="Try bounce, spiral, reveal…" /></label><label><span>Collection</span><select id="effect-category"><option>All effects</option><option>Entrance</option><option>Exit</option><option>Reveal</option><option>Emphasis</option></select></label><p id="effect-count" role="status" aria-live="polite">228 effects</p></div>
+    <div class="catalog-tools"><label><span>Find an effect</span><input id="effect-search" type="search" placeholder="Try bounce, spiral, reveal…" /></label><label><span>Collection</span><select id="effect-category"><option>All effects</option><option>Entrance</option><option>Exit</option><option>Reveal</option><option>Emphasis</option></select></label><p id="effect-count" role="status" aria-live="polite">{effects.length} effects</p></div>
     <div class="effect-grid">
       {effects.map(({name, className}, index) => <article class="effect-card" data-name={name} data-category={category(name)} data-demo>
         <div class="effect-card-top"><span>{String(index+1).padStart(3,'0')} / {category(name)}</span><button class="effect-play" aria-label={`Play ${name}`}>▷</button></div>

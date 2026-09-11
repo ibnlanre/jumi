@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import effects from '../data/effects.json';
 const { title = 'Jumi — Motion, atom by atom.', description = 'A composable animation library for Tailwind CSS. Make the web move with Jumi.', docs = false } = Astro.props;
 ---
 <!doctype html>
@@ -19,7 +20,7 @@ const { title = 'Jumi — Motion, atom by atom.', description = 'A composable an
       <span class="version">FOR TAILWIND CSS <b>V2.0</b></span>
       <nav aria-label="Main navigation">
         <a aria-current={docs ? 'page' : undefined} href="/docs/">Documentation</a>
-        <a href="/effects/">Effects <span>228</span></a>
+        <a href="/effects/">Effects <span>{effects.length}</span></a>
         <a href="https://github.com/ibnlanre/jumi">GitHub ↗</a>
       </nav>
       <button class="motion-toggle" aria-pressed="false" aria-label="Pause animations">Ⅱ <span>Pause motion</span></button>

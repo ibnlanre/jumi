@@ -1,4 +1,4 @@
-import type { Api } from '@/types'
+import type { Api, CssInJs } from '@/types'
 
 import { describe, expect, it, vi } from 'vitest'
 
@@ -8,11 +8,12 @@ import { css } from '@/helpers/css'
 import shorthash2 from 'shorthash2'
 
 function setup() {
+  const addBase = vi.fn()
   const addUtilities = vi.fn()
   const theme = vi.fn()
 
   const api: Api = {
-    addBase: vi.fn(),
+    addBase,
     addComponents: vi.fn(),
     addUtilities,
     addVariant: vi.fn(),
@@ -26,7 +27,7 @@ function setup() {
 
   const creator = getCreator(api)
 
-  return { addUtilities, creator }
+  return { addBase, addUtilities, creator }
 }
 
 describe('property curry', () => {
@@ -195,10 +196,13 @@ describe('keyframe emission', () => {
     creator.property('opacity')('0', { modifier: '25' })
     const animations = creator.animations
 
-    const slot = animations['--jumi-opacity-25-animation']
-    expect(slot).toContain('var(--jumi-opacity-25-animation-name, none)')
-    expect(slot).toContain('var(--jumi-opacity-25-animation-duration, var(--jumi-opacity-animation-duration')
-    expect(slot).toContain('var(--jumi-opacity-25-animation-delay, var(--jumi-opacity-animation-delay')
+    expect(animations['animation-name']).toContain('var(--jumi-opacity-25-animation-name, none)')
+    expect(animations['animation-duration']).toContain(
+      'var(--jumi-opacity-25-animation-duration, var(--jumi-opacity-animation-duration, var(--jumi-animation-duration)))',
+    )
+    expect(animations['animation-delay']).toContain(
+      'var(--jumi-opacity-25-animation-delay, var(--jumi-opacity-animation-delay, var(--jumi-animation-delay)))',
+    )
   })
 })
 
@@ -208,8 +212,9 @@ describe('animations wiring', () => {
 
     const animations = creator.animations
 
-    // With no registered values, `.animations` falls back to the shared shorthand.
-    expect(animations['animation']).toBe('var(--jumi-animation)')
+    // With no registered values, `.animations` falls back to the shared controls.
+    expect(animations['animation-name']).toBe('var(--jumi-animation-name)')
+    expect(animations['animation-duration']).toBe('var(--jumi-animation-duration)')
     expect(animations).toMatchObject({
       '--jumi-animation': expect.stringContaining('var(--jumi-animation-name)'),
       '--jumi-animation-composition': 'replace',
@@ -227,13 +232,25 @@ describe('animations wiring', () => {
     const animations = creator.animations
     const id = shorthash2('50')
 
-    expect(animations['animation']).toBe(`var(--jumi-opacity-${id}-animation)`)
-    expect(animations[`--jumi-opacity-${id}-animation`]).toContain(
+    expect(animations['animation-name']).toBe(
       `var(--jumi-opacity-${id}-animation-name, var(--jumi-animation-name))`,
     )
-    expect(animations[`--jumi-opacity-${id}-animation`]).toContain(
+    expect(animations['animation-duration']).toContain(
       'var(--jumi-opacity-animation-duration, var(--jumi-animation-duration))',
     )
+  })
+
+  it('emits longhands, never the `animation` shorthand', () => {
+    const { creator } = setup()
+
+    creator.property('opacity')('50', { modifier: null })
+    creator.effect('bounce-in')
+    const animations = creator.animations
+
+    // Chromium re-parses var() chains inside the shorthand and shuffles values
+    // between slots, so the shorthand must not come back.
+    expect(animations['animation']).toBeUndefined()
+    expect(animations['animation-name']).toContain(', ')
   })
 
   it('includes the per-attribute assembled default', () => {
@@ -256,12 +273,12 @@ describe('animations wiring', () => {
     const animations = creator.animations
     const id = shorthash2('50')
 
-    expect(animations['animation']).toBe(
+    expect(animations['animation-name']).toBe(
       [
-        `var(--jumi-opacity-${id}-animation)`,
-        'var(--jumi-filter-animation)',
-        'var(--jumi-opacity-25-animation)',
-        'var(--jumi-bounce-in-animation)',
+        `var(--jumi-opacity-${id}-animation-name, var(--jumi-animation-name))`,
+        'var(--jumi-filter-animation-name, var(--jumi-animation-name))',
+        'var(--jumi-opacity-25-animation-name, none)',
+        'var(--jumi-bounce-in-animation-name, var(--jumi-animation-name))',
       ].join(', '),
     )
   })
@@ -272,9 +289,65 @@ describe('animations wiring', () => {
     creator.property('opacity')('0', { modifier: '25' })
     const animations = creator.animations
 
-    expect(animations['--jumi-opacity-25-animation']).toContain(
+    expect(animations['animation-name']).toContain(
       'var(--jumi-opacity-25-animation-name, none)',
     )
+  })
+})
+
+describe('animation-name registration', () => {
+  const registered = (addBase: ReturnType<typeof setup>['addBase']) =>
+    addBase.mock.calls.reduce<CssInJs>((acc, [utilities]) => ({ ...acc, ...utilities }), {})
+
+  it('registers per-value, composed, per-stop and effect names as non-inheriting', () => {
+    const { addBase, creator } = setup()
+
+    creator.property('opacity')('50', { modifier: null })
+    creator.property('filter', [['filter-blur', value => css('blur', value)]])('8px', { modifier: null })
+    creator.property('opacity')('0', { modifier: '25' })
+    creator.effect('bounce-in')
+    creator.animations
+
+    const utilities = registered(addBase)
+    const id = shorthash2('50')
+
+    expect(Object.keys(utilities).filter(name => name.startsWith('@property')).sort()).toEqual([
+      '--jumi-bounce-in-animation-name',
+      '--jumi-filter-animation-name',
+      '--jumi-opacity-25-animation-name',
+      `--jumi-opacity-${id}-animation-name`,
+    ].map(name => `@property ${name}`))
+
+    expect(utilities[`@property --jumi-opacity-${id}-animation-name`]).toEqual({
+      inherits: 'false',
+      syntax: '"*"',
+    })
+  })
+
+  it('escapes a decimal stop into its registration', () => {
+    const { addBase, creator } = setup()
+
+    creator.property('opacity')('0', { modifier: '12.5' })
+    creator.animations
+
+    expect(registered(addBase)['@property --jumi-opacity-12\\.5-animation-name']).toEqual({
+      inherits: 'false',
+      syntax: '"*"',
+    })
+  })
+
+  it('leaves the shared animation name and controls inheritable for subtree cascades', () => {
+    const { addBase, creator } = setup()
+
+    creator.property('opacity')('50', { modifier: null })
+    creator.effect('fade-in')
+    creator.animations
+
+    const utilities = registered(addBase)
+
+    expect(utilities['@property --jumi-animation-name']).toBeUndefined()
+    expect(utilities['@property --jumi-animation-duration']).toBeUndefined()
+    expect(utilities['@property --jumi-animation-delay']).toBeUndefined()
   })
 })
 
