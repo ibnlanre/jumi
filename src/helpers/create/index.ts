@@ -1,12 +1,12 @@
 import type {
-    AnimatableStandardPropertyType,
-    Api,
-    Collection,
-    Creator,
-    CssInJs,
-    MatchComponentsPropertyFunction,
-    MatchUtilitiesPropertyFunction,
-    StaggerContext,
+  AnimatableStandardPropertyType,
+  Api,
+  Collection,
+  Creator,
+  CssInJs,
+  MatchComponentsPropertyFunction,
+  MatchUtilitiesPropertyFunction,
+  StaggerContext,
 } from '@/types'
 
 import { css } from '@/helpers/css'
@@ -22,6 +22,14 @@ import cssEscape from 'css.escape'
 import shorthash2 from 'shorthash2'
 import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette'
 
+/** One animation in `.animations`, addressed by its attribute and, optionally,
+ * its alias or the variable that declares it. */
+type Slot = {
+  alias?: string
+  attribute: string
+  nameVar?: string
+}
+
 export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
   const effects = new Set<string>()
   const properties = new Set<string>(['animation', 'animation-composition', 'animation-timeline', 'interpolate-size'])
@@ -29,7 +37,17 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
   const seen = new Set<string>()
 
   const keyframes = new Map<string, Collection<CssInJs>>()
-  const timelines = new Map<AnimatableStandardPropertyType, Set<string>>()
+
+  // `/[1]`, `/[50]` — named instances of an attribute's animation. Each alias
+  // owns a keyframe and an animation slot, so it can carry its own timing.
+  // Reach for one when you want separately driven tracks.
+  const aliases = new Map<AnimatableStandardPropertyType, Set<string>>()
+
+  // `/[at-50%]` — frame offsets contributed to the attribute's SHARED
+  // `jumi-{attribute}` keyframe. Several stop utilities extend ONE timeline
+  // instead of racing as separate same-property animations, where
+  // `animation-composition: replace` would discard all but the last.
+  const stops = new Map<AnimatableStandardPropertyType, Set<number>>()
 
   // OPTIMIZATION: Using a Set allows O(1) deduplication and move-to-end,
   // replacing the O(N) Array indexOf/splice logic. JS Sets maintain insertion order.
@@ -69,6 +87,22 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
       result[`@keyframes ${animationName}`] = { to: { [attribute]: value } }
     }
 
+    // A frame does not earn a keyframe of its own: every `/[at-*]` utility used
+    // in the build folds into the attribute's shared `jumi-{attribute}`
+    // keyframe, ordered by offset. One element then runs ONE animation whose
+    // frames all share a single pair of endpoints, which is what keeps the
+    // return leg coherent under `infinite` and `alternate`. A stop an element
+    // does not pin resolves to the base variable — its resting value.
+    const registerStop = (attribute: AnimatableStandardPropertyType, offset: number) => {
+      const animationName = `jumi-${attribute}`
+      const key = `@keyframes ${animationName}`
+      const blocks = result[key] ?? (result[key] = {})
+
+      blocks[`${offset}%`] = {
+        [attribute]: propertyKeyframeValue(attribute, `at-${offset}`, css('var', `--jumi-${attribute}`)),
+      }
+    }
+
     for (const [attribute, ids] of values) {
       for (const id of ids) {
         register(`jumi-${attribute}-${id}`, attribute, css('var', `--jumi-${attribute}-${id}`))
@@ -79,43 +113,53 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
       register(`jumi-${attribute}`, attribute, css('var', `--jumi-${attribute}`))
     }
 
-    for (const [attribute, stops] of timelines) {
-      if (!stops.size) continue
+    for (const [attribute, offsets] of stops) {
+      if (!offsets.size) continue
+      for (const offset of [...offsets].sort((a, b) => a - b)) registerStop(attribute, offset)
+    }
+
+    for (const [attribute, ids] of aliases) {
+      if (!ids.size) continue
       const base = css('var', `--jumi-${attribute}`)
-      for (const stop of stops) {
-        register(cssEscape(`jumi-${attribute}-${stop}`), attribute, propertyKeyframeValue(attribute, stop, base))
+      for (const id of ids) {
+        register(cssEscape(`jumi-${attribute}-${id}`), attribute, propertyKeyframeValue(attribute, id, base))
       }
     }
 
     if (Object.keys(result).length) addUtilities(result)
   }
 
-  function propertyKeyframeValue(attribute: AnimatableStandardPropertyType, stop: string, fallback: string): string {
-    const variable = cssEscape(`--jumi-${attribute}-${stop}`)
+  function propertyKeyframeValue(attribute: AnimatableStandardPropertyType, suffix: string, fallback: string): string {
+    const variable = cssEscape(`--jumi-${attribute}-${suffix}`)
     const { dependencies = [], value = fallback } = propertyVariables[attribute]
 
-    if (!dependencies.length) return css('var', variable)
+    // The fallback is what an element that does NOT pin this frame resolves to.
+    // Stopped tweens share one keyframe per attribute, so the frame set is the
+    // union of every stop used in the build: a frame another element pinned
+    // must land on this element's resting value, never on the property's
+    // initial value.
+    if (!dependencies.length) return css('var', variable, fallback)
 
     const expanded = dependencies.reduce((result, dependency) => {
       const part = propertyVariables[dependency].variable
-      return result.replaceAll(`var(${part})`, `var(${cssEscape(`${part}-${stop}`)}, var(${part}))`)
+      return result.replaceAll(`var(${part})`, `var(${cssEscape(`${part}-${suffix}`)}, var(${part}))`)
     }, value)
 
     return css('var', variable, expanded)
   }
 
-  function animationParts(attribute: string, nameVar?: string, stop?: string): CssInJs {
+  function animationParts(attribute: string, nameVar?: string, alias?: string): CssInJs {
     const timing = (part: string) => {
       const perAttribute = `--jumi-${attribute}-${part}`
-      if (stop) {
-        const perStop = cssEscape(`--jumi-${attribute}-${stop}-${part}`)
-        return css('var', perStop, css('var', perAttribute, css('var', `--jumi-${part}`)))
+      if (alias) {
+        const perAlias = cssEscape(`--jumi-${attribute}-${alias}-${part}`)
+        return css('var', perAlias, css('var', perAttribute, css('var', `--jumi-${part}`)))
       }
       return css('var', perAttribute, css('var', `--jumi-${part}`))
     }
 
-    const name = stop
-      ? css('var', cssEscape(`--jumi-${attribute}-${stop}-animation-name`), 'none')
+    const name = alias
+      ? css('var', cssEscape(`--jumi-${attribute}-${alias}-animation-name`), 'none')
       : css('var', nameVar ?? `--jumi-${attribute}-animation-name`, css('var', '--jumi-animation-name'))
 
     return {
@@ -146,12 +190,12 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
    * The shared `--jumi-animation-name` control is deliberately left inheritable,
    * so a parent can still cascade one named animation into its subtree.
    */
-  function computeAnimationRegister(slots: Array<{ attribute: string, nameVar?: string, stop?: string }>) {
+  function computeAnimationRegister(slots: Slot[]) {
     const names = new Set<string>()
 
-    for (const { attribute, nameVar, stop } of slots) {
+    for (const { alias, attribute, nameVar } of slots) {
       if (nameVar) names.add(nameVar)
-      else if (stop) names.add(cssEscape(`--jumi-${attribute}-${stop}-animation-name`))
+      else if (alias) names.add(cssEscape(`--jumi-${attribute}-${alias}-animation-name`))
       else names.add(`--jumi-${attribute}-animation-name`)
     }
 
@@ -164,8 +208,8 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
   }
 
   function computeAnimationVariable(): CssInJs {
-    const slots: Array<{ attribute: string, nameVar?: string, stop?: string }> = []
-    const shared = new Set<string>()
+    const slots: Slot[] = []
+    const shared = new Set<AnimatableStandardPropertyType>()
 
     for (const [attribute, ids] of values) {
       for (const id of ids) {
@@ -176,18 +220,20 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
       }
     }
 
-    for (const attribute of sorted(composed)) {
-      shared.add(attribute)
-    }
+    // Composed tweens and stops resolve the same `jumi-{attribute}` keyframe, so
+    // they resolve the same slot: a stop never adds a second animation of the
+    // property it belongs to.
+    for (const attribute of composed) shared.add(attribute)
+    for (const attribute of stops.keys()) shared.add(attribute)
 
     for (const attribute of sorted(shared)) {
       slots.push({ attribute })
     }
 
-    for (const [attribute, stops] of timelines) {
-      if (!stops.size) continue
-      for (const stop of stops) {
-        slots.push({ attribute, stop })
+    for (const [attribute, ids] of aliases) {
+      if (!ids.size) continue
+      for (const id of ids) {
+        slots.push({ alias: id, attribute })
       }
     }
 
@@ -205,8 +251,8 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
     // var chain. The `--jumi-animation-*` defaults the chains fall back to come
     // from `assemble('animation')` at the end of `.animations`.
     const animation = slots.length
-      ? slots.reduce((acc, { attribute, nameVar, stop }) => {
-          const parts = animationParts(attribute, nameVar, stop)
+      ? slots.reduce((acc, { alias, attribute, nameVar }) => {
+          const parts = animationParts(attribute, nameVar, alias)
           for (const part in parts) {
             acc[part] = acc[part] ? `${acc[part]}, ${parts[part]}` : parts[part]
           }
@@ -234,14 +280,29 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
 
   const register = (attribute: AnimatableStandardPropertyType, modifier: null | string) => {
     properties.add(attribute)
-    let stops = timelines.get(attribute)
+    if (!modifier) return
 
-    if (!stops) {
-      stops = new Set<string>()
-      timelines.set(attribute, stops)
+    let ids = aliases.get(attribute)
+
+    if (!ids) {
+      ids = new Set<string>()
+      aliases.set(attribute, ids)
     }
 
-    if (modifier) stops.add(modifier)
+    ids.add(modifier)
+  }
+
+  const registerStop = (attribute: AnimatableStandardPropertyType, offset: number) => {
+    properties.add(attribute)
+
+    let offsets = stops.get(attribute)
+
+    if (!offsets) {
+      offsets = new Set<number>()
+      stops.set(attribute, offsets)
+    }
+
+    offsets.add(offset)
   }
 
   function transitionVariables(attribute: string): string {
@@ -301,14 +362,24 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
 
     property: (attribute, parts = []): MatchComponentsPropertyFunction => {
       return (value, { modifier }) => {
-        register(attribute, modifier)
+        const offset = modifier ? stopOffset(modifier) : null
 
-        if (!parts.length && !modifier) return perValue(attribute, value)
+        // `/[at-50%]` and `/[at-50]` name the same frame, so the modifier is
+        // respelled from the parsed offset before it reaches a variable name:
+        // there is no `%` to escape and both spellings share one stop variable.
+        const stop = offset === null ? null : `at-${offset}`
 
-        if (parts.length && !modifier) composed.add(attribute)
+        if (offset === null) register(attribute, modifier)
+        else registerStop(attribute, offset)
+
+        if (!parts.length && !stop && !modifier) return perValue(attribute, value)
+
+        if (parts.length && !stop && !modifier) composed.add(attribute)
+
+        const suffix = stop ?? modifier
 
         const variable = (name: string) => {
-          return modifier ? cssEscape(`--jumi-${name}-${modifier}`) : `--jumi-${name}`
+          return suffix ? cssEscape(`--jumi-${name}-${suffix}`) : `--jumi-${name}`
         }
 
         const variables = parts.length
@@ -319,6 +390,16 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
               return acc
             }, {} as CssInJs)
           : { [variable(attribute)]: value }
+
+        // A stop feeds the attribute's shared timeline, which reads the frame
+        // variables by offset — so it activates the attribute-wide slot rather
+        // than claiming a slot of its own.
+        if (stop) {
+          return {
+            [`--jumi-${attribute}-animation-name`]: `jumi-${attribute}`,
+            ...variables,
+          }
+        }
 
         const animationName = modifier ? cssEscape(`jumi-${attribute}-${modifier}`) : `jumi-${attribute}`
 
@@ -407,4 +488,16 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
   }
 
   return creator
+}
+
+/**
+ * Read the frame offset out of a stop modifier — `at-50%` → `50`, `at-12.5` →
+ * `12.5`. The `at-` prefix is what separates a STOP from an ALIAS: `/[at-50%]`
+ * adds a frame to the attribute's shared timeline, while `/[1]` names an
+ * instance with a keyframe of its own. Anything that does not parse as an
+ * offset returns `null`, so the modifier keeps its alias meaning.
+ */
+function stopOffset(modifier: string): null | number {
+  const match = /^at-(\d+(?:\.\d+)?)%?$/.exec(modifier)
+  return match ? Number(match[1]) : null
 }

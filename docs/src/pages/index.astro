@@ -11,7 +11,29 @@ import effects from '../data/effects.json';
       <div class="hero-bottom"><p>Big motion. Small classes.<br />Compose expressive animations right in your markup, with the Tailwind CSS you already know.</p><a class="button lime" href="/docs/">Start moving <span>↗</span></a></div>
       <div class="hero-art" aria-hidden="true">
         <div class="orbit animations animate-rotate-[360deg] animation-duration-[24s] animation-timing-function-linear animation-iteration-count-infinite">
-          {Array.from({length: 12}, (_, i) => <div class="petal-position" style={`--angle:${i * 30}deg`}><div class="petal animations animate-rotate-[45deg] animation-duration-[4200ms] animation-direction-alternate-reverse animation-timing-function-[cubic-bezier(.85,0,.15,1)] animation-iteration-count-infinite" style={`--jumi-animation-delay:${i * -90}ms`}></div></div>)}
+          {Array.from({length: 12}, (_, i) => (
+            <div class="petal-position" style={`--angle:${i * 30}deg`}>
+              <div
+                class={`petal animations
+                  animate-scale-x-[0.30]/[at-0%]
+                  animate-scale-x-[0.30]/[at-12%]
+                  animate-scale-x-[1.06]/[at-24%]
+                  animate-scale-y-[0.08]/[at-0%]
+                  animate-scale-y-[0.08]/[at-12%]
+                  animate-scale-y-[1.06]/[at-24%]
+                  animate-rotate-[0deg]/[at-32%]
+                  animation-duration-[4200ms]
+                  animation-direction-alternate
+                  animation-iteration-count-infinite
+                  animation-timing-function-[cubic-bezier(0.22,1,0.36,1)]/scale
+                  animation-timing-function-[cubic-bezier(0.5,0,0.35,1)]/rotate
+                  ${i % 2 === 0
+                    ? 'animate-rotate-[26deg]/[at-0%] animate-rotate-[26deg]/[at-12%]'
+                    : 'animate-rotate-[-26deg]/[at-0%] animate-rotate-[-26deg]/[at-12%]'}`}
+                style={`--jumi-animation-delay:${i * -100}ms`}
+              ></div>
+            </div>
+          ))}
           <span class="orbit-core"></span>
         </div>
         <span class="art-coordinate top">FIG. 01 / COMPOSITION</span><span class="art-coordinate bottom">12 PARTS. ONE SHARED RHYTHM.</span>

@@ -81,9 +81,35 @@ That is how you place an action inside a cycle rather than spreading it across t
 
 The scale uses the shared controls: it opens, holds, and withdraws across the cycle. The rotation is a separate instance: `animation-direction-normal/[rotate.1]` takes it out of the shared `alternate-reverse`, and `cubic-bezier(1,0,1,1)` hugs its resting pose before releasing, so nothing turns until the second half. This site's hero is exactly this composition.
 
+## Set where the action happens
+
+A stop places a value at a point in the cycle. Add `/[at-<offset>]` — `/[at-50%]` or `/[at-50]`, the `%` is optional — and the value takes that frame of the property's timeline:
+
+```html
+<div class="animations animate-rotate-[-45deg]/[at-50%] animate-rotate-[15deg]/[at-75]
+  animation-duration-[2000ms]
+  animation-iteration-count-infinite">
+  Turn one way by halfway, the other by three quarters.
+</div>
+```
+
+Both utilities feed **one** `rotate` animation: the frames land at 50% and 75%, and the 0% and 100% frames stay at the element's resting value. The cycle closes on itself, so it repeats without a jump — which is what makes it safe to run `infinite`. A stop on a second property gets a timeline of its own:
+
+```html
+<div class="animations animate-rotate-[-45deg]/[at-50%] animate-scale-110/[at-50%]">
+  Turn and grow at the same point.
+</div>
+```
+
+Stops and aliases answer different questions. A stop says *when* inside one animation; an alias says *which* animation. Reach for a stop when the values belong to a single gesture, and for an alias when two tracks genuinely need separate timing.
+
+One consequence worth knowing: a stop extends a timeline shared by everything in your build, so the frame set is the project-wide union of every offset used. A frame you did not pin on an element resolves to that element's resting value for the property — never to the property's initial value, but it is a correction the element did not ask for. If two elements need unrelated frame sets for the same property, give them separate animations instead of stops.
+
 ## Timelines and composition
 
 Jumi also exposes global `animation-timeline`, `animation-composition`, and animation-range controls. These are separate CSS declarations from the core animation shorthand. Treat them as progressive enhancements and verify them in the browsers you support.
+
+Composition is not how Jumi brings several values of one property together — stops are, and they need no browser support flag. Keep `animation-composition` for blending an animation with a value that is already on the element.
 
 For predictable independent timing, use the duration, delay, easing, iteration, direction, fill, and playback controls above. Scoped composition and timeline values are not currently assembled into per-slot longhand lists; use their global forms.
 

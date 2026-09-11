@@ -43,7 +43,7 @@ describe('property curry', () => {
     })
   })
 
-  it('suffixes the stop modifier into the variable name', () => {
+  it('suffixes an alias modifier into the variable name', () => {
     const { creator } = setup()
 
     const result = creator.property('opacity')('0', { modifier: '25' })
@@ -77,7 +77,7 @@ describe('property curry', () => {
     })
   })
 
-  it('suffixes the stop modifier into part variables', () => {
+  it('suffixes an alias modifier into part variables', () => {
     const { creator } = setup()
 
     const result = creator.property('filter', [['filter-blur', value => css('blur', value)]])('8px', { modifier: '50' })
@@ -88,7 +88,7 @@ describe('property curry', () => {
     })
   })
 
-  it('escapes a decimal stop modifier in the variable name', () => {
+  it('escapes a decimal alias modifier in the variable name', () => {
     const { creator } = setup()
 
     const result = creator.property('opacity')('0', { modifier: '12.5' })
@@ -99,7 +99,7 @@ describe('property curry', () => {
     })
   })
 
-  it('escapes a decimal stop modifier into part variables', () => {
+  it('escapes a decimal alias modifier into part variables', () => {
     const { creator } = setup()
 
     const result = creator.property('filter', [['filter-blur', value => css('blur', value)]])('8px', { modifier: '12.5' })
@@ -107,6 +107,48 @@ describe('property curry', () => {
     expect(result).toEqual({
       '--jumi-filter-12\\.5-animation-name': 'jumi-filter-12\\.5',
       '--jumi-filter-blur-12\\.5': 'blur(8px)',
+    })
+  })
+
+  it('writes a stop to the shared timeline and activates the attribute slot', () => {
+    const { creator } = setup()
+
+    const result = creator.property('opacity')('0', { modifier: 'at-50%' })
+
+    expect(result).toEqual({
+      '--jumi-opacity-animation-name': 'jumi-opacity',
+      '--jumi-opacity-at-50': '0',
+    })
+  })
+
+  it('resolves `at-50%` and `at-50` to the same stop variable', () => {
+    const { creator } = setup()
+
+    const percent = creator.property('opacity')('0', { modifier: 'at-50%' })
+    const bare = creator.property('opacity')('0', { modifier: 'at-50' })
+
+    expect(percent).toEqual(bare)
+  })
+
+  it('writes a stop into the part variables of a composed property', () => {
+    const { creator } = setup()
+
+    const result = creator.property('filter', [['filter-blur', value => css('blur', value)]])('8px', { modifier: 'at-30%' })
+
+    expect(result).toEqual({
+      '--jumi-filter-animation-name': 'jumi-filter',
+      '--jumi-filter-blur-at-30': 'blur(8px)',
+    })
+  })
+
+  it('keeps a modifier that is not a stop as an alias', () => {
+    const { creator } = setup()
+
+    // `at-` is reserved for frame offsets. Anything that does not parse as one
+    // stays an alias, so it keeps a keyframe and a slot of its own.
+    expect(creator.property('opacity')('0', { modifier: 'at-nope' })).toEqual({
+      '--jumi-opacity-at-nope': '0',
+      '--jumi-opacity-at-nope-animation-name': 'jumi-opacity-at-nope',
     })
   })
 })
@@ -136,9 +178,46 @@ describe('keyframe emission', () => {
 
     expect(utilities).toContainEqual({
       '@keyframes jumi-opacity-25': {
-        to: { opacity: 'var(--jumi-opacity-25)' },
+        to: { opacity: 'var(--jumi-opacity-25, var(--jumi-opacity))' },
       },
     })
+  })
+
+  it('folds every stop into ONE shared keyframe, ordered by offset', () => {
+    const { addUtilities, creator } = setup()
+
+    creator.property('opacity')('0', { modifier: 'at-75%' })
+    creator.property('opacity')('1', { modifier: 'at-25' })
+    creator.animations
+
+    const utilities = addUtilities.mock.calls.map(([u]) => u)
+
+    // Stops are frames of one timeline, not keyframes of their own: a single
+    // `@keyframes jumi-opacity` carries every offset the build uses.
+    expect(utilities).toContainEqual({
+      '@keyframes jumi-opacity': {
+        '25%': { opacity: 'var(--jumi-opacity-at-25, var(--jumi-opacity))' },
+        '75%': { opacity: 'var(--jumi-opacity-at-75, var(--jumi-opacity))' },
+      },
+    })
+  })
+
+  it('adds stops to an existing composed keyframe instead of replacing it', () => {
+    const { addUtilities, creator } = setup()
+
+    creator.property('filter', [['filter-blur', value => css('blur', value)]])('8px', { modifier: null })
+    creator.property('filter', [['filter-blur', value => css('blur', value)]])('2px', { modifier: 'at-40%' })
+    creator.animations
+
+    const utilities = addUtilities.mock.calls
+      .map(([u]) => u)
+      .find(u => '@keyframes jumi-filter' in u)
+
+    expect(utilities).toBeDefined()
+    expect(utilities['@keyframes jumi-filter'].to).toBeDefined()
+    expect(utilities['@keyframes jumi-filter']['40%'].filter).toContain(
+      'var(--jumi-filter-blur-at-40,',
+    )
   })
 
   it('expands the composition per-alias for a composed property', () => {
@@ -168,7 +247,7 @@ describe('keyframe emission', () => {
 
     expect(utilities).toContainEqual({
       '@keyframes jumi-opacity-12\\.5': {
-        to: { opacity: 'var(--jumi-opacity-12\\.5)' },
+        to: { opacity: 'var(--jumi-opacity-12\\.5, var(--jumi-opacity))' },
       },
     })
   })
@@ -190,7 +269,7 @@ describe('keyframe emission', () => {
     expect(filter).toContain('var(--jumi-filter-blur-12\\.5, var(--jumi-filter-blur))')
   })
 
-  it('wires a per-stop animation slot with per-stop timing overrides', () => {
+  it('wires an alias animation slot with per-alias timing overrides', () => {
     const { creator } = setup()
 
     creator.property('opacity')('0', { modifier: '25' })
@@ -262,7 +341,7 @@ describe('animations wiring', () => {
     expect(animations['--jumi-opacity']).toBe('1')
   })
 
-  it('orders the animation list per-value → composed → per-stop → effects', () => {
+  it('orders the animation list per-value → composed → per-alias → effects', () => {
     const { creator } = setup()
 
     creator.property('opacity')('50', { modifier: null })
@@ -283,7 +362,7 @@ describe('animations wiring', () => {
     )
   })
 
-  it('resolves an unset per-stop slot to `none`', () => {
+  it('resolves an unset alias slot to `none`', () => {
     const { creator } = setup()
 
     creator.property('opacity')('0', { modifier: '25' })
@@ -293,13 +372,27 @@ describe('animations wiring', () => {
       'var(--jumi-opacity-25-animation-name, none)',
     )
   })
+
+  it('gives every stop on an attribute the attribute\'s single slot', () => {
+    const { creator } = setup()
+
+    creator.property('opacity')('0', { modifier: 'at-25%' })
+    creator.property('opacity')('1', { modifier: 'at-75%' })
+    const animations = creator.animations
+
+    // Two stop utilities, one animation: they are frames of the same timeline,
+    // not competing same-property animations for `replace` to arbitrate.
+    expect(animations['animation-name']).toBe(
+      'var(--jumi-opacity-animation-name, var(--jumi-animation-name))',
+    )
+  })
 })
 
 describe('animation-name registration', () => {
   const registered = (addBase: ReturnType<typeof setup>['addBase']) =>
     addBase.mock.calls.reduce<CssInJs>((acc, [utilities]) => ({ ...acc, ...utilities }), {})
 
-  it('registers per-value, composed, per-stop and effect names as non-inheriting', () => {
+  it('registers per-value, composed, per-alias and effect names as non-inheriting', () => {
     const { addBase, creator } = setup()
 
     creator.property('opacity')('50', { modifier: null })
@@ -324,13 +417,28 @@ describe('animation-name registration', () => {
     })
   })
 
-  it('escapes a decimal stop into its registration', () => {
+  it('escapes a decimal alias into its registration', () => {
     const { addBase, creator } = setup()
 
     creator.property('opacity')('0', { modifier: '12.5' })
     creator.animations
 
     expect(registered(addBase)['@property --jumi-opacity-12\\.5-animation-name']).toEqual({
+      inherits: 'false',
+      syntax: '"*"',
+    })
+  })
+
+  it('registers a stop against the shared attribute slot', () => {
+    const { addBase, creator } = setup()
+
+    creator.property('opacity')('0', { modifier: 'at-50%' })
+    creator.animations
+
+    // The stop reads its frame from `--jumi-opacity-at-50` inside the shared
+    // `jumi-opacity` keyframe, so the slot it switches on is the attribute-wide
+    // name — registered non-inheriting like every other activation var.
+    expect(registered(addBase)['@property --jumi-opacity-animation-name']).toEqual({
       inherits: 'false',
       syntax: '"*"',
     })

@@ -1,78 +1,62 @@
-/**
- * The one missing piece: make `animate-<attr>` honor `/at-<stop>`.
- *
- * Infrastructure already in place:
- *   - `atStops` theme      = { 'at-0%': '0', 'at-100%': '100' }
- *   - `modifiers: atStops` on every `animate-<attr>` utility
- *   - `stopsKeyframe()`    -> shared `jumi-<attr>-timeline` keyframe reading
- *                             var(--jumi-<attr>-0) and var(--jumi-<attr>-100)
- *   - `creator.property(attr)` registers that keyframe, returns its name
- *   - `stopVariable(attr, stop)` -> `--jumi-<attr>-<stop>`
- *
- * What's missing: the property fns don't consume `modifier`. So
- * `animate-width-16/at-0%` currently writes `--jumi-width: 16` (base var) and
- * never touches `--jumi-width-0`.
- *
- * --- WHAT TO ADD IN src/properties/match.ts -------------------------------
- *
- * 1) Import (near the other keyframes imports):
- *
- *    import { stopVariable } from '@/keyframes/stops'
- *
- * 2) Extend the type import to include Creator + AnimatableStandardPropertyType:
- *
- *    import type {
- *      AnimatableStandardPropertyType,
- *      Collection,
- *      Creator,
- *      GetMatchUtilities,
- *      MatchProperty,
- *      MatchUtilitiesPropertyValue,
- *    } from '@/types'
- *
- * 3) Right before `return matchProperties` in getMatchUtilities, wrap every
- *    property fn (skip non-property / effect utilities):
- *
- *    // Learn `/at-<stop>`: write the value to the per-stop variable so the
- *    // shared timeline keyframe interpolates the pinned stops.
- *    for (const name of Object.keys(matchProperties)) {
- *      if (!isProperty(name)) continue
- *      const { fn, ...options } = matchProperties[name]
- *      matchProperties[name] = { ...options, fn: withStops(fn, name, creator) }
- *    }
- *
- *    return matchProperties
- *
- * 4) Helpers (module scope, after getMatchUtilities):
- *
- *    function isProperty(name: string): name is `animate-${AnimatableStandardPropertyType}` {
- *      return name.startsWith('animate-') && name.slice('animate-'.length) in cssProperties
- *    }
- *
- *    function withStops(
- *      fn: MatchUtilitiesPropertyValue['fn'],
- *      name: `animate-${AnimatableStandardPropertyType}`,
- *      creator: Creator,
- *    ): MatchUtilitiesPropertyValue['fn'] {
- *      const attribute = name.slice('animate-'.length)
- *      return (value, extra) => {
- *        const stop = extra.modifier ? atStops[extra.modifier] : undefined
- *        if (stop !== undefined) {
- *          return {
- *            [`--jumi-${attribute}-animation-name`]: creator.property(attribute),
- *            [stopVariable(attribute, stop)]: value,
- *          }
- *        }
- *        return fn(value, extra)
- *      }
- *    }
- *
- * ---------------------------------------------------------------------------
- * Behaviour after this:
- *   animate-width-16/at-0% animate-width-32/at-100%
- *     ->  --jumi-width-0: 16 ; --jumi-width-100: 32
- *     ->  width tween 16 -> 32 -> 16
- *
- * A bare `animate-width-32` (no `/at-*`) keeps the old behaviour and writes
- * the base `--jumi-width: 32`.
- */
+# Stops — shipped
+
+`animate-<attr>-<value>/[at-<offset>]` puts a value at a frame of the attribute's
+one shared timeline. Documented for users in `docs/src/pages/docs/controls.md`
+("Set where the action happens").
+
+## The model
+
+One keyframe per attribute, never one per stop:
+
+```css
+@keyframes jumi-rotate {
+  50% { rotate: var(--jumi-rotate-at-50, var(--jumi-rotate-x-at-50, …)) }
+  75% { rotate: var(--jumi-rotate-at-75, var(--jumi-rotate-x-at-75, …)) }
+}
+```
+
+- `animate-rotate-[-45deg]/[at-50%]` writes `--jumi-rotate-at-50: -45deg` and
+  activates the attribute-wide slot (`--jumi-rotate-animation-name`). It adds no
+  animation of its own.
+- `at-50%` and `at-50` are the same stop: the offset is parsed out of the
+  modifier and the variable is respelled from the number, so there is no `%` to
+  escape.
+- Frames sort by offset. A stop the element does not pin falls back past the
+  per-part variables to the attribute's base variable.
+- Because the shared keyframe is global, its frame set is the union of every
+  stop in the build. Unpinned frames land on the element's resting value.
+
+## Why not composition, and why not per-stop keyframes
+
+- `animation-composition` sums complete animations. Two same-property
+  animations each carry their own 0% and 100%, so their return legs disagree and
+  `replace` discards all but the last. `accumulate` compounds per iteration,
+  which runs away on `infinite`.
+- Per-stop keyframes (the earlier shape: `jumi-<attr>-<stop>`, one slot each)
+  had the same problem in a different costume — several animations of one
+  property, arbitrated by `replace`.
+
+Frames of one keyframe share one pair of endpoints, so the phrase closes and
+loops cleanly.
+
+## Aliases are not stops
+
+`/[1]`, `/[50]` — a bare modifier — still names an instance, with a keyframe and
+a slot of its own so it can carry its own timing. That is the tool for two
+separately driven tracks of one property. `at-` is the reserved prefix;
+anything that does not parse as an offset keeps its alias meaning.
+
+## Where it lives
+
+`src/helpers/create/index.ts`:
+
+- `stopOffset(modifier)` — `at-50%` → `50`; anything else returns `null`.
+- `stops: Map<attribute, Set<offset>>` — stops, feeding the shared keyframe.
+- `aliases: Map<attribute, Set<string>>` — bare modifiers, one keyframe and slot
+  each.
+- `registerStop()` folds a frame into `@keyframes jumi-<attr>`;
+  `computePropertyKeyframes` runs values → composed → stops → aliases so a stop
+  merges into a keyframe the composed path may have already created.
+- `propertyKeyframeValue(attribute, suffix, fallback)` carries the fallback for
+  dependency-less properties too, which is what makes an unpinned frame resolve
+  to the resting value rather than the property's initial value.
