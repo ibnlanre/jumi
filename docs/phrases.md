@@ -138,3 +138,38 @@ list — 221 of 395 already had it. Widened so far: `animate-scale`,
 that property's *bare* arbitrary values, which is why it is done per property
 rather than wholesale; theme-defined phrases are resolved from the values map and
 skip the gate entirely.
+
+## Known limitation: the slot list is per pass, not per update
+
+`.animations` has to enumerate every slot in the build, so its rule is not a
+function of its own candidate — and Tailwind caches one AST per candidate. Both
+halves were measured against `@tailwindcss/node`'s `compile()` +
+`build(candidates)`, which is the path the Vite plugin takes:
+
+- **A fresh pass is correct by the alphabet.** The scanner returns candidates
+  sorted (`animate-rotate-…`, `animate-scale-110`, `animation-duration-500`,
+  `animations` — measured with `Scanner`, for markup that lists `animations`
+  first), and every `animate-…` / `animation-…` sorts before `animations` because
+  `-` < `s`. So every slot is registered before the list is built. Hand the same
+  candidates in another order and the list is short or empty: `['animations',
+  tween]` → no slot, `[tween, 'animations']` → one slot.
+- **An incremental pass can be stale.** Calling `build()` again with one more
+  tween reuses the cached `.animations` AST, and the list does not grow. The Vite
+  plugin holds one compiler and calls `build([...this.candidates])` per update,
+  and its candidate Set is created once per session and never cleared — so
+  candidates added later are appended *after* `animations`, which makes the
+  alphabetical guarantee a first-scan guarantee. That is why the workaround is a
+  dev-server restart, not a CSS edit: recreating the compiler does not reorder the
+  Set. Symptom: a newly added tween class does not animate, because the element's
+  slot is missing from the list.
+
+There is no plugin-side fix. The plugin API has no end-of-build hook and no way
+to invalidate a candidate, and plugin output is materialised eagerly — a getter
+on `addBase` and on a utility value returned its first value on three consecutive
+builds. Making the rule constant is the one structural alternative: a
+fixed-length list of `var(--jumi-slot-<n>-…)` positions, each tween writing its
+own slot's variables, so the rule depends on nothing. It costs two things: the
+list length becomes a fixed maximum shipped on every page, and a slot's
+*position* moves into the tween's own cached rule — and position is exactly how
+`perValue`'s move-to-end makes a re-registered value win under
+`animation-composition: replace`.
