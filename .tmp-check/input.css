@@ -1,0 +1,4 @@
+@import "tailwindcss" source(none);
+
+@source "./index.html";
+@plugin '../dist/index.js';

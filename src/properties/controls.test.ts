@@ -50,6 +50,18 @@ describe('per-attribute timing controls', () => {
       '--jumi-animation-direction': 'alternate',
     })
   })
+
+  it('addresses a labelled slot of a property with a dotted modifier', () => {
+    const { controls } = setup()
+
+    // `/[rotate.flick]` is the animation whose declaration carried `/[flick]` —
+    // how two animations of one property, summed by
+    // `animation-composition: add`, are given independent timing. A slot that is
+    // never addressed reads the attribute's variable instead.
+    expect(controls['animation-timing-function']!.fn('ease-out', { modifier: 'rotate.flick' })).toEqual({
+      '--jumi-rotate-flick-animation-timing-function': 'ease-out',
+    })
+  })
 })
 describe('transition controls', () => {
   it.each([

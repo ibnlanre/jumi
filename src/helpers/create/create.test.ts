@@ -161,14 +161,17 @@ describe('keyframe emission', () => {
     creator.animations
 
     const id = shorthash2('0:0,58:1')
-    const utilities = addUtilities.mock.calls.map(([u]) => u)
+    const keyframes = addUtilities.mock.calls
+      .map(([u]) => u)
+      .find(u => `@keyframes jumi-opacity-${id}` in u)
 
-    expect(utilities).toContainEqual({
-      [`@keyframes jumi-opacity-${id}`]: {
-        '0%': { opacity: `var(--jumi-opacity-${id}-0, var(--jumi-opacity))` },
-        '58%': { opacity: `var(--jumi-opacity-${id}-58, var(--jumi-opacity))` },
-      },
-    })
+    const frames = keyframes[`@keyframes jumi-opacity-${id}`]
+
+    // Exactly the declared offsets — nobody else's — each reading its own frame
+    // variable.
+    expect(Object.keys(frames)).toEqual(['0%', '58%'])
+    expect(frames['0%'].opacity).toBe(`var(--jumi-opacity-${id}-0, var(--jumi-opacity))`)
+    expect(frames['58%'].opacity).toBe(`var(--jumi-opacity-${id}-58, var(--jumi-opacity))`)
   })
 
   it('gives different phrases of one property separate keyframes', () => {
@@ -214,13 +217,12 @@ describe('keyframe emission', () => {
     creator.animations
 
     const id = shorthash2('12.5:0')
-    const utilities = addUtilities.mock.calls.map(([u]) => u)
+    const keyframes = addUtilities.mock.calls
+      .map(([u]) => u)
+      .find(u => `@keyframes jumi-opacity-${id}` in u)
 
-    expect(utilities).toContainEqual({
-      [`@keyframes jumi-opacity-${id}`]: {
-        '12.5%': { opacity: `var(--jumi-opacity-${id}-12\\.5, var(--jumi-opacity))` },
-      },
-    })
+    expect(keyframes[`@keyframes jumi-opacity-${id}`]['12.5%'].opacity)
+      .toBe(`var(--jumi-opacity-${id}-12\\.5, var(--jumi-opacity))`)
   })
 
   it('wires a phrase slot with per-attribute timing overrides', () => {
@@ -332,6 +334,27 @@ describe('animations wiring', () => {
         `var(--jumi-opacity-${shorthash2('0:0,100:1')}-animation-name, var(--jumi-animation-name))`,
       ].join(', '),
     )
+  })
+  it('gives a labelled slot its own control link', () => {
+    const { creator } = setup()
+
+    creator.property('rotate')('0:0deg,58:0deg', { modifier: 'flick' })
+    creator.property('rotate')('0:0deg,100:90deg', { modifier: null })
+    const animations = creator.animations
+
+    // A labelled slot reads its label's variable first, so `/[rotate.flick]`
+    // times that animation on its own — which is how two animations of one
+    // property, summed by `animation-composition: add`, are timed apart.
+    expect(animations['animation-duration']).toContain(
+      'var(--jumi-rotate-flick-animation-duration, var(--jumi-rotate-animation-duration, var(--jumi-animation-duration)))',
+    )
+
+    // An unlabelled slot has no name to be addressed by, so it keeps the
+    // shorter chain and falls straight through to the attribute's control.
+    expect(animations['animation-duration']).toContain(
+      'var(--jumi-rotate-animation-duration, var(--jumi-animation-duration)))',
+    )
+    expect(animations['animation-duration']).not.toContain('var(--jumi-rotate-0-animation-duration')
   })
 })
 

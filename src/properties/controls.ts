@@ -1,7 +1,5 @@
 import type { GetMatchUtilities, MatchProperty } from '@/types'
 
-import { merge } from '@/helpers/merge'
-import { cssEffects } from '@/keyframes/effects'
 import { cssProperties } from '@/keyframes/property'
 import { animationComposition } from '@/theme/animation-composition'
 import { animationDirection } from '@/theme/animation-direction'
@@ -20,7 +18,13 @@ import { transitionBehavior } from '@/theme/transition-behavior'
 
 export const getMatchControls: GetMatchUtilities = (creator) => {
   const { scope, stagger, theme, transition } = creator
-  const modifiers = merge(cssProperties, cssEffects)
+
+  // Modifiers cannot be validated against a list: a control addresses a property
+  // — `/rotate` — or a labelled slot of one — `/rotate.flick`, the animation its
+  // declaration named with `/[flick]`. Labels are chosen in the markup, so there
+  // is nothing to enumerate. A modifier that addresses no slot writes a variable
+  // nothing reads.
+  const modifiers = 'any'
 
   const matchControls: Partial<MatchProperty> = {
     // Stagger: distributes the stagger input across direct children at
@@ -50,10 +54,7 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
       values: theme('transitionDelay'),
     },
     'animation-composition': {
-      fn: (value, { modifier }) => {
-        if (!modifier) return { '--jumi-animation-composition': value }
-        return { [`--jumi-${modifier}-animation-composition`]: value }
-      },
+      fn: scope('animation-composition'),
       modifiers,
       values: animationComposition,
     },
@@ -157,10 +158,7 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
       values: animationRangeTimeline,
     },
     'animation-timeline': {
-      fn: (value, { modifier }) => {
-        if (!modifier) return { '--jumi-animation-timeline': value }
-        return { [`--jumi-${modifier}-animation-timeline`]: value }
-      },
+      fn: scope('animation-timeline'),
       modifiers,
       values: animationTimeline,
     },

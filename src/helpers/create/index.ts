@@ -29,10 +29,12 @@ type Frame = {
 }
 
 /** One animation in `.animations`, addressed by its attribute and, optionally,
- * the variable that declares its name. */
+ * the variable that declares its name. `label` is the name its declaration gave
+ * it with `/[flick]`, which is what `/[rotate.flick]` addresses. */
 type Slot = {
   attribute: string
-  nameVar?: string
+  label?: string | undefined
+  nameVar?: string | undefined
 }
 
 export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
@@ -83,6 +85,12 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
   // OPTIMIZATION: Using a Set allows O(1) deduplication and move-to-end,
   // replacing the O(N) Array indexOf/splice logic. JS Sets maintain insertion order.
   const values = new Map<AnimatableStandardPropertyType, Set<string>>()
+  // The name a declaration gave its slot — `/[flick]` on a phrase — keyed
+  // `attribute:id`. The control side spells the same word in `/[rotate.flick]`,
+  // so the two meet on one element-local variable instead of a number that
+  // depends on what else the page happens to animate.
+  const labels = new Map<string, string>()
+
   const composed = new Set<AnimatableStandardPropertyType>()
 
   // Deterministic alphabetical ordering for Sets of attribute/effect names.
@@ -167,9 +175,19 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
     return css('var', variable, expanded)
   }
 
-  function animationParts(attribute: string, nameVar?: string): CssInJs {
+  function animationParts(attribute: string, nameVar?: string, label?: string): CssInJs {
+    // Three links, narrowest first: the slot's own value, then the attribute's,
+    // then the global default. `/[rotate]` writes the middle link;
+    // `/[rotate.flick]` writes the first, which is how two animations of one
+    // property — summed by `animation-composition: add` — are timed apart. Only
+    // a labelled slot offers the link: an unlabelled one has no name to be
+    // addressed by, so it keeps the shorter chain.
     const timing = (part: string) => {
-      return css('var', `--jumi-${attribute}-${part}`, css('var', `--jumi-${part}`))
+      const chain = css('var', `--jumi-${attribute}-${part}`, css('var', `--jumi-${part}`))
+
+      return label === undefined
+        ? chain
+        : css('var', cssEscape(`--jumi-${attribute}-${label}-${part}`), chain)
     }
 
     const name = css('var', nameVar ?? `--jumi-${attribute}-animation-name`, css('var', '--jumi-animation-name'))
@@ -192,10 +210,7 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
 
     for (const [attribute, ids] of values) {
       for (const id of ids) {
-        slots.push({
-          attribute,
-          nameVar: `--jumi-${attribute}-${id}-animation-name`,
-        })
+        slots.push({ attribute, nameVar: `--jumi-${attribute}-${id}-animation-name` })
       }
     }
 
@@ -204,19 +219,19 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
     // and therefore claims a slot of its own.
     for (const attribute of composed) shared.add(attribute)
 
-    for (const attribute of sorted(shared)) {
-      slots.push({ attribute })
-    }
+    for (const attribute of sorted(shared)) slots.push({ attribute })
 
     for (const [attribute, byId] of phrases) {
       for (const id of byId.keys()) {
-        slots.push({ attribute, nameVar: `--jumi-${attribute}-${id}-animation-name` })
+        slots.push({
+          attribute,
+          label: labels.get(`${attribute}:${id}`),
+          nameVar: `--jumi-${attribute}-${id}-animation-name`,
+        })
       }
     }
 
-    for (const attribute of sorted(effects)) {
-      slots.push({ attribute })
-    }
+    for (const attribute of sorted(effects)) slots.push({ attribute })
 
     // One animation per slot, written as longhand sub-property LISTS. Chromium
     // re-parses the `animation` shorthand when var() chains resolve inside it,
@@ -226,8 +241,8 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
     // var chain. The `--jumi-animation-*` defaults the chains fall back to come
     // from `assemble('animation')` at the end of `.animations`.
     const animation = slots.length
-      ? slots.reduce((acc, { attribute, nameVar }) => {
-          const parts = animationParts(attribute, nameVar)
+      ? slots.reduce((acc, { attribute, label, nameVar }) => {
+          const parts = animationParts(attribute, nameVar, label)
           for (const part in parts) {
             acc[part] = acc[part] ? `${acc[part]}, ${parts[part]}` : parts[part]
           }
@@ -314,7 +329,7 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
     get properties(): string[] { return sorted(properties) },
 
     property: (attribute, parts = []): MatchComponentsPropertyFunction => {
-      return (value) => {
+      return (value, { modifier }) => {
         const frameList = parsePhrase(value)
 
         // A phrase declares this animation's frames, so it owns the keyframe —
@@ -334,6 +349,9 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
 
           byId.set(id, frameList)
           registerName(`--jumi-${attribute}-${id}-animation-name`)
+
+          // `/[flick]` names this slot, so a control can time it on its own.
+          if (modifier) labels.set(`${attribute}:${id}`, modifier)
 
           const variables = frameList.reduce((acc, { offset, value: frame }) => {
             const suffix = `${id}-${offset}`
@@ -381,12 +399,16 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
       return (value, { modifier }) => {
         if (!modifier) return { [`--jumi-${part}`]: value }
 
-        // The modifier names a property, so the property is escaped: a custom
-        // property name cannot carry an unescaped dot, and
-        // `animation-duration-300/[scale.1]` would otherwise emit
-        // `--jumi-scale.1-animation-delay`, which the browser drops along with
-        // the declaration it belongs to.
-        return { [cssEscape(`--jumi-${modifier}-${part}`)]: value }
+        // The modifier names a property — `rotate` — or one of its labelled
+        // slots — `rotate.flick`, the animation a declaration named with
+        // `/[flick]`. Both are escaped, because a custom property name cannot
+        // carry an unescaped dot.
+        const dot = modifier.indexOf('.')
+        const name = dot === -1
+          ? `--jumi-${modifier}-${part}`
+          : `--jumi-${modifier.slice(0, dot)}-${modifier.slice(dot + 1)}-${part}`
+
+        return { [cssEscape(name)]: value }
       }
     },
 

@@ -12,14 +12,24 @@ import effects from '../data/effects.json';
       <div class="hero-art" aria-hidden="true">
         <div class="orbit animations animate-rotate-[360deg] animation-duration-[24s] animation-timing-function-linear animation-iteration-count-infinite">
           {Array.from({length: 12}, (_, i) => (
-            <div class="petal-position" style={`--angle:${i * 30}deg`}>
+            <div
+              class="petal-position animations
+                animate-rotate-[0:var(--angle),100:calc(var(--angle)_-_360deg)]
+                animation-duration-[180s]
+                animation-timing-function-linear
+                animation-iteration-count-infinite"
+              style={`--angle:${i * 30}deg`}
+            >
               <div
                 class="petal animations
-                  animate-rotate-[0:45deg,70:0deg,100:0deg]
-                  animation-duration-[4200ms]
-                  animation-iteration-count-infinite
-                  animation-timing-function-[cubic-bezier(0.85,0,0.15,1)]"
-                style={`--jumi-animation-delay:${i * -90}ms`}
+                  animate-rotate-[0:0deg,12:-8deg,100:-8deg]/[flick]
+                  animate-rotate-[0:0deg,12:0deg,100:8deg]/[return]
+                  animation-composition-add
+                  animation-duration-[6000ms]
+                  animation-timing-function-[cubic-bezier(.85,0,.15,1)]/[rotate.flick]
+                  animation-timing-function-linear/[rotate.return]
+                  animation-iteration-count-infinite"
+                style={`--jumi-animation-delay:${i * -500}ms`}
               ></div>
             </div>
           ))}
