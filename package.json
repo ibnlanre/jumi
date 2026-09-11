@@ -12,9 +12,9 @@
     "LICENSE"
   ],
   "scripts": {
-    "docs:prepare": "pnpm run bundle && node scripts/prepare-docs.mjs",
-    "docs:dev": "pnpm run docs:prepare && astro dev --root docs",
-    "docs:build": "pnpm run docs:prepare && astro build --root docs",
+    "docs:prepare": "node scripts/prepare-docs.mjs",
+    "docs:dev": "astro dev --root docs",
+    "docs:build": "astro build --root docs",
     "docs:preview": "astro preview --root docs",
     "lint": "eslint --fix .",
     "bundle": "tsup src/index.ts --format cjs,esm --dts",

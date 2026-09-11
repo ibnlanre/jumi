@@ -137,6 +137,17 @@ describe('property curry', () => {
       [`--jumi-rotate-${id}-animation-name`]: `jumi-rotate-${id}`,
     })
   })
+  it('records a phrase label in the rule it declares', () => {
+    const { creator } = setup()
+
+    const labelled = creator.property('rotate')('0:0deg,58:0deg', { modifier: 'flick' })
+    const bare = creator.property('rotate')('0:0deg,100:90deg', { modifier: null })
+
+    // The label is the address a person can write down, unlike the hash the
+    // frame variables are keyed by, so the rule says what the slot is called.
+    expect(labelled).toMatchObject({ [`--jumi-rotate-${shorthash2('0:0deg,58:0deg')}-label`]: 'flick' })
+    expect(bare).not.toHaveProperty(`--jumi-rotate-${shorthash2('0:0deg,100:90deg')}-label`)
+  })
 })
 
 describe('keyframe emission', () => {
@@ -348,6 +359,13 @@ describe('animations wiring', () => {
     expect(animations['animation-duration']).toContain(
       'var(--jumi-rotate-flick-animation-duration, var(--jumi-rotate-animation-duration, var(--jumi-animation-duration)))',
     )
+
+    // Composition and timeline apply to one animation, so they are chained the
+    // same way — that is what lets `add` compose a single slot.
+    expect(animations['animation-composition']).toContain(
+      'var(--jumi-rotate-flick-animation-composition, var(--jumi-rotate-animation-composition, var(--jumi-animation-composition)))',
+    )
+    expect(animations['animation-timeline']).toContain('var(--jumi-rotate-flick-animation-timeline, ')
 
     // An unlabelled slot has no name to be addressed by, so it keeps the
     // shorter chain and falls straight through to the attribute's control.

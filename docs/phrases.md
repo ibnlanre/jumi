@@ -37,6 +37,32 @@ CSS value starts `digits:`, and ratios use a slash.
 - Undeclared offsets are the property's resting value, which is why a phrase
   closes itself and loops without a seam.
 
+## Labelled slots
+
+A phrase can be labelled where it is declared — `animate-rotate-[0:0deg,58:0deg]/[flick]` — and
+a control can then address that slot: `animation-timing-function-[…]/[rotate.flick]`.
+
+The label is not part of the phrase and not part of a keyframe's identity: the phrase still
+decides the keyframe, the label only routes controls, and it is recorded in the declaring rule
+as `--jumi-{attr}-{hash}-label` so the slot's name is visible in the CSS rather than being
+plugin state. The frame variables are keyed by a hash nobody can write; the label is the address
+a person can. An index cannot be that. Slots are collected page-wide, so the number one
+element's animation answers to depends on what every other element animates — measured on a
+page with three other rotate animations, the hero petal's two slots came out as `3` and `4`,
+and adding a fourth would renumber them.
+
+This is the part of the old alias idea worth keeping. Aliases were inert because two animations
+of one property are arbitrated by `animation-composition: replace`; with `add` they sum, and
+per-slot timing is what makes that useful — an eased flick and a linear return have to be two
+animations, because one easing times every segment of an animation.
+
+Note the asymmetry with frames: `animation-composition` and `animation-timeline` are animation
+longhands, so a variable drives them, and they are assembled per slot. A keyframe's own
+`animation-timing-function` is not — a `var()` there is dropped by the browser and the animation
+falls back to its own timing (verified: literal → the cubic-bezier, `var(--ease, linear)` →
+`ease`). Per-segment easing therefore has to be a property of the keyframe, which is why this
+route eases a whole slot rather than one frame of it.
+
 ## Why phrases and not any of the earlier designs
 
 - **A shared keyframe per attribute cannot work.** Every element animating that

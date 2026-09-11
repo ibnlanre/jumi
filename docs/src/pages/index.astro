@@ -10,26 +10,26 @@ import effects from '../data/effects.json';
       <h1>Give your<br />interface <em>life.</em></h1>
       <div class="hero-bottom"><p>Big motion. Small classes.<br />Compose expressive animations right in your markup, with the Tailwind CSS you already know.</p><a class="button lime" href="/docs/">Start moving <span>↗</span></a></div>
       <div class="hero-art" aria-hidden="true">
-        <div class="orbit animations animate-rotate-[360deg] animation-duration-[24s] animation-timing-function-linear animation-iteration-count-infinite">
+        <div class="orbit animations animate-rotate-360 animation-duration-[24s] animation-timing-function-linear animation-iteration-count-infinite">
           {Array.from({length: 12}, (_, i) => (
             <div
               class="petal-position animations
-                animate-rotate-[0:var(--angle),100:calc(var(--angle)_-_360deg)]
-                animation-duration-[180s]
+                animate-rotate-[0:var(--angle),100:calc(var(--angle)-360deg)]
+                animation-duration-[75s]
                 animation-timing-function-linear
                 animation-iteration-count-infinite"
               style={`--angle:${i * 30}deg`}
             >
               <div
                 class="petal animations
-                  animate-rotate-[0:0deg,12:-8deg,100:-8deg]/[flick]
-                  animate-rotate-[0:0deg,12:0deg,100:8deg]/[return]
-                  animation-composition-add
-                  animation-duration-[6000ms]
-                  animation-timing-function-[cubic-bezier(.85,0,.15,1)]/[rotate.flick]
-                  animation-timing-function-linear/[rotate.return]
+                  animate-rotate-[0:0deg,20:-8deg,100:-8deg]/[flick]
+                  animate-rotate-[0:0deg,20:0deg,100:8deg]/[return]
+                  animation-composition-add/rotate
+                  animation-duration-3000
+                  animation-timing-function-[cubic-bezier(.4,0,.6,1)]/rotate.flick
+                  animation-timing-function-linear/rotate.return
                   animation-iteration-count-infinite"
-                style={`--jumi-animation-delay:${i * -500}ms`}
+                style={`--jumi-animation-delay:${i * -250}ms`}
               ></div>
             </div>
           ))}

@@ -21,11 +21,7 @@ Defaults are a 1-second duration, one iteration, normal direction, and forwards 
 ## One motion, many personalities
 
 ```html
-<div class="animations animate-rotate-[90deg]
-  animation-duration-[1400ms]
-  animation-timing-function-ease-in-out
-  animation-direction-alternate
-  animation-iteration-count-infinite">
+<div class="animations animate-rotate-90 animation-duration-1400 animation-timing-function-ease-in-out animation-direction-alternate animation-iteration-count-infinite">
   Back and forth.
 </div>
 ```
@@ -33,8 +29,7 @@ Defaults are a 1-second duration, one iteration, normal direction, and forwards 
 Use `animation-timing-function-linear` for steady rotation. Try `animation-timing-function-ease-out-back` for a curve with overshoot, or an arbitrary `cubic-bezier()` value for a custom feel.
 
 ```html
-<div class="animations animate-scale-110
-  animation-timing-function-[cubic-bezier(0.22,1,0.36,1)]">
+<div class="animations animate-scale-110 animation-timing-function-ease-out-quint">
   Settle into place.
 </div>
 ```
@@ -44,12 +39,31 @@ Use `animation-timing-function-linear` for steady rotation. Try `animation-timin
 Append `/{property}` or `/{effect}` to timing controls:
 
 ```html
-<div class="animations animate-rotate-45 animate-scale-110
-  animation-duration-[500ms]
-  animation-duration-[1200ms]/rotate">
+<div class="animations animate-rotate-45 animate-scale-110 animation-duration-500 animation-duration-1200/rotate">
   Scale at 500ms. Rotate at 1200ms.
 </div>
 ```
+
+When one property carries more than one animation, name each where you declare it with `/[name]`, and address it by that name:
+
+```html
+<div class="animations
+  animate-rotate-[0:0deg,12:-8deg,100:-8deg]/[flick]
+  animate-rotate-[0:0deg,12:0deg,100:8deg]/[return]
+  animation-composition-add/rotate
+  animation-timing-function-ease-in-out-circ/rotate.flick
+  animation-timing-function-linear/rotate.return">
+  A flick that lands, then a plain return.
+</div>
+```
+
+`/[flick]` labels the slot; `/[rotate.flick]` writes that slot's own variable. A slot reads its own value first, then the property's, then the global one, so an unlabelled animation in the same list is untouched. The label is only a name — the phrase is unchanged — and `animation-composition: add` is what lets two animations of one property apply at once instead of the second replacing the first.
+
+This is the escape hatch when one easing is not enough. A single `animation-timing-function` times every segment of an animation, so an eased flick and a linear return have to be two animations. Here the flick is eased and then holds still, and the return runs `linear`: each slot has exactly one moving segment, so one easing per slot says precisely what is meant.
+
+The label is recorded in the rule as well — `--jumi-rotate-<hash>-label: flick` — because the frame variables are keyed by a hash of the phrase, which nobody can write by hand. The label is the address a person can write, so the CSS states it. Read the slot's name in the inspector, then set any `--jumi-rotate-flick-…` variable from your own CSS: `--jumi-rotate-flick-animation-duration: 900ms` retimes that slot alone, without touching the markup.
+
+That is also why tooling leaves the modifier alone. A class judged only by its own rule used to look identical with and without the label, because the label's only effect was on the `.animations` list; now the rule carries it.
 
 ## Write the shape of the animation
 
@@ -57,7 +71,7 @@ A value can declare its own frames — an offset, a colon, a value — so one ut
 
 ```html
 <div class="animations animate-rotate-[0:0deg,50:0deg,100:45deg]
-  animation-duration-[2000ms]
+  animation-duration-2000
   animation-iteration-count-infinite">
   Rest, then turn one way over the second half.
 </div>
@@ -72,7 +86,7 @@ Placing an action inside the cycle, rather than spreading it across the whole of
 ```html
 <div class="animations animate-scale-[0:0.5,50:1.1,100:1]
   animate-opacity-[0:0,50:1,100:1]
-  animation-duration-[2600ms]
+  animation-duration-2600
   animation-iteration-count-infinite">
   Gather, overshoot, settle — and arrive while it settles.
 </div>
@@ -80,20 +94,31 @@ Placing an action inside the cycle, rather than spreading it across the whole of
 
 A property that takes several values takes all of them at each frame, with `_` standing in for the space: `animate-scale-[0:0.42_0.30,50:1.03_1.03]` scales both axes together.
 
-This site's hero is built this way. Each of its twelve petals carries two phrases — one for `scale`, one for `rotate` — and a delay of `230ms` more than the petal before it, so the bloom travels around the ring:
+This site's hero is built this way. A wrapper around each petal carries a slow, seamless winding, and the petal inside it carries the flick:
 
 ```html
-<div class="petal animations
-  animate-scale-[0:0.42_0.30,12:0.42_0.30,50:1.03_1.03]
-  animate-rotate-[0:16deg,12:16deg,58:0deg]
-  animation-duration-[2000ms]
-  animation-direction-alternate
-  animation-timing-function-[cubic-bezier(0.45,0,0.25,1)]/scale
-  animation-timing-function-[cubic-bezier(0.5,0,0.3,1)]/rotate"
-  style="--jumi-animation-delay:-230ms"></div>
+<div class="petal-position animations
+  animate-rotate-[0:var(--angle),100:calc(var(--angle)-360deg)]
+  animation-duration-[75s]
+  animation-timing-function-linear
+  animation-iteration-count-infinite"
+  style="--angle:0deg">
+
+  <div class="petal animations
+    animate-rotate-[0:0deg,20:-8deg,100:-8deg]/[flick]
+    animate-rotate-[0:0deg,20:0deg,100:8deg]/[return]
+    animation-composition-add/rotate
+    animation-duration-3000
+    animation-timing-function-[cubic-bezier(.4,0,.6,1)]/rotate.flick
+    animation-timing-function-linear/rotate.return
+    animation-iteration-count-infinite"
+    style="--jumi-animation-delay:-250ms"></div>
+</div>
 ```
 
-The scale holds at the bud until 12%, overshoots at 50% and settles; the rotation untwists later, so the petals straighten after they arrive.
+The wrapper's phrase ends exactly one turn from where it starts, so `-360deg` and `0deg` are the same orientation and the loop closes with no seam — the winding is the one motion that is allowed to be continuous, because it never has to snap back. Because it only ever turns one way, the composed rotation never travels forward either: the petals flick back `8deg` and ride, and the drift keeps the total moving the same direction throughout.
+
+The twelve petals are staggered `250ms` apart, one twelfth of the petal's `3s` cycle, so the wave wraps the ring once per cycle instead of twelve petals firing together. Two numbers decide whether that reads as a ripple or a ticker: how long a petal is actually in motion, and how far apart the petals start. The flick occupies `20%` of the cycle, and the easing concentrates that movement into about `440ms` — comfortably more than the `250ms` stagger, so each petal hands on to the next. Shorten either one and you get discrete steps with pauses between them: when the motion is shorter than the stagger, twelve petals read as a wall clock, however gentle the easing and however long the segment.
 
 A phrase is a value, so it can live in your theme and be referenced by name:
 
@@ -111,9 +136,9 @@ That is the shorter spelling when one phrase is used on several elements, and it
 
 Jumi also exposes global `animation-timeline`, `animation-composition`, and animation-range controls. These are separate CSS declarations from the core animation shorthand. Treat them as progressive enhancements and verify them in the browsers you support.
 
-Composition is not how Jumi brings several values of one property together — a phrase is, and it needs no browser support flag. Keep `animation-composition` for blending an animation with a value that is already on the element.
+Composition is not how Jumi brings several values of one property together — a phrase is. Keep `animation-composition` for two things: blending an animation with a value already on the element, and letting two animations of one property apply at once, as in the labelled-slots example above.
 
-For predictable independent timing, use the duration, delay, easing, iteration, direction, fill, and playback controls above. Scoped composition and timeline values are not currently assembled into per-slot longhand lists; use their global forms.
+Composition and timeline are assembled per animation, alongside duration, delay, easing, iteration, direction, fill and playback, so `/{property}` and `/{property}.{label}` reach them exactly as they reach the others.
 
 ## Pause long-running motion
 

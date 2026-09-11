@@ -176,12 +176,13 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
   }
 
   function animationParts(attribute: string, nameVar?: string, label?: string): CssInJs {
-    // Three links, narrowest first: the slot's own value, then the attribute's,
-    // then the global default. `/[rotate]` writes the middle link;
-    // `/[rotate.flick]` writes the first, which is how two animations of one
-    // property — summed by `animation-composition: add` — are timed apart. Only
-    // a labelled slot offers the link: an unlabelled one has no name to be
-    // addressed by, so it keeps the shorter chain.
+    // Every `animation-*` longhand that applies to ONE animation in the list, so
+    // a slot can be timed, sequenced and composed on its own. Three links,
+    // narrowest first: the slot's own value, then the attribute's, then the
+    // global default. `/[rotate]` writes the middle link; `/[rotate.flick]`
+    // writes the first, which is how two animations of one property are timed
+    // apart. Only a labelled slot offers that first link: an unlabelled one has
+    // no name to be addressed by, so it keeps the shorter chain.
     const timing = (part: string) => {
       const chain = css('var', `--jumi-${attribute}-${part}`, css('var', `--jumi-${part}`))
 
@@ -193,6 +194,7 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
     const name = css('var', nameVar ?? `--jumi-${attribute}-animation-name`, css('var', '--jumi-animation-name'))
 
     return {
+      'animation-composition': timing('animation-composition'),
       'animation-delay': timing('animation-delay'),
       'animation-direction': timing('animation-direction'),
       'animation-duration': timing('animation-duration'),
@@ -200,6 +202,7 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
       'animation-iteration-count': timing('animation-iteration-count'),
       'animation-name': name,
       'animation-play-state': timing('animation-play-state'),
+      'animation-timeline': timing('animation-timeline'),
       'animation-timing-function': timing('animation-timing-function'),
     }
   }
@@ -249,6 +252,7 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
           return acc
         }, {} as CssInJs)
       : {
+          'animation-composition': css('var', '--jumi-animation-composition'),
           'animation-delay': css('var', '--jumi-animation-delay'),
           'animation-direction': css('var', '--jumi-animation-direction'),
           'animation-duration': css('var', '--jumi-animation-duration'),
@@ -256,12 +260,14 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
           'animation-iteration-count': css('var', '--jumi-animation-iteration-count'),
           'animation-name': css('var', '--jumi-animation-name'),
           'animation-play-state': css('var', '--jumi-animation-play-state'),
+          'animation-timeline': css('var', '--jumi-animation-timeline'),
           'animation-timing-function': css('var', '--jumi-animation-timing-function'),
         }
 
+    // Composition and timeline now live in the slot list, so they are declared
+    // here only for elements that animate nothing at all. Leaving them in both
+    // would let this single value overwrite the per-slot list.
     const baseAnimationVars = {
-      'animation-composition': css('var', '--jumi-animation-composition'),
-      'animation-timeline': css('var', '--jumi-animation-timeline'),
       'interpolate-size': css('var', '--jumi-interpolate-size'),
     }
 
@@ -350,7 +356,8 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
           byId.set(id, frameList)
           registerName(`--jumi-${attribute}-${id}-animation-name`)
 
-          // `/[flick]` names this slot, so a control can time it on its own.
+          // `/[flick]` names this slot, so a control — or your own CSS — can
+          // address it on its own.
           if (modifier) labels.set(`${attribute}:${id}`, modifier)
 
           const variables = frameList.reduce((acc, { offset, value: frame }) => {
@@ -371,6 +378,11 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
 
           return {
             [`--jumi-${attribute}-${id}-animation-name`]: `jumi-${attribute}-${id}`,
+            // The frame variables are keyed by a hash of the phrase, which nobody
+            // can write by hand. The label is the address a person CAN write, so
+            // the rule states it: read the slot's name here, then set
+            // `--jumi-${attribute}-${label}-…` from your own CSS.
+            ...(modifier ? { [`--jumi-${attribute}-${id}-label`]: modifier } : {}),
             ...variables,
           }
         }
