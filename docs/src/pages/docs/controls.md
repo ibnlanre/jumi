@@ -51,19 +51,27 @@ When one property carries more than one animation, name each where you declare i
   animate-rotate-[0:0deg,12:-8deg,100:-8deg]/[flick]
   animate-rotate-[0:0deg,12:0deg,100:8deg]/[return]
   animation-composition-add/rotate
-  animation-timing-function-ease-in-out-circ/rotate.flick
-  animation-timing-function-linear/rotate.return">
+  animation-timing-function-ease-in-out-circ/flick
+  animation-timing-function-linear/return">
   A flick that lands, then a plain return.
 </div>
 ```
 
-`/[flick]` labels the slot; `/[rotate.flick]` writes that slot's own variable. A slot reads its own value first, then the property's, then the global one, so an unlabelled animation in the same list is untouched. The label is only a name — the phrase is unchanged — and `animation-composition: add` is what lets two animations of one property apply at once instead of the second replacing the first.
+`/[flick]` gives that animation a name, and the same name on a control times it on its own. Each animation reads its own label first, then the property's control, then the global one, so anything else in the list is left alone — and naming one does not change its phrase.
 
-This is the escape hatch when one easing is not enough. A single `animation-timing-function` times every segment of an animation, so an eased flick and a linear return have to be two animations. Here the flick is eased and then holds still, and the return runs `linear`: each slot has exactly one moving segment, so one easing per slot says precisely what is meant.
+The label is yours to choose, and it becomes the variable name exactly as written — nothing is prepended. Labels and property names are one namespace, which is what lets `/rotate` and `/[flick]` be written the same way on a control: `--jumi-rotate-animation-timing-function` is the variable every rotate animation reads, so `rotate` is the name all of them answer to, and a label is a name one of them answers to. Give each animation you want to time apart its own word.
 
-The label is recorded in the rule as well — `--jumi-rotate-<hash>-label: flick` — because the frame variables are keyed by a hash of the phrase, which nobody can write by hand. The label is the address a person can write, so the CSS states it. Read the slot's name in the inspector, then set any `--jumi-rotate-flick-…` variable from your own CSS: `--jumi-rotate-flick-animation-duration: 900ms` retimes that slot alone, without touching the markup.
+A label belongs to the element that declared it. Its variable is registered non-inheriting, so it does not travel into descendants, and two elements can use the same word for different values without knowing about each other.
 
-That is also why tooling leaves the modifier alone. A class judged only by its own rule used to look identical with and without the label, because the label's only effect was on the `.animations` list; now the rule carries it.
+The three links do not behave alike across that boundary. A `/{property}` control on a wrapper does reach the animations inside it, because nothing declares `--jumi-{property}-animation-{part}` on the element, so the value it writes is inherited. A global control does not: every `animations` element declares the global defaults itself, and a declaration beats inheritance. A label never does.
+
+Reach for it when one easing is not enough. A single `animation-timing-function` applies to every segment of an animation, so pairing an eased flick with a linear return takes two animations, each with one moving segment. `animation-composition: add` lets both apply at once instead of the second replacing the first.
+
+The name is written into the rule, so you can retime or re-ease that animation from your own CSS without touching the markup:
+
+```css
+.petal { --jumi-flick-animation-duration: 900ms; }
+```
 
 ## Write the shape of the animation
 
@@ -98,7 +106,7 @@ This site's hero is built this way. A wrapper around each petal carries a slow, 
 
 ```html
 <div class="petal-position animations
-  animate-rotate-[0:var(--angle),100:calc(var(--angle)-360deg)]
+  animate-rotate-[0:var(--angle),100:calc(var(--angle)_-_360deg)]
   animation-duration-[75s]
   animation-timing-function-linear
   animation-iteration-count-infinite"
@@ -109,16 +117,16 @@ This site's hero is built this way. A wrapper around each petal carries a slow, 
     animate-rotate-[0:0deg,20:0deg,100:8deg]/[return]
     animation-composition-add/rotate
     animation-duration-3000
-    animation-timing-function-[cubic-bezier(.4,0,.6,1)]/rotate.flick
-    animation-timing-function-linear/rotate.return
+    animation-timing-function-[cubic-bezier(.4,0,.6,1)]/flick
+    animation-timing-function-linear/return
     animation-iteration-count-infinite"
     style="--jumi-animation-delay:-250ms"></div>
 </div>
 ```
 
-The wrapper's phrase ends exactly one turn from where it starts, so `-360deg` and `0deg` are the same orientation and the loop closes with no seam — the winding is the one motion that is allowed to be continuous, because it never has to snap back. Because it only ever turns one way, the composed rotation never travels forward either: the petals flick back `8deg` and ride, and the drift keeps the total moving the same direction throughout.
+The wrapper turns a full circle over `75s`, ending exactly one turn from where it starts, so its loop has no seam and the petals can wind continuously in one direction. The petal's own two animations are symmetric — back `8deg`, then forward to rest — so the winding is what keeps the composed rotation moving the same way throughout.
 
-The twelve petals are staggered `250ms` apart, one twelfth of the petal's `3s` cycle, so the wave wraps the ring once per cycle instead of twelve petals firing together. Two numbers decide whether that reads as a ripple or a ticker: how long a petal is actually in motion, and how far apart the petals start. The flick occupies `20%` of the cycle, and the easing concentrates that movement into about `440ms` — comfortably more than the `250ms` stagger, so each petal hands on to the next. Shorten either one and you get discrete steps with pauses between them: when the motion is shorter than the stagger, twelve petals read as a wall clock, however gentle the easing and however long the segment.
+The petals are staggered `250ms` apart, one twelfth of the `3s` cycle, so each flick overlaps the next and the motion travels around the ring rather than arriving everywhere at once.
 
 A phrase is a value, so it can live in your theme and be referenced by name:
 
@@ -136,9 +144,9 @@ That is the shorter spelling when one phrase is used on several elements, and it
 
 Jumi also exposes global `animation-timeline`, `animation-composition`, and animation-range controls. These are separate CSS declarations from the core animation shorthand. Treat them as progressive enhancements and verify them in the browsers you support.
 
-Composition is not how Jumi brings several values of one property together — a phrase is. Keep `animation-composition` for two things: blending an animation with a value already on the element, and letting two animations of one property apply at once, as in the labelled-slots example above.
+Composition is not how Jumi combines several values of one property — a phrase is. Use `animation-composition` to blend an animation with a value already on the element, or to apply two animations of one property at once, as in the labelled example above.
 
-Composition and timeline are assembled per animation, alongside duration, delay, easing, iteration, direction, fill and playback, so `/{property}` and `/{property}.{label}` reach them exactly as they reach the others.
+Composition and timeline are assembled per animation, alongside duration, delay, easing, iteration, direction, fill and playback, so `/{property}` and `/{label}` reach them the same way.
 
 ## Pause long-running motion
 

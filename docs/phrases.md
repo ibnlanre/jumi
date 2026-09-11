@@ -40,13 +40,43 @@ CSS value starts `digits:`, and ratios use a slash.
 ## Labelled slots
 
 A phrase can be labelled where it is declared — `animate-rotate-[0:0deg,58:0deg]/[flick]` — and
-a control can then address that slot: `animation-timing-function-[…]/[rotate.flick]`.
+a control can then address that slot by the same word: `animation-timing-function-[…]/[flick]`. The
+label is the handle, not a property-qualified path; it becomes `--jumi-flick-animation-timing-function`.Nothing is prepended, so `/[rotate-flick]` on `animate-rotate` is `--jumi-rotate-flick-animation-timing-function`
+— one `rotate`, because the label is written, not derived; the attribute came back out of the chain when
+the dot form went away.
 
+There is no second namespace. Labels and property names are the same kind of word, which is what lets a
+control's modifier be either; the chain settles it, since a labelled slot reads `--jumi-{label}-{part}`,
+then `--jumi-{attr}-{part}`, then `--jumi-{part}`. So a label equal to its own attribute name is inert
+rather than dangerous: `/[rotate]` on `animate-rotate` emits
+`var(--jumi-rotate-animation-…, var(--jumi-rotate-animation-…, var(--jumi-animation-…)))` — the unlabelled
+chain with the property link repeated. The animation already read that variable first, and the tween rule
+sets no timing variable, so nothing changes and nothing is added to the element (measured).
+
+What the flat space does cost is that two animations labelled `flick` share one variable. That is a naming
+choice rather than a defect, and it is the price of a label being sufficient on its own: the control knows
+only the word, never the property, so the variable can only be keyed by that word. It is bounded, though —
+a label is element-local, like a phrase name and for the same reason. Every link the chain reads for a
+labelled slot is registered `inherits: false`, emitted where the label is recorded rather than while
+`.animations` is assembled, so the registration cannot be missed by a slot created late. Measured: a
+wrapper carrying `animation-timing-function-ease-out/flick` over a child whose own phrase is labelled
+`[flick]` leaves the child's label link unset, where before the child inherited `ease-out`. The property
+link still crosses a wrapper boundary — nothing declares `--jumi-{attr}-animation-{part}` on the element,
+so a `/rotate` control above it cascades (measured: `500ms` reaching a child's unlabelled rotate) — while
+the global links do not, unregistered though they are: `.animations` declares their defaults on every
+element, and a declaration beats inheritance (measured: a wrapper's `--jumi-animation-duration: 5s` leaves
+a child at `1s`). Registration is skipped when a label IS the attribute name, since that variable is the
+property scope's, and the scope is the link that does cross the boundary.
 The label is not part of the phrase and not part of a keyframe's identity: the phrase still
 decides the keyframe, the label only routes controls, and it is recorded in the declaring rule
 as `--jumi-{attr}-{hash}-label` so the slot's name is visible in the CSS rather than being
 plugin state. The frame variables are keyed by a hash nobody can write; the label is the address
-a person can. An index cannot be that. Slots are collected page-wide, so the number one
+a person can.
+
+Keep that declaration. Without it, `animate-rotate-[…]/[flick]` and `animate-rotate-[…]` emit
+byte-identical rules, so a class judged by its own CSS looks as though the modifier does nothing
+— which is what made tooling suggest dropping it, and dropping it silently unmakes the scoped
+control, since nothing would then read the label's variable. An index cannot be that. Slots are collected page-wide, so the number one
 element's animation answers to depends on what every other element animates — measured on a
 page with three other rotate animations, the hero petal's two slots came out as `3` and `4`,
 and adding a fourth would renumber them.

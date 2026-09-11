@@ -30,12 +30,29 @@ type Frame = {
 
 /** One animation in `.animations`, addressed by its attribute and, optionally,
  * the variable that declares its name. `label` is the name its declaration gave
- * it with `/[flick]`, which is what `/[rotate.flick]` addresses. */
+ * it with `/[flick]`, which is the same word a control addresses it by. */
 type Slot = {
   attribute: string
   label?: string | undefined
   nameVar?: string | undefined
 }
+
+/** Every `animation-*` longhand that applies to ONE animation in the list, so a
+ * slot can be timed, sequenced and composed on its own. The chain reads each of
+ * these, and `scope` writes each of them, so they are also the links a label has
+ * to register. `animation-name` is not among them: a slot's name comes from its
+ * own `nameVar`, and the shared `--jumi-animation-name` is not scoped per slot. */
+const slotParts = [
+  'animation-composition',
+  'animation-delay',
+  'animation-direction',
+  'animation-duration',
+  'animation-fill-mode',
+  'animation-iteration-count',
+  'animation-play-state',
+  'animation-timeline',
+  'animation-timing-function',
+] as const
 
 export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
   const effects = new Set<string>()
@@ -74,8 +91,14 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
    * AFTER the last of those evaluations was never registered at all. The
    * `registered` set keeps it to one registration per name.
    *
-   * The shared `--jumi-animation-name` control is deliberately left inheritable,
-   * so a parent can still cascade one named animation into its subtree.
+   * The shared `--jumi-animation-*` controls are left unregistered, which is a
+   * different question from cascading. `.animations` declares their defaults on
+   * every element, and a declaration beats inheritance, so a global control
+   * written on an ancestor never reaches a descendant's animations (measured: a
+   * wrapper's `--jumi-animation-duration: 5s` still leaves a child at `1s`).
+   * The link that does cross that boundary is the property scope, because
+   * nothing declares `--jumi-{attribute}-animation-{part}` on the element: a
+   * `/rotate` control on a wrapper does reach inside it (measured: `500ms`).
    */
   const registerName = (name: string) => {
     if (registered.has(name)) return
@@ -86,9 +109,9 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
   // replacing the O(N) Array indexOf/splice logic. JS Sets maintain insertion order.
   const values = new Map<AnimatableStandardPropertyType, Set<string>>()
   // The name a declaration gave its slot — `/[flick]` on a phrase — keyed
-  // `attribute:id`. The control side spells the same word in `/[rotate.flick]`,
-  // so the two meet on one element-local variable instead of a number that
-  // depends on what else the page happens to animate.
+  // `attribute:id`. The control side spells the same word in `/[flick]`, so the
+  // two meet on one element-local variable instead of a number that depends on
+  // what else the page happens to animate.
   const labels = new Map<string, string>()
 
   const composed = new Set<AnimatableStandardPropertyType>()
@@ -178,32 +201,24 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
   function animationParts(attribute: string, nameVar?: string, label?: string): CssInJs {
     // Every `animation-*` longhand that applies to ONE animation in the list, so
     // a slot can be timed, sequenced and composed on its own. Three links,
-    // narrowest first: the slot's own value, then the attribute's, then the
-    // global default. `/[rotate]` writes the middle link; `/[rotate.flick]`
-    // writes the first, which is how two animations of one property are timed
-    // apart. Only a labelled slot offers that first link: an unlabelled one has
+    // narrowest first: the label a declaration gave this animation, then the
+    // property's own control, then the global default. `/[rotate]` writes the
+    // middle link; `/[flick]` — the same word the declaration used — writes the
+    // first. Only a labelled slot offers that first link: an unlabelled one has
     // no name to be addressed by, so it keeps the shorter chain.
     const timing = (part: string) => {
       const chain = css('var', `--jumi-${attribute}-${part}`, css('var', `--jumi-${part}`))
 
       return label === undefined
         ? chain
-        : css('var', cssEscape(`--jumi-${attribute}-${label}-${part}`), chain)
+        : css('var', cssEscape(`--jumi-${label}-${part}`), chain)
     }
 
     const name = css('var', nameVar ?? `--jumi-${attribute}-animation-name`, css('var', '--jumi-animation-name'))
 
     return {
-      'animation-composition': timing('animation-composition'),
-      'animation-delay': timing('animation-delay'),
-      'animation-direction': timing('animation-direction'),
-      'animation-duration': timing('animation-duration'),
-      'animation-fill-mode': timing('animation-fill-mode'),
-      'animation-iteration-count': timing('animation-iteration-count'),
+      ...Object.fromEntries(slotParts.map(part => [part, timing(part)])),
       'animation-name': name,
-      'animation-play-state': timing('animation-play-state'),
-      'animation-timeline': timing('animation-timeline'),
-      'animation-timing-function': timing('animation-timing-function'),
     }
   }
 
@@ -357,8 +372,19 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
           registerName(`--jumi-${attribute}-${id}-animation-name`)
 
           // `/[flick]` names this slot, so a control — or your own CSS — can
-          // address it on its own.
-          if (modifier) labels.set(`${attribute}:${id}`, modifier)
+          // address it on its own. Every link the chain then reads is registered
+          // non-inheriting, for the reason a phrase name is: a label names ONE
+          // animation, on the element that declared it, so a descendant that
+          // happens to use the same word must not answer to it. Skipped when the
+          // label is the attribute itself, because that name is the property
+          // scope's, and a scope cascades into subtrees on purpose.
+          if (modifier) {
+            labels.set(`${attribute}:${id}`, modifier)
+
+            if (modifier !== attribute) {
+              for (const part of slotParts) registerName(cssEscape(`--jumi-${modifier}-${part}`))
+            }
+          }
 
           const variables = frameList.reduce((acc, { offset, value: frame }) => {
             const suffix = `${id}-${offset}`
@@ -411,16 +437,12 @@ export function getCreator({ addBase, addUtilities, theme }: Api): Creator {
       return (value, { modifier }) => {
         if (!modifier) return { [`--jumi-${part}`]: value }
 
-        // The modifier names a property — `rotate` — or one of its labelled
-        // slots — `rotate.flick`, the animation a declaration named with
-        // `/[flick]`. Both are escaped, because a custom property name cannot
-        // carry an unescaped dot.
-        const dot = modifier.indexOf('.')
-        const name = dot === -1
-          ? `--jumi-${modifier}-${part}`
-          : `--jumi-${modifier.slice(0, dot)}-${modifier.slice(dot + 1)}-${part}`
-
-        return { [cssEscape(name)]: value }
+        // The modifier names a property — `rotate` — or the label a declaration
+        // gave one of its animations — `rotate-flick`, from
+        // `animate-rotate-[…]/[rotate-flick]`. Either way it is one word, so the
+        // variable is just the modifier and the part. Escaped, because a custom
+        // property name cannot carry a stray dot or space.
+        return { [cssEscape(`--jumi-${modifier}-${part}`)]: value }
       }
     },
 

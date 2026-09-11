@@ -349,13 +349,14 @@ describe('animations wiring', () => {
   it('gives a labelled slot its own control link', () => {
     const { creator } = setup()
 
-    creator.property('rotate')('0:0deg,58:0deg', { modifier: 'flick' })
+    creator.property('rotate')('0:0deg,58:0deg', { modifier: 'rotate-flick' })
     creator.property('rotate')('0:0deg,100:90deg', { modifier: null })
     const animations = creator.animations
 
-    // A labelled slot reads its label's variable first, so `/[rotate.flick]`
+    // A labelled slot reads its label's variable first, so `/[rotate-flick]`
     // times that animation on its own — which is how two animations of one
-    // property, summed by `animation-composition: add`, are timed apart.
+    // property, summed by `animation-composition: add`, are timed apart. The
+    // label is the whole handle: the property is not repeated in front of it.
     expect(animations['animation-duration']).toContain(
       'var(--jumi-rotate-flick-animation-duration, var(--jumi-rotate-animation-duration, var(--jumi-animation-duration)))',
     )
@@ -423,6 +424,40 @@ describe('animation-name registration', () => {
     })
   })
 
+  it('registers every link a labelled slot reads, so a label cannot inherit', () => {
+    const { addBase, creator } = setup()
+
+    creator.property('rotate')('0:16deg,58:0deg', { modifier: 'flick' })
+    creator.animations
+
+    const utilities = registered(addBase)
+    const parts = Object.keys(creator.animations)
+      .filter(part => part.startsWith('animation-') && part !== 'animation-name')
+
+    expect(parts.length).toBeGreaterThan(0)
+
+    for (const part of parts) {
+      expect(utilities[`@property --jumi-flick-${part}`]).toEqual({
+        inherits: 'false',
+        syntax: '"*"',
+      })
+    }
+  })
+
+  it('leaves the link inheritable when a label is the attribute name', () => {
+    const { addBase, creator } = setup()
+
+    // `/[rotate]` on `animate-rotate` resolves to the property scope's own
+    // variable, so registering it here would make a scope stop cascading.
+    creator.property('rotate')('0:16deg,58:0deg', { modifier: 'rotate' })
+    creator.animations
+
+    const utilities = registered(addBase)
+
+    expect(utilities['@property --jumi-rotate-animation-duration']).toBeUndefined()
+    expect(utilities['@property --jumi-rotate-animation-timing-function']).toBeUndefined()
+  })
+
   it('registers a name once, however often `.animations` is evaluated', () => {
     const { addBase, creator } = setup()
 
@@ -465,13 +500,18 @@ describe('animation-name registration', () => {
     })
   })
 
-  it('leaves the shared animation name and controls inheritable for subtree cascades', () => {
+  it('leaves the shared animation controls unregistered', () => {
     const { addBase, creator } = setup()
 
     creator.property('opacity')('50', { modifier: null })
     creator.effect('fade-in')
     creator.animations
 
+    // Unregistered is not the same as cascading: `.animations` declares these
+    // defaults on every element, and a declaration beats inheritance, so a
+    // global control written on an ancestor never reaches a descendant's
+    // animations. Registering them would add a block per name and change
+    // nothing a page could observe.
     const utilities = registered(addBase)
 
     expect(utilities['@property --jumi-animation-name']).toBeUndefined()

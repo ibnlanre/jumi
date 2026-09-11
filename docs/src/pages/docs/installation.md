@@ -9,7 +9,7 @@ description: Install the plugin, register it with Tailwind CSS, and make your fi
 Add Jumi to a project with Tailwind CSS already configured. The examples on this site target Tailwind CSS v4.
 
 ```sh
-pnpm add jumi
+pnpm add @ibnlanre/jumi
 ```
 
 Using another package manager? `npm install jumi`, `yarn add jumi`, and `bun add jumi` work too.

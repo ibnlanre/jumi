@@ -14,7 +14,7 @@ import effects from '../data/effects.json';
           {Array.from({length: 12}, (_, i) => (
             <div
               class="petal-position animations
-                animate-rotate-[0:var(--angle),100:calc(var(--angle)-360deg)]
+                animate-rotate-[0:var(--angle),100:calc(var(--angle)_-_360deg)]
                 animation-duration-[75s]
                 animation-timing-function-linear
                 animation-iteration-count-infinite"
@@ -25,9 +25,9 @@ import effects from '../data/effects.json';
                   animate-rotate-[0:0deg,20:-8deg,100:-8deg]/[flick]
                   animate-rotate-[0:0deg,20:0deg,100:8deg]/[return]
                   animation-composition-add/rotate
-                  animation-duration-3000
-                  animation-timing-function-[cubic-bezier(.4,0,.6,1)]/rotate.flick
-                  animation-timing-function-linear/rotate.return
+                  animation-duration-[3000ms]
+                  animation-timing-function-[cubic-bezier(.4,0,.6,1)]/[flick]
+                  animation-timing-function-linear/[return]
                   animation-iteration-count-infinite"
                 style={`--jumi-animation-delay:${i * -250}ms`}
               ></div>
@@ -61,6 +61,6 @@ import effects from '../data/effects.json';
   Make your move.
 &lt;/div&gt;</code></pre><div class="code-legend"><span>01 Activate</span><span>02 Compose</span><span>03 Control</span></div></div>
     </section>
-    <section class="closing section"><p class="eyebrow">YOUR NEXT IDEA DESERVES TO MOVE.</p><h2>Static is<br /><em>just the start.</em></h2><div class="install"><code>pnpm add jumi</code><button data-copy="pnpm add jumi" aria-label="Copy install command">Copy</button></div><a class="text-link" href="/docs/">Read the documentation ↗</a></section>
+    <section class="closing section"><p class="eyebrow">YOUR NEXT IDEA DESERVES TO MOVE.</p><h2>Static is<br /><em>just the start.</em></h2><div class="install"><code>pnpm add @ibnlanre/jumi</code><button data-copy="pnpm add @ibnlanre/jumi" aria-label="Copy install command">Copy</button></div><a class="text-link" href="/docs/">Read the documentation ↗</a></section>
   </main>
 </Layout>

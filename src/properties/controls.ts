@@ -20,10 +20,10 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
   const { scope, stagger, theme, transition } = creator
 
   // Modifiers cannot be validated against a list: a control addresses a property
-  // — `/rotate` — or a labelled slot of one — `/rotate.flick`, the animation its
-  // declaration named with `/[flick]`. Labels are chosen in the markup, so there
-  // is nothing to enumerate. A modifier that addresses no slot writes a variable
-  // nothing reads.
+  // — `/rotate` — or a labelled slot of one — `/flick`, the word its declaration
+  // used in `/[flick]`. Labels are chosen in the markup, so there is nothing to
+  // enumerate. A modifier that addresses no slot writes a variable nothing
+  // reads.
   const modifiers = 'any'
 
   const matchControls: Partial<MatchProperty> = {
