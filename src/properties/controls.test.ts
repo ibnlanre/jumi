@@ -24,28 +24,22 @@ function setup() {
   return { controls: getMatchControls(creator), creator }
 }
 
-describe('per-alias timing controls', () => {
-  const cases: Array<[string, string, string, Record<string, string>]> = [
-    ['animation-delay', '2000ms', 'width.2', { '--jumi-width-2-animation-delay': '2000ms' }],
-    ['animation-duration', '3000ms', 'rotate.1', { '--jumi-rotate-1-animation-duration': '3000ms' }],
-    ['animation-direction', 'alternate', 'width.2', { '--jumi-width-2-animation-direction': 'alternate' }],
-    ['animation-fill-mode', 'both', 'rotate.1', { '--jumi-rotate-1-animation-fill-mode': 'both' }],
-    ['animation-iteration-count', '3', 'scale.1', { '--jumi-scale-1-animation-iteration-count': '3' }],
-    ['animation-play-state', 'paused', 'width.2', { '--jumi-width-2-animation-play-state': 'paused' }],
-    ['animation-timing-function', 'ease', 'scale.1', { '--jumi-scale-1-animation-timing-function': 'ease' }],
+describe('per-attribute timing controls', () => {
+  const cases: Array<[string, string, string]> = [
+    ['animation-delay', '2000ms', 'width'],
+    ['animation-duration', '3000ms', 'rotate'],
+    ['animation-direction', 'alternate', 'width'],
+    ['animation-fill-mode', 'both', 'rotate'],
+    ['animation-iteration-count', '3', 'scale'],
+    ['animation-play-state', 'paused', 'width'],
+    ['animation-timing-function', 'ease', 'scale'],
   ]
 
-  it.each(cases)('scopes %s to its aliased stop slot', (control, value, modifier, expected) => {
+  it.each(cases)('scopes %s to its property', (control, value, modifier) => {
     const { controls } = setup()
 
-    expect(controls[control]!.fn(value, { modifier })).toEqual(expected)
-  })
-
-  it('keeps the per-attribute form for a bare `/{attr}` modifier', () => {
-    const { controls } = setup()
-
-    expect(controls['animation-direction']!.fn('alternate', { modifier: 'rotate' })).toEqual({
-      '--jumi-rotate-animation-direction': 'alternate',
+    expect(controls[control]!.fn(value, { modifier })).toEqual({
+      [`--jumi-${modifier}-${control}`]: value,
     })
   })
 
@@ -54,14 +48,6 @@ describe('per-alias timing controls', () => {
 
     expect(controls['animation-direction']!.fn('alternate', { modifier: null })).toEqual({
       '--jumi-animation-direction': 'alternate',
-    })
-  })
-
-  it('preserves a decimal stop in the per-alias variable name', () => {
-    const { controls } = setup()
-
-    expect(controls['animation-direction']!.fn('alternate', { modifier: 'rotate.12.5' })).toEqual({
-      '--jumi-rotate-12\\.5-animation-direction': 'alternate',
     })
   })
 })

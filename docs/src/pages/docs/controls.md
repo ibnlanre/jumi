@@ -51,65 +51,67 @@ Append `/{property}` or `/{effect}` to timing controls:
 </div>
 ```
 
-## Place an action with an alias
+## Write the shape of the animation
 
-A modifier can also carry an alias — a number naming one instance of that property's animation. Add `/[n]` to the animation utility, then target the instance from any control as `/{property}.{n}`:
-
-```html
-<div class="animations animate-scale-125/[1]
-  animation-duration-[2000ms]
-  animation-delay-[1000ms]/[scale.1]">
-  Grow, then wait a second before repeating.
-</div>
-```
-
-`animate-scale-125/[1]` names the instance `scale.1`. Any control can address it, and an unset alias falls back to the property's value, then to the global default — so you only write the controls that differ. Two aliases of the same property let it run twice with different timing.
-
-That is how you place an action inside a cycle rather than spreading it across the whole of it:
+A value can declare its own frames — an offset, a colon, a value — so one utility describes the whole motion:
 
 ```html
-<div class="animations animate-scale-[0.05] animate-rotate-[-45deg]/[1]
-  animation-duration-[4200ms]
-  animation-direction-alternate-reverse
-  animation-timing-function-[cubic-bezier(.85,0,.15,1)]
-  animation-direction-normal/[rotate.1]
-  animation-timing-function-[cubic-bezier(1,0,1,1)]/[rotate.1]
-  animation-iteration-count-infinite">
-  Grow first, turn on the way out.
-</div>
-```
-
-The scale uses the shared controls: it opens, holds, and withdraws across the cycle. The rotation is a separate instance: `animation-direction-normal/[rotate.1]` takes it out of the shared `alternate-reverse`, and `cubic-bezier(1,0,1,1)` hugs its resting pose before releasing, so nothing turns until the second half. This site's hero is exactly this composition.
-
-## Set where the action happens
-
-A stop places a value at a point in the cycle. Add `/[at-<offset>]` — `/[at-50%]` or `/[at-50]`, the `%` is optional — and the value takes that frame of the property's timeline:
-
-```html
-<div class="animations animate-rotate-[-45deg]/[at-50%] animate-rotate-[15deg]/[at-75]
+<div class="animations animate-rotate-[0:0deg,50:0deg,100:45deg]
   animation-duration-[2000ms]
   animation-iteration-count-infinite">
-  Turn one way by halfway, the other by three quarters.
+  Rest, then turn one way over the second half.
 </div>
 ```
 
-Both utilities feed **one** `rotate` animation: the frames land at 50% and 75%, and the 0% and 100% frames stay at the element's resting value. The cycle closes on itself, so it repeats without a jump — which is what makes it safe to run `infinite`. A stop on a second property gets a timeline of its own:
+Frames are separated by commas, each written `<offset>:<value>`. The offset is a bare number — the `%` is implied, and `0` and `100` are the endpoints. Any offset you leave out is the property's resting value, so a phrase holds still until its first frame and closes itself at the end. That is what makes it safe to run `infinite`: the loop has no seam.
+
+A phrase owns its property, and its keyframe is named after the phrase, so nothing else can share it. Two elements running the same phrase run the same keyframe; a different phrase gets a keyframe of its own. No other markup can change what your animation does — which is also why you write one phrase per property per element rather than layering several.
+
+Placing an action inside the cycle, rather than spreading it across the whole of it, is what this is for. A step earlier in the phrase is a step later in the cycle:
 
 ```html
-<div class="animations animate-rotate-[-45deg]/[at-50%] animate-scale-110/[at-50%]">
-  Turn and grow at the same point.
+<div class="animations animate-scale-[0:0.5,50:1.1,100:1]
+  animate-opacity-[0:0,50:1,100:1]
+  animation-duration-[2600ms]
+  animation-iteration-count-infinite">
+  Gather, overshoot, settle — and arrive while it settles.
 </div>
 ```
 
-Stops and aliases answer different questions. A stop says *when* inside one animation; an alias says *which* animation. Reach for a stop when the values belong to a single gesture, and for an alias when two tracks genuinely need separate timing.
+A property that takes several values takes all of them at each frame, with `_` standing in for the space: `animate-scale-[0:0.42_0.30,50:1.03_1.03]` scales both axes together.
 
-One consequence worth knowing: a stop extends a timeline shared by everything in your build, so the frame set is the project-wide union of every offset used. A frame you did not pin on an element resolves to that element's resting value for the property — never to the property's initial value, but it is a correction the element did not ask for. If two elements need unrelated frame sets for the same property, give them separate animations instead of stops.
+This site's hero is built this way. Each of its twelve petals carries two phrases — one for `scale`, one for `rotate` — and a delay of `230ms` more than the petal before it, so the bloom travels around the ring:
+
+```html
+<div class="petal animations
+  animate-scale-[0:0.42_0.30,12:0.42_0.30,50:1.03_1.03]
+  animate-rotate-[0:16deg,12:16deg,58:0deg]
+  animation-duration-[2000ms]
+  animation-direction-alternate
+  animation-timing-function-[cubic-bezier(0.45,0,0.25,1)]/scale
+  animation-timing-function-[cubic-bezier(0.5,0,0.3,1)]/rotate"
+  style="--jumi-animation-delay:-230ms"></div>
+```
+
+The scale holds at the bud until 12%, overshoots at 50% and settles; the rotation untwists later, so the petals straighten after they arrive.
+
+A phrase is a value, so it can live in your theme and be referenced by name:
+
+```js
+theme: { rotate: { unfurl: '0:16deg,58:0deg' } }
+```
+
+```html
+animate-rotate-unfurl
+```
+
+That is the shorter spelling when one phrase is used on several elements, and it keeps the frames in a single place.
 
 ## Timelines and composition
 
 Jumi also exposes global `animation-timeline`, `animation-composition`, and animation-range controls. These are separate CSS declarations from the core animation shorthand. Treat them as progressive enhancements and verify them in the browsers you support.
 
-Composition is not how Jumi brings several values of one property together — stops are, and they need no browser support flag. Keep `animation-composition` for blending an animation with a value that is already on the element.
+Composition is not how Jumi brings several values of one property together — a phrase is, and it needs no browser support flag. Keep `animation-composition` for blending an animation with a value that is already on the element.
 
 For predictable independent timing, use the duration, delay, easing, iteration, direction, fill, and playback controls above. Scoped composition and timeline values are not currently assembled into per-slot longhand lists; use their global forms.
 

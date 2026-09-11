@@ -118,8 +118,8 @@ export const getMatchTween: GetMatchComponents = (creator) => {
   /**
    * Consume the keyword modifier into the value (e.g. `/block`, `/span`,
    * `/from-font`), then write the joined value to the attribute's variable.
-   * Unlike the stop-based curry, the modifier is NOT registered as a keyframe
-   * stop and NOT suffixed into the variable name.
+   * The modifier is part of the CSS value, not an animation frame: it names no
+   * keyframe and never joins the variable name.
    */
   const token = (
     attribute: AnimatableStandardPropertyType,
@@ -1806,7 +1806,7 @@ export const getMatchTween: GetMatchComponents = (creator) => {
     },
     'animate-opacity': {
       fn: property('opacity'),
-      type: ['number', 'percentage'],
+      type: ['number', 'percentage', 'any'],
       values: theme('opacity'),
     },
     'animate-order': {
@@ -2041,25 +2041,25 @@ export const getMatchTween: GetMatchComponents = (creator) => {
     'animate-scale': {
       fn: property('scale'),
       supportsNegativeValues: true,
-      type: 'number',
+      type: ['number', 'any'],
       values: theme('scale'),
     },
     'animate-scale-x': {
       fn: property('scale', ['scale-x']),
       supportsNegativeValues: true,
-      type: 'number',
+      type: ['number', 'any'],
       values: theme('scale'),
     },
     'animate-scale-y': {
       fn: property('scale', ['scale-y']),
       supportsNegativeValues: true,
-      type: 'number',
+      type: ['number', 'any'],
       values: theme('scale'),
     },
     'animate-scale-z': {
       fn: property('scale', ['scale-z']),
       supportsNegativeValues: true,
-      type: 'number',
+      type: ['number', 'any'],
       values: theme('scale'),
     },
     'animate-skew': {

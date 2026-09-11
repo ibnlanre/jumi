@@ -43,14 +43,29 @@ describe('property curry', () => {
     })
   })
 
-  it('suffixes an alias modifier into the variable name', () => {
+  it('writes a phrase into one variable per declared frame', () => {
     const { creator } = setup()
 
-    const result = creator.property('opacity')('0', { modifier: '25' })
+    const result = creator.property('rotate')('0:16deg,58:0deg', { modifier: null })
+    const id = shorthash2('0:16deg,58:0deg')
 
     expect(result).toEqual({
-      '--jumi-opacity-25': '0',
-      '--jumi-opacity-25-animation-name': 'jumi-opacity-25',
+      [`--jumi-rotate-${id}-0`]: '16deg',
+      [`--jumi-rotate-${id}-58`]: '0deg',
+      [`--jumi-rotate-${id}-animation-name`]: `jumi-rotate-${id}`,
+    })
+  })
+
+  it('leaves a value that is not a phrase on the plain path', () => {
+    const { creator } = setup()
+
+    // No leading offset, so this stays a one-frame tween at 100%.
+    const result = creator.property('rotate')('16deg', { modifier: null })
+    const id = shorthash2('16deg')
+
+    expect(result).toEqual({
+      [`--jumi-rotate-${id}-animation-name`]: `jumi-rotate-${id}`,
+      [`--jumi-rotate-${id}`]: '16deg',
     })
   })
 
@@ -77,84 +92,55 @@ describe('property curry', () => {
     })
   })
 
-  it('suffixes an alias modifier into part variables', () => {
+  it('orders and dedupes frames, so one phrase is one declaration', () => {
     const { creator } = setup()
 
-    const result = creator.property('filter', [['filter-blur', value => css('blur', value)]])('8px', { modifier: '50' })
+    const ascending = creator.property('rotate')('0:16deg,58:0deg', { modifier: null })
+    const shuffled = creator.property('rotate')('58:0deg,0:16deg', { modifier: null })
+
+    expect(shuffled).toEqual(ascending)
+  })
+
+  it('lets the last of two frames at one offset win', () => {
+    const { creator } = setup()
+
+    const result = creator.property('rotate')('0:16deg,0:0deg', { modifier: null })
+    const id = shorthash2('0:0deg')
 
     expect(result).toEqual({
-      '--jumi-filter-50-animation-name': 'jumi-filter-50',
-      '--jumi-filter-blur-50': 'blur(8px)',
+      [`--jumi-rotate-${id}-0`]: '0deg',
+      [`--jumi-rotate-${id}-animation-name`]: `jumi-rotate-${id}`,
     })
   })
 
-  it('escapes a decimal alias modifier in the variable name', () => {
+  it('distributes every frame across the parts of a composed property', () => {
     const { creator } = setup()
 
-    const result = creator.property('opacity')('0', { modifier: '12.5' })
+    const result = creator.property('filter', [['filter-blur', value => css('blur', value)]])('0:0px,50:8px', { modifier: null })
+    const id = shorthash2('0:0px,50:8px')
 
     expect(result).toEqual({
-      '--jumi-opacity-12\\.5': '0',
-      '--jumi-opacity-12\\.5-animation-name': 'jumi-opacity-12\\.5',
+      [`--jumi-filter-${id}-animation-name`]: `jumi-filter-${id}`,
+      [`--jumi-filter-blur-${id}-0`]: 'blur(0px)',
+      [`--jumi-filter-blur-${id}-50`]: 'blur(8px)',
     })
   })
 
-  it('escapes a decimal alias modifier into part variables', () => {
+  it('escapes a decimal frame offset in the variable name', () => {
     const { creator } = setup()
 
-    const result = creator.property('filter', [['filter-blur', value => css('blur', value)]])('8px', { modifier: '12.5' })
+    const result = creator.property('rotate')('12.5:0deg', { modifier: null })
+    const id = shorthash2('12.5:0deg')
 
     expect(result).toEqual({
-      '--jumi-filter-12\\.5-animation-name': 'jumi-filter-12\\.5',
-      '--jumi-filter-blur-12\\.5': 'blur(8px)',
-    })
-  })
-
-  it('writes a stop to the shared timeline and activates the attribute slot', () => {
-    const { creator } = setup()
-
-    const result = creator.property('opacity')('0', { modifier: 'at-50%' })
-
-    expect(result).toEqual({
-      '--jumi-opacity-animation-name': 'jumi-opacity',
-      '--jumi-opacity-at-50': '0',
-    })
-  })
-
-  it('resolves `at-50%` and `at-50` to the same stop variable', () => {
-    const { creator } = setup()
-
-    const percent = creator.property('opacity')('0', { modifier: 'at-50%' })
-    const bare = creator.property('opacity')('0', { modifier: 'at-50' })
-
-    expect(percent).toEqual(bare)
-  })
-
-  it('writes a stop into the part variables of a composed property', () => {
-    const { creator } = setup()
-
-    const result = creator.property('filter', [['filter-blur', value => css('blur', value)]])('8px', { modifier: 'at-30%' })
-
-    expect(result).toEqual({
-      '--jumi-filter-animation-name': 'jumi-filter',
-      '--jumi-filter-blur-at-30': 'blur(8px)',
-    })
-  })
-
-  it('keeps a modifier that is not a stop as an alias', () => {
-    const { creator } = setup()
-
-    // `at-` is reserved for frame offsets. Anything that does not parse as one
-    // stays an alias, so it keeps a keyframe and a slot of its own.
-    expect(creator.property('opacity')('0', { modifier: 'at-nope' })).toEqual({
-      '--jumi-opacity-at-nope': '0',
-      '--jumi-opacity-at-nope-animation-name': 'jumi-opacity-at-nope',
+      [`--jumi-rotate-${id}-12\\.5`]: '0deg',
+      [`--jumi-rotate-${id}-animation-name`]: `jumi-rotate-${id}`,
     })
   })
 })
 
 describe('keyframe emission', () => {
-  it('emits a `to` keyframe for a no-stop property so its variable is applied', () => {
+  it('emits a `to` keyframe for a plain value so its variable is applied', () => {
     const { addUtilities, creator } = setup()
 
     creator.property('opacity')('50', { modifier: null })
@@ -168,119 +154,87 @@ describe('keyframe emission', () => {
     })
   })
 
-  it('emits a `to` keyframe for an aliased value', () => {
+  it('emits one keyframe per phrase, holding exactly its frames', () => {
     const { addUtilities, creator } = setup()
 
-    creator.property('opacity')('0', { modifier: '25' })
+    creator.property('opacity')('0:0,58:1', { modifier: null })
     creator.animations
 
+    const id = shorthash2('0:0,58:1')
     const utilities = addUtilities.mock.calls.map(([u]) => u)
 
     expect(utilities).toContainEqual({
-      '@keyframes jumi-opacity-25': {
-        to: { opacity: 'var(--jumi-opacity-25, var(--jumi-opacity))' },
+      [`@keyframes jumi-opacity-${id}`]: {
+        '0%': { opacity: `var(--jumi-opacity-${id}-0, var(--jumi-opacity))` },
+        '58%': { opacity: `var(--jumi-opacity-${id}-58, var(--jumi-opacity))` },
       },
     })
   })
 
-  it('folds every stop into ONE shared keyframe, ordered by offset', () => {
+  it('gives different phrases of one property separate keyframes', () => {
     const { addUtilities, creator } = setup()
 
-    creator.property('opacity')('0', { modifier: 'at-75%' })
-    creator.property('opacity')('1', { modifier: 'at-25' })
+    creator.property('opacity')('0:0,58:1', { modifier: null })
+    creator.property('opacity')('0:0,100:1', { modifier: null })
     creator.animations
 
-    const utilities = addUtilities.mock.calls.map(([u]) => u)
+    const names = addUtilities.mock.calls
+      .flatMap(([utilities]) => Object.keys(utilities))
+      .filter(name => name.startsWith('@keyframes jumi-opacity-'))
 
-    // Stops are frames of one timeline, not keyframes of their own: a single
-    // `@keyframes jumi-opacity` carries every offset the build uses.
-    expect(utilities).toContainEqual({
-      '@keyframes jumi-opacity': {
-        '25%': { opacity: 'var(--jumi-opacity-at-25, var(--jumi-opacity))' },
-        '75%': { opacity: 'var(--jumi-opacity-at-75, var(--jumi-opacity))' },
-      },
-    })
+    // Isolation is structural. Neither keyframe can hold the other's offsets,
+    // because each is named after the phrase that declared it.
+    expect(names).toContain(`@keyframes jumi-opacity-${shorthash2('0:0,58:1')}`)
+    expect(names).toContain(`@keyframes jumi-opacity-${shorthash2('0:0,100:1')}`)
+    expect(names).toHaveLength(2)
   })
 
-  it('adds stops to an existing composed keyframe instead of replacing it', () => {
+  it('expands the composition per frame for a composed property', () => {
     const { addUtilities, creator } = setup()
 
-    creator.property('filter', [['filter-blur', value => css('blur', value)]])('8px', { modifier: null })
-    creator.property('filter', [['filter-blur', value => css('blur', value)]])('2px', { modifier: 'at-40%' })
+    creator.property('filter', [['filter-blur', value => css('blur', value)]])('0:0px,40:8px', { modifier: null })
     creator.animations
 
-    const utilities = addUtilities.mock.calls
+    const id = shorthash2('0:0px,40:8px')
+    const keyframes = addUtilities.mock.calls
       .map(([u]) => u)
-      .find(u => '@keyframes jumi-filter' in u)
-
-    expect(utilities).toBeDefined()
-    expect(utilities['@keyframes jumi-filter'].to).toBeDefined()
-    expect(utilities['@keyframes jumi-filter']['40%'].filter).toContain(
-      'var(--jumi-filter-blur-at-40,',
-    )
-  })
-
-  it('expands the composition per-alias for a composed property', () => {
-    const { addUtilities, creator } = setup()
-
-    creator.property('filter', [['filter-blur', value => css('blur', value)]])('8px', { modifier: '50' })
-    creator.animations
-
-    const keyframes = addUtilities.mock.calls
-      .map(([utilities]) => utilities)
-      .find(utilities => '@keyframes jumi-filter-50' in utilities)
+      .find(u => `@keyframes jumi-filter-${id}` in u)
 
     expect(keyframes).toBeDefined()
 
-    const filter = keyframes['@keyframes jumi-filter-50'].to.filter
-    expect(filter).toContain('var(--jumi-filter-50,')
-    expect(filter).toContain('var(--jumi-filter-blur-50, var(--jumi-filter-blur))')
+    const frame = keyframes[`@keyframes jumi-filter-${id}`]['40%'].filter
+    expect(frame).toContain(`var(--jumi-filter-${id}-40,`)
+    expect(frame).toContain(`var(--jumi-filter-blur-${id}-40, var(--jumi-filter-blur))`)
   })
 
-  it('emits a `to` keyframe with an escaped decimal alias', () => {
+  it('escapes a decimal offset in the keyframe', () => {
     const { addUtilities, creator } = setup()
 
-    creator.property('opacity')('0', { modifier: '12.5' })
+    creator.property('opacity')('12.5:0', { modifier: null })
     creator.animations
 
+    const id = shorthash2('12.5:0')
     const utilities = addUtilities.mock.calls.map(([u]) => u)
 
     expect(utilities).toContainEqual({
-      '@keyframes jumi-opacity-12\\.5': {
-        to: { opacity: 'var(--jumi-opacity-12\\.5, var(--jumi-opacity))' },
+      [`@keyframes jumi-opacity-${id}`]: {
+        '12.5%': { opacity: `var(--jumi-opacity-${id}-12\\.5, var(--jumi-opacity))` },
       },
     })
   })
 
-  it('expands the composition per-alias for a decimal alias', () => {
-    const { addUtilities, creator } = setup()
-
-    creator.property('filter', [['filter-blur', value => css('blur', value)]])('8px', { modifier: '12.5' })
-    creator.animations
-
-    const keyframes = addUtilities.mock.calls
-      .map(([utilities]) => utilities)
-      .find(utilities => '@keyframes jumi-filter-12\\.5' in utilities)
-
-    expect(keyframes).toBeDefined()
-
-    const filter = keyframes['@keyframes jumi-filter-12\\.5'].to.filter
-    expect(filter).toContain('var(--jumi-filter-12\\.5,')
-    expect(filter).toContain('var(--jumi-filter-blur-12\\.5, var(--jumi-filter-blur))')
-  })
-
-  it('wires an alias animation slot with per-alias timing overrides', () => {
+  it('wires a phrase slot with per-attribute timing overrides', () => {
     const { creator } = setup()
 
-    creator.property('opacity')('0', { modifier: '25' })
+    creator.property('opacity')('0:0,58:1', { modifier: null })
     const animations = creator.animations
+    const id = shorthash2('0:0,58:1')
 
-    expect(animations['animation-name']).toContain('var(--jumi-opacity-25-animation-name, none)')
-    expect(animations['animation-duration']).toContain(
-      'var(--jumi-opacity-25-animation-duration, var(--jumi-opacity-animation-duration, var(--jumi-animation-duration)))',
+    expect(animations['animation-name']).toBe(
+      `var(--jumi-opacity-${id}-animation-name, var(--jumi-animation-name))`,
     )
-    expect(animations['animation-delay']).toContain(
-      'var(--jumi-opacity-25-animation-delay, var(--jumi-opacity-animation-delay, var(--jumi-animation-delay)))',
+    expect(animations['animation-duration']).toContain(
+      'var(--jumi-opacity-animation-duration, var(--jumi-animation-duration))',
     )
   })
 })
@@ -341,49 +295,42 @@ describe('animations wiring', () => {
     expect(animations['--jumi-opacity']).toBe('1')
   })
 
-  it('orders the animation list per-value → composed → per-alias → effects', () => {
+  it('orders the animation list per-value → composed → phrase → effects', () => {
     const { creator } = setup()
 
     creator.property('opacity')('50', { modifier: null })
     creator.property('filter', [['filter-blur', value => css('blur', value)]])('8px', { modifier: null })
-    creator.property('opacity')('0', { modifier: '25' })
+    creator.property('opacity')('0:0,58:1', { modifier: null })
     creator.effect('bounce-in')
 
     const animations = creator.animations
     const id = shorthash2('50')
+    const phraseId = shorthash2('0:0,58:1')
 
     expect(animations['animation-name']).toBe(
       [
         `var(--jumi-opacity-${id}-animation-name, var(--jumi-animation-name))`,
         'var(--jumi-filter-animation-name, var(--jumi-animation-name))',
-        'var(--jumi-opacity-25-animation-name, none)',
+        `var(--jumi-opacity-${phraseId}-animation-name, var(--jumi-animation-name))`,
         'var(--jumi-bounce-in-animation-name, var(--jumi-animation-name))',
       ].join(', '),
     )
   })
 
-  it('resolves an unset alias slot to `none`', () => {
+  it('gives each phrase its own slot', () => {
     const { creator } = setup()
 
-    creator.property('opacity')('0', { modifier: '25' })
+    creator.property('opacity')('0:0,58:1', { modifier: null })
+    creator.property('opacity')('0:0,100:1', { modifier: null })
     const animations = creator.animations
 
-    expect(animations['animation-name']).toContain(
-      'var(--jumi-opacity-25-animation-name, none)',
-    )
-  })
-
-  it('gives every stop on an attribute the attribute\'s single slot', () => {
-    const { creator } = setup()
-
-    creator.property('opacity')('0', { modifier: 'at-25%' })
-    creator.property('opacity')('1', { modifier: 'at-75%' })
-    const animations = creator.animations
-
-    // Two stop utilities, one animation: they are frames of the same timeline,
-    // not competing same-property animations for `replace` to arbitrate.
+    // Two phrases, two animations: each owns its keyframe, so neither can be
+    // corrupted by offsets the other declared.
     expect(animations['animation-name']).toBe(
-      'var(--jumi-opacity-animation-name, var(--jumi-animation-name))',
+      [
+        `var(--jumi-opacity-${shorthash2('0:0,58:1')}-animation-name, var(--jumi-animation-name))`,
+        `var(--jumi-opacity-${shorthash2('0:0,100:1')}-animation-name, var(--jumi-animation-name))`,
+      ].join(', '),
     )
   })
 })
@@ -392,24 +339,28 @@ describe('animation-name registration', () => {
   const registered = (addBase: ReturnType<typeof setup>['addBase']) =>
     addBase.mock.calls.reduce<CssInJs>((acc, [utilities]) => ({ ...acc, ...utilities }), {})
 
-  it('registers per-value, composed, per-alias and effect names as non-inheriting', () => {
+  it('registers per-value, composed, phrase and effect names as non-inheriting', () => {
     const { addBase, creator } = setup()
 
     creator.property('opacity')('50', { modifier: null })
     creator.property('filter', [['filter-blur', value => css('blur', value)]])('8px', { modifier: null })
-    creator.property('opacity')('0', { modifier: '25' })
+    creator.property('rotate')('0:16deg,58:0deg', { modifier: null })
     creator.effect('bounce-in')
     creator.animations
 
     const utilities = registered(addBase)
     const id = shorthash2('50')
+    const phraseId = shorthash2('0:16deg,58:0deg')
 
-    expect(Object.keys(utilities).filter(name => name.startsWith('@property')).sort()).toEqual([
+    const expected = [
       '--jumi-bounce-in-animation-name',
       '--jumi-filter-animation-name',
-      '--jumi-opacity-25-animation-name',
       `--jumi-opacity-${id}-animation-name`,
-    ].map(name => `@property ${name}`))
+      `--jumi-rotate-${phraseId}-animation-name`,
+    ].sort()
+
+    expect(Object.keys(utilities).filter(name => name.startsWith('@property')).sort())
+      .toEqual(expected.map(name => `@property ${name}`))
 
     expect(utilities[`@property --jumi-opacity-${id}-animation-name`]).toEqual({
       inherits: 'false',
@@ -417,28 +368,57 @@ describe('animation-name registration', () => {
     })
   })
 
-  it('escapes a decimal alias into its registration', () => {
+  it('registers a phrase name against its own slot', () => {
     const { addBase, creator } = setup()
 
-    creator.property('opacity')('0', { modifier: '12.5' })
+    creator.property('rotate')('0:16deg,58:0deg', { modifier: null })
     creator.animations
 
-    expect(registered(addBase)['@property --jumi-opacity-12\\.5-animation-name']).toEqual({
+    const id = shorthash2('0:16deg,58:0deg')
+
+    expect(registered(addBase)[`@property --jumi-rotate-${id}-animation-name`]).toEqual({
       inherits: 'false',
       syntax: '"*"',
     })
   })
 
-  it('registers a stop against the shared attribute slot', () => {
+  it('registers a name once, however often `.animations` is evaluated', () => {
     const { addBase, creator } = setup()
 
-    creator.property('opacity')('0', { modifier: 'at-50%' })
+    creator.property('opacity')('50', { modifier: null })
+    creator.effect('fade-in')
+
+    // Tailwind evaluates `.animations` once per candidate that carries it —
+    // `animations`, `*:animations`, `before:animations`, `hover:animations`.
+    creator.animations
+    creator.animations
+    creator.animations
     creator.animations
 
-    // The stop reads its frame from `--jumi-opacity-at-50` inside the shared
-    // `jumi-opacity` keyframe, so the slot it switches on is the attribute-wide
-    // name — registered non-inheriting like every other activation var.
-    expect(registered(addBase)['@property --jumi-opacity-animation-name']).toEqual({
+    const names = addBase.mock.calls.flatMap(([utilities]) => Object.keys(utilities))
+    const id = shorthash2('50')
+
+    expect(names.filter(name => name === `@property --jumi-opacity-${id}-animation-name`))
+      .toHaveLength(1)
+    expect(names.filter(name => name === '@property --jumi-fade-in-animation-name'))
+      .toHaveLength(1)
+  })
+
+  it('registers a slot created after the last `.animations` evaluation', () => {
+    const { addBase, creator } = setup()
+
+    creator.property('opacity')('50', { modifier: null })
+    creator.animations
+
+    // Tailwind sorts some candidates after `.animations` — a `not-sm:*` variant,
+    // for instance — so a slot can be created once the getter has run for good.
+    // Registration must not depend on the getter: otherwise that name is left
+    // inheritable and leaks an ancestor's animation into its descendants.
+    creator.property('accent-color')('amber-400', { modifier: null })
+
+    const id = shorthash2('amber-400')
+
+    expect(registered(addBase)[`@property --jumi-accent-color-${id}-animation-name`]).toEqual({
       inherits: 'false',
       syntax: '"*"',
     })

@@ -1,5 +1,6 @@
-import { css } from './index'
 import { describe, expect, it } from 'vitest'
+
+import { css } from './index'
 
 describe('css', () => {
   it('should return a CSS function with no value', () => {
