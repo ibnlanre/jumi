@@ -260,6 +260,9 @@ for (const [key, calls] of keys) {
     entries: entries.length,
     key,
     mapping: parts.join(' + ') || '—',
+    // Kept so the classification below can tell "no namespace resembles these values" from
+    // "the namespace exists but no emitted utility references it".
+    prefix: best?.prefix ?? null,
     spaced: spaced.length,
     verdict: entries.length === 0 ? 'empty' : covered === entries.length ? 'all' : covered ? 'partial' : 'none',
   })
@@ -314,31 +317,56 @@ if (extra.length) console.log(`  implemented and not measured: ${extra.join(', '
 if (!missing.length && !extra.length) console.log('  no drift')
 
 /* ------------------------------------------------------------------------------------
- * The token claims, checked against emitted CSS
+ * The classification: what every key Jumi consumes resolves to, and why
  *
- * A token existing is not the same as a utility *referencing* it, and only the second one is a
- * contract Jumi can borrow. `--shadow-*` exists and is spelled just like `--drop-shadow-*`, but
- * `shadow-sm` inlines its value (`--tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, …)`) while
- * `drop-shadow-sm` references its token — so `boxShadow` is not in the table above and
- * `dropShadow` is. This report re-derives every claim in `themeTokens` from the utilities
- * Tailwind actually emits: for each name, is `var(--namespace-name)` there or not?
+ * Phase 2 is complete when every key has an explicit representation strategy — **not** when every
+ * value has become a CSS variable. A literal is a valid final representation when that is what the
+ * host emits, so this report has to be able to say *why* a key stays literal, and the reason has to
+ * come from the emitted CSS rather than from the theme file or from a name that looks right.
+ *
+ * That is the whole point of the second stage. `--shadow-*` exists, `shadow-sm` exists, the values
+ * correspond — and `shadow-sm` still inlines its value while `drop-shadow-sm` references
+ * `var(--drop-shadow-sm)`. A namespace existing is not a contract; a utility referencing it is.
+ *
+ * Two things are reported, and both have to be empty:
+ *
+ *   drift        the strategy Jumi declares and the emitted CSS disagree
+ *   unmeasured   a key has a candidate namespace, and no utility could be found to check it
  * ---------------------------------------------------------------------------------- */
 
-/** One representative utility per key: a namespace is only real if some utility uses it. */
+/** Tailwind's utility name per key, where it is not the property name. Everything else is kebab. */
 const utility = {
   accentColor: 'accent',
+  aspectRatio: 'aspect',
+  backdropBlur: 'backdrop-blur',
   backgroundColor: 'bg',
   blur: 'blur',
   borderColor: 'border',
   borderRadius: 'rounded',
+  boxShadow: 'shadow',
   boxShadowColor: 'shadow',
   caretColor: 'caret',
   colors: 'text',
   dropShadow: 'drop-shadow',
+  fontFamily: 'font',
+  fontSize: 'text',
+  gridAutoColumns: 'auto-cols',
+  gridAutoRows: 'auto-rows',
+  gridColumn: 'col',
+  gridColumnEnd: 'col-end',
+  gridColumnStart: 'col-start',
+  gridRow: 'row',
+  gridRowEnd: 'row-end',
+  gridRowStart: 'row-start',
+  gridTemplateColumns: 'grid-cols',
+  gridTemplateRows: 'grid-rows',
   letterSpacing: 'tracking',
   lineHeight: 'leading',
   maxWidth: 'max-w',
   outlineColor: 'outline',
+  transformOrigin: 'origin',
+  transitionDelay: 'delay',
+  transitionDuration: 'duration',
 }
 
 /** What the source claims: which key resolves to which namespace, and which names stay literal. */
@@ -363,71 +391,166 @@ const claims = () => {
   return found
 }
 
+const claimable = name => /^[\w-]+$/.test(name)
 const number = /^\d+(?:\.\d+)?$/
-const claimable = (name) => /^[\w-]+$/.test(name)
+const kebab = key => key.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`)
 
-const announced = claims()
-const classes = []
+const announced = new Map(claims().map(claim => [claim.key, claim]))
 
-for (const claim of announced) {
-  const prefix = utility[claim.key]
-  const names = Object.keys(values[claim.key] ?? {}).filter(claimable)
+/** Every key worth measuring: what Jumi claims, plus what the weak pass found resembling a scale. */
+const suspects = keys
+  .map(([key]) => ({
+    key,
+    namespace: announced.get(key)?.namespace ?? rows.find(row => row.key === key)?.prefix ?? null,
+    prefix: utility[key] ?? kebab(key),
+  }))
+  .filter(suspect => suspect.namespace)
 
-  claim.names = names
-  classes.push(...names.map(name => `${prefix}-${name === 'DEFAULT' ? '' : name}`))
-
-  // The bare utility is a separate candidate: `shadow` is `shadow-DEFAULT`, `rounded` is
-  // `rounded-DEFAULT`, and neither is `rounded-DEFAULT` as a class name.
-  claim.prefix = prefix
+for (const suspect of suspects) {
+  suspect.names = Object.keys(values[suspect.key] ?? {}).filter(claimable)
+  suspect.selector = name => `${suspect.prefix}-${name === 'DEFAULT' ? '' : name}`.replace(/-$/, '')
 }
 
 const scan = mkdtempSync(path.join(here, '.theme-map-'))
 const instance = await compile('@import "tailwindcss" source(none);', { base: scan, onDependency() {} })
-const emitted = instance.build([...new Set(classes)].filter(Boolean))
+const emitted = instance.build(
+  [...new Set(suspects.flatMap(suspect => suspect.names.map(suspect.selector)))].filter(Boolean),
+)
 
-rmSync(scan, { recursive: true, force: true })
+rmSync(scan, { force: true, recursive: true })
 
-/** Does the rule for `selector` reference `var(--token)`? */
-const declares = (selector, token) => {
+/** The rule body for `selector`, or nothing when the utility was not emitted at all. */
+const rule = (selector) => {
   for (const form of [`.${selector} {`, `.${selector}{`]) {
     const at = emitted.indexOf(form)
 
-    if (at !== -1) return emitted.slice(at, emitted.indexOf('}', at)).includes(`var(--${token})`)
+    if (at !== -1) return emitted.slice(at, emitted.indexOf('}', at))
   }
 
-  return false
+  return null
 }
 
-console.log(`\ntoken claims: ${announced.length} keys`)
+for (const suspect of suspects) {
+  const bodies = suspect.names.map(name => rule(suspect.selector(name)))
 
-let drift = 0
+  suspect.tokens = suspect.names.filter(
+    (name, index) => bodies[index]?.includes(`var(--${suspect.namespace}-${name})`),
+  )
+  // A wrong utility name would measure zero and look exactly like a literal, so a key nobody
+  // emitted a rule for is reported as unmeasured rather than as intentionally literal.
+  suspect.reachable = bodies.some(body => body !== null)
+}
 
-for (const claim of announced) {
-  const predicted = (name) => !claim.literal.includes(name) && !number.test(name)
-  const missingTokens = []
-  const extraTokens = []
-  let tokensHere = 0
+/**
+ * The strategy Jumi declares, read from `src/helpers/create/theme.ts`: a namespace, the spacing
+ * formula, both, or neither. Neither is a strategy too — it is the decision to keep the host's own
+ * output, which is what the report then has to justify.
+ */
+const strategy = (key) => {
+  const claim = announced.get(key)
+  const spaced = jumi.has(key)
 
-  for (const name of claim.names) {
-    const selector = `${claim.prefix}-${name === 'DEFAULT' ? '' : name}`.replace(/-$/, '')
-    const reference = declares(selector, `${claim.namespace}-${name}`)
+  if (claim) return claim.literal.length || spaced ? 'mixed' : 'token'
 
-    if (reference) tokensHere += 1
-    if (predicted(name) && !reference) missingTokens.push(name)
-    if (!predicted(name) && reference) extraTokens.push(name)
+  return spaced ? 'formula' : 'literal'
+}
+
+const measured = (suspect) => {
+  if (!suspect) return '—'
+  if (!suspect.reachable) return 'unmeasured'
+  if (!suspect.tokens.length) return 'none'
+
+  return suspect.tokens.length === suspect.names.length ? 'all' : 'partial'
+}
+
+/**
+ * The strategy and the measurement have to agree, which is the whole check: a key that stays
+ * literal needs the emitted CSS to inline it, and a key that claims a namespace needs the emitted
+ * CSS to reference at least one name of it.
+ */
+const agrees = (declared, found) => {
+  if (found === 'unmeasured') return false
+  if (found === '—') return declared === 'formula' || declared === 'literal'
+  if (declared === 'literal') return found === 'none'
+  if (declared === 'token') return found === 'all'
+
+  return found !== 'none'
+}
+
+/**
+ * A literal list is a claim about individual names, so it is checked name by name — a list that
+ * names the wrong exception still has the right length, and that is how `DEFAULT` would get lost.
+ * A bare number counts as a literal without being listed: it is never a namespace name.
+ */
+const contradictions = (suspect) => {
+  const claim = announced.get(suspect.key)
+
+  if (!claim || !suspect.reachable) return []
+
+  const found = []
+
+  for (const name of suspect.names) {
+    const referenced = suspect.tokens.includes(name)
+    const literal = claim.literal.includes(name) || number.test(name)
+
+    if (referenced && literal) found.push(`${name}: listed literal, referenced`)
+    if (!referenced && !literal) found.push(`${name}: not listed, inlined`)
   }
 
-  drift += missingTokens.length + extraTokens.length
+  return found
+}
 
-  const notes = []
-  if (missingTokens.length) notes.push(`not a token: ${missingTokens.slice(0, 4).join(', ')}`)
-  if (extraTokens.length) notes.push(`is a token: ${extraTokens.slice(0, 4).join(', ')}`)
+const namespace_width = Math.max(9, ...suspects.map(suspect => suspect.namespace.length + 4))
+
+console.log('\nclassification: what every key Jumi consumes resolves to\n')
+console.log(`${'key'.padEnd(width)}  strategy  measured   ${'namespace'.padEnd(namespace_width)}  token names`)
+
+let drifted = 0
+let unmeasured = 0
+
+for (const [key] of keys) {
+  const suspect = suspects.find(candidate => candidate.key === key)
+  const declared = strategy(key)
+  const found = measured(suspect)
+  const notes = suspect ? contradictions(suspect) : []
+  const ok = agrees(declared, found) && !notes.length
+
+  if (!ok) drifted += 1
+  if (found === 'unmeasured') unmeasured += 1
 
   console.log(
-    `  ${claim.key.padEnd(width)} --${claim.namespace}-*: ${tokensHere} of ${claim.names.length}`
-    + ` name${claim.names.length === 1 ? '' : 's'}, literal ${claim.literal.length}`
-    + (notes.length ? `  ⚠ ${notes.join('; ')}` : ''),
+    `${key.padEnd(width)}  ${declared.padEnd(8)}  ${(ok ? found : `${found} ⚠`).padEnd(10)}  `
+    + `${(suspect ? `--${suspect.namespace}-*` : '—').padEnd(namespace_width)}  `
+    + `${suspect ? `${suspect.tokens.length}/${suspect.names.length}` : '—'}`,
   )
+
+  for (const note of notes.slice(0, 3)) console.log(`${''.padEnd(width + 13)}⚠ ${note}`)
 }
 
-console.log(drift ? `\n${drift} claims contradicted by the emitted CSS` : '\nno drift: every claim matches the emitted CSS')
+/** Why a key stays literal, which is the only part of the strategy that needs a reason. */
+const reason = (suspect) => {
+  if (!suspect) return 'no candidate namespace resembles these values'
+  if (!suspect.reachable) return `unmeasured: no \`${suspect.prefix}-*\` utility to check`
+  if (!suspect.tokens.length) return `--${suspect.namespace}-* exists, but the emitted utility inlines it`
+
+  return 'partly token-backed'
+}
+
+console.log('\nliteral by decision, with the reason:\n')
+
+for (const [key] of keys) {
+  if (strategy(key) !== 'literal') continue
+
+  console.log(`  ${key.padEnd(width)}  ${reason(suspects.find(candidate => candidate.key === key))}`)
+}
+
+const counts = {}
+for (const [key] of keys) counts[strategy(key)] = (counts[strategy(key)] ?? 0) + 1
+
+console.log(`\n${keys.length} keys classified: ${Object.entries(counts).map(([name, count]) => `${count} ${name}`).join(', ')}`)
+console.log(`${drifted ? `${drifted} strategies contradicted by the emitted CSS` : 'no drift: every strategy matches the emitted CSS'}`)
+console.log(`${unmeasured ? `${unmeasured} keys could not be measured` : 'no unmeasured namespace candidates'}`)
+
+// `pnpm check` runs this, so a strategy and the emitted CSS disagreeing is a failure and not a
+// report: the classification is only worth keeping if something stops it from drifting.
+if (drifted || unmeasured) process.exitCode = 1

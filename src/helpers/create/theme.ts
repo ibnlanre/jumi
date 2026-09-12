@@ -40,6 +40,10 @@ export type TokenNamespace = {
  */
 export const themeTokens: Record<string, TokenNamespace> = {
   accentColor: { namespace: 'color' },
+  // Measured with the rest of the filter scales and not with `blur`: they are separate keys with
+  // separate utilities (`backdrop-blur-*` beside `blur-*`), and only the measurement says they
+  // borrow the same `--blur-*` tokens.
+  backdropBlur: { literal: ['DEFAULT', 'none'], namespace: 'blur' },
   backgroundColor: { namespace: 'color' },
   blur: { literal: ['DEFAULT', 'none'], namespace: 'blur' },
   // The scale's own name has no token — there is no bare `--color` — so it keeps the host's

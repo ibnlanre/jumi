@@ -1,9 +1,9 @@
 {
   "canonical": {
     "aggregateBytes": 52958,
-    "aggregateShare": 58,
+    "aggregateShare": 57,
     "aggregateWrites": 20,
-    "bytes": 90628,
+    "bytes": 92296,
     "carriers": 2,
     "keyframes": 33,
     "media": 5,
@@ -12,7 +12,7 @@
     "strayStaging": 0,
     "supports": 5,
     "publishEvents": 34,
-    "rawBytes": 502457,
+    "rawBytes": 504125,
     "stagingBytes": 464867,
     "colorValues": {
       "literal": 1,
@@ -20,7 +20,7 @@
     },
     "themeResolution": {
       "formula": 4,
-      "literal": 69,
+      "literal": 71,
       "token": 12
     }
   },

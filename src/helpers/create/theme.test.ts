@@ -207,11 +207,21 @@ describe('partial scales', () => {
 
   it('resolves a blur and a drop shadow to their tokens', () => {
     const themed = api({
+      backdropBlur: { 0: '0', DEFAULT: '8px', none: '', sm: '8px' },
       blur: { 0: '0', DEFAULT: '8px', none: '', sm: '8px' },
       dropShadow: { DEFAULT: '0 1px 2px rgb(0 0 0 / 0.1)', none: '0 0 #0000', sm: '0 1px 2px rgb(0 0 0 / 0.15)' },
     })
 
     expect(resolveTheme(themed, 'blur')).toEqual({
+      0: '0',
+      DEFAULT: '8px',
+      none: '',
+      sm: 'var(--blur-sm)',
+    })
+
+    // A separate key, the same namespace: `backdrop-blur-sm` borrows `--blur-sm` too, and only
+    // the emitted CSS says so.
+    expect(resolveTheme(themed, 'backdropBlur')).toEqual({
       0: '0',
       DEFAULT: '8px',
       none: '',

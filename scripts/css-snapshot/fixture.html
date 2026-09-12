@@ -70,7 +70,9 @@
          a spacing formula and a token out of the same key (`animate-line-height-6` beside
          `animate-line-height-tight`, `animate-max-width-4` beside `animate-max-width-xs`),
          and the literal that is left (`animate-box-shadow-sm`, which is *not* a token
-         even though `--shadow-*` exists — measured, `shadow-sm` inlines its value). -->
-    <div class="animations animate-border-radius-sm animate-box-shadow-blur-sm animate-backdrop-filter-drop-shadow-sm animate-line-height-tight animate-line-height-6 animate-max-width-xs animate-max-width-4 animate-box-shadow-sm"></div>
+         even though `--shadow-*` exists — measured, `shadow-sm` inlines its value).
+         `animate-backdrop-filter-blur-sm` is from the closing sweep: a separate key from
+         `blur`, borrowing the same `--blur-*` tokens, which only the measurement shows. -->
+    <div class="animations animate-border-radius-sm animate-box-shadow-blur-sm animate-backdrop-filter-blur-sm animate-backdrop-filter-drop-shadow-sm animate-line-height-tight animate-line-height-6 animate-max-width-xs animate-max-width-4 animate-box-shadow-sm"></div>
   </body>
 </html>

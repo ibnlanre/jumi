@@ -186,7 +186,8 @@ This is the rule the theme batches are run by, and every part of it was paid for
   creates a second theme source inside Jumi, and a missing token has to be visibly missing.
 
 `pnpm theme:map` re-derives every claim in `src/helpers/create/theme.ts` from the utilities Tailwind
-emits and reports drift in either direction; `pnpm behaviour:check` proves the reference form in a
+emits and reports drift in either direction — it runs in `pnpm check`, and it fails on drift or on a
+namespace candidate it could not measure. `pnpm behaviour:check` proves the reference form in a
 browser, because an emitted `var(--radius-sm)` and a build-time `0.25rem` compile identically and
 only an override of the token tells them apart.
 

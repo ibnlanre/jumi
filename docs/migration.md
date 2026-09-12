@@ -201,21 +201,42 @@ of its resolved value, so switching a value from a literal to a token *renames* 
 slot's variables and keyframe. The utility and its candidate are unchanged; the
 generated names are not.
 
-### What maps, of the 71 keys
+### The classification, complete: 71 keys, one strategy each
 
-| Keys | Representation | Coverage |
+Phase 2 is complete when every theme key Jumi consumes has an **explicit representation strategy** —
+not when every value has become a CSS variable. A literal is a valid final representation when that
+is what the host emits, so the requirement is that the choice is deliberate and can be justified.
+`pnpm theme:map` derives both halves and prints them side by side: the strategy Jumi declares in
+`src/helpers/create/theme.ts`, and what the emitted CSS does. It reports any key where the two
+disagree, and any key whose namespace candidate could not be measured at all.
+
+| Strategy | Keys | Count |
 | --- | --- | --- |
-| `colors`, `backgroundColor`, `borderColor`, `caretColor`, `accentColor`, `boxShadowColor`, `outlineColor` | `var(--color-*)` | 288 values each; one exception, `borderColor.DEFAULT`, has no token |
-| `letterSpacing` | `var(--tracking-*)` | 6/6 |
-| `margin`, `padding`, `gap`, `inset`, `translate`, `width`, `height`, `minHeight`, `minWidth`, `maxHeight`, `maxWidth`, `flexBasis`, `lineHeight` | `calc(var(--spacing) * n)` | numeric names only; `0`, `px`, `auto` and the fractions stay literal |
-| `borderRadius`, `blur`, `dropShadow`, `lineHeight`, `maxWidth` | a namespace for part of the scale, spacing arithmetic for some names, literals for the rest | `--radius-*` 8/18, `--blur-*` 7/10, `--drop-shadow-*` 6/8, `--leading-*` 5/14, `--container-*` 13/50; resolved per name, see batch 3 |
-| `boxShadow`, `backdropBlur` | nothing yet | `--shadow-*` exists but no emitted utility references it — see batch 3; `backdropBlur` is unmeasured |
-| **45 keys** — `borderWidth`, `outlineWidth`, `strokeWidth`, `opacity`, `scale`, `rotate`, `skew`, `transitionDuration`, `transitionDelay`, `zIndex`, `order`, the filter scales, grid scales, `objectPosition`, `backgroundPosition`, `backgroundSize`, `transformOrigin`, `flex`, `flexGrow`, `flexShrink` | nothing — the host emits literals for these too | stays literal until there is evidence for better |
+| `token` — every name resolves to a namespace token | `accentColor`, `backgroundColor`, `boxShadowColor`, `caretColor`, `colors`, `letterSpacing`, `outlineColor` | 7 |
+| `mixed` — a namespace for some names, literals or arithmetic for the rest | `backdropBlur`, `blur`, `borderColor`, `borderRadius`, `dropShadow`, `lineHeight`, `maxWidth` | 7 |
+| `formula` — numeric names are `calc(var(--spacing) * n)` | `flexBasis`, `gap`, `height`, `inset`, `margin`, `maxHeight`, `minHeight`, `minWidth`, `padding`, `translate`, `width` | 11 |
+| `literal` — the host emits a literal and Jumi keeps it | `boxShadow`, plus the 45 keys below | 46 |
 
-Measured 2026-09-11: 1734 values resolve to a token or a spacing formula; 986 sit
-in partially mapped keys. One candidate namespace was dropped as a measured false
-positive — `--inset-shadow-*` matches three `inset` names by spelling, and is the
-inset *shadow* utility's namespace, not `inset`'s.
+`boxShadow` is the one literal key with a reason worth naming: `--shadow-*` exists and is spelled
+like `--drop-shadow-*`, but `shadow-sm` inlines its value while `drop-shadow-sm` references its
+token. The namespace exists, the name exists, the values correspond — and the emitted utility does
+not use it. `theme:map` says exactly that, next to `0/71` names referencing the namespace.
+
+The other 45 are literal because no candidate namespace resembles their values at all — the host
+emits literals for these too, which is a sufficient reason and the end of the search rather than a
+backlog. For the record: `borderWidth`, `outlineOffset`, `transitionDelay`, `backgroundSize`,
+`opacity`, `scale`, `objectPosition`, `rotate`, `skew`, `transitionDuration`, `backgroundPosition`,
+`backdropBrightness`, `backdropContrast`, `backdropGrayscale`, `backdropHueRotate`,
+`backdropInvert`, `backdropOpacity`, `backdropSaturate`, `backdropSepia`, `backgroundImage`,
+`brightness`, `contrast`, `grayscale`, `hueRotate`, `invert`, `saturate`, `sepia`, `flex`,
+`flexGrow`, `flexShrink`, `gridAutoColumns`, `gridAutoRows`, `gridColumn`, `gridColumnEnd`,
+`gridColumnStart`, `gridRow`, `gridRowEnd`, `gridRowStart`, `gridTemplateColumns`,
+`gridTemplateRows`, `order`, `outlineWidth`, `strokeWidth`, `transformOrigin`, `zIndex`.
+
+Measured 2026-09-12: **71 keys — 11 formula, 7 mixed, 46 literal, 7 token — no drift, and no
+namespace candidate left unmeasured.** One candidate namespace was dropped earlier as a measured
+false positive — `--inset-shadow-*` matches three `inset` names by spelling, and is the inset
+*shadow* utility's namespace, not `inset`'s.
 
 ### Batches
 
@@ -325,6 +346,12 @@ now resolve per **name** rather than per key, so one scale can carry all three m
 | `lineHeight` | `--leading-*` | 5 (`tight snug normal relaxed loose`) | `none` | `3`–`10` (batch 2) |
 | `maxWidth` | `--container-*` | 13 | `none full min max fit prose px` | `0`–`96`, `0.5`… (batch 2) |
 
+`backdropBlur` came from the closing sweep rather than from this batch's list: a *separate* key with
+its own utility (`backdrop-blur-*`, beside `blur-*`), and it borrows the same `--blur-*` tokens —
+measured, not inferred from the name. It is the one thing the sweep found still unclassified, and
+adding it is what closed the classification: `backdropBlur` → `--blur-*`, literals `none` and
+`DEFAULT`, 7 of 10 names.
+
 `lineHeight` and `maxWidth` are in both tables, and that is the batch's shape: `leading-6` is
 `calc(var(--spacing) * 6)` while `leading-tight` is `var(--leading-tight)`, out of one scale. A bare
 number is never a namespace name — measured, every numeric name in these scales is either a spacing
@@ -367,16 +394,17 @@ way — only the override can tell a reference from a literal baked in at build 
 
 ```text
 before   themeResolution: formula 2, literal 59, token 8
-after    themeResolution: formula 4, literal 69, token 12
+after    themeResolution: formula 4, literal 71, token 12
          --jumi-border-radius-…: var(--radius-sm)      resolved 0.9rem in a browser
          --jumi-line-height-…:   var(--leading-tight)
          --jumi-line-height-…:   calc(var(--spacing) * 6)
          --jumi-box-shadow-…:    0 1px 3px 0 rgb(0 0 0 / 0.1), …   (not a token)
 ```
 
-`literal 69` covers the new names that are not tokens, `animate-box-shadow-sm`'s inline shadow among
-them, and `formula 4` is the pair of mixed names that proves the per-name resolution in emitted
-CSS.
+`literal 71` covers the new names that are not tokens, `animate-box-shadow-sm`'s inline shadow among
+them; it also counts a *composed* reference like `blur(var(--blur-sm))`, because the resolution
+metric only classifies a value that starts with `var(--` as a token. `formula 4` is the pair of
+mixed names that proves the per-name resolution in emitted CSS.
 
 Every batch has to hold this invariant, so a snapshot diff stays readable:
 
@@ -584,14 +612,18 @@ last, semantic ownership first.
    registration.
 3. **Keep the capability inventory honest** — every new host capability gets a row
    with a classification, in the same change that adds it.
-4. **Theme ownership** (active). Replace Tailwind-scale lookup with a Jumi-owned
-   resolver. Scope is measured rather than assumed: **193 call sites, 71 distinct
-   keys**. The contract stays `(key, values) => values map`, so no call site
-   changes — the work is the 71-key vocabulary and what a resolved value *is*.
-   The representation target and the measured mapping are in "Theme
-   representation" above; `pnpm theme:map` reproduces them.
+4. **Theme ownership** (done — 2026-09-12). Replace Tailwind-scale lookup with a
+   Jumi-owned resolver. Scope is measured rather than assumed: **193 call sites, 71
+   distinct keys**. The contract stays `(key, values) => values map`, so no call
+   site changes — the work was the 71-key vocabulary and what a resolved value
+   *is*. **Done means every one of the 71 keys has an explicit representation
+   strategy**, not that every value became a CSS variable: 7 `token`, 7 `mixed`,
+   11 `formula`, 46 `literal`, with `pnpm theme:map` reporting no drift and no
+   unmeasured namespace candidate. The classification and the batches are in
+   "Theme representation" above.
    **Do not reproduce Tailwind theme semantics** — own the finite vocabulary Jumi
-   actually consumes and nothing more.
+   actually consumes and nothing more. Literal is a final answer when the host
+   emits a literal.
 5. **Flattening ownership** (done — see gaps).
 6. **Order and representation** (done — the representation shipped flat; see
    `aggregate-representation.md` for the measurement that rejected the linked one).

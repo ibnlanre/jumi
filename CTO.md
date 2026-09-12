@@ -1,58 +1,53 @@
-This is a very good Phase 2 result.
+Approved.
 
-The strongest part is not the formula itself, it’s that the measurement forced the design to follow **Tailwind’s CSS contract rather than its JS theme surface**. That is exactly the migration direction we wanted.
-
-I’d lock in three rules from this batch.
-
-* For spacing-derived scales, **the key name is semantic and `--spacing` is the representation**. Do not trust `api.theme()` to materialize those derived values correctly.
-* Theme mappings must be measured against actual emitted v4 CSS, not guessed from similarly named scales.
-* Partial scales can legitimately have mixed resolution modes. A single key may contain token-backed names, spacing-derived names, and literals.
-
-That last point matters for the next batch. I would not try to make:
+This batch gives us something more valuable than additional token coverage: the resolution model is now properly **per value**, not per scale.
 
 ```text
-borderRadius
-blur
-boxShadow
-dropShadow
-lineHeight
-maxWidth
+(key, name)
+   ↓
+spacing formula?
+   ↓ no
+verified CSS token?
+   ↓ no
+literal
 ```
 
-each belong to one strategy.
+That feels like the correct long-term contract. `lineHeight` and `maxWidth` proving all three modes can coexist within one theme key is the strongest evidence for it.
 
-Instead, let resolution be per value:
+And I particularly like that `boxShadow` failed the mapping test. That is exactly the sort of thing we would have gotten wrong by trying to "complete" the migration from naming intuition:
 
 ```text
-theme key + value name
-        ↓
-token?
-formula?
-literal?
+--shadow-sm exists
+shadow-sm exists
+values correspond
 ```
 
-That seems to be what the evidence is telling us.
+yet Tailwind's emitted utility still chooses to inline the value. So yes, leave `boxShadow` literal. Jumi should follow the CSS behavior we have actually measured, not the token vocabulary Tailwind happens to expose.
 
-I’d also be cautious with the wording “real bug in Tailwind’s JS theme” internally. The repro is compelling, but unless the API promises derived spacing values under overridden `--spacing`, it may be an implementation limitation rather than a contract violation. For Jumi, that distinction doesn’t matter. We have enough evidence not to depend on it.
+I would now define **Phase 2 completion** carefully:
 
-For the next batch, I’d proceed exactly where DeepSeek suggests, but split it into two sub-batches:
+> Every theme value Jumi consumes has a classified representation: token, formula, or literal.
 
-1. **Direct namespaces**
+Not:
 
-   ```text
-   borderRadius → --radius-*
-   blur         → --blur-*
-   boxShadow    → --shadow-*
-   dropShadow   → --drop-shadow-*
-   lineHeight   → --leading-*
-   maxWidth     → --container-*
-   ```
+> Every theme value must become a CSS variable.
 
-2. **Remainders**
-   Anything that does not have a verified token or spacing formula stays literal.
+That distinction prevents this phase from turning into an endless hunt for token coverage. Literal is a valid final representation when that's what the host actually emits.
 
-Do not invent mappings just to increase coverage.
+For the remaining work, I'd do one final classification sweep rather than many tiny batches. Measure `backdropBlur` and any other still-unclassified keys, then produce a table of the full 71-key vocabulary:
 
-And I like `1.0.0-beta.1`. That accurately reflects where Jumi is: architecture is becoming real, but the public contract is still being shaped before first publication.
+```text
+fully token/formula backed
+mixed
+intentionally literal
+```
 
-So my call is: **Phase 2 Batch 2 approved. Continue with the verified partial namespaces next, per-value rather than per-key.**
+Anything still literal should have a reason, but "Tailwind emits it literally" is sufficient reason.
+
+I would also leave the strange numeric junk from collapsed `DEFAULT` values alone unless it causes actual output. You've already proven things like `rounded-1` and `blur-0` are unreachable. Filtering those values more aggressively would be cleanup, not migration progress.
+
+Once every consumed key is classified and the harness reports no unmeasured mappings, I would call **theme ownership complete** and move on. We shouldn't keep Phase 2 open just because Tailwind happens to expose more CSS variables that Jumi doesn't need.
+
+So my call is:
+
+**Batch 3 approved. Measure the remaining unclassified vocabulary, close Phase 2 when all 71 keys have an explicit representation strategy, then move to the next dependency rather than chasing higher token percentages.**
