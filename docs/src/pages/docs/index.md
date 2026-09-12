@@ -46,7 +46,7 @@ Each property can have its own duration. This element rotates over 800 milliseco
 
 ## Start here
 
-1. [Install Jumi](/docs/installation/) in a Tailwind CSS project.
+1. [Install Jumi](/docs/installation/) in a Tailwind CSS project, and read [why it takes two pieces](/docs/build-step/).
 2. [Explore the effect catalog](/effects/) to find a starting point.
 3. [Compose properties](/docs/properties/) and [tune their timing](/docs/controls/).
 4. [Respect motion preferences](/docs/accessibility/) before you ship.

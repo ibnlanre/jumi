@@ -53,7 +53,7 @@ import { jumiFinalizer } from '@ibnlanre/jumi/vite'
 export default defineConfig({ plugins: [tailwindcss(), jumiFinalizer()] })
 ```
 
-Both forms compile to the same CSS. Registration alone is not enough: `@plugin "@ibnlanre/jumi"` teaches Tailwind the utilities but never finishes the stylesheet, so the animations would compile to nothing.
+Both forms compile to the same CSS. Registration alone is not enough: `@plugin "@ibnlanre/jumi"` teaches Tailwind the utilities but never finishes the stylesheet, so the animations would compile to nothing. [Why there is a build step](/docs/build-step/) is what the second half does, and why Tailwind's plugin API cannot do it for you.
 
 ### Using PostCSS instead?
 
