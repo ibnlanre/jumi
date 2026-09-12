@@ -11,9 +11,13 @@ import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises'
 const root = new URL('../', import.meta.url)
 const effects = await readFile(new URL('src/keyframes/effects.ts', root), 'utf8')
 const names = [...effects.matchAll(/'@keyframes jumi-([^']+)'/g)].map(match => match[1])
+// The sidebar badge, from the same manifest npm publishes: a version written into the site by hand
+// is a version that goes stale silently.
+const { version } = JSON.parse(await readFile(new URL('package.json', root), 'utf8'))
 await mkdir(new URL('docs/src/data/', root), { recursive: true })
 await mkdir(new URL('docs/vendor/', root), { recursive: true })
 await writeFile(new URL('docs/src/data/effects.json', root), JSON.stringify(names.map(name => ({ className: `animate-${name}`, name })), null, 2) + '\n')
+await writeFile(new URL('docs/src/data/version.json', root), JSON.stringify({ version }, null, 2) + '\n')
 await copyFile(new URL('dist/index.js', root), new URL('docs/vendor/jumi.js', root))
 await copyFile(new URL('dist/vite.js', root), new URL('docs/vendor/jumi-vite.js', root))
-console.log(`Prepared Jumi plugin, finalizer and ${names.length} effects for documentation.`)
+console.log(`Prepared Jumi plugin, finalizer, version ${version} and ${names.length} effects for documentation.`)

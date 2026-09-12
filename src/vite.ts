@@ -10,7 +10,7 @@ import tailwindcss from '@tailwindcss/vite'
  * Jumi's Vite integration: one entry, and it owns Jumi's whole lifecycle inside the build.
  *
  *   // vite.config.ts
- *   import jumi from 'jumi/vite'
+ *   import jumi from '@ibnlanre/jumi/vite'
  *   export default defineConfig({ plugins: [jumi()] })
  *
  *   // style.css, unchanged
@@ -18,7 +18,7 @@ import tailwindcss from '@tailwindcss/vite'
  *
  * Three phases, in this order, and only the middle one is Tailwind's:
  *
- *   register      `@plugin "jumi"` is added to the Tailwind entry stylesheet if it is not there
+ *   register      `@plugin "@ibnlanre/jumi"` is added to the Tailwind entry stylesheet if it is not there
  *   generate      Tailwind compiles what the project wrote
  *   finalize      the aggregate is completed into every carrier, and the staging removed
  *

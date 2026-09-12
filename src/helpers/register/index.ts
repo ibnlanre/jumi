@@ -3,14 +3,15 @@ import type { AtRule, Root } from 'postcss'
 import postcss from 'postcss'
 
 /**
- * Registering Jumi with Tailwind, so that `@plugin "jumi"` stops being something a user writes.
+ * Registering Jumi with Tailwind, so that `@plugin "@ibnlanre/jumi"` stops being something a user
+ * writes.
  *
  * Jumi's lifetime inside Tailwind is three steps — registration, generation, finalization — and only
  * the middle one is Tailwind's. Asking the author to write a CSS directive for the first step and a
  * plugin entry for the third is Jumi exporting its own lifecycle. So the integration does the first
  * step too: `jumi()` in a Vite config or a PostCSS config registers Jumi in the stylesheet that is
- * acting as the Tailwind entry, and `@plugin "jumi"` keeps working for anyone who prefers it
- * explicit.
+ * acting as the Tailwind entry, and `@plugin "@ibnlanre/jumi"` keeps working for anyone who
+ * prefers it explicit.
  *
  * Two rules keep that from being clever, and both are conservative:
  *
@@ -28,8 +29,9 @@ import postcss from 'postcss'
  */
 
 /** What to register. Override it when the stylesheet registers Jumi by path — a monorepo, or the
- * docs site here, whose CSS names the vendored bundle instead of the package. */
-export const pluginSpecifier = 'jumi'
+ * docs site here, whose CSS names the vendored bundle instead of the package. It has to be the
+ * published package name, because Tailwind resolves the directive as a module specifier. */
+export const pluginSpecifier = '@ibnlanre/jumi'
 
 export type Registered = {
   /** The stylesheet imports Tailwind, so it is a compilation root and a place to register. */

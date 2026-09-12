@@ -55,7 +55,7 @@ An effect can animate several properties. Combining two effects that both write 
 
 ```html
 <div class="animations animate-fade-in">
-  <div class="animations animate-spin
+  <div class="animations animate-spinning
     animation-duration-[8s]
     animation-timing-function-linear
     animation-iteration-count-infinite">✳</div>

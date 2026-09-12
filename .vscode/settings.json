@@ -13,5 +13,20 @@
   },
   "prettier.enable": false,
   "css.customData": [".vscode/tailwind.v4.json"],
-  "typescript.experimental.useTsgo": false
+  // The Tailwind IntelliSense extension builds one project per CSS file that imports "tailwindcss",
+  // and creating them all is what exhausted its heap. Only four files here are real entry points —
+  // docs/src/styles/{motion,catalog}.css, stories/globals.css and examples/input.css. The `scripts/`
+  // corpora are harness fixtures, and storybook-static/ and docs/.astro/ are build output; none of
+  // them should be built as a project. Overriding this setting replaces the extension's defaults
+  // (**/.git/**, **/node_modules/**, **/.hg/**, **/.svn/**), so they are repeated here.
+  "tailwindCSS.files.exclude": [
+    "**/.git/**",
+    "**/node_modules/**",
+    "**/.hg/**",
+    "**/.svn/**",
+    "**/scripts/**",
+    "**/storybook-static/**",
+    "**/docs/.astro/**",
+    "**/.pnpm-store/**"
+  ]
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { register, registerCss } from '@/helpers/register'
+import { pluginSpecifier, register, registerCss } from '@/helpers/register'
 
 import postcss from 'postcss'
 
@@ -18,7 +18,7 @@ describe('registration', () => {
     const { css, entry, injected } = registerCss(ENTRY)
 
     expect({ entry, injected }).toEqual({ entry: true, injected: true })
-    expect(css).toBe('@import "tailwindcss";\n@plugin "jumi";\n\n.applied-motion {\n  @apply animations;\n}\n')
+    expect(css).toBe(`@import "tailwindcss";\n@plugin "${pluginSpecifier}";\n\n.applied-motion {\n  @apply animations;\n}\n`)
   })
 
   it('leaves a stylesheet that is not a Tailwind entry untouched', () => {
@@ -40,7 +40,7 @@ describe('registration', () => {
   })
 
   it('does nothing when the file already registers Jumi', () => {
-    const css = '@import "tailwindcss";\n@plugin "jumi";\n'
+    const css = `@import "tailwindcss";\n@plugin "${pluginSpecifier}";\n`
 
     expect(registerCss(css)).toEqual({ css, entry: true, injected: false })
   })
@@ -57,7 +57,7 @@ describe('registration', () => {
     const { css, injected } = registerCss('@import "tailwindcss";\n@plugin "@tailwindcss/forms";\n')
 
     expect(injected).toBe(true)
-    expect(css).toBe('@import "tailwindcss";\n@plugin "jumi";\n@plugin "@tailwindcss/forms";\n')
+    expect(css).toBe(`@import "tailwindcss";\n@plugin "${pluginSpecifier}";\n@plugin "@tailwindcss/forms";\n`)
   })
 
   it('takes a specifier, for both adding and recognising it', () => {
@@ -82,7 +82,7 @@ describe('registration', () => {
     const { injected } = register(root)
 
     expect(injected).toBe(true)
-    expect(root.toString()).toContain('@plugin "jumi";')
+    expect(root.toString()).toContain(`@plugin "${pluginSpecifier}";`)
     expect(root.toString().indexOf('@import')).toBeLessThan(root.toString().indexOf('@plugin'))
   })
 })

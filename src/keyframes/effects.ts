@@ -2246,8 +2246,10 @@ export const effectKeyframes: Collection = {
       },
     },
   },
-  'spin': {
-    '@keyframes jumi-spin': {
+  // Deliberately not `spin`: Tailwind ships `animate-spin`, and a plugin does not take the host's
+  // name. Named for what it looks like, like `floating`, `pulsing` and `wobbling`.
+  'spinning': {
+    '@keyframes jumi-spinning': {
       '0%': {
         transform: 'rotateX(0deg) rotateY(0deg)',
       },

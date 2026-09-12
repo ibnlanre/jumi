@@ -608,8 +608,8 @@
     "name": "slide-stack"
   },
   {
-    "className": "animate-spin",
-    "name": "spin"
+    "className": "animate-spinning",
+    "name": "spinning"
   },
   {
     "className": "animate-spiral",

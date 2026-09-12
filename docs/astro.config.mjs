@@ -1,6 +1,6 @@
 import { defineConfig } from 'astro/config';
 
-// Vendored by `pnpm docs:prepare`: the docs are not a package here, so `jumi/vite` does not resolve.
+// Vendored by `pnpm docs:prepare`: the docs are not a package here, so `@ibnlanre/jumi/vite` does not resolve.
 // One entry, as documented: `jumi()` composes Tailwind's Vite plugin, registers Jumi in each Tailwind
 // entrypoint (`catalog.css`, `motion.css` — and not in `global.css`, which Tailwind does not
 // compile), and completes the stylesheet afterwards. The specifier is the path those stylesheets

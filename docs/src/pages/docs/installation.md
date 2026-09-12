@@ -1,7 +1,7 @@
 ---
 layout: ../../layouts/Docs.astro
 title: From zero to moving.
-description: Install the plugin, register it with Tailwind CSS, and make your first entrance.
+description: Install the plugin, wire it into your build, and make your first entrance.
 ---
 
 ## 01 — Install
@@ -12,18 +12,68 @@ Add Jumi to a project with Tailwind CSS already configured. The examples on this
 pnpm add @ibnlanre/jumi
 ```
 
-Using another package manager? `npm install jumi`, `yarn add jumi`, and `bun add jumi` work too.
+Using another package manager? `npm install @ibnlanre/jumi`, `yarn add @ibnlanre/jumi`, and `bun add @ibnlanre/jumi` work too.
 
-## 02 — Register the plugin
+## 02 — Wire it into your build
 
-In your main CSS file:
+Jumi needs two things: the plugin, which teaches Tailwind the utilities, and an integration, which finishes the stylesheet once every `animate-*` class on the page has been compiled. Replacing Tailwind's Vite plugin with Jumi gives you both at once:
+
+```diff
+- import tailwindcss from '@tailwindcss/vite'
++ import jumi from '@ibnlanre/jumi/vite'
+
+  export default defineConfig({
+-   plugins: [tailwindcss()],
++   plugins: [jumi()],
+  })
+```
+
+Your stylesheet does not mention Jumi:
 
 ```css
 @import "tailwindcss";
-@plugin "jumi";
 ```
 
-Import this stylesheet into your application. Tailwind needs to scan the files containing your animation classes.
+Import that stylesheet into your application. Tailwind needs to scan the files containing your animation classes.
+
+### Prefer to be explicit?
+
+Register the plugin in CSS and finish the stylesheet with Jumi beside Tailwind's plugin:
+
+```css
+@import "tailwindcss";
+@plugin "@ibnlanre/jumi";
+```
+
+```ts
+// vite.config.ts — Tailwind's entry, plus Jumi after it
+import tailwindcss from '@tailwindcss/vite'
+import { jumiFinalizer } from '@ibnlanre/jumi/vite'
+
+export default defineConfig({ plugins: [tailwindcss(), jumiFinalizer()] })
+```
+
+Both forms compile to the same CSS. Registration alone is not enough: `@plugin "@ibnlanre/jumi"` teaches Tailwind the utilities but never finishes the stylesheet, so the animations would compile to nothing.
+
+### Using PostCSS instead?
+
+One entry replaces `@tailwindcss/postcss`:
+
+```js
+// postcss.config.js
+export default { plugins: { '@ibnlanre/jumi/postcss': {} } }
+```
+
+### Building with the Tailwind CLI?
+
+The CLI has no hook to finish in, so add one step after Tailwind writes its output:
+
+```js
+import { finalizeCss } from '@ibnlanre/jumi'
+
+const { css } = finalizeCss(readFileSync('dist/output.css', 'utf8'))
+writeFileSync('dist/output.css', css)
+```
 
 ## 03 — Make an entrance
 
@@ -39,14 +89,14 @@ Import this stylesheet into your application. Tailwind needs to scan the files c
 
 ## Using Astro
 
-Use Tailwind's Vite plugin in your Astro configuration:
+Use Jumi's Vite integration in your Astro configuration:
 
 ```js
 import { defineConfig } from 'astro/config';
-import tailwindcss from '@tailwindcss/vite';
+import jumi from '@ibnlanre/jumi/vite';
 
 export default defineConfig({
-  vite: { plugins: [tailwindcss()] },
+  vite: { plugins: [jumi()] },
 });
 ```
 
@@ -63,7 +113,8 @@ Write complete class names in your source. Tailwind cannot discover a class asse
 ## If nothing moves
 
 - Check that the element includes `animations` or `motion-safe:animations`.
-- Check that your stylesheet registers Jumi and is imported by your app.
+- Check that your build includes the integration, not only the plugin. `@plugin "@ibnlanre/jumi"` on its own leaves the stylesheet unfinished, and the animations then compile to nothing, without an error.
+- Check that your stylesheet is imported by your app.
 - Use explicit units for arbitrary timing values: `animation-duration-[800ms]`.
 - Check whether reduced motion is enabled on your device.
 - Remember that a one-shot animation runs when applied. Remount the element or remove and reapply the animation to replay it.

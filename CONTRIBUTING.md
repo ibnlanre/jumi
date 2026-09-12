@@ -260,15 +260,21 @@ Follow the pattern: `animate-{css-property}-{value}`
 
 ```
 src/
+├── composition/         # Compound properties assembled from parts (filter, transform, …)
+├── core/                # The model: parsing, aggregation, finalization
+├── helpers/             # Adapters to Tailwind's plugin API (register, create, carriers)
 ├── keyframes/
 │   ├── effects.ts       # Named animations (bounce-in, slide-out, etc.)
 │   └── property.ts      # Property-based keyframes
 ├── properties/
-│   ├── match.ts         # Main utility definitions
-│   └── component.ts     # Additional utilities  
+│   ├── controls.ts      # Timing, repetition, direction, playback
+│   └── tween.ts         # Property utilities (animate-rotate, animate-width, …)
 ├── theme/               # Theme value definitions
-├── variants/            # Relationship helpers (if needed)
-└── variables/           # CSS custom property definitions
+├── types/               # TypeScript types
+├── variables/           # CSS custom property definitions
+├── index.ts             # The plugin entry
+├── postcss.ts           # PostCSS entry
+└── vite.ts              # Vite entry
 ```
 
 ---
@@ -278,18 +284,20 @@ src/
 ### Adding a New CSS Property
 
 1. **Verify the CSS property name** on [MDN](https://developer.mozilla.org/en-US/docs/Web/CSS)
-2. **Add to `properties/match.ts`** in alphabetical order
+2. **Add it to `src/properties/tween.ts`** in alphabetical order
 3. **Use the established pattern:**
 
 ```typescript
-'animate-scroll-margin-top': {
-  property: value => ({
-    '--jumi-scroll-margin-top': value,
-    // Register keyframes via shared creator
-  }),
-  type: 'spacing', // or appropriate type
+'animate-gap': {
+  fn: property('gap'),
+  type: ['length', 'percentage', 'any'],
+  values: theme('gap'),
 },
 ```
+
+`fn` builds the declarations, `type` is what Tailwind accepts for a bare value, and `values` is the
+scale the named values come from. `property()`, `token()` and `color()` are the three creators;
+`supportsNegativeValues: true` opts the utility into the negative form (`-animate-gap-4`).
 
 4. **Support Tailwind theme tokens** when applicable (colors, spacing, etc.)
 5. **Test with arbitrary values:** `animate-scroll-margin-top-[24px]`
@@ -406,12 +414,11 @@ the check that knows.
 ### ✅ Adding backdrop-filter-hue-rotate
 
 ```typescript
-// properties/match.ts (alphabetically placed)
+// src/properties/tween.ts (alphabetically placed)
 'animate-backdrop-filter-hue-rotate': {
-  property: value => ({
-    '--jumi-backdrop-filter-hue-rotate': value,
-  }),
+  fn: property('backdrop-filter', [['backdrop-filter-hue-rotate', value => css('hue-rotate', value)]]),
   type: 'angle',
+  values: theme('backdropHueRotate'),
 },
 ```
 
@@ -423,22 +430,24 @@ the check that knows.
 ### ✅ Adding elastic-bounce effect
 
 ```typescript
-// keyframes/effects.ts
+// src/keyframes/effects.ts
 'elastic-bounce': {
-  '0%': {
-    transform: 'scale(0) translateY(100%)',
-    opacity: '0',
-  },
-  '60%': {
-    transform: 'scale(1.1) translateY(-10%)',
-    opacity: '1',
-  },
-  '80%': {
-    transform: 'scale(0.95) translateY(5%)',
-  },
-  '100%': {
-    transform: 'scale(1) translateY(0)',
-    opacity: '1',
+  '@keyframes jumi-elastic-bounce': {
+    '0%': {
+      transform: 'scale(0) translateY(100%)',
+      opacity: '0',
+    },
+    '60%': {
+      transform: 'scale(1.1) translateY(-10%)',
+      opacity: '1',
+    },
+    '80%': {
+      transform: 'scale(0.95) translateY(5%)',
+    },
+    '100%': {
+      transform: 'scale(1) translateY(0)',
+      opacity: '1',
+    },
   },
 },
 ```
@@ -452,8 +461,8 @@ the check that knows.
 
 ## Getting Help
 
-- **Questions?** Open a [Discussion](https://github.com/your-repo/discussions)
-- **Found a bug?** Create an [Issue](https://github.com/your-repo/issues) with a minimal reproduction
+- **Questions?** Open an [issue](https://github.com/ibnlanre/jumi/issues)
+- **Found a bug?** Create an [issue](https://github.com/ibnlanre/jumi/issues) with a minimal reproduction
 - **Feature request?** Propose it in an issue first before implementing
 
 ---

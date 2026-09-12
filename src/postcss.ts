@@ -11,12 +11,12 @@ import postcss from 'postcss'
  * Jumi's PostCSS integration: one entry, and it owns Jumi's whole lifecycle inside the build.
  *
  *   // postcss.config.js
- *   export default { plugins: { 'jumi/postcss': {} } }
+ *   export default { plugins: { '@ibnlanre/jumi/postcss': {} } }
  *
  *   // style.css, unchanged
  *   @import "tailwindcss";
  *
- * Same three phases as `jumi/vite`. The phase that needs care here is registration: Tailwind reads
+ * Same three phases as `@ibnlanre/jumi/vite`. The phase that needs care here is registration: Tailwind reads
  * `@plugin` during its own `Once`, so the directive has to be added *before* that — which is why the
  * registration plugin runs in `Once` and leads the list, while the finalizer runs in `OnceExit`,
  * after every plugin's `Once` whatever the order the config lists. Measured, both orderings work;
@@ -43,7 +43,7 @@ export default function jumi(options?: { plugin?: string, tailwind?: PluginOptio
  * before Tailwind — the same class of failure as a Vite `post` transform, and just as quiet.
  *
  * It does not register Jumi: by the time this runs, Tailwind has already read the directives, so a
- * config using this one still names `@plugin "jumi"` itself.
+ * config using this one still names `@plugin "@ibnlanre/jumi"` itself.
  */
 export function jumiFinalizer(): Plugin {
   return {

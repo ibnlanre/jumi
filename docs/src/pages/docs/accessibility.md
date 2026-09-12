@@ -16,6 +16,14 @@ Activate decorative animation through Tailwind's `motion-safe` variant:
 
 Keep the base element visible. Avoid an unconditional `opacity-0` or off-screen transform that leaves content hidden when the animation is disabled.
 
+When the movement is continuous rather than an entrance, the inverse variant is the one to reach for. It strips the repetition, and only for the visitors who ask for it:
+
+```html
+<div class="animations animate-pulsing animation-iteration-count-infinite motion-reduce:animation-iteration-count-1">
+  Pulses until you say otherwise.
+</div>
+```
+
 ## Reduce motion across a surface
 
 For a dedicated showcase, a CSS rule can disable Jumi animation throughout the page:

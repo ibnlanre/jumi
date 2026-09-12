@@ -738,7 +738,7 @@ export type Effect
     | 'slide-peek-right'
     | 'slide-peek-up'
     | 'slide-stack'
-    | 'spin'
+    | 'spinning'
     | 'spiral'
     | 'spiral-back-in'
     | 'spiral-back-out'

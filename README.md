@@ -25,14 +25,14 @@ runtime to ship to the browser.
 Install Jumi in a project with Tailwind CSS configured:
 
 ```sh
-pnpm add jumi
+pnpm add @ibnlanre/jumi
 ```
 
 Register it by replacing `@tailwindcss/vite` with Jumi in your Vite config:
 
 ```diff
 - import tailwindcss from '@tailwindcss/vite'
-+ import jumi from 'jumi/vite'
++ import jumi from '@ibnlanre/jumi/vite'
 
   export default defineConfig({
 -   plugins: [tailwindcss()],
@@ -55,13 +55,13 @@ Prefer to be explicit? Both work, and they compile to the same CSS:
 
 ```css
 @import "tailwindcss";
-@plugin "jumi";
+@plugin "@ibnlanre/jumi";
 ```
 
 ```ts
 // vite.config.ts — Tailwind's entry, plus Jumi after it
 import tailwindcss from '@tailwindcss/vite'
-import { jumiFinalizer } from 'jumi/vite'
+import { jumiFinalizer } from '@ibnlanre/jumi/vite'
 
 export default defineConfig({ plugins: [tailwindcss(), jumiFinalizer()] })
 ```
@@ -70,14 +70,14 @@ PostCSS instead? Same shape — one entry replaces `@tailwindcss/postcss`:
 
 ```js
 // postcss.config.js
-export default { plugins: { 'jumi/postcss': {} } }
+export default { plugins: { '@ibnlanre/jumi/postcss': {} } }
 ```
 
 Building with the Tailwind CLI, or from a script? The CLI has no hook to finish in, so that one
 still needs a final step:
 
 ```js
-import { finalizeCss } from 'jumi'
+import { finalizeCss } from '@ibnlanre/jumi'
 
 const { css } = finalizeCss(readFileSync('dist/output.css', 'utf8'))
 writeFileSync('dist/output.css', css)

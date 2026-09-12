@@ -14,6 +14,7 @@ export { default } from './helpers/create'
  *
  * One engine, three boundaries. `finalize(root)` walks a CSS AST in place, for a host that
  * already has one; `finalizeCss(css)` is the same thing across parse/serialize; and
- * `jumi/postcss` and `jumi/vite` adapters call it at the two host integrations Jumi supports.
+ * `@ibnlanre/jumi/postcss` and `@ibnlanre/jumi/vite` adapters call it at the two host integrations
+ * Jumi supports.
  */
 export { carrierMarker, finalize, finalizeCss, type Finalized, stagingMarker } from './helpers/carriers'

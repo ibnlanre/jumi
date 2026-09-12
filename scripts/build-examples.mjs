@@ -39,9 +39,12 @@ const { complete } = await import('./lib/compile.mjs')
 console.log('· emitting')
 const raw = path.join(mkdtempSync(path.join(tmpdir(), 'jumi-examples-')), 'output.css')
 
+// No `--config`: the v4 CLI has no such flag and ignores unknown ones silently, so the pointer to
+// `examples/tailwind.config.js` never did anything. `input.css` is the config — `@import`,
+// `@source`, `@plugin`.
 execFileSync(
   'pnpm',
-  ['exec', 'tailwindcss', '-i', input, '-o', raw, '--config', path.join(root, 'examples', 'tailwind.config.js')],
+  ['exec', 'tailwindcss', '-i', input, '-o', raw],
   { cwd: root, stdio: 'pipe' },
 )
 
