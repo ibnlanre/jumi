@@ -10,6 +10,7 @@ this.
 ```text
 engineering/
   architecture/   how the machine works, and why it is shaped this way
+  decisions/      proposals and decisions, including ones not acted on
   research/       investigations, measurements, and their conclusions
   roadmap/        what is planned, in what order, and what was closed
 ```
@@ -23,6 +24,9 @@ engineering/
 | `architecture/dependency-gap.md` | what still stands between Jumi and independent emission, and why that is a product decision |
 | `architecture/effect-model.md` | what an effect is mechanically — one element, one keyframe timeline |
 | `architecture/phrases.md` | the shipped phrase grammar, and the host value-parser constraints it works within |
+| `decisions/hooks-proposal.md` | a lifecycle-hooks proposal that was never implemented |
+| `decisions/CTO.md` | the running record of architectural direction and its approvals |
+| `research/deployment.md` | the Vercel contract, and the 2026-09-12 diagnosis of a stale deploy |
 | `research/scanner-inventory.md` | candidate discovery: what the host hands a matcher, per candidate |
 | `research/upstream-limitation.md` | a parked investigation into a host limitation |
 | `roadmap/migration.md` | the migration: its phases, what closed, and what was decided along the way |
@@ -33,8 +37,8 @@ engineering/
   linked from the site's navigation, it does not belong there.
 - **`engineering/` is build history and rationale.** Its audience is someone changing Jumi, including
   a future agent, and it is where measurements, rejected options and settled decisions are recorded.
-- **Root markdown is the entry point.** `README.md` introduces the package; `CONTRIBUTING.md` states
-  the rules, including this one (principle 10).
+- **Root markdown is the entry point, and only that.** `README.md` introduces the package — it is
+  also what npm shows — and `CONTRIBUTING.md` states the rules. Neither is a place for notes,
+  incidents or dates; those live here.
 
-`CTO.md` and `HOOKS.md` still sit at the root. They are candidates for `engineering/decisions/` when
-that cleanup is worth doing — not mixed into the split above.
+This is principle 10 of `CONTRIBUTING.md`.

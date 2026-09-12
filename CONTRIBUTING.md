@@ -105,7 +105,9 @@ than it looks, and what the `has-*` incident cost.
 
 ### 6. Carrier Classes Hold What Utilities Cannot
 
-Some responsibilities cannot live in a single utility class. `animations` and `transitions` are **carriers**: the author opts an element in once, and the carrier declares the shared composition state that element needs.
+Some responsibilities cannot live in a utility class. `animations` and `transitions` are **carriers**:
+the author opts an element in once, and the carrier declares the shared composition state that
+element needs.
 
 ```html
 ✅ Good
@@ -115,138 +117,97 @@ Some responsibilities cannot live in a single utility class. `animations` and `t
 <div class="animate-rotate-45 animate-scale-110">   <!-- nothing assembles them -->
 ```
 
-**Why?** Every animation on an element competes for the same CSS declarations, and those declarations are *lists* (`animation-name`, `animation-duration`, and the rest) that the browser resolves by position. A utility can own its own value, but it cannot own the list: Tailwind compiles each candidate without knowing what else the element carries. So the list is assembled once, on the element, by a carrier the author asks for.
+**Why?** Every animation on an element competes for the same declarations, and those are *lists*
+(`animation-name`, `animation-duration`, and the rest) the browser resolves by position. A utility can
+own its own value; it cannot own the list, because Tailwind compiles each candidate without knowing
+what else the element carries. So the list is assembled once, on the element, by a carrier the author
+asks for. The carrier is also the single handle for turning motion off, and it declares the shared
+defaults.
 
-The carrier is also the surface's single handle for turning motion off — `.animations { animation: none }` is what the reduced-motion guidance targets — and it declares the shared defaults, which is why a global control written on an ancestor does not silently retime a descendant's animations.
+`@apply` works: `@apply animations animate-rotate-45` produces a carrier like any other.
 
-**Before proposing to remove a carrier class, answer this:** where does the shared composition responsibility move? If the answer is "nowhere", the change has reintroduced the exact problem the carrier solved. The extra class is deliberate; it is the price of composing motion under a compiler that never sees the whole element.
+Guardrails, each of which cost a shipped bug to learn:
 
-**The carrier can be `@apply`ed, and its data still follows it.**
+- **The aggregate resolves on the carrier.** Its entries reference the slot variables the `animate-*`
+  utilities declare *on the element*, and a `var()` chain inside a custom property resolves where it
+  is declared. Published anywhere else, every carrier silently resolves `animation-name: none`.
+- **The finalizer needs the finished stylesheet.** For Vite that is a transform with no `enforce`; for
+  PostCSS it is `OnceExit`. Both were measured against the alternatives.
 
-```html
-✅ Good
-<div class="animations animate-rotate-45">
-
-✅ Also fine
-<div class="my-motion">   <!-- .my-motion { @apply animations animate-rotate-45 } -->
-```
-
-It took two changes to make that true, and both are worth knowing before touching either.
-
-The first is that the aggregate cannot be published at a literal selector. Every entry is `var(--jumi-<slot>-animation-name, …)`, those slot variables are declared by the `animate-*` utilities **on the element**, and a `var()` chain inside a custom property resolves where it is *declared*. Published on `:root` — which shipped for a while — the declaration computes to the guaranteed-invalid value, that value inherits, and every carrier resolves `animation-name: none`. Published on `.animations` it never reaches a variant-prefixed form. Measured both times; `pnpm behaviour:check` is the check that catches it.
-
-The second is that a utility body is not a fixed selector. Tailwind re-parents it for a variant and **copies** it for `@apply`, so by the time CSS exists, one carrier has become several rules in contexts Jumi never wrote. So the carrier marks itself (`--jumi-carrier`), the model publishes the aggregate as *staging* (`--jumi-carrier-staging`, on a rule nothing reads), and `finalize` — after Tailwind is done — writes the aggregate into every marked rule and deletes the staging. `@apply animations` copies the marker with the rest of the body, so the copy is a carrier like any other and is completed the same way.
-
-**Before proposing to publish the aggregate anywhere else, answer this:** which element will resolve that declaration? A rule that nothing reads is fine; a rule that is read at the wrong element is the bug above, and it fails silently — a carrier that resolves `none` looks exactly like a carrier with no slots.
-
-**And before proposing that the finalizer move, answer this:** does the host hand over the
-stylesheet there? Tailwind's Vite plugins are all `enforce: 'pre'`, so `enforce: 'post'` looks like
-the obvious seat — measured, it is the wrong one: at `post` Vite gives you the JS module that wraps
-the CSS in dev, and an empty string in a build. A transform with no `enforce` runs after Tailwind's
-`pre` generation and before Vite's own CSS handling, which is the only place the two modes agree.
-For PostCSS the equivalent question is answered by the hook: `OnceExit`, which runs after every
-plugin's `Once` whatever order the config lists.
+Before proposing to remove a carrier, answer: where does the shared composition responsibility move?
+Before publishing the aggregate anywhere else: which element will resolve that declaration? The
+reasoning and measurements are in `engineering/architecture/carrier-locality.md`.
 
 ### 7. One Integration Step, Or A Deletion Path
 
-**Jumi must converge back toward one integration step. Any temporary second setup requirement must
-have a deletion path.**
+**Jumi must converge toward one integration step. Any temporary second setup requirement needs a
+deletion path.**
 
-This is a product constraint, not a preference about ergonomics. Every correction this feature
-needed — the `:root` placement, `addBase` losing variant locality, `@apply` copying the carrier
-body — was found *after* it had shipped, and the architecture that fixes them requires a step after
-Tailwind. That step is legitimate; asking the author to understand it is not. An integration that
-makes someone learn plugin ordering has exported Jumi's complexity to the one person who has no way
-to fix it.
+An integration that teaches someone plugin ordering has exported Jumi's complexity to the person with
+no way to fix it. So `jumi()` composes Tailwind's plugin rather than sitting beside it
+(`plugins: [jumi()]`), and registers itself in the Tailwind entry stylesheet, so there is no `@plugin`
+directive to write. The remaining step — finishing the stylesheet after Tailwind — has a deletion
+path; see `engineering/roadmap/migration.md`. **A new required step is a regression unless it ships
+with the plan to remove it.**
 
-So: `jumi()` composes Tailwind's plugin rather than sitting beside it (`plugins: [jumi()]`, not
-`[tailwindcss(), jumi()]`), and it registers Jumi in the Tailwind entry stylesheet, so there is no
-`@plugin` directive to write either. What is left is the roadmap in `engineering/roadmap/migration.md`: today the
-integration still composes somebody else's plugin, and the end state is Jumi owning emission.
-**A new required step is a regression unless it comes with the plan to remove it.**
-
-**Registering Jumi is `jumi()`'s job, and the injection rules are not negotiable:** only a
-stylesheet that imports Tailwind is a compilation root, and a file that already registers Jumi — by
-specifier, or by any path whose name mentions Jumi — is left alone. Measured: registering twice is
-not harmless, it emits every `@keyframes` twice.
+Registration is `jumi()`'s job, and the injection rules are not negotiable: only a stylesheet that
+imports Tailwind is a compilation root, and a file that already registers Jumi — by specifier, or by
+any path whose name mentions Jumi — is left alone. Registering twice emits every `@keyframes` twice.
 
 ### 8. Theme Mappings Are Measured, Not Inferred
 
 **A theme mapping is verified against emitted CSS, never deduced from a name that looks right.**
 
-This is the rule the theme batches are run by, and every part of it was paid for:
-
-- **A token existing is not a contract.** `--shadow-*` exists, and `--drop-shadow-*` is spelled
-  almost identically — but `shadow-sm` inlines its value while `drop-shadow-sm` references its
-  token. A namespace that merely looks compatible proves nothing (`--inset-shadow-*` matches three
-  `inset` names by spelling and belongs to another utility).
-- **The key *name* can be the contract.** For a spacing-derived scale, the numeric name *is* the
-  multiple, and `--spacing` is only its representation. Measured: with `--spacing` overridden, the
-  host's JS scale returns the characters of the base string, so nothing may depend on it.
+- **A token existing is not a contract.** `--shadow-*` exists and is spelled like `--drop-shadow-*`,
+  but `shadow-sm` inlines its value while `drop-shadow-sm` references its token.
+- **A key *name* can be the contract.** For a spacing-derived scale the numeric name *is* the
+  multiple; `--spacing` is only its representation, and the host's JS scale cannot be trusted for it.
 - **A scale can mix modes, so resolution is per value.** `leading-6` is `calc(var(--spacing) * 6)`,
-  `leading-tight` is `var(--leading-tight)`, and `leading-none` is a literal — out of one key.
-- **A name with no verified token or formula stays literal.** Inventing a mapping to raise coverage
-  creates a second theme source inside Jumi, and a missing token has to be visibly missing.
+  `leading-tight` is `var(--leading-tight)`, `leading-none` is a literal — out of one key.
+- **A name with no verified token or formula stays literal.** Inventing a mapping creates a second
+  theme source inside Jumi.
 
 `pnpm theme:map` re-derives every claim in `src/helpers/create/theme.ts` from the utilities Tailwind
-emits and reports drift in either direction — it runs in `pnpm check`, and it fails on drift or on a
-namespace candidate it could not measure. `pnpm behaviour:check` proves the reference form in a
-browser, because an emitted `var(--radius-sm)` and a build-time `0.25rem` compile identically and
-only an override of the token tells them apart.
-
----
+emits, runs in `pnpm check`, and fails on drift or on a candidate it could not measure.
+`pnpm behaviour:check` proves the reference form in a browser. The batches that got here are in
+`engineering/roadmap/migration.md`.
 
 ### 9. Do Not Occupy Host Vocabulary
 
 **A Jumi plugin should not claim generic Tailwind vocabulary merely because the host does not
-implement it yet.**
-
-The test to apply before adding anything to the plugin API:
+implement it yet.** The test before adding anything to the plugin API:
 
 > If Tailwind introduced something with this exact name tomorrow, would Jumi be happy to delete its
 > implementation with no user-visible change?
 
-If the answer is not an easy yes, either do not add it, or put it under explicitly Jumi-owned
-vocabulary. The boundary:
+If not, do not add it, or put it under explicitly Jumi-owned vocabulary:
 
 ```text
 generic CSS / utility-language semantics   Tailwind owns the namespace
 motion semantics unique to Jumi            Jumi owns the namespace
 ```
 
-`has-*` is the worked example, and it is why this principle exists. Jumi saw a capability it believed
-missing, registered `has-*` itself, and then the host shipped a **richer, correct** implementation —
-so Jumi silently shadowed it. Measured, with Jumi loaded: `has-[.x]` went from the host's
-`&:has(:is(.x))` to a descendant `& :has(.x)`, and `has-hover:` — composition the host supports —
-stopped emitting anything at all.
+Claiming a namespace leaves only bad options later: override the host forever, break users by
+removing it, version-detect, or emulate. Jumi registers no variants today; relationship matching uses
+the host's forms, including the arbitrary one (`[&:is(h1)]:animate-fade-in`). What Jumi owns is
+motion: `animations`, `transitions`, `animate-*`, phrases, effects, composition. The two variants
+this cost are recorded in `engineering/roadmap/migration.md`.
 
-The consequences of claiming a namespace are all bad: keep overriding the host and users never get
-native behaviour; remove it later and existing code changes behaviour; version-detect and register
-conditionally; or emulate the host forever. For a convenience feature, that is a terrible debt
-profile.
+### 10. Documents State Rules; Records Keep History
 
-`is-*` and `where-*` were the same bet and were removed before 1.0 for the same reason — Tailwind
-ships neither today, and may ship both tomorrow. The host's arbitrary form costs a few characters:
-`[&:is(h1)]:animate-fade-in`. What Jumi owns is motion: `animations`, `transitions`, the `animate-*`
-family, phrases, effects and composition. Those exist regardless of what Tailwind does.
+**Publish documents, not notes.** `README.md` is read on npm, and `docs/` is the public site: they
+state what Jumi is and how to use it. Measurements, incidents, rejected options, dates and hashes are
+records, and records live in `engineering/`.
 
----
-
-### 10. `docs/` Is Product Documentation
-
-**`docs/` is the public documentation site. `engineering/` explains how and why Jumi is built.**
-
-| Directory | Holds |
+| Location | Holds |
 | --- | --- |
-| `docs/` | the Astro site only — `src/pages`, layouts, styles, data, `public/`, and its own README |
-| `engineering/architecture` | how the machine works and why it is shaped that way |
+| `docs/` | the Astro site only — `src/pages`, layouts, styles, data, `public/` |
+| `engineering/architecture` | how the machine works, and why it is shaped this way |
 | `engineering/research` | investigations, measurements, and their conclusions |
 | `engineering/roadmap` | what is planned, in what order, and what was closed |
-| `README.md`, `CONTRIBUTING.md` | the package introduction and the rules for changing it |
+| `README.md`, `CONTRIBUTING.md` | what Jumi is, and the rules for changing it |
 
-Nothing under `engineering/` is private — the split is about intended audience, so that a technical
-investigation is not mistaken for a page someone is meant to read on the website. See
-`engineering/README.md`.
+None of it is private; the split is *intended audience*. See `engineering/README.md`.
 
 ---
 

@@ -1,3 +1,12 @@
+# Hooks: proposal (not implemented)
+
+A design proposal for plugin lifecycle hooks — `onInit`, `onResolveClass`, `onGenerateKeyframes`,
+`onThemeChange`, `onPurge`, `onFinish` — kept as a record of the reasoning. Nothing here is
+implemented: what Jumi uses today are the host's own hooks (`Once`/`OnceExit` for PostCSS, `enforce`
+ordering for Vite).
+
+---
+
 Optimized tool selectionCompacted conversationShort answer: Yes — for a JIT-heavy Tailwind plugin like `jumi`, well-designed lifecycle hooks are strongly beneficial.
 
 - **Why:** Hooks let the plugin manage dynamic keyframes and resources at the right times — generation, deduplication, purge, and config/theme updates — improving correctness, performance, and extensibility.

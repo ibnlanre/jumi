@@ -164,17 +164,8 @@ pnpm install
 pnpm run docs:dev
 ```
 
-To generate the static site:
-
-```sh
-pnpm run docs:build
-pnpm run docs:preview
-```
-
-The preparation step builds the library, copies its plugin into the docs build,
-and generates the effect inventory directly from the source catalog. The landing
-page and catalog use separate animation stylesheets so visitors do not download
-the full effect collection just to read the introduction.
+To generate the static site, run `pnpm run docs:build` and preview it with
+`pnpm run docs:preview`.
 
 ## Development
 
