@@ -203,7 +203,7 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
       values: animationTimingFunction,
     },
     'animations': {
-      fn: () => creator.animations,
+      fn: () => creator.animationUtility,
       values: empty.string,
     },
     'transition-behavior': {

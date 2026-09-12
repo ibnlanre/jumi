@@ -2,6 +2,7 @@ import type { Api, CssInJs } from '@/types'
 
 import { describe, expect, it, vi } from 'vitest'
 
+import { carrierMarker, stagingMarker } from '@/helpers/carriers'
 import { getCreator } from '@/helpers/create'
 import { css } from '@/helpers/css'
 
@@ -548,6 +549,236 @@ describe('color paints', () => {
     const result = creator.color('fill', [], { paint: true })('url(#pattern)', { modifier: null })
 
     expect(Object.values(result)).toContain('url(#pattern)')
+  })
+})
+
+describe('the aggregate', () => {
+  const parts = [
+    'animation-composition',
+    'animation-delay',
+    'animation-direction',
+    'animation-duration',
+    'animation-fill-mode',
+    'animation-iteration-count',
+    'animation-name',
+    'animation-play-state',
+    'animation-timeline',
+    'animation-timing-function',
+  ]
+
+  // `sink.aggregate` writes `{ ':root': {…} }`, so every publish is one `addBase`
+  // call. Several are expected and they accumulate: a later declaration wins, and
+  // nothing is ever retracted.
+  const staged = (addBase: ReturnType<typeof setup>['addBase']) =>
+    addBase.mock.calls
+      .map(([payload]) => payload[':root'] as CssInJs | undefined)
+      .filter((lists): lists is CssInJs => Boolean(lists))
+
+  /** Every declaration staged so far, later publications winning. */
+  const data = (addBase: ReturnType<typeof setup>['addBase']) =>
+    Object.assign({}, ...staged(addBase)) as Record<string, string>
+
+  /** The aggregate alone: exactly what `@/helpers/carriers` injects into a carrier. */
+  const lists = (addBase: ReturnType<typeof setup>['addBase']) =>
+    Object.fromEntries(Object.entries(data(addBase)).filter(([name]) => name !== stagingMarker))
+
+  it('marks the carrier, because the carrier is what has to be found in the output', () => {
+    const { creator } = setup()
+
+    creator.property('opacity')('50', { modifier: null })
+    const utility = creator.animationUtility
+
+    // The marker is a declaration on the carrier body, so whatever Tailwind does with
+    // that body — re-parenting it for a variant, copying it for `@apply` — it goes
+    // with it. That is how the finalizer finds every place the aggregate has to be
+    // written, including the places a literal selector cannot name.
+    expect(utility[carrierMarker]).toBe('animations')
+
+    // The utility is the same rule whatever the slot set is: it reads the aggregate
+    // and declares no part of it. Constant is what makes Tailwind's per-candidate
+    // cache safe.
+    expect(utility['animation-name'])
+      .toBe('var(--jumi-aggregate-animation-name, var(--jumi-animation-name))')
+    expect(utility['animation-duration'])
+      .toBe('var(--jumi-aggregate-animation-duration, var(--jumi-animation-duration))')
+    expect(Object.keys(utility).filter(name => name.startsWith('--jumi-aggregate-'))).toEqual([])
+  })
+
+  it('stages the ten flat lists on a rule nothing reads, marked for the finalizer', () => {
+    const { addBase, creator } = setup()
+
+    creator.property('opacity')('50', { modifier: null })
+    creator.animationUtility
+
+    const id = shorthash2('50')
+
+    // The whole aggregate, all ten lists, and nothing else but the marker that says
+    // what they are.
+    expect(Object.keys(data(addBase)).sort())
+      .toEqual([...parts.map(part => `--jumi-aggregate-${part}`), stagingMarker].sort())
+
+    // Each entry is the slot reference itself. `var(--jumi-<slot>-animation-name)` is
+    // declared *on the element* by the `animate-*` utility, so these lists only
+    // resolve where the carrier ended up — which is precisely why they are staged
+    // rather than published.
+    expect(lists(addBase)['--jumi-aggregate-animation-name'])
+      .toBe(`var(--jumi-opacity-${id}-animation-name, var(--jumi-animation-name))`)
+
+    // Only custom properties travel, and only through base: a longhand there would sit
+    // in a weaker layer, competing with the utilities supposed to beat it.
+    expect(Object.keys(data(addBase)).every(name => /^--jumi-/.test(name))).toBe(true)
+  })
+
+  it('republishes when a slot registers after a pass has already published', () => {
+    const { addBase, creator } = setup()
+
+    creator.property('opacity')('50', { modifier: null })
+    creator.animationUtility // a pass publishes the chain it can see
+    creator.property('rotate')('45deg', { modifier: null }) // …then a slot appears
+
+    // Tailwind will not revisit the candidate it cached, so the only way that
+    // slot reaches the element is a fresh publication.
+    expect(staged(addBase)).toHaveLength(2)
+
+    const names = lists(addBase)['--jumi-aggregate-animation-name'] as string
+
+    expect(names).toContain('--jumi-opacity-')
+    expect(names).toContain('--jumi-rotate-')
+  })
+
+  it('publishes once per change to the slot set, not once per read', () => {
+    const { addBase, creator } = setup()
+
+    creator.property('opacity')('50', { modifier: null })
+    creator.animationUtility
+
+    // Tailwind recompiles the accumulated candidate set whenever anything changed, so
+    // the same slot set arrives here over and over. Re-saying it is pure cost — the
+    // finalizer would inject an identical declaration — so a publication is gated on
+    // the registration count rather than on being read.
+    creator.animationUtility
+    creator.animations
+    creator.animationUtility
+
+    expect(staged(addBase)).toHaveLength(1)
+
+    creator.property('rotate')('45deg', { modifier: null })
+    creator.animationUtility
+
+    expect(staged(addBase)).toHaveLength(2)
+  })
+
+  it('publishes nothing until the utility is read', () => {
+    const { addBase, creator } = setup()
+
+    creator.property('opacity')('50', { modifier: null })
+    creator.animations
+
+    // The data getter is not a publish point: a parse with no carrier candidate emits
+    // no rule to consume the data, so there is nothing to publish.
+    expect(staged(addBase)).toEqual([])
+  })
+
+  it('moves a re-registered value to the end of all ten lists', () => {
+    // A → B → A. Re-registering a value is what a variant (`hover:`) does, and
+    // `animation-composition: replace` decides the winner by list position, so
+    // the first value has to land last — in every list, or the composite stops
+    // being a single animation.
+    const first = '50'
+    const second = '25'
+    const a = `--jumi-opacity-${shorthash2(first)}`
+    const b = `--jumi-opacity-${shorthash2(second)}`
+
+    const aggregateFor = (sequence: string[]) => {
+      const scope = setup()
+
+      for (const value of sequence) scope.creator.property('opacity')(value, { modifier: null })
+      scope.creator.animationUtility
+
+      return lists(scope.addBase)
+    }
+
+    const reregistered = aggregateFor([first, second, first])
+    const order = aggregateFor([second, first])
+    const appended = aggregateFor([first, second])
+
+    // The whole aggregate, all ten lists at once: `A → B → A` resolves to exactly
+    // what `B → A` would have. Comparing the aggregate rather than each list's
+    // entries is what makes the relationship atomic — and it is also the only
+    // way to state it for the lists whose entries are per-attribute rather than
+    // per-slot (`animation-composition` lists the same chain twice when one
+    // property has two slots, so its order is not observable at all).
+    expect(Object.keys(reregistered)).toHaveLength(10)
+    expect(reregistered).toEqual(order)
+    expect(reregistered).not.toEqual(appended)
+
+    // And the order it produced is B then A, not merely stable.
+    const names = reregistered['--jumi-aggregate-animation-name'] as string
+
+    expect(names.indexOf(b)).toBeGreaterThan(-1)
+    expect(names.indexOf(b)).toBeLessThan(names.indexOf(a))
+  })
+
+  it('says the whole aggregate every time, and only when the slots moved', () => {
+    const { addBase, creator } = setup()
+
+    // A pass publishes what it can see. With no slots at all the aggregate is the
+    // shared default for each longhand, which is what the fallback in the carrier's
+    // declaration duplicates — and what makes a carrier with no slots still resolve.
+    creator.animationUtility
+    expect(staged(addBase)).toHaveLength(1)
+    expect(lists(addBase)['--jumi-aggregate-animation-name']).toBe('var(--jumi-animation-name)')
+
+    // The getter is the oracle: every ordering assertion in this file is written
+    // against it, and staging is what actually ships. The two have to agree after
+    // every mutation, not merely at the end.
+    const compare = (label: string) => {
+      const flat = creator.animations
+
+      for (const part of parts) {
+        expect(lists(addBase)[`--jumi-aggregate-${part}`], `${label} · ${part}`).toBe(flat[part])
+      }
+    }
+
+    const mutations: Array<[string, () => void]> = [
+      ['a value on a first attribute', () => creator.property('opacity')('50', { modifier: null })],
+      ['a second attribute', () => creator.property('rotate')('45deg', { modifier: null })],
+      ['a third value on the first attribute', () => creator.property('opacity')('25', { modifier: null })],
+      ['a re-registered value, which moves within its group', () => creator.property('opacity')('50', { modifier: null })],
+      ['a phrase, which claims a slot of its own', () => creator.property('background-color')('0:red,100:blue', { modifier: null })],
+      ['an effect', () => creator.effect('bounce-in')],
+      ['a fourth value on the first attribute', () => creator.property('opacity')('75', { modifier: null })],
+      ['a re-registered effect', () => creator.effect('bounce-in')],
+      // A long group, so the lists stop being short: twenty slots resolve in one
+      // declaration each, with nothing accumulating per slot.
+      ...Array.from({ length: 12 }, (_, index) => [
+        `value ${index + 1} of a long group`,
+        () => creator.property('rotate')(`${10 + index}deg`, { modifier: null }),
+      ] as [string, () => void]),
+    ]
+
+    for (const [label, mutate] of mutations) {
+      mutate()
+      compare(label)
+    }
+
+    // One publication per mutation, on top of the one the first pass made — including
+    // the re-registered effect, which changes nothing about *which* slots exist but
+    // does move one to the end of the lists, and the lists are what is published.
+    // A read that follows no registration publishes nothing (see the test above);
+    // that is the gate that keeps this from being a publish-per-pass.
+    const publications = staged(addBase)
+
+    expect(publications).toHaveLength(mutations.length + 1)
+
+    // And a publication is bounded — one declaration per longhand plus the marker,
+    // whatever the slot count. The lists get longer; the publication does not get
+    // bigger. This is the property the linked representation existed to provide, and
+    // it is stated here so that a future change that reintroduces per-slot emission
+    // fails loudly rather than quietly growing the stylesheet.
+    for (const payload of publications) {
+      expect(Object.keys(payload)).toHaveLength(parts.length + 1)
+    }
   })
 })
 

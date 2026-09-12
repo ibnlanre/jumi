@@ -1,38 +1,18 @@
-import type { GetMatchComponents, GetMatchUtilities } from './types'
+/**
+ * Jumi's entry point, which is Tailwind-shaped by definition: the adapter that
+ * registers Jumi's definitions with Tailwind's plugin API. The semantics it
+ * drives live in `@/core`.
+ */
+export { default } from './helpers/create'
 
-import { getCreator } from '@/helpers/create'
-import { getMatchControls } from '@/properties/controls'
-import { getMatchTween } from '@/properties/tween'
-import { variants } from '@/variants'
-
-import createPlugin from 'tailwindcss/plugin'
-
-const jumi = createPlugin((api) => {
-  const { matchComponents, matchUtilities, matchVariant } = api
-
-  for (const { generator, name, values } of variants) {
-    matchVariant(name, generator, { values })
-  }
-
-  const creator = getCreator(api)
-
-  const registerComponents = (utilities: ReturnType<GetMatchComponents>) => {
-    for (const name in utilities) {
-      const { fn, ...options } = utilities[name]
-      const { modifiers = {}, supportsNegativeValues = false, type = 'any', values } = options
-      matchComponents({ [name]: fn }, { modifiers, supportsNegativeValues, type, values })
-    }
-  }
-  registerComponents(getMatchTween(creator))
-
-  const registerUtilities = (utilities: ReturnType<GetMatchUtilities>) => {
-    for (const name in utilities) {
-      const { fn, ...options } = utilities[name]
-      const { modifiers = {}, supportsNegativeValues = false, type = 'any', values } = options
-      matchUtilities({ [name]: fn }, { modifiers, supportsNegativeValues, type, values })
-    }
-  }
-  registerUtilities(getMatchControls(creator))
-})
-
-export default jumi as ReturnType<typeof createPlugin>
+/**
+ * The carrier protocol, for hosts. Tailwind expands a carrier into rules Jumi never
+ * wrote — `:is(.animations > *)`, `.animations::before`, the copy `@apply` inlined — and
+ * the aggregate those rules read cannot be published at a literal selector, because its
+ * entries reference slot variables that exist only on the element. So the carrier marks
+ * itself and the data is completed afterwards, on the emitted stylesheet.
+ *
+ * One engine, and host wrappers around it: call `finalize(css)` on whatever Tailwind
+ * produced. It is pure and idempotent, so a PostCSS and a Vite plugin can both run it.
+ */
+export { carrierMarker, finalize, type Finalized, stagingMarker } from './helpers/carriers'

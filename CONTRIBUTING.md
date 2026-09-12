@@ -100,6 +100,44 @@ Leverage Tailwind's built-in `:is()`, `:has()`, and `:where()` variants instead 
 
 ---
 
+### 6. Carrier Classes Hold What Utilities Cannot
+
+Some responsibilities cannot live in a single utility class. `animations` and `transitions` are **carriers**: the author opts an element in once, and the carrier declares the shared composition state that element needs.
+
+```html
+✅ Good
+<div class="animations animate-rotate-45 animate-scale-110">
+
+❌ Avoid
+<div class="animate-rotate-45 animate-scale-110">   <!-- nothing assembles them -->
+```
+
+**Why?** Every animation on an element competes for the same CSS declarations, and those declarations are *lists* (`animation-name`, `animation-duration`, and the rest) that the browser resolves by position. A utility can own its own value, but it cannot own the list: Tailwind compiles each candidate without knowing what else the element carries. So the list is assembled once, on the element, by a carrier the author asks for.
+
+The carrier is also the surface's single handle for turning motion off — `.animations { animation: none }` is what the reduced-motion guidance targets — and it declares the shared defaults, which is why a global control written on an ancestor does not silently retime a descendant's animations.
+
+**Before proposing to remove a carrier class, answer this:** where does the shared composition responsibility move? If the answer is "nowhere", the change has reintroduced the exact problem the carrier solved. The extra class is deliberate; it is the price of composing motion under a compiler that never sees the whole element.
+
+**The carrier can be `@apply`ed, and its data still follows it.**
+
+```html
+✅ Good
+<div class="animations animate-rotate-45">
+
+✅ Also fine
+<div class="my-motion">   <!-- .my-motion { @apply animations animate-rotate-45 } -->
+```
+
+It took two changes to make that true, and both are worth knowing before touching either.
+
+The first is that the aggregate cannot be published at a literal selector. Every entry is `var(--jumi-<slot>-animation-name, …)`, those slot variables are declared by the `animate-*` utilities **on the element**, and a `var()` chain inside a custom property resolves where it is *declared*. Published on `:root` — which shipped for a while — the declaration computes to the guaranteed-invalid value, that value inherits, and every carrier resolves `animation-name: none`. Published on `.animations` it never reaches a variant-prefixed form. Measured both times; `pnpm behaviour:check` is the check that catches it.
+
+The second is that a utility body is not a fixed selector. Tailwind re-parents it for a variant and **copies** it for `@apply`, so by the time CSS exists, one carrier has become several rules in contexts Jumi never wrote. So the carrier marks itself (`--jumi-carrier`), the model publishes the aggregate as *staging* (`--jumi-carrier-staging`, on a rule nothing reads), and `finalize` — after Tailwind is done — writes the aggregate into every marked rule and deletes the staging. `@apply animations` copies the marker with the rest of the body, so the copy is a carrier like any other and is completed the same way.
+
+**Before proposing to publish the aggregate anywhere else, answer this:** which element will resolve that declaration? A rule that nothing reads is fine; a rule that is read at the wrong element is the bug above, and it fails silently — a carrier that resolves `none` looks exactly like a carrier with no slots.
+
+---
+
 ## Animation Conventions
 
 ### Effect Animations
@@ -225,12 +263,42 @@ src/
 
 ### Before Submitting
 
+Run the gate. It is the whole contract, and it is cheap:
+
+```bash
+pnpm check        # tsc, eslint, unit tests, and every check below
+```
+
+Individually, when you are iterating on one of them:
+
+```bash
+pnpm exec tsc --noEmit      # types
+pnpm exec eslint src scripts
+pnpm vitest run             # unit tests, including the shared CSS helper
+pnpm css:check              # the byte snapshot, over two frozen corpora
+pnpm incremental:check      # incremental builds stay correct and local
+pnpm behaviour:check        # a real browser resolves a real carrier
+```
+
+**`behaviour:check` is not optional, and it is not a duplicate of the others.** Every
+harness above reads emitted *text*: the snapshot compares bytes, the structural metrics
+count declarations, the incremental harness watches a list grow. A page can pass all of
+them while a browser does nothing — that has happened twice here. It happened most
+recently with the aggregate published on `:root`, where the CSS looked plausible, the
+snapshot was green, 123 unit tests passed, and every carrier resolved
+`animation-name: none`, because a `var()` chain inside a custom property resolves where
+it is *declared* and the slot variables are element-local. `behaviour:check` compiles
+the canonical corpus, loads it in Chromium, and asserts the resolved `animation-name` of
+real carriers. If you change where data is declared, or how an element reads it, this is
+the check that knows.
+
 - [ ] Read and understand the design philosophy
 - [ ] Verify CSS property names on MDN
 - [ ] Check for similar existing implementations
 - [ ] Add utilities in alphabetical order
 - [ ] Test with arbitrary values
 - [ ] Ensure TypeScript types are correct
+- [ ] `pnpm check` passes
 - [ ] Include examples in your PR description
 
 ---

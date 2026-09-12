@@ -27,6 +27,8 @@ Jumi generates CSS at build time. Your animations run in the browser's CSS engin
 
 Use `animations` to activate animations and `transitions` to activate transitions. These opt-ins assemble the relevant CSS declarations on the element.
 
+That assembly is the whole job of those two classes. One element can carry as many utilities as you like — each one declares its own value, and the carrier gathers them into the animation lists the browser needs. It is also the single handle for switching motion off across a surface, which is how [reduced motion](/docs/accessibility/) is handled.
+
 ## Compose something personal
 
 Each property can have its own duration. This element rotates over 800 milliseconds while its scale changes over 1.2 seconds.

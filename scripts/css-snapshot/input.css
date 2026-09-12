@@ -1,0 +1,26 @@
+@import "tailwindcss" source(none);
+
+/* The canonical corpus: an ordinary unprefixed carrier, so the aggregate is read
+   once after every slot exists and the byte metric stays readable. The prefixed
+   carrier forms live in variant.css. */
+@source "./fixture.html";
+@plugin "../../dist/index.js";
+
+/* The point of theme ownership: a theme change has to reach Jumi through CSS,
+   with no JS theme lookup in the path. `brand` is a new name; the `red-500`
+   override proves a built-in-looking class follows the variable too, because the
+   emitted value is a token reference rather than a resolved literal. Both are
+   deliberately different from the host defaults. */
+@theme {
+  --color-brand: oklch(65% 0.2 150);
+  --color-red-500: oklch(30% 0.02 250);
+}
+
+/* `@apply` inlines utilities and never a base rule, so this carrier declares the
+   consumer longhands and its own slots but never the aggregate, and resolves to
+   nothing. Measured: `scripts/behaviour-check.mjs` pins it as a known gap. It is not
+   a reason to publish the data document-wide — `:root` measured `none` here too,
+   because a `var()` chain in a custom property resolves where it is declared. */
+.applied-motion {
+  @apply animations animate-rotate-45;
+}

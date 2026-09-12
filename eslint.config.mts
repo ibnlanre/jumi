@@ -58,6 +58,8 @@ const ignoresConfig = defineConfig({
     '**/tsconfig*.tsbuildinfo',
     '**/*.d.ts',
     "**/*.css",
+    // A recorded measurement, not source: `pnpm css:snapshot` writes it.
+    '**/css-snapshot/structure.json',
   ],
 })
 

@@ -483,7 +483,22 @@ export type CounterFunction
     | 'symbols'
 
 export interface Creator {
+  /**
+   * The aggregate as ten flat longhand lists, in the model's order.
+   *
+   * This is the **oracle**, not an emission path. What the host publishes is a
+   * chain of links (`--jumi-link*`) that the `--jumi-aggregate-*` pointers name,
+   * and this getter is what that chain is checked against — every list assertion
+   * in the tests is written against these lists, and a differential test compares
+   * the chain to them after every mutation. Nothing emits this shape.
+   */
   get animations(): CssInJs;
+  /**
+   * What Tailwind emits for `.animations`: a constant rule that reads the
+   * aggregate through custom properties. Constant on purpose — Tailwind caches a
+   * candidate's output, so nothing in it may depend on which slots exist.
+   */
+  get animationUtility(): CssInJs;
   color(attribute: AnimatableStandardPropertyType, parts?: PropertyParts, options?: { paint?: boolean }): MatchComponentsPropertyFunction;
   effect(attribute: string): string;
   readonly effects: string[];

@@ -1,0 +1,7 @@
+@import "tailwindcss" source(none);
+
+/* The carrier-variant corpus: prefixed carrier forms, the quadratic publication
+   path. Compiled separately so it can be held to a budget without inflating the
+   canonical fixture's byte metric. */
+@source "./variant.html";
+@plugin "../../dist/index.js";
