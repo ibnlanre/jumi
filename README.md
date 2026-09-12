@@ -6,9 +6,9 @@ Give your interface life with a composable animation library for Tailwind CSS.
 Choose from **228 effects**, animate property targets, give each its own rhythm,
 and stagger motion across children—all from your markup.
 
-**[Start here](docs/src/pages/docs/installation.md)** ·
-**[Learn to compose](docs/src/pages/docs/properties.md)** ·
-**[Explore the effects](docs/src/pages/effects.astro)** ·
+**[Start here](https://jumi-css.vercel.app/docs/installation/)** ·
+**[Learn to compose](https://jumi-css.vercel.app/docs/properties/)** ·
+**[Explore the effects](https://jumi-css.vercel.app/effects/)** ·
 **[Run the docs site](#the-documentation-site)**
 
 ```html
