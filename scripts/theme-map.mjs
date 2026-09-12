@@ -312,3 +312,122 @@ console.log(`  implemented: ${[...jumi].join(', ')}`)
 if (missing.length) console.log(`  measured and not implemented: ${missing.join(', ')}`)
 if (extra.length) console.log(`  implemented and not measured: ${extra.join(', ')}`)
 if (!missing.length && !extra.length) console.log('  no drift')
+
+/* ------------------------------------------------------------------------------------
+ * The token claims, checked against emitted CSS
+ *
+ * A token existing is not the same as a utility *referencing* it, and only the second one is a
+ * contract Jumi can borrow. `--shadow-*` exists and is spelled just like `--drop-shadow-*`, but
+ * `shadow-sm` inlines its value (`--tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, …)`) while
+ * `drop-shadow-sm` references its token — so `boxShadow` is not in the table above and
+ * `dropShadow` is. This report re-derives every claim in `themeTokens` from the utilities
+ * Tailwind actually emits: for each name, is `var(--namespace-name)` there or not?
+ * ---------------------------------------------------------------------------------- */
+
+/** One representative utility per key: a namespace is only real if some utility uses it. */
+const utility = {
+  accentColor: 'accent',
+  backgroundColor: 'bg',
+  blur: 'blur',
+  borderColor: 'border',
+  borderRadius: 'rounded',
+  boxShadowColor: 'shadow',
+  caretColor: 'caret',
+  colors: 'text',
+  dropShadow: 'drop-shadow',
+  letterSpacing: 'tracking',
+  lineHeight: 'leading',
+  maxWidth: 'max-w',
+  outlineColor: 'outline',
+}
+
+/** What the source claims: which key resolves to which namespace, and which names stay literal. */
+const claims = () => {
+  const source = readFileSync(path.join(root, 'src/helpers/create/theme.ts'), 'utf8')
+  const block = /themeTokens[^=]*= \{([\s\S]*?)\n\}/.exec(source)?.[1] ?? ''
+  const found = []
+
+  for (const entry of block.matchAll(/^ {2}(\w+): \{(.*)\},$/gm)) {
+    const namespace = /namespace: '([^']+)'/.exec(entry[2])?.[1]
+    const list = /literal: \[([^\]]*)\]/.exec(entry[2])?.[1]
+
+    if (namespace) {
+      found.push({
+        key: entry[1],
+        literal: list ? [...list.matchAll(/'([^']+)'/g)].map(match => match[1]) : [],
+        namespace,
+      })
+    }
+  }
+
+  return found
+}
+
+const number = /^\d+(?:\.\d+)?$/
+const claimable = (name) => /^[\w-]+$/.test(name)
+
+const announced = claims()
+const classes = []
+
+for (const claim of announced) {
+  const prefix = utility[claim.key]
+  const names = Object.keys(values[claim.key] ?? {}).filter(claimable)
+
+  claim.names = names
+  classes.push(...names.map(name => `${prefix}-${name === 'DEFAULT' ? '' : name}`))
+
+  // The bare utility is a separate candidate: `shadow` is `shadow-DEFAULT`, `rounded` is
+  // `rounded-DEFAULT`, and neither is `rounded-DEFAULT` as a class name.
+  claim.prefix = prefix
+}
+
+const scan = mkdtempSync(path.join(here, '.theme-map-'))
+const instance = await compile('@import "tailwindcss" source(none);', { base: scan, onDependency() {} })
+const emitted = instance.build([...new Set(classes)].filter(Boolean))
+
+rmSync(scan, { recursive: true, force: true })
+
+/** Does the rule for `selector` reference `var(--token)`? */
+const declares = (selector, token) => {
+  for (const form of [`.${selector} {`, `.${selector}{`]) {
+    const at = emitted.indexOf(form)
+
+    if (at !== -1) return emitted.slice(at, emitted.indexOf('}', at)).includes(`var(--${token})`)
+  }
+
+  return false
+}
+
+console.log(`\ntoken claims: ${announced.length} keys`)
+
+let drift = 0
+
+for (const claim of announced) {
+  const predicted = (name) => !claim.literal.includes(name) && !number.test(name)
+  const missingTokens = []
+  const extraTokens = []
+  let tokensHere = 0
+
+  for (const name of claim.names) {
+    const selector = `${claim.prefix}-${name === 'DEFAULT' ? '' : name}`.replace(/-$/, '')
+    const reference = declares(selector, `${claim.namespace}-${name}`)
+
+    if (reference) tokensHere += 1
+    if (predicted(name) && !reference) missingTokens.push(name)
+    if (!predicted(name) && reference) extraTokens.push(name)
+  }
+
+  drift += missingTokens.length + extraTokens.length
+
+  const notes = []
+  if (missingTokens.length) notes.push(`not a token: ${missingTokens.slice(0, 4).join(', ')}`)
+  if (extraTokens.length) notes.push(`is a token: ${extraTokens.slice(0, 4).join(', ')}`)
+
+  console.log(
+    `  ${claim.key.padEnd(width)} --${claim.namespace}-*: ${tokensHere} of ${claim.names.length}`
+    + ` name${claim.names.length === 1 ? '' : 's'}, literal ${claim.literal.length}`
+    + (notes.length ? `  ⚠ ${notes.join('; ')}` : ''),
+  )
+}
+
+console.log(drift ? `\n${drift} claims contradicted by the emitted CSS` : '\nno drift: every claim matches the emitted CSS')

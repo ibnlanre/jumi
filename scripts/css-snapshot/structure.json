@@ -1,34 +1,34 @@
 {
   "canonical": {
-    "aggregateBytes": 41818,
+    "aggregateBytes": 52958,
     "aggregateShare": 58,
     "aggregateWrites": 20,
-    "bytes": 72654,
+    "bytes": 90628,
     "carriers": 2,
-    "keyframes": 26,
+    "keyframes": 33,
     "media": 5,
-    "properties": 44,
-    "slots": 26,
+    "properties": 51,
+    "slots": 33,
     "strayStaging": 0,
-    "supports": 4,
-    "publishEvents": 27,
-    "rawBytes": 324158,
-    "stagingBytes": 293402,
+    "supports": 5,
+    "publishEvents": 34,
+    "rawBytes": 502457,
+    "stagingBytes": 464867,
     "colorValues": {
       "literal": 1,
       "token": 6
     },
     "themeResolution": {
-      "formula": 2,
-      "literal": 59,
-      "token": 8
+      "formula": 4,
+      "literal": 69,
+      "token": 12
     }
   },
   "carrierVariant": {
     "aggregateBytes": 59940,
     "aggregateShare": 66,
     "aggregateWrites": 40,
-    "bytes": 90542,
+    "bytes": 90577,
     "carriers": 4,
     "keyframes": 18,
     "media": 1,
@@ -37,7 +37,7 @@
     "strayStaging": 0,
     "supports": 5,
     "publishEvents": 19,
-    "rawBytes": 177793,
+    "rawBytes": 177828,
     "stagingBytes": 147411,
     "colorValues": {
       "literal": 0,
@@ -45,8 +45,8 @@
     },
     "themeResolution": {
       "formula": 0,
-      "literal": 38,
-      "token": 3
+      "literal": 37,
+      "token": 4
     }
   }
 }

@@ -1,111 +1,58 @@
-Yes. Given the actual history, I’d make two decisions explicit now.
+This is a very good Phase 2 result.
 
-First, this is **Jumi 1.0**, not 2.0. There is no published compatibility surface to preserve. I’d change the package version to `1.0.0` when you are ready to treat the current API as the first public release. Until then, a prerelease like `1.0.0-beta.x` would also make sense. The old Sass incarnation is history, not a released major version.
+The strongest part is not the formula itself, it’s that the measurement forced the design to follow **Tailwind’s CSS contract rather than its JS theme surface**. That is exactly the migration direction we wanted.
 
-Second, **Tailwind v4 should be the floor**. I would not spend another minute carrying v3 compatibility. Jumi is being designed around v4 concepts already:
+I’d lock in three rules from this batch.
 
-```text
-@theme / CSS tokens
-@plugin
-CSS-first configuration
-@tailwindcss/vite
-v4 candidate/compiler behavior
-```
+* For spacing-derived scales, **the key name is semantic and `--spacing` is the representation**. Do not trust `api.theme()` to materialize those derived values correctly.
+* Theme mappings must be measured against actual emitted v4 CSS, not guessed from similarly named scales.
+* Partial scales can legitimately have mixed resolution modes. A single key may contain token-backed names, spacing-derived names, and literals.
 
-Supporting v3 would create compatibility work for users who do not exist.
-
-So yes, move on to Phase 2.
-
-## Phase 2: own theme resolution
-
-This is where the migration starts paying off beyond fixing the carrier architecture.
-
-Batch 1 proved the pattern with tokens:
+That last point matters for the next batch. I would not try to make:
 
 ```text
-colors → var(--color-*)
-letterSpacing → var(--tracking-*)
+borderRadius
+blur
+boxShadow
+dropShadow
+lineHeight
+maxWidth
 ```
 
-Batch 2 should prove the other important class of theme ownership:
+each belong to one strategy.
+
+Instead, let resolution be per value:
 
 ```text
-spacing scale → calc(var(--spacing) * n)
+theme key + value name
+        ↓
+token?
+formula?
+literal?
 ```
 
-I’d proceed with the measured set:
+That seems to be what the evidence is telling us.
 
-```text
-margin
-padding
-gap
-inset
-translate
-width
-height
-minWidth
-minHeight
-maxHeight
-flexBasis
-outlineOffset
-```
+I’d also be cautious with the wording “real bug in Tailwind’s JS theme” internally. The repro is compelling, but unless the API promises derived spacing values under overridden `--spacing`, it may be an implementation limitation rather than a contract violation. For Jumi, that distinction doesn’t matter. We have enough evidence not to depend on it.
 
-with explicit non-formula values remaining literals:
+For the next batch, I’d proceed exactly where DeepSeek suggests, but split it into two sub-batches:
 
-```text
-0
-px
-auto
-```
+1. **Direct namespaces**
 
-and whatever other exceptions your measurement has actually established.
+   ```text
+   borderRadius → --radius-*
+   blur         → --blur-*
+   boxShadow    → --shadow-*
+   dropShadow   → --drop-shadow-*
+   lineHeight   → --leading-*
+   maxWidth     → --container-*
+   ```
 
-The important architectural rule is:
+2. **Remainders**
+   Anything that does not have a verified token or spacing formula stays literal.
 
-> Jumi maps only the Tailwind v4 CSS contract it actually consumes. It does not reproduce Tailwind's JavaScript theme engine.
+Do not invent mappings just to increase coverage.
 
-So this:
+And I like `1.0.0-beta.1`. That accurately reflects where Jumi is: architecture is becoming real, but the public contract is still being shaped before first publication.
 
-```ts
-theme('padding')
-```
-
-can continue to exist as Jumi's internal vocabulary for now, but its implementation should increasingly resolve through:
-
-```css
-var(--spacing)
-var(--color-*)
-var(--radius-*)
-...
-```
-
-rather than through `api.theme()`.
-
-That lets the 193 call sites remain untouched while their dependency underneath changes.
-
-## I’d also change how we think about the Tailwind adapter now
-
-The one-step integration work has moved Tailwind into a much healthier role:
-
-```text
-jumi()
-  ├─ registers Jumi
-  ├─ hosts Tailwind v4
-  └─ finalizes Jumi
-```
-
-But the semantic core is already escaping it.
-
-Phase 2 should continue that direction. Every successful theme batch should reduce the amount of information that must cross:
-
-```text
-Tailwind → Jumi
-```
-
-Eventually the adapter should mostly provide candidate/variant machinery, not values.
-
-And because there are no users yet, this is the ideal moment to make those changes. You don't need deprecation aliases, migration warnings, compatibility shims, or two competing resolution systems for three releases. We can make the 1.0 architecture the architecture we actually want.
-
-One thing I would **not** do yet is choose between `@ibnlanre/jumi` and `@jumi/...` based on implementation convenience. That's branding/package topology and deserves its own decision closer to publication. Keep the internals package-name-neutral where possible.
-
-So: **Tailwind v4 only, Jumi 1.0, Phase 2 approved. Start with the spacing/formula batch.**
+So my call is: **Phase 2 Batch 2 approved. Continue with the verified partial namespaces next, per-value rather than per-key.**

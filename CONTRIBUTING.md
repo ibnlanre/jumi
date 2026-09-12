@@ -167,6 +167,29 @@ stylesheet that imports Tailwind is a compilation root, and a file that already 
 specifier, or by any path whose name mentions Jumi — is left alone. Measured: registering twice is
 not harmless, it emits every `@keyframes` twice.
 
+### 8. Theme Mappings Are Measured, Not Inferred
+
+**A theme mapping is verified against emitted CSS, never deduced from a name that looks right.**
+
+This is the rule the theme batches are run by, and every part of it was paid for:
+
+- **A token existing is not a contract.** `--shadow-*` exists, and `--drop-shadow-*` is spelled
+  almost identically — but `shadow-sm` inlines its value while `drop-shadow-sm` references its
+  token. A namespace that merely looks compatible proves nothing (`--inset-shadow-*` matches three
+  `inset` names by spelling and belongs to another utility).
+- **The key *name* can be the contract.** For a spacing-derived scale, the numeric name *is* the
+  multiple, and `--spacing` is only its representation. Measured: with `--spacing` overridden, the
+  host's JS scale returns the characters of the base string, so nothing may depend on it.
+- **A scale can mix modes, so resolution is per value.** `leading-6` is `calc(var(--spacing) * 6)`,
+  `leading-tight` is `var(--leading-tight)`, and `leading-none` is a literal — out of one key.
+- **A name with no verified token or formula stays literal.** Inventing a mapping to raise coverage
+  creates a second theme source inside Jumi, and a missing token has to be visibly missing.
+
+`pnpm theme:map` re-derives every claim in `src/helpers/create/theme.ts` from the utilities Tailwind
+emits and reports drift in either direction; `pnpm behaviour:check` proves the reference form in a
+browser, because an emitted `var(--radius-sm)` and a build-time `0.25rem` compile identically and
+only an override of the token tells them apart.
+
 ---
 
 ## Animation Conventions

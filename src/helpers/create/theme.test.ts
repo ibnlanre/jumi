@@ -135,10 +135,114 @@ describe('themeTokens', () => {
   })
 })
 
-describe('themeSpacing', () => {
-  it('does not overlap the token keys, because a key has one representation', () => {
-    const both = [...themeSpacing].filter(key => key in themeTokens)
+describe('partial scales', () => {
+  it('resolves one scale three ways at once', () => {
+    // Measured against the emitted CSS: `leading-6` is `calc(var(--spacing) * 6)`,
+    // `leading-tight` is `var(--leading-tight)`, and `leading-none` is `1`.
+    const themed = api({ lineHeight: { 3: '0.75rem', 6: '1.5rem', none: '1', tight: '1.25' } })
 
-    expect(both).toEqual([])
+    expect(resolveTheme(themed, 'lineHeight')).toEqual({
+      3: 'calc(var(--spacing) * 3)',
+      6: 'calc(var(--spacing) * 6)',
+      none: '1',
+      tight: 'var(--leading-tight)',
+    })
+  })
+
+  it('keeps the names in a partial scale that the namespace does not back', () => {
+    const themed = api({
+      maxWidth: {
+        0: '0px',
+        0.5: '0.125rem',
+        4: '1rem',
+        fit: 'fit-content',
+        full: '100%',
+        none: 'none',
+        prose: '65ch',
+        px: '1px',
+        xs: '20rem',
+      },
+    })
+
+    expect(resolveTheme(themed, 'maxWidth')).toEqual({
+      0: '0px',
+      0.5: 'calc(var(--spacing) * 0.5)',
+      4: 'calc(var(--spacing) * 4)',
+      fit: 'fit-content',
+      full: '100%',
+      none: 'none',
+      prose: '65ch',
+      px: '1px',
+      xs: 'var(--container-xs)',
+    })
+  })
+
+  it('keeps the characters a collapsed scale spreads, because they are not names', () => {
+    // A scale with a `DEFAULT` is collapsed to a string and spread, so `theme('radius')`
+    // really does hand over `0: '0'`, `1: '.'`, `2: '2'`. Measured: `rounded-1` emits nothing.
+    const themed = api({
+      borderRadius: {
+        0: '0',
+        1: '.',
+        2: '2',
+        DEFAULT: '0.25rem',
+        full: '9999px',
+        md: '0.375rem',
+        none: '0px',
+        sm: '0.25rem',
+      },
+    })
+
+    expect(resolveTheme(themed, 'borderRadius')).toEqual({
+      0: '0',
+      1: '.',
+      2: '2',
+      DEFAULT: '0.25rem',
+      full: '9999px',
+      md: 'var(--radius-md)',
+      none: '0px',
+      sm: 'var(--radius-sm)',
+    })
+  })
+
+  it('resolves a blur and a drop shadow to their tokens', () => {
+    const themed = api({
+      blur: { 0: '0', DEFAULT: '8px', none: '', sm: '8px' },
+      dropShadow: { DEFAULT: '0 1px 2px rgb(0 0 0 / 0.1)', none: '0 0 #0000', sm: '0 1px 2px rgb(0 0 0 / 0.15)' },
+    })
+
+    expect(resolveTheme(themed, 'blur')).toEqual({
+      0: '0',
+      DEFAULT: '8px',
+      none: '',
+      sm: 'var(--blur-sm)',
+    })
+
+    expect(resolveTheme(themed, 'dropShadow')).toEqual({
+      DEFAULT: '0 1px 2px rgb(0 0 0 / 0.1)',
+      none: '0 0 #0000',
+      sm: 'var(--drop-shadow-sm)',
+    })
+  })
+
+  it('leaves box shadows alone, because the host does not reference the namespace', () => {
+    // The trap this batch was measured to avoid: `--shadow-*` exists and looks exactly like
+    // `--drop-shadow-*`, but `shadow-sm` inlines its value (`--tw-shadow: 0 1px 3px 0
+    // var(--tw-shadow-color, …)`) while `drop-shadow-sm` references its token.
+    const themed = api({ boxShadow: { DEFAULT: '0 1px 3px 0 rgb(0 0 0 / 0.1)', none: 'none', sm: '0 1px 3px 0 rgb(0 0 0 / 0.1)' } })
+
+    expect(resolveTheme(themed, 'boxShadow')).toEqual({
+      DEFAULT: '0 1px 3px 0 rgb(0 0 0 / 0.1)',
+      none: 'none',
+      sm: '0 1px 3px 0 rgb(0 0 0 / 0.1)',
+    })
+  })
+})
+
+describe('themeSpacing', () => {
+  it('overlaps the token keys, because representation is per name', () => {
+    const both = [...themeSpacing].filter(key => key in themeTokens).sort()
+
+    expect(both).toEqual(['lineHeight', 'maxWidth'])
   })
 })

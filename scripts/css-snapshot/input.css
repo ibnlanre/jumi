@@ -24,6 +24,14 @@
   --spacing: 0.3rem;
 }
 
+/* The partial-namespace batch's acceptance test, again as an override: `--radius-sm`
+   is not the host's 0.25rem, so a name that resolves through the token follows it.
+   The utility is emitted the same either way — only the browser can tell a token
+   reference from a build-time literal, which is what `behaviour:check` reads. */
+@theme {
+  --radius-sm: 0.9rem;
+}
+
 /* `@apply` inlines utilities and never a base rule, so this carrier declares the
    consumer longhands and its own slots but never the aggregate, and resolves to
    nothing. Measured: `scripts/behaviour-check.mjs` pins it as a known gap. It is not

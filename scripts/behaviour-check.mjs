@@ -219,6 +219,7 @@ const directPage = await load(canonicalCss, `
     <div id="bare" class="animations"></div>
     <div id="applied" class="applied-motion"></div>
     <div id="spacing" class="animations animate-padding-4 animate-margin-2"></div>
+    <div id="radius" class="animations animate-border-radius-sm"></div>
 `)
 
 const direct = []
@@ -274,6 +275,28 @@ if (!spacingResolved) {
   failures.push(`theme: the padding utility resolved to "${String(spacingValue).slice(0, 60)}", expected the corpus's 0.3rem`)
 }
 
+/* ------------------------------------------------------------------------------------
+ * 4. The partial-namespace batch: a token-backed name resolves through the token
+ * ---------------------------------------------------------------------------------- */
+
+// Same claim as the spacing one above, for a name that is not arithmetic: the corpus overrides
+// `--radius-sm` (0.9rem), and the utility is emitted as `var(--radius-sm)` either way. Only the
+// browser shows whether the value is a reference or a literal baked in at build time — and a
+// literal is exactly what the table would produce if a namespace were only guessed at.
+const radiusProperty = /(--jumi-border-radius-[\w-]+):\s*var\(--radius-sm\)/.exec(canonicalCss)?.[1]
+const radiusValue = radiusProperty
+  ? await directPage.evaluate(
+      property => getComputedStyle(document.querySelector('#radius')).getPropertyValue(property),
+      radiusProperty,
+    )
+  : '(no token reference in the CSS)'
+
+const radiusResolved = typeof radiusValue === 'string' && radiusValue.includes('0.9rem')
+
+if (!radiusResolved) {
+  failures.push(`theme: the border-radius utility resolved to "${String(radiusValue).slice(0, 60)}", expected the corpus's 0.9rem`)
+}
+
 // `@apply animations` inlines the carrier — longhands, slot references *and* the marker that
 // says what the rule is. So the copied rule is a carrier like any other, and the finalizer
 // writes the aggregate into it after the build. It used to resolve nothing, because the only
@@ -312,10 +335,11 @@ for (const { measured, utility } of direct) {
 console.log(`    ✓ a carrier with no slot resolves to nones only (${bareNames.length} slots in the sheet)`)
 console.log(`    ${appliedWorks ? '✓' : '✗'} @apply animations -> ${appliedNames.join(' + ') || 'resolves nothing'}`)
 console.log(`    ${spacingResolved ? '✓' : '✗'} spacing follows --spacing -> ${String(spacingValue).slice(0, 40)}`)
+console.log(`    ${radiusResolved ? '✓' : '✗'} radius follows --radius-sm -> ${String(radiusValue).slice(0, 40)}`)
 console.log(`    ✓ finalization settles: ${variantBuild.staging + canonicalBuild.staging} staging rules`
   + ` removed, ${variantBuild.carriers + canonicalBuild.carriers} carriers written, a second pass a no-op`)
 
-const required = contexts.length + utilities.length + 2
+const required = contexts.length + utilities.length + 3
 const passing = required - failures.length
 
 console.log(`\n  ${passing}/${required} required contexts and carriers behave`)

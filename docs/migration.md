@@ -177,7 +177,9 @@ is owned for real.**
 Theme **ownership** and theme **representation** are two changes, and the mapping
 is proven before anything switches. `pnpm theme:map` prints the current table: it
 reads the vocabulary out of `src/`, the tokens out of the shipped `theme.css`, and
-counts a mapping only when the token exists *and* carries the same value.
+counts a mapping only when the token exists *and* carries the same value — then
+verifies every claim in `themeTokens` against the utilities Tailwind actually
+emits, because neither of those two is the contract on its own.
 
 The rule:
 
@@ -206,7 +208,8 @@ generated names are not.
 | `colors`, `backgroundColor`, `borderColor`, `caretColor`, `accentColor`, `boxShadowColor`, `outlineColor` | `var(--color-*)` | 288 values each; one exception, `borderColor.DEFAULT`, has no token |
 | `letterSpacing` | `var(--tracking-*)` | 6/6 |
 | `margin`, `padding`, `gap`, `inset`, `translate`, `width`, `height`, `minHeight`, `minWidth`, `maxHeight`, `maxWidth`, `flexBasis`, `lineHeight` | `calc(var(--spacing) * n)` | numeric names only; `0`, `px`, `auto` and the fractions stay literal |
-| `borderRadius`, `blur`, `backdropBlur`, `boxShadow`, `dropShadow`, `lineHeight`, `maxWidth` | a namespace for part of the scale, literals for the rest | `--radius-*` 8/18, `--shadow-*` 8/71, `--container-*` 13/54, `--blur-*` 7/10 |
+| `borderRadius`, `blur`, `dropShadow`, `lineHeight`, `maxWidth` | a namespace for part of the scale, spacing arithmetic for some names, literals for the rest | `--radius-*` 8/18, `--blur-*` 7/10, `--drop-shadow-*` 6/8, `--leading-*` 5/14, `--container-*` 13/50; resolved per name, see batch 3 |
+| `boxShadow`, `backdropBlur` | nothing yet | `--shadow-*` exists but no emitted utility references it — see batch 3; `backdropBlur` is unmeasured |
 | **45 keys** — `borderWidth`, `outlineWidth`, `strokeWidth`, `opacity`, `scale`, `rotate`, `skew`, `transitionDuration`, `transitionDelay`, `zIndex`, `order`, the filter scales, grid scales, `objectPosition`, `backgroundPosition`, `backgroundSize`, `transformOrigin`, `flex`, `flexGrow`, `flexShrink` | nothing — the host emits literals for these too | stays literal until there is evidence for better |
 
 Measured 2026-09-11: 1734 values resolve to a token or a spacing formula; 986 sit
@@ -257,13 +260,18 @@ measured                 lineHeight and maxWidth carry spacing names; outlineOff
                          does not — its scale is 1: 1px, 2: 2px, 4: 4px, 8: 8px
 ```
 
-**And it found a bug in the host's JS theme.** With `--spacing` overridden in `@theme`, the host's
-spacing scales are *unusable*: measured with `--spacing: 0.3rem`, `api.theme('margin')` returns the
-characters of the base string — `1: '.'`, `2: '3'`, `4: 'e'` — because the scale is derived by
-indexing the base rather than multiplying it. Anything that trusted those values emitted
-`margin: 3`. So the batch does not read the JS scale for these names at all: **the name is the
-contract**, and numeric names are the base multiple by definition. This is the same reason the
-CSS variable is the right representation — it is the only one that can follow an override.
+**And it found an implementation limitation in the host's JS theme.** With `--spacing` overridden
+in `@theme`, the host's spacing scales are *unusable*: measured with `--spacing: 0.3rem`,
+`api.theme('margin')` returns the characters of the base string — `1: '.'`, `2: '3'`, `4: 'e'` —
+because the scale is derived by indexing the base rather than multiplying it. Anything that trusted
+those values emitted `margin: 3`.
+
+Whether that is a bug in the host or a limitation of an API that never promised derived spacing
+values under an overridden `--spacing`, we do not have to settle: for Jumi the distinction does not
+matter, and we have enough evidence not to depend on it. So the batch does not read the JS scale for
+these names at all: **the name is the contract**, and a numeric name is the base multiple by
+definition. This is the same reason the CSS variable is the right representation — it is the only
+one that can follow an override.
 
 The acceptance test is the corpus again, and it is stronger than batch 1's: `input.css` overrides
 `--spacing` to `0.3rem`, `fixture.html` carries `animate-padding-4` and `animate-margin-2`, and
@@ -296,8 +304,7 @@ at tokens does not pull in the namespace. That also answers the only real risk i
 this design: a tree-shaken token would have resolved to nothing, and with no
 fallback the animation would have silently stopped.
 
-Two notes for whoever reviews the next batch's diff (batch 2, the spacing formula, is
-**paused** until the aggregate representation work is settled):
+Two notes for whoever reviews a batch's diff:
 
 - the corpus grew by 9 utilities, and because the fixture contains `*:animations`
   every added slot costs quadratically in the aggregate — 132 KB → 288 KB, of which
@@ -306,19 +313,70 @@ Two notes for whoever reviews the next batch's diff (batch 2, the spacing formul
 - naming is value-derived, so a batch renames variables and keyframes even though
   the utility set and slot order are untouched.
 
-**Batch 2 — landed: the spacing formula** (`calc(var(--spacing) * n)`). A computed
-token rather than a token reference, which is a different kind of ownership to
-prove: it means consuming the host's CSS contract without cloning its JS theme
-engine. See the batch's own section above for what the measurement corrected and
-for the host bug it worked around. `0`, `px` and `auto` stay literal, and the
-20-odd call sites that merge Jumi's own vocabulary (`theme('inset', inset)`) keep
-what they were given.
+**Batch 3 — landed: the partial namespaces, resolved per value.** Five scales are *partial*: some
+names are token-backed, some are spacing arithmetic, and the rest keep what the host supplied. They
+now resolve per **name** rather than per key, so one scale can carry all three modes at once:
 
-Then the partially mapped scales — `borderRadius` 8/18, `blur` 7/10, `boxShadow`
-8/71, `dropShadow` 6/8, `lineHeight` 5/14, `maxWidth` 13/54 — where `DEFAULT` maps
-to a bare namespace token for `--radius`/`--blur`/`--shadow` but not `--tracking`.
-`lineHeight` and `maxWidth` have already had their *spacing* names taken by batch 2,
-so what is left of them is the namespace half.
+| Key | Namespace | Token-backed | Stays literal | Spacing formula |
+| --- | --- | --- | --- | --- |
+| `borderRadius` | `--radius-*` | 8 (`xs sm md lg xl 2xl 3xl 4xl`) | `none`, `full`, `DEFAULT` | — |
+| `blur` | `--blur-*` | 7 | `none`, `DEFAULT` | — |
+| `dropShadow` | `--drop-shadow-*` | 6 | `none`, `DEFAULT` | — |
+| `lineHeight` | `--leading-*` | 5 (`tight snug normal relaxed loose`) | `none` | `3`–`10` (batch 2) |
+| `maxWidth` | `--container-*` | 13 | `none full min max fit prose px` | `0`–`96`, `0.5`… (batch 2) |
+
+`lineHeight` and `maxWidth` are in both tables, and that is the batch's shape: `leading-6` is
+`calc(var(--spacing) * 6)` while `leading-tight` is `var(--leading-tight)`, out of one scale. A bare
+number is never a namespace name — measured, every numeric name in these scales is either a spacing
+multiple or an entry the host itself cannot reach (`rounded-1` emits nothing).
+
+**`boxShadow` is not in the table, and that is the batch's most useful result.** The `--shadow-*`
+namespace exists, and it is spelled exactly like `--drop-shadow-*`:
+
+```css
+.shadow-sm      { --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), …; }
+.drop-shadow-sm { --tw-drop-shadow: drop-shadow(var(--drop-shadow-sm)); }
+```
+
+`shadow-sm` inlines its value; `drop-shadow-sm` references its token. The namespace exists, the name
+exists and the value matches — and none of the three is the contract. That is why `theme:map` now
+checks each name against the emitted utility and not against the theme file:
+
+```text
+token claims: 13 keys
+  borderRadius        --radius-*: 8 of 18 names, literal 3
+  blur                --blur-*: 7 of 10 names, literal 2
+  dropShadow          --drop-shadow-*: 6 of 8 names, literal 2
+  lineHeight          --leading-*: 5 of 14 names, literal 1
+  maxWidth            --container-*: 13 of 50 names, literal 7
+  …
+no drift: every claim matches the emitted CSS
+```
+
+Three rules came out of this, and they are the batch discipline now:
+
+1. For a spacing-derived scale the key *name* is the semantic contract and `--spacing` is its
+   representation; `api.theme()` is not trusted to materialise those values.
+2. A mapping is verified against emitted v4 CSS, never inferred from a similarly named scale.
+3. A partial scale may legitimately mix resolution modes, so resolution has to be per value.
+
+The acceptance test is the corpus, stronger than the last one: `input.css` overrides `--radius-sm`
+to `0.9rem`, `fixture.html` carries `animate-border-radius-sm`, and `behaviour:check` asserts in a
+browser that the resolved value is `0.9rem`. The utility is emitted as `var(--radius-sm)` either
+way — only the override can tell a reference from a literal baked in at build time.
+
+```text
+before   themeResolution: formula 2, literal 59, token 8
+after    themeResolution: formula 4, literal 69, token 12
+         --jumi-border-radius-…: var(--radius-sm)      resolved 0.9rem in a browser
+         --jumi-line-height-…:   var(--leading-tight)
+         --jumi-line-height-…:   calc(var(--spacing) * 6)
+         --jumi-box-shadow-…:    0 1px 3px 0 rgb(0 0 0 / 0.1), …   (not a token)
+```
+
+`literal 69` covers the new names that are not tokens, `animate-box-shadow-sm`'s inline shadow among
+them, and `formula 4` is the pair of mixed names that proves the per-name resolution in emitted
+CSS.
 
 Every batch has to hold this invariant, so a snapshot diff stays readable:
 
@@ -331,11 +389,11 @@ only resolved values change — a literal becomes a var(…)
 
 ## Aggregate representation (active workstream)
 
-Theme migration is paused between batches. The reason is a cost measurement, not a
-change of direction: rebuilding the examples corpus produced **1.47 MB for 60
-slots, 96% of it repeated bookkeeping**, because the bridge re-publishes the whole
-list on every registration. That is `O(n²)`, and it is the normal path rather than
-an edge case.
+Theme migration is measured batch by batch rather than run straight through, and it
+gives way to a cost measurement when one lands. The reason is not a change of
+direction: rebuilding the examples corpus produced **1.47 MB for 60 slots, 96% of it
+repeated bookkeeping**, because the bridge re-publishes the whole list on every
+registration. That is `O(n²)`, and it is the normal path rather than an edge case.
 
 ### The cost, measured
 
