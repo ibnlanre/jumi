@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import { mkdirSync, writeFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 /**
  * SPIKE — the K curve: what does redundancy buy the linked aggregate?
  *
@@ -32,10 +34,7 @@
  *
  * Run: node scripts/spike-style-cost.mjs
  */
-import { gzipSync, brotliCompressSync } from 'node:zlib'
-import { mkdirSync, writeFileSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
-
+import { brotliCompressSync, gzipSync } from 'node:zlib'
 import { chromium } from 'playwright'
 
 import path from 'node:path'
@@ -301,7 +300,7 @@ await browser.close()
  * Report
  * ---------------------------------------------------------------------------------- */
 
-const bytes = (text) => ({
+const bytes = text => ({
   brotli: brotliCompressSync(text).length,
   gzip: gzipSync(text).length,
   raw: Buffer.byteLength(text),
@@ -431,7 +430,8 @@ for (const K of CURVE) {
 
 if (!survivor) {
   console.log('\n  no K meets the bar on this evidence')
-} else {
+}
+else {
   console.log(`\n  ${survivor} K value(s) meet the bar`)
 }
 

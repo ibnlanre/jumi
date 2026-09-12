@@ -1,12 +1,9 @@
 {
   "canonical": {
-    "rawBytes": 282646,
-    "publishEvents": 25,
-    "stagingBytes": 253103,
-    "bytes": 68357,
     "aggregateBytes": 38814,
     "aggregateShare": 57,
     "aggregateWrites": 20,
+    "bytes": 68437,
     "carriers": 2,
     "keyframes": 24,
     "media": 5,
@@ -14,6 +11,9 @@
     "slots": 24,
     "strayStaging": 0,
     "supports": 4,
+    "publishEvents": 25,
+    "rawBytes": 282646,
+    "stagingBytes": 253103,
     "colorValues": {
       "literal": 1,
       "token": 6
@@ -25,13 +25,10 @@
     }
   },
   "carrierVariant": {
-    "rawBytes": 177793,
-    "publishEvents": 19,
-    "stagingBytes": 147411,
-    "bytes": 90322,
     "aggregateBytes": 59940,
     "aggregateShare": 66,
     "aggregateWrites": 40,
+    "bytes": 90542,
     "carriers": 4,
     "keyframes": 18,
     "media": 1,
@@ -39,6 +36,9 @@
     "slots": 18,
     "strayStaging": 0,
     "supports": 5,
+    "publishEvents": 19,
+    "rawBytes": 177793,
+    "stagingBytes": 147411,
     "colorValues": {
       "literal": 0,
       "token": 2

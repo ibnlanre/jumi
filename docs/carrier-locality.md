@@ -303,3 +303,27 @@ resolution a non-question, and the real-emission benchmark that rejected the lin
 The `tailwindcss-core` fork stays a laboratory: it produced the diagnosis (`compileAstNodes` builds
 the body, variants re-parent it) and the proof that late mutation is the right shape, and the
 finalizer now delivers that shape inside Jumi.
+
+### The boundary is real, and it is not where it looks
+
+`pnpm vite:check` drives `@tailwindcss/vite` — the plugin users install — in dev and in a build,
+with a browser checking the four contexts and a source edit while the dev server runs. It passes,
+and it settled the one thing that could not be reasoned out from the source:
+
+```
+dev    pre    CSS      ← Tailwind generates here
+       normal CSS      ← Jumi finalizes here
+       post   JS       ← Vite's CSS→JS step has already run
+build  pre    CSS
+       normal CSS      ← Jumi finalizes here (after Tailwind's own optimize)
+       post   ''       ← already bundled into an asset
+```
+
+Tailwind's three Vite plugins are all `enforce: 'pre'`, so `enforce: 'post'` reads as the obvious
+seat for a finalizer. It is the wrong one: at `post` the stylesheet is a JS module in dev and an
+empty string in build, so the pass would find nothing and — worse — would look wired up. A plugin
+with no `enforce` is the only position both modes agree on, which is why `jumiFinalizer()` declares
+none — and why `jumi()` composes Tailwind's plugin and that finalizer behind one entry, so no author
+has to know any of this. `tailwindcss({ optimize: false })` changes nothing the protocol relies on:
+the marker and the staging are ordinary custom properties, and the aggregate is injected after the
+optimizer either way.

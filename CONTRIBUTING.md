@@ -136,6 +136,37 @@ The second is that a utility body is not a fixed selector. Tailwind re-parents i
 
 **Before proposing to publish the aggregate anywhere else, answer this:** which element will resolve that declaration? A rule that nothing reads is fine; a rule that is read at the wrong element is the bug above, and it fails silently — a carrier that resolves `none` looks exactly like a carrier with no slots.
 
+**And before proposing that the finalizer move, answer this:** does the host hand over the
+stylesheet there? Tailwind's Vite plugins are all `enforce: 'pre'`, so `enforce: 'post'` looks like
+the obvious seat — measured, it is the wrong one: at `post` Vite gives you the JS module that wraps
+the CSS in dev, and an empty string in a build. A transform with no `enforce` runs after Tailwind's
+`pre` generation and before Vite's own CSS handling, which is the only place the two modes agree.
+For PostCSS the equivalent question is answered by the hook: `OnceExit`, which runs after every
+plugin's `Once` whatever order the config lists.
+
+### 7. One Integration Step, Or A Deletion Path
+
+**Jumi must converge back toward one integration step. Any temporary second setup requirement must
+have a deletion path.**
+
+This is a product constraint, not a preference about ergonomics. Every correction this feature
+needed — the `:root` placement, `addBase` losing variant locality, `@apply` copying the carrier
+body — was found *after* it had shipped, and the architecture that fixes them requires a step after
+Tailwind. That step is legitimate; asking the author to understand it is not. An integration that
+makes someone learn plugin ordering has exported Jumi's complexity to the one person who has no way
+to fix it.
+
+So: `jumi()` composes Tailwind's plugin rather than sitting beside it (`plugins: [jumi()]`, not
+`[tailwindcss(), jumi()]`), and it registers Jumi in the Tailwind entry stylesheet, so there is no
+`@plugin` directive to write either. What is left is the roadmap in `docs/migration.md`: today the
+integration still composes somebody else's plugin, and the end state is Jumi owning emission.
+**A new required step is a regression unless it comes with the plan to remove it.**
+
+**Registering Jumi is `jumi()`'s job, and the injection rules are not negotiable:** only a
+stylesheet that imports Tailwind is a compilation root, and a file that already registers Jumi — by
+specifier, or by any path whose name mentions Jumi — is left alone. Measured: registering twice is
+not harmless, it emits every `@keyframes` twice.
+
 ---
 
 ## Animation Conventions
@@ -274,10 +305,12 @@ Individually, when you are iterating on one of them:
 ```bash
 pnpm exec tsc --noEmit      # types
 pnpm exec eslint src scripts
-pnpm vitest run             # unit tests, including the shared CSS helper
+pnpm vitest run             # unit tests, including the finalizer and the shared CSS helper
 pnpm css:check              # the byte snapshot, over two frozen corpora
 pnpm incremental:check      # incremental builds stay correct and local
 pnpm behaviour:check        # a real browser resolves a real carrier
+pnpm vite:check             # the shipped Vite integration, in dev and in every build shape
+pnpm postcss:check          # the shipped PostCSS integration, in every configuration
 ```
 
 **`behaviour:check` is not optional, and it is not a duplicate of the others.** Every

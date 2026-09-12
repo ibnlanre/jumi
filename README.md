@@ -28,11 +28,59 @@ Install Jumi in a project with Tailwind CSS configured:
 pnpm add jumi
 ```
 
-Register it in your main stylesheet (Tailwind CSS v4):
+Register it by replacing `@tailwindcss/vite` with Jumi in your Vite config:
+
+```diff
+- import tailwindcss from '@tailwindcss/vite'
++ import jumi from 'jumi/vite'
+
+  export default defineConfig({
+-   plugins: [tailwindcss()],
++   plugins: [jumi()],
+  })
+```
+
+and that is the whole setup. Your stylesheet does not mention Jumi:
+
+```css
+@import "tailwindcss";
+```
+
+`jumi()` owns Jumi's lifecycle inside the build: it registers Jumi with Tailwind, lets Tailwind
+compile what you wrote, and then completes the stylesheet — because a carrier opts an element in,
+and the animations it assembles cannot be known until every `animate-*` class on the page has been
+compiled.
+
+Prefer to be explicit? Both work, and they compile to the same CSS:
 
 ```css
 @import "tailwindcss";
 @plugin "jumi";
+```
+
+```ts
+// vite.config.ts — Tailwind's entry, plus Jumi after it
+import tailwindcss from '@tailwindcss/vite'
+import { jumiFinalizer } from 'jumi/vite'
+
+export default defineConfig({ plugins: [tailwindcss(), jumiFinalizer()] })
+```
+
+PostCSS instead? Same shape — one entry replaces `@tailwindcss/postcss`:
+
+```js
+// postcss.config.js
+export default { plugins: { 'jumi/postcss': {} } }
+```
+
+Building with the Tailwind CLI, or from a script? The CLI has no hook to finish in, so that one
+still needs a final step:
+
+```js
+import { finalizeCss } from 'jumi'
+
+const { css } = finalizeCss(readFileSync('dist/output.css', 'utf8'))
+writeFileSync('dist/output.css', css)
 ```
 
 Add `animations` to activate motion, then choose an effect:

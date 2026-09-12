@@ -5,6 +5,23 @@
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./postcss": {
+      "types": "./dist/postcss.d.ts",
+      "import": "./dist/postcss.js",
+      "require": "./dist/postcss.cjs"
+    },
+    "./vite": {
+      "types": "./dist/vite.d.ts",
+      "import": "./dist/vite.js",
+      "require": "./dist/vite.cjs"
+    }
+  },
   "type": "module",
   "files": [
     "dist",
@@ -21,7 +38,7 @@
     "theme:map": "node scripts/theme-map.mjs",
     "incremental:check": "node scripts/incremental-build.mjs",
     "lint": "eslint --fix .",
-    "bundle": "tsup src/index.ts --format cjs,esm --dts",
+    "bundle": "tsup",
     "watch-bundle": "tsup src/index.ts --format cjs,esm --dts --watch",
     "build": "pnpm run bundle && pnpm run examples:build",
     "examples:build": "node scripts/build-examples.mjs",
@@ -34,9 +51,11 @@
     "build-storybook": "storybook build",
     "analyze": "node scripts/analyze.js",
     "behaviour:check": "node scripts/behaviour-check.mjs",
+    "vite:check": "node scripts/vite-check.mjs",
+    "postcss:check": "node scripts/postcss-check.mjs",
     "spike:carrier-seam": "node scripts/spike-carrier-seam.mjs",
     "spike:carrier-finalize": "node scripts/spike-carrier-finalize.mjs",
-    "check": "pnpm run check-types && pnpm exec eslint src scripts && pnpm run test:run && pnpm run css:check && pnpm run incremental:check && pnpm run behaviour:check"
+    "check": "pnpm run check-types && pnpm exec eslint src scripts && pnpm run test:run && pnpm run css:check && pnpm run incremental:check && pnpm run behaviour:check && pnpm run vite:check && pnpm run postcss:check"
   },
   "keywords": [
     "tailwindcss",
@@ -51,7 +70,11 @@
   "author": "Ridwan Olanrewaju",
   "license": "MIT",
   "peerDependencies": {
-    "tailwindcss": ">=3.0.0"
+    "@tailwindcss/postcss": "^4.0.0",
+    "@tailwindcss/vite": "^4.0.0",
+    "postcss": "^8.0.0",
+    "tailwindcss": "^4.0.0",
+    "vite": "^5.2.0 || ^6 || ^7 || ^8"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^4.1.2",
@@ -65,6 +88,7 @@
     "@stylistic/eslint-plugin": "^5.5.0",
     "@tailwindcss/cli": "^4.1.17",
     "@tailwindcss/node": "4.3.3",
+    "@tailwindcss/postcss": "^4.3.3",
     "@tailwindcss/vite": "^4.1.17",
     "@types/css.escape": "^1.5.2",
     "@types/culori": "^4.0.1",
@@ -89,6 +113,7 @@
     "happy-dom": "^20.0.10",
     "jiti": "^2.6.1",
     "playwright": "^1.63.0",
+    "postcss": "^8.5.23",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "storybook": "^10.0.7",
@@ -111,5 +136,16 @@
     "culori": "^4.0.2",
     "glob": "^11.0.3",
     "shorthash2": "^1.0.5"
+  },
+  "peerDependenciesMeta": {
+    "@tailwindcss/postcss": {
+      "optional": true
+    },
+    "@tailwindcss/vite": {
+      "optional": true
+    },
+    "vite": {
+      "optional": true
+    }
   }
 }

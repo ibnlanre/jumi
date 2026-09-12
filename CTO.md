@@ -1,174 +1,136 @@
-Yes. This is the Eureka moment.
+This is a good place to stop and recognize that the product story has improved materially.
 
-The finalizer is a much better architectural answer than either the bridge or adopting `tailwindcss-core`.
-
-It preserves the division we actually want:
+You wanted to avoid turning Jumi into:
 
 ```text
-Tailwind
-  discovers candidates
-  expands variants
-  handles @apply
-  produces CSS
-
-Jumi
-  marks its own carrier semantics
-  owns aggregate state
-  finalizes its own carrier rules
+install package
++ add @plugin
++ add Vite plugin
++ care about ordering
++ maybe configure PostCSS too
 ```
 
-That is a clean boundary.
+What you have now is already much better:
 
-And the `@apply` result is especially important. I would now reverse my earlier ruling and **keep `@apply animations` supported**. The reason it looked structurally impossible was that we were trying to solve the problem before Tailwind had finished transforming the stylesheet. Once Jumi operates on the emitted CSS, an `@apply` copy is simply another rule carrying `--jumi-carrier`. Jumi no longer cares how it got there.
+```diff
+- tailwindcss()
++ jumi()
+```
 
-That gives us a very elegant invariant:
+with the existing:
 
-> Any emitted rule containing the Jumi carrier marker receives the current aggregate data.
+```css
+@plugin "jumi";
+```
 
-That covers all of these without special cases:
+So the finalizer complexity has been absorbed by the integration layer rather than exported to users. That was the right constraint.
+
+I agree with almost everything DeepSeek did, with two calls.
+
+First, I would tighten the Tailwind peer eventually. `>=3.0.0` no longer describes reality if the supported architecture relies on v4 constructs and the v4 build system. Keeping a permissive peer range that does not actually work is worse than admitting the compatibility break. If Jumi has meaningful v3 users, make that a major-version boundary. Otherwise, I'd move to something like:
+
+```json
+"tailwindcss": "^4.0.0"
+```
+
+or the broader v4 range appropriate to your support policy.
+
+Second, yes, I think the **next row is worth doing**, but carefully:
 
 ```text
-animations
-*:animations
-before:animations
-motion-safe:animations
-compound/arbitrary variants
-@apply animations
+Today:
+jumi() + @plugin "jumi"
+
+Next:
+jumi() only
 ```
 
-And importantly, the finalizer knows none of those syntaxes.
+That is not speculative architecture. It directly removes the remaining duplicate integration step.
 
-That is exactly the kind of abstraction I want.
+However, I would put strict constraints around automatic injection.
 
-### I would promote the marker to a protocol
+Jumi should not blindly prepend:
 
-`--jumi-carrier` is no longer just an implementation trick. It is the handshake between Jumi's utility-generation phase and its finalization phase.
+```css
+@plugin "jumi";
+```
 
-I would treat that as an internal protocol with very few rules:
+to every CSS file Vite sees.
+
+The injection should only happen on the stylesheet that is actually acting as the Tailwind entrypoint, and it should be idempotent. At minimum:
 
 ```text
-carrier marker present
-    → inject current aggregate
-
-aggregate staging marker present
-    → consume/remove staging
-
-everything else
-    → untouched
+contains Tailwind entry/import?
+    yes → ensure @plugin "jumi" exists exactly once
+    no  → leave untouched
 ```
 
-Keep it deliberately tiny.
+And if the author already wrote:
 
-I would also make the finalizer idempotent. Running it twice on the same stylesheet should not duplicate declarations or otherwise change the result after the first pass. That will save pain across Vite/PostCSS integrations.
-
-### The staging mechanism should now disappear
-
-DeepSeek's result that two staging rules can be removed is important.
-
-Once production is wired:
-
-```text
-model aggregate
-      ↓
-finalizer
-      ↓
-marked carrier rules
+```css
+@plugin "jumi";
 ```
 
-there should be no reason for the `addBase` bridge to remain.
+do nothing.
 
-Delete it rather than retaining it as fallback behavior. We've already proved that bridge has the wrong locality semantics.
+That gives you a graceful migration path where old and new setup both work:
 
-### Where the finalizer runs
+```css
+/* existing users */
+@import "tailwindcss";
+@plugin "jumi";
+```
 
-This is now the main integration question.
+and:
 
-I would prefer one Jumi-owned transformation primitive:
+```css
+/* new users */
+@import "tailwindcss";
+```
+
+with:
 
 ```ts
-finalize(css, aggregate)
+plugins: [jumi()]
 ```
 
-or AST equivalent, with tiny host wrappers around it.
+both producing the same thing.
 
-Then:
+I would also test multiple CSS entrypoints before declaring this finished. That's the case most likely to expose an assumption like "there is one global Tailwind stylesheet." If two legitimate Tailwind entrypoints exist, either both need Jumi registration or the API needs a way to scope which one does.
+
+One point I particularly like is keeping:
+
+```ts
+jumiFinalizer()
+```
+
+exported.
+
+Even if the recommended DX is:
+
+```ts
+jumi()
+```
+
+the lower-level primitive remains useful for unusual setups and gives you a clean escape hatch without bloating the default API.
+
+Architecturally, the shape now feels right:
 
 ```text
-jumi/postcss → invoke finalizer
-jumi/vite    → invoke finalizer
-CLI integration → invoke same finalizer
+jumi()
+  ├─ Tailwind host integration
+  ├─ Jumi registration
+  └─ Jumi finalization
 ```
 
-But don't let that become three separate implementations. There should be exactly one finalization engine.
+while the semantic core remains independent beneath it.
 
-If Tailwind's public `compile()` boundary is sufficient for the spike, that's encouraging, because we're no longer depending on compiler internals. We are operating on the thing Tailwind is explicitly supposed to produce: CSS.
+And there is an important strategic difference between this and where we were several hours ago. We are no longer adding a Jumi Vite plugin merely to compensate for a Tailwind bug. We now have a **Jumi build integration that deliberately owns Jumi's lifecycle**. Tailwind is one stage inside it.
 
-### Restore flat first
+That's compatible with the end-state migration rather than being throwaway work.
 
-DeepSeek's sequencing is exactly right.
+So my call is:
 
-Do **not** bring linked aggregation into this yet.
+**Do the one-step integration next.** Make `jumi()` ensure Jumi is registered with Tailwind, idempotently and only on actual Tailwind entry CSS. Keep explicit `@plugin "jumi"` working for compatibility. Then the public setup becomes genuinely simpler than it was before this migration started.
 
-First establish the clean baseline:
-
-```text
-stock Tailwind
-+ marker
-+ Jumi finalizer
-+ flat aggregate
-```
-
-Then require:
-
-```text
-direct             ✓
-descendant         ✓
-pseudo             ✓
-@apply             ✓
-incremental new slot ✓
-incremental variant  ✓
-```
-
-And rerun the real examples corpus.
-
-Only once that foundation is correct should we ask whether flat aggregate publication is still too large.
-
-There's a decent chance the economics change substantially now, because instead of repeatedly publishing aggregate data through `addBase`, the finalizer may be able to write the final aggregate **once per actual carrier rule in the finished stylesheet**. That's a very different cost model from everything we benchmarked so far.
-
-So yes, all K measurements are stale.
-
-### Bigger architectural implication
-
-This might be the first point in the migration where I feel Jumi genuinely stands on its own.
-
-We went from:
-
-```text
-Jumi semantics implemented through Tailwind plugin behavior
-```
-
-to:
-
-```text
-Jumi semantics
-    ↓
-Tailwind happens to produce candidate-expanded CSS
-    ↓
-Jumi completes its own semantics
-```
-
-That is a much healthier dependency.
-
-Tailwind is becoming a transformer/host rather than the place where Jumi's model lives.
-
-And `tailwindcss-core` played exactly the right role: it was the laboratory that taught us **where** the missing extension point belonged. We extracted the insight and left the fork behind.
-
-So my call:
-
-**Wire the finalizer into the real Jumi path, remove the `addBase` bridge, restore flat aggregation, make `@apply` supported again, and get the entire behavioral matrix green on stock Tailwind.**
-
-Then stop.
-
-Measure the resulting real output before touching linked aggregation again.
-
-We may discover that the architecture change has made half of that optimization work obsolete.
+After that, resume theme Batch 2.

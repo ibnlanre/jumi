@@ -81,11 +81,41 @@ Classifications: **keep** (worth keeping — the host is better at it), **own**
   theme lookup and two sinks, and it holds the decisions.
 - **Publication is host-independent.** `incremental:check` is green with the plain
   plugin, so the aggregate no longer depends on Tailwind's candidate cache or on
-  candidate order to be *complete*. This is what closed `jumi/vite`.
+  candidate order to be *complete*.
 - **The carriers are Jumi vocabulary, not adapter accidents.** They stay through
   the migration; if a future generator makes them implicit, that is an API change
   with an explicit new home for what they carry, not cleanup. See principle 6 in
   `CONTRIBUTING.md`.
+- **Host integration is one post-pass, and it is generic CSS.** `finalize(root)`
+  walks a PostCSS AST; `finalizeCss(css)` is the same thing across parse/serialize;
+  `jumi/vite` and `jumi/postcss` are adapters, and nothing in the pass knows
+  Tailwind's selectors, variants or AST. The dependency direction is
+  Jumi → generic CSS AST, never Jumi → Tailwind compiler AST, so the day Tailwind's
+  internals change is the day nothing here changes. PostCSS is a **peer** dependency
+  for the same reason `tailwindcss` and the host plugins are: they are the
+  environment Jumi runs in, not versions Jumi chooses and has to keep current.
+  `@tailwindcss/vite`, `@tailwindcss/postcss` and `vite` are *optional* peers — only
+  the integration you install pulls its own.
+
+## Adoption: the step count, and its deletion path
+
+The finalizer has to run after Tailwind, so *something* has to invoke it. That is a
+real cost and it is a product regression unless it converges back to one step, which
+is why principle 7 of `CONTRIBUTING.md` states it as a constraint:
+
+> **Jumi must converge back toward one integration step. Any temporary second setup
+> requirement must have a deletion path.**
+
+| | what the author writes | what is temporary about it |
+| --- | --- | --- |
+| **Now** | `plugins: [jumi()]` (or `{'jumi/postcss': {}}`), and nothing in the CSS | `jumi()` composes Tailwind's plugin, so it *replaces* an entry rather than adding one — and it registers Jumi itself, so the CSS directive is gone too. Measured: a build with the directive injected is byte-identical to one where the author wrote `@plugin "jumi"`. |
+| **CLI** | the build, then `finalizeCss(css)` | The Tailwind CLI has no hook to finish in. Deletion path: the row below — a Jumi-owned emitter has nowhere it cannot finish. |
+| **End** | `plugins: [jumi()]`, with no Tailwind JS plugin composed | Jumi owns the emission (theme, scanning, arbitrary values, variants — the rest of this document's sequence), so composing `@tailwindcss/vite` is no longer needed and finalization becomes an internal phase rather than an external pass. |
+
+The middle two rows are the whole remaining cost: one entry, and it composes somebody else's plugin.
+That is a big step down from where this started — the CSS directive is gone, and nothing asks an
+author to understand plugin ordering — but it is not one step of Jumi's own, so it stays on this
+list until it is.
 
 ## Gaps the inventory found
 

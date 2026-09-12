@@ -60,6 +60,8 @@ const ignoresConfig = defineConfig({
     "**/*.css",
     // A recorded measurement, not source: `pnpm css:snapshot` writes it.
     '**/css-snapshot/structure.json',
+    // A fixture and its builds, written by `pnpm vite:check` on every run: outputs, not source.
+    '**/scripts/tmp-vite/**',
   ],
 })
 

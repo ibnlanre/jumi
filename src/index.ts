@@ -12,7 +12,8 @@ export { default } from './helpers/create'
  * entries reference slot variables that exist only on the element. So the carrier marks
  * itself and the data is completed afterwards, on the emitted stylesheet.
  *
- * One engine, and host wrappers around it: call `finalize(css)` on whatever Tailwind
- * produced. It is pure and idempotent, so a PostCSS and a Vite plugin can both run it.
+ * One engine, three boundaries. `finalize(root)` walks a CSS AST in place, for a host that
+ * already has one; `finalizeCss(css)` is the same thing across parse/serialize; and
+ * `jumi/postcss` and `jumi/vite` adapters call it at the two host integrations Jumi supports.
  */
-export { carrierMarker, finalize, type Finalized, stagingMarker } from './helpers/carriers'
+export { carrierMarker, finalize, finalizeCss, type Finalized, stagingMarker } from './helpers/carriers'

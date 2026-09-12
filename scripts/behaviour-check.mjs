@@ -45,7 +45,7 @@ execFileSync('pnpm', ['run', 'bundle'], { cwd: root, stdio: 'pipe' })
 
 // Bundling comes first because the helper loads the finalizer out of `dist/`: the harness
 // exercises the artifact that ships, not the source it was built from.
-const { corpus, finalize } = await import('./lib/compile.mjs')
+const { corpus, finalizeCss } = await import('./lib/compile.mjs')
 
 /** Compile a corpus, finalize it, and say what the finalizer did. */
 const compile = async (name) => {
@@ -66,7 +66,7 @@ const compile = async (name) => {
  * removed what it found: this says a second pass finds no work at all.
  */
 const settled = (built, name) => {
-  const again = finalize(built.css)
+  const again = finalizeCss(built.css)
 
   if (again.staging !== 0) failures.push(`${name}: ${again.staging} staging rules survived finalization`)
   if (again.carriers !== 0) failures.push(`${name}: ${again.carriers} carriers were re-finalized`)

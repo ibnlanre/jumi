@@ -1,3 +1,2 @@
 @import 'tailwindcss' source(none);
 @source '../pages/index.astro';
-@plugin '../../vendor/jumi.js';

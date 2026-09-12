@@ -7,7 +7,7 @@
  * post-build step Jumi owns. So the CLI emits, and this completes: `corpus()` runs the CLI over a
  * frozen fixture and finalizes what it produced, which is the same two steps a build runs.
  *
- * `finalize` comes from `dist/`, not from `src/`, for the same reason: the harness should exercise
+ * `finalize` comes from `dist/`, not from `src/`: the harness should exercise
  * the artifact. Callers therefore **bundle first**, then import this module.
  */
 import { execFileSync } from 'node:child_process'
@@ -28,13 +28,13 @@ export const snapshot = path.join(root, 'scripts', 'css-snapshot')
 const tailwind = path.join(root, 'node_modules', 'tailwindcss', 'index.css')
 
 /** The finalizer that ships, read out of the bundle. */
-export const { finalize } = await import(path.join(root, 'dist', 'index.js'))
+export const { finalizeCss } = await import(path.join(root, 'dist', 'index.js'))
 
 /**
  * The post-build step, which is the whole of Jumi's side of this: read the aggregate out of the
  * stylesheet, write it into every carrier, delete the staging.
  */
-export const complete = css => ({ raw: css, ...finalize(css) })
+export const complete = css => ({ raw: css, ...finalizeCss(css) })
 
 /**
  * Compile one stylesheet.

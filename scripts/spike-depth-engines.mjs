@@ -22,7 +22,6 @@
  */
 import { writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-
 import { chromium, firefox, webkit } from 'playwright'
 
 import path from 'node:path'
@@ -88,7 +87,7 @@ const sheet = (depth) => {
 `
 }
 
-const page = (depth) => `<!doctype html>
+const page = depth => `<!doctype html>
 <html>
   <head><meta charset="utf-8"><style>${sheet(depth)}</style></head>
   <body>

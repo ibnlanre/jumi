@@ -39,7 +39,6 @@ import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { gzipSync } from 'node:zlib'
-
 import { chromium } from 'playwright'
 
 import path from 'node:path'

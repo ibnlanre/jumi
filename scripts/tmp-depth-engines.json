@@ -1,66 +1,66 @@
 [
   {
-    "engine": "chromium",
     "addOnce": "400px",
     "addTwice": "500px",
     "aligned": false,
     "alignedAndResolved": false,
     "depth": 60,
+    "engine": "chromium",
     "relinkedOk": false,
     "resolved": false,
     "vacatedOk": false
   },
   {
-    "engine": "chromium",
     "addOnce": "400px",
     "addTwice": "500px",
     "aligned": false,
     "alignedAndResolved": false,
     "depth": 228,
+    "engine": "chromium",
     "relinkedOk": false,
     "resolved": false,
     "vacatedOk": false
   },
   {
-    "engine": "chromium",
     "addOnce": "400px",
     "addTwice": "500px",
     "aligned": false,
     "alignedAndResolved": false,
     "depth": 512,
+    "engine": "chromium",
     "relinkedOk": false,
     "resolved": false,
     "vacatedOk": false
   },
   {
-    "engine": "firefox",
     "addOnce": "400px",
     "addTwice": "500px",
     "aligned": false,
     "alignedAndResolved": false,
     "depth": 60,
+    "engine": "firefox",
     "relinkedOk": false,
     "resolved": false,
     "vacatedOk": false
   },
   {
-    "engine": "firefox",
     "addOnce": "400px",
     "addTwice": "500px",
     "aligned": false,
     "alignedAndResolved": false,
     "depth": 228,
+    "engine": "firefox",
     "relinkedOk": false,
     "resolved": false,
     "vacatedOk": false
   },
   {
-    "engine": "firefox",
     "addOnce": "400px",
     "addTwice": "500px",
     "aligned": false,
     "alignedAndResolved": false,
     "depth": 512,
+    "engine": "firefox",
     "relinkedOk": false,
     "resolved": false,
     "vacatedOk": false
