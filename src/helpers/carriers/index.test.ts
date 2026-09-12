@@ -50,9 +50,9 @@ describe('the finalizer', () => {
       '.other { color: red; }',
     ].join('\n')
 
-    const { carriers, css: out, staging } = finalizeCss(css)
+    const { carriersChanged, carriersFound, css: out, staging } = finalizeCss(css)
 
-    expect({ carriers, staging }).toEqual({ carriers: 1, staging: 1 })
+    expect({ carriersChanged, carriersFound, staging }).toEqual({ carriersChanged: 1, carriersFound: 1, staging: 1 })
     expect(out).not.toContain(stagingMarker)
     expect(out).toContain('.animations { animation-name: var(--jumi-rotate-a, var(--jumi-animation-name)); }')
     expect(out).toContain('.other { color: red; }')
@@ -70,22 +70,22 @@ describe('the finalizer', () => {
       '}',
     ].join('\n')
 
-    const { carriers, css: out, staging } = finalizeCss(css)
+    const { carriersChanged, carriersFound, css: out, staging } = finalizeCss(css)
 
-    expect({ carriers, staging }).toEqual({ carriers: 1, staging: 1 })
+    expect({ carriersChanged, carriersFound, staging }).toEqual({ carriersChanged: 1, carriersFound: 1, staging: 1 })
     expect(out).toContain(':is(.animations > *) { animation-name: var(--a); }')
     expect(out).not.toContain(stagingMarker)
   })
 
   it('reaches a carrier nested inside another rule', () => {
-    const { carriers, css: out } = finalizeCss([
+    const { carriersFound, css: out } = finalizeCss([
       staged('var(--a)'),
       '.parent {',
       `  .animations { ${carrier()} }`,
       '}',
     ].join('\n'))
 
-    expect(carriers).toBe(1)
+    expect(carriersFound).toBe(1)
     expect(out).toContain('.animations { animation-name: var(--a); }')
   })
 
@@ -105,7 +105,7 @@ describe('the finalizer', () => {
       '--jumi-aggregate-transition: var(--jumi-scale-transition-chain);',
     ].join(' ')
 
-    const { carriers, css: out } = finalizeCss([
+    const { carriersChanged, css: out } = finalizeCss([
       `:root { ${stagingMarker}: 1; ${lists} }`,
       `.animations { ${carrier()} }`,
       `.transitions { ${carrier(['transition'])} }`,
@@ -114,7 +114,7 @@ describe('the finalizer', () => {
     // One staging rule, two carriers, two different requests — and each is handed the part it
     // declared and nothing else. This is what lets `animations` and `transitions` share a channel
     // while needing different data.
-    expect(carriers).toBe(2)
+    expect(carriersChanged).toBe(2)
     expect(out).toContain('.animations { animation-name: var(--jumi-rotate-a, var(--jumi-animation-name)); }')
     expect(out).toContain('.transitions { transition: var(--jumi-scale-transition-chain); }')
   })
@@ -126,11 +126,12 @@ describe('the finalizer', () => {
       '.animations { --jumi-carrier: animations; }',
     ].join('\n')
 
-    const { carriers, css: out, staging } = finalizeCss(css)
+    const { carriersChanged, carriersFound, css: out, staging } = finalizeCss(css)
 
-    // The comment and the string are not declarations, so there is nothing to remove — and this
-    // carrier declares no part, so there is nothing to write either.
-    expect({ carriers, staging }).toEqual({ carriers: 0, staging: 0 })
+    // The comment and the string are not declarations, so there is nothing to remove. The rule is
+    // found — it declares the marker — but it declares no part and the sheet published nothing, so
+    // it is neither written nor erased.
+    expect({ carriersChanged, carriersFound, staging }).toEqual({ carriersChanged: 0, carriersFound: 1, staging: 0 })
     expect(out).toBe(css)
   })
 
@@ -153,7 +154,7 @@ describe('the finalizer', () => {
 
     const twice = finalizeCss(once.css)
 
-    expect(twice).toEqual({ carriers: 0, css: once.css, staging: 0 })
+    expect(twice).toEqual({ carriersChanged: 0, carriersFound: 0, css: once.css, staging: 0 })
   })
 
   it('returns a stylesheet it did not change exactly as it found it', () => {
@@ -166,18 +167,18 @@ describe('the finalizer', () => {
       '}',
     ].join('\n')
 
-    const { carriers, css: out } = finalizeCss(css)
+    const { carriersChanged, carriersFound, css: out } = finalizeCss(css)
 
-    expect({ carriers, out }).toEqual({ carriers: 0, out: css })
+    expect({ carriersChanged, carriersFound, out }).toEqual({ carriersChanged: 0, carriersFound: 1, out: css })
   })
 
-  it('counts a carrier only when it was written', () => {
+  it('finds no carrier on a second pass, because the first erased every marker', () => {
     const root = { css: [staged('var(--a)'), `.animations { ${carrier()} }`].join('\n') }
     const first = finalizeCss(root.css)
 
-    // The second pass is the same document with no staging: there is nothing left to say, so
-    // nothing is rewritten and the count is zero — a publication the caller did not cause.
-    expect(finalizeCss(first.css).carriers).toBe(0)
+    // The same document with no staging and no marker: nothing is left to recognize, so nothing
+    // is rewritten and the count is zero — a publication the caller did not cause.
+    expect(finalizeCss(first.css)).toEqual({ carriersChanged: 0, carriersFound: 0, css: first.css, staging: 0 })
   })
 
   it('removes a staging rule that carries nothing but the marker', () => {
@@ -203,9 +204,9 @@ describe('the finalizer', () => {
       `.animations { ${carrier(PARTS)} }`,
     ].join('\n')
 
-    const { carriers, css: out, staging } = finalizeCss(css)
+    const { carriersChanged, carriersFound, css: out, staging } = finalizeCss(css)
 
-    expect({ carriers, staging }).toEqual({ carriers: 1, staging: 1 })
+    expect({ carriersChanged, carriersFound, staging }).toEqual({ carriersChanged: 1, carriersFound: 1, staging: 1 })
 
     // The invariant. Everything the two markers and the staging namespace spell is build-time
     // only, and a browser should never be handed any of it.
@@ -217,23 +218,44 @@ describe('the finalizer', () => {
     expect(out).toContain('animation-timeline: var(--jumi-animation-timeline);')
   })
 
-  it('keeps the marker when there is nothing to materialize, so the invariant can fire', () => {
+  it('keeps the marker when the stylesheet published no aggregate, so the invariant can fire', () => {
     const css = `.animations { ${carrier()} }`
 
-    const { carriers, css: out, staging } = finalizeCss(css)
+    const { carriersChanged, carriersFound, css: out, staging } = finalizeCss(css)
 
     // A carrier with no aggregate behind it is a broken build, not an empty one. Leaving the
     // marker behind is what turns that into a detectable violation — the zero-occurrence check
-    // fails — instead of a carrier that silently animates nothing.
-    expect({ carriers, out, staging }).toEqual({ carriers: 0, out: css, staging: 0 })
+    // fails — instead of a carrier that silently animates nothing. The rule is still *found*: the
+    // marker is what says so, which is exactly why it must survive here.
+    expect({ carriersChanged, carriersFound, out, staging }).toEqual({ carriersChanged: 0, carriersFound: 1, out: css, staging: 0 })
+  })
+
+  it('erases the marker when a carrier had nothing to change', () => {
+    // A motionless `transitions` carrier. The body already declares the fallback, and with no
+    // motions the published list *is* that fallback, so there is nothing to rewrite — but the
+    // protocol completed, so the marker still has to go. Erasing it was once conditional on a value
+    // actually moving, and this carrier shipped `--jumi-carrier: transitions` because of it.
+    const css = [
+      `:root { ${stagingMarker}: 1; --jumi-aggregate-transition: var(--jumi-transition); }`,
+      '.transitions { --jumi-carrier: transitions; transition: var(--jumi-transition); }',
+    ].join('\n')
+
+    const { carriersChanged, carriersFound, css: out, staging } = finalizeCss(css)
+
+    expect({ carriersChanged, carriersFound, staging }).toEqual({ carriersChanged: 0, carriersFound: 1, staging: 1 })
+
+    // What is left is the declaration a browser applies, and none of the build-time names.
+    expect(out.trim()).toBe('.transitions { transition: var(--jumi-transition); }')
+    expect(out).not.toContain('--jumi-carrier')
+    expect(out).not.toContain('--jumi-aggregate-')
   })
 
   it('walks an AST in place, so a host that owns one needs no parse', () => {
     const root = postcss.parse([staged('var(--a)'), `.animations { ${carrier()} }`].join('\n'))
 
-    const { carriers, staging } = finalize(root)
+    const { carriersChanged, carriersFound, staging } = finalize(root)
 
-    expect({ carriers, staging }).toEqual({ carriers: 1, staging: 1 })
+    expect({ carriersChanged, carriersFound, staging }).toEqual({ carriersChanged: 1, carriersFound: 1, staging: 1 })
     expect(root.toString()).toContain('animation-name: var(--a);')
     expect(root.toString()).not.toContain(stagingMarker)
   })

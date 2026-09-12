@@ -29,6 +29,11 @@ import postcss from 'postcss'
  *   staging marker present        → read the data, then remove the rule
  *   anything else                 → untouched
  *
+ * The marker is erased because the rule **participated**, not because a value moved — the two are
+ * different questions and conflating them shipped `--jumi-carrier` on a build with a motionless
+ * `transitions` carrier. What gates the erasure instead is whether the stylesheet published an
+ * aggregate at all, which is what keeps a build that never published a loud failure.
+ *
  * **The carrier's own declarations are the contract.** A part is written only where the carrier
  * asks for it, which is what keeps two carriers with different data apart: `animations` declares
  * the ten animation longhands and `transitions` declares `transition`, so neither is handed the
@@ -75,9 +80,16 @@ export const stagingMarker = '--jumi-carrier-staging'
 const aggregatePrefix = '--jumi-aggregate-'
 
 export type Finalized = {
-  /** How many carrier rules the aggregate was written into. Zero on a second pass, because the
-   * injection replaces the declarations it finds rather than adding to them. */
-  carriers: number
+  /**
+   * How many of those the aggregate actually rewrote. Zero is a valid, complete result rather than
+   * a failure: a motionless `transitions` carrier already declares the list it would be handed.
+   */
+  carriersChanged: number
+  /**
+   * Carrier rules the marker identified, whether or not the aggregate had anything to change.
+   * Zero on a second pass, because the first erased every marker it found.
+   */
+  carriersFound: number
   /** How many staging rules were consumed. Zero on a second pass, by construction. */
   staging: number
 }
@@ -104,12 +116,13 @@ const carries = (rule: Rule) => ownDeclarations(rule).some(decl => decl.prop ===
  * `--jumi-aggregate-animation-name`. The stylesheet stays the normal channel, which is what lets
  * finalization be a pure function of the CSS it is given.
  *
- * Reports what it changed and does not serialize. A second pass finds nothing staged and nothing
- * to replace, so it reports zero and leaves the document — and therefore the output — untouched.
+ * Reports what it found and what it changed, and does not serialize. A second pass finds nothing
+ * staged and no marker to recognize, so it reports zero and leaves the document — and therefore
+ * the output — untouched.
  */
 export function finalize(root: Root, aggregate?: Collection<string>): Finalized {
   const materialized = new Map<string, string>()
-  const finalized: Finalized = { carriers: 0, staging: 0 }
+  const finalized: Finalized = { carriersChanged: 0, carriersFound: 0, staging: 0 }
 
   // Pass 1 — read the data, and take the rules that carried it out of the document. Removal
   // during a walk is why this is an AST and not a string: the rule can go wherever it is nested.
@@ -128,6 +141,15 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
 
   for (const [longhand, value] of Object.entries(aggregate ?? {})) materialized.set(longhand, value)
 
+  /**
+   * Whether this pass had an aggregate to hand out at all.
+   *
+   * It separates two situations that look identical in the declarations: a stylesheet that
+   * published and had nothing to change, which is complete, and a stylesheet that never published,
+   * which is broken. Once the staging is gone, only the marker can tell them apart.
+   */
+  const published = finalized.staging > 0 || materialized.size > 0
+
   // Pass 2 — write it into every carrier, as the declarations a browser actually applies. Only a
   // property the carrier already declares is written, which is what scopes the data: the carrier
   // body names the parts it needs, so a rule is never handed another carrier's list. The value
@@ -135,6 +157,8 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
   // than rewritten: nothing here parses a CSS value.
   root.walkRules((rule) => {
     if (!carries(rule)) return
+
+    finalized.carriersFound += 1
 
     let changed = false
 
@@ -147,21 +171,25 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
       changed = true
     }
 
-    if (!changed) return
+    if (changed) finalized.carriersChanged += 1
 
-    // The marker has served its purpose and a browser has no use for it: a carrier that was
-    // written is indistinguishable from any other rule afterwards. That is also what makes a
-    // second pass a no-op — there is no marker left to find, so there is nothing to redo.
+    // Erasing is about **participation**, not about change. A motionless `transitions` carrier
+    // already declares `transition: var(--jumi-transition)`, and the aggregate it would be handed
+    // is that same string — so there is nothing to rewrite, and it used to keep its marker for
+    // precisely that reason, shipping the protocol on a legitimate build. "Did this carrier need a
+    // new value?" and "did this carrier complete the protocol?" are different questions, and the
+    // marker answers the second one.
     //
-    // Erasing it *only* here is what keeps the zero-occurrence invariant worth asserting. A
-    // carrier with nothing to materialize keeps its marker, so a build that published no
-    // aggregate leaves the protocol in the output and the checks fail loudly, rather than
-    // shipping a carrier whose animations silently do nothing.
+    // The gate is whether the pass had an aggregate at all, which keeps the zero-occurrence
+    // invariant worth asserting: a build that never published hands out nothing, so no marker is
+    // erased, the protocol is left in the output, and the checks fail loudly — rather than shipping
+    // a carrier whose animations silently do nothing. It is also what makes a second pass a no-op:
+    // the first erased every marker it found, so there is nothing left to find and nothing to redo.
+    if (!published) return
+
     for (const declaration of ownDeclarations(rule)) {
       if (declaration.prop === carrierMarker) declaration.remove()
     }
-
-    finalized.carriers += 1
   })
 
   return finalized

@@ -119,9 +119,12 @@ function measure(built) {
     // declaration only it has — `animation-name`, or the composed `transition`.
     animations: state.animations,
     bytes: css.length,
-    // Carrier rules the finalizer reported writing the aggregate into. The number that used to be
-    // one — it is whatever Tailwind made of the classes, and no longer something Jumi chooses.
-    carriers: built.carriers,
+    // Carrier rules the finalizer recognized by the marker, and how many of those it rewrote. The
+    // number that used to be one — it is whatever Tailwind made of the classes, and no longer
+    // something Jumi chooses. The two differ only when a carrier had nothing to change, which is
+    // why they are kept apart: the completed count is not the written count.
+    carriersChanged: built.carriersChanged,
+    carriersFound: built.carriersFound,
     carriersInOutput: state.animations + state.transitions,
     keyframes: (css.match(/@keyframes jumi-/g) ?? []).length,
     media: (css.match(/@media /g) ?? []).length,
@@ -192,13 +195,13 @@ const variantChecks = [
   {
     detail: measured => `${measured.aggregateWrites} declarations for`
       + ` ${measured.animations} animations + ${measured.transitions} transitions carriers`,
-    holds: measured => measured.carriers > 0 && measured.aggregateWrites === expectedDeclarations(measured),
+    holds: measured => measured.carriersFound > 0 && measured.aggregateWrites === expectedDeclarations(measured),
     what: 'each carrier holds the whole list for the parts it declares, and nothing else',
   },
   {
-    detail: measured => `${measured.carriersInOutput} carriers in the output, ${measured.carriers} reported`,
-    holds: measured => measured.carriersInOutput === measured.carriers,
-    what: 'the finalizer wrote every carrier it recognised',
+    detail: measured => `${measured.carriersInOutput} carriers in the output, ${measured.carriersFound} found`,
+    holds: measured => measured.carriersInOutput === measured.carriersFound,
+    what: 'the finalizer recognized every carrier it reported, and erased every marker',
   },
   {
     detail: measured => Object.entries(measured.protocol).map(([name, count]) => `${count} ${name}`).join(', '),

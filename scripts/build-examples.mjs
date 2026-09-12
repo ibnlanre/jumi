@@ -68,7 +68,7 @@ const percent = (value, total) => `${Math.round(100 * value / total)}%`
 
 console.log(`\n  examples build\n`)
 console.log(`    slots           ${slots}`)
-console.log(`    carriers        ${built.carriers} rules the aggregate was written into`
+console.log(`    carriers        ${built.carriersFound} rules the marker identified, ${built.carriersChanged} written into`
   + ` (${state.animations} animations + ${state.transitions} transitions)`)
 console.log(`\n    build cost — what Tailwind emitted, before the finalizer touched it`)
 console.log(`      publications  ${staging.length} staging rules, one per slot registered after the first read`)

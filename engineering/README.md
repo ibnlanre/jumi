@@ -64,8 +64,19 @@ Retired 2026-09-12, with the conclusions kept in `architecture/aggregate-represe
 `spike-depth-engines`, `spike-linked-order.test`, `spike-real-cost`, `spike-style-cost`, and the
 `lib/linked-aggregate.mjs` they shared.
 
+`spike-shared-runtime` was retired under the same rule the day it was written. It answered its
+question — module identity across the `@plugin` boundary — and the answer removed the design it was
+probing, because a shared instance turned out to be one per *process* rather than one per
+stylesheet. The conclusion is in `architecture/carrier-locality.md`.
+
 Kept, because they still reproduce current behaviour: `spike-candidates` (candidate parsing and
 order), `spike-variants` (the host variant model, 12/12), and `spike-precedence.html` (a browser
 probe for `animation-composition` semantics — a language fact, not Jumi's).
+
+`spike-marker-elimination` was retired the same day, under the rule it was written to satisfy: its
+question was answered — a semantic fallback declaration survives variants and `@apply`, but is not
+unique enough to identify a Jumi-owned carrier rule — and the defect it found on the way was fixed,
+so the fixture that documented that defect now measures nothing. The conclusion is in
+`architecture/carrier-locality.md`.
 
 This is principle 10 of `CONTRIBUTING.md`.

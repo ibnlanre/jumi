@@ -447,3 +447,132 @@ The browser level is the one that is not optional. `incremental:check` asserts t
 stylesheet; the user's symptom is a computed style. `vite:check` reads
 `getComputedStyle(el).transitionProperty`, edits the page while the server runs, and requires
 `background-color` to become `background-color, scale` with no restart.
+
+### Why the data travels in CSS and not in memory
+
+The transport has always been justified by a claim that was never measured: that the plugin
+Tailwind loads and the finalizer cannot share one model, so the data has to travel through the
+stylesheet. `scripts/spike-shared-runtime.mjs` (retired) measured it, and the claim is **wrong as
+stated** — identity is available, with no globals and no Tailwind internals.
+
+Tailwind's own loader branches on the *form* of the plugin id, and `@tailwindcss/node` ships an
+`esm-cache.loader` that propagates a parent's `?id` to whatever that parent imports:
+
+```js
+if (id[0] !== '.') return import(resolve(id))        // bare or absolute
+return import(resolve(id) + '?id=' + Date.now())     // relative
+```
+
+So a relative `@plugin` path is cache-busted on every load and gets a **private instance**, while a
+bare or absolute one falls through to Node's ESM registry, which is per-process — and therefore
+shared, whichever side imports first:
+
+| `@plugin` form | vite dev | dev, 2nd entry | two entrypoints | recompile | vite build | postcss |
+| --- | --- | --- | --- | --- | --- | --- |
+| `"./runtime.mjs"` | PRIVATE | PRIVATE | ISOLATED | REPLACED | PRIVATE | PRIVATE |
+| absolute path | SHARED | SHARED | **SHARED** | STABLE | SHARED | SHARED |
+| `"@jumi/probe"` | SHARED | SHARED | **SHARED** | STABLE | SHARED | SHARED |
+
+The middle column is why the design was not taken. Sharing is exactly the problem: **one instance
+serves both entrypoints.** A shared runtime knows everything that happened in the process and
+nothing about which stylesheet a motion belongs to, so a finalizer handed the process-wide
+aggregate would write one stylesheet's motions into another's carrier — including motions whose
+keyframes Tailwind emitted only into the other file. Today two entrypoints get isolated instances,
+and each stylesheet's staging carries only its own data.
+
+Nor can that be repaired by keying the model per stylesheet, because the plugin cannot see which
+stylesheet it is serving. Measured from inside the plugin: `api.base` is `null`, and the API
+surface is `addBase, addComponents, addUtilities, addVariant, config, matchComponents,
+matchUtilities, matchVariant, prefix, theme` — nothing path-like. The stylesheet path is known only
+to the finalizer, so per-stylesheet scoping would need a map the plugin cannot fill.
+
+Two further consequences, both structural:
+
+- **An out-of-process finalizer is excluded.** The Tailwind CLI — and `examples:build` — emits in a
+  child process and completes in the parent. No loader trick crosses that, so a pure in-memory
+  design would have no CLI story at all.
+- **The documented form and our own fixtures disagree.** The docs say `@plugin "@ibnlanre/jumi"`
+  (bare → shared); `examples/input.css` and `stories/globals.css` use `@plugin '../dist/index.js'`
+  (relative → isolated). A design that depended on the form would work in the docs and break in the
+  fixtures, which is the kind of coupling this migration has been removing.
+
+So the CSS channel is doing real work, but not the work it was credited with. It is not
+compensating for a missing hook — it is the only place the **per-stylesheet boundary** exists.
+
+### Why the marker stays
+
+That leaves the narrower question, which is about *locating* the carrier rather than about carrying
+the data: the aggregate travels in CSS, but `--jumi-carrier` is a synthetic name a browser never
+reads, and both carriers already declare something better. `transitions` declares
+`transition: var(--jumi-transition)`; `animations` could declare
+`animation-name: var(--jumi-animation-name)`. Both are real reads of real controls, so they travel
+through variants, are copied by `@apply`, and are meaningful CSS whether or not a post-pass runs.
+
+`scripts/spike-marker-elimination.mjs` measured it, with the shipping finalizer as the oracle: the
+real plugin over the real corpora, transformed mechanically into the marker-free shape, then
+finalized both ways. **The outputs must be identical** — the marker is only doing work if they are
+not.
+
+| corpus | carrier rules | verdict |
+| --- | --- | --- |
+| `input.css` | 3 | IDENTICAL |
+| `variant.css` | 4 | IDENTICAL |
+| carrier matrix | 7 | IDENTICAL |
+| no slots or motions | 2 | IDENTICAL but for 1 marker the shipping pass leaked |
+
+Covered contexts, all written: `animations`, `transitions`, `*:animations`, `before:animations`,
+`motion-safe:animations`, `hover:animations`, `@apply animations`, `@apply transitions`. So the
+marker is **not needed to find a carrier**, on Jumi's own output, under either locator.
+
+It fails on the rest:
+
+- **It is ambiguous, and not in a contrived way.** The fallback is a *public* read —
+  `--jumi-animation-name` and `--jumi-transition` are documented controls with defaults. A page
+  that writes `transition: var(--jumi-transition)` writes the same declaration the carrier does.
+  Measured: **2 of 2 such rules rewritten** by the proposal, against **0** for the shipping pass. A
+  locator that cannot tell a carrier from a page reading a control is not a locator.
+- **It is value-sensitive where the marker is not.** The marker identifies a rule by *property*, so
+  a declaration whose value has drifted is still written. Matching on the value misses it: with one
+  value changed, the shipping pass left **0** declarations behind, per-declaration matching left
+  **1**, silently. Per-rule matching also leaves 0 — but only by widening the ambiguity above, since
+  a rule that matches gets every part it declares overwritten.
+- **It loses the only success signal there is.** A carrier with nothing to apply keeps its fallback
+  — correct output, and indistinguishable from a carrier the locator never found. The shipping pass
+  distinguishes them by erasing a marker; there is nothing here to erase.
+
+The marker would go only if the fallback stopped being a public name, which means introducing a
+private variable per part and reading that instead. That is the same shape with a new spelling —
+the thing this spike existed to rule out.
+
+**And it found a real defect in what ships.** With no motions, `transitions` already declares
+`transition: var(--jumi-transition)` and the staged list is the same string, so nothing was
+replaced, `changed` stayed `false`, and the marker was never erased:
+
+```text
+no slots or motions · emitted by the CLI, as examples:build runs it
+  before   1 carrier written, 1 staging rule consumed,   1 carrier left
+  after    1 carrier found,   0 written,  1 staging rule consumed,   no protocol left
+```
+
+A page with `class="transitions"` and no `transition-*` utility shipped
+`--jumi-carrier: transitions` and tripped the zero-occurrence invariant on a legitimate build.
+`animations` escaped only because its body reads *through* the transport, so replacing that read is
+a change even when the value is unchanged. It stayed latent because no corpus had a motionless
+carrier; `postcss:check` has one now, and it reproduced the leak in all five of its configurations
+before the fix.
+
+The mistake was conflating two questions — *did this carrier need a new value?* and *did this
+carrier complete the protocol?* — and reporting only the first. They are separate fields now,
+`carriersChanged` and `carriersFound`, and the erasure follows participation rather than change.
+
+One thing did **not** become unconditional, and the distinction is why. Erasing whenever a marker is
+found would have removed the only signal left for a stylesheet that never published an aggregate: a
+carrier with no data behind it would lose its marker, ship nothing, and look exactly like a carrier
+whose animations are meant to be inert. So the gate is whether the pass had an aggregate at all —
+staging consumed, or one handed in — which keeps that build a loud failure while letting a
+motionless carrier finish.
+
+What each carrier can be caught by differs, which is what makes the gate pass-level rather than
+per-rule: an unfinalized `animations` carrier still reads through the transport, so the leftover
+`--jumi-aggregate-*` name is a second signal, while an unfinalized `transitions` carrier declares
+only the fallback — the marker is the *only* thing that says it was never completed.

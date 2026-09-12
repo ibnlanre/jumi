@@ -51,8 +51,8 @@ const { corpus, finalizeCss } = await import('./lib/compile.mjs')
 const compile = async (name) => {
   const built = await corpus(name)
 
-  console.log(`· ${name} — ${built.carriers} carriers finalized, ${built.staging} staging removed,`
-    + ` ${built.css.length} bytes`)
+  console.log(`· ${name} — ${built.carriersFound} carriers found, ${built.carriersChanged} written,`
+    + ` ${built.staging} staging removed, ${built.css.length} bytes`)
 
   return built
 }
@@ -69,7 +69,7 @@ const settled = (built, name) => {
   const again = finalizeCss(built.css)
 
   if (again.staging !== 0) failures.push(`${name}: ${again.staging} staging rules survived finalization`)
-  if (again.carriers !== 0) failures.push(`${name}: ${again.carriers} carriers were re-finalized`)
+  if (again.carriersFound !== 0) failures.push(`${name}: ${again.carriersFound} carriers were re-finalized`)
   if (again.css !== built.css) failures.push(`${name}: finalizing the finalized CSS changed it`)
 }
 
@@ -152,7 +152,7 @@ const slots = slotReader(variantCss)
 
 settled(variantBuild, 'variant.css')
 
-if (variantBuild.carriers === 0) {
+if (variantBuild.carriersFound === 0) {
   failures.push('variant.css: the finalizer found no carrier to write the aggregate into')
 }
 
@@ -377,7 +377,7 @@ console.log(`    ${isResolved ? '✓' : '✗'} [&:is(h1)] matches the element ->
 console.log(`    ${descendantResolved ? '✗' : '✓'} [&:is(h1)] does not match a descendant (${descendantResolved ? 'it did' : 'nones only'})`)
 console.log(`    ${hasResolved ? '✓' : '✗'} has-[>button] matches the element -> ${hasChild.name.slice(0, 34)}`)
 console.log(`    ✓ finalization settles: ${variantBuild.staging + canonicalBuild.staging} staging rules`
-  + ` removed, ${variantBuild.carriers + canonicalBuild.carriers} carriers written, a second pass a no-op`)
+  + ` removed, ${variantBuild.carriersFound + canonicalBuild.carriersFound} carriers found, a second pass a no-op`)
 
 const required = contexts.length + utilities.length + 6
 const passing = required - failures.length

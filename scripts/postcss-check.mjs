@@ -49,6 +49,7 @@ writeFileSync(path.join(dir, 'index.html'), `
 <div id="descendant" class="*:animations"><i class="animate-rotate-45"></i></div>
 <div id="pseudo" class="before:animations before:content-[''] before:animate-scale-110"></div>
 <div id="applied" class="applied-motion"></div>
+<div id="motionless" class="transitions"></div>
 `)
 
 /** The bundle a stylesheet registers by path, since the fixtures are not an installed package. */
