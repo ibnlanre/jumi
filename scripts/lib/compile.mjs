@@ -3,7 +3,7 @@
  * Compiling a corpus the way a real build does: Tailwind emits, Jumi finalizes.
  *
  * No harness here can stop at the CLI. The carrier is identified by a marker in the utility body,
- * and the aggregate is injected into every marked rule *after* the stylesheet exists — a
+ * and the aggregate is materialized into every marked rule *after* the stylesheet exists — a
  * post-build step Jumi owns. So the CLI emits, and this completes: `corpus()` runs the CLI over a
  * frozen fixture and finalizes what it produced, which is the same two steps a build runs.
  *
@@ -32,7 +32,8 @@ export const { finalizeCss } = await import(path.join(root, 'dist', 'index.js'))
 
 /**
  * The post-build step, which is the whole of Jumi's side of this: read the aggregate out of the
- * stylesheet, write it into every carrier, delete the staging.
+ * stylesheet, write it into every carrier as that carrier's own `animation-*` longhands, and erase
+ * the staging and the marker.
  */
 export const complete = css => ({ raw: css, ...finalizeCss(css) })
 

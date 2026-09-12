@@ -41,4 +41,31 @@ engineering/
   also what npm shows — and `CONTRIBUTING.md` states the rules. Neither is a place for notes,
   incidents or dates; those live here.
 
+## Spikes
+
+`scripts/spike-*.mjs` are throwaway probes: each exists to answer a question by measurement, and each
+carries its result in its own header. The rule for keeping one:
+
+> Keep a spike if it still reproduces the phenomenon it documents. Retire it once the architecture it
+> probes no longer exists and the result has been captured here.
+
+A stale spike is worse than an absent one, because a reader cannot tell a probe that measures nothing
+from one that measures correctly. Two ways to go stale, both seen:
+
+- **it encodes a protocol that changed.** The carrier-protocol spikes read `--jumi-aggregate-*` and
+  counted `--jumi-carrier` markers out of emitted CSS. Once the finalizer began materializing the
+  carrier's longhands and erasing both, they measured zero — and one of them still exited `0`.
+- **it probes a rejected design.** The linked-representation spikes measured an alternative that was
+  evaluated and not shipped.
+
+Retired 2026-09-12, with the conclusions kept in `architecture/aggregate-representation.md`,
+`architecture/carrier-locality.md` and `roadmap/migration.md`: `spike-aggregate-order`,
+`spike-aggregate-read`, `spike-carrier-finalize`, `spike-carrier-seam`, `spike-css-slots`,
+`spike-depth-engines`, `spike-linked-order.test`, `spike-real-cost`, `spike-style-cost`, and the
+`lib/linked-aggregate.mjs` they shared.
+
+Kept, because they still reproduce current behaviour: `spike-candidates` (candidate parsing and
+order), `spike-variants` (the host variant model, 12/12), and `spike-precedence.html` (a browser
+probe for `animation-composition` semantics — a language fact, not Jumi's).
+
 This is principle 10 of `CONTRIBUTING.md`.

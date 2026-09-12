@@ -195,7 +195,7 @@ workstream rather than an inconvenience.
 
 ## The experiment
 
-`scripts/spike-carrier-seam.mjs` builds the same carrier twice with the fork's compiler,
+`scripts/spike-carrier-seam.mjs` (retired) builds the same carrier twice with the fork's compiler,
 differing only in *where* the aggregate is published, and asks a browser which carrier
 contexts resolve. Both arms use one carrier body and one aggregate; the slot utilities are
 identical. It loads the compiler from `tailwindcss-core` by path and is deliberately not
@@ -246,7 +246,7 @@ way.
 
 ## The answer: a Jumi-owned finalizer over emitted CSS
 
-`scripts/spike-carrier-finalize.mjs` (`pnpm spike:carrier-finalize`) runs **stock Tailwind**, the
+`scripts/spike-carrier-finalize.mjs` (retired) runs **stock Tailwind**, the
 real plugin, and three incremental builds:
 
 ```text

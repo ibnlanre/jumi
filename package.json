@@ -54,8 +54,6 @@
     "behaviour:check": "node scripts/behaviour-check.mjs",
     "vite:check": "node scripts/vite-check.mjs",
     "postcss:check": "node scripts/postcss-check.mjs",
-    "spike:carrier-seam": "node scripts/spike-carrier-seam.mjs",
-    "spike:carrier-finalize": "node scripts/spike-carrier-finalize.mjs",
     "spike:candidates": "node scripts/spike-candidates.mjs",
     "spike:variants": "node scripts/spike-variants.mjs",
     "candidate:diff": "node scripts/candidate-diff.mjs",

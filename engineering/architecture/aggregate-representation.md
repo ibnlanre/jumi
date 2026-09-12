@@ -92,7 +92,7 @@ nothing. See the P0 note in `engineering/roadmap/migration.md`.
 
 ### Spike 1 — order equivalence: PASSING
 
-`scripts/spike-linked-order.test.mjs`, run against the real model. Four registration
+`scripts/spike-linked-order.test.mjs` (retired), run against the real model. Four registration
 histories are fed to today's aggregation and to the linked one, and after **every**
 mutation all ten lists must be *identical*, not merely equal in slot count:
 
@@ -156,7 +156,7 @@ data the model knows is redundant — but it is the honest sizing of the prize.
 
 ### Spike 3 — the K curve: `K = 8` survives
 
-`scripts/spike-style-cost.mjs` builds each representation at runtime and measures the
+`scripts/spike-style-cost.mjs` (retired) builds each representation at runtime and measures the
 same matrix for each. `K` is the number of entries each link appends: serial depth is what
 costs, so fewer links is the lever, paid for with a larger rewrite unit per mutation.
 
@@ -272,8 +272,8 @@ entries. Neither is asymptotic; both are why these corpora shrink by 3.5× rathe
 11× the ideal append unit implied. Merging adjacent short links would recover some of it
 and was deliberately not attempted: the quadratic term is gone, which was the goal.
 
-**The real emission fails the runtime bar at `K = 8`.** `scripts/spike-real-cost.mjs` measures
-the representation that actually ships: both arms come from one real compile through the
+**The real emission fails the runtime bar at `K = 8`.** `scripts/spike-real-cost.mjs` (retired)
+measures the representation that actually ships: both arms come from one real compile through the
 plugin, and the flat arm is built by resolving the chain and re-declaring the same entries
 flat, so only the representation differs. Chrome 153, median of 5, `forced-one` — a single
 carrier invalidated — against `carrier-flat-current`:

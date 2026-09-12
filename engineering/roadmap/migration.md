@@ -490,7 +490,7 @@ guarantee an early read; ordinary corpora also publish once per registration.
 published once because its corpus contains *none* of the three things that move the
 read earlier — it is 228 plain `animate-*` classes with no variants and no `@apply`,
 and its carrier sorts last (`animate-…` < `animations`). Each cause was isolated by
-experiment (`node scripts/spike-aggregate-read.mjs`):
+experiment (the retired `spike-aggregate-read.mjs`):
 
 | Cause | Evidence |
 | --- | --- |
@@ -530,7 +530,7 @@ current order exactly while publishing O(1) per change.
    examples build's own 63 publications: **0 of 58 registrations appended**; every
    one inserted mid-list, because the slot order is a *grouped and sorted view*
    (`values` by attribute, `composed` and `effects` alphabetically), not a
-   registration log. `scripts/spike-aggregate-order.mjs` reproduces this.
+   registration log. `scripts/spike-aggregate-order.mjs` (retired) reproduced this.
 
    Kept as evidence rather than discarded, because it establishes what a replacement
    may assume: chains work at realistic depth, parallel chains stay aligned, a link
