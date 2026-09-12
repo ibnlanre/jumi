@@ -34,6 +34,8 @@ Wire up only the plugin and your utilities compile, your page has no animations,
 
 Two things make that impossible to write while any single utility is being compiled. The lists depend on **which other classes are present**, and their order is the order the browser resolves them in — `animation-composition: replace` gives the last entry the win. Both facts are only settled at the end of the build.
 
+`animations` is one of two carriers; `transitions` is the other. It composes a `transition` shorthand from whichever `transition-property/…` motions are on the element, and it has the identical problem — the list depends on which utilities exist — so it is assembled the same way. Everything below applies to both.
+
 ## The three places that list could live
 
 There are only three, and each one gives up something:

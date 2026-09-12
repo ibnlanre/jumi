@@ -15,6 +15,8 @@
  *   5. every rule but the aggregate is unchanged              (the carrier is constant)
  *   6. the aggregate reaches the carriers in *every* build,
  *      and no staging survives                               (the finalizer's contract)
+ *   7. a motion added after `transitions` compiled still
+ *      reaches that carrier                                   (a second carrier, same problem)
  *
  * Assertions 3–6 are the acceptance contract. The carrier utility is a constant consumer —
  * Tailwind caches it and never revisits it — while the list it applies is data that a later
@@ -26,7 +28,7 @@
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
-import { aggregateSlots, PARTS, protocolState } from './lib/css.mjs'
+import { aggregateSlots, PARTS, protocolState, TRANSITION_PARTS } from './lib/css.mjs'
 
 import path from 'node:path'
 
@@ -36,6 +38,12 @@ const root = path.join(here, '..')
 const base = 'animate-rotate-[0:0deg,20:-8deg,100:-8deg]'
 const cacheTween = 'animate-rotate-[0:30deg,50:-30deg,100:30deg]/[return]'
 const orderTween = 'animate-rotate-[0:60deg,70:-60deg,100:60deg]/[bounce]'
+
+// The transitions carrier has the same obligation as `animations` — it applies a list that depends
+// on which utilities exist — so it is driven through the same three builds and held to the same
+// freshness requirement.
+const motion = 'transition-property/background-color'
+const lateMotion = 'transition-property/scale'
 
 const css = [
   '@import "tailwindcss" source(none);',
@@ -51,15 +59,15 @@ const { build, compiler } = await import('./lib/compile.mjs')
 
 const instance = await compiler(css, root)
 
-// The scanner sorts candidates, so every tween precedes `animations`.
-const first = build(instance, [base, 'animations'])
+// The scanner sorts candidates, so every tween and every transition utility precedes both carriers.
+const first = build(instance, [base, motion, 'animations', 'transitions'])
 
 // A tween is added and the scan is fresh again: still sorted.
-const cache = build(instance, [base, cacheTween, 'animations'])
+const cache = build(instance, [base, cacheTween, motion, 'animations', 'transitions'])
 
-// A tween is added to a long-lived session: the dev server's candidate Set only
-// ever grows, so the new class lands after `animations`.
-const order = build(instance, [base, cacheTween, 'animations', orderTween])
+// A tween and a motion are added to a long-lived session: the dev server's candidate Set only ever
+// grows, so both new classes land after the carriers that have to apply them.
+const order = build(instance, [base, cacheTween, motion, 'animations', 'transitions', orderTween, lateMotion])
 
 /**
  * The aggregate the browser applies, read out of the finalized stylesheet: with the lists flat
@@ -81,7 +89,7 @@ const utilities = (out) => {
 
   for (const m of out.matchAll(/(\.[^{}\s][^{}]*)\{([^{}]*)\}/g)) {
     const body = m[2]
-      .replace(new RegExp(`(?<![\\w-])(?:${PARTS.join('|')})\\s*:\\s*[^;]+;`, 'g'), '')
+      .replace(new RegExp(`(?<![\\w-])(?:${[...PARTS, ...TRANSITION_PARTS].join('|')})\\s*:\\s*[^;]+;`, 'g'), '')
       .replace(/\s+/g, ' ')
       .trim()
     const selector = m[1].trim()
@@ -123,6 +131,30 @@ checks.push({
   what: 'the slot list grows (candidate set only grows)',
 })
 
+/**
+ * The motions `.transitions` actually applies, read off its `transition` shorthand.
+ *
+ * Matched as a *prefix* so the assertion holds either side of the fix: the shorthand names a
+ * motion as `var(--jumi-<motion>-transition)` when the carrier declares the composition itself, and
+ * as `var(--jumi-<motion>-transition-property, …)` when it is inlined. Either way the motion is the
+ * word between `--jumi-` and `-transition`.
+ */
+const transitionMotions = (built) => {
+  const rule = built.css.match(/\.transitions\s*\{([^}]*)\}/)
+  if (!rule) return []
+
+  const value = (rule[1].match(/(?:^|;)\s*transition:\s*([^;]+);/) ?? [, ''])[1]
+
+  return [...new Set([...value.matchAll(/--jumi-([\w-]+)-transition/g)].map(match => match[1]))]
+}
+
+checks.push({
+  detail: `motions ${transitionMotions(first).join(' + ') || 'none'} → ${transitionMotions(order).join(' + ') || 'none'}`,
+  pass: [motion, lateMotion].every(candidate =>
+    transitionMotions(order).includes(candidate.replace('transition-property/', ''))),
+  what: 'a motion added after `transitions` compiled still reaches the carrier',
+})
+
 const before = utilities(first.css)
 const after = utilities(order.css)
 const changed = [...before].filter(([selector, body]) => after.has(selector) && after.get(selector) !== body)
@@ -143,12 +175,13 @@ const finalization = [first, cache, order].map(built => protocolState(built.css)
 
 checks.push({
   detail: finalization
-    .map(state => `${state.carriers} carriers × ${state.carriers ? state.declarations / state.carriers : 0} declarations`
+    .map(state => `${state.animations} + ${state.transitions} carriers, ${state.declarations} declarations`
       + (state.leaks.staging ? `, ${state.leaks.staging} staging left` : ''))
     .join('; '),
   pass: finalization.every(state => Object.values(state.leaks).every(count => count === 0)
-    && state.carriers > 0 && state.declarations === state.carriers * PARTS.length),
-  what: 'the aggregate reaches every carrier, and no build-time name survives',
+    && state.animations > 0
+    && state.declarations === state.animations * PARTS.length + state.transitions * TRANSITION_PARTS.length),
+  what: 'each carrier holds its own parts, and no build-time name survives',
 })
 
 for (const { detail, pass, what } of checks) {

@@ -26,10 +26,10 @@
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { PARTS, protocolState } from './lib/css.mjs'
-
 import { chromium } from 'playwright'
 import { build, createServer, preview } from 'vite'
+
+import { expectedDeclarations, protocolState } from './lib/css.mjs'
 
 import path from 'node:path'
 
@@ -73,6 +73,7 @@ const CONTEXTS = `
     <div id="applied" class="applied-motion"></div>
     <div id="bare" class="animations"></div>
     <div id="grown" class="animations"></div>
+    <div id="transitioning" class="transitions transition-property/background-color transition-duration-[300ms]"></div>
 `
 
 /** The same shape as `behaviour:check`: the contexts are the product promise. */
@@ -180,6 +181,22 @@ const measure = (page, check) => page.evaluate(
 
 const resolving = name => name.split(',').map(part => part.trim()).filter(part => part !== 'none')
 
+/**
+ * The transition a browser applies to the element.
+ *
+ * `transition-property` is the composed shorthand resolved, so it is the one reading that says both
+ * things at once: that the list reached this element, and which motions it lists. Nothing about the
+ * AST is consulted, which is the point of asking a browser.
+ */
+const transitioning = (page, selector = '#transitioning') => page.evaluate(
+  selector => {
+    const element = document.querySelector(selector)
+
+    return element ? getComputedStyle(element).transitionProperty : '(absent)'
+  },
+  selector,
+)
+
 const browser = await chromium.launch()
 const failures = []
 
@@ -225,16 +242,17 @@ const matrix = async (label, url, slots) => {
 
 /** What the protocol requires of any emitted stylesheet, whatever produced it. */
 const structure = (label, css) => {
-  const { carriers, declarations, leaks } = protocolState(css)
+  const { animations, declarations, leaks, transitions } = protocolState(css)
   const leaked = Object.entries(leaks).filter(([, count]) => count > 0)
+  const expected = expectedDeclarations({ animations, transitions })
 
-  console.log(`\n    ${!leaked.length && carriers ? '✓' : '✗'} ${label}: ${css.length.toLocaleString()} bytes,`
-    + ` ${carriers} carriers, ${declarations} declarations written,`
+  console.log(`\n    ${!leaked.length && animations ? '✓' : '✗'} ${label}: ${css.length.toLocaleString()} bytes,`
+    + ` ${animations} + ${transitions} carriers, ${declarations} declarations written,`
     + ` ${leaked.length ? `${leaked.map(([name, count]) => `${count} ${name}`).join(', ')} left` : 'no protocol left'}`)
 
   if (leaked.length) failures.push(`${label}: the transport reached the output — ${leaked.map(([name, count]) => `${count} ${name}`).join(', ')}`)
-  if (!carriers) failures.push(`${label}: no carrier reached the output`)
-  if (declarations !== carriers * PARTS.length) failures.push(`${label}: ${declarations} declarations for ${carriers} carriers`)
+  if (!animations) failures.push(`${label}: no carrier reached the output`)
+  if (declarations !== expected) failures.push(`${label}: ${declarations} declarations for ${animations} + ${transitions} carriers, expected ${expected}`)
 
   return css
 }
@@ -266,9 +284,25 @@ structure('dev', devCss)
 const slots = slotReader(devCss)
 const page = await matrix('dev · matrix', devUrl, slots)
 
+// The transitions carrier's obligation, read the way a user would see it: one motion resolves on
+// the element before anything changes.
+const transitionsBefore = await transitioning(page)
+
+console.log(`\n    ${transitionsBefore.includes('background-color') ? '✓' : '✗'} transitions: the composed shorthand reaches the element — ${transitionsBefore}`)
+
+if (!transitionsBefore.includes('background-color')) {
+  failures.push(`dev · transitions: "${transitionsBefore}" does not include background-color`)
+}
+
 // A candidate appears while the server is running: this is the path where Tailwind's cache and
-// Jumi's staging both have to produce a *new* aggregate, and the only proof is the computed name.
-const grownClasses = CONTEXTS.replace('id="grown" class="animations"', 'id="grown" class="animations animate-shake"')
+// Jumi's staging both have to produce a *new* aggregate, and the only proof is the computed value.
+// Both carriers grow at once, because a slot and a motion are the same class of state.
+const grownClasses = CONTEXTS
+  .replace('id="grown" class="animations"', 'id="grown" class="animations animate-shake"')
+  .replace(
+    'transition-property/background-color transition-duration',
+    'transition-property/background-color transition-property/scale transition-duration',
+  )
 
 writeFileSync(path.join(dir, 'index.html'), html(grownClasses))
 
@@ -281,6 +315,23 @@ const grown = await page.waitForFunction(
 console.log(`\n    ${grown ? '✓' : '✗'} incremental: a slot added while the server ran`)
 
 if (!grown) failures.push('dev · incremental: animate-shake never reached the carrier after the source changed')
+
+// The same acceptance for the second carrier. `scale` was not on the page when `transitions` was
+// first compiled, so this is the case where the carrier's own body would have been reused stale.
+const transitionsAfter = await transitioning(page)
+const both = ['background-color', 'scale'].every(property => transitionsAfter.includes(property))
+
+console.log(`    ${both ? '✓' : '✗'} incremental: a motion added while the server ran — ${transitionsAfter}`)
+
+if (!both) failures.push(`dev · transitions: "${transitionsAfter}" never gained scale after the source changed`)
+
+const { code: grownCss } = await server.transformRequest('/style.css?direct')
+
+structure('dev · after the edit', grownCss)
+
+if (!grownCss.includes('--jumi-scale-transition-property')) {
+  failures.push('dev · transitions: the composed list still omits the new motion after the edit')
+}
 
 await page.close()
 

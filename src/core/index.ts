@@ -1,11 +1,11 @@
 import type {
-    AnimatableStandardPropertyType,
-    Collection,
-    Creator,
-    CssInJs,
-    MatchComponentsPropertyFunction,
-    MatchUtilitiesPropertyFunction,
-    StaggerContext,
+  AnimatableStandardPropertyType,
+  Collection,
+  Creator,
+  CssInJs,
+  MatchComponentsPropertyFunction,
+  MatchUtilitiesPropertyFunction,
+  StaggerContext,
 } from '@/types'
 
 import { assemble } from '@/helpers/assemble'
@@ -185,7 +185,7 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
 
     registerName(`--jumi-${attribute}-${id}-animation-name`)
     emitKeyframe(`jumi-${attribute}-${id}`, { to: { [attribute]: css('var', `--jumi-${attribute}-${id}`) } })
-    slotRegistered()
+    aggregateChanged()
 
     return {
       [`--jumi-${attribute}-${id}-animation-name`]: `jumi-${attribute}-${id}`,
@@ -357,7 +357,7 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
   /** Every longhand a slot contributes an entry to. */
   const aggregateParts = [...slotParts, 'animation-name']
 
-  let slotsRegistered = 0
+  let registrations = 0
   // -1 means no pass has published yet; then the utility's own read covers it.
   let publishedAt = -1
 
@@ -373,11 +373,16 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
   const aggregateVariables = (): Collection<string> => {
     const lists = computeAnimationVariable()
 
-    return Object.fromEntries(
-      aggregateParts
+    return Object.fromEntries([
+      ...aggregateParts
         .filter(part => typeof lists[part] === 'string')
         .map(part => [aggregateVariable(part), lists[part] as string]),
-    )
+      // The transitions carrier applies a list for the same reason `animations` does — it depends
+      // on which utilities exist — so it travels the same channel and gets the same freshness.
+      // Publishing it is free when the page has no `transitions` carrier: no rule declares the
+      // part, so the finalizer has nowhere to write it.
+      [aggregateVariable('transition'), transitionList()],
+    ])
   }
 
   /**
@@ -394,15 +399,20 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
    * never reads this rule — which is what makes it safe to put the data outside the carrier.
    */
   const publishAggregate = () => {
-    if (publishedAt === slotsRegistered) return
-    publishedAt = slotsRegistered
+    if (publishedAt === registrations) return
+    publishedAt = registrations
 
     sink.aggregate(aggregateVariables())
   }
 
-  /** A slot became real: republish if a pass has already published. */
-  const slotRegistered = () => {
-    slotsRegistered += 1
+  /**
+   * Aggregate state changed: republish if a pass has already published.
+   *
+   * Named for what it means rather than for slots, because a motion is one of the things that has
+   * to reach a carrier late and a slot is no longer the only one.
+   */
+  const aggregateChanged = () => {
+    registrations += 1
     if (publishedAt !== -1) publishAggregate()
   }
 
@@ -419,8 +429,21 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
     ], ' ')
   }
 
-  function variables(type: 'animation' | 'effect' | 'transition') {
-    return (attribute: string) => css('var', `--jumi-${attribute}-${type}`)
+  /**
+   * The composed `transition` shorthand: one entry per motion, each the four-link chain that
+   * motion's utilities fill in on the element.
+   *
+   * Inlined, rather than assembled from a `--jumi-<motion>-transition` variable per motion. That
+   * intermediate would be dynamic too — which motions exist is — and every dynamic declaration has
+   * to be staged and materialized separately. A composed list is one declaration, and one
+   * declaration is one staged part.
+   */
+  function transitionList(): string {
+    const active = sorted(motions)
+
+    return active.length
+      ? active.map(attribute => transitionVariables(attribute)).join(', ')
+      : css('var', '--jumi-transition')
   }
 
   const creator: Creator = {
@@ -439,20 +462,27 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
 
     /**
      * What Tailwind emits for `.animations`: a constant rule that marks the element as a
-     * carrier and declares the controls an animation falls back to.
+     * carrier, names the parts it applies, and declares the controls they fall back to.
      *
      * Constant is the point. Tailwind caches a candidate's output, so a rule that
      * changed as slots appeared could be reused stale; reading this is also what
      * publishes the data, so a pass with no tweens at all still publishes an
      * aggregate for the carrier to materialize.
      *
-     * Note what is *not* here: the `animation-*` longhands. They cannot be written at a
-     * literal selector — each one holds the aggregate list, whose entries reference slot
-     * variables that exist only on the element — so `@/helpers/carriers` writes them into
-     * every rule this marker reached, and erases the marker.
+     * The ten `animation-*` declarations are reads, not values: each one names a part in the
+     * staging namespace and falls back to the matching control. They are how the carrier says
+     * which parts it wants — `@/helpers/carriers` replaces every one of them it was given data
+     * for, and erases the marker — so they are also why a browser sees no transport in a
+     * finished stylesheet, and why a carrier that was never finalized still animates the
+     * control defaults instead of nothing.
      */
     get animationUtility(): CssInJs {
       publishAggregate()
+
+      const consumers = Object.fromEntries([
+        ...slotParts.map(part => [part, css('var', aggregateVariable(part), css('var', `--jumi-${part}`))]),
+        ['animation-name', css('var', aggregateVariable('animation-name'), css('var', '--jumi-animation-name'))],
+      ])
 
       const assembled = sorted(properties).reduce((acc, attribute) =>
         merge(acc, assemble(attribute)), {} as CssInJs)
@@ -462,10 +492,11 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
         // variants to it. A variant re-parents this body (`variants.ts`: `r.nodes =
         // selectors.map(selector => rule(selector, r.nodes))`), so the marker travels to
         // `:is(.animations > *)` and `.animations::before` — and that is what lets Jumi's
-        // finalizer materialize the longhands where they resolve, instead of publishing
-        // them at a literal selector it cannot follow. Build-time only: the finalizer
-        // removes it, so it never reaches the browser.
+        // finalizer materialize the list where it resolves, instead of publishing it at a
+        // literal selector it cannot follow. Build-time only: the finalizer removes it, so
+        // it never reaches the browser.
         '--jumi-carrier': 'animations',
+        ...consumers,
         'interpolate-size': css('var', '--jumi-interpolate-size'),
       }, assembled)
     },
@@ -479,14 +510,21 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
       effects.add(attribute)
       registerName(`--jumi-${attribute}-animation-name`)
       emitEffectKeyframes(attribute)
-      slotRegistered()
+      aggregateChanged()
       return `jumi-${attribute}`
     },
 
     get effects(): string[] { return sorted(effects) },
 
     motion(attribute): string {
+      if (motions.has(attribute)) return attribute
+
       motions.add(attribute)
+      // A motion is aggregate state in exactly the way a slot is: if a pass has already published,
+      // the composed list has to be re-said or the new motion never reaches the carrier — the
+      // `transitions` candidate was compiled once and Tailwind will not revisit it.
+      aggregateChanged()
+
       return attribute
     },
 
@@ -516,7 +554,7 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
           byId.set(id, frameList)
           registerName(`--jumi-${attribute}-${id}-animation-name`)
           emitKeyframe(`jumi-${attribute}-${id}`, phraseKeyframe(attribute, id, frameList))
-          slotRegistered()
+          aggregateChanged()
 
           // `/[flick]` names this slot, so a control — or your own CSS — can
           // address it on its own. Every link the chain then reads is registered
@@ -567,7 +605,7 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
         composed.add(attribute)
         registerName(`--jumi-${attribute}-animation-name`)
         emitKeyframe(`jumi-${attribute}`, { to: { [attribute]: css('var', `--jumi-${attribute}`) } })
-        slotRegistered()
+        aggregateChanged()
 
         const variables = parts.reduce((acc, part) => {
           const [property, transform] = Array.isArray(part) ? part : [part]
@@ -635,19 +673,18 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
     },
 
     get transitions(): CssInJs {
-      const activeMotions = sorted(motions)
+      publishAggregate()
 
-      const motionSlots = activeMotions.reduce((acc, attribute) => {
-        acc[`--jumi-${attribute}-transition`] = transitionVariables(attribute)
-        return acc
+      return merge({
+        // The same marker discipline as `animations`, and the same reason: this body is constant,
+        // and the list it applies is staged and materialized late. The `transition` declaration is
+        // both the fallback and the carrier's declaration of interest — it is the property the
+        // finalizer writes the composed list into, which is also what stops an `animations`
+        // carrier from being handed it.
+        '--jumi-carrier': 'transitions',
+        'transition': css('var', '--jumi-transition'),
+        'transition-behavior': css('var', '--jumi-transition-behavior'),
       }, assemble('transition') as CssInJs)
-
-      const transition = activeMotions.map(variables('transition')).join(', ') || css('var', '--jumi-transition')
-
-      return merge(
-        { transition, 'transition-behavior': css('var', '--jumi-transition-behavior') },
-        motionSlots,
-      )
     },
   }
 

@@ -263,7 +263,8 @@ fork.** Three pieces:
    carry it wherever they move the body
 2. Jumi publishes the aggregate as it does today, as a staging rule
 3. a finalizer resolves that aggregate, writes it into every marked rule as that rule's own
-   `animation-*` longhands, and removes both the staging and the marker
+   declarations — the `animation-*` longhands, or the `transition` shorthand — and removes both
+   the staging and the marker
 
 The finalizer's entire vocabulary is Jumi's own: **a carrier is a rule declaring the marker**;
 staging is a rule declaring aggregate data that is not a carrier. It knows nothing about Tailwind
@@ -338,7 +339,8 @@ description: `--jumi-carrier`, `--jumi-carrier-staging` and every `--jumi-aggreg
 from a finished stylesheet, and `css:check`, `vite:check`, `postcss:check` and `examples:build`
 fail on any occurrence of the three.
 
-It used to ship. The finalizer kept the marker and injected the ten `--jumi-aggregate-*` declarations into each carrier, so a carrier read its own data through a pointer it also declared:
+It used to ship. The finalizer kept the marker and injected the staged declarations into each
+carrier, so a carrier read its own data through a pointer it also declared:
 
 ```css
 .animations {
@@ -367,3 +369,81 @@ Measured across the harnesses, before → after: canonical `snapshot.css` 92,303
 the carrier variant 90,577 → **85,659**, `examples/output.css` 272,553 → **267,635**. The PostCSS
 fixture's four carriers went 23,861 → **18,987**. Nothing about the data changed — the same 40
 declarations across the same 4 carriers — only where it is written.
+
+### The carrier's own declarations are the contract
+
+Two requirements pull in opposite directions:
+
+- **locality** wants the list *inside* the utility body, because that is what travels with a
+  re-parented or `@apply`-copied body
+- **freshness** wants it *outside*, because Tailwind caches one AST per candidate and will not
+  revisit the carrier when a later class changes what the list should say
+
+The finalizer is neither. The body is **constant** and names the parts it applies; the list is
+staged and written late. What makes that extensible is that the carrier's own declarations are the
+whole of the contract — a staged part is written only where the carrier already declares that
+property:
+
+```ts
+const existing = ownDeclarations(rule).find(declaration => declaration.prop === longhand)
+
+if (!existing || existing.value === value) continue
+```
+
+Nothing is appended. A property a carrier does not declare is not one it wants, so the finalizer
+needs **no knowledge of carrier types**: `animations` declares the ten animation longhands and
+`transitions` declares `transition`, each is handed only its own, and both travel one flat staging
+channel. A carrier says what it is by what it declares — which is also why erasing the marker costs
+nothing: the declarations left behind *are* the distinction.
+
+That is a better trade than a per-carrier protocol branch. A third carrier needs no change in the
+finalizer, only a body that declares what it applies.
+
+### `transitions` had the same problem, from the other side
+
+`animations` was refactored into that shape first; `transitions` was left composing its `transition`
+shorthand **inside** the utility body, from the live set of motions:
+
+```css
+/* was */
+.transitions {
+  transition: var(--jumi-background-color-transition), var(--jumi-scale-transition);
+  --jumi-background-color-transition: var(…) var(…) var(…) var(…);
+}
+```
+
+That gets locality for free — the body travels — and gives up freshness, because the shorthand is
+part of the thing Tailwind caches. Measured on one long-lived compiler:
+
+```text
+build 1                                              .animations 1 slot    .transitions [background-color]
+build 2  + animate-scale-110, + transition-property/scale
+                                                     .animations 2 slots   .transitions [background-color]
+```
+
+`.animations` picked the new slot up; `.transitions` never saw the new motion. One-shot builds were
+correct only because Tailwind sorts candidates lexically and every `transition-*` utility precedes
+`transitions` — a lifecycle accident, not a contract, and exactly the class of thing the rest of
+this migration removed.
+
+It now uses the same means. The intermediate `--jumi-<motion>-transition` variables went with it:
+they were dynamic too — which motions exist is — and every dynamic declaration is another part that
+would have to be materialized, so the composed list is inlined into the single declaration the
+finalizer writes.
+
+### Three levels, because the bug has three shapes
+
+*Fresh build correct, incremental compiler stale, only the browser shows it* is the shape this
+class of bug takes, and it has now appeared twice. The property is pinned at three levels, each
+catching a different failure:
+
+```text
+unit       src/helpers/create/create.test.ts   a motion arriving after a pass republishes the list
+compiler   scripts/incremental-build.mjs       both carriers grow on one long-lived compiler
+browser    scripts/vite-check.mjs              the dev server's element reports both motions
+```
+
+The browser level is the one that is not optional. `incremental:check` asserts the emitted
+stylesheet; the user's symptom is a computed style. `vite:check` reads
+`getComputedStyle(el).transitionProperty`, edits the page while the server runs, and requires
+`background-color` to become `background-color, scale` with no restart.

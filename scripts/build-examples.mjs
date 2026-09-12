@@ -21,7 +21,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { fileURLToPath } from 'node:url'
 
-import { aggregateSlots, PARTS, protocolState } from './lib/css.mjs'
+import { aggregateSlots, expectedDeclarations, PARTS, protocolState } from './lib/css.mjs'
 
 import path from 'node:path'
 
@@ -60,14 +60,16 @@ writeFileSync(output, built.css)
 
 const staging = [...emitted.matchAll(/[^{}]+\{[^{}]*--jumi-carrier-staging[^{}]*\}/g)]
 const stagingBytes = staging.reduce((total, match) => total + match[0].length, 0)
-const { carriers, declarationBytes: aggregateBytes, declarations, leaks } = protocolState(built.css)
+const state = protocolState(built.css)
+const expected = expectedDeclarations(state)
 const slots = aggregateSlots(built.css)
 
 const percent = (value, total) => `${Math.round(100 * value / total)}%`
 
 console.log(`\n  examples build\n`)
 console.log(`    slots           ${slots}`)
-console.log(`    carriers        ${built.carriers} rules the aggregate was written into`)
+console.log(`    carriers        ${built.carriers} rules the aggregate was written into`
+  + ` (${state.animations} animations + ${state.transitions} transitions)`)
 console.log(`\n    build cost — what Tailwind emitted, before the finalizer touched it`)
 console.log(`      publications  ${staging.length} staging rules, one per slot registered after the first read`)
 console.log(`      emitted       ${emitted.length.toLocaleString()} bytes`)
@@ -75,9 +77,10 @@ console.log(`      staging       ${stagingBytes.toLocaleString()} bytes (${perce
 console.log(`      keyframes     ${(emitted.match(/@keyframes /g) ?? []).length}`)
 console.log(`\n    shipped — what a browser downloads`)
 console.log(`      bytes         ${built.css.length.toLocaleString()} bytes`)
-console.log(`      aggregate     ${aggregateBytes.toLocaleString()} bytes (${percent(aggregateBytes, built.css.length)}),`
-  + ` ${carriers} carriers × ${slots} entries × ${PARTS.length} lists`)
-console.log(`      protocol      ${declarations} declarations written, no build-time name left`)
+console.log(`      aggregate     ${state.declarationBytes.toLocaleString()} bytes (${percent(state.declarationBytes, built.css.length)}),`
+  + ` ${state.animations} carriers × ${slots} entries × ${PARTS.length} lists`
+  + (state.transitions ? `, ${state.transitions} transitions carriers` : ''))
+console.log(`      protocol      ${state.declarations} declarations written, no build-time name left`)
 console.log(`      file          ${path.relative(root, output)}\n`)
 
 /* ------------------------------------------------------------------------------------
@@ -86,17 +89,20 @@ console.log(`      file          ${path.relative(root, output)}\n`)
 
 // Without this, `output.css` could ship the transport, or a carrier that was recognised and never
 // written, and still look fine here.
-const leaked = Object.entries(leaks).filter(([, count]) => count > 0)
+const leaked = Object.entries(state.leaks).filter(([, count]) => count > 0)
 const failures = []
 
 if (leaked.length) {
   failures.push(`the transport reached the file — ${leaked.map(([name, count]) => `${count} ${name}`).join(', ')}`)
 }
 
-if (!carriers) failures.push('no carrier was finalized — the marker never reached the output')
+if (!state.animations && !state.transitions) {
+  failures.push('no carrier was finalized — the marker never reached the output')
+}
 
-if (carriers && declarations !== carriers * PARTS.length) {
-  failures.push(`${declarations} materialized declarations for ${carriers} carriers, expected ${carriers * PARTS.length}`)
+if (state.declarations !== expected) {
+  failures.push(`${state.declarations} materialized declarations for`
+    + ` ${state.animations} animations + ${state.transitions} transitions carriers, expected ${expected}`)
 }
 
 if (failures.length) {

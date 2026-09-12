@@ -25,9 +25,14 @@ import postcss from 'postcss'
  * So the carrier marks itself and the data is carried to it, and both the marker and the carry
  * are erased afterwards, because neither is anything a browser should be handed:
  *
- *   carrier marker present        → materialize the longhands here, then erase the marker
- *   staging marker present        → read the aggregate, then remove the rule
+ *   carrier marker present        → materialize the parts this carrier declares, then erase it
+ *   staging marker present        → read the data, then remove the rule
  *   anything else                 → untouched
+ *
+ * **The carrier's own declarations are the contract.** A part is written only where the carrier
+ * asks for it, which is what keeps two carriers with different data apart: `animations` declares
+ * the ten animation longhands and `transitions` declares `transition`, so neither is handed the
+ * other's list. Nothing is appended — a property the carrier does not declare is not one it wants.
  *
  * **The finished stylesheet carries no protocol.** `--jumi-carrier`, `--jumi-carrier-staging` and
  * every `--jumi-aggregate-*` are build-time names with a zero-occurrence invariant, asserted by
@@ -123,9 +128,11 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
 
   for (const [longhand, value] of Object.entries(aggregate ?? {})) materialized.set(longhand, value)
 
-  // Pass 2 — write it into every carrier as the declarations a browser actually applies. The
-  // value replaces the whole longhand, so the read that used to point through the aggregate is
-  // gone rather than rewritten: nothing here parses a CSS value.
+  // Pass 2 — write it into every carrier, as the declarations a browser actually applies. Only a
+  // property the carrier already declares is written, which is what scopes the data: the carrier
+  // body names the parts it needs, so a rule is never handed another carrier's list. The value
+  // replaces the whole declaration, so the read that pointed through the transport is gone rather
+  // than rewritten: nothing here parses a CSS value.
   root.walkRules((rule) => {
     if (!carries(rule)) return
 
@@ -134,13 +141,7 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
     for (const [longhand, value] of materialized) {
       const existing = ownDeclarations(rule).find(declaration => declaration.prop === longhand)
 
-      if (!existing) {
-        rule.append({ prop: longhand, value })
-        changed = true
-        continue
-      }
-
-      if (existing.value === value) continue
+      if (!existing || existing.value === value) continue
 
       existing.value = value
       changed = true

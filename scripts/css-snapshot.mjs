@@ -38,7 +38,7 @@ import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { fileURLToPath } from 'node:url'
 
-import { aggregateSlots, PARTS, protocolState } from './lib/css.mjs'
+import { aggregateSlots, expectedDeclarations, protocolState } from './lib/css.mjs'
 
 import path from 'node:path'
 
@@ -52,7 +52,6 @@ const update = process.argv.includes('--update')
 
 /** A staging rule: the aggregate the model published, before the finalizer consumed it. */
 const STAGING = /[^{}]+\{[^{}]*--jumi-carrier-staging[^{}]*\}/g
-
 
 /** A CSS colour literal — what a theme value looks like before it is a token. */
 const COLOR_LITERAL = /^(?:#|(?:rgba?|hsla?|lab|lch|oklab|oklch|color|color-mix|light-dark)\()|^(?:currentColor|transparent|canvastext)$/i
@@ -116,19 +115,21 @@ function measure(built) {
     aggregateBytes: state.declarationBytes,
     aggregateShare: Math.round(100 * state.declarationBytes / css.length),
     aggregateWrites: state.declarations,
+    // Carriers counted off the output, by kind: the marker is erased, so each is identified by the
+    // declaration only it has — `animation-name`, or the composed `transition`.
+    animations: state.animations,
     bytes: css.length,
     // Carrier rules the finalizer reported writing the aggregate into. The number that used to be
-    // one — it is whatever Tailwind made of the class, and no longer something Jumi chooses.
+    // one — it is whatever Tailwind made of the classes, and no longer something Jumi chooses.
     carriers: built.carriers,
-    // …and the same thing counted off the output. They have to agree: the marker is erased, so a
-    // finalizer that reported a carrier it never gave a list to would otherwise be invisible.
-    carriersInOutput: state.carriers,
+    carriersInOutput: state.animations + state.transitions,
     keyframes: (css.match(/@keyframes jumi-/g) ?? []).length,
     media: (css.match(/@media /g) ?? []).length,
     properties: (css.match(/@property --jumi-/g) ?? []).length,
     protocol: state.leaks,
     slots: aggregateSlots(css),
     supports: (css.match(/@supports /g) ?? []).length,
+    transitions: state.transitions,
   }
 
   // What the build cost. `publishEvents` is one staging rule per publication — the number the
@@ -189,9 +190,10 @@ function report(before, after, indent = 2) {
  */
 const variantChecks = [
   {
-    detail: measured => `${measured.aggregateWrites} declarations for ${measured.carriers} carriers`,
-    holds: measured => measured.carriers > 0 && measured.aggregateWrites === measured.carriers * PARTS.length,
-    what: 'every carrier holds the whole aggregate exactly once, and no publication survives',
+    detail: measured => `${measured.aggregateWrites} declarations for`
+      + ` ${measured.animations} animations + ${measured.transitions} transitions carriers`,
+    holds: measured => measured.carriers > 0 && measured.aggregateWrites === expectedDeclarations(measured),
+    what: 'each carrier holds the whole list for the parts it declares, and nothing else',
   },
   {
     detail: measured => `${measured.carriersInOutput} carriers in the output, ${measured.carriers} reported`,

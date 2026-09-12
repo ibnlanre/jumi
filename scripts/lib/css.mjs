@@ -20,7 +20,7 @@
 
 /**
  * The ten `animation-*` longhands the model stages a list for, and therefore the ten the finalizer
- * materializes into every carrier.
+ * materializes into every carrier that declares them.
  */
 export const PARTS = [
   'animation-composition',
@@ -36,14 +36,27 @@ export const PARTS = [
 ]
 
 /**
- * One materialized longhand, value and all. The leading guard is load-bearing: without it
+ * The other carrier's part. `transitions` composes one shorthand rather than a list per longhand,
+ * so it declares exactly one part — and that part is also what identifies the carrier, the way
+ * `animation-name` identifies `animations`.
+ */
+export const TRANSITION_PARTS = ['transition']
+
+/**
+ * One materialized declaration, value and all. The leading guard is load-bearing: without it
  * `animation-name` matches inside `--jumi-animation-name`, and every control declaration on every
  * element would be counted as a carrier's data.
  */
-const LONGHAND = new RegExp(`(?<![\\w-])(?:${PARTS.join('|')})\\s*:\\s*[^;]*;?`, 'g')
+const LONGHAND = new RegExp(`(?<![\\w-])(?:${[...PARTS, ...TRANSITION_PARTS].join('|')})\\s*:\\s*[^;]*;?`, 'g')
 
-/** A carrier's own list, which is what a carrier always has exactly one of. */
-const NAME_LONGHAND = /(?<![\w-])animation-name\s*:/g
+/**
+ * A carrier's identifying declaration: the one property each kind always has exactly one of.
+ *
+ * The marker is erased, so this is what a carrier is counted by instead. The guard matters for the
+ * same reason as above — `--jumi-transition` and `transition-behavior` both start with the word.
+ */
+const ANIMATION_CARRIER = /(?<![\w-])animation-name\s*:/g
+const TRANSITION_CARRIER = /(?<![\w-])transition\s*:/g
 
 /**
  * A stylesheet with every at-rule prelude removed, so what remains can be counted as
@@ -58,32 +71,6 @@ const NAME_LONGHAND = /(?<![\w-])animation-name\s*:/g
  * before its `;`, so it is not a prelude and is not touched.
  */
 const declarationsOnly = css => css.replace(/@[a-z-]+[^{;]*\{/gi, '{')
-
-/**
- * What a finished stylesheet says about the protocol.
- *
- * `leaks` is the invariant — three build-time names, all expected at zero, none of them a property
- * a browser applies, and counted over the whole file because that is where they must not appear.
- * `carriers` is counted by the `animation-name` longhand instead of by the marker, because the
- * marker is erased; `declarations` and `declarationBytes` are the materialized longhands and how
- * much of the file they are. The set still says "each carrier got the whole list exactly once" —
- * the assertion that a publication reached every carrier without a copy surviving outside one.
- */
-export function protocolState(css) {
-  const bodies = declarationsOnly(css)
-  const materialized = [...bodies.matchAll(LONGHAND)]
-
-  return {
-    carriers: (bodies.match(NAME_LONGHAND) ?? []).length,
-    declarationBytes: materialized.reduce((total, match) => total + match[0].length, 0),
-    declarations: materialized.length,
-    leaks: {
-      aggregate: (css.match(/--jumi-aggregate-/g) ?? []).length,
-      carrier: (css.match(/--jumi-carrier(?!-)/g) ?? []).length,
-      staging: (css.match(/--jumi-carrier-staging/g) ?? []).length,
-    },
-  }
-}
 
 /**
  * The aggregate list for one longhand, read from any carrier.
@@ -101,6 +88,42 @@ export function aggregateList(css, part = 'animation-name') {
 /** The slots the browser applies: the entries in the aggregate name list. */
 export function aggregateSlots(css) {
   return splitTopLevel(aggregateList(css)).length
+}
+
+/**
+ * How many materialized declarations a finished stylesheet is expected to hold, given how many
+ * carriers it has. Exported so four checks cannot drift from each other on the arithmetic.
+ */
+export function expectedDeclarations({ animations, transitions }) {
+  return animations * PARTS.length + transitions * TRANSITION_PARTS.length
+}
+
+/**
+ * What a finished stylesheet says about the protocol.
+ *
+ * `leaks` is the invariant — three build-time names, all expected at zero, none of them a property
+ * a browser applies, and counted over the whole file because that is where they must not appear.
+ * `animations` and `transitions` count each carrier by the declaration it alone has, because the
+ * marker is erased; `declarations` and `declarationBytes` are every part materialized and how much
+ * of the file they are. Together they still say "each carrier got the whole list for the parts it
+ * declares, and nothing else" — so a part written into the wrong carrier shows up as a count that
+ * does not fit.
+ */
+export function protocolState(css) {
+  const bodies = declarationsOnly(css)
+  const materialized = [...bodies.matchAll(LONGHAND)]
+
+  return {
+    animations: (bodies.match(ANIMATION_CARRIER) ?? []).length,
+    declarationBytes: materialized.reduce((total, match) => total + match[0].length, 0),
+    declarations: materialized.length,
+    leaks: {
+      aggregate: (css.match(/--jumi-aggregate-/g) ?? []).length,
+      carrier: (css.match(/--jumi-carrier(?!-)/g) ?? []).length,
+      staging: (css.match(/--jumi-carrier-staging/g) ?? []).length,
+    },
+    transitions: (bodies.match(TRANSITION_CARRIER) ?? []).length,
+  }
 }
 
 /**

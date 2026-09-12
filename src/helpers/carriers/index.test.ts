@@ -13,7 +13,16 @@ import postcss from 'postcss'
  * must hold the carrier's real `animation-*` longhands and none of the build-time names.
  */
 
-const carrier = (extra = '') => `--jumi-carrier: animations;${extra}`
+/**
+ * A carrier body: the marker, plus a read for each part it asks the finalizer to write.
+ *
+ * The reads are the contract. A part is written only where the carrier declares it, which is what
+ * keeps two carriers with different data apart — `animations` declares the animation longhands and
+ * `transitions` declares `transition`, so neither is handed the other's list. A fixture that leaves
+ * a part out is therefore testing something real: it must not receive what it did not ask for.
+ */
+const carrier = (parts: string[] = ['animation-name']) =>
+  `--jumi-carrier: animations;${parts.map(part => ` ${part}: var(--jumi-aggregate-${part}, var(--jumi-${part}));`).join('')}`
 
 /** Every longhand the model stages a list for, and therefore every longhand the finalizer writes. */
 const PARTS = [
@@ -37,7 +46,7 @@ describe('the finalizer', () => {
   it('writes the aggregate into every carrier and removes what staged it', () => {
     const css = [
       staged('var(--jumi-rotate-a, var(--jumi-animation-name))'),
-      '.animations { --jumi-carrier: animations; }',
+      `.animations { ${carrier()} }`,
       '.other { color: red; }',
     ].join('\n')
 
@@ -56,7 +65,7 @@ describe('the finalizer', () => {
       '}',
       '@media (min-width: 40rem) {',
       '  @supports (color: red) {',
-      '    :is(.animations > *) { --jumi-carrier: animations; }',
+      `    :is(.animations > *) { ${carrier()} }`,
       '  }',
       '}',
     ].join('\n')
@@ -72,7 +81,7 @@ describe('the finalizer', () => {
     const { carriers, css: out } = finalizeCss([
       staged('var(--a)'),
       '.parent {',
-      '  .animations { --jumi-carrier: animations; }',
+      `  .animations { ${carrier()} }`,
       '}',
     ].join('\n'))
 
@@ -83,11 +92,31 @@ describe('the finalizer', () => {
   it('takes the last publication, the way a later declaration would win', () => {
     const { css: out } = finalizeCss([
       staged('var(--first)'),
-      '.animations { --jumi-carrier: animations; }',
+      `.animations { ${carrier()} }`,
       staged('var(--second)'),
     ].join('\n'))
 
     expect(out).toContain('animation-name: var(--second);')
+  })
+
+  it('writes only the parts a carrier declares, so two carriers can differ', () => {
+    const lists = [
+      '--jumi-aggregate-animation-name: var(--jumi-rotate-a, var(--jumi-animation-name));',
+      '--jumi-aggregate-transition: var(--jumi-scale-transition-chain);',
+    ].join(' ')
+
+    const { carriers, css: out } = finalizeCss([
+      `:root { ${stagingMarker}: 1; ${lists} }`,
+      `.animations { ${carrier()} }`,
+      `.transitions { ${carrier(['transition'])} }`,
+    ].join('\n'))
+
+    // One staging rule, two carriers, two different requests — and each is handed the part it
+    // declared and nothing else. This is what lets `animations` and `transitions` share a channel
+    // while needing different data.
+    expect(carriers).toBe(2)
+    expect(out).toContain('.animations { animation-name: var(--jumi-rotate-a, var(--jumi-animation-name)); }')
+    expect(out).toContain('.transitions { transition: var(--jumi-scale-transition-chain); }')
   })
 
   it('does not mistake a comment or a string for the protocol', () => {
@@ -99,8 +128,8 @@ describe('the finalizer', () => {
 
     const { carriers, css: out, staging } = finalizeCss(css)
 
-    // The comment and the string are not declarations, so nothing to inject and nothing to
-    // remove — and the carrier has no data to receive.
+    // The comment and the string are not declarations, so there is nothing to remove — and this
+    // carrier declares no part, so there is nothing to write either.
     expect({ carriers, staging }).toEqual({ carriers: 0, staging: 0 })
     expect(out).toBe(css)
   })
@@ -108,7 +137,7 @@ describe('the finalizer', () => {
   it('keeps a value that only looks like it ends early', () => {
     const css = [
       staged('var(--a, "x;y"), var(--b, "}" )'),
-      '.animations { --jumi-carrier: animations; }',
+      `.animations { ${carrier()} }`,
     ].join('\n')
 
     const { css: out } = finalizeCss(css)
@@ -119,7 +148,7 @@ describe('the finalizer', () => {
   it('is idempotent, byte for byte', () => {
     const once = finalizeCss([
       staged('var(--a)'),
-      '.animations { --jumi-carrier: animations; }',
+      `.animations { ${carrier()} }`,
     ].join('\n'))
 
     const twice = finalizeCss(once.css)
@@ -143,7 +172,7 @@ describe('the finalizer', () => {
   })
 
   it('counts a carrier only when it was written', () => {
-    const root = { css: [staged('var(--a)'), '.animations { --jumi-carrier: animations; }'].join('\n') }
+    const root = { css: [staged('var(--a)'), `.animations { ${carrier()} }`].join('\n') }
     const first = finalizeCss(root.css)
 
     // The second pass is the same document with no staging: there is nothing left to say, so
@@ -158,7 +187,7 @@ describe('the finalizer', () => {
   })
 
   it('prefers an aggregate handed to it over the one in the stylesheet', () => {
-    const css = [staged('var(--stale)'), '.animations { --jumi-carrier: animations; }'].join('\n')
+    const css = [staged('var(--stale)'), `.animations { ${carrier()} }`].join('\n')
 
     const { css: out } = finalizeCss(css, { 'animation-name': 'var(--fresh)' })
 
@@ -171,7 +200,7 @@ describe('the finalizer', () => {
     const lists = PARTS.map(part => `--jumi-aggregate-${part}: var(--jumi-${part});`).join(' ')
     const css = [
       `:root { ${stagingMarker}: 1; ${lists} }`,
-      `.animations { ${carrier()} }`,
+      `.animations { ${carrier(PARTS)} }`,
     ].join('\n')
 
     const { carriers, css: out, staging } = finalizeCss(css)
@@ -200,7 +229,7 @@ describe('the finalizer', () => {
   })
 
   it('walks an AST in place, so a host that owns one needs no parse', () => {
-    const root = postcss.parse([staged('var(--a)'), '.animations { --jumi-carrier: animations; }'].join('\n'))
+    const root = postcss.parse([staged('var(--a)'), `.animations { ${carrier()} }`].join('\n'))
 
     const { carriers, staging } = finalize(root)
 
