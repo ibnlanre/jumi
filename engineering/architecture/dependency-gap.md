@@ -6,7 +6,7 @@ The question this answers, asked before spending anything on Phase 3c:
 > capability would still remain load-bearing before Jumi can emit the corresponding utility itself?
 
 The answer is **not scanning**. Three of the four things discovery was bundled with are already
-settled by measurement: parsing (3a, proven — `scanner-inventory.md`), ordering (3b, closed — a
+settled by measurement: parsing (3a, proven — `engineering/research/scanner-inventory.md`), ordering (3b, closed — a
 lexical sort of raw candidates) and the theme vocabulary (Phase 2, closed — a token, a formula or a
 literal, with the gate enforcing it). What is left is larger than a scanner and mostly not in this
 repository yet.
@@ -50,7 +50,7 @@ Jumi's own corpora actually use, and prints the wrapper the host produces:
 | `has-[>button]` | `&:has( > button)` — the host's built-in, which Jumi no longer shadows |
 
 Every one of them sits inside `@layer utilities`, and every one applies to the **carrier** as well
-as to the utility — which is the case `carrier-locality.md` describes from the other side: `*`
+as to the utility — which is the case `engineering/architecture/carrier-locality.md` describes from the other side: `*`
 re-parents the carrier body, and that re-parenting is why the aggregate cannot be published at a
 literal selector.
 
@@ -165,7 +165,7 @@ to Jumi — token, formula, literal — while the host keeps parsing and exposin
 That is the success criterion now, so it deserves an answer. The whole dependency is
 `addBase`, `addUtilities`, `matchComponents`, `matchUtilities`, `matchVariant`, `theme` and
 `createPlugin` — all documented. The behaviours Jumi has had to work around are enumerated in
-`migration.md`, and each is handled by construction rather than by assumption. Two entries remain
+`engineering/roadmap/migration.md`, and each is handled by construction rather than by assumption. Two entries remain
 worth naming:
 
 - **candidate ordering.** The aggregate's precedence follows the order candidates reach the matcher,

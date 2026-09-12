@@ -27,7 +27,7 @@ import tailwindcss from '@tailwindcss/vite'
  * has an ordering to get right.
  *
  * **Jumi must converge back toward one integration step.** That is the product constraint behind
- * this file. See the roadmap in `docs/migration.md`: what is left is the CSS directive's twin in the
+ * this file. See the roadmap in `engineering/roadmap/migration.md`: what is left is the CSS directive's twin in the
  * other direction — no Tailwind JS plugin to compose at all.
  *
  * `jumiFinalizer` and `jumiRegister` are exported for a project that wants the phases explicit.

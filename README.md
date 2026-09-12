@@ -8,7 +8,7 @@ and stagger motion across children—all from your markup.
 
 **[Start here](docs/src/pages/docs/installation.md)** ·
 **[Learn to compose](docs/src/pages/docs/properties.md)** ·
-**[Explore the effects](documentation/effects.md)** ·
+**[Explore the effects](docs/src/pages/effects.astro)** ·
 **[Run the docs site](#the-documentation-site)**
 
 ```html

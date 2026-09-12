@@ -161,7 +161,7 @@ to fix it.
 
 So: `jumi()` composes Tailwind's plugin rather than sitting beside it (`plugins: [jumi()]`, not
 `[tailwindcss(), jumi()]`), and it registers Jumi in the Tailwind entry stylesheet, so there is no
-`@plugin` directive to write either. What is left is the roadmap in `docs/migration.md`: today the
+`@plugin` directive to write either. What is left is the roadmap in `engineering/roadmap/migration.md`: today the
 integration still composes somebody else's plugin, and the end state is Jumi owning emission.
 **A new required step is a regression unless it comes with the plan to remove it.**
 
@@ -229,6 +229,24 @@ profile.
 ships neither today, and may ship both tomorrow. The host's arbitrary form costs a few characters:
 `[&:is(h1)]:animate-fade-in`. What Jumi owns is motion: `animations`, `transitions`, the `animate-*`
 family, phrases, effects and composition. Those exist regardless of what Tailwind does.
+
+---
+
+### 10. `docs/` Is Product Documentation
+
+**`docs/` is the public documentation site. `engineering/` explains how and why Jumi is built.**
+
+| Directory | Holds |
+| --- | --- |
+| `docs/` | the Astro site only — `src/pages`, layouts, styles, data, `public/`, and its own README |
+| `engineering/architecture` | how the machine works and why it is shaped that way |
+| `engineering/research` | investigations, measurements, and their conclusions |
+| `engineering/roadmap` | what is planned, in what order, and what was closed |
+| `README.md`, `CONTRIBUTING.md` | the package introduction and the rules for changing it |
+
+Nothing under `engineering/` is private — the split is about intended audience, so that a technical
+investigation is not mistaken for a page someone is meant to read on the website. See
+`engineering/README.md`.
 
 ---
 

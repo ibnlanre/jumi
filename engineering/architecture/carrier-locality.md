@@ -298,7 +298,7 @@ with the same list lengths as every other carrier. `behaviour:check` requires it
 The `K` curve was **not** remeasured, and that is the point: the placement change made per-element
 resolution a non-question, and the real-emission benchmark that rejected the linked representation
 (1.82× at `K = 8`) measured a cost the flat lists no longer pay. The numbers in
-`aggregate-representation.md` stand as the reason it was rejected, not as something to re-run.
+`engineering/architecture/aggregate-representation.md` stand as the reason it was rejected, not as something to re-run.
 
 The `tailwindcss-core` fork stays a laboratory: it produced the diagnosis (`compileAstNodes` builds
 the body, variants re-parent it) and the proof that late mutation is the right shape, and the

@@ -16,7 +16,7 @@
  *   type rejection         `type: 'length'` refuses `abc`, so the host calls nothing
  *
  * Variants are opaque prefixes and are stripped by the caller: measured, they never reach a matcher
- * (see `docs/scanner-inventory.md`). `!` is recorded, not acted on — the corpora do not use it.
+ * (see `engineering/research/scanner-inventory.md`). `!` is recorded, not acted on — the corpora do not use it.
  */
 
 /**

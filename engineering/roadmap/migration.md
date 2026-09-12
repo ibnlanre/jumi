@@ -11,7 +11,7 @@ We go upstream only when Tailwind creates a problem we cannot reasonably solve o
 our side without damaging Jumi's API, correctness, or performance. Until then,
 Tailwind is one host among the ones we could have.
 
-`upstream-limitation.md` is parked as research evidence, not a workstream.
+`engineering/research/upstream-limitation.md` is parked as research evidence, not a workstream.
 
 ## The test we keep applying
 
@@ -64,7 +64,7 @@ none of them, so a Jumi-owned host interface is already ≈5 calls wide.
 Of those, **`theme` stopped being a host question in Phase 2**: the call remains, but what it means
 is Jumi's — resolve a vocabulary entry to a token, a spacing formula, or the value as given. All 71
 consumed keys have an explicit strategy and the gate fails if Tailwind's emitted CSS stops agreeing
-with it (`scanner-inventory.md` covers what is left of the host's side).
+with it (`engineering/research/scanner-inventory.md` covers what is left of the host's side).
 
 What is still entirely the host's is **candidate discovery**: which strings become candidates, in
 what syntax, deduplicated, and in what order. Phase 3's inventory measures exactly what that hands
@@ -78,7 +78,7 @@ Classifications: **keep** (worth keeping — the host is better at it), **own**
 | Capability | How Jumi uses it | Evidence | Classification |
 | --- | --- | --- | --- |
 | Candidate scanning | Not at all — Jumi never walks source files | no scanner in `src/`; `@source` is the host's | **retain** (the largest piece a Jumi emitter would need) |
-| Candidate parsing / arbitrary values | `animate-rotate-[0:0deg,_,:]` — the phrase grammar is shaped by Tailwind's value parser | `docs/phrases.md`: `_` arrives already converted to a space, `{`/`}` are rejected outright | **retain**, and the deepest coupling: a Jumi parser must accept its own grammar, so the syntax is currently Tailwind's |
+| Candidate parsing / arbitrary values | `animate-rotate-[0:0deg,_,:]` — the phrase grammar is shaped by Tailwind's value parser | `engineering/architecture/phrases.md`: `_` arrives already converted to a space, `{`/`}` are rejected outright | **retain**, and the deepest coupling: a Jumi parser must accept its own grammar, so the syntax is currently Tailwind's |
 | Variants | Built-ins only (`motion-safe:`, `hover:`, `sm:`, `*:`, `before:`, `has-*`), plus the host's arbitrary form `[&:is(h1)]` | `docs/src/pages/docs/*.md` | **removed** — Jumi no longer registers any variant: `is-*`/`where-*`/`has-*` are gone (principle 9 of `CONTRIBUTING.md`), because claiming host vocabulary is a bet the host can win at any time |
 | Candidate sorting / compile order | Load-bearing for *semantics*, not just output: slot registration order is what `perValue`'s move-to-end drives, and that order decides which animation wins under `animation-composition: replace` | `src/core/index.ts` `perValue`; the harness asserts "fresh-scan order" | **semantic precedence — its own workstream, below** |
 | Theme values | One function: `theme(key, values)` → `api.theme(key)`, flattened, called with 71 distinct Tailwind scale keys from 193 call sites | `src/helpers/create/index.ts`; `src/properties/*` | **own** — active workstream, below |
@@ -120,7 +120,7 @@ and the test that decides it:
 
 > Is there any Jumi behaviour whose correctness depends on undocumented Tailwind internals?
 
-`dependency-gap.md` answers that against the measured surface. Two behaviours are named there — the
+`engineering/architecture/dependency-gap.md` answers that against the measured surface. Two behaviours are named there — the
 scanner's candidate order, which the aggregate's precedence follows, and the collapsed-scale spread
 Jumi *guards against* rather than uses — and one of the two fails the gate here if it changes
 upstream. Everything else Jumi consumes is documented API: `addBase`, `addUtilities`,
@@ -183,7 +183,7 @@ now marks itself (`--jumi-carrier`), the model publishes the aggregate as stagin
 marked rule and deletes the staging. The earlier conclusion — that `@apply` inlines
 utilities and never a base rule, so the data cannot arrive — was true of the *bridge*, not
 of the platform: the data does not have to arrive through `@apply`, because it is written
-afterwards. Recorded in `docs/carrier-locality.md`, asserted by
+afterwards. Recorded in `engineering/architecture/carrier-locality.md`, asserted by
 `scripts/behaviour-check.mjs`, and stated for contributors in principle 6 of
 `CONTRIBUTING.md`.
 
@@ -513,7 +513,7 @@ favourable timing is a byproduct of a corpus that happens to avoid all three, no
 property Jumi can guarantee. Per the decision rule, that sends us back to the
 representation.
 
-**Next: the representation redesign.** `docs/aggregate-representation.md` carries the
+**Next: the representation redesign.** `engineering/architecture/aggregate-representation.md` carries the
 design spike: explicit precedence metadata is falsified (position is the only channel,
 measured in a browser), and a linked-run representation is proposed that preserves the
 current order exactly while publishing O(1) per change.
@@ -572,7 +572,7 @@ redesign rather than optimisation.
 ### The representation: `K = 8`, measured
 
 The K curve is run and the tradeoff is settled — see "Spike 3 — the K curve" in
-`docs/aggregate-representation.md` for the full tables. `K` is the entries per link, so it
+`engineering/architecture/aggregate-representation.md` for the full tables. `K` is the entries per link, so it
 trades serial depth for rewrite size:
 
 ```text
@@ -595,7 +595,7 @@ at `K=8` (Chromium passes; Firefox and WebKit are the gate).
 
 ### Implemented: the chain ships, the flat lists are the oracle
 
-> **Paused 2026-09-12.** The carrier-locality P0 (`docs/carrier-locality.md`) shows the
+> **Paused 2026-09-12.** The carrier-locality P0 (`engineering/architecture/carrier-locality.md`) shows the
 > aggregate is published where a variant cannot carry it: `*:animations` and
 > `before:animations` resolve `none`. `K` is not chosen and the representation work stops
 > until that is fixed, because fixing it changes both the aggregate's placement and its
@@ -619,7 +619,7 @@ trigger is unchanged — they become smaller: one to three links re-said each, n
 than four, against a chain of about twenty. That constant bound is what removes the
 quadratic term. The remaining constant (a link is re-said in full as it grows, so filling
 one costs `1 + 2 + … + K`) is why the corpora shrink by 3.5× rather than 11×; noted in
-`docs/aggregate-representation.md`, not pursued.
+`engineering/architecture/aggregate-representation.md`, not pursued.
 
 ### The corpora
 
@@ -675,7 +675,7 @@ last, semantic ownership first.
    emits a literal.
 5. **Flattening ownership** (done — see gaps).
 6. **Order and representation** (done — the representation shipped flat; see
-   `aggregate-representation.md` for the measurement that rejected the linked one).
+   `engineering/architecture/aggregate-representation.md` for the measurement that rejected the linked one).
    What it settled:
 
    > If the same logical animation slot is registered multiple times, what
@@ -693,7 +693,7 @@ last, semantic ownership first.
    copies the carrier body, marker included, and the aggregate is written into the copy
    after the build, so when the carrier is evaluated stops mattering at all.
 8. **Candidate semantics, then ordering, then discovery** (Phase 3; discovery parked by
-   measurement — `scanner-inventory.md`). The inventory found that discovery is easy but
+   measurement — `engineering/research/scanner-inventory.md`). The inventory found that discovery is easy but
    low-value on its own: owning it without parsing would add a subsystem and remove no
    dependency, because every string would go back to the host to be parsed. So the order
    is now:
@@ -709,7 +709,7 @@ last, semantic ownership first.
      made by the scanner before parsing, so it is reproducible from raw strings alone. The
      exception is `@apply`, which arrives in declared order and is the second candidate
      source;
-   - **3c discovery** — parked, and now deprioritised on evidence: `docs/dependency-gap.md`
+   - **3c discovery** — parked, and now deprioritised on evidence: `engineering/architecture/dependency-gap.md`
      inventories what still stands between Jumi and independent emission, and discovery is the
      cheapest remaining capability and the one that removes the least. What is actually
      load-bearing is variant transformation (measured: `@media`, negation, re-parenting `:is()`

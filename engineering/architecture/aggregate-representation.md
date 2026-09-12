@@ -2,13 +2,13 @@
 
 Status: **implemented, then paused.** The chain ships at `K = 8` and removes the quadratic
 output growth (below), but its measurements are now stale: the carrier-locality P0 in
-`docs/carrier-locality.md` says the aggregate is published where a variant cannot carry it,
+`engineering/architecture/carrier-locality.md` says the aggregate is published where a variant cannot carry it,
 so `*:animations` and `before:animations` do not animate at all. **`K` is not chosen and no
 further linked work happens until that is fixed** — moving the aggregate into the carrier's
 body changes its placement and its per-element resolution, which is exactly what the K curve
 measured.
 
-Follows the forensics in `migration.md`: the bridge is correct but structurally quadratic,
+Follows the forensics in `engineering/roadmap/migration.md`: the bridge is correct but structurally quadratic,
 and the cost is forced by legitimate usage (`@apply`, prefixed carriers, variant-prefixed
 utilities), so it cannot be fixed by ordering.
 
@@ -88,7 +88,7 @@ That placement is not a detail. The chain's entries reference the slot variables
 property resolves where it is *declared* — so a chain published anywhere else inherits the
 guaranteed-invalid value and resolves `none`. The first version of this design published
 the chain on `:root` with a pointer on the carrier; it measured fast and animated
-nothing. See the P0 note in `docs/migration.md`.
+nothing. See the P0 note in `engineering/roadmap/migration.md`.
 
 ### Spike 1 — order equivalence: PASSING
 
@@ -309,7 +309,7 @@ placement: the data has to sit where the slot variables are.
 declares `--jumi-carrier` in its body, so Tailwind's own re-parenting and `@apply` copies carry it,
 and `finalize` writes the aggregate into every marked rule after the build. Both of these bugs —
 `:root` and `*:animations` — are the same bug, and neither can recur, because there is no longer a
-selector to get wrong. See `docs/carrier-locality.md`.
+selector to get wrong. See `engineering/architecture/carrier-locality.md`.
 
 ### Acceptance criteria
 

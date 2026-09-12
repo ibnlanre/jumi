@@ -210,7 +210,7 @@ Phase 3a  candidate semantics — proven, kept in scripts/ until 3c needs it
 Phase 3b  ordering / precedence — closed: scanner byte order; @apply authored order
 Phase 3c  discovery — parked pending the dependency gap inventory
 Phase 3d  arbitrary values and modifiers cleanup — decoding, phrase validation, bare derivation
-Variants  later, and mostly orthogonal to a *matcher payload*; see dependency-gap.md
+Variants  later, and mostly orthogonal to a *matcher payload*; see `engineering/architecture/dependency-gap.md`
 ```
 
 ### 3a is the real question, and it has a definition of done

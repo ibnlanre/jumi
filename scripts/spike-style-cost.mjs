@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
  * SPIKE — the K curve: what does redundancy buy the linked aggregate?
  *
  * VERDICT, recorded after this ran: not enough. `K = 8` costs 1.82× the flat list's per-carrier
- * restyle on the real emission, against a 1.5× bar — see `docs/aggregate-representation.md`.
+ * restyle on the real emission, against a 1.5× bar — see `engineering/architecture/aggregate-representation.md`.
  * The representation that shipped is the flat list, completed into the carriers after the
  * build, and this script outlives the design it measured because the measurement is the reason
  * the design is not here.
@@ -25,7 +25,7 @@ import { fileURLToPath } from 'node:url'
  * version of this harness published the data on `:root`, so two of three arms resolved
  * `animation-name: none` and the fastest-looking arm was the broken one. A `var()` chain
  * inside a custom property resolves where it is *declared*, and the slot variables are
- * element-local — see the P0 note in `docs/migration.md`.
+ * element-local — see the P0 note in `engineering/roadmap/migration.md`.
  *
  *   carrier       the list published on the carrier, the consumer reading it — what ships
  *   inline        the carrier rule carries every list in full — pre-bridge

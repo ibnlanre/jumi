@@ -2,7 +2,7 @@
 /**
  * INVESTIGATION — the theme vocabulary, mapped to CSS tokens.
  *
- * `docs/migration.md` wants theme ownership and theme representation as two
+ * `engineering/roadmap/migration.md` wants theme ownership and theme representation as two
  * separate changes: first prove *which* of the keys Jumi consumes have a CSS
  * token representation, then switch them in reviewed batches. This is the first
  * half, and it measures rather than assumes.

@@ -6,7 +6,7 @@
  * shipped representation — the lists are flat now, and there are no links to find. It is kept
  * because it is the artifact that produced the number the rejection rests on (1.82× at
  * `K = 8`), and because it is the only place that measured the *real* emission's chain rather
- * than a synthetic one. See `docs/aggregate-representation.md`.
+ * than a synthetic one. See `engineering/architecture/aggregate-representation.md`.
  *
  * SPIKE — style cost of the representation that actually ships.
  *

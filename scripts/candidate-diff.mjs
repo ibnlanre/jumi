@@ -18,7 +18,7 @@
  *   the matcher), and the raw candidate still goes to the host in full so the comparison stays
  *   honest about which shapes were exercised.
  * - **`@apply` keeps authored order.** This measures payloads, not sequences; ordering is the
- *   source's job (see `docs/scanner-inventory.md`).
+ *   source's job (see `engineering/research/scanner-inventory.md`).
  *
  * Run: node scripts/candidate-diff.mjs
  */

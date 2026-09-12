@@ -17,7 +17,7 @@
  * 288/288 colour keys carry the bit for the default `@theme` form, so the branch
  * is inert for every input Jumi can currently produce — and for the nested cases
  * where it would fire, the host helper replaces a flattened scalar with a subtree.
- * Owning the theme contract for real (`docs/migration.md`) is where that decision
+ * Owning the theme contract for real (`engineering/roadmap/migration.md`) is where that decision
  * belongs.
  */
 export function flattenPalette(values: Record<string, any> | undefined): Record<string, any> {

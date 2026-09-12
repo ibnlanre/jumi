@@ -7,7 +7,7 @@ us: the base-layer bridge made the plain plugin path incrementally correct, and
 the harness is green. We go upstream only when Tailwind creates a problem we
 cannot reasonably solve on our side without damaging Jumi's API, correctness, or
 performance. Until then Tailwind is one host among the ones we could have — see
-`migration.md` for the active direction.
+`engineering/roadmap/migration.md` for the active direction.
 
 It is worth keeping because the measurements below are what established that the
 problem was Jumi's to solve, and because a future requirement that genuinely needs
