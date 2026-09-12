@@ -949,12 +949,6 @@ export interface MatchUtilitiesPropertyValue extends MatchUtilitiesOptions {
   fn: MatchUtilitiesPropertyFunction
 }
 
-export interface MatchVariant {
-  generator: (value: string, extra: { modifier: null | string }) => string | string[]
-  name: string
-  values: Collection<string>
-}
-
 export type MatrixFunction
   = | 'calc'
     | 'calc-size'

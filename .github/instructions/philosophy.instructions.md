@@ -383,10 +383,14 @@ only when Firefox support is required.
 
 ```html
 ✅ CORRECT
-<div class="is-[h1]:animate-fade-in">
+<h1 class="animate-fade-in [&:is(h1)]:animate-fade-in">
 <nav class="has-[>button]:animate-scale-110">
-<section class="where-[.active]:animate-glow">
+<section class="[&:where(.active)]:animate-glow">
 ```
+
+**DON'T:** Register variants in Tailwind's namespace - no `is-*`, `where-*`, `has-*`, or other
+generic selector variants. Use the arbitrary form above. See principle 9 of `CONTRIBUTING.md` for
+the reason and the test to apply before adding anything to the plugin API.
 
 **DON'T:** Create custom natural-language selector variants
 

@@ -83,7 +83,7 @@ process.on('exit', () => {
 })
 `
 
-const trace = (html) => {
+const trace = (html, extra = '') => {
   const dir = mkdtempSync(path.join(here, '.candidates-'))
   const wrapper = path.join(dir, 'wrapper.js')
   const calls = path.join(dir, 'calls.json')
@@ -93,7 +93,7 @@ const trace = (html) => {
   writeFileSync(
     path.join(dir, 'entry.css'),
     '@import "tailwindcss" source(none);\n@source "./fixture.html";\n'
-    + `@plugin ${JSON.stringify(wrapper)};\n`,
+    + `@plugin ${JSON.stringify(wrapper)};\n${extra}`,
   )
 
   try {
@@ -112,7 +112,6 @@ const trace = (html) => {
 
 const observed = trace(fixture)
 const grouped = new Map()
-
 for (const call of observed) {
   const key = `${call.name} ${JSON.stringify(call.value)}${call.modifier === null ? '' : ` /${call.modifier}`}`
   const entry = grouped.get(key) ?? { ...call, count: 0 }
@@ -142,13 +141,50 @@ console.log(`\n${observed.length} calls, ${new Set(observed.map(call => `${call.
 console.log(`context keys seen: ${context.join(', ') || '(none)'}`)
 
 /* ------------------------------------------------------------------------------------
- * Ordering: is the call order the source's or the candidate sort's?
+ * Ordering: what relation decides the sequence, and is it reproducible from raw strings?
  *
- * It matters because the call order *is* the slot order — the aggregate's ten flat lists are
- * built in registration order — so whatever decides it decides Jumi's animation order. The
- * shuffled fixture holds the same candidates in a different document order: identical sequences
- * mean the host sorts them; different ones mean Jumi inherits the source's order.
+ * It matters more than bytes. The aggregate's ten flat lists are built in registration order,
+ * and their order **is** precedence: a later slot's longhand wins where two animations share
+ * one. So the relation below is a semantic contract, not a formatting detail.
+ *
+ * Source: `crates/oxide/src/scanner/mod.rs` returns `result.par_sort_unstable()` over the raw
+ * candidate strings, and `compile.ts` keeps that order in a `Map` keyed by the raw candidate.
+ * The measurement here is the check: the call sequence has to equal the sort of the candidates,
+ * mapped through what each one resolves to.
  * ---------------------------------------------------------------------------------- */
+
+/** Candidate → what the matcher receives (from the trace above). Order comes from the sort. */
+const shape = {
+  '*:animate-scale-110': ['animate-scale', '1.1'],
+  '-animate-bottom-4': ['animate-bottom', 'calc(calc(var(--spacing) * 4) * -1)'],
+  'animate-bounce-in': ['animate', 'bounce-in'],
+  'animate-opacity-50': ['animate-opacity', '0.5'],
+  'animate-rotate-45': ['animate-rotate', '45deg'],
+  'animate-rotate-[0.25turn]': ['animate-rotate', '0.25turn'],
+  'animate-rotate-[23deg]': ['animate-rotate', '23deg'],
+  'animate-rotate-[calc(1deg_+_2deg)]': ['animate-rotate', 'calc(1deg + 2deg)'],
+  'animate-rotate-[var(--spin)]': ['animate-rotate', 'var(--spin)'],
+  'animate-scale-110': ['animate-scale', '1.1'],
+  'animate-width-[3rem]': ['animate-width', '3rem'],
+  'animations': ['animations', ''],
+  'hover:animate-scale-110': ['animate-scale', '1.1'],
+  'motion-reduce:animate-scale-110': ['animate-scale', '1.1'],
+  'transition-duration-600/rotate': ['transition-duration', '600ms'],
+}
+
+const predicted = Object.keys(shape).sort().map(candidate => `${shape[candidate][0]}-${shape[candidate][1]}`)
+const received = observed.map(call => `${call.name}-${call.value}`)
+const lexical = predicted.join(' | ') === received.join(' | ')
+
+/* ------------------------------------------------------------------------------------
+ * `@apply` is the second candidate source, and it is not scanned.
+ *
+ * `apply.ts` splits the directive's own parameters, so those candidates arrive in the order the
+ * author wrote them. Two sources with two orders is worth knowing before either is Jumi's.
+ * ---------------------------------------------------------------------------------- */
+const applied = trace('<div class="applied"></div>', '.applied { @apply animate-opacity-50 animate-scale-110; }\n')
+const appliedOrder = applied.map(call => `${call.name}-${call.value}`).join(' | ')
+
 const shuffled = fixture
   .split('\n')
   .filter(line => line.includes('<div'))
@@ -158,10 +194,10 @@ const shuffled = fixture
 const reordered = trace(shuffled)
 
 console.log('\nordering\n')
-console.log(`  same candidates, reversed document order: ${sequence(observed) === sequence(reordered) ? 'identical call sequence — the host decides it' : 'different call sequence — the source decides it'}`)
-console.log(`  first three calls: ${observed.slice(0, 3).map(call => `${call.name}-${call.value}`).join(', ')}`)
-console.log('\n  candidates that produced no call at all:')
+console.log(`  call order is the lexical sort of the raw candidates: ${lexical ? 'yes' : 'no'}`)
+console.log(`  reversed document order: ${sequence(observed) === sequence(reordered) ? 'identical sequence' : 'different sequence'}`)
+console.log(`  @apply animate-opacity-50 animate-scale-110 -> ${appliedOrder} (declared order, not sorted)`)
+console.log(`  first three calls: ${received.slice(0, 3).join(', ')}`)
 
-for (const silent of ['animate-width-abc']) {
-  console.log(`    ${silent}  (declared \`type: 'length'\` — the host validates, Jumi never sees it)`)
-}
+console.log('\n  candidates that produced no call at all:\n')
+console.log('    animate-width-abc  (declared `type: \'length\'` — the host validates, Jumi never sees it)')

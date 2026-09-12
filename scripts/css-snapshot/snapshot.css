@@ -550,7 +550,7 @@
       --jumi-scale-d38: 1.1;
     }
   }
-  .has-\[\>button\]\:animate-scale-110 :has(>button) {
+  .has-\[\>button\]\:animate-scale-110:has( > button) {
     --jumi-scale-d38-animation-name: jumi-scale-d38;
     --jumi-scale-d38: 1.1;
   }
@@ -570,7 +570,7 @@
       --jumi-rotate-3zWYd: 45deg;
     }
   }
-  .is-\[h1\]\:animate-fade-in :is(h1) {
+  .\[\&\:is\(h1\)\]\:animate-fade-in:is(h1) {
     --jumi-fade-in-animation-name: jumi-fade-in;
   }
 }
@@ -628,6 +628,20 @@
 @keyframes jumi-rotate-3zWYd {
   to {
     rotate: var(--jumi-rotate-3zWYd);
+  }
+}
+@layer base {
+  @property --jumi-fade-in-animation-name {
+    inherits: false;
+    syntax: "*";
+  }
+}
+@keyframes jumi-fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }
 @layer base {
@@ -747,20 +761,6 @@
 @keyframes jumi-caret-color-abeHu {
   to {
     caret-color: var(--jumi-caret-color-abeHu);
-  }
-}
-@layer base {
-  @property --jumi-fade-in-animation-name {
-    inherits: false;
-    syntax: "*";
-  }
-}
-@keyframes jumi-fade-in {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
   }
 }
 @layer base {

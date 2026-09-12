@@ -3,7 +3,7 @@
     "aggregateBytes": 52958,
     "aggregateShare": 57,
     "aggregateWrites": 20,
-    "bytes": 92296,
+    "bytes": 92303,
     "carriers": 2,
     "keyframes": 33,
     "media": 5,
@@ -12,8 +12,8 @@
     "strayStaging": 0,
     "supports": 5,
     "publishEvents": 34,
-    "rawBytes": 504125,
-    "stagingBytes": 464867,
+    "rawBytes": 503544,
+    "stagingBytes": 464279,
     "colorValues": {
       "literal": 1,
       "token": 6

@@ -19,7 +19,6 @@ import { stagingMarker } from '@/helpers/carriers'
 import { resolveTheme } from '@/helpers/create/theme'
 import { getMatchControls } from '@/properties/controls'
 import { getMatchTween } from '@/properties/tween'
-import { variants } from '@/variants'
 
 import createPlugin from 'tailwindcss/plugin'
 
@@ -58,11 +57,7 @@ export function getCreator(api: Api): Creator {
 }
 
 const jumi = createPlugin((api) => {
-  const { matchComponents, matchUtilities, matchVariant } = api
-
-  for (const { generator, name, values } of variants) {
-    matchVariant(name, generator, { values })
-  }
+  const { matchComponents, matchUtilities } = api
 
   const creator = getCreator(api)
 

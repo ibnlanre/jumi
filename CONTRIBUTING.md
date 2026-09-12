@@ -83,20 +83,23 @@ Prioritize clear, readable class names over shorter alternatives.
 
 ### 5. Use Tailwind v4 Relationship Variants
 
-Leverage Tailwind's built-in `:is()`, `:has()`, and `:where()` variants instead of creating custom selector utilities.
+Relationship matching is Tailwind's grammar. Use its variants — including the arbitrary form when a
+named one does not exist — instead of registering a variant of your own.
 
 ```html
-✅ Good - Use Tailwind v4 variants
-<div class="is-[h1]:animate-fade-in">
+✅ Good - Tailwind's variants
+<h1 class="animate-fade-in [&:is(h1)]:animate-fade-in">
 <nav class="has-[>button]:animate-scale-110">
-<section class="where-[.card]:animate-slide-in-up">
+<section class="[&:where(.card)]:animate-slide-in-up">
 
 ❌ Avoid - Custom natural language variants
 <div class="child-h1:animate-fade-in">
 <nav class="has-button:animate-scale-110">
 ```
 
-**Why?** Tailwind v4 provides standardized, well-documented patterns. No need to reinvent the wheel.
+**Why?** Tailwind owns the selector grammar and keeps evolving it. Jumi registering `is-*`,
+`where-*` or `has-*` would claim part of that vocabulary — see principle 9 for why that is worse
+than it looks, and what the `has-*` incident cost.
 
 ---
 
@@ -190,6 +193,42 @@ emits and reports drift in either direction — it runs in `pnpm check`, and it 
 namespace candidate it could not measure. `pnpm behaviour:check` proves the reference form in a
 browser, because an emitted `var(--radius-sm)` and a build-time `0.25rem` compile identically and
 only an override of the token tells them apart.
+
+---
+
+### 9. Do Not Occupy Host Vocabulary
+
+**A Jumi plugin should not claim generic Tailwind vocabulary merely because the host does not
+implement it yet.**
+
+The test to apply before adding anything to the plugin API:
+
+> If Tailwind introduced something with this exact name tomorrow, would Jumi be happy to delete its
+> implementation with no user-visible change?
+
+If the answer is not an easy yes, either do not add it, or put it under explicitly Jumi-owned
+vocabulary. The boundary:
+
+```text
+generic CSS / utility-language semantics   Tailwind owns the namespace
+motion semantics unique to Jumi            Jumi owns the namespace
+```
+
+`has-*` is the worked example, and it is why this principle exists. Jumi saw a capability it believed
+missing, registered `has-*` itself, and then the host shipped a **richer, correct** implementation —
+so Jumi silently shadowed it. Measured, with Jumi loaded: `has-[.x]` went from the host's
+`&:has(:is(.x))` to a descendant `& :has(.x)`, and `has-hover:` — composition the host supports —
+stopped emitting anything at all.
+
+The consequences of claiming a namespace are all bad: keep overriding the host and users never get
+native behaviour; remove it later and existing code changes behaviour; version-detect and register
+conditionally; or emulate the host forever. For a convenience feature, that is a terrible debt
+profile.
+
+`is-*` and `where-*` were the same bet and were removed before 1.0 for the same reason — Tailwind
+ships neither today, and may ship both tomorrow. The host's arbitrary form costs a few characters:
+`[&:is(h1)]:animate-fade-in`. What Jumi owns is motion: `animations`, `transitions`, the `animate-*`
+family, phrases, effects and composition. Those exist regardless of what Tailwind does.
 
 ---
 

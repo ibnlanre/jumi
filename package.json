@@ -56,6 +56,8 @@
     "spike:carrier-seam": "node scripts/spike-carrier-seam.mjs",
     "spike:carrier-finalize": "node scripts/spike-carrier-finalize.mjs",
     "spike:candidates": "node scripts/spike-candidates.mjs",
+    "spike:variants": "node scripts/spike-variants.mjs",
+    "candidate:diff": "node scripts/candidate-diff.mjs",
     "check": "pnpm run check-types && pnpm exec eslint src scripts && pnpm run test:run && pnpm run theme:map && pnpm run css:check && pnpm run incremental:check && pnpm run behaviour:check && pnpm run vite:check && pnpm run postcss:check"
   },
   "keywords": [

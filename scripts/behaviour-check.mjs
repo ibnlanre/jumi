@@ -79,7 +79,10 @@ const settled = (built, name) => {
  * because a prefixed form wraps it (`… > *` for a descendant, `::before` for a pseudo).
  */
 const slotReader = css => (utility) => {
-  const escaped = utility.replace(/[[\]()/.:%'\\]/g, character => `\\${character}`)
+  // Escape the way the host escapes a class selector: every character that is not a word character
+  // or a dash. A hand-rolled character class kept missing one (`>`, then `&`), and a miss reads as
+  // "this utility is not in the sheet" rather than as a harness bug.
+  const escaped = utility.replace(/[^\w-]/g, character => `\\${character}`)
   for (const m of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
     if (!m[1].includes(escaped)) continue
 
@@ -220,6 +223,9 @@ const directPage = await load(canonicalCss, `
     <div id="applied" class="applied-motion"></div>
     <div id="spacing" class="animations animate-padding-4 animate-margin-2"></div>
     <div id="radius" class="animations animate-border-radius-sm"></div>
+    <h1 id="sel-is" class="animations [&:is(h1)]:animate-fade-in"></h1>
+    <div class="[&:is(h1)]:animate-fade-in"><h1 id="sel-is-descendant" class="animations"></h1></div>
+    <div id="sel-has" class="animations has-[>button]:animate-scale-110"><button></button></div>
 `)
 
 const direct = []
@@ -318,6 +324,37 @@ if (applied.lengths.length !== 1) {
   failures.push(`@apply animations: longhand lists disagree on length (${applied.lengths.join(' vs ')})`)
 }
 
+/* ------------------------------------------------------------------------------------
+ * 5. Relationship variants: same element, not a descendant
+ * ---------------------------------------------------------------------------------- */
+
+// These three are chosen so a descendant selector fails them. `is-[h1]:x` used to be Jumi's own
+// variant, and it emitted `.is-\[h1\]\:x :is(h1)` — a *descendant* — which would have matched the
+// carrier h1 inside the div below, and would not have matched the h1 carrying the class at all.
+// The variant is gone now (Jumi does not occupy `is-*`), and `[&:is(h1)]` is the host's arbitrary
+// form, so this pins the semantics Jumi recommends instead.
+const sameElement = await entry(directPage, '#sel-is')
+const descendant = await entry(directPage, '#sel-is-descendant')
+const hasChild = await entry(directPage, '#sel-has')
+
+const isSlot = canonicalSlots('[&:is(h1)]:animate-fade-in')
+const hasSlot = canonicalSlots('has-[>button]:animate-scale-110')
+const isResolved = isSlot !== null && sameElement.name.includes(isSlot)
+const descendantResolved = descendant.name.split(',').some(name => name.trim() !== 'none')
+const hasResolved = hasSlot !== null && hasChild.name.includes(hasSlot)
+
+if (!isResolved) {
+  failures.push(`[&:is(h1)]: the element carrying the class resolved "${sameElement.name.slice(0, 40)}", expected ${isSlot ?? '(no slot)'}`)
+}
+
+if (descendantResolved) {
+  failures.push(`[&:is(h1)]: a descendant resolved "${descendant.name.slice(0, 40)}" — the variant is not same-element`)
+}
+
+if (!hasResolved) {
+  failures.push(`has-[>button]: the element with a direct child button resolved "${hasChild.name.slice(0, 40)}", expected ${hasSlot ?? '(no slot)'}`)
+}
+
 await browser.close()
 
 /* ------------------------------------------------------------------------------------
@@ -336,10 +373,13 @@ console.log(`    ✓ a carrier with no slot resolves to nones only (${bareNames.
 console.log(`    ${appliedWorks ? '✓' : '✗'} @apply animations -> ${appliedNames.join(' + ') || 'resolves nothing'}`)
 console.log(`    ${spacingResolved ? '✓' : '✗'} spacing follows --spacing -> ${String(spacingValue).slice(0, 40)}`)
 console.log(`    ${radiusResolved ? '✓' : '✗'} radius follows --radius-sm -> ${String(radiusValue).slice(0, 40)}`)
+console.log(`    ${isResolved ? '✓' : '✗'} [&:is(h1)] matches the element -> ${sameElement.name.slice(0, 34)}`)
+console.log(`    ${descendantResolved ? '✗' : '✓'} [&:is(h1)] does not match a descendant (${descendantResolved ? 'it did' : 'nones only'})`)
+console.log(`    ${hasResolved ? '✓' : '✗'} has-[>button] matches the element -> ${hasChild.name.slice(0, 34)}`)
 console.log(`    ✓ finalization settles: ${variantBuild.staging + canonicalBuild.staging} staging rules`
   + ` removed, ${variantBuild.carriers + canonicalBuild.carriers} carriers written, a second pass a no-op`)
 
-const required = contexts.length + utilities.length + 3
+const required = contexts.length + utilities.length + 6
 const passing = required - failures.length
 
 console.log(`\n  ${passing}/${required} required contexts and carriers behave`)

@@ -1,87 +1,143 @@
-Approved. Phase 2 is genuinely closed now.
+Yes. I think this is one of those cases where the `has-` incident is telling us something broader than “this one implementation was wrong.”
 
-The strongest result is not the percentage of values converted to variables. It is that **all 71 keys now have an explicit, measured strategy**, and the gate will fail if Tailwind's emitted behavior drifts:
-
-```text
-token     7
-mixed     7
-formula  11
-literal  46
-──────────
-total    71
-```
-
-That is exactly the finish line we defined. `literal` is no longer unfinished migration work. It is an intentional representation.
-
-The `backdropBlur` discovery is also a good validation of the sweep. It found something that neither naming intuition nor the previous batch planning had identified. And the `boxShadow` row is probably the best demonstration of why this whole methodology matters: a namespace existing is not enough; emitted behavior is the contract we're consuming.
-
-I would **not restore `scripts/tmp-ns/measure.mjs`**. The generalized `theme-map.mjs` supersedes it and is now part of the gate. Keeping the narrower probe would just create two sources of truth.
-
-One architectural consequence worth recording explicitly is that `creator.theme()` is now effectively a **Jumi abstraction**, despite retaining its old name and call shape. Its semantics are no longer "ask Tailwind's JS theme API." They are:
-
-> resolve a Jumi theme vocabulary entry to the representation appropriate for Tailwind v4 CSS.
-
-That distinction will matter when the Tailwind adapter gets thinner later.
-
-### Next: scanning/candidate discovery
-
-I agree with the sequence. This should be the next dependency we investigate.
-
-But I would start with an inventory again, not implementation.
-
-We need to know exactly what Jumi currently receives from Tailwind's scanner/compiler that it actually needs. In particular:
+The risky part is not merely implementing a variant Tailwind lacks today. It is **claiming part of Tailwind's own namespace**:
 
 ```text
-candidate discovery
-deduplication
-incremental candidate accumulation
-source configuration
-arbitrary candidate syntax
-variant-bearing candidates
-candidate ordering
+is-*
+where-*
+has-*
 ```
 
-Some of those may turn out not to belong to "scanning" at all.
+inside something that presents itself as a Tailwind plugin.
 
-The key question I'd give DeepSeek is:
+That creates exactly the future compatibility problem you're describing. Suppose Jumi 1.0 ships:
 
-> **If Jumi had the complete set of class-like strings present in the user's sources, what information would still be missing before the Jumi model could determine everything it needs?**
+```html
+<div class="is-[h1]:animate-fade-in">
+```
 
-That separates discovery from parsing.
+with semantics A.
 
-For example, if:
+Then Tailwind 4.8 or 5.0 introduces:
 
 ```text
-animate-rotate-45
-hover:animate-scale-110
-before:animations
+is-*
 ```
 
-are found as raw strings, Jumi may still currently rely on Tailwind to interpret the latter two. That belongs later under variants, not scanner ownership.
+with semantics B, perhaps richer composition rules, different arbitrary-value handling, or slightly different selector wrapping.
 
-So Phase 3 should initially aim for a very narrow answer:
+Now every option is unpleasant:
 
-> Can Jumi independently discover the raw candidates it cares about, without yet understanding Tailwind's variant grammar?
+* Jumi keeps overriding Tailwind and prevents users from getting the native behavior.
+* Jumi removes its variant and existing Jumi code changes behavior.
+* Jumi tries to detect Tailwind versions and conditionally register it.
+* Jumi maintains a compatibility emulation forever.
 
-If yes, that's another clean dependency we can peel away without accidentally rebuilding Tailwind.
+For a convenience feature, that's a terrible debt profile.
 
-### The aggregate item
+And `has-` has already given us a live demonstration:
 
-I'd park the remaining build-time quadratic for now.
+```text
+Jumi thought host capability was missing
+        ↓
+Jumi occupied the namespace
+        ↓
+host actually had a richer implementation
+        ↓
+Jumi silently shadowed it
+```
 
-The finalizer changed its importance substantially:
+That should become a design principle.
 
-* shipped CSS is now sane;
-* browser behavior is correct;
-* runtime isn't waiting on a new representation;
-* what remains is compiler/intermediate waste.
+> **A Jumi plugin should not occupy generic Tailwind vocabulary merely because the host does not currently implement it.**
 
-That's real technical debt, but it is no longer architecture-blocking.
+If something is fundamentally **Jumi semantics**, own it.
 
-I'd put a measurable threshold on it rather than continuing immediately. Something like:
+If it's generic CSS/Tailwind syntax that Jumi happens to wish existed, leave that gap with the host.
 
-> Revisit aggregate representation if build/dev-server cost becomes materially noticeable on a real Jumi project or if corpora grow beyond current levels.
+### So I would remove `is-*` and `where-*` before 1.0
 
-That prevents the very productive migration from getting trapped again in optimizing an internal artifact users never receive.
+You have no published users. This is the cheapest possible moment to do it.
 
-So my call is: **delete the obsolete probe, mark Phase 2 complete, park aggregate optimization, and begin Phase 3 with a measured scanner/discovery inventory before writing any scanner code.**
+Users can already express these ideas using Tailwind's arbitrary variants when needed:
+
+```html
+<div class="[&:is(h1)]:animate-fade-in">
+```
+
+and:
+
+```html
+<div class="[&:where(h1)]:animate-fade-in">
+```
+
+It's more verbose, but Tailwind owns the grammar and future evolution.
+
+If these conveniences are valuable enough that you really want them, then namespace them explicitly:
+
+```text
+jumi-is-[h1]:
+jumi-where-[h1]:
+```
+
+or whatever syntax fits Jumi.
+
+But I would question whether even that belongs in Jumi. They aren't motion concepts. They're generic selector conveniences.
+
+### This principle extends beyond variants
+
+Your phrase:
+
+> Every plugin capability surface is effectively a backup for a missing functionality on the host.
+
+I'd sharpen that slightly.
+
+Some plugin capabilities are **Jumi's domain**:
+
+```text
+animations
+transitions
+animate-*
+Jumi phrases
+effects
+motion composition
+```
+
+Those should absolutely exist regardless of what Tailwind does.
+
+But things such as:
+
+```text
+is-*
+where-*
+generic selector variants
+generic theme conveniences
+generic CSS utilities
+```
+
+are host-domain extensions.
+
+Those are dangerous because Tailwind can legitimately grow into them.
+
+A good test before adding anything to the plugin API is now:
+
+> **If Tailwind introduced something with this exact name tomorrow, would Jumi be happy to delete its implementation with no user-visible change?**
+
+If the answer is not an easy yes, either:
+
+1. don't add it, or
+2. put it under explicitly Jumi-owned vocabulary.
+
+That gives you a nice ownership boundary:
+
+```text
+Generic CSS / utility-language semantics
+→ Tailwind owns the namespace
+
+Motion semantics unique to Jumi
+→ Jumi owns the namespace
+```
+
+Given that this is still pre-1.0 with no users, I'd take advantage of the freedom and **delete `is-*` and `where-*` now rather than turning them into compatibility promises you never really wanted to own**.
+
+The `has-` discovery wasn't just a bug fix. It was an early warning about namespace ownership. I think we should listen to it.

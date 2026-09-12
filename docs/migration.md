@@ -51,11 +51,14 @@ guaranteed-invalid value, that invalid value inherits, and every carrier resolve
 surface of the dependency — everything the adapter touches:
 
 ```
-addBase, addUtilities, matchComponents, matchUtilities, matchVariant, theme
+addBase, addUtilities, matchComponents, matchUtilities, theme
 tailwindcss/plugin (createPlugin)
 ```
 
-`Api` also declares `addComponents`, `addVariant`, `config`, `prefix`. Jumi uses
+`matchVariant` was there until 1.0 preparations removed Jumi's `is-*`/`where-*`/`has-*` — the last
+of which had been shadowing the host's own correct `has-*`. See principle 9 of `CONTRIBUTING.md`.
+
+`Api` also declares `addComponents`, `addVariant`, `matchVariant`, `config`, `prefix`. Jumi uses
 none of them, so a Jumi-owned host interface is already ≈5 calls wide.
 
 Of those, **`theme` stopped being a host question in Phase 2**: the call remains, but what it means
@@ -76,7 +79,7 @@ Classifications: **keep** (worth keeping — the host is better at it), **own**
 | --- | --- | --- | --- |
 | Candidate scanning | Not at all — Jumi never walks source files | no scanner in `src/`; `@source` is the host's | **retain** (the largest piece a Jumi emitter would need) |
 | Candidate parsing / arbitrary values | `animate-rotate-[0:0deg,_,:]` — the phrase grammar is shaped by Tailwind's value parser | `docs/phrases.md`: `_` arrives already converted to a space, `{`/`}` are rejected outright | **retain**, and the deepest coupling: a Jumi parser must accept its own grammar, so the syntax is currently Tailwind's |
-| Variants | Built-ins (`motion-safe:`, `hover:`, `sm:`, `*:`, `before:`) plus Jumi's own `is`/`has`/`where` via `matchVariant` | `src/variants/index.ts`; `docs/src/pages/docs/*.md` | **retain** until last — largest trap |
+| Variants | Built-ins only (`motion-safe:`, `hover:`, `sm:`, `*:`, `before:`, `has-*`), plus the host's arbitrary form `[&:is(h1)]` | `docs/src/pages/docs/*.md` | **removed** — Jumi no longer registers any variant: `is-*`/`where-*`/`has-*` are gone (principle 9 of `CONTRIBUTING.md`), because claiming host vocabulary is a bet the host can win at any time |
 | Candidate sorting / compile order | Load-bearing for *semantics*, not just output: slot registration order is what `perValue`'s move-to-end drives, and that order decides which animation wins under `animation-composition: replace` | `src/core/index.ts` `perValue`; the harness asserts "fresh-scan order" | **semantic precedence — its own workstream, below** |
 | Theme values | One function: `theme(key, values)` → `api.theme(key)`, flattened, called with 71 distinct Tailwind scale keys from 193 call sites | `src/helpers/create/index.ts`; `src/properties/*` | **own** — active workstream, below |
 | Utility registration | `matchComponents` / `matchUtilities` with `type`, `values`, `modifiers`, `supportsNegativeValues` | `src/properties/tween.ts`, `controls.ts` | **keep** — transport, and the option shape is already host vocabulary Jumi only passes through |
@@ -105,6 +108,29 @@ Classifications: **keep** (worth keeping — the host is better at it), **own**
   environment Jumi runs in, not versions Jumi chooses and has to keep current.
   `@tailwindcss/vite`, `@tailwindcss/postcss` and `vite` are *optional* peers — only
   the integration you install pulls its own.
+
+## What success means now
+
+The goal is no longer "remove Tailwind from Jumi". It is:
+
+> **Jumi owns all Jumi semantics. Tailwind may remain the host for generic utility-language
+> semantics.**
+
+and the test that decides it:
+
+> Is there any Jumi behaviour whose correctness depends on undocumented Tailwind internals?
+
+`dependency-gap.md` answers that against the measured surface. Two behaviours are named there — the
+scanner's candidate order, which the aggregate's precedence follows, and the collapsed-scale spread
+Jumi *guards against* rather than uses — and one of the two fails the gate here if it changes
+upstream. Everything else Jumi consumes is documented API: `addBase`, `addUtilities`,
+`matchComponents`, `matchUtilities`, `theme`, `createPlugin`.
+
+Under that definition the migration is essentially done, and the remaining phases are the road to
+*standing entirely alone*: variants (prototype done — the shape is small, parity is a catalogue),
+`@theme` parsing (surface scoped, not evaluated), and emission. Whether that road is worth walking
+is a product decision — becoming a Tailwind-compatible CSS compiler is a much larger commitment
+than extracting Jumi from Tailwind, and it is not required by the test above.
 
 ## Adoption: the step count, and its deletion path
 
@@ -666,16 +692,41 @@ last, semantic ownership first.
    publications from 32 to 7. That fact is what the finalizer was built for: `@apply`
    copies the carrier body, marker included, and the aggregate is written into the copy
    after the build, so when the carrier is evaluated stops mattering at all.
-8. **Scanning / candidate discovery** (begun — inventory first; `scanner-inventory.md`
-   measures what the host hands Jumi per candidate and separates discovery from
-   parsing). The narrow question is whether Jumi can find its own candidates without
-   understanding Tailwind's variant grammar, and the measured answer is that discovery
-   is a substring problem — `hover:animate-scale-110` contains its bare form, and the
-   matcher cannot tell them apart anyway. What carries meaning is ordering (it is
-   precedence, not bytes) and type validation (`animate-width-abc` calls nothing
-   today). Then **arbitrary values** (the phrase grammar is currently shaped by the
-   host's value parser), then **variants** last. Variants are syntax and expansion
-   complexity; nothing should depend on them being Tailwind's.
+8. **Candidate semantics, then ordering, then discovery** (Phase 3; discovery parked by
+   measurement — `scanner-inventory.md`). The inventory found that discovery is easy but
+   low-value on its own: owning it without parsing would add a subsystem and remove no
+   dependency, because every string would go back to the host to be parsed. So the order
+   is now:
+   - **3a candidate semantics** — prototype done: `scripts/lib/candidate.mjs` reproduces the
+     payload a matcher receives for 121 of 123 Jumi-relevant candidates in the real corpora,
+     against the host as the oracle (`pnpm candidate:diff`). The two exceptions are candidates
+     whose *variant* the host rejects, which is the variants workstream. The differential run also
+     bounded the work: arbitrary values are accepted whatever their shape (Jumi's tween utilities
+     take phrases), so type validation only gates *bare* values, and `modifiers` does not filter
+     candidates at all. What remains for 3a is lifting the prototype into `@/core` — worth doing
+     when 3c needs it, so Jumi ships no parser it does not yet use;
+   - **3b ordering/precedence** — answered: a plain lexical sort of the raw candidates,
+     made by the scanner before parsing, so it is reproducible from raw strings alone. The
+     exception is `@apply`, which arrives in declared order and is the second candidate
+     source;
+   - **3c discovery** — parked, and now deprioritised on evidence: `docs/dependency-gap.md`
+     inventories what still stands between Jumi and independent emission, and discovery is the
+     cheapest remaining capability and the one that removes the least. What is actually
+     load-bearing is variant transformation (measured: `@media`, negation, re-parenting `:is()`
+     selectors, composition, and the carrier moving with the utility), reading the user's own
+     `@theme` rather than asking the host for a resolved value, and emission itself — layers,
+     placement, tree-shaking, `@apply`;
+   - **generic variants stay with the host, and Jumi's own variant surface is now empty.** The two
+     Tailwind does not ship (`is-*`, `where-*`) were removed before 1.0: registering them was a bet
+     that the host will not ship a richer `is-*` later, which is the bet `has-*` lost — it shadowed
+     the host's correct built-in, downgraded `has-[.x]` to a descendant, and killed `has-hover:`. The
+     host's arbitrary form covers both (`[&:is(h1)]:animate-fade-in`) with the same semantics. The
+     rule is now principle 9 of `CONTRIBUTING.md`: **do not claim host vocabulary because the host
+     does not implement it yet**;
+   - **`@theme` stays with the host** as well: Phase 2's boundary — Tailwind parses theme syntax,
+     Jumi decides what the values mean — is the long-term division, not a waypoint.
+   - **Full independence is not a 1.0 goal.** With the criteria above met, the remaining work is the
+     product: API polish, docs, naming, examples, packaging, release readiness.
 
 ## Guardrails
 
