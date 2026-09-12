@@ -200,8 +200,7 @@ const hostTokens = () => {
   return tokens
 }
 
-/** `0.25rem * 4` → `1rem`, so a spacing formula can be checked arithmetically. */
-const spacingProduct = (name, base) => {
+/** `0.25rem * 4` → `1rem`, so a spacing formula can be checked arithmetically. */const spacingProduct = (name, base) => {
   const factor = Number(name)
   const amount = Number.parseFloat(base)
 
@@ -261,10 +260,10 @@ for (const [key, calls] of keys) {
     entries: entries.length,
     key,
     mapping: parts.join(' + ') || '—',
+    spaced: spaced.length,
     verdict: entries.length === 0 ? 'empty' : covered === entries.length ? 'all' : covered ? 'partial' : 'none',
   })
 }
-
 const width = Math.max(...rows.map(row => row.key.length))
 const covered = rows.reduce((total, row) => total + (row.verdict === 'all' ? row.entries : 0), 0)
 const literal = rows.reduce((total, row) => total + (row.verdict === 'partial' ? row.entries : 0), 0)
@@ -284,3 +283,32 @@ const tally = rows.reduce((acc, row) => ({ ...acc, [row.verdict]: (acc[row.verdi
 console.log(`\n${rows.length} keys: ${Object.entries(tally).map(([k, v]) => `${v} ${k}`).join(', ')}`)
 console.log(`values fully mappable: ${covered}, in partially mapped keys: ${literal}`)
 console.log(`spacing base: ${spacing}`)
+
+/* ------------------------------------------------------------------------------------
+ * The batch list, checked against the measurement
+ *
+ * The written plan for the spacing batch named `outlineOffset` — whose scale is px — and missed
+ * `lineHeight` and `maxWidth`, which carry spacing names. That is the kind of error this report
+ * exists to make loud: what Jumi implements and what the host's own values say has to be the same
+ * set, and either direction of drift is a decision that was not measured.
+ * ---------------------------------------------------------------------------------- */
+
+/** The keys Jumi resolves through the spacing formula, read from the source that declares them. */
+const implemented = () => {
+  const source = readFileSync(path.join(root, 'src/helpers/create/theme.ts'), 'utf8')
+  const block = /themeSpacing = new Set\(\[([\s\S]*?)\]\)/.exec(source)?.[1] ?? ''
+
+  return new Set([...block.matchAll(/'([A-Za-z]+)'/g)].map(match => match[1]))
+}
+
+const jumi = implemented()
+const host = new Set(rows.filter(row => row.spaced).map(row => row.key))
+const missing = [...host].filter(key => !jumi.has(key))
+const extra = [...jumi].filter(key => !host.has(key))
+
+console.log(`\nspacing: implemented ${jumi.size}, measured ${host.size}`)
+console.log(`  implemented: ${[...jumi].join(', ')}`)
+
+if (missing.length) console.log(`  measured and not implemented: ${missing.join(', ')}`)
+if (extra.length) console.log(`  implemented and not measured: ${extra.join(', ')}`)
+if (!missing.length && !extra.length) console.log('  no drift')

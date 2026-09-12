@@ -218,6 +218,7 @@ const directPage = await load(canonicalCss, `
     ${utilities.map((utility, index) => `<div id="c${index}" class="animations ${utility}"></div>`).join('\n    ')}
     <div id="bare" class="animations"></div>
     <div id="applied" class="applied-motion"></div>
+    <div id="spacing" class="animations animate-padding-4 animate-margin-2"></div>
 `)
 
 const direct = []
@@ -243,12 +244,34 @@ for (const [index, utility] of utilities.entries()) {
 }
 
 const bare = await entry(directPage, '#bare')
+
 // The bare carrier has no slot of its own: the aggregate still lists every slot in the
 // sheet, each resolving to `none`, so nothing may animate there.
 const bareNames = bare.name.split(',').map(name => name.trim())
 
 if (bareNames.some(name => name !== 'none')) {
   failures.push(`a carrier with no slot resolved something other than nones: "${bare.name.slice(0, 60)}"`)
+}
+
+/* ------------------------------------------------------------------------------------
+ * 3. The theme batch: a spacing name resolves through `--spacing`, not a build-time literal
+ * ---------------------------------------------------------------------------------- */
+
+// The corpus overrides `--spacing` (0.3rem), so this is the batch's claim measured where it
+// matters: the emitted value is a *reference* the browser resolves against the page's theme. A
+// resolved literal — `1rem` — would compile, animate, and ignore the override entirely.
+const spacingProperty = /(--jumi-padding-[\w-]+):\s*calc\(var\(--spacing\) \* 4\)/.exec(canonicalCss)?.[1]
+const spacingValue = spacingProperty
+  ? await directPage.evaluate(
+      property => getComputedStyle(document.querySelector('#spacing')).getPropertyValue(property),
+      spacingProperty,
+    )
+  : '(no formula in the CSS)'
+
+const spacingResolved = typeof spacingValue === 'string' && spacingValue.includes('0.3rem')
+
+if (!spacingResolved) {
+  failures.push(`theme: the padding utility resolved to "${String(spacingValue).slice(0, 60)}", expected the corpus's 0.3rem`)
 }
 
 // `@apply animations` inlines the carrier — longhands, slot references *and* the marker that
@@ -288,10 +311,11 @@ for (const { measured, utility } of direct) {
 
 console.log(`    ✓ a carrier with no slot resolves to nones only (${bareNames.length} slots in the sheet)`)
 console.log(`    ${appliedWorks ? '✓' : '✗'} @apply animations -> ${appliedNames.join(' + ') || 'resolves nothing'}`)
+console.log(`    ${spacingResolved ? '✓' : '✗'} spacing follows --spacing -> ${String(spacingValue).slice(0, 40)}`)
 console.log(`    ✓ finalization settles: ${variantBuild.staging + canonicalBuild.staging} staging rules`
   + ` removed, ${variantBuild.carriers + canonicalBuild.carriers} carriers written, a second pass a no-op`)
 
-const required = contexts.length + utilities.length + 1
+const required = contexts.length + utilities.length + 2
 const passing = required - failures.length
 
 console.log(`\n  ${passing}/${required} required contexts and carriers behave`)

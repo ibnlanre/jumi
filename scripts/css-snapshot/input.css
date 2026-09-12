@@ -16,6 +16,14 @@
   --color-red-500: oklch(30% 0.02 250);
 }
 
+/* The spacing batch's acceptance test, and the same shape as the colour override
+   above: `--spacing` is not the host's 0.25rem, and every numeric spacing name
+   Jumi resolves has to follow it. The emitted `calc(var(--spacing) * 4)` is what
+   makes that true; a resolved literal would ignore this block entirely. */
+@theme {
+  --spacing: 0.3rem;
+}
+
 /* `@apply` inlines utilities and never a base rule, so this carrier declares the
    consumer longhands and its own slots but never the aggregate, and resolves to
    nothing. Measured: `scripts/behaviour-check.mjs` pins it as a known gap. It is not

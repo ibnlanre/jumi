@@ -205,7 +205,7 @@ generated names are not.
 | --- | --- | --- |
 | `colors`, `backgroundColor`, `borderColor`, `caretColor`, `accentColor`, `boxShadowColor`, `outlineColor` | `var(--color-*)` | 288 values each; one exception, `borderColor.DEFAULT`, has no token |
 | `letterSpacing` | `var(--tracking-*)` | 6/6 |
-| `margin`, `padding`, `gap`, `inset`, `translate`, `width`, `height`, `minHeight`, `minWidth`, `maxHeight`, `flexBasis`, `outlineOffset` | `calc(var(--spacing) * n)` | typically 33/35 — `0`, `px`, `auto` stay literal |
+| `margin`, `padding`, `gap`, `inset`, `translate`, `width`, `height`, `minHeight`, `minWidth`, `maxHeight`, `maxWidth`, `flexBasis`, `lineHeight` | `calc(var(--spacing) * n)` | numeric names only; `0`, `px`, `auto` and the fractions stay literal |
 | `borderRadius`, `blur`, `backdropBlur`, `boxShadow`, `dropShadow`, `lineHeight`, `maxWidth` | a namespace for part of the scale, literals for the rest | `--radius-*` 8/18, `--shadow-*` 8/71, `--container-*` 13/54, `--blur-*` 7/10 |
 | **45 keys** — `borderWidth`, `outlineWidth`, `strokeWidth`, `opacity`, `scale`, `rotate`, `skew`, `transitionDuration`, `transitionDelay`, `zIndex`, `order`, the filter scales, grid scales, `objectPosition`, `backgroundPosition`, `backgroundSize`, `transformOrigin`, `flex`, `flexGrow`, `flexShrink` | nothing — the host emits literals for these too | stays literal until there is evidence for better |
 
@@ -242,6 +242,44 @@ after    colorValues: token 6   literal 1      themeResolution: token 8, literal
 
 `literal 1` is `borderColor.DEFAULT`, and it cannot be hidden.
 
+**Batch 2 — landed: the spacing formula.** The 13 keys the measurement marks as spacing-backed
+(`flexBasis`, `gap`, `height`, `inset`, `lineHeight`, `margin`, `maxHeight`, `maxWidth`, `minHeight`,
+`minWidth`, `padding`, `translate`, `width`) now resolve numeric names to `calc(var(--spacing) * n)`,
+with `1` emitted as `var(--spacing)` because that is what the host's own output does. `0`, `px`,
+`auto`, the fractions and Jumi's own additions keep what the host supplied.
+
+**The written plan was wrong twice, and the measurement is what says so.** `pnpm theme:map` now
+prints the implemented set against the measured one and reports drift in either direction:
+
+```text
+planned                  outlineOffset, and no lineHeight or maxWidth
+measured                 lineHeight and maxWidth carry spacing names; outlineOffset
+                         does not — its scale is 1: 1px, 2: 2px, 4: 4px, 8: 8px
+```
+
+**And it found a bug in the host's JS theme.** With `--spacing` overridden in `@theme`, the host's
+spacing scales are *unusable*: measured with `--spacing: 0.3rem`, `api.theme('margin')` returns the
+characters of the base string — `1: '.'`, `2: '3'`, `4: 'e'` — because the scale is derived by
+indexing the base rather than multiplying it. Anything that trusted those values emitted
+`margin: 3`. So the batch does not read the JS scale for these names at all: **the name is the
+contract**, and numeric names are the base multiple by definition. This is the same reason the
+CSS variable is the right representation — it is the only one that can follow an override.
+
+The acceptance test is the corpus again, and it is stronger than batch 1's: `input.css` overrides
+`--spacing` to `0.3rem`, `fixture.html` carries `animate-padding-4` and `animate-margin-2`, and
+`behaviour:check` asserts in a browser that the resolved value is `calc(0.3rem * 4)` — not the
+`0.25rem` the host's JS scale would have produced, and not a literal.
+
+```text
+before   themeResolution: formula 0, literal 57, token 8
+         --jumi-padding-…: 1rem                 (a build-time literal, override ignored)
+after    themeResolution: formula 2, literal 59, token 8
+         --jumi-padding-…: calc(var(--spacing) * 4)
+```
+
+`literal 59` went *up* by two: the two new utilities bring their own non-multiple names (`0`, the
+shorthand), which is the batch working as stated rather than a regression.
+
 The acceptance test is in the corpus: `input.css` overrides the theme
 
 ```css
@@ -268,15 +306,19 @@ Two notes for whoever reviews the next batch's diff (batch 2, the spacing formul
 - naming is value-derived, so a batch renames variables and keyframes even though
   the utility set and slot order are untouched.
 
-**Batch 2 — next: the spacing formula** (`calc(var(--spacing) * n)`). A computed
+**Batch 2 — landed: the spacing formula** (`calc(var(--spacing) * n)`). A computed
 token rather than a token reference, which is a different kind of ownership to
 prove: it means consuming the host's CSS contract without cloning its JS theme
-engine. `0`, `px` and `auto` stay literal, and the 20-odd call sites that merge
-Jumi's own vocabulary (`theme('inset', inset)`) are where the guard earns its keep.
+engine. See the batch's own section above for what the measurement corrected and
+for the host bug it worked around. `0`, `px` and `auto` stay literal, and the
+20-odd call sites that merge Jumi's own vocabulary (`theme('inset', inset)`) keep
+what they were given.
 
 Then the partially mapped scales — `borderRadius` 8/18, `blur` 7/10, `boxShadow`
 8/71, `dropShadow` 6/8, `lineHeight` 5/14, `maxWidth` 13/54 — where `DEFAULT` maps
 to a bare namespace token for `--radius`/`--blur`/`--shadow` but not `--tracking`.
+`lineHeight` and `maxWidth` have already had their *spacing* names taken by batch 2,
+so what is left of them is the namespace half.
 
 Every batch has to hold this invariant, so a snapshot diff stays readable:
 

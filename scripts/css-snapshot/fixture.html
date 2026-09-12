@@ -29,6 +29,14 @@
 
     <div class="animations animate-rotate-45 animate-scale-110 animation-opacity-50 animation-duration-500/rotate animation-duration-1200/scale animation-direction-alternate animation-fill-mode-forwards animation-iteration-count-infinite"></div>
 
+    <!--
+      One spacing-keyed utility, because the theme the batch owns has to appear in the corpus or
+      the change is invisible: `animate-padding-4` is `calc(var(--spacing) * 4)`, which follows the
+      `--spacing` override in `input.css`. A literal `1rem` here would be a regression the snapshot
+      could not see.
+    -->
+    <div id="spacing" class="animations animate-padding-4 animate-margin-2"></div>
+
     <div class="animations animate-accent-color-amber-400 animate-scale-y-[0.2] animation-play-state-paused animation-delay-150"></div>
 
     <div class="animations animate-bounce-in animate-fade-in animate-shake animation-duration-[1200ms]"></div>

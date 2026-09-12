@@ -1,26 +1,26 @@
 {
   "canonical": {
-    "aggregateBytes": 38814,
-    "aggregateShare": 57,
+    "aggregateBytes": 41818,
+    "aggregateShare": 58,
     "aggregateWrites": 20,
-    "bytes": 68437,
+    "bytes": 72654,
     "carriers": 2,
-    "keyframes": 24,
+    "keyframes": 26,
     "media": 5,
-    "properties": 42,
-    "slots": 24,
+    "properties": 44,
+    "slots": 26,
     "strayStaging": 0,
     "supports": 4,
-    "publishEvents": 25,
-    "rawBytes": 282646,
-    "stagingBytes": 253103,
+    "publishEvents": 27,
+    "rawBytes": 324158,
+    "stagingBytes": 293402,
     "colorValues": {
       "literal": 1,
       "token": 6
     },
     "themeResolution": {
-      "formula": 0,
-      "literal": 57,
+      "formula": 2,
+      "literal": 59,
       "token": 8
     }
   },

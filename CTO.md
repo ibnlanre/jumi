@@ -1,136 +1,111 @@
-This is a good place to stop and recognize that the product story has improved materially.
+Yes. Given the actual history, I’d make two decisions explicit now.
 
-You wanted to avoid turning Jumi into:
+First, this is **Jumi 1.0**, not 2.0. There is no published compatibility surface to preserve. I’d change the package version to `1.0.0` when you are ready to treat the current API as the first public release. Until then, a prerelease like `1.0.0-beta.x` would also make sense. The old Sass incarnation is history, not a released major version.
 
-```text
-install package
-+ add @plugin
-+ add Vite plugin
-+ care about ordering
-+ maybe configure PostCSS too
-```
-
-What you have now is already much better:
-
-```diff
-- tailwindcss()
-+ jumi()
-```
-
-with the existing:
-
-```css
-@plugin "jumi";
-```
-
-So the finalizer complexity has been absorbed by the integration layer rather than exported to users. That was the right constraint.
-
-I agree with almost everything DeepSeek did, with two calls.
-
-First, I would tighten the Tailwind peer eventually. `>=3.0.0` no longer describes reality if the supported architecture relies on v4 constructs and the v4 build system. Keeping a permissive peer range that does not actually work is worse than admitting the compatibility break. If Jumi has meaningful v3 users, make that a major-version boundary. Otherwise, I'd move to something like:
-
-```json
-"tailwindcss": "^4.0.0"
-```
-
-or the broader v4 range appropriate to your support policy.
-
-Second, yes, I think the **next row is worth doing**, but carefully:
+Second, **Tailwind v4 should be the floor**. I would not spend another minute carrying v3 compatibility. Jumi is being designed around v4 concepts already:
 
 ```text
-Today:
-jumi() + @plugin "jumi"
-
-Next:
-jumi() only
+@theme / CSS tokens
+@plugin
+CSS-first configuration
+@tailwindcss/vite
+v4 candidate/compiler behavior
 ```
 
-That is not speculative architecture. It directly removes the remaining duplicate integration step.
+Supporting v3 would create compatibility work for users who do not exist.
 
-However, I would put strict constraints around automatic injection.
+So yes, move on to Phase 2.
 
-Jumi should not blindly prepend:
+## Phase 2: own theme resolution
 
-```css
-@plugin "jumi";
-```
+This is where the migration starts paying off beyond fixing the carrier architecture.
 
-to every CSS file Vite sees.
-
-The injection should only happen on the stylesheet that is actually acting as the Tailwind entrypoint, and it should be idempotent. At minimum:
+Batch 1 proved the pattern with tokens:
 
 ```text
-contains Tailwind entry/import?
-    yes → ensure @plugin "jumi" exists exactly once
-    no  → leave untouched
+colors → var(--color-*)
+letterSpacing → var(--tracking-*)
 ```
 
-And if the author already wrote:
+Batch 2 should prove the other important class of theme ownership:
 
-```css
-@plugin "jumi";
+```text
+spacing scale → calc(var(--spacing) * n)
 ```
 
-do nothing.
+I’d proceed with the measured set:
 
-That gives you a graceful migration path where old and new setup both work:
-
-```css
-/* existing users */
-@import "tailwindcss";
-@plugin "jumi";
+```text
+margin
+padding
+gap
+inset
+translate
+width
+height
+minWidth
+minHeight
+maxHeight
+flexBasis
+outlineOffset
 ```
 
-and:
+with explicit non-formula values remaining literals:
 
-```css
-/* new users */
-@import "tailwindcss";
+```text
+0
+px
+auto
 ```
 
-with:
+and whatever other exceptions your measurement has actually established.
+
+The important architectural rule is:
+
+> Jumi maps only the Tailwind v4 CSS contract it actually consumes. It does not reproduce Tailwind's JavaScript theme engine.
+
+So this:
 
 ```ts
-plugins: [jumi()]
+theme('padding')
 ```
 
-both producing the same thing.
+can continue to exist as Jumi's internal vocabulary for now, but its implementation should increasingly resolve through:
 
-I would also test multiple CSS entrypoints before declaring this finished. That's the case most likely to expose an assumption like "there is one global Tailwind stylesheet." If two legitimate Tailwind entrypoints exist, either both need Jumi registration or the API needs a way to scope which one does.
-
-One point I particularly like is keeping:
-
-```ts
-jumiFinalizer()
+```css
+var(--spacing)
+var(--color-*)
+var(--radius-*)
+...
 ```
 
-exported.
+rather than through `api.theme()`.
 
-Even if the recommended DX is:
+That lets the 193 call sites remain untouched while their dependency underneath changes.
 
-```ts
-jumi()
-```
+## I’d also change how we think about the Tailwind adapter now
 
-the lower-level primitive remains useful for unusual setups and gives you a clean escape hatch without bloating the default API.
-
-Architecturally, the shape now feels right:
+The one-step integration work has moved Tailwind into a much healthier role:
 
 ```text
 jumi()
-  ├─ Tailwind host integration
-  ├─ Jumi registration
-  └─ Jumi finalization
+  ├─ registers Jumi
+  ├─ hosts Tailwind v4
+  └─ finalizes Jumi
 ```
 
-while the semantic core remains independent beneath it.
+But the semantic core is already escaping it.
 
-And there is an important strategic difference between this and where we were several hours ago. We are no longer adding a Jumi Vite plugin merely to compensate for a Tailwind bug. We now have a **Jumi build integration that deliberately owns Jumi's lifecycle**. Tailwind is one stage inside it.
+Phase 2 should continue that direction. Every successful theme batch should reduce the amount of information that must cross:
 
-That's compatible with the end-state migration rather than being throwaway work.
+```text
+Tailwind → Jumi
+```
 
-So my call is:
+Eventually the adapter should mostly provide candidate/variant machinery, not values.
 
-**Do the one-step integration next.** Make `jumi()` ensure Jumi is registered with Tailwind, idempotently and only on actual Tailwind entry CSS. Keep explicit `@plugin "jumi"` working for compatibility. Then the public setup becomes genuinely simpler than it was before this migration started.
+And because there are no users yet, this is the ideal moment to make those changes. You don't need deprecation aliases, migration warnings, compatibility shims, or two competing resolution systems for three releases. We can make the 1.0 architecture the architecture we actually want.
 
-After that, resume theme Batch 2.
+One thing I would **not** do yet is choose between `@ibnlanre/jumi` and `@jumi/...` based on implementation convenience. That's branding/package topology and deserves its own decision closer to publication. Keep the internals package-name-neutral where possible.
+
+So: **Tailwind v4 only, Jumi 1.0, Phase 2 approved. Start with the spacing/formula batch.**
