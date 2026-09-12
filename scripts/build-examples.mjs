@@ -21,7 +21,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { fileURLToPath } from 'node:url'
 
-import { aggregateSlots } from './lib/css.mjs'
+import { aggregateSlots, PARTS, protocolState } from './lib/css.mjs'
 
 import path from 'node:path'
 
@@ -60,10 +60,8 @@ writeFileSync(output, built.css)
 
 const staging = [...emitted.matchAll(/[^{}]+\{[^{}]*--jumi-carrier-staging[^{}]*\}/g)]
 const stagingBytes = staging.reduce((total, match) => total + match[0].length, 0)
-const aggregate = [...built.css.matchAll(/--jumi-aggregate-[\w-]+:\s*[^;]*;?/g)]
-const aggregateBytes = aggregate.reduce((total, match) => total + match[0].length, 0)
+const { carriers, declarationBytes: aggregateBytes, declarations, leaks } = protocolState(built.css)
 const slots = aggregateSlots(built.css)
-const stray = (built.css.match(/--jumi-carrier-staging/g) ?? []).length
 
 const percent = (value, total) => `${Math.round(100 * value / total)}%`
 
@@ -78,21 +76,28 @@ console.log(`      keyframes     ${(emitted.match(/@keyframes /g) ?? []).length}
 console.log(`\n    shipped — what a browser downloads`)
 console.log(`      bytes         ${built.css.length.toLocaleString()} bytes`)
 console.log(`      aggregate     ${aggregateBytes.toLocaleString()} bytes (${percent(aggregateBytes, built.css.length)}),`
-  + ` ${built.carriers} copies of ${slots} entries × 10 lists`)
-console.log(`      staging       ${stray} declarations left`)
+  + ` ${carriers} carriers × ${slots} entries × ${PARTS.length} lists`)
+console.log(`      protocol      ${declarations} declarations written, no build-time name left`)
 console.log(`      file          ${path.relative(root, output)}\n`)
 
-// The same two invariants the frozen corpora are held to, on the real corpus: the aggregate
-// reaches every carrier exactly once, and none of the staging that carried it survives. Without
-// this, `output.css` could be a file that ships a rule nothing reads and still look fine here.
+/* ------------------------------------------------------------------------------------
+ * The protocol invariant — the same ones the frozen corpora are held to, on the real corpus
+ * ---------------------------------------------------------------------------------- */
+
+// Without this, `output.css` could ship the transport, or a carrier that was recognised and never
+// written, and still look fine here.
+const leaked = Object.entries(leaks).filter(([, count]) => count > 0)
 const failures = []
 
-if (stray) failures.push(`${stray} staging declarations survived finalization`)
-if (aggregate.length !== built.carriers * 10) {
-  failures.push(`${aggregate.length} aggregate declarations for ${built.carriers} carriers, expected ${built.carriers * 10}`)
+if (leaked.length) {
+  failures.push(`the transport reached the file — ${leaked.map(([name, count]) => `${count} ${name}`).join(', ')}`)
 }
 
-if (built.carriers === 0) failures.push('no carrier was finalized — the marker never reached the output')
+if (!carriers) failures.push('no carrier was finalized — the marker never reached the output')
+
+if (carriers && declarations !== carriers * PARTS.length) {
+  failures.push(`${declarations} materialized declarations for ${carriers} carriers, expected ${carriers * PARTS.length}`)
+}
 
 if (failures.length) {
   console.error('✗ the examples build is not complete:')

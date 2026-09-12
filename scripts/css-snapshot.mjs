@@ -38,7 +38,7 @@ import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { fileURLToPath } from 'node:url'
 
-import { aggregateSlots } from './lib/css.mjs'
+import { aggregateSlots, PARTS, protocolState } from './lib/css.mjs'
 
 import path from 'node:path'
 
@@ -53,8 +53,6 @@ const update = process.argv.includes('--update')
 /** A staging rule: the aggregate the model published, before the finalizer consumed it. */
 const STAGING = /[^{}]+\{[^{}]*--jumi-carrier-staging[^{}]*\}/g
 
-/** One aggregate declaration, wherever the finalizer wrote it. */
-const AGGREGATE = /--jumi-aggregate-[\w-]+:\s*[^;]*;?/g
 
 /** A CSS colour literal — what a theme value looks like before it is a token. */
 const COLOR_LITERAL = /^(?:#|(?:rgba?|hsla?|lab|lch|oklab|oklch|color|color-mix|light-dark)\()|^(?:currentColor|transparent|canvastext)$/i
@@ -104,29 +102,32 @@ const resolution = (css) => {
 function measure(built) {
   const css = built.css
   const staging = [...built.raw.matchAll(STAGING)]
-  const writes = [...css.matchAll(AGGREGATE)]
-  const aggregate = writes.reduce((total, match) => total + match[0].length, 0)
+  const state = protocolState(css)
 
   // Two halves, two objects, because they answer different questions and the numbers no longer
   // agree — kept apart rather than merged so that stays visible in the code that measures them.
   //
-  // What ships. The aggregate is one copy of each list per carrier: a carrier reads it, so it has
-  // to declare it, and `aggregateWrites / carriers` is the number that says no *publication*
-  // reached the file (anything above ten means a copy survived outside a carrier). `strayStaging`
-  // is a leak by construction — the file would be shipping a rule nothing reads.
+  // What ships. The aggregate is one copy of each list per carrier, materialized into the
+  // carrier's own longhands, and `aggregateWrites / carriers` is the number that says no
+  // *publication* reached the file (the ten longhands a carrier applies, and nothing more).
+  // `protocol` is the invariant, and a leak is a failure by construction: the transport would be
+  // shipping in place of the declarations a browser reads.
   const shipped = {
-    aggregateBytes: aggregate,
-    aggregateShare: Math.round(100 * aggregate / css.length),
-    aggregateWrites: writes.length,
+    aggregateBytes: state.declarationBytes,
+    aggregateShare: Math.round(100 * state.declarationBytes / css.length),
+    aggregateWrites: state.declarations,
     bytes: css.length,
-    // Carrier rules the finalizer wrote the aggregate into. The number that used to be one — it
-    // is whatever Tailwind made of the class, and no longer something Jumi chooses.
+    // Carrier rules the finalizer reported writing the aggregate into. The number that used to be
+    // one — it is whatever Tailwind made of the class, and no longer something Jumi chooses.
     carriers: built.carriers,
+    // …and the same thing counted off the output. They have to agree: the marker is erased, so a
+    // finalizer that reported a carrier it never gave a list to would otherwise be invisible.
+    carriersInOutput: state.carriers,
     keyframes: (css.match(/@keyframes jumi-/g) ?? []).length,
     media: (css.match(/@media /g) ?? []).length,
     properties: (css.match(/@property --jumi-/g) ?? []).length,
+    protocol: state.leaks,
     slots: aggregateSlots(css),
-    strayStaging: (css.match(/--jumi-carrier-staging/g) ?? []).length,
     supports: (css.match(/@supports /g) ?? []).length,
   }
 
@@ -175,7 +176,9 @@ function report(before, after, indent = 2) {
  * regress quietly, and these are the three things that can:
  *
  *   a publication surviving into the output   (the aggregate declared outside a carrier)
- *   staging surviving finalization            (the finalizer not finishing its job)
+ *   a carrier the finalizer claimed but never wrote (the marker is erased, so only the longhands
+ *                                                    can confirm it)
+ *   the transport surviving finalization      (a build-time name reaching the browser)
  *   the shipped file growing with the build   (the two halves collapsing back together)
  *
  * What is *not* bounded is the aggregate's share of the file, and that is deliberate: a
@@ -186,14 +189,19 @@ function report(before, after, indent = 2) {
  */
 const variantChecks = [
   {
-    detail: measured => `${measured.aggregateWrites} aggregate declarations for ${measured.carriers} carriers`,
-    holds: measured => measured.carriers > 0 && measured.aggregateWrites === measured.carriers * 10,
-    what: 'every carrier declares the aggregate exactly once, and no publication survives',
+    detail: measured => `${measured.aggregateWrites} declarations for ${measured.carriers} carriers`,
+    holds: measured => measured.carriers > 0 && measured.aggregateWrites === measured.carriers * PARTS.length,
+    what: 'every carrier holds the whole aggregate exactly once, and no publication survives',
   },
   {
-    detail: measured => `${measured.strayStaging} staging declarations left in the output`,
-    holds: measured => measured.strayStaging === 0,
-    what: 'finalization consumed every staging rule',
+    detail: measured => `${measured.carriersInOutput} carriers in the output, ${measured.carriers} reported`,
+    holds: measured => measured.carriersInOutput === measured.carriers,
+    what: 'the finalizer wrote every carrier it recognised',
+  },
+  {
+    detail: measured => Object.entries(measured.protocol).map(([name, count]) => `${count} ${name}`).join(', '),
+    holds: measured => Object.values(measured.protocol).every(count => count === 0),
+    what: 'no build-time name reaches the file',
   },
   {
     detail: measured => `${measured.bytes} shipped from ${measured.rawBytes} emitted`

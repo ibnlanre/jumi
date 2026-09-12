@@ -578,7 +578,7 @@ describe('the aggregate', () => {
   const data = (addBase: ReturnType<typeof setup>['addBase']) =>
     Object.assign({}, ...staged(addBase)) as Record<string, string>
 
-  /** The aggregate alone: exactly what `@/helpers/carriers` injects into a carrier. */
+  /** The aggregate alone: exactly what `@/helpers/carriers` materializes into a carrier. */
   const lists = (addBase: ReturnType<typeof setup>['addBase']) =>
     Object.fromEntries(Object.entries(data(addBase)).filter(([name]) => name !== stagingMarker))
 
@@ -594,14 +594,12 @@ describe('the aggregate', () => {
     // written, including the places a literal selector cannot name.
     expect(utility[carrierMarker]).toBe('animations')
 
-    // The utility is the same rule whatever the slot set is: it reads the aggregate
-    // and declares no part of it. Constant is what makes Tailwind's per-candidate
-    // cache safe.
-    expect(utility['animation-name'])
-      .toBe('var(--jumi-aggregate-animation-name, var(--jumi-animation-name))')
-    expect(utility['animation-duration'])
-      .toBe('var(--jumi-aggregate-animation-duration, var(--jumi-animation-duration))')
-    expect(Object.keys(utility).filter(name => name.startsWith('--jumi-aggregate-'))).toEqual([])
+    // The utility is the same rule whatever the slot set is, and it declares no part of
+    // the aggregate — not a copy of it, not even a pointer to it. Constant is what makes
+    // Tailwind's per-candidate cache safe, and the absence is what lets the finalizer
+    // materialize the longhands where they resolve instead of rewriting a value here.
+    expect(Object.keys(utility).filter(name => /^(--jumi-aggregate-|animation-)/.test(name))).toEqual([])
+    expect(utility['interpolate-size']).toBe('var(--jumi-interpolate-size)')
   })
 
   it('stages the ten flat lists on a rule nothing reads, marked for the finalizer', () => {

@@ -8,9 +8,26 @@ import postcss from 'postcss'
  * The finalizer is the mechanism the whole carrier feature now depends on, so it is tested
  * against the constructs rather than the happy path: nested at-rules, nested rules, comments,
  * strings, `var()` fallbacks, and the exact whitespace of a stylesheet it must not disturb.
+ *
+ * It is also where the protocol's zero-occurrence invariant is pinned: what the finalizer returns
+ * must hold the carrier's real `animation-*` longhands and none of the build-time names.
  */
 
 const carrier = (extra = '') => `--jumi-carrier: animations;${extra}`
+
+/** Every longhand the model stages a list for, and therefore every longhand the finalizer writes. */
+const PARTS = [
+  'animation-composition',
+  'animation-delay',
+  'animation-direction',
+  'animation-duration',
+  'animation-fill-mode',
+  'animation-iteration-count',
+  'animation-name',
+  'animation-play-state',
+  'animation-timeline',
+  'animation-timing-function',
+]
 
 /** A staging rule carrying one longhand, with the marker the finalizer looks for. */
 const staged = (value: string, selector = ':root') =>
@@ -28,7 +45,7 @@ describe('the finalizer', () => {
 
     expect({ carriers, staging }).toEqual({ carriers: 1, staging: 1 })
     expect(out).not.toContain(stagingMarker)
-    expect(out).toContain(`.animations { --jumi-carrier: animations; --jumi-aggregate-animation-name: var(--jumi-rotate-a, var(--jumi-animation-name)); }`)
+    expect(out).toContain('.animations { animation-name: var(--jumi-rotate-a, var(--jumi-animation-name)); }')
     expect(out).toContain('.other { color: red; }')
   })
 
@@ -47,7 +64,7 @@ describe('the finalizer', () => {
     const { carriers, css: out, staging } = finalizeCss(css)
 
     expect({ carriers, staging }).toEqual({ carriers: 1, staging: 1 })
-    expect(out).toContain(':is(.animations > *) { --jumi-carrier: animations; --jumi-aggregate-animation-name: var(--a); }')
+    expect(out).toContain(':is(.animations > *) { animation-name: var(--a); }')
     expect(out).not.toContain(stagingMarker)
   })
 
@@ -60,7 +77,7 @@ describe('the finalizer', () => {
     ].join('\n'))
 
     expect(carriers).toBe(1)
-    expect(out).toContain('.animations { --jumi-carrier: animations; --jumi-aggregate-animation-name: var(--a); }')
+    expect(out).toContain('.animations { animation-name: var(--a); }')
   })
 
   it('takes the last publication, the way a later declaration would win', () => {
@@ -70,7 +87,7 @@ describe('the finalizer', () => {
       staged('var(--second)'),
     ].join('\n'))
 
-    expect(out).toContain('--jumi-aggregate-animation-name: var(--second);')
+    expect(out).toContain('animation-name: var(--second);')
   })
 
   it('does not mistake a comment or a string for the protocol', () => {
@@ -96,7 +113,7 @@ describe('the finalizer', () => {
 
     const { css: out } = finalizeCss(css)
 
-    expect(out).toContain('--jumi-aggregate-animation-name: var(--a, "x;y"), var(--b, "}" );')
+    expect(out).toContain('animation-name: var(--a, "x;y"), var(--b, "}" );')
   })
 
   it('is idempotent, byte for byte', () => {
@@ -143,11 +160,43 @@ describe('the finalizer', () => {
   it('prefers an aggregate handed to it over the one in the stylesheet', () => {
     const css = [staged('var(--stale)'), '.animations { --jumi-carrier: animations; }'].join('\n')
 
-    const { css: out } = finalizeCss(css, { '--jumi-aggregate-animation-name': 'var(--fresh)' })
+    const { css: out } = finalizeCss(css, { 'animation-name': 'var(--fresh)' })
 
-    expect(out).toContain('--jumi-aggregate-animation-name: var(--fresh);')
+    expect(out).toContain('.animations { animation-name: var(--fresh); }')
     expect(out).not.toContain('var(--stale)')
     expect(out).not.toContain(stagingMarker)
+  })
+
+  it('leaves no build-time name in the stylesheet it returns', () => {
+    const lists = PARTS.map(part => `--jumi-aggregate-${part}: var(--jumi-${part});`).join(' ')
+    const css = [
+      `:root { ${stagingMarker}: 1; ${lists} }`,
+      `.animations { ${carrier()} }`,
+    ].join('\n')
+
+    const { carriers, css: out, staging } = finalizeCss(css)
+
+    expect({ carriers, staging }).toEqual({ carriers: 1, staging: 1 })
+
+    // The invariant. Everything the two markers and the staging namespace spell is build-time
+    // only, and a browser should never be handed any of it.
+    expect(out).not.toContain('--jumi-carrier')
+    expect(out).not.toContain('--jumi-aggregate-')
+
+    // What is left is the declarations a browser actually applies.
+    expect(out).toContain('animation-name: var(--jumi-animation-name);')
+    expect(out).toContain('animation-timeline: var(--jumi-animation-timeline);')
+  })
+
+  it('keeps the marker when there is nothing to materialize, so the invariant can fire', () => {
+    const css = `.animations { ${carrier()} }`
+
+    const { carriers, css: out, staging } = finalizeCss(css)
+
+    // A carrier with no aggregate behind it is a broken build, not an empty one. Leaving the
+    // marker behind is what turns that into a detectable violation — the zero-occurrence check
+    // fails — instead of a carrier that silently animates nothing.
+    expect({ carriers, out, staging }).toEqual({ carriers: 0, out: css, staging: 0 })
   })
 
   it('walks an AST in place, so a host that owns one needs no parse', () => {
@@ -156,7 +205,7 @@ describe('the finalizer', () => {
     const { carriers, staging } = finalize(root)
 
     expect({ carriers, staging }).toEqual({ carriers: 1, staging: 1 })
-    expect(root.toString()).toContain('--jumi-aggregate-animation-name: var(--a);')
+    expect(root.toString()).toContain('animation-name: var(--a);')
     expect(root.toString()).not.toContain(stagingMarker)
   })
 })

@@ -26,6 +26,8 @@
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { PARTS, protocolState } from './lib/css.mjs'
+
 import { chromium } from 'playwright'
 import { build, createServer, preview } from 'vite'
 
@@ -223,16 +225,16 @@ const matrix = async (label, url, slots) => {
 
 /** What the protocol requires of any emitted stylesheet, whatever produced it. */
 const structure = (label, css) => {
-  const stray = (css.match(/--jumi-carrier-staging/g) ?? []).length
-  const writes = (css.match(/--jumi-aggregate-[\w-]+:/g) ?? []).length
-  const carriers = (css.match(/--jumi-carrier:/g) ?? []).length
+  const { carriers, declarations, leaks } = protocolState(css)
+  const leaked = Object.entries(leaks).filter(([, count]) => count > 0)
 
-  console.log(`\n    ${stray ? '✗' : '✓'} ${label}: ${css.length.toLocaleString()} bytes,`
-    + ` ${carriers} carriers, ${writes} aggregate declarations, ${stray} staging left`)
+  console.log(`\n    ${!leaked.length && carriers ? '✓' : '✗'} ${label}: ${css.length.toLocaleString()} bytes,`
+    + ` ${carriers} carriers, ${declarations} declarations written,`
+    + ` ${leaked.length ? `${leaked.map(([name, count]) => `${count} ${name}`).join(', ')} left` : 'no protocol left'}`)
 
-  if (stray) failures.push(`${label}: ${stray} staging declarations survived`)
+  if (leaked.length) failures.push(`${label}: the transport reached the output — ${leaked.map(([name, count]) => `${count} ${name}`).join(', ')}`)
   if (!carriers) failures.push(`${label}: no carrier reached the output`)
-  if (writes !== carriers * 10) failures.push(`${label}: ${writes} aggregate declarations for ${carriers} carriers`)
+  if (declarations !== carriers * PARTS.length) failures.push(`${label}: ${declarations} declarations for ${carriers} carriers`)
 
   return css
 }

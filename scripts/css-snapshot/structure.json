@@ -1,18 +1,23 @@
 {
   "canonical": {
-    "aggregateBytes": 52958,
-    "aggregateShare": 57,
+    "aggregateBytes": 52618,
+    "aggregateShare": 59,
     "aggregateWrites": 20,
-    "bytes": 92303,
+    "bytes": 89877,
     "carriers": 2,
+    "carriersInOutput": 2,
     "keyframes": 33,
     "media": 5,
     "properties": 51,
+    "protocol": {
+      "aggregate": 0,
+      "carrier": 0,
+      "staging": 0
+    },
     "slots": 33,
-    "strayStaging": 0,
     "supports": 5,
     "publishEvents": 34,
-    "rawBytes": 503544,
+    "rawBytes": 501520,
     "stagingBytes": 464279,
     "colorValues": {
       "literal": 1,
@@ -25,19 +30,24 @@
     }
   },
   "carrierVariant": {
-    "aggregateBytes": 59940,
-    "aggregateShare": 66,
+    "aggregateBytes": 59260,
+    "aggregateShare": 69,
     "aggregateWrites": 40,
-    "bytes": 90577,
+    "bytes": 85659,
     "carriers": 4,
+    "carriersInOutput": 4,
     "keyframes": 18,
     "media": 1,
     "properties": 36,
+    "protocol": {
+      "aggregate": 0,
+      "carrier": 0,
+      "staging": 0
+    },
     "slots": 18,
-    "strayStaging": 0,
     "supports": 5,
     "publishEvents": 19,
-    "rawBytes": 177828,
+    "rawBytes": 173720,
     "stagingBytes": 147411,
     "colorValues": {
       "literal": 0,

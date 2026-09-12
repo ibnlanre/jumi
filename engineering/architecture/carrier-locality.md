@@ -262,7 +262,8 @@ fork.** Three pieces:
 1. the carrier body declares `--jumi-carrier` — a declaration in the utility body, so variants
    carry it wherever they move the body
 2. Jumi publishes the aggregate as it does today, as a staging rule
-3. a finalizer resolves that aggregate, injects it into every marked rule, and removes the staging
+3. a finalizer resolves that aggregate, writes it into every marked rule as that rule's own
+   `animation-*` longhands, and removes both the staging and the marker
 
 The finalizer's entire vocabulary is Jumi's own: **a carrier is a rule declaring the marker**;
 staging is a rule declaring aggregate data that is not a carrier. It knows nothing about Tailwind
@@ -289,6 +290,8 @@ with the same list lengths as every other carrier. `behaviour:check` requires it
    stylesheet, exported from the package, and every harness here calls it right after `build()`.
 2. **The bridge is deleted.** `publishAggregate` hands the flat lists to the sink, the adapter
    stages them under `:root` with the marker, and the carrier body declares `--jumi-carrier`.
+   Both are build-time only: `finalize` materializes the lists into the carrier's longhands and
+   erases the marker, so a finished stylesheet holds none of the protocol.
 3. **The flat aggregate is restored.** The chain is gone from `src/core`, from the tests and from
    the metrics. `behaviour:check` is 8/8 including `@apply`, `incremental:check` is 6/6, and the
    snapshot carries the whole aggregate per carrier instead of per publication — canonical shipped
@@ -325,5 +328,42 @@ empty string in build, so the pass would find nothing and — worse — would lo
 with no `enforce` is the only position both modes agree on, which is why `jumiFinalizer()` declares
 none — and why `jumi()` composes Tailwind's plugin and that finalizer behind one entry, so no author
 has to know any of this. `tailwindcss({ optimize: false })` changes nothing the protocol relies on:
-the marker and the staging are ordinary custom properties, and the aggregate is injected after the
-optimizer either way.
+the marker and the staging are ordinary custom properties, and the aggregate is materialized after
+the optimizer either way.
+
+### The transport does not ship
+
+Those three pieces are build-time only, and that is an asserted invariant rather than a
+description: `--jumi-carrier`, `--jumi-carrier-staging` and every `--jumi-aggregate-*` are absent
+from a finished stylesheet, and `css:check`, `vite:check`, `postcss:check` and `examples:build`
+fail on any occurrence of the three.
+
+It used to ship. The finalizer kept the marker and injected the ten `--jumi-aggregate-*` declarations into each carrier, so a carrier read its own data through a pointer it also declared:
+
+```css
+.animations {
+  --jumi-carrier: animations;
+  animation-duration: var(--jumi-aggregate-animation-duration, var(--jumi-animation-duration));
+  --jumi-aggregate-animation-duration: var(…), var(…);
+}
+```
+
+Now the data is written where it is read, and the pointer and the marker are dropped:
+
+```css
+.animations {
+  animation-duration: var(…), var(…);
+}
+```
+
+The carrier's longhands **are** the aggregate, so "is this carrier finished?" is answerable by
+reading the declarations a browser applies instead of by trusting a marker. That is also why the
+marker is erased only when something was materialized: a carrier with no data behind it keeps its
+marker, which is what lets the invariant fire — a build that published no aggregate leaves the
+protocol in the output and the checks say so, rather than shipping a carrier that silently animates
+nothing.
+
+Measured across the harnesses, before → after: canonical `snapshot.css` 92,303 → **89,877 bytes**,
+the carrier variant 90,577 → **85,659**, `examples/output.css` 272,553 → **267,635**. The PostCSS
+fixture's four carriers went 23,861 → **18,987**. Nothing about the data changed — the same 40
+declarations across the same 4 carriers — only where it is written.

@@ -1,11 +1,11 @@
 import type {
-  AnimatableStandardPropertyType,
-  Collection,
-  Creator,
-  CssInJs,
-  MatchComponentsPropertyFunction,
-  MatchUtilitiesPropertyFunction,
-  StaggerContext,
+    AnimatableStandardPropertyType,
+    Collection,
+    Creator,
+    CssInJs,
+    MatchComponentsPropertyFunction,
+    MatchUtilitiesPropertyFunction,
+    StaggerContext,
 } from '@/types'
 
 import { assemble } from '@/helpers/assemble'
@@ -364,10 +364,10 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
   /**
    * The aggregate as data: for each longhand, the exact list every carrier must read.
    *
-   * Flat lists, and published to be *consumed* — the carrier marks itself in the utility
-   * body, and `@/helpers/carriers` reads these out of the emitted stylesheet, writes them
-   * into every marked rule, and removes this one. The browser never reads it, which is what
-   * makes it safe to publish the data outside the carrier: a rule nothing consumes cannot be
+   * Flat lists, and published only to be *consumed* — the carrier marks itself in the utility
+   * body, and `@/helpers/carriers` reads these out of the emitted stylesheet, materializes them
+   * into every marked rule's longhands, and removes this one. The browser never reads it, which
+   * is what makes it safe to publish the data outside the carrier: a rule nothing consumes cannot
    * wrong.
    */
   const aggregateVariables = (): Collection<string> => {
@@ -438,22 +438,21 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
     },
 
     /**
-     * What Tailwind emits for `.animations`: a constant rule that reads the
-     * aggregate through custom properties, falling back to the shared controls
-     * when no slot exists.
+     * What Tailwind emits for `.animations`: a constant rule that marks the element as a
+     * carrier and declares the controls an animation falls back to.
      *
      * Constant is the point. Tailwind caches a candidate's output, so a rule that
      * changed as slots appeared could be reused stale; reading this is also what
      * publishes the data, so a pass with no tweens at all still publishes an
-     * aggregate for the rule to consume.
+     * aggregate for the carrier to materialize.
+     *
+     * Note what is *not* here: the `animation-*` longhands. They cannot be written at a
+     * literal selector — each one holds the aggregate list, whose entries reference slot
+     * variables that exist only on the element — so `@/helpers/carriers` writes them into
+     * every rule this marker reached, and erases the marker.
      */
     get animationUtility(): CssInJs {
       publishAggregate()
-
-      const consumers = Object.fromEntries([
-        ...slotParts.map(part => [part, css('var', aggregateVariable(part), css('var', `--jumi-${part}`))]),
-        ['animation-name', css('var', aggregateVariable('animation-name'), css('var', '--jumi-animation-name'))],
-      ])
 
       const assembled = sorted(properties).reduce((acc, attribute) =>
         merge(acc, assemble(attribute)), {} as CssInJs)
@@ -462,11 +461,11 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
         // A marker, so a carrier rule can be recognised *after* Tailwind has applied
         // variants to it. A variant re-parents this body (`variants.ts`: `r.nodes =
         // selectors.map(selector => rule(selector, r.nodes))`), so the marker travels to
-        // `:is(.animations > *)` and `.animations::before` with the consumers — and that
-        // is what lets Jumi's finalizer inject the aggregate where it resolves, instead
-        // of publishing it at a literal selector it cannot follow.
+        // `:is(.animations > *)` and `.animations::before` — and that is what lets Jumi's
+        // finalizer materialize the longhands where they resolve, instead of publishing
+        // them at a literal selector it cannot follow. Build-time only: the finalizer
+        // removes it, so it never reaches the browser.
         '--jumi-carrier': 'animations',
-        ...consumers,
         'interpolate-size': css('var', '--jumi-interpolate-size'),
       }, assembled)
     },

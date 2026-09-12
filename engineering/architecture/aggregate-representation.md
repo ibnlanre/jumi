@@ -307,7 +307,8 @@ placement: the data has to sit where the slot variables are.
 
 **Closed by the carrier marker.** The data is no longer published at any selector: the carrier
 declares `--jumi-carrier` in its body, so Tailwind's own re-parenting and `@apply` copies carry it,
-and `finalize` writes the aggregate into every marked rule after the build. Both of these bugs —
+and `finalize` materializes the aggregate into every marked rule's own `animation-*` longhands
+after the build — then erases the marker, because a browser has no use for it. Both of these bugs —
 `:root` and `*:animations` — are the same bug, and neither can recur, because there is no longer a
 selector to get wrong. See `engineering/architecture/carrier-locality.md`.
 
@@ -383,3 +384,15 @@ flat        build emission 94% waste, shipped bytes same,  per-carrier restyle 1
 
 `pnpm examples:build` prints this table on every run and fails if a publication survives into
 `examples/output.css` or a carrier is left without the aggregate.
+
+**Update — the transport no longer ships.** The table above measures flat lists as completed by the
+*first* finalizer, which kept the marker and wrote `--jumi-aggregate-*` declarations into each
+carrier so that carrier's longhands could read them. That layer is gone: the finalizer now writes
+the lists into the carrier's own `animation-*` longhands and erases the marker, and
+`--jumi-carrier`, `--jumi-carrier-staging` and `--jumi-aggregate-*` are held to zero occurrences in
+finished output by `css:check`, `vite:check`, `postcss:check` and `examples:build`.
+
+On this corpus that moved shipped bytes 271,812 → **267,635**, with the same 59 publications, the
+same 4 carriers and the same 60 entries × 10 lists. The build-cost half of the table is unchanged,
+and that is the point: the transport was never what the *file* cost — it was what the build cost,
+and the build is still 95% staging. See `engineering/architecture/carrier-locality.md`.

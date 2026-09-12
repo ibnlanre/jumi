@@ -486,17 +486,21 @@ export interface Creator {
   /**
    * The aggregate as ten flat longhand lists, in the model's order.
    *
-   * This is the **oracle**, not an emission path. What the host publishes is a
-   * chain of links (`--jumi-link*`) that the `--jumi-aggregate-*` pointers name,
-   * and this getter is what that chain is checked against — every list assertion
-   * in the tests is written against these lists, and a differential test compares
-   * the chain to them after every mutation. Nothing emits this shape.
+   * This is the **oracle**, not an emission path. What the host publishes is the
+   * same lists as staging under `--jumi-aggregate-*`, and this getter is what that
+   * staging is checked against — every list assertion in the tests is written
+   * against these lists, and a differential test compares the two after every
+   * mutation. Nothing emits this shape: the ten lists reach a browser as the
+   * carrier's own `animation-*` longhands.
    */
   get animations(): CssInJs;
   /**
-   * What Tailwind emits for `.animations`: a constant rule that reads the
-   * aggregate through custom properties. Constant on purpose — Tailwind caches a
-   * candidate's output, so nothing in it may depend on which slots exist.
+   * What Tailwind emits for `.animations`: a constant rule that marks the element
+   * as a carrier and declares the controls an animation falls back to. Constant on
+   * purpose — Tailwind caches a candidate's output, so nothing in it may depend on
+   * which slots exist. The longhands are deliberately absent: they hold the
+   * aggregate list, which only resolves on the element, so the finalizer writes
+   * them there.
    */
   get animationUtility(): CssInJs;
   color(attribute: AnimatableStandardPropertyType, parts?: PropertyParts, options?: { paint?: boolean }): MatchComponentsPropertyFunction;

@@ -23,6 +23,8 @@ import { execFileSync } from 'node:child_process'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
+import { PARTS, protocolState } from './lib/css.mjs'
+
 import path from 'node:path'
 import postcss from 'postcss'
 
@@ -73,19 +75,20 @@ writeFileSync(path.join(dir, 'in.css'), registered)
 
 const failures = []
 
-/** The protocol, from the CSS PostCSS hands back — the same assertions the other checks make. */
+/** What the protocol requires of any emitted stylesheet, whatever produced it. */
 const structure = (label, css) => {
-  const stray = (css.match(/--jumi-carrier-staging/g) ?? []).length
-  const writes = (css.match(/--jumi-aggregate-[\w-]+:/g) ?? []).length
-  const carriers = (css.match(/--jumi-carrier:/g) ?? []).length
+  const { carriers, declarations, leaks } = protocolState(css)
+  const leaked = Object.entries(leaks).filter(([, count]) => count > 0)
   const slots = (css.match(/--jumi-[\w-]+-animation-name:/g) ?? []).length
+  const held = carriers >= 4 && declarations === carriers * PARTS.length && !leaked.length
 
-  console.log(`\n    ${stray || !carriers ? '✗' : '✓'} ${label}: ${css.length.toLocaleString()} bytes,`
-    + ` ${carriers} carriers, ${writes} aggregate declarations, ${slots} slots, ${stray} staging left`)
+  console.log(`\n    ${held ? '✓' : '✗'} ${label}: ${css.length.toLocaleString()} bytes,`
+    + ` ${carriers} carriers, ${declarations} declarations written, ${slots} slots,`
+    + ` ${leaked.length ? `${leaked.map(([name, count]) => `${count} ${name}`).join(', ')} left` : 'no protocol left'}`)
 
-  if (stray) failures.push(`${label}: ${stray} staging declarations survived`)
+  if (leaked.length) failures.push(`${label}: the transport reached the output — ${leaked.map(([name, count]) => `${count} ${name}`).join(', ')}`)
   if (carriers < 4) failures.push(`${label}: ${carriers} carriers, expected the four contexts`)
-  if (writes !== carriers * 10) failures.push(`${label}: ${writes} aggregate declarations for ${carriers} carriers`)
+  if (declarations !== carriers * PARTS.length) failures.push(`${label}: ${declarations} declarations for ${carriers} carriers`)
 
   // The data has to be the compiled one: a slot for a scanned candidate, in every carrier.
   if (!/jumi-rotate-/.test(css)) failures.push(`${label}: no slot for animate-rotate-45 — Tailwind did not run`)

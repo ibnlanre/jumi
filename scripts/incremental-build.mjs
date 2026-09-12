@@ -26,7 +26,7 @@
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
-import { aggregateSlots } from './lib/css.mjs'
+import { aggregateSlots, PARTS, protocolState } from './lib/css.mjs'
 
 import path from 'node:path'
 
@@ -71,9 +71,9 @@ const keyframes = out => new Set([...out.matchAll(/@keyframes\s+([\w-]+)/g)].map
 
 /**
  * Every rule in the output, minus the aggregate. Comparing this is the point of the constant
- * carrier: the rules Tailwind caches are identical between builds, and only the data they read
- * changes. Staging is gone by now, so the only declarations removed here are the ones the
- * finalizer wrote — which is exactly the set allowed to differ.
+ * carrier: the rules Tailwind caches are identical between builds, and only the data they receive
+ * changes. Staging is gone by now, and the marker with it, so the only declarations removed here
+ * are the ones the finalizer wrote — which is exactly the set allowed to differ.
  */
 const utilities = (out) => {
   const map = new Map()
@@ -81,7 +81,7 @@ const utilities = (out) => {
 
   for (const m of out.matchAll(/(\.[^{}\s][^{}]*)\{([^{}]*)\}/g)) {
     const body = m[2]
-      .replace(/--jumi-aggregate-[\w-]*:\s*[^;]+;/g, '')
+      .replace(new RegExp(`(?<![\\w-])(?:${PARTS.join('|')})\\s*:\\s*[^;]+;`, 'g'), '')
       .replace(/\s+/g, ' ')
       .trim()
     const selector = m[1].trim()
@@ -135,23 +135,20 @@ checks.push({
   what: 'every rule but the aggregate is unchanged',
 })
 
-// The finalizer's contract, per build. A build where it did not run would ship a staging rule
-// that nothing reads, and a carrier whose list was never written would resolve nothing —
-// including the carrier Tailwind cached and never revisited, which is why the data has to be
-// read out of the stylesheet rather than emitted at the utility.
-const finalization = [first, cache, order].map(built => ({
-  ...built,
-  stray: (built.css.match(/--jumi-carrier-staging/g) ?? []).length,
-  writes: (built.css.match(/--jumi-aggregate-[\w-]+:/g) ?? []).length,
-}))
+// The finalizer's contract, per build. A build where it did not run would ship the whole
+// transport — a staging rule nothing reads, and a carrier still marked but holding none of the
+// declarations a browser applies. The marker is erased, so "did every carrier get its data?" can
+// only be answered by counting what was written, which is what `protocolState` does.
+const finalization = [first, cache, order].map(built => protocolState(built.css))
 
 checks.push({
   detail: finalization
-    .map(built => `${built.carriers} carriers × ${built.writes / built.carriers} declarations`
-      + (built.stray ? `, ${built.stray} staging left` : ''))
+    .map(state => `${state.carriers} carriers × ${state.carriers ? state.declarations / state.carriers : 0} declarations`
+      + (state.leaks.staging ? `, ${state.leaks.staging} staging left` : ''))
     .join('; '),
-  pass: finalization.every(built => built.stray === 0 && built.carriers > 0 && built.writes === built.carriers * 10),
-  what: 'the aggregate reaches every carrier, and no staging survives',
+  pass: finalization.every(state => Object.values(state.leaks).every(count => count === 0)
+    && state.carriers > 0 && state.declarations === state.carriers * PARTS.length),
+  what: 'the aggregate reaches every carrier, and no build-time name survives',
 })
 
 for (const { detail, pass, what } of checks) {

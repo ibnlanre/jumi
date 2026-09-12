@@ -41,14 +41,23 @@ describe('splitTopLevel', () => {
 
 describe('lastDeclaration', () => {
   it('returns the last declaration, because a later one wins', () => {
-    const css = '.animations { --jumi-aggregate-animation-name: one, two; }\n'
-      + '.animations { --jumi-aggregate-animation-name: one, two, three; }'
+    const css = '.animations { animation-name: one, two; }\n'
+      + '.animations { animation-name: one, two, three; }'
 
-    expect(lastDeclaration(css, '--jumi-aggregate-animation-name')).toBe('one, two, three')
+    expect(lastDeclaration(css, 'animation-name')).toBe('one, two, three')
   })
 
   it('returns an empty string when the property is absent', () => {
-    expect(lastDeclaration('.animations { color: red; }', '--jumi-aggregate-animation-name')).toBe('')
+    expect(lastDeclaration('.animations { color: red; }', 'animation-name')).toBe('')
+  })
+
+  it('does not match a property that merely ends with the same word', () => {
+    // `--jumi-animation-name` is a different property, every carrier declares it, and it comes
+    // *after* the data in the rule body — reading it as `animation-name` would report the control
+    // as the aggregate.
+    const css = '.animations { animation-name: one, two; --jumi-animation-name: none; }'
+
+    expect(lastDeclaration(css, 'animation-name')).toBe('one, two')
   })
 })
 
@@ -56,13 +65,16 @@ describe('aggregateSlots', () => {
   const entry = name => `var(--jumi-${name}-animation-name, var(--jumi-animation-name))`
 
   it('counts the entries the browser applies', () => {
-    const css = `.animations { --jumi-aggregate-animation-name: ${entry('a')}; }`
-      + `.animations { --jumi-aggregate-animation-name: ${entry('a')}, ${entry('b')}; }`
+    // The list lands in the longhand a browser reads, not in a `--jumi-aggregate-*` pointer.
+    const css = `.animations { animation-name: ${entry('a')}; }`
+      + `.animations { animation-name: ${entry('a')}, ${entry('b')}; }`
 
     expect(aggregateSlots(css)).toBe(2)
   })
 
-  it('counts nothing when no aggregate has been published', () => {
-    expect(aggregateSlots('.animations { animation-name: none; }')).toBe(0)
+  it('counts nothing when the carrier was never materialized', () => {
+    // An unfinalized carrier declares only custom properties, so there is no longhand to read and
+    // the answer is zero — which is also what makes a build that skipped finalization visible.
+    expect(aggregateSlots('.animations { --jumi-animation-name: none; }')).toBe(0)
   })
 })
