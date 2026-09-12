@@ -55,6 +55,7 @@
     "postcss:check": "node scripts/postcss-check.mjs",
     "spike:carrier-seam": "node scripts/spike-carrier-seam.mjs",
     "spike:carrier-finalize": "node scripts/spike-carrier-finalize.mjs",
+    "spike:candidates": "node scripts/spike-candidates.mjs",
     "check": "pnpm run check-types && pnpm exec eslint src scripts && pnpm run test:run && pnpm run theme:map && pnpm run css:check && pnpm run incremental:check && pnpm run behaviour:check && pnpm run vite:check && pnpm run postcss:check"
   },
   "keywords": [
@@ -98,6 +99,7 @@
     "@typescript-eslint/parser": "^8.46.4",
     "@vitest/coverage-v8": "4.0.9",
     "@vitest/eslint-plugin": "^1.4.2",
+    "glob": "^11.0.3",
     "astro": "^5.18.2",
     "css.escape": "^1.5.1",
     "csstype": "^3.2.1",
@@ -134,7 +136,6 @@
   },
   "dependencies": {
     "culori": "^4.0.2",
-    "glob": "^11.0.3",
     "shorthash2": "^1.0.5"
   },
   "peerDependenciesMeta": {

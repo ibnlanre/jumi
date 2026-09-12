@@ -1,53 +1,87 @@
-Approved.
+Approved. Phase 2 is genuinely closed now.
 
-This batch gives us something more valuable than additional token coverage: the resolution model is now properly **per value**, not per scale.
-
-```text
-(key, name)
-   ↓
-spacing formula?
-   ↓ no
-verified CSS token?
-   ↓ no
-literal
-```
-
-That feels like the correct long-term contract. `lineHeight` and `maxWidth` proving all three modes can coexist within one theme key is the strongest evidence for it.
-
-And I particularly like that `boxShadow` failed the mapping test. That is exactly the sort of thing we would have gotten wrong by trying to "complete" the migration from naming intuition:
+The strongest result is not the percentage of values converted to variables. It is that **all 71 keys now have an explicit, measured strategy**, and the gate will fail if Tailwind's emitted behavior drifts:
 
 ```text
---shadow-sm exists
-shadow-sm exists
-values correspond
+token     7
+mixed     7
+formula  11
+literal  46
+──────────
+total    71
 ```
 
-yet Tailwind's emitted utility still chooses to inline the value. So yes, leave `boxShadow` literal. Jumi should follow the CSS behavior we have actually measured, not the token vocabulary Tailwind happens to expose.
+That is exactly the finish line we defined. `literal` is no longer unfinished migration work. It is an intentional representation.
 
-I would now define **Phase 2 completion** carefully:
+The `backdropBlur` discovery is also a good validation of the sweep. It found something that neither naming intuition nor the previous batch planning had identified. And the `boxShadow` row is probably the best demonstration of why this whole methodology matters: a namespace existing is not enough; emitted behavior is the contract we're consuming.
 
-> Every theme value Jumi consumes has a classified representation: token, formula, or literal.
+I would **not restore `scripts/tmp-ns/measure.mjs`**. The generalized `theme-map.mjs` supersedes it and is now part of the gate. Keeping the narrower probe would just create two sources of truth.
 
-Not:
+One architectural consequence worth recording explicitly is that `creator.theme()` is now effectively a **Jumi abstraction**, despite retaining its old name and call shape. Its semantics are no longer "ask Tailwind's JS theme API." They are:
 
-> Every theme value must become a CSS variable.
+> resolve a Jumi theme vocabulary entry to the representation appropriate for Tailwind v4 CSS.
 
-That distinction prevents this phase from turning into an endless hunt for token coverage. Literal is a valid final representation when that's what the host actually emits.
+That distinction will matter when the Tailwind adapter gets thinner later.
 
-For the remaining work, I'd do one final classification sweep rather than many tiny batches. Measure `backdropBlur` and any other still-unclassified keys, then produce a table of the full 71-key vocabulary:
+### Next: scanning/candidate discovery
+
+I agree with the sequence. This should be the next dependency we investigate.
+
+But I would start with an inventory again, not implementation.
+
+We need to know exactly what Jumi currently receives from Tailwind's scanner/compiler that it actually needs. In particular:
 
 ```text
-fully token/formula backed
-mixed
-intentionally literal
+candidate discovery
+deduplication
+incremental candidate accumulation
+source configuration
+arbitrary candidate syntax
+variant-bearing candidates
+candidate ordering
 ```
 
-Anything still literal should have a reason, but "Tailwind emits it literally" is sufficient reason.
+Some of those may turn out not to belong to "scanning" at all.
 
-I would also leave the strange numeric junk from collapsed `DEFAULT` values alone unless it causes actual output. You've already proven things like `rounded-1` and `blur-0` are unreachable. Filtering those values more aggressively would be cleanup, not migration progress.
+The key question I'd give DeepSeek is:
 
-Once every consumed key is classified and the harness reports no unmeasured mappings, I would call **theme ownership complete** and move on. We shouldn't keep Phase 2 open just because Tailwind happens to expose more CSS variables that Jumi doesn't need.
+> **If Jumi had the complete set of class-like strings present in the user's sources, what information would still be missing before the Jumi model could determine everything it needs?**
 
-So my call is:
+That separates discovery from parsing.
 
-**Batch 3 approved. Measure the remaining unclassified vocabulary, close Phase 2 when all 71 keys have an explicit representation strategy, then move to the next dependency rather than chasing higher token percentages.**
+For example, if:
+
+```text
+animate-rotate-45
+hover:animate-scale-110
+before:animations
+```
+
+are found as raw strings, Jumi may still currently rely on Tailwind to interpret the latter two. That belongs later under variants, not scanner ownership.
+
+So Phase 3 should initially aim for a very narrow answer:
+
+> Can Jumi independently discover the raw candidates it cares about, without yet understanding Tailwind's variant grammar?
+
+If yes, that's another clean dependency we can peel away without accidentally rebuilding Tailwind.
+
+### The aggregate item
+
+I'd park the remaining build-time quadratic for now.
+
+The finalizer changed its importance substantially:
+
+* shipped CSS is now sane;
+* browser behavior is correct;
+* runtime isn't waiting on a new representation;
+* what remains is compiler/intermediate waste.
+
+That's real technical debt, but it is no longer architecture-blocking.
+
+I'd put a measurable threshold on it rather than continuing immediately. Something like:
+
+> Revisit aggregate representation if build/dev-server cost becomes materially noticeable on a real Jumi project or if corpora grow beyond current levels.
+
+That prevents the very productive migration from getting trapped again in optimizing an internal artifact users never receive.
+
+So my call is: **delete the obsolete probe, mark Phase 2 complete, park aggregate optimization, and begin Phase 3 with a measured scanner/discovery inventory before writing any scanner code.**

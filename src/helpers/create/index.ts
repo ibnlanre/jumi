@@ -26,9 +26,15 @@ import createPlugin from 'tailwindcss/plugin'
 /**
  * The model, wired to Tailwind.
  *
- * The values map is the host's shape for a theme scale, so it is assembled on
- * this side of the boundary and handed straight back: the model looks up a key
- * and never inspects what comes out.
+ * Note what `theme` means here, because the name is now misleading. It is not "ask Tailwind's JS
+ * theme" — it is **resolve a Jumi theme vocabulary entry to the representation Tailwind v4 CSS
+ * wants**, which is a token, a spacing formula, or the value as given. The host's API is one input
+ * to that decision, not the decision: `@/helpers/create/theme` owns the table and the order, and
+ * `pnpm theme:map` re-derives both from the emitted CSS. Every one of the 71 keys Jumi consumes has
+ * an explicit strategy, and `literal` is one of them.
+ *
+ * So the signature is unchanged and the semantics are Jumi's. When the emitter is Jumi's own, this
+ * is the function that stops being an adapter and becomes a resolver.
  */
 export function getCreator(api: Api): Creator {
   return createJumiModel({

@@ -58,6 +58,15 @@ tailwindcss/plugin (createPlugin)
 `Api` also declares `addComponents`, `addVariant`, `config`, `prefix`. Jumi uses
 none of them, so a Jumi-owned host interface is already ≈5 calls wide.
 
+Of those, **`theme` stopped being a host question in Phase 2**: the call remains, but what it means
+is Jumi's — resolve a vocabulary entry to a token, a spacing formula, or the value as given. All 71
+consumed keys have an explicit strategy and the gate fails if Tailwind's emitted CSS stops agreeing
+with it (`scanner-inventory.md` covers what is left of the host's side).
+
+What is still entirely the host's is **candidate discovery**: which strings become candidates, in
+what syntax, deduplicated, and in what order. Phase 3's inventory measures exactly what that hands
+over, per candidate.
+
 ## Inventory
 
 Classifications: **keep** (worth keeping — the host is better at it), **own**
@@ -415,7 +424,21 @@ same slot ordering
 only resolved values change — a literal becomes a var(…)
 ```
 
-## Aggregate representation (active workstream)
+## Aggregate representation (parked, with a threshold)
+
+**Parked 2026-09-12.** The finalizer changed what the remaining cost means: shipped
+CSS is sane again, browser behaviour is correct, and nothing at runtime is waiting
+on a different representation. What is left is compiler and intermediate waste —
+real debt, but no longer architecture-blocking, and it should not hold up the
+migration the way it did once.
+
+The trigger to pick it back up, so it is a decision and not a mood:
+
+> Revisit aggregate representation when build or dev-server cost becomes
+> materially noticeable on a real Jumi project, or when the corpora grow well
+> beyond their current size (60 slots / 1.5 MB emitted is the current worst case).
+
+Everything below is the measurement that got us here.
 
 Theme migration is measured batch by batch rather than run straight through, and it
 gives way to a cost measurement when one lands. The reason is not a change of
@@ -643,10 +666,16 @@ last, semantic ownership first.
    publications from 32 to 7. That fact is what the finalizer was built for: `@apply`
    copies the carrier body, marker included, and the aggregate is written into the copy
    after the build, so when the carrier is evaluated stops mattering at all.
-8. **Scanning / candidate discovery**, then **arbitrary values** (the phrase
-   grammar is currently shaped by the host's value parser), then **variants** last.
-   Variants are syntax and expansion complexity; nothing should depend on them being
-   Tailwind's.
+8. **Scanning / candidate discovery** (begun — inventory first; `scanner-inventory.md`
+   measures what the host hands Jumi per candidate and separates discovery from
+   parsing). The narrow question is whether Jumi can find its own candidates without
+   understanding Tailwind's variant grammar, and the measured answer is that discovery
+   is a substring problem — `hover:animate-scale-110` contains its bare form, and the
+   matcher cannot tell them apart anyway. What carries meaning is ordering (it is
+   precedence, not bytes) and type validation (`animate-width-abc` calls nothing
+   today). Then **arbitrary values** (the phrase grammar is currently shaped by the
+   host's value parser), then **variants** last. Variants are syntax and expansion
+   complexity; nothing should depend on them being Tailwind's.
 
 ## Guardrails
 
