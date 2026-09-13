@@ -327,7 +327,7 @@ export const Playground: Story = {
   render: () => (
     <div className="p-8">
       <AnimationPlayground
-        animationClass="typing"
+        animationClass="animate-typing"
         delays={['animation-delay-0', 'animation-delay-0.5', 'animation-delay-1', 'animation-delay-1.5']}
         durations={['animation-duration-1', 'animation-duration-2', 'animation-duration-3', 'animation-duration-4', 'animation-duration-5']}
         timingFunctions={['animation-timing-function-linear', 'animation-timing-function-ease-out', 'animation-timing-function-steps', 'animation-timing-function-cubic-bezier']}

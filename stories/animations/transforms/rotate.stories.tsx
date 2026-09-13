@@ -179,7 +179,7 @@ export const Playground: Story = {
   render: () => (
     <div className="p-8">
       <AnimationPlayground
-        animationClass="rotate"
+        animationClass="animate-rotate"
         delays={['animation-delay-0', 'animation-delay-0.2', 'animation-delay-0.4', 'animation-delay-0.6']}
         durations={['animation-duration-0.5', 'animation-duration-1', 'animation-duration-1.5', 'animation-duration-2', 'animation-duration-3']}
         timingFunctions={['animation-timing-function-linear', 'animation-timing-function-ease-in-out', 'animation-timing-function-ease', 'animation-timing-function-elastic']}

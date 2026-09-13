@@ -57,14 +57,14 @@ What the flat space does cost is that two animations labelled `flick` share one 
 choice rather than a defect, and it is the price of a label being sufficient on its own: the control knows
 only the word, never the property, so the variable can only be keyed by that word. It is bounded, though —
 a label is element-local, like a phrase name and for the same reason. Every link the chain reads for a
-labelled slot is registered `inherits: false`, emitted where the label is recorded rather than while
-`.animations` is assembled, so the registration cannot be missed by a slot created late. Measured: a
+labelled slot is registered `inherits: false`, emitted where the label is recorded rather than when
+the composition is assembled, so the registration cannot be missed by a slot created late. Measured: a
 wrapper carrying `animation-timing-function-ease-out/flick` over a child whose own phrase is labelled
 `[flick]` leaves the child's label link unset, where before the child inherited `ease-out`. The property
 link still crosses a wrapper boundary — nothing declares `--jumi-{attr}-animation-{part}` on the element,
 so a `/rotate` control above it cascades (measured: `500ms` reaching a child's unlabelled rotate) — while
-the global links do not, unregistered though they are: `.animations` declares their defaults on every
-element, and a declaration beats inheritance (measured: a wrapper's `--jumi-animation-duration: 5s` leaves
+the global links do not, unregistered though they are: the derived defaults rule declares them on every
+animating element, and a declaration beats inheritance (measured: a wrapper's `--jumi-animation-duration: 5s` leaves
 a child at `1s`). Registration is skipped when a label IS the attribute name, since that variable is the
 property scope's, and the scope is the link that does cross the boundary.
 The label is not part of the phrase and not part of a keyframe's identity: the phrase still
@@ -141,7 +141,13 @@ skip the gate entirely.
 
 ## Known limitation: the slot list is per pass, not per update
 
-`.animations` has to enumerate every slot in the build, so its rule is not a
+> **Superseded in mechanism, not in cause.** The carrier this section names left userland: the
+> composition is now derived from the finished stylesheet, so nothing has to enumerate slots inside a
+> candidate any more. The host facts below are unchanged, and they are why the model re-publishes its
+> data instead of trusting a single pass — Tailwind caches one AST per candidate, and an incremental
+> scan appends rather than sorts.
+
+`animations` used to enumerate every slot in the build, so its rule was not a
 function of its own candidate — and Tailwind caches one AST per candidate. Both
 halves were measured against `@tailwindcss/node`'s `compile()` +
 `build(candidates)`, which is the path the Vite plugin takes:

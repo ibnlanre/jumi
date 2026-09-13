@@ -61,7 +61,7 @@ export interface EffectComparisonProps {
 export function AnimationGrid({
   animations,
   columns = 3,
-  defaultDuration = 'animation-duration-1',
+  defaultDuration = 'animation-duration-1000',
   description,
   title,
 }: AnimationGridProps) {
@@ -88,7 +88,7 @@ export function AnimationGrid({
       <div className={`grid gap-6 ${gridClasses[columns as keyof typeof gridClasses] || gridClasses[3]}`}>
         {animations.map(animation => (
           <AnimationShowcase
-            animationClass={`jumi ${animation.class} ${animation.duration || defaultDuration}`}
+            animationClass={`animate-${animation.class} ${animation.duration || defaultDuration}`}
             backgroundClass={animation.backgroundClass || 'bg-white'}
             description={animation.description || ''}
             key={animation.name}
@@ -102,8 +102,8 @@ export function AnimationGrid({
 
 export function AnimationPlayground({
   animationClass,
-  delays = ['animation-delay-0', 'animation-delay-0.2', 'animation-delay-0.5', 'animation-delay-1'],
-  durations = ['animation-duration-0.3', 'animation-duration-0.5', 'animation-duration-1', 'animation-duration-1.5', 'animation-duration-2'],
+  delays = ['animation-delay-150', 'animation-delay-300', 'animation-delay-500', 'animation-delay-1000'],
+  durations = ['animation-duration-150', 'animation-duration-300', 'animation-duration-500', 'animation-duration-700', 'animation-duration-1000'],
   timingFunctions = ['animation-timing-function-ease', 'animation-timing-function-ease-in', 'animation-timing-function-ease-out', 'animation-timing-function-ease-in-out'],
 }: AnimationPlaygroundProps) {
   const [selectedDuration, setSelectedDuration] = React.useState(durations[2])
@@ -111,7 +111,7 @@ export function AnimationPlayground({
   const [selectedTiming, setSelectedTiming] = React.useState(timingFunctions[0])
   const [key, setKey] = React.useState(0)
 
-  const currentAnimation = `jumi ${animationClass} ${selectedDuration} ${selectedDelay} ${selectedTiming}`
+  const currentAnimation = `animate-${animationClass} ${selectedDuration} ${selectedDelay} ${selectedTiming}`
 
   return (
     <div className="p-6 space-y-6 rounded-lg bg-gray-50">
@@ -260,7 +260,7 @@ export function EffectComparison({ effects, title }: EffectComparisonProps) {
         {effects.map(effect => (
           <div className="space-y-4" key={effect.name}>
             <AnimationShowcase
-              animationClass={`jumi ${effect.class} animation-duration-1`}
+              animationClass={`animate-${effect.class} animation-duration-1000`}
               backgroundClass={effect.backgroundClass || 'bg-white'}
               description={effect.description}
               title={effect.name}

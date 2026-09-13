@@ -145,7 +145,7 @@ export const Playground: Story = {
   render: () => (
     <div className="p-8">
       <AnimationPlayground
-        animationClass="fade-out-up"
+        animationClass="animate-fade-out-up"
         delays={['animation-delay-0', 'animation-delay-0.1', 'animation-delay-0.2', 'animation-delay-0.4']}
         durations={['animation-duration-0.3', 'animation-duration-0.4', 'animation-duration-0.6', 'animation-duration-0.8', 'animation-duration-1']}
         timingFunctions={['animation-timing-function-ease-in', 'animation-timing-function-ease-out', 'animation-timing-function-ease-in-out', 'animation-timing-function-cubic-bezier']}

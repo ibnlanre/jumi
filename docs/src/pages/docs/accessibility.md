@@ -26,14 +26,13 @@ When the movement is continuous rather than an entrance, the inverse variant is 
 
 ## Reduce motion across a surface
 
-For a dedicated showcase, a CSS rule can disable Jumi animation throughout the page:
+There is no carrier class to switch off any more, so a rule that reduces motion across a showcase
+has to reach every element:
 
 ```css
 @media (prefers-reduced-motion: reduce) {
-  .animations {
+  *, *::before, *::after {
     animation: none !important;
-  }
-  .transitions {
     transition: none !important;
   }
 }
@@ -46,7 +45,7 @@ This is the approach used for the animated specimens in this documentation site.
 Provide an accessible pause control for persistent decorative movement. Use a real button, label its action, and communicate whether it is pressed with `aria-pressed`.
 
 ```css
-.motion-paused .animations {
+.motion-paused *, .motion-paused *::before, .motion-paused *::after {
   animation-play-state: paused !important;
 }
 ```

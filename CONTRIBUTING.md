@@ -103,40 +103,50 @@ than it looks, and what the `has-*` incident cost.
 
 ---
 
-### 6. Carrier Classes Hold What Utilities Cannot
+### 6. The Composition Is Synthesized, Not Declared
 
-Some responsibilities cannot live in a utility class. `animations` and `transitions` are **carriers**:
-the author opts an element in once, and the carrier declares the shared composition state that
-element needs.
+An element animates because it carries a motion utility. Nothing opts it in a second time, and no
+rule of Jumi's is written by hand.
 
 ```html
-✅ Good
-<div class="animations animate-rotate-45 animate-scale-110">
+✅ Good — the utilities are the whole interface
+<div class="animate-rotate-45 animate-scale-110">
 
-❌ Avoid
-<div class="animate-rotate-45 animate-scale-110">   <!-- nothing assembles them -->
+❌ Avoid — a hand-written list is a copy that goes stale
+<div class="animate-rotate-45" style="animation-name: rot, scale">
 ```
 
 **Why?** Every animation on an element competes for the same declarations, and those are *lists*
 (`animation-name`, `animation-duration`, and the rest) the browser resolves by position. A utility can
 own its own value; it cannot own the list, because Tailwind compiles each candidate without knowing
-what else the element carries. So the list is assembled once, on the element, by a carrier the author
-asks for. The carrier is also the single handle for turning motion off, and it declares the shared
-defaults.
+what else the element carries — and caches that utility's output per candidate, so a list written
+inside one is reused stale the moment another slot appears. So the integration derives the list from
+the finished stylesheet, for every selector that proves it animates.
 
-`@apply` works: `@apply animations animate-rotate-45` produces a carrier like any other.
+This used to be a class the author wrote — `animations`, and `transitions` for the other carrier.
+Those are gone, replaced by an inference over emitted CSS, and what survives them is the reason they
+existed. The guardrails below are the ones that outlived the class.
+
+`@apply` works: `@apply animate-rotate-45` is an activation like any other, because the finalizer
+reads it out of the finished stylesheet. A rule that names a selector cannot reach every prefixed
+form, which is why nothing tries.
 
 Guardrails, each of which cost a shipped bug to learn:
 
-- **The aggregate resolves on the carrier.** Its entries reference the slot variables the `animate-*`
+- **The defaults resolve on the element.** Their entries reference the slot variables the `animate-*`
   utilities declare *on the element*, and a `var()` chain inside a custom property resolves where it
-  is declared. Published anywhere else, every carrier silently resolves `animation-name: none`.
+  is declared. Published on `:root` instead, every animating element silently resolves
+  `animation-name: none`, and the stagger system stops — `--jumi-animation-delay` reads a variable
+  only the element sets.
 - **The finalizer needs the finished stylesheet.** For Vite that is a transform with no `enforce`; for
   PostCSS it is `OnceExit`. Both were measured against the alternatives.
+- **Slot activation names are registered `inherits: false`; controls are not.** An activation is
+  state — inherited into an animating descendant it makes that descendant run its ancestor's
+  animation. A control is configuration, and inheriting from a wrapper is the point of it.
 
-Before proposing to remove a carrier, answer: where does the shared composition responsibility move?
-Before publishing the aggregate anywhere else: which element will resolve that declaration? The
-reasoning and measurements are in `engineering/architecture/carrier-locality.md`.
+Before publishing the composition anywhere else: which element will resolve that declaration? Before
+moving a registration: is this state or configuration? The reasoning and measurements are in
+`engineering/architecture/carrier-locality.md`.
 
 ### 7. One Integration Step, Or A Deletion Path
 

@@ -46,9 +46,14 @@ const { title = 'Jumi — Motion, atom by atom.', description = 'A composable an
       document.querySelectorAll<HTMLButtonElement>('[data-replay]').forEach(button => {
         button.addEventListener('click', () => {
           const surface = button.closest('[data-demo]');
-          const items = surface?.querySelectorAll<HTMLElement>('.animations');
-          items?.forEach(item => item.style.animation = 'none');
-          requestAnimationFrame(() => requestAnimationFrame(() => items?.forEach(item => item.style.removeProperty('animation'))));
+          // Whatever the composition resolved onto: a direct utility, a variant, or the children a
+          // stagger drives. There is no carrier class to select any more, so the predicate is the one
+          // the browser computed — an element animates when its `animation-name` is not `none`.
+          const animated = (element: HTMLElement) => getComputedStyle(element).animationName
+            .split(',').some(name => name.trim() !== 'none');
+          const items = [...(surface?.querySelectorAll<HTMLElement>('*') ?? [])].filter(animated);
+          items.forEach(item => item.style.animation = 'none');
+          requestAnimationFrame(() => requestAnimationFrame(() => items.forEach(item => item.style.removeProperty('animation'))));
         });
       });
     </script>

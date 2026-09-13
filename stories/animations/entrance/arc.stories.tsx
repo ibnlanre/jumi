@@ -179,7 +179,7 @@ export const Playground: Story = {
   render: () => (
     <div className="p-8">
       <AnimationPlayground
-        animationClass="arc-in-gentle"
+        animationClass="animate-arc-in-gentle"
         delays={['animation-delay-0', 'animation-delay-0.1', 'animation-delay-0.3', 'animation-delay-0.5']}
         durations={['animation-duration-0.8', 'animation-duration-1', 'animation-duration-1.2', 'animation-duration-1.5', 'animation-duration-2']}
         timingFunctions={['animation-timing-function-ease-in-out', 'animation-timing-function-ease-out', 'animation-timing-function-cubic-bezier', 'animation-timing-function-spring']}

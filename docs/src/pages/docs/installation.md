@@ -97,7 +97,9 @@ writeFileSync('dist/output.css', css)
 </div>
 ```
 
-`motion-safe:animations` activates the animation only when the visitor has not requested reduced motion. The element stays visible otherwise.
+`motion-safe:` puts the animation behind the visitor's preference: it applies only when they have
+not requested reduced motion. The element stays visible otherwise, because only the animation is
+conditional.
 
 ## Using Astro
 

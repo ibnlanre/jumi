@@ -169,7 +169,7 @@ export const Playground: Story = {
   render: () => (
     <div className="p-8">
       <AnimationPlayground
-        animationClass="bounce-out"
+        animationClass="animate-bounce-out"
         delays={['animation-delay-0', 'animation-delay-0.1', 'animation-delay-0.2', 'animation-delay-0.4']}
         durations={['animation-duration-0.6', 'animation-duration-0.8', 'animation-duration-1', 'animation-duration-1.2', 'animation-duration-1.5']}
         timingFunctions={['animation-timing-function-ease-in', 'animation-timing-function-bounce', 'animation-timing-function-elastic', 'animation-timing-function-back']}

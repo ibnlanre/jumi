@@ -297,7 +297,7 @@ export const Playground: Story = {
   render: () => (
     <div className="p-8">
       <AnimationPlayground
-        animationClass="shimmer"
+        animationClass="animate-shimmer"
         delays={['animation-delay-0', 'animation-delay-0.3', 'animation-delay-0.6', 'animation-delay-1']}
         durations={['animation-duration-1', 'animation-duration-1.5', 'animation-duration-2', 'animation-duration-2.5', 'animation-duration-3']}
         timingFunctions={['animation-timing-function-ease-in-out', 'animation-timing-function-linear', 'animation-timing-function-ease-out', 'animation-timing-function-cubic-bezier']}

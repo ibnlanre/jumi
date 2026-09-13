@@ -77,7 +77,7 @@ type Frame = {
   value: string
 }
 
-/** One animation in `.animations`, addressed by its attribute and, optionally,
+/** One animation in the composition, addressed by its attribute and, optionally,
  * the variable that declares its name. `label` is the name its declaration gave
  * it with `/[flick]`, which is the same word a control addresses it by. */
 type Slot = {
@@ -113,8 +113,8 @@ const slotParts = [
  * created. Every registry below — `values`, `phrases`, `composed`, `effects`,
  * `labels`, `registered` — is therefore per-instance, and slots accumulate across
  * every candidate that instance compiles. That is why a slot can be created after
- * `.animations` has been asked for its declarations, and why a registration is
- * emitted from the slot's own creation rather than from a getter here.
+ * the composition's lists were first assembled, and why a registration is emitted
+ * from the slot's own creation rather than from a getter here.
  *
  * Adapter assumption: the host keeps that instance alive for the lifetime of its
  * compiler. Tailwind does — measured, the plugin function runs once per compiler
@@ -148,24 +148,25 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
    *
    * `.animate-*` utilities declare their animation name on the element itself
    * (`--jumi-{attribute}-{id}-animation-name`), but custom properties inherit by
-   * default. Without this, any descendant that also opts into `animations`
-   * resolves an ANCESTOR's name and re-runs its animation with the descendant's
+   * default. Without this, any descendant that also animates resolves an
+   * ANCESTOR's name and re-runs its animation with the descendant's
    * own timing — e.g. the hero orbit's `animate-rotate-[360deg]` leaking into
    * nested petals, which then spun at the petal's duration instead of the
    * orbit's.
    *
-   * Registering here rather than while `.animations` is assembled matters twice
-   * over. Tailwind evaluates that utility once per candidate — `animations`,
-   * `*:animations`, `before:animations`, `hover:animations` — so assembling
-   * there re-emitted every registration once per candidate, and any slot created
-   * AFTER the last of those evaluations was never registered at all. The
-   * `registered` set keeps it to one registration per name.
+   * Registering at the slot's creation rather than from the composition keeps it
+   * complete: the composition is derived from the *finished* stylesheet, so a
+   * registration written there would arrive a pass too late for a utility
+   * compiled after it. There is no point during a build where every slot is
+   * known. The `registered` set keeps it to one registration per name, however
+   * often a variant re-declares the same value.
    *
    * The shared `--jumi-animation-*` controls are left unregistered, which is a
-   * different question from cascading. `.animations` declares their defaults on
-   * every element, and a declaration beats inheritance, so a global control
-   * written on an ancestor never reaches a descendant's animations (measured: a
-   * wrapper's `--jumi-animation-duration: 5s` still leaves a child at `1s`).
+   * different question from cascading. The derived defaults rule declares them on
+   * every animating element, and a declaration beats inheritance, so a global
+   * control written on an ancestor never reaches a descendant's animations
+   * (measured: a wrapper's `--jumi-animation-duration: 5s` still leaves a child
+   * at `1s`).
    * The link that does cross that boundary is the property scope, because
    * nothing declares `--jumi-{attribute}-animation-{part}` on the element: a
    * `/rotate` control on a wrapper does reach inside it (measured: `500ms`).
@@ -217,7 +218,7 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
    * Emit a keyframe the first time its name is seen.
    *
    * Emission belongs at the point where a slot's existence is certain — the
-   * registration itself — and not in the `.animations` getter, which Tailwind is
+   * registration itself — and not in the aggregate getter, which Tailwind is
    * free never to ask again once it has cached that candidate. Ownership is the
    * reason: a phrase causing a keyframe to exist is a fact about the phrase, and
    * an aggregate that happens to enumerate slots is the wrong place for it.
@@ -339,8 +340,8 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
     // and shuffles values between slots: a fill-mode keyword lands in
     // `animation-name` (the `forwards, forwards, …` you see in the inspector)
     // and slots get dropped. Longhand lists keep every slot bound to its own
-    // var chain. The `--jumi-animation-*` defaults the chains fall back to come
-    // from `assemble('animation')` at the end of `.animations`.
+    // var chain. The `--jumi-animation-*` defaults the chains fall back to are
+    // declared by the defaults rule the finalizer derives, on the element.
     const animation = slots.length
       ? slots.reduce((acc, { attribute, label, nameVar }) => {
           const parts = animationParts(attribute, nameVar, label)
@@ -510,7 +511,7 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
   const creator: Creator = {
     /**
      * The aggregate's own slot lists, in the model's order — what the data
-     * channel publishes, and what the adapter's `.animations` rule carries.
+     * channel publishes, and what the adapter stages for the finalizer.
      */
     get animations(): CssInJs {
       const assembled = sorted(properties).reduce((acc, attribute) =>

@@ -179,7 +179,7 @@ export const Playground: Story = {
   render: () => (
     <div className="p-8">
       <AnimationPlayground
-        animationClass="flip-in-y"
+        animationClass="animate-flip-in-y"
         delays={['animation-delay-0', 'animation-delay-0.1', 'animation-delay-0.2', 'animation-delay-0.4']}
         durations={['animation-duration-0.5', 'animation-duration-0.6', 'animation-duration-0.8', 'animation-duration-1', 'animation-duration-1.2']}
         timingFunctions={['animation-timing-function-ease-out', 'animation-timing-function-ease-in-out', 'animation-timing-function-back', 'animation-timing-function-cubic-bezier']}

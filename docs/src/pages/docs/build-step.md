@@ -17,14 +17,16 @@ Wire up only the plugin and your utilities compile, your page has no animations,
 
 ## What the second step does
 
-`animations` is a gathering class. It has to produce one list per animation longhand, covering every `animate-*` utility on the element:
+Nothing in your markup says "assemble these". An element animates because it carries a motion
+utility, and the integration derives the composition from the finished stylesheet: every rule that
+declares a slot's activation variable is one of the selectors the composition is written for.
 
 ```html
 <div class="animate-rotate-45 animate-fade-in">…</div>
 ```
 
 ```css
-.animations {
+.animate-rotate-45, .animate-fade-in {
   animation-name: var(--jumi-rotate-…-animation-name, var(--jumi-animation-name)),
                   var(--jumi-fade-in-…-animation-name, var(--jumi-animation-name));
   animation-duration: …;
@@ -32,9 +34,15 @@ Wire up only the plugin and your utilities compile, your page has no animations,
 }
 ```
 
-Two things make that impossible to write while any single utility is being compiled. The lists depend on **which other classes are present**, and their order is the order the browser resolves them in — `animation-composition: replace` gives the last entry the win. Both facts are only settled at the end of the build.
+Two things make that impossible to write while any single utility is being compiled. The lists depend
+on **which other classes are present**, and their order is the order the browser resolves them in —
+`animation-composition: replace` gives the last entry the win. Both facts are only settled at the end
+of the build.
 
-`animations` is one of two carriers; `transitions` is the other. It composes a `transition` shorthand from whichever `transition-property/…` motions are on the element, and it has the identical problem — the list depends on which utilities exist — so it is assembled the same way. Everything below applies to both.
+A second composition does the same for transitions: `transition-property/…` is what activates a
+motion, and the shorthand is composed from whichever motions the element declared. It has the
+identical problem — the list depends on which utilities exist — so it is assembled the same way.
+Everything below applies to both.
 
 ## The three places that list could live
 
@@ -42,9 +50,9 @@ There are only three, and each one gives up something:
 
 | Written… | Locality | Freshness |
 | --- | --- | --- |
-| **In the `animations` utility body** | ✓ the body travels with the class — `*:animations`, `before:animations` and `@apply animations` all carry it | ✗ Tailwind caches a utility's output per candidate, so a list that depends on other classes is reused stale |
-| **In a separate rule at a literal selector** | ✗ the rule that needs it has moved — a variant re-parents the class body, so `.animations` is not where `*:animations` ended up | ✓ it is rewritten whenever the lists change |
-| **After Tailwind emits** | ✓ written into each rule the class ended up in, wherever that is | ✓ computed once every class has been compiled |
+| **In the utility body** | ✓ the body travels with the class — `*:animate-*`, `before:animate-*` and `@apply animate-*` all carry it | ✗ Tailwind caches a utility's output per candidate, so a list that depends on other classes is reused stale |
+| **In a separate rule at a literal selector** | ✗ the rule that needs it has moved — a variant re-parents the class body, so a rule written for the utility is not where `*:animate-*` ended up | ✓ it is rewritten whenever the lists change |
+| **After Tailwind emits** | ✓ written for every selector the finished stylesheet proves animates, wherever that is | ✓ computed once every class has been compiled |
 
 The first two are complements rather than alternatives: locality wants the list inside the class, freshness wants it outside. That is the entire reason the step exists, and it is why no `@plugin` configuration can stand in for it.
 

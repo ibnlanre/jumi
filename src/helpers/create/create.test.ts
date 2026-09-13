@@ -254,12 +254,12 @@ describe('keyframe emission', () => {
 })
 
 describe('animations wiring', () => {
-  it('merges the animation-control defaults into `.animations`', () => {
+  it('merges the animation-control defaults into the animations getter', () => {
     const { creator } = setup()
 
     const animations = creator.animations
 
-    // With no registered values, `.animations` falls back to the shared controls.
+    // With no registered values, the getter falls back to the shared controls.
     expect(animations['animation-name']).toBe('var(--jumi-animation-name)')
     expect(animations['animation-duration']).toBe('var(--jumi-animation-duration)')
     expect(animations).toMatchObject({
@@ -459,14 +459,13 @@ describe('animation-name registration', () => {
     expect(utilities['@property --jumi-rotate-animation-timing-function']).toBeUndefined()
   })
 
-  it('registers a name once, however often `.animations` is evaluated', () => {
+  it('registers a name once, however often the animations getter is read', () => {
     const { addBase, creator } = setup()
 
     creator.property('opacity')('50', { modifier: null })
     creator.effect('fade-in')
 
-    // Tailwind evaluates `.animations` once per candidate that carries it —
-    // `animations`, `*:animations`, `before:animations`, `hover:animations`.
+    // Every read has to leave exactly one registration behind, however many callers read it.
     creator.animations
     creator.animations
     creator.animations
@@ -481,16 +480,16 @@ describe('animation-name registration', () => {
       .toHaveLength(1)
   })
 
-  it('registers a slot created after the last `.animations` evaluation', () => {
+  it('registers a slot created after the last read of the animations getter', () => {
     const { addBase, creator } = setup()
 
     creator.property('opacity')('50', { modifier: null })
     creator.animations
 
-    // Tailwind sorts some candidates after `.animations` — a `not-sm:*` variant,
-    // for instance — so a slot can be created once the getter has run for good.
-    // Registration must not depend on the getter: otherwise that name is left
-    // inheritable and leaks an ancestor's animation into its descendants.
+    // A slot's utility can be compiled after anything has read the lists, so a
+    // slot can be created once the getter has run for good. Registration must not
+    // depend on the getter: otherwise that name is left inheritable and leaks an
+    // ancestor's animation into its descendants.
     creator.property('accent-color')('amber-400', { modifier: null })
 
     const id = shorthash2('amber-400')
@@ -508,11 +507,11 @@ describe('animation-name registration', () => {
     creator.effect('fade-in')
     creator.animations
 
-    // Unregistered is not the same as cascading: `.animations` declares these
-    // defaults on every element, and a declaration beats inheritance, so a
-    // global control written on an ancestor never reaches a descendant's
-    // animations. Registering them would add a block per name and change
-    // nothing a page could observe.
+    // Unregistered is not the same as cascading: the derived defaults rule
+    // declares these on every animating element, and a declaration beats
+    // inheritance, so a global control written on an ancestor never reaches a
+    // descendant's animations. Registering them would add a block per name and
+    // change nothing a page could observe.
     const utilities = registered(addBase)
 
     expect(utilities['@property --jumi-animation-name']).toBeUndefined()

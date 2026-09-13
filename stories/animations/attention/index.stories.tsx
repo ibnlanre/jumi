@@ -269,7 +269,7 @@ export const Playground: Story = {
   render: () => (
     <div className="p-8">
       <AnimationPlayground
-        animationClass="pulse"
+        animationClass="animate-pulse"
         delays={['animation-delay-0', 'animation-delay-0.2', 'animation-delay-0.5', 'animation-delay-1']}
         durations={['animation-duration-0.5', 'animation-duration-1', 'animation-duration-1.5', 'animation-duration-2', 'animation-duration-3']}
         timingFunctions={['animation-timing-function-ease-in-out', 'animation-timing-function-ease-out', 'animation-timing-function-linear', 'animation-timing-function-elastic']}

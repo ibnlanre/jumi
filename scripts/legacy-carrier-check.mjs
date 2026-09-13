@@ -85,6 +85,18 @@ const classText = source => [
 ].map(match => match[0])
 
 /**
+ * The visible text of a code sample, with its syntax-highlight spans stripped.
+ *
+ * A sample is markup, not prose, and the attribute extractor above cannot see inside one: the
+ * landing page rendered its class list as a `syntax-white` span wrapped around the token, so
+ * `animations` never sat inside a `class="…"` capture. That is how it went on advertising a carrier
+ * after the carrier was gone, with every other harness green — so a code sample is read as what it
+ * ultimately shows, not as the markup that shows it.
+ */
+const codeText = source => [...source.matchAll(/<code[^>]*>([\s\S]*?)<\/code>/g)]
+  .map(match => match[1].replace(/<[^>]*>/g, ' '))
+
+/**
  * The class names in a fragment, with a variant prefix stripped.
  *
  * `before:animations` is the same mistake as `animations` — the variant moved onto the carrier
@@ -101,7 +113,7 @@ const hits = []
 for (const file of SURFACES.flatMap(walk)) {
   const source = readFileSync(file, 'utf8')
 
-  for (const fragment of classText(source)) {
+  for (const fragment of [...classText(source), ...codeText(source)]) {
     for (const token of tokens(fragment)) {
       if (LEGACY.has(token)) hits.push({ file: path.relative(root, file), token })
     }

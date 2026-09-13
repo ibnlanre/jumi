@@ -133,16 +133,18 @@ let matched = 0
 
 for (const variant of variants) {
   const instance = await compile(readFileSync(path.join(dir, 'entry.css'), 'utf8'), { base: dir, onDependency() {} })
-  const css = instance.build([`${variant}:animations`, `${variant}:animate-rotate-45`])
+  const css = instance.build([`${variant}:animate-rotate-45`])
 
-  const carrier = wrapperOf(css, 'animations')
   const utility = wrapperOf(css, 'animate-rotate-45')
   const mine = render(variant, '&')
 
-  // Both the utility and the carrier have to transform the same way; the carrier is the one that
-  // moves, which is why it is checked rather than assumed.
-  const same = carrier
-    && JSON.stringify(carrier) === JSON.stringify(utility)
+  // The utility is the witness: a variant re-parents the class body, so what the host emits is the
+  // model's transformation applied to that class. A second witness used to be read here — the
+  // `animations` carrier, on the grounds that it was the one that moved — and when the carrier left
+  // userland `wrapperOf` returned null for it, which this comparison counted as a mismatch. The
+  // spike then reported 0/12 and still exited 0, which is the failure mode `engineering/README.md`
+  // warns about, so the count is now the exit code.
+  const same = Boolean(utility)
     && JSON.stringify(utility) === JSON.stringify({ media: mine.media, selector: mine.selector })
 
   if (same) matched += 1
@@ -153,7 +155,7 @@ for (const variant of variants) {
   )
 
   if (!same) {
-    console.log(`                  host ${JSON.stringify(utility)}   carrier ${JSON.stringify(carrier)}`)
+    console.log(`                  host ${JSON.stringify(utility)}`)
     console.log(`                  model ${JSON.stringify({ media: mine.media, selector: mine.selector })}`)
   }
 }
@@ -161,5 +163,7 @@ for (const variant of variants) {
 console.log(`\n${matched}/${variants.length} transformations reproduced by the prototype`
   + ` (${Object.keys(registry).length} registry entries + ${arbitrary.length} arbitrary rules)`)
 console.log('class escaping is not modelled: the comparison normalises the class token to `&`')
+
+if (matched !== variants.length) process.exitCode = 1
 
 rmSync(dir, { force: true, recursive: true })

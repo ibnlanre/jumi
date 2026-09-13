@@ -179,7 +179,7 @@ export const Playground: Story = {
   render: () => (
     <div className="p-8">
       <AnimationPlayground
-        animationClass="skew-x"
+        animationClass="animate-skew-x"
         delays={['animation-delay-0', 'animation-delay-0.1', 'animation-delay-0.3', 'animation-delay-0.5']}
         durations={['animation-duration-0.5', 'animation-duration-0.8', 'animation-duration-1', 'animation-duration-1.2', 'animation-duration-1.5']}
         timingFunctions={['animation-timing-function-ease-out', 'animation-timing-function-ease-in-out', 'animation-timing-function-elastic', 'animation-timing-function-back']}

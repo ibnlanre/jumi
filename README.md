@@ -47,9 +47,8 @@ and that is the whole setup. Your stylesheet does not mention Jumi:
 ```
 
 `jumi()` owns Jumi's lifecycle inside the build: it registers Jumi with Tailwind, lets Tailwind
-compile what you wrote, and then completes the stylesheet — because a carrier opts an element in,
-and the animations it assembles cannot be known until every `animate-*` class on the page has been
-compiled.
+compile what you wrote, and then completes the stylesheet — because the composition lists cannot be
+known until every `animate-*` class on the page has been compiled.
 
 Prefer to be explicit? Both work, and they compile to the same CSS:
 
@@ -95,8 +94,9 @@ Choose an effect, then its timing:
 </div>
 ```
 
-Use `motion-safe:animations` for decorative motion that respects the visitor's
-reduced-motion preference. Keep the element visible in its unanimated state.
+Use `motion-safe:animate-reveal-swipe` for decorative motion that respects the
+visitor's reduced-motion preference. Keep the element visible in its unanimated
+state.
 
 ## Motion, atom by atom
 
@@ -113,12 +113,11 @@ modifiers scope a control to that property's animation slot.
 
 | Piece | Example | What it does |
 | --- | --- | --- |
-| Activate | `animations` | Assemble animations on an element |
 | Effects | `animate-bounce-in` | Apply a named keyframe effect |
 | Properties | `animate-rotate-[0.25turn]` | Animate a property toward a target |
 | Controls | `animation-duration-[800ms]/rotate` | Give a property its own timing |
 | Stagger | `animate-stagger-forward-[100ms]/3` | Sequence direct children |
-| Transitions | `transitions transition-property/scale` | Animate a change of state |
+| Transitions | `transition-property/scale` | Animate a change of state |
 
 Theme values and arbitrary values work together. Compound properties such as
 filters and transforms are assembled from custom properties; their parts share
