@@ -1,4 +1,4 @@
-import type { AtRule, PropertiesHyphen } from 'csstype'
+import type { PropertiesHyphen } from 'csstype'
 import type { PluginCreator } from 'tailwindcss/plugin'
 
 export type AddProperty = Collection<CssInJs>
@@ -436,10 +436,6 @@ export type AnimationFrame = 'from' | 'to' | `${number}%` | (string & {})
 export type AnimationFunction
   = | 'scroll'
     | 'view'
-
-export type AnimationPropertyRegister = `@property --jumi-${StandardAnimationPropertyType}`
-
-export type AnimationPropertyRegisterCollection = Partial<Record<AnimationPropertyRegister, AtRule.PropertyHyphen<string>>>
 
 export type AnimationPropertyType = NonStandardAnimtionPropertyType | StandardAnimationPropertyType
 

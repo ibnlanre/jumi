@@ -29,6 +29,11 @@
  * property over both. And it asserts the finalizer did its job: the payload is gone, and running
  * the pass over its own output changes nothing.
  *
+ * Finally it asserts the one promise that is not about an element opting in: a slot activation name
+ * is registered `inherits: false`, so an ancestor's activation cannot reach an animating
+ * descendant. The emitted CSS for that case looks entirely reasonable, which is the whole reason it
+ * belongs here — see the `property` sink, and section 6.
+ *
  * Run: pnpm behaviour:check
  */
 import { execFileSync } from 'node:child_process'
@@ -220,7 +225,7 @@ console.log(`    ${pseudoOk ? '✓' : '✗'} pseudo-element substrate  ${pseudo?
 if (!pseudoOk) failures.push(`pseudo-element: substrate resolved "${pseudo?.duration.slice(0, 44) ?? 'none'}", expected 1s per slot`)
 
 /* ------------------------------------------------------------------------------------
- * 2. The contexts that are not a variant, and the mechanisms a selector reaches
+ * 3. The contexts that are not a variant, and the mechanisms a selector reaches
  *    (canonical corpus).
  * ---------------------------------------------------------------------------------- */
 
@@ -310,7 +315,7 @@ if (bareNames.some(name => name !== 'none')) {
 }
 
 /* ------------------------------------------------------------------------------------
- * 3. The theme batch: a spacing name resolves through `--spacing`, not a build-time literal
+ * 4. The theme batch: a spacing name resolves through `--spacing`, not a build-time literal
  * ---------------------------------------------------------------------------------- */
 
 // The corpus overrides `--spacing` (0.3rem), so this is the batch's claim measured where it
@@ -331,7 +336,7 @@ if (!spacingResolved) {
 }
 
 /* ------------------------------------------------------------------------------------
- * 4. The partial-namespace batch: a token-backed name resolves through the token
+ * 5. The partial-namespace batch: a token-backed name resolves through the token
  * ---------------------------------------------------------------------------------- */
 
 // Same claim as the spacing one above, for a name that is not arithmetic: the corpus overrides
@@ -374,7 +379,7 @@ if (applied.lengths.length !== 1) {
 }
 
 /* ------------------------------------------------------------------------------------
- * 5. Relationship variants: same element, not a descendant
+ * 6. Relationship variants: same element, not a descendant
  * ---------------------------------------------------------------------------------- */
 
 // These three are chosen so a descendant selector fails them. `is-[h1]:x` used to be Jumi's own
@@ -404,6 +409,47 @@ if (!hasResolved) {
   failures.push(`has-[>button]: the element with a direct child button resolved "${hasChild.name.slice(0, 40)}", expected ${hasSlot ?? '(no slot)'}`)
 }
 
+/* ------------------------------------------------------------------------------------
+ * 7. Non-inheritance: an ancestor's activation must not reach an animating descendant
+ * ---------------------------------------------------------------------------------- */
+
+// A slot activation name is *state*, not configuration, so it is registered `inherits: false` (see
+// the `property` sink in `@/helpers/create`). Left unregistered, a custom property inherits like
+// any other — and a descendant that also animates, which is exactly what puts it in the composition
+// set, then resolves the ancestor's token at that slot's position and re-runs the ancestor's
+// animation with its own timing. The declared defaults do not cover this: `--jumi-animation-name:
+// none` is a different property, and a `var()` fallback applies only when a property is *unset*,
+// which an inherited value is not.
+//
+// This is the recorded failure in miniature — the hero orbit's `animate-rotate-[360deg]` leaking
+// into nested petals, which then spun at the petal's duration instead of the orbit's. Deleting
+// `inherits: false` from the sink leaves every other harness here green, because none of them can
+// see inheritance at all.
+const nesting = await load(canonicalCss, `
+    <div id="nest-outer" class="animate-rotate-45">
+      <div id="nest-inner" class="animate-fade-in"></div>
+    </div>
+`)
+
+const outerSlot = canonicalSlots('animate-rotate-45')
+const innerSlot = canonicalSlots('animate-fade-in')
+const outerNames = (await entry(nesting, '#nest-outer'))?.name.split(',').map(name => name.trim()) ?? []
+const innerNames = (await entry(nesting, '#nest-inner'))?.name.split(',').map(name => name.trim()) ?? []
+
+const outerAnimates = outerSlot !== null && outerNames.includes(outerSlot)
+const innerAnimates = innerSlot !== null && innerNames.includes(innerSlot)
+const innerInherits = outerSlot !== null && innerNames.includes(outerSlot)
+const nestingOk = outerAnimates && innerAnimates && !innerInherits
+
+if (!nestingOk) {
+  failures.push(
+    'non-inheritance:'
+    + ` the outer ${outerAnimates ? 'animated' : `resolved no ${outerSlot}`},`
+    + ` the inner ${innerAnimates ? 'animated' : `resolved no ${innerSlot}`},`
+    + ` and the inner ${innerInherits ? `ran the ancestor's ${outerSlot}` : 'stayed clear of the ancestor'}`,
+  )
+}
+
 await browser.close()
 
 /* ------------------------------------------------------------------------------------
@@ -425,10 +471,16 @@ console.log(`    ${radiusResolved ? '✓' : '✗'} radius follows --radius-sm ->
 console.log(`    ${isResolved ? '✓' : '✗'} [&:is(h1)] matches the element -> ${sameElement.name.slice(0, 34)}`)
 console.log(`    ${descendantResolved ? '✗' : '✓'} [&:is(h1)] does not match a descendant (${descendantResolved ? 'it did' : 'nones only'})`)
 console.log(`    ${hasResolved ? '✓' : '✗'} has-[>button] matches the element -> ${hasChild.name.slice(0, 34)}`)
+console.log(`    ${nestingOk ? '✓' : '✗'} a nested animation runs its own slot only`
+  + ` (outer ${outerNames.filter(name => name !== 'none').length},`
+  + ` inner ${innerNames.filter(name => name !== 'none').length} live)`)
 console.log(`    ✓ finalization settles: ${variantBuild.staging + canonicalBuild.staging} payload rules`
   + ` consumed, a second pass a no-op`)
 
-const required = contexts.length + utilities.length + 6
+// Every assertion above that can fail, so the summary line is the count it claims to be: the three
+// activation contexts, the pseudo substrate, the direct carriers, bare, applied, spacing, radius,
+// the three relationship-variant cases, and non-inheritance.
+const required = contexts.length + utilities.length + 9
 const passing = required - failures.length
 
 console.log(`\n  ${passing}/${required} required contexts and carriers behave`)

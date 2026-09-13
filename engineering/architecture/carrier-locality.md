@@ -681,6 +681,46 @@ the element, an ancestor's `--jumi-animation-duration` would resolve there by in
 the opposite of the scope rule `controls.md` states. That is a trade of behaviour for bytes, not a
 cleanup.
 
+### Activation state does not inherit; configuration may
+
+The registration policy is deliberately asymmetric, and the asymmetry is the difference between
+**state** and **configuration**:
+
+| property | shipped as | why |
+| --- | --- | --- |
+| `--jumi-<slot>-animation-name`, `--jumi-<label>-animation-<part>` | registered, `inherits: false` | **Activation state.** It says *this* element runs *this* animation. Inherited into a descendant that also animates — which is exactly what puts the descendant in the composition set — it says the descendant runs it too, at the descendant's own timing. |
+| the shared `--jumi-animation-*` and `--jumi-transition-*` controls | ordinary custom properties | **Configuration.** `--jumi-animation-duration: 500ms` on a wrapper is a useful thing to write, and it stays useful *because* it is inherited: a declaration beats inheritance, so the wrapper reaches exactly the elements that never declared their own. |
+
+Measured in Chromium on the canonical corpus — an `animate-rotate-45` wrapper around an
+`animate-fade-in` child:
+
+```text
+                                    outer's slot   inner's slot   inner runs the outer's
+registered { inherits: false }           yes            yes                no
+registration removed                     yes            yes               YES
+```
+
+The shape of the failure is what makes it worth recording: the emitted CSS is identical and
+entirely reasonable in both columns, and the only difference is one property's inheritance. Nothing
+that reads the stylesheet as text can see it, which is why the assertion lives in the browser
+harness.
+
+A `var()` fallback cannot cover this. The composition reads
+`var(--jumi-rotate-3zWYd-animation-name, var(--jumi-animation-name))`, and a fallback applies only
+when a property is **unset** — an inherited value is set. The declared defaults do not cover it
+either, because `--jumi-animation-name: none` is a different property. Non-inheritance is the only
+mechanism CSS offers, which makes the registration load-bearing rather than incidental machinery.
+
+`behaviour:check` holds it: the inner element must animate its own slot and must not animate the
+ancestor's.
+
+**The rejected alternative.** The defaults rule already targets exactly the elements that animate,
+and a declaration beats inheritance, so it could declare `--jumi-<slot>-animation-name: none` for
+every slot and make the registrations unnecessary. It is the wrong shape: that trades O(slots)
+stylesheet at-rules for O(slots × participating elements) computed declarations, and slot count ×
+participating elements is the dimension already established as the expensive one — see
+`aggregate-representation.md`.
+
 ## Why the alternatives were rejected
 
 Each of these looks simpler on paper. They are recorded because every one of them was proposed,
@@ -798,7 +838,8 @@ attempted for 1.0.
 first settled that an implicit carrier is viable and that `addBase` is not a safe home; the second
 pinned the insertion point and falsified `utilities:start`. Both describe an architecture that no
 longer exists — the carrier is gone — and their conclusions are the sections above. The production
-path now reproduces every invariant they established: `behaviour:check` asserts the pseudo-element
-and the precedence triangle in a browser, `incremental:check` asserts that exactly two rules are
-derived per kind and that Tailwind's cached rules do not move, and `css:check` holds the bytes.
+path now reproduces every invariant they established: `behaviour:check` asserts the pseudo-element,
+the precedence triangle and non-inheritance in a browser, `incremental:check` asserts that exactly
+two rules are derived per kind and that Tailwind's cached rules do not move, and `css:check` holds
+the bytes.
 

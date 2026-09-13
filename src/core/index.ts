@@ -44,7 +44,26 @@ export type ModelSink = {
    * they compose custom properties the slot utilities write there.
    */
   payload(kind: CarrierKind, variables: Collection<string>): void
-  /** Register a slot's activation name as non-inheriting. */
+  /** Register a slot's activation name as non-inheriting.
+   *
+   * This is the only asymmetry in what the model publishes, and it is the difference between
+   * **state** and **configuration**.
+   *
+   * A shared control is configuration: `--jumi-animation-duration: 500ms` on a wrapper is a useful
+   * thing to write, and it stays useful precisely because it is inherited — the elements that
+   * declared their own default beat it, and the ones that did not take it. Nothing registers those,
+   * and nothing should.
+   *
+   * An activation name is state: it says *this* element runs *this* animation. Inherited into a
+   * descendant that also animates, it says the descendant runs it too — and because the composition
+   * lists every slot in the stylesheet, the descendant always has a position to read it into. That
+   * is the hero orbit's `animate-rotate-[360deg]` leaking into nested petals, which then spun at the
+   * petal's duration. There is no configuration an author could want there, and no `var()` fallback
+   * that can prevent it, because a fallback applies only when a property is unset.
+   *
+   * `behaviour:check` asserts this in a browser: a nested animating element must run its own slot
+   * and not its ancestor's.
+   */
   property(name: string): void
 }
 

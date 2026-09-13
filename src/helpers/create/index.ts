@@ -50,6 +50,13 @@ export function getCreator(api: Api): Creator {
         ':root': Object.fromEntries(Object.entries(variables)
           .map(([name, value]) => [`${stagingMarker}${kind}-${name}`, value])),
       }),
+      // `syntax: "*"` is not a placeholder for a grammar Jumi has yet to write: it is the
+      // permissive syntax that makes the registration *valid* without imposing a typed value
+      // grammar on a token like `jumi-rotate-3zWYd`. With no `initial-value` it also leaves the
+      // initial value as the guaranteed-invalid value, so a descendant that declares no activation
+      // of its own takes the composition's `var()` fallback rather than an ancestor's token. The two
+      // declarations are one semantic unit — `inherits: false` cannot be written without a syntax,
+      // and `syntax: "*"` alone would still inherit. See the `property` sink in `@/core`.
       property: name => api.addBase({ [`@property ${name}`]: { inherits: 'false', syntax: '"*"' } }),
     },
     theme: (key, values) => resolveTheme(api, key, values),
