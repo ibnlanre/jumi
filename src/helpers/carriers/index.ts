@@ -147,8 +147,13 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
    * It separates two situations that look identical in the declarations: a stylesheet that
    * published and had nothing to change, which is complete, and a stylesheet that never published,
    * which is broken. Once the staging is gone, only the marker can tell them apart.
+   *
+   * "Published" is the *existence* of an aggregate, not its size. A host that holds the data and
+   * has nothing to say passes an empty one, and that is a complete build rather than a failed one —
+   * reading emptiness as absence would make a correct no-motion stylesheet trip the invariant for
+   * the same reason this gate exists.
    */
-  const published = finalized.staging > 0 || materialized.size > 0
+  const published = finalized.staging > 0 || aggregate !== undefined
 
   // Pass 2 — write it into every carrier, as the declarations a browser actually applies. Only a
   // property the carrier already declares is written, which is what scopes the data: the carrier

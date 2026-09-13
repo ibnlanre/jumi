@@ -30,8 +30,10 @@ import tailwindcss from '@tailwindcss/vite'
  * this file. See the roadmap in `engineering/roadmap/migration.md`: what is left is the CSS directive's twin in the
  * other direction — no Tailwind JS plugin to compose at all.
  *
- * `jumiFinalizer` and `jumiRegister` are exported for a project that wants the phases explicit.
- * They work, `vite:check` exercises both ways, and they are not what the docs tell anyone to write.
+ * `jumiFinalizer` is exported for a project that wants the phases explicit. It works,
+ * `vite:check` exercises both ways, and it is not what the docs tell anyone to write. Registration
+ * is not exported: `jumi()` is the only thing that should be adding the directive, and the
+ * hand-written equivalent is `@plugin "@ibnlanre/jumi"` in the stylesheet.
  */
 export default function jumi(options?: { plugin?: string, tailwind?: PluginOptions }): Plugin[] {
   return [
@@ -81,7 +83,7 @@ export function jumiFinalizer(): Plugin {
  * a `post` one — runs after generation, where the directive would arrive too late to register
  * anything.
  */
-export function jumiRegister(specifier: string = pluginSpecifier): Plugin {
+function jumiRegister(specifier: string = pluginSpecifier): Plugin {
   return {
     enforce: 'pre',
     name: 'jumi:register',

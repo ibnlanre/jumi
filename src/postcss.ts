@@ -25,6 +25,10 @@ import postcss from 'postcss'
  * The list is returned as a `Processor` because that is how PostCSS expresses "a plugin that is
  * several plugins" — the type-safe equivalent of the `{ postcssPlugin, plugins }` container the
  * Tailwind plugin itself returns.
+ *
+ * The public surface is `jumi()` and `jumiFinalizer()`. Registration is deliberately not exported:
+ * `jumi()` is the only thing that adds the directive, and the hand-written equivalent is
+ * `@plugin "@ibnlanre/jumi"` in the stylesheet, which nothing needs a plugin for.
  */
 export default function jumi(options?: { plugin?: string, tailwind?: PluginOptions }): Processor {
   return postcss([
@@ -40,7 +44,9 @@ export default function jumi(options?: { plugin?: string, tailwind?: PluginOptio
  * `OnceExit` rather than `Once` is the whole robustness of this plugin: the finalizer has to run
  * after Tailwind has emitted, and `OnceExit` runs after every plugin's `Once` regardless of where
  * this one sits in the list. With `Once` it would silently finalize an empty document when listed
- * before Tailwind — the same class of failure as a Vite `post` transform, and just as quiet.
+ * before Tailwind — the same class of failure as a Vite `post` transform, and just as quiet. That is
+ * a safety net rather than an invitation, though: the documented order is Tailwind's plugin first,
+ * because that is the one an author can read.
  *
  * It does not register Jumi: by the time this runs, Tailwind has already read the directives, so a
  * config using this one still names `@plugin "@ibnlanre/jumi"` itself.
@@ -60,7 +66,7 @@ export function jumiFinalizer(): Plugin {
  *
  * `Once`, not `OnceExit`: registration is the one phase that cannot be last.
  */
-export function jumiRegister(specifier: string = pluginSpecifier): Plugin {
+function jumiRegister(specifier: string = pluginSpecifier): Plugin {
   return {
     Once(root) {
       register(root, specifier)

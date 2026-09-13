@@ -73,6 +73,10 @@ PostCSS instead? Same shape — one entry replaces `@tailwindcss/postcss`:
 export default { plugins: { '@ibnlanre/jumi/postcss': {} } }
 ```
 
+With `@tailwindcss/postcss` already configured separately, `jumiFinalizer()` from
+`@ibnlanre/jumi/postcss` goes after it instead — and the stylesheet names
+`@plugin "@ibnlanre/jumi";`, because nothing registers Jumi in that shape.
+
 Building with the Tailwind CLI, or from a script? The CLI has no hook to finish in, so that one
 still needs a final step:
 

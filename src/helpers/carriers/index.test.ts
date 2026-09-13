@@ -250,6 +250,19 @@ describe('the finalizer', () => {
     expect(out).not.toContain('--jumi-aggregate-')
   })
 
+  it('erases the marker for an empty aggregate, because empty is still published', () => {
+    const css = '.transitions { --jumi-carrier: transitions; transition: var(--jumi-transition); }'
+
+    const { carriersChanged, carriersFound, css: out, staging } = finalizeCss(css, {})
+
+    // A host that holds the aggregate and has nothing to say has still published. This carrier is
+    // the case that proves it matters: it stages nothing and has nothing to change, so without
+    // "handed in" counting as published, both of its signals would read as never finalized and a
+    // correct build would trip the invariant.
+    expect({ carriersChanged, carriersFound, staging }).toEqual({ carriersChanged: 0, carriersFound: 1, staging: 0 })
+    expect(out.trim()).toBe('.transitions { transition: var(--jumi-transition); }')
+  })
+
   it('walks an AST in place, so a host that owns one needs no parse', () => {
     const root = postcss.parse([staged('var(--a)'), `.animations { ${carrier()} }`].join('\n'))
 

@@ -64,6 +64,19 @@ One entry replaces `@tailwindcss/postcss`:
 export default { plugins: { '@ibnlanre/jumi/postcss': {} } }
 ```
 
+If `@tailwindcss/postcss` is already configured separately and you would rather not replace that
+entry, put `jumiFinalizer()` after it instead. Nothing registers Jumi in that shape, so the
+stylesheet still names the plugin — the same `@plugin "@ibnlanre/jumi";` as the explicit setup
+above:
+
+```js
+// postcss.config.js
+import tailwindcss from '@tailwindcss/postcss'
+import { jumiFinalizer } from '@ibnlanre/jumi/postcss'
+
+export default { plugins: [tailwindcss(), jumiFinalizer()] }
+```
+
 ### Building with the Tailwind CLI?
 
 The CLI has no hook to finish in, so add one step after Tailwind writes its output:
