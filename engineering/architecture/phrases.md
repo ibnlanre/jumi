@@ -9,37 +9,65 @@ animation").
 ## Grammar
 
 ```
-phrase := frame ("," frame)*
-frame  := <offset> ":" <value>
-offset := 0–100, integer or decimal — the % is implied and never written
-value  := any CSS value, may contain ":" "," "(" ")" ";" and spaces
+phrase      := frame ("|" frame)*
+frame       := offset-list ":" value
+offset-list := <offset> ("," <offset>)*
+offset      := 0–100, integer or decimal — the % is implied and never written
+value       := any CSS value, may contain ":" "," "(" ")" and spaces
 ```
 
 ```html
-animate-rotate-[0:0deg,50:0deg,100:45deg]
-animate-scale-[0:0.42_0.30,50:1.03_1.03]     <!-- `_` stands in for a space -->
+animate-rotate-[0:0deg|50:0deg|100:45deg]
+animate-rotate-[0,100:45deg|50:0deg]         <!-- one value, two offsets -->
+animate-scale-[0:0.42_0.30|50:1.03_1.03]     <!-- `_` stands in for a space -->
 ```
 
-Tailwind rejects `{` and `}` in an arbitrary value, so the object-literal
-spelling (`[{0:16deg}]`) silently produces nothing. It accepts `@`, `,`, `:`,
-`_` and `%` intact, and `_` arrives at the plugin already converted to a space.
+**The separator is a pipe because the comma became the offset separator, and the obvious replacement
+— a semicolon — does not survive the host.** Tailwind drops any candidate containing a `;` inside its
+arbitrary value. Measured against `@`, `%`, `|`, `!`, `~` and `^`, a semicolon is the only one of the
+seven that emits nothing at all — and it emits nothing *quietly*: with every phrase in the canonical
+corpus written with semicolons, the keyframe count fell from 33 to 27 and no harness said a word. `%`
+and `!` are carried but unusable here, since both are legal in a CSS value (`50%`, `!important`) —
+which is the same reason the comma could not stay the frame separator. A pipe is carried, appears in
+no CSS value, and collides with nothing in the host's own syntax.
 
-Frames split on commas at nesting depth 0, so `rgb(0,0,0)` stays one value, and
-each frame splits on its FIRST colon, so `url(data:image/png;base64,x)` stays
-one value. A value is a phrase iff it matches `^\s*\d+(?:\.\d+)?\s*:`; no plain
-CSS value starts `digits:`, and ratios use a slash.
+Tailwind rejects `{` and `}` in an arbitrary value, so the object-literal spelling (`[{0:16deg}]`)
+silently produces nothing. It accepts `@`, `,`, `|`, `:`, `_` and `%` intact, and `_` arrives at the
+plugin already converted to a space. A value is a phrase iff it matches
+`^\s*\d+(?:\.\d+)?(?:\s*,\s*\d+(?:\.\d+)?)*\s*:`; no plain CSS value starts `digits:`, and
+ratios use a slash.
 
-- Reparsed and normalised per declaration: frames sorted by offset, duplicated
-  offsets last-wins, trimmed. Hashed from that canonical form, so `0:a,50:b` and
-  `50:b,0:a` are one keyframe.
-- A bare value is the degenerate phrase: `animate-rotate-45` ≡ `45deg@100`, and
-  its output is unchanged.
-- Undeclared offsets are the property's resting value, which is why a phrase
-  closes itself and loops without a seam.
+- Offsets that share a value are **one frame**, not a spelling of several, which is what the change
+  was for: `0,100:45deg|50:0deg` and `0:45deg|50:0deg|100:45deg` are the same declaration, hash to
+  one keyframe, and emit identical CSS. A frame's offsets are last-wins among themselves, the same
+  way a duplicated offset is.
+- Reparsed and normalised per declaration: frames sorted by offset, duplicated offsets last-wins,
+  trimmed. Hashed from that canonical form, so `0:a|50:b` and `50:b|0:a` are one keyframe.
+- A bare value is the degenerate phrase: `animate-rotate-45` ≡ `45deg@100`, and its output is
+  unchanged.
+- Undeclared offsets are the property's resting value, which is why a phrase closes itself and loops
+  without a seam.
+
+### The key is the phrase's own text, and the grammar made that load-bearing
+
+`phraseKey` serialises the canonical frames as `0:45deg|50:0deg|100:45deg`, and the keyframe is named
+after the hash of that. It was a comma join before, which the new grammar turns from a style into a
+hazard: `0:0deg,50:0deg` is read as ONE frame — offset 0, value `0deg,50:0deg` — so a comma join
+gives it the same string as the two-frame `0:0deg|50:0deg`, and one spelling would silently share,
+and then overwrite, the other's keyframe. A value can never hold a top-level `|`, because `splitFrames`
+has already cut every one, so the join is injective.
+
+Every emitted slot id changed once with the grammar, since the key is the phrase text. It is visible
+only in the byte snapshot.
+
+**This is a breaking change to a shipped syntax.** A phrase written with commas now reads as a single
+frame whose offset list is one number and whose value happens to contain commas, which for most
+properties is not a valid CSS value — so it will not animate, and nothing will say so. The pre-1.0
+window is the time to take it.
 
 ## Labelled slots
 
-A phrase can be labelled where it is declared — `animate-rotate-[0:0deg,58:0deg]/[flick]` — and
+A phrase can be labelled where it is declared — `animate-rotate-[0:0deg|58:0deg]/[flick]` — and
 a control can then address that slot by the same word: `animation-timing-function-[…]/[flick]`. The
 label is the handle, not a property-qualified path; it becomes `--jumi-flick-animation-timing-function`.Nothing is prepended, so `/[rotate-flick]` on `animate-rotate` is `--jumi-rotate-flick-animation-timing-function`
 — one `rotate`, because the label is written, not derived; the attribute came back out of the chain when

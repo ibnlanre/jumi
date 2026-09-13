@@ -132,7 +132,7 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
   // element declaring the same phrase) from emitting a second copy.
   const seen = new Set<string>()
 
-  // A phrase — `0:16deg,58:0deg` — declares the frames of its own animation, so
+  // A phrase — `0:16deg|58:0deg` — declares the frames of its own animation, so
   // it owns a keyframe no other declaration can name. Identity IS the phrase:
   // two elements share a keyframe only when they declared the identical thing,
   // which is what makes the frames safe to trust. A keyframe shared per
@@ -706,20 +706,30 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
 }
 
 /**
- * Read a phrase — `0:16deg,58:0deg` — out of a tween value. A phrase declares
+ * Read a phrase — `0:16deg;58:0deg` — out of a tween value. A phrase declares
  * the frames of its own animation, which is what makes its keyframe private:
  * identity is the declaration, so nothing can be shared by accident.
  *
- * Frames split on commas at nesting depth 0, so `rgb(0,0,0)` stays one value,
- * and each frame splits on its FIRST colon, so `url(data:image/png;base64,x)`
- * stays one value. The offset is a bare number — the percentage is implied.
+ * Frames split on PIPES at nesting depth 0, and each frame splits on its FIRST
+ * colon, so `url(data:image/png;base64,x)` stays one value.
+ *
+ * A pipe rather than the obvious semicolon, which is where this started:
+ * **Tailwind will not carry a `;` through an arbitrary value.** A candidate
+ * containing one is dropped silently, so every phrase simply stopped compiling -
+ * six keyframes gone from the canonical corpus, and nothing logged. Measured
+ * against `@`, `%`, `|`, `!`, `~` and `^`, all of which are carried. `%` and `!`
+ * are ruled out anyway, being legal in a CSS value (`50%`, `!important`), which
+ * is the same reason the comma could not stay the frame separator.
+ *
+ * The offset is a bare number — the percentage is implied — and one frame may
+ * name several offsets, so `0,100:45deg` is the two of them at once.
  *
  * Anything that is not a phrase returns `null`, leaving the value to be treated
  * as a plain tween. No plain CSS value begins `number:`, and ratios are written
  * with a slash, so the leading test is unambiguous.
  */
 function parsePhrase(value: string): Frame[] | null {
-  if (!/^\s*\d+(?:\.\d+)?\s*:/.test(value)) return null
+  if (!/^\s*\d+(?:\.\d+)?(?:\s*,\s*\d+(?:\.\d+)?)*\s*:/.test(value)) return null
 
   const frames = new Map<number, string>()
 
@@ -727,33 +737,50 @@ function parsePhrase(value: string): Frame[] | null {
     const colon = frame.indexOf(':')
     if (colon === -1) return null
 
-    const offset = Number(frame.slice(0, colon).trim())
     const content = frame.slice(colon + 1).trim()
+    if (!content) return null
 
-    if (!Number.isFinite(offset) || !content) return null
+    for (const part of frame.slice(0, colon).split(',')) {
+      const text = part.trim()
+      const offset = Number(text)
 
-    // A repeated offset: the last declaration wins, the same way it would in
-    // any other cascade.
-    frames.set(offset, content)
+      if (!text || !Number.isFinite(offset)) return null
+
+      // A repeated offset: the last declaration wins, the same way it would in
+      // any other cascade.
+      frames.set(offset, content)
+    }
   }
 
-  // Ordered by offset, so `0:a,50:b` and `50:b,0:a` are one keyframe.
+  // Ordered by offset, so `0:a|50:b` and `50:b|0:a` are one keyframe.
   return [...frames]
     .sort(([a], [b]) => a - b)
     .map(([offset, content]) => ({ offset, value: content }))
 }
 
 /**
- * The phrase's identity — its frames in canonical order. Two elements hash to
- * one keyframe exactly when they declared the same frames.
+ * The phrase's identity — its frames in canonical order, which is the phrase's
+ * own text: `0:16deg|58:0deg`. Two elements hash to one keyframe exactly when
+ * they declared the same frames.
+ *
+ * A join is sound only because a value can never hold the joiner: `splitFrames`
+ * has already cut every top-level pipe, so one survives only inside parentheses
+ * or quotes — and read as a boundary there, the frame after it fails to name an
+ * offset, so the value is not a phrase at all.
+ *
+ * That distinction is not academic. `0:0deg,50:0deg` is read as ONE frame —
+ * offset 0, value `0deg,50:0deg` — so a comma join would give it the same key as
+ * the two-frame `0:0deg|50:0deg`, and one spelling would silently share, and
+ * overwrite, the other's keyframe.
  */
 function phraseKey(frames: Frame[]): string {
-  return frames.map(frame => `${frame.offset}:${frame.value}`).join(',')
+  return frames.map(frame => `${frame.offset}:${frame.value}`).join('|')
 }
 
 /**
- * Split a phrase into frames on top-level commas only, so a value that carries
- * its own commas or strings — `rgb(0,0,0)`, `url("a,b")` — stays intact.
+ * Split a phrase into frames on top-level pipes only, so a value that carries
+ * its own punctuation, parentheses or strings — `rgb(0,0,0)`, `url("a|b")` —
+ * stays intact.
  */
 function splitFrames(value: string): string[] {
   const frames: string[] = []
@@ -772,7 +799,7 @@ function splitFrames(value: string): string[] {
     if (char === '"' || char === '\'') quote = char
     else if (char === '(') depth++
     else if (char === ')') depth--
-    else if (char === ',' && depth === 0) {
+    else if (char === '|' && depth === 0) {
       frames.push(value.slice(start, index))
       start = index + 1
     }

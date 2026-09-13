@@ -37,12 +37,12 @@ import { compile } from '@tailwindcss/node'
 const compiler = await compile(css, { base, onDependency() {} })
 
 // 1. the scanner sorts candidates, so the aggregate utility is compiled last
-compiler.build(['animate-rotate-[0:0deg,20:-8deg,100:-8deg]', 'animations'])
+compiler.build(['animate-rotate-[0:0deg|20:-8deg|100:-8deg]', 'animations'])
 
 // 2. a second tween appears: the candidate set only ever grows in a dev session
 const out = compiler.build([
-  'animate-rotate-[0:0deg,20:-8deg,100:-8deg]',
-  'animate-rotate-[0:30deg,50:-30deg,100:30deg]/[return]',
+  'animate-rotate-[0:0deg|20:-8deg|100:-8deg]',
+  'animate-rotate-[0:30deg|50:-30deg|100:30deg]/[return]',
   'animations',
 ])
 ```

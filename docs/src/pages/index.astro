@@ -14,7 +14,7 @@ import effects from '../data/effects.json';
           {Array.from({length: 12}, (_, i) => (
             <div
               class="petal-position
-                animate-rotate-[0:var(--angle),100:calc(var(--angle)_-_360deg)]
+                animate-rotate-[0:var(--angle)|100:calc(var(--angle)_-_360deg)]
                 animation-duration-[75s]
                 animation-timing-function-linear
                 animation-iteration-count-infinite"
@@ -22,8 +22,8 @@ import effects from '../data/effects.json';
             >
               <div
                 class="petal
-                  animate-rotate-[0:0deg,20:-8deg,100:-8deg]/[flick]
-                  animate-rotate-[0:0deg,20:0deg,100:8deg]/[return]
+                  animate-rotate-[0:0deg|20:-8deg|100:-8deg]/[flick]
+                  animate-rotate-[0:0deg|20:0deg|100:8deg]/[return]
                   animation-composition-add/rotate
                   animation-duration-[3000ms]
                   animation-timing-function-[cubic-bezier(.4,0,.6,1)]/[flick]

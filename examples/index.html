@@ -722,7 +722,7 @@
         <p class="mb-6 text-gray-600">
           A value can declare its own frames — <code class="px-1 text-sm bg-gray-200 rounded">offset:value</code>,
           comma separated — so one utility describes the whole motion
-          (e.g. <code class="px-1 text-sm bg-gray-200 rounded">animate-rotate-[0:0deg,50:0deg,100:90deg]</code>).
+          (e.g. <code class="px-1 text-sm bg-gray-200 rounded">animate-rotate-[0:0deg|50:0deg|100:90deg]</code>).
           The offset is a bare number: the <code class="px-1 text-sm bg-gray-200 rounded">%</code> is implied.
           Any offset you leave out is the property's resting value, so a phrase holds
           until its first frame and closes itself at the end.
@@ -739,7 +739,7 @@
           <div class="p-4 overflow-hidden text-center bg-blue-100 rounded">
             <h3 class="mb-2 font-medium">Place an action</h3>
             <div
-              class="mx-auto bg-blue-600 size-8 animate-rotate-[0:0deg,50:0deg,100:90deg] animation-duration-2000 animation-direction-alternate animation-iteration-count-infinite"
+              class="mx-auto bg-blue-600 size-8 animate-rotate-[0:0deg|50:0deg|100:90deg] animation-duration-2000 animation-direction-alternate animation-iteration-count-infinite"
             ></div>
             <p class="mt-2 text-xs text-gray-500">rest to 50%, then turn</p>
           </div>
@@ -748,7 +748,7 @@
           <div class="p-4 overflow-hidden text-center bg-green-100 rounded">
             <h3 class="mb-2 font-medium">Seamless loop</h3>
             <div
-              class="mx-auto bg-green-600 size-8 animate-scale-[0:0.5,50:1.25,100:0.5] animation-duration-2000 animation-iteration-count-infinite"
+              class="mx-auto bg-green-600 size-8 animate-scale-[0:0.5|50:1.25|100:0.5] animation-duration-2000 animation-iteration-count-infinite"
             ></div>
             <p class="mt-2 text-xs text-gray-500">0% and 100% match, so it never jumps</p>
           </div>
@@ -757,7 +757,7 @@
           <div class="p-4 overflow-hidden text-center bg-purple-100 rounded">
             <h3 class="mb-2 font-medium">Per-property timing</h3>
             <div
-              class="mx-auto bg-purple-600 size-8 animate-rotate-[0:0deg,100:180deg] animate-scale-[0:0.6,100:1.2] animation-duration-1500/scale animation-duration-3000/rotate animation-direction-alternate animation-iteration-count-infinite"
+              class="mx-auto bg-purple-600 size-8 animate-rotate-[0:0deg|100:180deg] animate-scale-[0:0.6|100:1.2] animation-duration-1500/scale animation-duration-3000/rotate animation-direction-alternate animation-iteration-count-infinite"
             ></div>
             <p class="mt-2 text-xs text-gray-500">scale 1500ms, rotate 3000ms</p>
           </div>
@@ -766,7 +766,7 @@
           <div class="p-4 overflow-hidden text-center rounded bg-rose-100">
             <h3 class="mb-2 font-medium">Overshoot and settle</h3>
             <div
-              class="mx-auto bg-rose-600 size-8 animate-opacity-[0:1,35:0.2,70:1] animate-scale-[0:1,35:1.4,70:1] animation-duration-2000 animation-iteration-count-infinite"
+              class="mx-auto bg-rose-600 size-8 animate-opacity-[0:1|35:0.2|70:1] animate-scale-[0:1|35:1.4|70:1] animation-duration-2000 animation-iteration-count-infinite"
             ></div>
             <p class="mt-2 text-xs text-gray-500">three frames, no keyframe written</p>
           </div>

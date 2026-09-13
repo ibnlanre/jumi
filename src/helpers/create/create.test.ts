@@ -47,8 +47,8 @@ describe('property curry', () => {
   it('writes a phrase into one variable per declared frame', () => {
     const { creator } = setup()
 
-    const result = creator.property('rotate')('0:16deg,58:0deg', { modifier: null })
-    const id = shorthash2('0:16deg,58:0deg')
+    const result = creator.property('rotate')('0:16deg|58:0deg', { modifier: null })
+    const id = shorthash2('0:16deg|58:0deg')
 
     expect(result).toEqual({
       [`--jumi-rotate-${id}-0`]: '16deg',
@@ -96,16 +96,49 @@ describe('property curry', () => {
   it('orders and dedupes frames, so one phrase is one declaration', () => {
     const { creator } = setup()
 
-    const ascending = creator.property('rotate')('0:16deg,58:0deg', { modifier: null })
-    const shuffled = creator.property('rotate')('58:0deg,0:16deg', { modifier: null })
+    const ascending = creator.property('rotate')('0:16deg|58:0deg', { modifier: null })
+    const shuffled = creator.property('rotate')('58:0deg|0:16deg', { modifier: null })
 
     expect(shuffled).toEqual(ascending)
+  })
+
+  it('puts one value at several offsets from a single frame', () => {
+    const { creator } = setup()
+
+    // Offsets that share a value are one frame, so the comma is free to be the offset separator —
+    // and the shorthand has to be pure syntax, not a second spelling with its own keyframe.
+    const shared = creator.property('rotate')('0,100:45deg| 50:0deg', { modifier: null })
+    const written = creator.property('rotate')('0:45deg|50:0deg|100:45deg', { modifier: null })
+    const id = shorthash2('0:45deg|50:0deg|100:45deg')
+
+    expect(shared).toEqual(written)
+    expect(shared).toEqual({
+      [`--jumi-rotate-${id}-0`]: '45deg',
+      [`--jumi-rotate-${id}-50`]: '0deg',
+      [`--jumi-rotate-${id}-100`]: '45deg',
+      [`--jumi-rotate-${id}-animation-name`]: `jumi-rotate-${id}`,
+    })
+  })
+
+  it('still reads a value that carries its own commas as one frame', () => {
+    const { creator } = setup()
+
+    // A comma inside a value is why the offset list gets its own separator rather than the frame:
+    // `rgb(0,0,0)` is one value, not three offsets.
+    const result = creator.property('background-color')('0:rgb(0,0,0)|100:rgb(255,0,0)', { modifier: null })
+    const id = shorthash2('0:rgb(0,0,0)|100:rgb(255,0,0)')
+
+    expect(result).toEqual({
+      [`--jumi-background-color-${id}-0`]: 'rgb(0,0,0)',
+      [`--jumi-background-color-${id}-100`]: 'rgb(255,0,0)',
+      [`--jumi-background-color-${id}-animation-name`]: `jumi-background-color-${id}`,
+    })
   })
 
   it('lets the last of two frames at one offset win', () => {
     const { creator } = setup()
 
-    const result = creator.property('rotate')('0:16deg,0:0deg', { modifier: null })
+    const result = creator.property('rotate')('0:16deg|0:0deg', { modifier: null })
     const id = shorthash2('0:0deg')
 
     expect(result).toEqual({
@@ -117,8 +150,8 @@ describe('property curry', () => {
   it('distributes every frame across the parts of a composed property', () => {
     const { creator } = setup()
 
-    const result = creator.property('filter', [['filter-blur', value => css('blur', value)]])('0:0px,50:8px', { modifier: null })
-    const id = shorthash2('0:0px,50:8px')
+    const result = creator.property('filter', [['filter-blur', value => css('blur', value)]])('0:0px|50:8px', { modifier: null })
+    const id = shorthash2('0:0px|50:8px')
 
     expect(result).toEqual({
       [`--jumi-filter-${id}-animation-name`]: `jumi-filter-${id}`,
@@ -141,13 +174,13 @@ describe('property curry', () => {
   it('records a phrase label in the rule it declares', () => {
     const { creator } = setup()
 
-    const labelled = creator.property('rotate')('0:0deg,58:0deg', { modifier: 'flick' })
-    const bare = creator.property('rotate')('0:0deg,100:90deg', { modifier: null })
+    const labelled = creator.property('rotate')('0:0deg|58:0deg', { modifier: 'flick' })
+    const bare = creator.property('rotate')('0:0deg|100:90deg', { modifier: null })
 
     // The label is the address a person can write down, unlike the hash the
     // frame variables are keyed by, so the rule says what the slot is called.
-    expect(labelled).toMatchObject({ [`--jumi-rotate-${shorthash2('0:0deg,58:0deg')}-label`]: 'flick' })
-    expect(bare).not.toHaveProperty(`--jumi-rotate-${shorthash2('0:0deg,100:90deg')}-label`)
+    expect(labelled).toMatchObject({ [`--jumi-rotate-${shorthash2('0:0deg|58:0deg')}-label`]: 'flick' })
+    expect(bare).not.toHaveProperty(`--jumi-rotate-${shorthash2('0:0deg|100:90deg')}-label`)
   })
 })
 
@@ -169,10 +202,10 @@ describe('keyframe emission', () => {
   it('emits one keyframe per phrase, holding exactly its frames', () => {
     const { addUtilities, creator } = setup()
 
-    creator.property('opacity')('0:0,58:1', { modifier: null })
+    creator.property('opacity')('0:0|58:1', { modifier: null })
     creator.animations
 
-    const id = shorthash2('0:0,58:1')
+    const id = shorthash2('0:0|58:1')
     const keyframes = addUtilities.mock.calls
       .map(([u]) => u)
       .find(u => `@keyframes jumi-opacity-${id}` in u)
@@ -189,8 +222,8 @@ describe('keyframe emission', () => {
   it('gives different phrases of one property separate keyframes', () => {
     const { addUtilities, creator } = setup()
 
-    creator.property('opacity')('0:0,58:1', { modifier: null })
-    creator.property('opacity')('0:0,100:1', { modifier: null })
+    creator.property('opacity')('0:0|58:1', { modifier: null })
+    creator.property('opacity')('0:0|100:1', { modifier: null })
     creator.animations
 
     const names = addUtilities.mock.calls
@@ -199,18 +232,18 @@ describe('keyframe emission', () => {
 
     // Isolation is structural. Neither keyframe can hold the other's offsets,
     // because each is named after the phrase that declared it.
-    expect(names).toContain(`@keyframes jumi-opacity-${shorthash2('0:0,58:1')}`)
-    expect(names).toContain(`@keyframes jumi-opacity-${shorthash2('0:0,100:1')}`)
+    expect(names).toContain(`@keyframes jumi-opacity-${shorthash2('0:0|58:1')}`)
+    expect(names).toContain(`@keyframes jumi-opacity-${shorthash2('0:0|100:1')}`)
     expect(names).toHaveLength(2)
   })
 
   it('expands the composition per frame for a composed property', () => {
     const { addUtilities, creator } = setup()
 
-    creator.property('filter', [['filter-blur', value => css('blur', value)]])('0:0px,40:8px', { modifier: null })
+    creator.property('filter', [['filter-blur', value => css('blur', value)]])('0:0px|40:8px', { modifier: null })
     creator.animations
 
-    const id = shorthash2('0:0px,40:8px')
+    const id = shorthash2('0:0px|40:8px')
     const keyframes = addUtilities.mock.calls
       .map(([u]) => u)
       .find(u => `@keyframes jumi-filter-${id}` in u)
@@ -240,9 +273,9 @@ describe('keyframe emission', () => {
   it('wires a phrase slot with per-attribute timing overrides', () => {
     const { creator } = setup()
 
-    creator.property('opacity')('0:0,58:1', { modifier: null })
+    creator.property('opacity')('0:0|58:1', { modifier: null })
     const animations = creator.animations
-    const id = shorthash2('0:0,58:1')
+    const id = shorthash2('0:0|58:1')
 
     expect(animations['animation-name']).toBe(
       `var(--jumi-opacity-${id}-animation-name, var(--jumi-animation-name))`,
@@ -314,12 +347,12 @@ describe('animations wiring', () => {
 
     creator.property('opacity')('50', { modifier: null })
     creator.property('filter', [['filter-blur', value => css('blur', value)]])('8px', { modifier: null })
-    creator.property('opacity')('0:0,58:1', { modifier: null })
+    creator.property('opacity')('0:0|58:1', { modifier: null })
     creator.effect('bounce-in')
 
     const animations = creator.animations
     const id = shorthash2('50')
-    const phraseId = shorthash2('0:0,58:1')
+    const phraseId = shorthash2('0:0|58:1')
 
     expect(animations['animation-name']).toBe(
       [
@@ -334,24 +367,24 @@ describe('animations wiring', () => {
   it('gives each phrase its own slot', () => {
     const { creator } = setup()
 
-    creator.property('opacity')('0:0,58:1', { modifier: null })
-    creator.property('opacity')('0:0,100:1', { modifier: null })
+    creator.property('opacity')('0:0|58:1', { modifier: null })
+    creator.property('opacity')('0:0|100:1', { modifier: null })
     const animations = creator.animations
 
     // Two phrases, two animations: each owns its keyframe, so neither can be
     // corrupted by offsets the other declared.
     expect(animations['animation-name']).toBe(
       [
-        `var(--jumi-opacity-${shorthash2('0:0,58:1')}-animation-name, var(--jumi-animation-name))`,
-        `var(--jumi-opacity-${shorthash2('0:0,100:1')}-animation-name, var(--jumi-animation-name))`,
+        `var(--jumi-opacity-${shorthash2('0:0|58:1')}-animation-name, var(--jumi-animation-name))`,
+        `var(--jumi-opacity-${shorthash2('0:0|100:1')}-animation-name, var(--jumi-animation-name))`,
       ].join(', '),
     )
   })
   it('gives a labelled slot its own control link', () => {
     const { creator } = setup()
 
-    creator.property('rotate')('0:0deg,58:0deg', { modifier: 'rotate-flick' })
-    creator.property('rotate')('0:0deg,100:90deg', { modifier: null })
+    creator.property('rotate')('0:0deg|58:0deg', { modifier: 'rotate-flick' })
+    creator.property('rotate')('0:0deg|100:90deg', { modifier: null })
     const animations = creator.animations
 
     // A labelled slot reads its label's variable first, so `/[rotate-flick]`
@@ -387,13 +420,13 @@ describe('animation-name registration', () => {
 
     creator.property('opacity')('50', { modifier: null })
     creator.property('filter', [['filter-blur', value => css('blur', value)]])('8px', { modifier: null })
-    creator.property('rotate')('0:16deg,58:0deg', { modifier: null })
+    creator.property('rotate')('0:16deg|58:0deg', { modifier: null })
     creator.effect('bounce-in')
     creator.animations
 
     const utilities = registered(addBase)
     const id = shorthash2('50')
-    const phraseId = shorthash2('0:16deg,58:0deg')
+    const phraseId = shorthash2('0:16deg|58:0deg')
 
     const expected = [
       '--jumi-bounce-in-animation-name',
@@ -414,10 +447,10 @@ describe('animation-name registration', () => {
   it('registers a phrase name against its own slot', () => {
     const { addBase, creator } = setup()
 
-    creator.property('rotate')('0:16deg,58:0deg', { modifier: null })
+    creator.property('rotate')('0:16deg|58:0deg', { modifier: null })
     creator.animations
 
-    const id = shorthash2('0:16deg,58:0deg')
+    const id = shorthash2('0:16deg|58:0deg')
 
     expect(registered(addBase)[`@property --jumi-rotate-${id}-animation-name`]).toEqual({
       inherits: 'false',
@@ -428,7 +461,7 @@ describe('animation-name registration', () => {
   it('registers every link a labelled slot reads, so a label cannot inherit', () => {
     const { addBase, creator } = setup()
 
-    creator.property('rotate')('0:16deg,58:0deg', { modifier: 'flick' })
+    creator.property('rotate')('0:16deg|58:0deg', { modifier: 'flick' })
     creator.animations
 
     const utilities = registered(addBase)
@@ -450,7 +483,7 @@ describe('animation-name registration', () => {
 
     // `/[rotate]` on `animate-rotate` resolves to the property scope's own
     // variable, so registering it here would make a scope stop cascading.
-    creator.property('rotate')('0:16deg,58:0deg', { modifier: 'rotate' })
+    creator.property('rotate')('0:16deg|58:0deg', { modifier: 'rotate' })
     creator.animations
 
     const utilities = registered(addBase)
@@ -766,7 +799,7 @@ describe('the payload', () => {
       ['a second attribute', () => creator.property('rotate')('45deg', { modifier: null })],
       ['a third value on the first attribute', () => creator.property('opacity')('25', { modifier: null })],
       ['a re-registered value, which moves within its group', () => creator.property('opacity')('50', { modifier: null })],
-      ['a phrase, which claims a slot of its own', () => creator.property('background-color')('0:red,100:blue', { modifier: null })],
+      ['a phrase, which claims a slot of its own', () => creator.property('background-color')('0:red|100:blue', { modifier: null })],
       ['an effect', () => creator.effect('bounce-in')],
       ['a fourth value on the first attribute', () => creator.property('opacity')('75', { modifier: null })],
       ['a re-registered effect', () => creator.effect('bounce-in')],

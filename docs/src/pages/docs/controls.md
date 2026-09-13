@@ -47,8 +47,8 @@ Append `/{property}` or `/{effect}` to timing controls:
 When one property carries more than one animation, name each where you declare it with `/[name]`, and address it by that name:
 
 ```html
-<div class="animate-rotate-[0:0deg,12:-8deg,100:-8deg]/[flick]
-  animate-rotate-[0:0deg,12:0deg,100:8deg]/[return]
+<div class="animate-rotate-[0:0deg|12:-8deg|100:-8deg]/[flick]
+  animate-rotate-[0:0deg|12:0deg|100:8deg]/[return]
   animation-composition-add/rotate
   animation-timing-function-ease-in-out-circ/flick
   animation-timing-function-linear/return">
@@ -77,7 +77,7 @@ The name is written into the rule, so you can retime or re-ease that animation f
 A value can declare its own frames — an offset, a colon, a value — so one utility describes the whole motion:
 
 ```html
-<div class="animate-rotate-[0:0deg,50:0deg,100:45deg]
+<div class="animate-rotate-[0:0deg|50:0deg|100:45deg]
   animation-duration-2000
   animation-iteration-count-infinite">
   Rest, then turn one way over the second half.
@@ -91,29 +91,29 @@ A phrase owns its property, and its keyframe is named after the phrase, so nothi
 Placing an action inside the cycle, rather than spreading it across the whole of it, is what this is for. A step earlier in the phrase is a step later in the cycle:
 
 ```html
-<div class="animate-scale-[0:0.5,50:1.1,100:1]
-  animate-opacity-[0:0,50:1,100:1]
+<div class="animate-scale-[0:0.5|50:1.1|100:1]
+  animate-opacity-[0:0|50:1|100:1]
   animation-duration-2600
   animation-iteration-count-infinite">
   Gather, overshoot, settle — and arrive while it settles.
 </div>
 ```
 
-A property that takes several values takes all of them at each frame, with `_` standing in for the space: `animate-scale-[0:0.42_0.30,50:1.03_1.03]` scales both axes together.
+A property that takes several values takes all of them at each frame, with `_` standing in for the space: `animate-scale-[0:0.42_0.30|50:1.03_1.03]` scales both axes together.
 
 This site's hero is built this way. A wrapper around each petal carries a slow, seamless winding, and the petal inside it carries the flick:
 
 ```html
 <div class="petal-position
-  animate-rotate-[0:var(--angle),100:calc(var(--angle)_-_360deg)]
+  animate-rotate-[0:var(--angle)|100:calc(var(--angle)_-_360deg)]
   animation-duration-[75s]
   animation-timing-function-linear
   animation-iteration-count-infinite"
   style="--angle:0deg">
 
   <div class="petal
-    animate-rotate-[0:0deg,20:-8deg,100:-8deg]/[flick]
-    animate-rotate-[0:0deg,20:0deg,100:8deg]/[return]
+    animate-rotate-[0:0deg|20:-8deg|100:-8deg]/[flick]
+    animate-rotate-[0:0deg|20:0deg|100:8deg]/[return]
     animation-composition-add/rotate
     animation-duration-3000
     animation-timing-function-[cubic-bezier(.4,0,.6,1)]/flick

@@ -184,13 +184,13 @@ What the differential test corrected, compared to the plan:
 | Assumption | Measured |
 | --- | --- |
 | the payload is `{root, value, modifier, negative}` | the observable payload is the **triple**. Negation is *in* the value (`calc(<value> * -1)`), so the test still covers it |
-| type validation is a meaningful dependency | it is much smaller than it looked: **arbitrary values are accepted whatever their shape.** Jumi's tween utilities take *phrases* — `animate-rotate-[0:0deg,20:-8deg,100:-8deg]` — which the host never type-checks. Only *bare* values are gated, and only by inference: a bare number is derived by type (`360` → `360deg`), a bare word is rejected (`animate-width-abc` calls nothing) |
+| type validation is a meaningful dependency | it is much smaller than it looked: **arbitrary values are accepted whatever their shape.** Jumi's tween utilities take *phrases* — `animate-rotate-[0:0deg|20:-8deg|100:-8deg]` — which the host never type-checks. Only *bare* values are gated, and only by inference: a bare number is derived by type (`360` → `360deg`), a bare word is rejected (`animate-width-abc` calls nothing) |
 | `modifiers` filters candidates | it does not. Measured with all three option shapes — the empty object Jumi passes by default, a property map, and `'any'` — the host accepts the modifier and hands it straight to the matcher |
 | a bracketed modifier stays bracketed | `/[flick]` arrives as `flick`, unwrapped like any arbitrary value |
 | variants are a prefix to strip | stripping is enough to reproduce the *payload*, but not to reproduce *validity* — an unknown variant rejects the whole candidate before any matcher runs |
 
 One more thing the tables above already said, and this run confirms: **arbitrary values are passed
-through unresolved**. `[0:var(--angle),100:calc(var(--angle)_-_360deg)]` arrives with the `_` decoded
+through unresolved**. `[0:var(--angle)|100:calc(var(--angle)_-_360deg)]` arrives with the `_` decoded
 to a space and nothing else touched. Phrase validation is the model's business (3d), not the host's.
 
 ### Locked conclusions

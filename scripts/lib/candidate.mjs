@@ -115,7 +115,7 @@ const roots = vocabulary => [...vocabulary].sort((a, b) => b.name.length - a.nam
  *
  *   named        `values[remainder]` — resolved by the model already, so this is a lookup
  *   arbitrary    accepted for any shape at all. Jumi's tween utilities take *phrases*
- *                (`[0:0deg,20:-8deg,100:-8deg]`), so the host does not type-check them; the model
+ *                (`[0:0deg|20:-8deg|100:-8deg]`), so the host does not type-check them; the model
  *                validates a phrase after the fact, which is 3d's business
  *   bare         a number the declared type can derive from (`360` -> `360deg`)
  *   otherwise    rejected, which is why `animate-width-abc` never reaches a matcher

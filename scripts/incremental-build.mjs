@@ -35,9 +35,9 @@ import path from 'node:path'
 const here = path.dirname(fileURLToPath(import.meta.url))
 const root = path.join(here, '..')
 
-const base = 'animate-rotate-[0:0deg,20:-8deg,100:-8deg]'
-const cacheTween = 'animate-rotate-[0:30deg,50:-30deg,100:30deg]/[return]'
-const orderTween = 'animate-rotate-[0:60deg,70:-60deg,100:60deg]/[bounce]'
+const base = 'animate-rotate-[0:0deg|20:-8deg|100:-8deg]'
+const cacheTween = 'animate-rotate-[0:30deg|50:-30deg|100:30deg]/[return]'
+const orderTween = 'animate-rotate-[0:60deg|70:-60deg|100:60deg]/[bounce]'
 
 // The transitions composition has the same obligation as the animation one — it applies a list that
 // depends on which utilities exist — so it is driven through the same three builds and held to the
