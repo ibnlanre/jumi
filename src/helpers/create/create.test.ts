@@ -435,10 +435,22 @@ describe('animation-name registration', () => {
       `--jumi-rotate-${phraseId}-animation-name`,
     ].sort()
 
+    // Two registrations per slot, and the *pair* is the contract rather than the count. The name a
+    // slot is activated by, and the value the aggregate publishes it under — both have to be
+    // non-inheriting, because a descendant that inherits either one re-runs its ancestor's
+    // animation. The second was missing when the aggregate became a hoist, and
+    // `behaviour:check`'s non-inheritance arm is what found it.
+    const hoisted = expected.map(name => name.replace(/^--jumi-(.+)-animation-name$/, '--jumi-slot-$1'))
+
     expect(Object.keys(utilities).filter(name => name.startsWith('@property')).sort())
-      .toEqual(expected.map(name => `@property ${name}`))
+      .toEqual([...expected, ...hoisted].sort().map(name => `@property ${name}`))
 
     expect(utilities[`@property --jumi-opacity-${id}-animation-name`]).toEqual({
+      inherits: 'false',
+      syntax: '"*"',
+    })
+
+    expect(utilities[`@property --jumi-slot-opacity-${id}`]).toEqual({
       inherits: 'false',
       syntax: '"*"',
     })

@@ -19,7 +19,7 @@ engineering/
 
 | File | Why it is here |
 | --- | --- |
-| `architecture/aggregate-representation.md` | the carrier protocol and the measurement that rejected the linked representation |
+| `architecture/aggregate-representation.md` | the carrier protocol, the linked representation that was rejected, and the evaluation cost that set the terms of the hoist — annotated where the two conflict |
 | `architecture/carrier-locality.md` | why the aggregate resolves on the carrier, with the browser measurement |
 | `architecture/dependency-gap.md` | what still stands between Jumi and independent emission, and why that is a product decision |
 | `architecture/effect-model.md` | what an effect is mechanically — one element, one keyframe timeline |
@@ -30,6 +30,7 @@ engineering/
 | `research/scanner-inventory.md` | candidate discovery: what the host hands a matcher, per candidate |
 | `research/upstream-limitation.md` | a parked investigation into a host limitation |
 | `research/view-transitions.md` | the View Transition API measured against the emitted model: the composition retargets onto the pseudo-elements, and cannot be reached from the source element |
+| `research/style-cost.md` | what the aggregate costs DevTools: 863 KB of protocol response for one selected element at 228 slots, 82% of it the declaration payload, and the hoisted representation that removes 61% of it and 60% of the recalc — confirmed by hand at 47 s → 2.7 s in the Inspector, and by the shipped build at 965,683 → 419,673 bytes with 228/228 live animations unchanged |
 | `roadmap/migration.md` | the migration: its phases, what closed, and what was decided along the way |
 
 ## Rules of the split
@@ -82,6 +83,32 @@ declared on the source element cannot reach them, that an author animation on
 Jumi might abandon. Its fixtures are templated by the harness's own server rather than duplicated
 per variant, and it is the *only* spike here that needs a served origin: a cross-document transition
 requires a same-origin navigation, and `file://` cannot provide one.
+
+`spike-cdp-cost`, `spike-recalc` and `spike-local-list` are kept under the same rule, and together
+they are one question seen from three sides. `spike-cdp-cost` measures the aggregate through the
+DevTools protocol rather than through the renderer — the cost no other harness looks at, and the one
+that made Inspector unusable at 228 slots; it can also park a page on a port so the human-visible
+half is checked by hand rather than asserted. `spike-recalc` prices the same representation through
+the renderer. `spike-local-list` enumerates the CSS primitives that could remove the cost at the
+root and shows each of them selecting rather than accumulating, so that direction stays falsified
+instead of being re-proposed. All three build their corpora through the real pipeline, and the two
+that construct an alternative representation take it from `scripts/lib/aggregate.mjs` rather than
+rebuilding it — shared, so the harnesses cannot disagree about what they are measuring, which is
+exactly the failure mode the carrier-protocol spikes died of.
+
+`measure-real-page` is the fourth side, and it is the one that closes the question. The three above
+price a *fixture*: `spike-cdp-cost` compiles its own slots from the real plugin, so its activating
+selectors are escaped arbitrary values averaging 57 characters against the shipped catalogue's 22 —
+a difference that decides the conclusion, because the frontend's cost tracks selector *text*. So the
+real page gets its own instrument, which serves a built site, reads every animating element's live
+positions, and inspects one element through CDP. It has two modes and they depend on different things:
+by default it asserts what needs no baseline at all — every element resolves its own effect, and every
+live position resolved its own control — which is what makes it runnable against any build, including
+a deployed one; `--compare` adds a diff against a baseline captured before a representation change,
+which is an artifact of that change rather than a fixture. It taught itself three things the hard way
+— that headless Chromium reports `prefers-reduced-motion: reduce` and the catalogue honours it, that
+the catalogue plays a card only while it carries `is-playing`, and that neither of its assertions
+means anything until they have been falsified against a tampered baseline and a removed control.
 
 `spike-marker-elimination` was retired the same day, under the rule it was written to satisfy: its
 question was answered — a semantic fallback declaration survives variants and `@apply`, but is not

@@ -143,6 +143,97 @@ const ACTIVATION: Record<CarrierKind, RegExp> = {
   transitions: /^--jumi-.+-transition-(?:delay|duration|property|timing-function)$/,
 }
 
+/**
+ * The eight components an `animation` shorthand carries — and therefore the eight a per-slot value
+ * can hold. The two that are missing are missing for a reason: the shorthand *resets*
+ * `animation-composition` and `animation-timeline` and cannot set them, so they stay in their own
+ * lists and are declared **after** the shorthand.
+ */
+const SHORTHAND = [
+  'animation-name',
+  'animation-duration',
+  'animation-timing-function',
+  'animation-delay',
+  'animation-iteration-count',
+  'animation-direction',
+  'animation-fill-mode',
+  'animation-play-state',
+]
+
+/** Reset by the shorthand, so they follow it rather than being carried inside it. */
+const AFTER_SHORTHAND = ['animation-composition', 'animation-timeline']
+
+/**
+ * What an unset position falls back to, per component.
+ *
+ * Not a detail. `var(--unset-slot, none)` is fine for `animation-name`, where `none` is a keyword,
+ * and fatal for `animation-duration`, where it is not: the substitution is invalid at computed-value
+ * time and the *entire declaration* is dropped, so every position — including the live one — loses
+ * its duration. Measured on the first build of this shape, caught by the parity check.
+ */
+const FALLBACK: Record<string, string> = {
+  'animation-delay': '0s',
+  'animation-direction': 'normal',
+  'animation-duration': '0s',
+  'animation-fill-mode': 'none',
+  'animation-iteration-count': '1',
+  'animation-name': 'none',
+  'animation-play-state': 'running',
+  'animation-timing-function': 'linear',
+}
+
+/**
+ * The slot a hoisted value belongs to, read off the activation variable.
+ *
+ *   --jumi-rotate-3zWYd-animation-name   →   rotate-3zWYd   →   --jumi-slot-rotate-3zWYd
+ *
+ * The name is derived from the activation rather than from a position in the list, because
+ * positions are a fact about the stylesheet and the declaration is a fact about the *rule*: an
+ * `@apply`, a variant and a plain utility all carry the same activation variable, and each needs
+ * the matching value on itself.
+ */
+const ACTIVATED_SLOT = /^--jumi-(.+)-animation-name$/
+
+const hoistedName = (slot: string) => `--jumi-slot-${slot}`
+
+/** The slot a composition entry reads, or null when the entry is not a slot reference. */
+const referencedSlot = (entry: string) => {
+  const match = /^var\(--jumi-(.+?)-animation-name\b/.exec(entry.trim())
+
+  return match ? match[1] : null
+}
+
+/**
+ * Split a comma-separated value on its top-level commas.
+ *
+ * The payload's entries are `var(--a, var(--b))`, so a `split(',')` counts every fallback comma and
+ * doubles the list — the same mistake `scripts/lib/css.mjs` exists to prevent on the script side,
+ * and it has to be prevented here too or the two disagree about how long a list is.
+ */
+const splitTopLevel = (value: string) => {
+  const parts: string[] = []
+  let current = ''
+  let depth = 0
+
+  for (const char of value) {
+    if (char === '(') depth += 1
+    if (char === ')') depth -= 1
+
+    if (char === ',' && depth === 0) {
+      parts.push(current)
+      current = ''
+
+      continue
+    }
+
+    current += char
+  }
+
+  parts.push(current)
+
+  return parts.map(part => part.trim()).filter(Boolean)
+}
+
 /** A rule activates a kind when one of its own declarations is an activation for it. */
 const activates = (rule: Rule, pattern: RegExp) =>
   ownDeclarations(rule).some(declaration => pattern.test(declaration.prop))
@@ -226,6 +317,66 @@ const defaultsLayerFor = (root: Root) => {
  * Reports what it built and does not serialize. A second pass finds nothing staged and produces
  * nothing, so it reports zero and leaves the document — and therefore the output — untouched.
  */
+/**
+ * Move the aggregate's per-position chains onto the rules that activate them, and return the shallow
+ * list the composition is left with.
+ *
+ * The ownership rule is not "the utility rule owns its hoist". Ownership follows the **activation**:
+ * Tailwind re-parents a utility body for a variant, copies it for `@apply`, and prefixes it for a
+ * pseudo-element, and in every case what the finished stylesheet holds is a rule declaring
+ * `--jumi-<slot>-animation-name`. Whichever rules hold that declaration must also hold
+ * `--jumi-slot-<slot>`, or an element matching one of them resolves the position to its fallback and
+ * quietly animates nothing.
+ *
+ * `@apply` is the case that makes the difference visible: the applied element carries
+ * `.applied-motion` and never matches `.animate-rotate-45`, so a value published only on the
+ * utility's own rule cannot reach it. Deriving the name from the activation rather than from a
+ * position in the list is what makes the same code correct for all of them.
+ *
+ * The move is worth its complexity because of what it removes. The composition used to carry ten
+ * lists of *every* slot, so an element that activates one slot resolved ten positions per slot in
+ * the stylesheet; hoisted, it carries one shallow reference per position and resolves three — one
+ * `animation` list plus the two the shorthand cannot hold. Measured on the effects catalogue: the
+ * inspector's matched-style response fell from 965 KB to 413 KB, and recalc from 976 ms to 392 ms
+ * over 1,000 animating elements. `engineering/research/style-cost.md` has the whole account.
+ */
+const hoist = (staged: Collection<string>, rules: Rule[]) => {
+  const entries = Object.fromEntries(SHORTHAND.map(part => [part, splitTopLevel(staged[part] ?? '')]))
+  const positions = entries['animation-name'].map((entry, position) => {
+    const slot = referencedSlot(entry)
+
+    return slot
+      ? { position, slot, value: SHORTHAND.map(part => entries[part][position] || FALLBACK[part]).join(' ') }
+      : null
+  })
+  const known = new Map(positions.flatMap(entry => (entry ? [[entry.slot, entry.value] as const] : [])))
+
+  for (const rule of rules) {
+    const own = ownDeclarations(rule)
+    const published = new Set(own.map(declaration => declaration.prop))
+
+    for (const declaration of own) {
+      const match = ACTIVATED_SLOT.exec(declaration.prop)
+
+      if (!match) continue
+
+      const value = known.get(match[1])
+      const prop = hoistedName(match[1])
+
+      if (!value || published.has(prop)) continue
+
+      published.add(prop)
+      rule.append(postcss.decl({ prop, value }))
+    }
+  }
+
+  return positions
+    .map((entry, position) => (entry
+      ? `var(${hoistedName(entry.slot)}, none)`
+      : SHORTHAND.map(part => entries[part][position] || FALLBACK[part]).join(' ')))
+    .join(', ')
+}
+
 export function finalize(root: Root, aggregate?: Collection<string>): Finalized {
   const payload: Collection<Collection<string>> = {}
   const finalized: Finalized = { animations: 0, staging: 0, transitions: 0 }
@@ -293,6 +444,13 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
     // then made the whole declaration invalid at computed-value time on that pseudo-element.
     const defaults = postcss.rule({ selector: group })
 
+    // The animations aggregate is the one written as a **hoist**. Its payload is ten lists of every
+    // slot in the stylesheet while an element activates one or two of them, so the deep chains move
+    // onto the rules that activate the slot and the composition is left holding one shallow
+    // reference per position. `transitions` composes a single shorthand already, so it is written
+    // exactly as it was — this change is deliberately scoped to the aggregate that was measured.
+    const hoisted = kind === 'animations' ? hoist(staged, rules) : null
+
     for (const [name, value] of Object.entries(staged)) {
       // A name that is itself a custom property is a default the element resolves through, and it
       // has to be declared *on the element*: it composes other custom properties the slot
@@ -305,7 +463,28 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
         continue
       }
 
+      if (hoisted) continue
+
       composition.append(postcss.decl({ prop: name, value }))
+    }
+
+    if (hoisted) {
+      // The shorthand first, and the two it resets after it: `animation` sets `animation-composition`
+      // and `animation-timeline` back to their initial values, so a rule that declares them before it
+      // has already lost them by the time the cascade is done.
+      composition.append(postcss.decl({ prop: 'animation', value: hoisted }))
+
+      for (const part of AFTER_SHORTHAND) {
+        if (staged[part]) composition.append(postcss.decl({ prop: part, value: staged[part] }))
+      }
+
+      for (const [name, value] of Object.entries(staged)) {
+        if (name.startsWith('--') || SHORTHAND.includes(name) || AFTER_SHORTHAND.includes(name)) continue
+
+        // Anything else the payload carries is not a position — `interpolate-size` is the one that
+        // exists today — and is written verbatim, as it always was.
+        composition.append(postcss.decl({ prop: name, value }))
+      }
     }
 
     // A composition with no declarations is not one: a payload of nothing but defaults cannot

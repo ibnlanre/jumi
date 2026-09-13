@@ -217,12 +217,23 @@ console.log('\n  substrate\n')
 // composition's list made the whole declaration invalid at computed-value time — the name read
 // `none` rather than reading wrong. The duration is asserted too, because that is the substrate
 // itself arriving rather than something else making the name resolve.
-const pseudo = await entry(variantPage, '#ctx-pseudo', '::before')
-const pseudoOk = Boolean(pseudo) && pseudo.duration.split(',').every(part => part.trim() === '1s')
+//
+// Read at the **live** position. The aggregate publishes one shallow reference per slot and only
+// the activated ones resolve to a slot's value; the rest fall back, and their computed longhands are
+// bookkeeping rather than contract — `engineering/research/style-cost.md` records the ruling, and
+// asserting them here would pin the old representation on positions that never run.
+const pseudo = await variantPage.evaluate(() => {
+  const style = getComputedStyle(document.querySelector('#ctx-pseudo'), '::before')
+  const names = style.animationName.split(',').map(part => part.trim())
+  const durations = style.animationDuration.split(',').map(part => part.trim())
 
-console.log(`    ${pseudoOk ? '✓' : '✗'} pseudo-element substrate  ${pseudo?.duration.slice(0, 44) ?? '(missing)'}`)
+  return names.map((name, index) => (name === 'none' ? null : durations[index])).filter(Boolean)
+})
+const pseudoOk = pseudo.length > 0 && pseudo.every(duration => duration === '1s')
 
-if (!pseudoOk) failures.push(`pseudo-element: substrate resolved "${pseudo?.duration.slice(0, 44) ?? 'none'}", expected 1s per slot`)
+console.log(`    ${pseudoOk ? '✓' : '✗'} pseudo-element substrate  ${pseudo.join(', ') || '(nothing live)'}`)
+
+if (!pseudoOk) failures.push(`pseudo-element: the live position resolved "${pseudo.join(', ') || 'nothing'}", expected the 1s substrate`)
 
 /* ------------------------------------------------------------------------------------
  * 3. The contexts that are not a variant, and the mechanisms a selector reaches
@@ -253,15 +264,23 @@ const precedence = await load(canonicalCss, `
 `)
 
 for (const [id, expected] of [['precedence-default', '1s'], ['precedence-controlled', '0.5s'], ['precedence-arbitrary', '0.75s']]) {
-  const value = await precedence.evaluate(
-    selector => getComputedStyle(document.querySelector(selector)).animationDuration,
-    `#${id}`,
-  )
-  const works = value.split(',').every(part => part.trim() === expected)
+  // The control has to reach the position that runs. Inactive positions carry no animation, and
+  // under the ruling in `engineering/research/style-cost.md` their longhands are implementation
+  // bookkeeping — reading them would be asserting the old representation's behaviour on values no
+  // browser reads. Reading the live position tests the same cascade end to end and tests the thing
+  // that actually matters.
+  const live = await precedence.evaluate((selector) => {
+    const style = getComputedStyle(document.querySelector(selector))
+    const names = style.animationName.split(',').map(part => part.trim())
+    const durations = style.animationDuration.split(',').map(part => part.trim())
 
-  console.log(`    ${works ? '✓' : '✗'} ${id.padEnd(22)}${expected.padEnd(8)}${value.slice(0, 44)}`)
+    return names.map((name, index) => (name === 'none' ? null : durations[index])).filter(Boolean)
+  }, `#${id}`)
+  const works = live.length > 0 && live.every(duration => duration === expected)
 
-  if (!works) failures.push(`precedence: #${id} resolved "${value.slice(0, 44)}", expected ${expected}`)
+  console.log(`    ${works ? '✓' : '✗'} ${id.padEnd(22)}${expected.padEnd(8)}${live.join(', ').slice(0, 44)}`)
+
+  if (!works) failures.push(`precedence: #${id} resolved "${live.join(', ') || 'nothing live'}", expected ${expected}`)
 }
 
 const utilities = [

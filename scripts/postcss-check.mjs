@@ -23,7 +23,7 @@ import { execFileSync } from 'node:child_process'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
-import { expectedDeclarations, protocolState } from './lib/css.mjs'
+import { compositionScope, expectedDeclarations, protocolState } from './lib/css.mjs'
 
 import path from 'node:path'
 import postcss from 'postcss'
@@ -77,25 +77,6 @@ writeFileSync(path.join(dir, 'in.css'), registered)
 
 const failures = []
 
-/**
- * How many selectors a composition was written for, read off the rule that declares the part.
- *
- * Counting rules instead would say nothing: there is exactly one composition per kind, and the
- * whole question is which selectors it carries. A descendant, a pseudo-element and a rule `@apply`
- * inlined are all in that list, and none of them names the element the utility was written on.
- */
-const compositionSelectors = (css, part) => {
-  let count = 0
-
-  postcss.parse(css).walkRules((rule) => {
-    if (count || !rule.nodes?.some(node => node.type === 'decl' && node.prop === part)) return
-
-    count = rule.selector.split(/,\s*\n/).length
-  })
-
-  return count
-}
-
 /** What the protocol requires of any emitted stylesheet, whatever produced it. */
 const structure = (label, css) => {
   const { animations, declarations, leaks, transitions } = protocolState(css)
@@ -104,8 +85,8 @@ const structure = (label, css) => {
   const expected = expectedDeclarations({ animations, transitions })
   // Four ways in — the utility itself, a descendant variant, a pseudo-element variant, and the
   // rule `@apply` inlined — and one for transitions.
-  const selectors = compositionSelectors(css, 'animation-name')
-  const transitionSelectors = compositionSelectors(css, 'transition')
+  const selectors = compositionScope(css, 'animations')
+  const transitionSelectors = compositionScope(css, 'transitions')
   const held = selectors === 4 && transitionSelectors === 1 && declarations === expected && !leaked.length
 
   console.log(`\n    ${held ? '✓' : '✗'} ${label}: ${css.length.toLocaleString()} bytes,`

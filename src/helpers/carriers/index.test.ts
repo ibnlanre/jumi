@@ -75,9 +75,14 @@ describe('the finalizer', () => {
 
     expect({ animations, staging }).toEqual({ animations: 1, staging: 1 })
 
-    // What the payload bound to a declaration became that declaration, and what it carried under
-    // its own name became one too — `interpolate-size` is a real property and rides the same channel.
-    expect(out).toContain('animation-name: var(--jumi-rotate-3zWYd-animation-name, var(--jumi-animation-name));')
+    // The activator carries the slot's hoisted value and the composition carries one shallow
+    // reference to it. That split is the whole change: ten lists of every slot became one list of
+    // shallow references, and the ten chains moved onto the rule that activates the slot.
+    expect(out).toContain('--jumi-slot-rotate-3zWYd: var(--jumi-rotate-3zWYd-animation-name, var(--jumi-animation-name)) 0s linear 0s 1 normal none running;')
+    expect(out).toContain('animation: var(--jumi-slot-rotate-3zWYd, none);')
+
+    // A payload declaration that is not a slot reference is still written verbatim: `interpolate-size`
+    // is a real property and rides the same channel.
     expect(out).toContain('interpolate-size: var(--jumi-interpolate-size);')
 
     // And none of the transport survives it.
@@ -91,7 +96,7 @@ describe('the finalizer', () => {
     // composition is what the browser applies. Two rules, because they have opposite cascade
     // responsibilities — one exists to be overridden, the other to win.
     expect(out).toContain('--jumi-animation-duration: 1s;')
-    expect(out).toContain('animation-name: var(--jumi-rotate-3zWYd-animation-name')
+    expect(out).toContain('animation: var(--jumi-slot-rotate-3zWYd, none);')
 
     // And not `:where()`, which is how this started. A pseudo-element cannot appear inside it, and
     // `before:` / `after:` are ordinary Jumi usage: the rule was dropped as invalid, the substrate
@@ -140,7 +145,7 @@ describe('the finalizer', () => {
     // stay inside `@layer utilities`, where a utility draws its cascade strength: `base` would lose
     // to `components`, which the placement differential measured.
     expect(out.indexOf('--jumi-animation-duration: 1s')).toBeLessThan(out.indexOf('--jumi-animation-duration: 500ms'))
-    expect(out.indexOf('--jumi-animation-duration: 500ms')).toBeLessThan(out.indexOf('animation-name: var('))
+    expect(out.indexOf('--jumi-animation-duration: 500ms')).toBeLessThan(out.indexOf('animation: var(--jumi-slot-'))
 
     // And the defaults really are the first thing the layer holds, not merely earlier than the one
     // control this fixture happens to include.
@@ -233,7 +238,12 @@ describe('the finalizer', () => {
       activation('.animate-rotate-45'),
     ].join('\n')
 
-    expect(finalizeCss(css).css).toContain('animation-name: var(--a, "x;y"), var(--b, "}" );')
+    // Neither entry references a slot, so both are written into the `animation` list verbatim rather
+    // than hoisted — and the point of the fixture is that a value only *looks* like it ends early.
+    const out = finalizeCss(css).css
+
+    expect(out).toContain('var(--a, "x;y")')
+    expect(out).toContain('var(--b, "}" )')
   })
 
   it('takes the last publication, the way a later declaration would win', () => {
@@ -246,7 +256,7 @@ describe('the finalizer', () => {
     const { css: out, staging } = finalizeCss(css)
 
     expect(staging).toBe(2)
-    expect(out).toContain('animation-name: var(--second);')
+    expect(out).toContain('animation: var(--second) 0s linear 0s 1 normal none running;')
     expect(out).not.toContain('var(--first)')
   })
 
@@ -264,7 +274,7 @@ describe('the finalizer', () => {
 
     const { css: out } = finalizeCss(css, { 'animation-name': 'var(--fresh)' })
 
-    expect(out).toContain('animation-name: var(--fresh);')
+    expect(out).toContain('animation: var(--fresh) 0s linear 0s 1 normal none running;')
     expect(out).not.toContain('var(--jumi-animation-name)')
     expect(out).not.toContain(stagingMarker)
   })
@@ -275,7 +285,7 @@ describe('the finalizer', () => {
     const { animations, staging } = finalize(root)
 
     expect({ animations, staging }).toEqual({ animations: 1, staging: 1 })
-    expect(root.toString()).toContain('animation-name: var(--jumi-rotate-3zWYd-animation-name, var(--jumi-animation-name));')
+    expect(root.toString()).toContain('animation: var(--jumi-slot-rotate-3zWYd, none);')
     expect(root.toString()).not.toContain(stagingMarker)
   })
 
@@ -296,8 +306,10 @@ describe('the finalizer', () => {
     // should never be handed any of it.
     expect(out).not.toContain(stagingMarker)
 
-    // What is left is the declarations a browser actually applies.
-    expect(out).toContain('animation-name: var(--jumi-animation-name);')
+    // `--jumi-animation-name` is the *substrate* name and not a slot's, so it is not a reference the
+    // hoist can follow. It is written into the shorthand verbatim, and the two longhands the
+    // shorthand resets are declared after it.
+    expect(out).toContain('animation: var(--jumi-animation-name) 0s linear var(--jumi-animation-delay) 1 normal none running;')
     expect(out).toContain('animation-timeline: var(--jumi-animation-timeline);')
   })
 })

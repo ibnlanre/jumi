@@ -21,7 +21,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { fileURLToPath } from 'node:url'
 
-import { aggregateSlots, expectedDeclarations, PARTS, protocolState } from './lib/css.mjs'
+import { aggregateSlots, expectedDeclarations, protocolState } from './lib/css.mjs'
 
 import path from 'node:path'
 
@@ -78,7 +78,7 @@ console.log(`      keyframes     ${(emitted.match(/@keyframes /g) ?? []).length}
 console.log(`\n    shipped — what a browser downloads`)
 console.log(`      bytes         ${built.css.length.toLocaleString()} bytes`)
 console.log(`      aggregate     ${state.declarationBytes.toLocaleString()} bytes (${percent(state.declarationBytes, built.css.length)}),`
-  + ` ${state.animations} compositions × ${slots} entries × ${PARTS.length} lists`
+  + ` ${state.animations} compositions × ${slots} shallow entries`
   + (state.transitions ? `, ${state.transitions} transition composition` : ''))
 console.log(`      protocol      ${state.declarations} declarations written, no build-time name left`)
 console.log(`      file          ${path.relative(root, output)}\n`)

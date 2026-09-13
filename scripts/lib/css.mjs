@@ -7,20 +7,33 @@
  * `split(',')` counts it as two and doubles every slot metric. The splitter lives here so the
  * scripts cannot disagree.
  *
- * The aggregate is flat, and it is *materialized* before any of this runs: `finalize` writes the
- * ten lists into every carrier's own `animation-*` longhands, so a stylesheet has one copy per
- * carrier and they all hold the same thing. Reading one is reading a single declaration — which
- * is the point of shipping it that way, and the reason there is no chain to walk any more.
+ * The aggregate is *materialized* before any of this runs, and since the animations aggregate became
+ * a hoist there are two readings of that, one per kind:
  *
- * The other half of that: `--jumi-aggregate-*`, `--jumi-carrier` and `--jumi-carrier-staging` are
- * build-time names, and a finished stylesheet holds none of them. `protocolState` counts all
- * three, so the checks that used to find a carrier by its marker find it by what it was given
- * instead — and fail if a build ever leaves the transport in the file.
+ *   animations   one composition rule carrying `animation:` — one shallow `var(--jumi-slot-<slot>,
+ *                none)` per position — plus the two longhands the shorthand resets. The chains moved
+ *                onto the rules that activate the slot, as `--jumi-slot-<slot>`.
+ *   transitions  one composition rule carrying a single `transition` shorthand, unchanged.
+ *
+ * Which is why neither kind is found by counting a longhand any more: `compositionRules` identifies
+ * the animations composition by its structure, and `transitionRules` by the one declaration it
+ * still has. Everything here is the same shape as the scripts' subject, and `scripts/lib/css.test.mjs`
+ * pins both detectors against hand-written CSS.
+ *
+ * The other half: `--jumi-aggregate-*`, `--jumi-carrier` and `--jumi-carrier-staging` are build-time
+ * names, and a finished stylesheet holds none of them. `protocolState` counts all three, so the
+ * checks that used to find a carrier by its marker find it by what it was given instead — and fail
+ * if a build ever leaves the transport in the file.
  */
+
+import postcss from 'postcss'
 
 /**
  * The ten `animation-*` longhands the model stages a list for, and therefore the ten the finalizer
  * materializes into every carrier that declares them.
+ *
+ * A hoisted animations composition declares none of them — it declares the `animation` shorthand,
+ * which is not in this list — so `PARTS` no longer counts it. See `expectedDeclarations`.
  */
 export const PARTS = [
   'animation-composition',
@@ -43,20 +56,17 @@ export const PARTS = [
 export const TRANSITION_PARTS = ['transition']
 
 /**
+ * The two the `animation` shorthand *resets* and cannot set, so a hoisted composition declares them
+ * as separate lists after the shorthand. They are the longhands a composition still writes by name.
+ */
+const RESET_BY_SHORTHAND = ['animation-composition', 'animation-timeline']
+
+/**
  * One materialized declaration, value and all. The leading guard is load-bearing: without it
  * `animation-name` matches inside `--jumi-animation-name`, and every control declaration on every
  * element would be counted as a carrier's data.
  */
 const LONGHAND = new RegExp(`(?<![\\w-])(?:${[...PARTS, ...TRANSITION_PARTS].join('|')})\\s*:\\s*[^;]*;?`, 'g')
-
-/**
- * A carrier's identifying declaration: the one property each kind always has exactly one of.
- *
- * The marker is erased, so this is what a carrier is counted by instead. The guard matters for the
- * same reason as above — `--jumi-transition` and `transition-behavior` both start with the word.
- */
-const ANIMATION_CARRIER = /(?<![\w-])animation-name\s*:/g
-const TRANSITION_CARRIER = /(?<![\w-])transition\s*:/g
 
 /**
  * A stylesheet with every at-rule prelude removed, so what remains can be counted as
@@ -73,45 +83,121 @@ const TRANSITION_CARRIER = /(?<![\w-])transition\s*:/g
 const declarationsOnly = css => css.replace(/@[a-z-]+[^{;]*\{/gi, '{')
 
 /**
- * The aggregate list for one longhand, read from any carrier.
+ * The synthesized animations compositions, found **structurally**.
  *
- * The data is written into the longhand a browser applies, so the declaration to read is
- * `animation-name` and not `--jumi-aggregate-animation-name`: that namespace is build-time only
- * and no longer reaches output. Every carrier holds the same lists, so the last declaration in the
- * file is the one a browser resolving the last carrier would apply; which copy is read makes no
- * difference.
+ * Not "a rule with an `animation` shorthand": that is an ordinary utility, and a stylesheet is full
+ * of them. A composition is a rule that declares the shorthand, **and** the two longhands the
+ * shorthand resets, **and** whose positions are shallow references to values the activation rules
+ * publish. All three are required.
+ *
+ * The middle condition is the one that needed measuring: the resets are written only when the
+ * payload staged them, so requiring them is only sound if the payload always stages them. It does
+ * — verified on a one-slot build (`animate-rotate-45` alone), where the composition still declares
+ * `animation`, `animation-composition`, `animation-timeline` and `interpolate-size`. If that ever
+ * stops being true the detector reports zero compositions, which fails every check that uses it
+ * loudly rather than passing them quietly, and that is the direction of failure to prefer here.
+ *
+ * None of the three is a fact about formatting, which is the point. The detector this replaced keyed
+ * on `animation-name` and went to zero the moment the aggregate became a hoist; "has an `animation`
+ * shorthand" would have been the same mistake with a different word in it.
  */
-export function aggregateList(css, part = 'animation-name') {
-  return lastDeclaration(css, part)
+/**
+ * The aggregate list a composition carries, read as the `animation` shorthand.
+ *
+ * Its length is the slot universe and its entries name the slots: each position is
+ * `var(--jumi-slot-<slot>, none)`, so the list is one shallow reference per slot rather than ten
+ * nested chains per slot. The value a reference resolves to is published on the rules that activate
+ * that slot, not here.
+ */
+export function aggregateList(css, part = 'animation') {
+  const rule = compositionRules(css)[0]
+
+  if (!rule) return ''
+
+  return (rule.nodes ?? []).find(node => node.type === 'decl' && node.prop === part)?.value ?? ''
 }
 
-/** The slots the browser applies: the entries in the aggregate name list. */
+/** The slots the browser applies: the entries in the aggregate list. */
 export function aggregateSlots(css) {
-  return splitTopLevel(aggregateList(css)).length
+  return splitTopLevel(aggregateList(css)).filter(Boolean).length
+}
+
+/**
+ * The synthesized animations compositions, found **structurally**.
+ *
+ * Not "a rule with an `animation` shorthand": that is an ordinary utility, and a stylesheet is full
+ * of them. A composition is a rule that declares the shorthand, **and** the two longhands the
+ * shorthand resets, **and** whose positions are shallow references to values the activation rules
+ * publish. All three are required.
+ *
+ * The middle condition is the one that needed measuring: the resets are written only when the
+ * payload staged them, so requiring them is only sound if the payload always stages them. It does
+ * — verified on a one-slot build (`animate-rotate-45` alone), where the composition still declares
+ * `animation`, `animation-composition`, `animation-timeline` and `interpolate-size`. If that ever
+ * stops being true the detector reports zero compositions, which fails every check that uses it
+ * loudly rather than passing them quietly, and that is the direction of failure to prefer here.
+ *
+ * None of the three is a fact about formatting, which is the point. The detector this replaced keyed
+ * on `animation-name` and went to zero the moment the aggregate became a hoist; "has an `animation`
+ * shorthand" would have been the same mistake with a different word in it.
+ */
+export function compositionRules(css) {
+  const root = typeof css === 'string' ? postcss.parse(css) : css
+  const found = []
+
+  root.walkRules((rule) => {
+    const declarations = (rule.nodes ?? []).filter(node => node.type === 'decl')
+    const props = new Set(declarations.map(node => node.prop))
+
+    if (!props.has('animation-composition') || !props.has('animation-timeline')) return
+
+    // The shorthand *resets* those two, so the synthesized rule declares them after it. Checking the
+    // order is free here and it is the difference between "declares these three properties" and
+    // "declares them in the arrangement only the finalizer produces".
+    const shorthand = declarations.findIndex(node => node.prop === 'animation')
+    const lastReset = Math.max(
+      declarations.findIndex(node => node.prop === 'animation-composition'),
+      declarations.findIndex(node => node.prop === 'animation-timeline'),
+    )
+
+    if (shorthand < 0 || shorthand > lastReset) return
+    if (!declarations[shorthand].value.includes('var(--jumi-slot-')) return
+
+    found.push(rule)
+  })
+
+  return found
+}
+
+/**
+ * How many selectors a kind's composition was written for.
+ *
+ * Counting *rules* instead would say nothing: there is exactly one composition per kind, and the
+ * whole question is which selectors it carries. A descendant, a pseudo-element and a rule `@apply`
+ * was inlined into all have to be in the list, and none of them can be named by the utility it came
+ * from — so the list length is the shape of the activation, made countable.
+ *
+ * Split depth-aware rather than on `,\n`: the emitter writes one selector per line today, but a
+ * variant can carry a comma inside `:is()`/`:where()` and the answer must not depend on which
+ * formatting the emitter happens to be using.
+ */
+export function compositionScope(css, kind = 'animations') {
+  const rule = kind === 'animations' ? compositionRules(css)[0] : transitionRules(css)[0]
+
+  return rule ? splitTopLevel(rule.selector).length : 0
 }
 
 /**
  * How many materialized declarations a finished stylesheet is expected to hold, given how many
- * carriers it has. Exported so four checks cannot drift from each other on the arithmetic.
+ * compositions it has. Exported so the checks cannot drift from each other on the arithmetic.
+ *
+ * A hoisted animations composition declares the shorthand — which is not one of the ten longhands,
+ * so `PARTS` does not count it — plus the two the shorthand resets. That it carries *every* slot is
+ * no longer proved by counting declarations; it is proved by the list being one shallow reference
+ * per slot, which `aggregateSlots` reads.
  */
 export function expectedDeclarations({ animations, transitions }) {
-  return animations * PARTS.length + transitions * TRANSITION_PARTS.length
-}
-
-/**
- * The last value of a declaration in the file.
- *
- * The property name is matched whole. Anchoring only at the colon would make `animation-name`
- * match inside `--jumi-animation-name`, which is a different property that happens to end with
- * the same word — and every element declares that one.
- *
- * The aggregate is written into every carrier and a later declaration of the same property
- * wins in the cascade, so the last one is the one a browser applies to the last carrier.
- */
-export function lastDeclaration(css, property) {
-  const matches = [...css.matchAll(new RegExp(`(?<![\\w-])${property}\\s*:\\s*([^;]+);`, 'g'))]
-
-  return matches.at(-1)?.[1].trim() ?? ''
+  return animations * RESET_BY_SHORTHAND.length + transitions * TRANSITION_PARTS.length
 }
 
 /**
@@ -130,13 +216,16 @@ export function protocolState(css) {
   const materialized = [...bodies.matchAll(LONGHAND)]
 
   return {
-    animations: (bodies.match(ANIMATION_CARRIER) ?? []).length,
+    // Both kinds are counted structurally now, and for the same reason: the marker is erased, so the
+    // shape of the synthesized rule is the only thing left that says it was synthesized rather than
+    // authored.
+    animations: compositionRules(css).length,
     declarationBytes: materialized.reduce((total, match) => total + match[0].length, 0),
     declarations: materialized.length,
     leaks: {
       staging: (css.match(/--jumi-staging-/g) ?? []).length,
     },
-    transitions: (bodies.match(TRANSITION_CARRIER) ?? []).length,
+    transitions: transitionRules(css).length,
   }
 }
 
@@ -182,4 +271,23 @@ export function splitTopLevel(value) {
   parts.push(current)
 
   return parts.map(part => part.trim()).filter(Boolean)
+}
+
+/**
+ * The rules that publish the transition composition, in source order.
+ *
+ * Transitions compose a single shorthand already, so their composition is identified by the one
+ * declaration it always has — which is exactly what the animations detector used to do with
+ * `animation-name`, and what stopped working the moment animations were hoisted. Kept as the
+ * transition detector precisely *because* transitions were deliberately left alone.
+ */
+export function transitionRules(css) {
+  const root = typeof css === 'string' ? postcss.parse(css) : css
+  const found = []
+
+  root.walkRules((rule) => {
+    if (rule.nodes?.some(node => node.type === 'decl' && node.prop === 'transition')) found.push(rule)
+  })
+
+  return found
 }

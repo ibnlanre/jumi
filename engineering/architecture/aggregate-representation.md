@@ -399,6 +399,29 @@ and the build is still 95% staging. See `engineering/architecture/carrier-locali
 
 ## The evaluation cost, and why the representation is not where it lives
 
+> **Partly superseded, and superseded in the direction that matters.** Everything below stays true as
+> *measurement* — the cost scales with the number of aggregate positions resolved per animated
+> element, and no rearrangement of the `var()` indirection removes it. What changed is the conclusion
+> drawn from it. The doc reads it as "therefore the representation is not the lever"; the hoist that
+> shipped took it as "then reduce the positions resolved", and 10N → 3N is where the −60% recalc and
+> the −57% protocol response actually came from. See `engineering/research/style-cost.md`.
+>
+> Two consequences for reading the rest of this section:
+>
+> - **The parity divergence below is the accepted contract, not a defect to avoid.** Hoisting really
+>   does stop a shared control from reaching an inactive position — that was measured here first, and
+>   the shorthand hoist ships it deliberately. The resolution was to state the boundary: *Jumi
+>   guarantees the semantics of active animation positions; the computed longhand values of inactive
+>   `animation-name: none` positions are not part of the semantic API.*
+> - **The two things recorded as unsettled are settled.** The label-scoped collision is tested in
+>   `spike-cdp-cost`'s active-slot parity section, against a control that is asserted to reach its
+>   slot, and the read is all ten longhands rather than `animation-duration` alone.
+>
+> The `hoisted` row below is the **longhand** hoist (−19%), not the shorthand one that shipped; the
+> two differ by how many positions an element resolves, which is precisely the quantity this section
+> identifies as the cost. The earlier rejection of `hoisted` was a rejection of a *different shape on
+> a different workload*, and does not transfer.
+
 `scripts/spike-aggregate-cost.mjs` (retired) measured what an animated element pays to *resolve* the
 aggregate, in Chromium, against hand-written controls with identical list lengths. The conclusion:
 
@@ -448,6 +471,11 @@ semantic fork rather than a transparent optimisation, and not a trade to take ca
 off the aggregate, the cost stays in the hundreds of milliseconds. Reducing it means reducing the
 number of positions an element resolves — a change to what a slot universe *is*, not to how one is
 written down.
+
+That sentence is the one the shipped hoist acts on, which is why this section is annotated rather than
+left to read as a veto: it says the cost is positions resolved, and the hoist reduces positions
+resolved — 10N to 3N, by moving the chains onto the rules that activate them and leaving the
+composition one shallow reference per position instead of ten deep ones.
 
 Two things the matrix did not settle, recorded so they are not mistaken for passes: the label-scoped
 control row activates a slot but its control never reaches it, so the collision between a hoisted

@@ -28,7 +28,7 @@
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
-import { aggregateSlots, PARTS, protocolState, TRANSITION_PARTS } from './lib/css.mjs'
+import { aggregateSlots, expectedDeclarations, protocolState } from './lib/css.mjs'
 
 import path from 'node:path'
 
@@ -96,12 +96,20 @@ const names = body => [...body.matchAll(/(?<![-\w])(--[\w-]+|[\w-]+)\s*:/g)].map
  *
  * A selector is the wrong key here, and so is "the first rule with X": the composition's selectors
  * are precisely what grows between builds, so a check keyed on them would report the growth it
- * exists to measure. The fingerprints are the whole expected set — every longhand, plus the
- * property the animation composition also declares — which is strong enough that a user's own
- * `animation-name` cannot be mistaken for this rule.
+ * exists to measure. The fingerprints are declaration sets — a combination no utility produces, so
+ * a user's own `animation` cannot be mistaken for the composition's.
+ *
+ * The animations composition is the one that changed shape: it is written as a hoist, so it carries
+ * the shorthand, the two longhands the shorthand resets, and one shallow `--jumi-slot-*` reference
+ * per position — and none of the eight remaining longhands the old fingerprint looked for. Asking
+ * for those eight is what left the composition in the "Tailwind owned" set, where its growing
+ * selector list read as the cache moving. `compositionRules` in `lib/css.mjs` is the normative
+ * definition of the same signature; this is it read from a rule body rather than from a rule.
  */
 const fingerprint = (body) => {
-  if ([...PARTS, 'interpolate-size'].every(property => has(body, property))) return 'animations:composition'
+  if (has(body, 'animation') && has(body, 'animation-composition') && has(body, 'animation-timeline')
+    && body.includes('var(--jumi-slot-')) return 'animations:composition'
+
   if (['transition', 'transition-behavior'].every(property => has(body, property))) return 'transitions:composition'
 
   // The defaults are all custom properties, and which kind they are for is which substrate they
@@ -245,7 +253,7 @@ checks.push({
     .join('; '),
   pass: finalization.every(state => Object.values(state.leaks).every(count => count === 0)
     && state.animations > 0
-    && state.declarations === state.animations * PARTS.length + state.transitions * TRANSITION_PARTS.length),
+    && state.declarations === expectedDeclarations(state)),
   what: 'each composition holds its own parts, and no build-time name survives',
 })
 

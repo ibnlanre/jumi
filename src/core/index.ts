@@ -1,12 +1,12 @@
 import type { CarrierKind } from '@/helpers/carriers'
 import type {
-  AnimatableStandardPropertyType,
-  Collection,
-  Creator,
-  CssInJs,
-  MatchComponentsPropertyFunction,
-  MatchUtilitiesPropertyFunction,
-  StaggerContext,
+    AnimatableStandardPropertyType,
+    Collection,
+    Creator,
+    CssInJs,
+    MatchComponentsPropertyFunction,
+    MatchUtilitiesPropertyFunction,
+    StaggerContext,
 } from '@/types'
 
 import { assemble } from '@/helpers/assemble'
@@ -175,6 +175,20 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
     if (registered.has(name)) return
     registered.add(name)
     sink.property(name)
+
+    // The hoisted value the aggregate publishes a slot under inherits the same obligation, for the
+    // same reason and at the same moment: it is an ordinary custom property, so without a
+    // registration a descendant resolves an *ancestor's* slot and re-runs that animation. Measured
+    // on `behaviour:check`'s non-inheritance arm — the inner element ran the outer's
+    // `jumi-rotate-3zWYd`. Deriving the name here is what keeps the registration and the
+    // finalizer's publication in step: both read it off the activation variable.
+    const slot = /^--jumi-(.+)-animation-name$/.exec(name)?.[1]
+    const hoisted = slot ? `--jumi-slot-${slot}` : null
+
+    if (hoisted && !registered.has(hoisted)) {
+      registered.add(hoisted)
+      sink.property(hoisted)
+    }
   }
   // OPTIMIZATION: Using a Set allows O(1) deduplication and move-to-end,
   // replacing the O(N) Array indexOf/splice logic. JS Sets maintain insertion order.

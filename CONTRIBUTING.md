@@ -366,12 +366,27 @@ Individually, when you are iterating on one of them:
 pnpm exec tsc --noEmit      # types
 pnpm exec eslint src scripts
 pnpm vitest run             # unit tests, including the finalizer and the shared CSS helper
+pnpm theme:map              # the theme maps still resolve
 pnpm css:check              # the byte snapshot, over two frozen corpora
 pnpm incremental:check      # incremental builds stay correct and local
 pnpm behaviour:check        # a real browser resolves a real carrier
 pnpm vite:check             # the shipped Vite integration, in dev and in every build shape
 pnpm postcss:check          # the shipped PostCSS integration, in every configuration
+pnpm legacy:check           # no carrier class in a shipped surface
+pnpm stories:check          # every effect the Storybook names is one Jumi ships
 ```
+
+`pnpm check` runs those eleven in that order and **names every one in its summary**, with the
+stages it did not reach marked `not run` rather than left out. The sequence still stops at the first
+failure — later checks against a half-built `dist` would be a different gate, not a clearer one — but
+a failure can no longer read as "everything after it passed". That misreading cost a real bug: a
+composition fingerprint in `incremental:check` stayed stale across a whole representation change
+because the chain stopped at `test:run` and every stage below it was simply absent from the output.
+
+**When you change the composition, price it through the protocol as well.** Nothing in the
+gate above can see the cost that made Inspector unusable at 228 slots: every check in it
+reads emitted text, or the renderer, and the freeze was in neither. See "Tooling" under
+Quality Standards.
 
 **`behaviour:check` is not optional, and it is not a duplicate of the others.** Every
 harness above reads emitted *text*: the snapshot compares bytes, the structural metrics
@@ -392,6 +407,7 @@ the check that knows.
 - [ ] Test with arbitrary values
 - [ ] Ensure TypeScript types are correct
 - [ ] `pnpm check` passes
+- [ ] If you changed the composition, `pnpm spike:cdp-cost` was run and the response did not regress
 - [ ] Include examples in your PR description
 
 ---
@@ -411,6 +427,33 @@ the check that knows.
 ### Browser Support
 - Target modern browsers (Chrome 88+, Firefox 89+, Safari 14+)
 - Test cross-browser before submitting
+
+### Tooling
+
+A developer-facing CSS library is only as usable as the tools developers read it with. Jumi's
+composition is synthesized into every activating rule, so the amount an inspector has to fetch and
+render scales with the number of slots — and that cost is invisible to every check in the gate.
+
+- **DevTools inspectability is a release criterion.** Opening the effects catalogue and selecting an
+  animated element must not stall Inspector. This was missed once already: the page was smooth, the
+  snapshot was green, `behaviour:check` passed, and selecting an element in the Elements panel took
+  over 20 seconds.
+- **Measure the protocol, not the file.** At 228 slots the stylesheet and the response differ by a
+  factor of five — 178 KB of composition-rule text becomes 863 KB of
+  `CSS.getMatchedStylesForNode` payload, because the declaration body crosses the wire three times
+  (as each property's `value`, its `text`, and the rule's `cssText`). A 3% change in stylesheet
+  bytes corresponded to a 61% change in response bytes, so sheet size is not a usable proxy.
+- **Price a representation change on both workloads.** A change to the composition is a recalc
+  question *and* a tooling question, and they do not move together unless the shape is right.
+
+```bash
+pnpm spike:cdp-cost     # the protocol: bytes and latency per slot count, plus the A/B variants
+pnpm spike:recalc       # the renderer: recalc over slot counts × animated element counts
+pnpm spike:local-list   # why an element-local vector is not expressible in CSS
+```
+
+These are measurements, not gates — they are too slow for `pnpm check`. The reasoning and the
+numbers are in `engineering/research/style-cost.md`.
 
 ### Documentation
 - Clear examples for new features
