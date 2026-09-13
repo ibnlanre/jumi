@@ -396,3 +396,61 @@ On this corpus that moved shipped bytes 271,812 → **267,635**, with the same 5
 same 4 carriers and the same 60 entries × 10 lists. The build-cost half of the table is unchanged,
 and that is the point: the transport was never what the *file* cost — it was what the build cost,
 and the build is still 95% staging. See `engineering/architecture/carrier-locality.md`.
+
+## The evaluation cost, and why the representation is not where it lives
+
+`scripts/spike-aggregate-cost.mjs` (retired) measured what an animated element pays to *resolve* the
+aggregate, in Chromium, against hand-written controls with identical list lengths. The conclusion:
+
+> Flattening and hoisting reduce cost modestly, but do not remove the dominant expense. The cost
+> scales with the number of aggregate positions resolved per animated element. Further optimization
+> requires reducing the slot universe seen by an element, which is a semantic/architectural change
+> rather than a representation cleanup.
+
+At 100 slots and 1,000 animating elements, recalc above an inert page of the same shape:
+
+```text
+jumi      439ms   the real emission
+hoisted   356ms   chain moved to the activator, aggregate reads a shallow scoped name   −19%
+flat      392ms   the same shallow aggregate, nothing hoisted, controls inert           −11%
+native     17ms   the same list lengths with literal values, no custom properties
+narrow      8ms   one-entry lists
+```
+
+So the entries themselves cost almost nothing (`narrow` → `native` is +9 ms for 100 entries), the
+`var()` indirection costs ~370 ms, and no rearrangement of that indirection removes it: the price is
+the ~1,000 lookups an element performs for positions it will never use.
+
+**Hoisting is not behaviour-preserving, and the divergence is inherent.** A parity matrix over the
+control scopes shows `hoisted` differing from `jumi` in exactly the cases where a control is *shared*
+across positions:
+
+```text
+case                          jumi          hoisted        parity
+default                       1s ×101       1s ×101        same
+global control                0.5s ×101     2 distinct     DIFFERS
+property-scoped control       2 distinct    2 distinct     same
+two slots, both controlled    0.5s ×101     2 distinct     DIFFERS
+global control set inline     0.75s ×101    2 distinct     DIFFERS
+```
+
+In `jumi` every position reads the *shared* attribute-scoped variable, so a global control moves all
+101 of them. Hoisted, only the active slot's chain is declared, so the other 100 fall back to a
+literal. A position cannot be cheap and identical at once — cheap means its fallback is a literal,
+identical means its fallback is the shared control. The divergence is harmless today only because an
+inactive position's `animation-name` is `none`, so nothing reads its duration; that makes it a
+semantic fork rather than a transparent optimisation, and not a trade to take casually.
+
+**The other suspects are clear.** Removing `@property` registration costs 8.9 ms and removing
+`interpolate-size` costs nothing, of 435 ms.
+
+**And it is not a bug in Jumi's output.** With the chain correctly hoisted and 909 declarations moved
+off the aggregate, the cost stays in the hundreds of milliseconds. Reducing it means reducing the
+number of positions an element resolves — a change to what a slot universe *is*, not to how one is
+written down.
+
+Two things the matrix did not settle, recorded so they are not mistaken for passes: the label-scoped
+control row activates a slot but its control never reaches it, so the collision between a hoisted
+chain and `--jumi-<label>-<part>` — the same property a label-scoped control writes — is still
+untested; and only `animation-duration` is read, so a representation could agree about durations
+while differing about, say, `animation-fill-mode`.

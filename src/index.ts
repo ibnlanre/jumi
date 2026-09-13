@@ -6,15 +6,15 @@
 export { default } from './helpers/create'
 
 /**
- * The carrier protocol, for hosts. Tailwind expands a carrier into rules Jumi never
- * wrote — `:is(.animations > *)`, `.animations::before`, the copy `@apply` inlined — and
- * the aggregate those rules read cannot be published at a literal selector, because its
- * entries reference slot variables that exist only on the element. So the carrier marks
- * itself and the data is completed afterwards, on the emitted stylesheet.
+ * The carrier protocol, for hosts. Tailwind emits `animate-*` utilities as it discovers them, so
+ * no utility can hold the composition — it is a list of every slot in the stylesheet, and each
+ * entry resolves only on the element. So the model stages the data in a rule that is never output,
+ * and this pass reads it, derives the selectors that animate, and writes the composition where a
+ * browser will apply it.
  *
  * One engine, three boundaries. `finalize(root)` walks a CSS AST in place, for a host that
  * already has one; `finalizeCss(css)` is the same thing across parse/serialize; and
  * `@ibnlanre/jumi/postcss` and `@ibnlanre/jumi/vite` adapters call it at the two host integrations
  * Jumi supports.
  */
-export { carrierMarker, finalize, finalizeCss, type Finalized, stagingMarker } from './helpers/carriers'
+export { finalize, finalizeCss, type Finalized, stagingMarker } from './helpers/carriers'

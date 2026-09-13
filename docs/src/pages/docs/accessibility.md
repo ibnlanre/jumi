@@ -9,7 +9,7 @@ description: Good motion includes the option to experience less of it.
 Activate decorative animation through Tailwind's `motion-safe` variant:
 
 ```html
-<div class="motion-safe:animations animate-fade-in-up">
+<div class="motion-safe:animate-fade-in-up">
   Always readable. Animated when welcome.
 </div>
 ```
@@ -19,7 +19,7 @@ Keep the base element visible. Avoid an unconditional `opacity-0` or off-screen 
 When the movement is continuous rather than an entrance, the inverse variant is the one to reach for. It strips the repetition, and only for the visitors who ask for it:
 
 ```html
-<div class="animations animate-pulsing animation-iteration-count-infinite motion-reduce:animation-iteration-count-1">
+<div class="animate-pulsing animation-iteration-count-infinite motion-reduce:animation-iteration-count-1">
   Pulses until you say otherwise.
 </div>
 ```

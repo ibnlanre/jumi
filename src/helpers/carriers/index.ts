@@ -1,4 +1,4 @@
-import type { Declaration, Root, Rule } from 'postcss'
+import type { Container, Declaration, Root, Rule } from 'postcss'
 
 import type { Collection } from '@/types'
 
@@ -7,51 +7,74 @@ import postcss from 'postcss'
 /**
  * The carrier protocol, and the one engine that completes it.
  *
- * Jumi's carrier is a *class*: `animations` opts an element in, and the carrier declares the
- * shared composition state it needs. Tailwind expands that class — variants re-parent the
- * utility body (`variants.ts`: `r.nodes = selectors.map(selector => rule(selector, r.nodes))`),
- * and `@apply` copies it — so by the time CSS exists, one carrier has become several rules in
- * contexts Jumi never wrote:
+ * Jumi has no carrier class, and no dormant rule waiting to become one. An element opts in by
+ * animating: a rule *activates* a slot when it declares the generated name variable a slot is
+ * named by, and that is a fact this pass reads off the finished stylesheet, with variants and
+ * `@apply` already resolved.
  *
- *   .animations                    :is(.animations > *)        .animations::before
- *   (a motion-safe wrapper)        (an arbitrary variant)      (a copy @apply inlined)
+ *   .animate-rotate-45 { --jumi-rotate-3zWYd-animation-name: jumi-rotate-3zWYd; … }
+ *   .transition-duration-500\/rotate { --jumi-rotate-transition-duration: 500ms; }
  *
- * The aggregate those rules need is dynamic, and it cannot be published at a literal selector:
- * each entry is `var(--jumi-<slot>-…)`, the slot variables are declared by the `animate-*`
- * utilities **on the element**, and a `var()` chain in a custom property resolves where it is
- * *declared*. Published on `:root` the declaration is invalid and every carrier falls back to
- * `none`; published on `.animations` it never reaches a prefixed form. Both were measured.
+ * What an animating element needs is not in that rule, though, and cannot be: the composition is a
+ * list of every slot in the stylesheet, and each entry is a `var()` over a slot variable that only
+ * exists on the element. Tailwind emits the activation utilities as it discovers them, so no
+ * utility can hold the list — it would be stale the moment another slot appeared, or one rule per
+ * element.
  *
- * So the carrier marks itself and the data is carried to it, and both the marker and the carry
- * are erased afterwards, because neither is anything a browser should be handed:
+ * So the composition is written **after** the cascade rather than built out of it. The model
+ * stages the data in a rule that is never output, and this pass reads it, derives the selectors
+ * that animate, and synthesizes what a browser needs:
  *
- *   carrier marker present        → materialize the parts this carrier declares, then erase it
- *   staging marker present        → read the data, then remove the rule
- *   anything else                 → untouched
+ *   payload rule     → read the data and the element-local defaults, then remove the rule
+ *   activation rule  → contributes its selector to the group its kind is written on
+ *   anything else    → untouched
  *
- * The marker is erased because the rule **participated**, not because a value moved — the two are
- * different questions and conflating them shipped `--jumi-carrier` on a build with a motionless
- * `transitions` carrier. What gates the erasure instead is whether the stylesheet published an
- * aggregate at all, which is what keeps a build that never published a loud failure.
+ * Two rules come out of it per kind, and the split is what makes the cascade safe:
  *
- * **The carrier's own declarations are the contract.** A part is written only where the carrier
- * asks for it, which is what keeps two carriers with different data apart: `animations` declares
- * the ten animation longhands and `transitions` declares `transition`, so neither is handed the
- * other's list. Nothing is appended — a property the carrier does not declare is not one it wants.
- *
- * **The finished stylesheet carries no protocol.** `--jumi-carrier`, `--jumi-carrier-staging` and
- * every `--jumi-aggregate-*` are build-time names with a zero-occurrence invariant, asserted by
- * `css:check`, `vite:check` and `postcss:check`. What ships is the carrier's real `animation-*`
- * longhands holding their final lists, beside the slot variables, which are genuine runtime state:
- *
- *   .animations {
- *     animation-duration: var(--jumi-rotate-animation-duration, var(--jumi-animation-duration)), …;
- *     --jumi-rotate-…: 45deg;
- *     --jumi-animation-duration: 1s;
+ *   @layer utilities {
+ *     .animate-rotate-45, .animate-scale-110 {           ← the defaults it resolves through
+ *       --jumi-animation-duration: 1s;                   ← first in the layer, so a control wins
+ *       --jumi-animation-delay: var(--jumi-stagger-animation-delay, 0s); …
+ *     }
+ *     … the activations, the controls, the variants Tailwind generated …
+ *     .animate-rotate-45, .animate-scale-110 {           ← the composition
+ *       animation-name: var(--jumi-rotate-3zWYd-animation-name, …), …;
+ *       interpolate-size: var(--jumi-interpolate-size);
+ *     }
  *   }
  *
- * The transport layer is not part of the output, which is what makes "is this carrier finished?"
- * answerable by reading the declarations a browser applies rather than by trusting a pointer.
+ * **Two rules and not one, because they need opposite positions — and a rule has exactly one.**
+ * The defaults must *lose* to the controls, which are ordinary utilities in this same layer, so
+ * they open it; the composition must *beat* the author's utilities, so it closes it. Merged at
+ * either end, one side is wrong, and both were measured: at the end the defaults beat the controls
+ * (`1s` where the control says `500ms`), at the start the composition loses to a Tailwind
+ * arbitrary utility. Lowering one rule's weight instead of moving it is not available either,
+ * because specificity belongs to the **selector**, not to an individual declaration: one selector
+ * list is one weight, so the defaults and the composition cannot be weaker and stronger than each
+ * other from inside the same rule. `:where()` is the construct that would express it, and it is
+ * the one that fails — a pseudo-element cannot appear inside it, and `before:` / `after:` are
+ * ordinary usage. `carrier-locality.md`, "Why two rules and not one", holds the measurement and
+ * the cost of the split.
+ *
+ * The defaults have to be declared on the element rather than published once on `:root`, because
+ * they compose other custom properties the slot utilities write there: `--jumi-animation-delay`
+ * reads `--jumi-stagger-animation-delay`, and a custom property containing `var()` resolves where
+ * it is *declared*. On `:root` it resolves once, to the default, and every element inherits that
+ * literal — measured, and it silently stops the stagger system. It is also what keeps a global
+ * control on a wrapper out of the animations inside it: they declare the default themselves, and a
+ * declaration beats inheritance, which is the scope rule `controls.md` documents.
+ *
+ * The composition goes into the utilities layer, at the end of the block that holds the
+ * activations — after Tailwind's own utilities, before any utilities-layer block the author wrote
+ * later. Measured against the carrier this replaces, across six competing declarations: the
+ * position matters only against a Tailwind arbitrary utility, and only a position *before*
+ * Tailwind's own utilities gets that one wrong.
+ *
+ * **The finished stylesheet carries no protocol.** `--jumi-staging-*` is a build-time name with a
+ * zero-occurrence invariant, asserted by `css:check`, `vite:check` and `postcss:check`. When this
+ * pass does not run the payload survives, and the checks fail loudly — a stronger signal than a
+ * marker on a rule that may have been rewritten anyway, and one that cannot be mistaken for
+ * output.
  *
  * That is the whole protocol, and it is deliberately tiny. It is a walk over a generic CSS AST —
  * PostCSS's, not Tailwind's — because the pass has to survive the constructs Tailwind emits and
@@ -62,140 +85,247 @@ import postcss from 'postcss'
  * like a text bug until a browser disagreed.
  */
 
-/** Marks a rule that carries a Jumi carrier, and therefore needs its longhands materialized. */
-export const carrierMarker = '--jumi-carrier'
+/** The two kinds of composition. */
+export type CarrierKind = 'animations' | 'transitions'
 
 /**
- * Marks the rule the model stages its aggregate in. It exists only to be read and removed:
- * nothing in a browser ever consumes it, so it can never be a functional publication.
+ * The prefix every staged declaration is written under, and the only thing a host needs to
+ * recognize a payload. It reaches no browser, so it never has to be a property a browser applies.
  */
-export const stagingMarker = '--jumi-carrier-staging'
+export const stagingMarker = '--jumi-staging-'
 
 /**
- * The namespace the aggregate is staged under, and the only place it appears at all: it names no
- * property a browser applies, so it cannot survive into output. A staged name carries the
- * longhand it materializes into, which is why the two cannot disagree —
- * `--jumi-aggregate-animation-duration` becomes `animation-duration`.
+ * How a payload names what it carries: `--jumi-staging-<kind>-<declaration>`.
+ *
+ * The kind is part of **every entry name**, not of a marker's value, and that is a correction
+ * rather than a style. The first version put the kind in the marker's value, which read correctly
+ * for as long as each payload stayed its own rule — and then `@tailwindcss/postcss` coalesced the
+ * payload rules into one. Two markers then declared the same property with different values, one
+ * won, and the animations composition was handed the transition's declarations while the
+ * transitions composition was never built at all. A name cannot collide with a different name.
+ *
+ * The remainder of the name is the declaration it becomes, verbatim: `animation-name` for the
+ * longhand a browser applies, `--jumi-rotate` for a custom property the element resolves through.
+ * One rule, no special cases — and a payload still coalesced across kinds cannot mix them up.
  */
-const aggregatePrefix = '--jumi-aggregate-'
+const stagedName = (prop: string) => prop.slice(stagingMarker.length)
+
+/** Which kind a staged declaration is for, and what declaration it becomes. */
+const stagedEntry = (prop: string) => {
+  const rest = stagedName(prop)
+  const boundary = rest.indexOf('-')
+  const kind = rest.slice(0, boundary)
+
+  if (kind !== 'animations' && kind !== 'transitions') return null
+
+  return { kind: kind as CarrierKind, name: rest.slice(boundary + 1) }
+}
+
+/**
+ * What activates a composition: a rule that declares the generated variable a slot is named by.
+ *
+ *   .animate-rotate-45 { --jumi-rotate-3zWYd-animation-name: jumi-rotate-3zWYd; … }
+ *   .transition-duration-500\/rotate { --jumi-rotate-transition-duration: 500ms; }
+ *
+ * Deliberately not "mentions a Jumi variable". A control declares a different property —
+ * `.animation-duration-500 { --jumi-rotate-animation-duration: 500ms }` — and must stay inert on
+ * its own, so the locator is the activation rather than anything in the namespace. A global
+ * `transition-duration-500` writes `--jumi-transition-duration`, which names no motion and is
+ * inert for the same reason.
+ *
+ * Both patterns need at least one segment between `--jumi-` and the suffix, which is what
+ * excludes the substrate (`--jumi-animation-name`, `--jumi-transition-property`) by construction
+ * rather than by a blocklist — and the transition pattern requires `-transition-` outright, so
+ * the stagger slot's `--jumi-stagger-animation-delay` is not mistaken for an activation.
+ */
+const ACTIVATION: Record<CarrierKind, RegExp> = {
+  animations: /^--jumi-.+-animation-name$/,
+  transitions: /^--jumi-.+-transition-(?:delay|duration|property|timing-function)$/,
+}
+
+/** A rule activates a kind when one of its own declarations is an activation for it. */
+const activates = (rule: Rule, pattern: RegExp) =>
+  ownDeclarations(rule).some(declaration => pattern.test(declaration.prop))
 
 export type Finalized = {
   /**
-   * How many of those the aggregate actually rewrote. Zero is a valid, complete result rather than
-   * a failure: a motionless `transitions` carrier already declares the list it would be handed.
+   * How many selectors the animations composition was written for. Zero means no composition was
+   * built, which is the ordinary result on a stylesheet with no `animate-*` in it.
    */
-  carriersChanged: number
-  /**
-   * Carrier rules the marker identified, whether or not the aggregate had anything to change.
-   * Zero on a second pass, because the first erased every marker it found.
-   */
-  carriersFound: number
-  /** How many staging rules were consumed. Zero on a second pass, by construction. */
+  animations: number
+  /** How many payload rules were consumed. Zero on a second pass, by construction. */
   staging: number
+  /** The same for transitions, from the rules that declare a motion's transition chain. */
+  transitions: number
 }
 
 /** The declarations of a rule itself, ignoring anything nested inside it. */
 const ownDeclarations = (rule: Rule) =>
   (rule.nodes ?? []).filter((node): node is Declaration => node.type === 'decl')
 
-const stages = (rule: Rule) => ownDeclarations(rule).some(decl => decl.prop === stagingMarker)
-const carries = (rule: Rule) => ownDeclarations(rule).some(decl => decl.prop === carrierMarker)
+/**
+ * The utilities-layer block the composition belongs in.
+ *
+ * The end of it, not the start: this pass appends, so the composition lands after everything
+ * Tailwind generated for that layer and before any utilities-layer block the author wrote later.
+ * Measured against the carrier this replaces, across six competing declarations, that is the only
+ * placement that reproduces every winner — a position at the *start* of the layer loses to
+ * Tailwind's own arbitrary utilities, which today's carrier beats.
+ *
+ * Walking up rather than taking the nearest ancestor keeps it at the outermost one, so an
+ * activation nested in `@media` or `@supports` still contributes to one composition instead of a
+ * separate rule inside each condition.
+ */
+const layerFor = (root: Root, rule: Rule) => {
+  let layer: Container = root
+
+  for (let node = rule.parent; node && node.type !== 'root'; node = node.parent) {
+    if (node.type === 'atrule' && node.name === 'layer' && node.params.trim() === 'utilities') layer = node
+  }
+
+  return layer
+}
 
 /**
- * Complete every carrier in a stylesheet, in place.
+ * The block the defaults belong at the top of: the first utilities layer with a body.
  *
- * Two passes, because the order of the two kinds of rule is not a contract: the aggregate is read
- * from the whole document first — later publications winning, exactly as a later declaration would
- * in the browser — and only then written into the carriers. One pass would depend on every
- * publication preceding every carrier, which happens to be true today (base output is emitted
- * before utilities) and is not something to build on.
+ * First in the **layer**, not merely early in the stylesheet. A later `@layer utilities` block —
+ * the author's own, or a second one Tailwind emitted — still comes after this one, so one `prepend`
+ * puts the defaults ahead of every utility declaration the layer holds, which is the invariant
+ * rather than a property of the order Tailwind happened to choose.
+ */
+const defaultsLayerFor = (root: Root) => {
+  for (const node of root.nodes ?? []) {
+    if (node.type !== 'atrule' || node.name !== 'layer' || node.params.trim() !== 'utilities') continue
+    if (node.nodes?.length) return node
+  }
+
+  return root
+}
+
+/**
+ * Complete every composition in a stylesheet, in place.
+ *
+ * Three phases, because each one needs the document to have stopped moving. The payload is read
+ * from the whole document first — later publications winning, exactly as a later declaration
+ * would in the browser — and the rules that carried it are removed, so a payload rule can never
+ * be mistaken for an activator of its own data. Then the activators are collected, in document
+ * order, from what is left. Only then is anything written.
+ *
+ * That order is not an optimization. A staged name such as `--jumi-staging-animations-animation-name`
+ * matches the activation pattern for `animations`, so a payload still in the document would add
+ * `:root` to the selector list it is used to build. One pass would have this bug, and it would
+ * present as a rule that looks right.
  *
  * `aggregate` is for a host that already holds the data: it is applied over whatever the
- * stylesheet staged, and the staging is removed either way. It is keyed by **longhand**, because
- * that is what the data is once it is no longer in transit — `animation-name`, not
- * `--jumi-aggregate-animation-name`. The stylesheet stays the normal channel, which is what lets
- * finalization be a pure function of the CSS it is given.
+ * stylesheet staged, which is removed either way. It is keyed by **longhand**, because that is
+ * what the data is once it is no longer in transit — `animation-name`, not
+ * `--jumi-staging-animations-animation-name`. The element-local defaults are not part of it; those
+ * compose custom properties that only the stylesheet knows, so they come from the payload.
  *
- * Reports what it found and what it changed, and does not serialize. A second pass finds nothing
- * staged and no marker to recognize, so it reports zero and leaves the document — and therefore
- * the output — untouched.
+ * Reports what it built and does not serialize. A second pass finds nothing staged and produces
+ * nothing, so it reports zero and leaves the document — and therefore the output — untouched.
  */
 export function finalize(root: Root, aggregate?: Collection<string>): Finalized {
-  const materialized = new Map<string, string>()
-  const finalized: Finalized = { carriersChanged: 0, carriersFound: 0, staging: 0 }
+  const payload: Collection<Collection<string>> = {}
+  const finalized: Finalized = { animations: 0, staging: 0, transitions: 0 }
 
-  // Pass 1 — read the data, and take the rules that carried it out of the document. Removal
+  // Phase 1 — read the payload, and take the rules that carried it out of the document. Removal
   // during a walk is why this is an AST and not a string: the rule can go wherever it is nested.
   root.walkRules((rule) => {
-    if (!stages(rule)) return
+    const declarations = ownDeclarations(rule)
+    const staged = declarations.filter(declaration => declaration.prop.startsWith(stagingMarker))
 
-    for (const declaration of ownDeclarations(rule)) {
-      if (!declaration.prop.startsWith(aggregatePrefix)) continue
+    if (!staged.length) return
 
-      materialized.set(declaration.prop.slice(aggregatePrefix.length), declaration.value)
+    for (const declaration of staged) {
+      const entry = stagedEntry(declaration.prop)
+
+      if (!entry) continue
+
+      ;(payload[entry.kind] ??= {})[entry.name] = declaration.value
     }
 
     rule.remove()
     finalized.staging += 1
   })
 
-  for (const [longhand, value] of Object.entries(aggregate ?? {})) materialized.set(longhand, value)
+  for (const [longhand, value] of Object.entries(aggregate ?? {})) {
+    ;(payload.animations ??= {})[longhand] = value
+  }
 
-  /**
-   * Whether this pass had an aggregate to hand out at all.
-   *
-   * It separates two situations that look identical in the declarations: a stylesheet that
-   * published and had nothing to change, which is complete, and a stylesheet that never published,
-   * which is broken. Once the staging is gone, only the marker can tell them apart.
-   *
-   * "Published" is the *existence* of an aggregate, not its size. A host that holds the data and
-   * has nothing to say passes an empty one, and that is a complete build rather than a failed one —
-   * reading emptiness as absence would make a correct no-motion stylesheet trip the invariant for
-   * the same reason this gate exists.
-   */
-  const published = finalized.staging > 0 || aggregate !== undefined
+  // Phase 2 — the rules that activate a slot, per kind, in document order.
+  //
+  // A rule contributes its selector once. Several rules can carry the same one — a utility emitted
+  // twice, two `@apply` copies in one selector — and a selector list repeats what it is given.
+  // Document order and not sorted order, because the output has to be byte-stable across a fresh
+  // build and an incremental one: `walkRules` visits in document order and a `Set` keeps
+  // first-insertion order, so the same stylesheet always produces the same list. Sorting would
+  // order the selectors by name, which is not a fact about the page.
+  const activators: Collection<Rule[]> = {}
 
-  // Pass 2 — write it into every carrier, as the declarations a browser actually applies. Only a
-  // property the carrier already declares is written, which is what scopes the data: the carrier
-  // body names the parts it needs, so a rule is never handed another carrier's list. The value
-  // replaces the whole declaration, so the read that pointed through the transport is gone rather
-  // than rewritten: nothing here parses a CSS value.
   root.walkRules((rule) => {
-    if (!carries(rule)) return
-
-    finalized.carriersFound += 1
-
-    let changed = false
-
-    for (const [longhand, value] of materialized) {
-      const existing = ownDeclarations(rule).find(declaration => declaration.prop === longhand)
-
-      if (!existing || existing.value === value) continue
-
-      existing.value = value
-      changed = true
-    }
-
-    if (changed) finalized.carriersChanged += 1
-
-    // Erasing is about **participation**, not about change. A motionless `transitions` carrier
-    // already declares `transition: var(--jumi-transition)`, and the aggregate it would be handed
-    // is that same string — so there is nothing to rewrite, and it used to keep its marker for
-    // precisely that reason, shipping the protocol on a legitimate build. "Did this carrier need a
-    // new value?" and "did this carrier complete the protocol?" are different questions, and the
-    // marker answers the second one.
-    //
-    // The gate is whether the pass had an aggregate at all, which keeps the zero-occurrence
-    // invariant worth asserting: a build that never published hands out nothing, so no marker is
-    // erased, the protocol is left in the output, and the checks fail loudly — rather than shipping
-    // a carrier whose animations silently do nothing. It is also what makes a second pass a no-op:
-    // the first erased every marker it found, so there is nothing left to find and nothing to redo.
-    if (!published) return
-
-    for (const declaration of ownDeclarations(rule)) {
-      if (declaration.prop === carrierMarker) declaration.remove()
+    for (const kind of Object.keys(ACTIVATION) as CarrierKind[]) {
+      if (activates(rule, ACTIVATION[kind])) (activators[kind] ??= []).push(rule)
     }
   })
+
+  // Phase 3 — synthesize what a browser applies, and leave nothing of the transport behind.
+  for (const kind of Object.keys(ACTIVATION) as CarrierKind[]) {
+    const rules = activators[kind]
+    const staged = payload[kind]
+
+    // No payload means the stylesheet never staged one, which is not this pass's to invent: the
+    // transport is still in the output, and the zero-occurrence invariant is what says so.
+    if (!rules?.length || !staged) continue
+
+    const selectors = [...new Set(rules.map(rule => rule.selector))]
+    const group = selectors.join(',\n')
+    const composition = postcss.rule({ selector: group })
+    // The defaults are the weakest thing this pass writes: everything that exists to override them
+    // — a control utility, an arbitrary custom-property utility, the author's own `--jumi-*` — is
+    // an ordinary utility in this layer. So they go first in the layer and order settles it once,
+    // structurally, rather than being left to where Tailwind happened to sort the composition.
+    //
+    // They are deliberately *not* `:where()`-wrapped, which is how this started: a pseudo-element
+    // cannot appear inside `:where()`, and `before:` / `after:` are ordinary Jumi usage. The rule
+    // was dropped as invalid, the substrate never arrived, and the composition's `var()` fallback
+    // then made the whole declaration invalid at computed-value time on that pseudo-element.
+    const defaults = postcss.rule({ selector: group })
+
+    for (const [name, value] of Object.entries(staged)) {
+      // A name that is itself a custom property is a default the element resolves through, and it
+      // has to be declared *on the element*: it composes other custom properties the slot
+      // utilities write there — `--jumi-animation-delay` reads `--jumi-stagger-animation-delay`,
+      // which the stagger rule sets on the element — and a custom property containing `var()`
+      // resolves where it is **declared**. Published on `:root` it resolves once, to the default,
+      // and every element inherits that literal. Measured, and it stops the stagger system.
+      if (name.startsWith('--')) {
+        defaults.append(postcss.decl({ prop: name, value }))
+        continue
+      }
+
+      composition.append(postcss.decl({ prop: name, value }))
+    }
+
+    // A composition with no declarations is not one: a payload of nothing but defaults cannot
+    // animate anything, and an empty rule would be noise in the output.
+    if (!composition.nodes?.length) continue
+
+    const layer = layerFor(root, rules[0])
+
+    // Two rules, two jobs, two placements — and they cannot be collapsed into one, which is the
+    // question their shared selector list invites. The defaults must lose to the controls, which are
+    // ordinary utilities in this layer, so they open it; the composition must beat the author's
+    // utilities, so it closes it. A rule has one position, and lowering one rule's weight instead is
+    // not available: specificity belongs to the selector, not to a declaration, so one selector list
+    // is one weight. `:where()` would express it and is the construct that breaks on pseudo-elements.
+    if (defaults.nodes?.length) defaultsLayerFor(root).prepend(defaults)
+
+    layer.append(composition)
+
+    finalized[kind] = selectors.length
+  }
 
   return finalized
 }

@@ -9,11 +9,11 @@ description: Animate property targets directly. Give simple pieces a shared purp
 Property utilities follow `animate-{property}-{value}`. Values come from the relevant Tailwind theme scale, built-in keywords, or arbitrary values in brackets.
 
 ```html
-<div class="animations animate-color-red-600">Color</div>
-<div class="animations animate-width-[240px]">Width</div>
-<div class="animations animate-rotate-[0.25turn]">Rotation</div>
-<div class="animations animate-filter-blur-[8px]">Blur</div>
-<div class="animations animate-border-radius-[40px]">Corners</div>
+<div class="animate-color-red-600">Color</div>
+<div class="animate-width-[240px]">Width</div>
+<div class="animate-rotate-[0.25turn]">Rotation</div>
+<div class="animate-filter-blur-[8px]">Blur</div>
+<div class="animate-border-radius-[40px]">Corners</div>
 ```
 
 Simple property animations generate a `to` keyframe. The starting point comes from the element's underlying styles. Set a useful starting value when the default does not interpolate as you expect.
@@ -21,8 +21,7 @@ Simple property animations generate a `to` keyframe. The starting point comes fr
 ## Separate properties, separate rhythms
 
 ```html
-<div class="animations
-  animate-rotate-[180deg]
+<div class="animate-rotate-[180deg]
   animate-scale-[0.75]
   animation-duration-[3s]/rotate
   animation-duration-[1s]/scale
@@ -39,8 +38,7 @@ The `/rotate` and `/scale` modifiers target those property slots. A global contr
 Jumi assembles parts of compound CSS values through custom properties. For example, blur and brightness contribute to the same filter:
 
 ```html
-<div class="animations
-  animate-filter-blur-[4px]
+<div class="animate-filter-blur-[4px]
   animate-filter-brightness-[1.2]
   animation-duration-[900ms]/filter">
   A softer glow.
@@ -54,8 +52,8 @@ These parts share a `filter` animation slot. Their timing belongs to `/filter`, 
 An effect can animate several properties. Combining two effects that both write `transform` or `opacity` can cause one to replace the other. Use nested elements when you want independent effects on the same visual object.
 
 ```html
-<div class="animations animate-fade-in">
-  <div class="animations animate-spinning
+<div class="animate-fade-in">
+  <div class="animate-spinning
     animation-duration-[8s]
     animation-timing-function-linear
     animation-iteration-count-infinite">✳</div>

@@ -99,6 +99,22 @@ export function expectedDeclarations({ animations, transitions }) {
 }
 
 /**
+ * The last value of a declaration in the file.
+ *
+ * The property name is matched whole. Anchoring only at the colon would make `animation-name`
+ * match inside `--jumi-animation-name`, which is a different property that happens to end with
+ * the same word — and every element declares that one.
+ *
+ * The aggregate is written into every carrier and a later declaration of the same property
+ * wins in the cascade, so the last one is the one a browser applies to the last carrier.
+ */
+export function lastDeclaration(css, property) {
+  const matches = [...css.matchAll(new RegExp(`(?<![\\w-])${property}\\s*:\\s*([^;]+);`, 'g'))]
+
+  return matches.at(-1)?.[1].trim() ?? ''
+}
+
+/**
  * What a finished stylesheet says about the protocol.
  *
  * `leaks` is the invariant — three build-time names, all expected at zero, none of them a property
@@ -118,28 +134,10 @@ export function protocolState(css) {
     declarationBytes: materialized.reduce((total, match) => total + match[0].length, 0),
     declarations: materialized.length,
     leaks: {
-      aggregate: (css.match(/--jumi-aggregate-/g) ?? []).length,
-      carrier: (css.match(/--jumi-carrier(?!-)/g) ?? []).length,
-      staging: (css.match(/--jumi-carrier-staging/g) ?? []).length,
+      staging: (css.match(/--jumi-staging-/g) ?? []).length,
     },
     transitions: (bodies.match(TRANSITION_CARRIER) ?? []).length,
   }
-}
-
-/**
- * The last value of a declaration in the file.
- *
- * The property name is matched whole. Anchoring only at the colon would make `animation-name`
- * match inside `--jumi-animation-name`, which is a different property that happens to end with
- * the same word — and every element declares that one.
- *
- * The aggregate is written into every carrier and a later declaration of the same property
- * wins in the cascade, so the last one is the one a browser applies to the last carrier.
- */
-export function lastDeclaration(css, property) {
-  const matches = [...css.matchAll(new RegExp(`(?<![\\w-])${property}\\s*:\\s*([^;]+);`, 'g'))]
-
-  return matches.at(-1)?.[1].trim() ?? ''
 }
 
 /** Split a CSS value on its top-level commas, ignoring nested `()`, `[]` and strings. */

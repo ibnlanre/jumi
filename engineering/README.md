@@ -79,4 +79,26 @@ unique enough to identify a Jumi-owned carrier rule — and the defect it found 
 so the fixture that documented that defect now measures nothing. The conclusion is in
 `architecture/carrier-locality.md`.
 
+`spike-carrier-placement`, `spike-global-carrier` and `spike-inference-placement` were retired
+together, when the migration they argued for landed. The first settled that a carrier can be
+implicit and that `addBase` is not a safe home for one — a `@layer components` declaration that loses
+to a utility-layer carrier beats a base-layer one. The second asked whether the composition could
+simply live on `*`, found it correctness-equivalent and retired on cost: a universal carrier scales
+with total DOM size rather than with the elements that animate, and splitting inherited substrate
+from applied longhands reduced that tax without removing it. The third pinned where inside
+`@layer utilities` a synthesized composition belongs, and falsified the start of the layer, which
+loses to Tailwind's own arbitrary utilities. All three describe an architecture that no longer
+exists — the carrier class is gone, and with it the marker. Their conclusions are in
+`architecture/carrier-locality.md`, and the properties they established are now asserted by the
+production harnesses rather than by a probe — `behaviour:check` covers the pseudo-element and the
+precedence triangle in a browser, `incremental:check` covers the derived-rule count and cache
+stability, and `css:check` holds the bytes.
+
+`spike-aggregate-cost` was retired once its question was answered and the conclusion was recorded in
+`architecture/aggregate-representation.md`: flattening and hoisting the aggregate's `var()` chains
+reduce the cost modestly but do not remove it, because the expense is the number of positions each
+animated element resolves. Its corpus measured the realistic scale on the way out — the canonical
+corpus discovers 33 slots and the examples app 60 — and it carries a known gap, that the label-scoped
+control row never exercised the collision it was written for.
+
 This is principle 10 of `CONTRIBUTING.md`.

@@ -5,271 +5,299 @@ import { finalize, finalizeCss, stagingMarker } from '@/helpers/carriers'
 import postcss from 'postcss'
 
 /**
- * The finalizer is the mechanism the whole carrier feature now depends on, so it is tested
- * against the constructs rather than the happy path: nested at-rules, nested rules, comments,
- * strings, `var()` fallbacks, and the exact whitespace of a stylesheet it must not disturb.
+ * The finalizer *is* the feature now, so it is tested against the constructs rather than the happy
+ * path: nested at-rules, nested rules, comments, strings, `var()` fallbacks, and the exact
+ * whitespace of a stylesheet it must not disturb.
  *
- * It is also where the protocol's zero-occurrence invariant is pinned: what the finalizer returns
- * must hold the carrier's real `animation-*` longhands and none of the build-time names.
+ * Two properties carry more weight than the rest. The synthesized rules are the only place the
+ * composition exists, so which selectors they land on is the whole contract. And the payload is
+ * addressed by name, so the locator has to tell an activation from a control that declares a
+ * different property — a `--jumi-` prefix is not enough, and neither is a suffix pattern that
+ * matches the stagger slot.
  */
 
 /**
- * A carrier body: the marker, plus a read for each part it asks the finalizer to write.
- *
- * The reads are the contract. A part is written only where the carrier declares it, which is what
- * keeps two carriers with different data apart — `animations` declares the animation longhands and
- * `transitions` declares `transition`, so neither is handed the other's list. A fixture that leaves
- * a part out is therefore testing something real: it must not receive what it did not ask for.
+ * A payload rule. Every declaration is staged under its kind, because that is where the kind lives:
+ * a name cannot collide with a different name when a host coalesces payload rules, and a property
+ * value can — which is how the animations composition was once handed the transition's data.
  */
-const carrier = (parts: string[] = ['animation-name']) =>
-  `--jumi-carrier: animations;${parts.map(part => ` ${part}: var(--jumi-aggregate-${part}, var(--jumi-${part}));`).join('')}`
+const payload = (kind: string, declarations: string, selector = ':root') => {
+  const staged = declarations
+    .split(';')
+    .map(part => part.trim())
+    .filter(Boolean)
+    .map((part) => {
+      const at = part.indexOf(':')
 
-/** Every longhand the model stages a list for, and therefore every longhand the finalizer writes. */
-const PARTS = [
-  'animation-composition',
-  'animation-delay',
-  'animation-direction',
-  'animation-duration',
-  'animation-fill-mode',
-  'animation-iteration-count',
-  'animation-name',
-  'animation-play-state',
-  'animation-timeline',
-  'animation-timing-function',
-]
+      return `${stagingMarker}${kind}-${part.slice(0, at).trim()}: ${part.slice(at + 1).trim()};`
+    })
+    .join(' ')
 
-/** A staging rule carrying one longhand, with the marker the finalizer looks for. */
-const staged = (value: string, selector = ':root') =>
-  `${selector} { --jumi-carrier-staging: 1; --jumi-aggregate-animation-name: ${value}; }`
+  return `${selector} { ${staged} }`
+}
+
+/** An activation: the generated name variable a slot is declared by, on the rule declaring it. */
+const activation = (selector: string, name = 'rotate-3zWYd', attribute = 'rotate') =>
+  `${selector} { --jumi-${name}-animation-name: jumi-${name}; --jumi-${attribute}-${name}: 45deg; }`
+
+/** A motion's transition chain, as the `transition-*` utilities declare it. */
+const motionActivation = (selector: string, motion = 'rotate') =>
+  `${selector} { --jumi-${motion}-transition-property: ${motion}; --jumi-${motion}-transition-duration: 500ms; }`
+
+const ANIMATIONS = payload('animations', [
+  'animation-name: var(--jumi-rotate-3zWYd-animation-name, var(--jumi-animation-name));',
+  'interpolate-size: var(--jumi-interpolate-size);',
+  '--jumi-animation-duration: 1s;',
+].join(' '))
+
+const TRANSITIONS = payload('transitions', [
+  'transition: var(--jumi-rotate-transition-property) 500ms;',
+  '--jumi-transition-duration: 0s;',
+].join(' '))
+
+/** The selectors a stylesheet's utilities layer holds, in source order. */
+const layerRules = (css: string) => {
+  const found: string[] = []
+
+  postcss.parse(css).walkAtRules('layer', (layer) => {
+    if (!layer.params.includes('utilities') || !layer.nodes) return
+    found.push(...layer.nodes.map(node => (node.type === 'rule' ? node.selector : `@${node.type}`)))
+  })
+
+  return found
+}
 
 describe('the finalizer', () => {
-  it('writes the aggregate into every carrier and removes what staged it', () => {
-    const css = [
-      staged('var(--jumi-rotate-a, var(--jumi-animation-name))'),
-      `.animations { ${carrier()} }`,
-      '.other { color: red; }',
-    ].join('\n')
+  it('synthesizes the composition on the selectors that activate it', () => {
+    const css = [ANIMATIONS, activation('.animate-rotate-45')].join('\n')
 
-    const { carriersChanged, carriersFound, css: out, staging } = finalizeCss(css)
+    const { animations, css: out, staging } = finalizeCss(css)
 
-    expect({ carriersChanged, carriersFound, staging }).toEqual({ carriersChanged: 1, carriersFound: 1, staging: 1 })
-    expect(out).not.toContain(stagingMarker)
-    expect(out).toContain('.animations { animation-name: var(--jumi-rotate-a, var(--jumi-animation-name)); }')
-    expect(out).toContain('.other { color: red; }')
-  })
+    expect({ animations, staging }).toEqual({ animations: 1, staging: 1 })
 
-  it('reaches a carrier wherever Tailwind put it, including nested at-rules', () => {
-    const css = [
-      '@layer base {',
-      `  ${staged('var(--a)')}`,
-      '}',
-      '@media (min-width: 40rem) {',
-      '  @supports (color: red) {',
-      `    :is(.animations > *) { ${carrier()} }`,
-      '  }',
-      '}',
-    ].join('\n')
+    // What the payload bound to a declaration became that declaration, and what it carried under
+    // its own name became one too — `interpolate-size` is a real property and rides the same channel.
+    expect(out).toContain('animation-name: var(--jumi-rotate-3zWYd-animation-name, var(--jumi-animation-name));')
+    expect(out).toContain('interpolate-size: var(--jumi-interpolate-size);')
 
-    const { carriersChanged, carriersFound, css: out, staging } = finalizeCss(css)
-
-    expect({ carriersChanged, carriersFound, staging }).toEqual({ carriersChanged: 1, carriersFound: 1, staging: 1 })
-    expect(out).toContain(':is(.animations > *) { animation-name: var(--a); }')
+    // And none of the transport survives it.
     expect(out).not.toContain(stagingMarker)
   })
 
-  it('reaches a carrier nested inside another rule', () => {
-    const { carriersFound, css: out } = finalizeCss([
-      staged('var(--a)'),
-      '.parent {',
-      `  .animations { ${carrier()} }`,
-      '}',
-    ].join('\n'))
+  it('separates the element-local defaults from the composition', () => {
+    const { css: out } = finalizeCss([ANIMATIONS, activation('.animate-rotate-45')].join('\n'))
 
-    expect(carriersFound).toBe(1)
-    expect(out).toContain('.animations { animation-name: var(--a); }')
+    // The same selectors twice: the defaults are the substrate the element resolves through and the
+    // composition is what the browser applies. Two rules, because they have opposite cascade
+    // responsibilities — one exists to be overridden, the other to win.
+    expect(out).toContain('--jumi-animation-duration: 1s;')
+    expect(out).toContain('animation-name: var(--jumi-rotate-3zWYd-animation-name')
+
+    // And not `:where()`, which is how this started. A pseudo-element cannot appear inside it, and
+    // `before:` / `after:` are ordinary Jumi usage: the rule was dropped as invalid, the substrate
+    // never arrived, and the composition's `var()` fallback then made the whole declaration invalid
+    // at computed-value time on that pseudo-element. Measured — the composition computed to `none`.
+    expect(out).not.toContain(':where(')
   })
 
-  it('takes the last publication, the way a later declaration would win', () => {
-    const { css: out } = finalizeCss([
-      staged('var(--first)'),
-      `.animations { ${carrier()} }`,
-      staged('var(--second)'),
-    ].join('\n'))
-
-    expect(out).toContain('animation-name: var(--second);')
-  })
-
-  it('writes only the parts a carrier declares, so two carriers can differ', () => {
-    const lists = [
-      '--jumi-aggregate-animation-name: var(--jumi-rotate-a, var(--jumi-animation-name));',
-      '--jumi-aggregate-transition: var(--jumi-scale-transition-chain);',
-    ].join(' ')
-
-    const { carriersChanged, css: out } = finalizeCss([
-      `:root { ${stagingMarker}: 1; ${lists} }`,
-      `.animations { ${carrier()} }`,
-      `.transitions { ${carrier(['transition'])} }`,
-    ].join('\n'))
-
-    // One staging rule, two carriers, two different requests — and each is handed the part it
-    // declared and nothing else. This is what lets `animations` and `transitions` share a channel
-    // while needing different data.
-    expect(carriersChanged).toBe(2)
-    expect(out).toContain('.animations { animation-name: var(--jumi-rotate-a, var(--jumi-animation-name)); }')
-    expect(out).toContain('.transitions { transition: var(--jumi-scale-transition-chain); }')
-  })
-
-  it('does not mistake a comment or a string for the protocol', () => {
+  it('groups every activating selector once, in document order', () => {
     const css = [
-      '/* --jumi-carrier: animations; --jumi-carrier-staging: 1; */',
-      '.quoted { content: "--jumi-carrier: animations"; }',
-      '.animations { --jumi-carrier: animations; }',
+      ANIMATIONS,
+      activation('.animate-rotate-45', 'rotate-3zWYd'),
+      activation('.animate-scale-110', 'scale-d38', 'scale'),
+      // The same selector twice, which a variant and a duplicate utility both produce. A selector
+      // list repeats what it is given, so this has to collapse.
+      activation('.animate-scale-110', 'scale-d38', 'scale'),
     ].join('\n')
 
-    const { carriersChanged, carriersFound, css: out, staging } = finalizeCss(css)
+    const { animations, css: out } = finalizeCss(css)
 
-    // The comment and the string are not declarations, so there is nothing to remove. The rule is
-    // found — it declares the marker — but it declares no part and the sheet published nothing, so
-    // it is neither written nor erased.
-    expect({ carriersChanged, carriersFound, staging }).toEqual({ carriersChanged: 0, carriersFound: 1, staging: 0 })
-    expect(out).toBe(css)
+    expect(animations).toBe(2)
+    expect(out).toContain('.animate-rotate-45,\n.animate-scale-110 {')
+    // Document order, not sorted order: the page's order is the only order that is a fact.
+    expect(out).not.toContain('.animate-scale-110,\n.animate-rotate-45')
   })
 
-  it('keeps a value that only looks like it ends early', () => {
+  it('opens the layer with the defaults and closes it with the composition', () => {
     const css = [
-      staged('var(--a, "x;y"), var(--b, "}" )'),
-      `.animations { ${carrier()} }`,
+      '@layer utilities {',
+      activation('.animate-rotate-45'),
+      '.animation-duration-500 { --jumi-animation-duration: 500ms; }',
+      '}',
+      ANIMATIONS,
+      '@layer base { .registered { color: red; } }',
     ].join('\n')
 
     const { css: out } = finalizeCss(css)
 
-    expect(out).toContain('animation-name: var(--a, "x;y"), var(--b, "}" );')
+    // Within the layer, in order: the defaults, then everything Tailwind emitted — an activation and
+    // a control — then the composition. That is the invariant, and it is constructed here rather
+    // than inherited from whichever order Tailwind happened to choose.
+    //
+    // Order is what settles precedence now that `:where()` is gone: a control is an ordinary utility
+    // in this layer, so a default placed ahead of every utility declaration loses to it, and the
+    // composition — which exists to win — keeps the selectors' own specificity and sits last. Both
+    // stay inside `@layer utilities`, where a utility draws its cascade strength: `base` would lose
+    // to `components`, which the placement differential measured.
+    expect(out.indexOf('--jumi-animation-duration: 1s')).toBeLessThan(out.indexOf('--jumi-animation-duration: 500ms'))
+    expect(out.indexOf('--jumi-animation-duration: 500ms')).toBeLessThan(out.indexOf('animation-name: var('))
+
+    // And the defaults really are the first thing the layer holds, not merely earlier than the one
+    // control this fixture happens to include.
+    expect(layerRules(out)[0]).toBe('.animate-rotate-45')
+    expect(out.slice(out.indexOf('@layer utilities'))).toMatch(/^@layer utilities \{\n\.animate-rotate-45 \{ --jumi-animation-duration/)
   })
 
-  it('is idempotent, byte for byte', () => {
-    const once = finalizeCss([
-      staged('var(--a)'),
-      `.animations { ${carrier()} }`,
-    ].join('\n'))
+  it('leaves a stylesheet that staged nothing exactly as it found it', () => {
+    const css = '/* keep me */\n.animate-rotate-45 { --jumi-rotate-a-animation-name: jumi-rotate-a; }'
 
-    const twice = finalizeCss(once.css)
-
-    expect(twice).toEqual({ carriersChanged: 0, carriersFound: 0, css: once.css, staging: 0 })
+    expect(finalizeCss(css)).toEqual({ animations: 0, css, staging: 0, transitions: 0 })
   })
 
-  it('returns a stylesheet it did not change exactly as it found it', () => {
+  it('invents nothing from a payload that nothing activates', () => {
+    const { animations, css: out, staging } = finalizeCss(ANIMATIONS)
+
+    // The payload is consumed either way — it is transport, and transport is never output. What is
+    // not invented is a composition, because there is no selector to write one on.
+    expect({ animations, out, staging }).toEqual({ animations: 0, out: '', staging: 1 })
+  })
+
+  it('keeps the two kinds apart, and writes each from its own payload', () => {
     const css = [
-      '/* keep me */',
-      '@media (width > 100px) {',
-      '  .animations {',
-      '    --jumi-carrier: animations;/* trailing comment */',
-      '  }',
-      '}',
+      ANIMATIONS,
+      TRANSITIONS,
+      activation('.animate-rotate-45'),
+      motionActivation('.transition-duration-500\\/rotate'),
     ].join('\n')
 
-    const { carriersChanged, carriersFound, css: out } = finalizeCss(css)
+    const { animations, css: out, transitions } = finalizeCss(css)
 
-    expect({ carriersChanged, carriersFound, out }).toEqual({ carriersChanged: 0, carriersFound: 1, out: css })
+    expect({ animations, transitions }).toEqual({ animations: 1, transitions: 1 })
+    expect(out).toContain('transition: var(--jumi-rotate-transition-property) 500ms;')
+
+    // Each kind's defaults carry that kind's selectors: the transition substrate is not written
+    // onto the animation selectors, or the other way round.
+    expect(out).toContain('.animate-rotate-45 { --jumi-animation-duration: 1s; }')
+    expect(out).toContain('.transition-duration-500\\/rotate { --jumi-transition-duration: 0s; }')
   })
 
-  it('finds no carrier on a second pass, because the first erased every marker', () => {
-    const root = { css: [staged('var(--a)'), `.animations { ${carrier()} }`].join('\n') }
-    const first = finalizeCss(root.css)
+  it('does not read a control as an activation', () => {
+    // A control writes a different property. `--jumi-rotate-animation-duration` is not the name a
+    // slot is declared by, and `--jumi-transition-duration` names no motion at all — so neither is
+    // an element that animates, and neither earns a composition.
+    const css = [
+      ANIMATIONS,
+      TRANSITIONS,
+      '.animation-duration-500 { --jumi-rotate-animation-duration: 500ms; }',
+      '.transition-duration-500 { --jumi-transition-duration: 500ms; }',
+    ].join('\n')
 
-    // The same document with no staging and no marker: nothing is left to recognize, so nothing
-    // is rewritten and the count is zero — a publication the caller did not cause.
-    expect(finalizeCss(first.css)).toEqual({ carriersChanged: 0, carriersFound: 0, css: first.css, staging: 0 })
-  })
+    const { animations, css: out, transitions } = finalizeCss(css)
 
-  it('removes a staging rule that carries nothing but the marker', () => {
-    const { css: out, staging } = finalizeCss(`:root { ${stagingMarker}: 1; }`)
-
-    expect({ out, staging }).toEqual({ out: '', staging: 1 })
-  })
-
-  it('prefers an aggregate handed to it over the one in the stylesheet', () => {
-    const css = [staged('var(--stale)'), `.animations { ${carrier()} }`].join('\n')
-
-    const { css: out } = finalizeCss(css, { 'animation-name': 'var(--fresh)' })
-
-    expect(out).toContain('.animations { animation-name: var(--fresh); }')
-    expect(out).not.toContain('var(--stale)')
+    expect({ animations, transitions }).toEqual({ animations: 0, transitions: 0 })
+    // The controls are output and stay exactly as they were; only the transport is consumed.
+    expect(out).toContain('.animation-duration-500 { --jumi-rotate-animation-duration: 500ms; }')
+    expect(out).toContain('.transition-duration-500 { --jumi-transition-duration: 500ms; }')
     expect(out).not.toContain(stagingMarker)
   })
 
-  it('leaves no build-time name in the stylesheet it returns', () => {
-    const lists = PARTS.map(part => `--jumi-aggregate-${part}: var(--jumi-${part});`).join(' ')
+  it('does not read the stagger slot as a transition', () => {
+    // `--jumi-stagger-animation-delay` is set on the children of a stagger utility, and it ends in
+    // `-delay` the way a transition control does. Requiring `-transition-` is what keeps a stagger
+    // from being answered with a `transition` list it never asked for.
     const css = [
-      `:root { ${stagingMarker}: 1; ${lists} }`,
-      `.animations { ${carrier(PARTS)} }`,
+      TRANSITIONS,
+      '.animate-stagger-forward-120\\/7 > * { --jumi-stagger-animation-delay: calc((sibling-index() - 1) * 120ms); }',
     ].join('\n')
 
-    const { carriersChanged, carriersFound, css: out, staging } = finalizeCss(css)
+    expect(finalizeCss(css).transitions).toBe(0)
+  })
 
-    expect({ carriersChanged, carriersFound, staging }).toEqual({ carriersChanged: 1, carriersFound: 1, staging: 1 })
+  it('does not mistake a comment or a string for the protocol', () => {
+    const css = [
+      `/* ${stagingMarker}animations-animation-name: x; */`,
+      `.quoted { content: "${stagingMarker}animations-animation-name"; }`,
+      activation('.animate-rotate-45'),
+    ].join('\n')
 
-    // The invariant. Everything the two markers and the staging namespace spell is build-time
-    // only, and a browser should never be handed any of it.
-    expect(out).not.toContain('--jumi-carrier')
-    expect(out).not.toContain('--jumi-aggregate-')
+    // Neither is a declaration, so there is no payload to read — and a string that names the marker
+    // must not become one. Nothing is synthesized, because nothing was published.
+    expect(finalizeCss(css)).toEqual({ animations: 0, css, staging: 0, transitions: 0 })
+  })
+
+  it('keeps a value that only looks like it ends early', () => {
+    // Written out rather than through `payload()`, because the value is the fixture: a declaration
+    // whose text a naive split would end early.
+    const css = [
+      `:root { ${stagingMarker}animations-animation-name: var(--a, "x;y"), var(--b, "}" ); }`,
+      activation('.animate-rotate-45'),
+    ].join('\n')
+
+    expect(finalizeCss(css).css).toContain('animation-name: var(--a, "x;y"), var(--b, "}" );')
+  })
+
+  it('takes the last publication, the way a later declaration would win', () => {
+    const css = [
+      payload('animations', 'animation-name: var(--first);'),
+      payload('animations', 'animation-name: var(--second);'),
+      activation('.animate-rotate-45'),
+    ].join('\n')
+
+    const { css: out, staging } = finalizeCss(css)
+
+    expect(staging).toBe(2)
+    expect(out).toContain('animation-name: var(--second);')
+    expect(out).not.toContain('var(--first)')
+  })
+
+  it('is idempotent, byte for byte', () => {
+    const once = finalizeCss([ANIMATIONS, activation('.animate-rotate-45')].join('\n'))
+    const twice = finalizeCss(once.css)
+
+    // The first pass removed every payload rule, so the second finds nothing to read and nothing to
+    // add. Collecting facts before mutating the AST is what makes this hold.
+    expect(twice).toEqual({ animations: 0, css: once.css, staging: 0, transitions: 0 })
+  })
+
+  it('prefers an aggregate handed to it over the one in the stylesheet', () => {
+    const css = [ANIMATIONS, activation('.animate-rotate-45')].join('\n')
+
+    const { css: out } = finalizeCss(css, { 'animation-name': 'var(--fresh)' })
+
+    expect(out).toContain('animation-name: var(--fresh);')
+    expect(out).not.toContain('var(--jumi-animation-name)')
+    expect(out).not.toContain(stagingMarker)
+  })
+
+  it('walks an AST in place, so a host that owns one needs no parse', () => {
+    const root = postcss.parse([ANIMATIONS, activation('.animate-rotate-45')].join('\n'))
+
+    const { animations, staging } = finalize(root)
+
+    expect({ animations, staging }).toEqual({ animations: 1, staging: 1 })
+    expect(root.toString()).toContain('animation-name: var(--jumi-rotate-3zWYd-animation-name, var(--jumi-animation-name));')
+    expect(root.toString()).not.toContain(stagingMarker)
+  })
+
+  it('leaves no build-time name in the stylesheet it returns', () => {
+    const lists = [
+      'animation-composition: var(--jumi-animation-composition);',
+      'animation-delay: var(--jumi-animation-delay);',
+      'animation-name: var(--jumi-animation-name);',
+      'animation-timeline: var(--jumi-animation-timeline);',
+    ].join(' ')
+
+    const { css: out } = finalizeCss([
+      payload('animations', lists),
+      activation('.animate-rotate-45'),
+    ].join('\n'))
+
+    // The invariant. Everything the staging namespace spells is build-time only, and a browser
+    // should never be handed any of it.
+    expect(out).not.toContain(stagingMarker)
 
     // What is left is the declarations a browser actually applies.
     expect(out).toContain('animation-name: var(--jumi-animation-name);')
     expect(out).toContain('animation-timeline: var(--jumi-animation-timeline);')
-  })
-
-  it('keeps the marker when the stylesheet published no aggregate, so the invariant can fire', () => {
-    const css = `.animations { ${carrier()} }`
-
-    const { carriersChanged, carriersFound, css: out, staging } = finalizeCss(css)
-
-    // A carrier with no aggregate behind it is a broken build, not an empty one. Leaving the
-    // marker behind is what turns that into a detectable violation — the zero-occurrence check
-    // fails — instead of a carrier that silently animates nothing. The rule is still *found*: the
-    // marker is what says so, which is exactly why it must survive here.
-    expect({ carriersChanged, carriersFound, out, staging }).toEqual({ carriersChanged: 0, carriersFound: 1, out: css, staging: 0 })
-  })
-
-  it('erases the marker when a carrier had nothing to change', () => {
-    // A motionless `transitions` carrier. The body already declares the fallback, and with no
-    // motions the published list *is* that fallback, so there is nothing to rewrite — but the
-    // protocol completed, so the marker still has to go. Erasing it was once conditional on a value
-    // actually moving, and this carrier shipped `--jumi-carrier: transitions` because of it.
-    const css = [
-      `:root { ${stagingMarker}: 1; --jumi-aggregate-transition: var(--jumi-transition); }`,
-      '.transitions { --jumi-carrier: transitions; transition: var(--jumi-transition); }',
-    ].join('\n')
-
-    const { carriersChanged, carriersFound, css: out, staging } = finalizeCss(css)
-
-    expect({ carriersChanged, carriersFound, staging }).toEqual({ carriersChanged: 0, carriersFound: 1, staging: 1 })
-
-    // What is left is the declaration a browser applies, and none of the build-time names.
-    expect(out.trim()).toBe('.transitions { transition: var(--jumi-transition); }')
-    expect(out).not.toContain('--jumi-carrier')
-    expect(out).not.toContain('--jumi-aggregate-')
-  })
-
-  it('erases the marker for an empty aggregate, because empty is still published', () => {
-    const css = '.transitions { --jumi-carrier: transitions; transition: var(--jumi-transition); }'
-
-    const { carriersChanged, carriersFound, css: out, staging } = finalizeCss(css, {})
-
-    // A host that holds the aggregate and has nothing to say has still published. This carrier is
-    // the case that proves it matters: it stages nothing and has nothing to change, so without
-    // "handed in" counting as published, both of its signals would read as never finalized and a
-    // correct build would trip the invariant.
-    expect({ carriersChanged, carriersFound, staging }).toEqual({ carriersChanged: 0, carriersFound: 1, staging: 0 })
-    expect(out.trim()).toBe('.transitions { transition: var(--jumi-transition); }')
-  })
-
-  it('walks an AST in place, so a host that owns one needs no parse', () => {
-    const root = postcss.parse([staged('var(--a)'), `.animations { ${carrier()} }`].join('\n'))
-
-    const { carriersChanged, carriersFound, staging } = finalize(root)
-
-    expect({ carriersChanged, carriersFound, staging }).toEqual({ carriersChanged: 1, carriersFound: 1, staging: 1 })
-    expect(root.toString()).toContain('animation-name: var(--a);')
-    expect(root.toString()).not.toContain(stagingMarker)
   })
 })

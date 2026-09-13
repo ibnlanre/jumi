@@ -11,23 +11,23 @@
  * behaviour is the truth for this part of Jumi, not emitted CSS shape.**
  *
  * So this compiles two corpora — through the same two steps a real build runs, Tailwind
- * emitting and Jumi finalizing — loads them in a real browser, and asserts every carrier
+ * emitting and Jumi finalizing — loads them in a real browser, and asserts every activation
  * context Jumi promises:
  *
- *   direct carrier                 must animate
- *   *:animations descendant        must animate
- *   before:animations pseudo       must animate
- *   @apply animations              must animate
+ *   the utility itself             must animate
+ *   *:animate-* descendant         must animate
+ *   before:animate-* pseudo        must animate, substrate included
+ *   @apply animate-*               must animate
  *
- * The fourth is the interesting one. It used to be refused, and refusing it was wrong: there
- * was nothing about `@apply` that Jumi could not support, only a publication site it could
- * not reach. The carrier now marks itself, `@apply` copies that marker along with the rest of
- * the body, and the finalizer writes the aggregate into every marked rule after the build.
- * The context that could not be named is found the same way as the ones that can.
+ * There is no opt-in class any more: an element animates because it carries a motion utility, so
+ * every one of these is an *inference* this pass makes from the emitted CSS rather than a marker it
+ * follows. The three non-obvious ones are the ones a marker could not reach — a descendant, a
+ * pseudo-element, and a rule `@apply` inlined.
  *
- * It also asserts the finalizer did its job: staging is gone, and something was finalized.
- * A green browser with a leaked staging rule would mean the data is being read from a rule
- * that is not supposed to be there.
+ * It also asserts the substrate's precedence triangle, because the architecture now depends on it:
+ * a default written at the top of the layer, a Jumi control over it, and an arbitrary custom
+ * property over both. And it asserts the finalizer did its job: the payload is gone, and running
+ * the pass over its own output changes nothing.
  *
  * Run: pnpm behaviour:check
  */
@@ -51,8 +51,8 @@ const { corpus, finalizeCss } = await import('./lib/compile.mjs')
 const compile = async (name) => {
   const built = await corpus(name)
 
-  console.log(`· ${name} — ${built.carriersFound} carriers found, ${built.carriersChanged} written,`
-    + ` ${built.staging} staging removed, ${built.css.length} bytes`)
+  console.log(`· ${name} — ${built.animations + built.transitions} selectors composed,`
+    + ` ${built.staging} payload rules consumed, ${built.css.length} bytes`)
 
   return built
 }
@@ -60,16 +60,16 @@ const compile = async (name) => {
 /**
  * The finalizer's own contract, checked before the browser is asked anything.
  *
- * `finalize` is idempotent and staging is consumed, so running it over its own output must
- * find nothing left to do — nothing to inject, nothing to remove — and must not rewrite a
- * byte. That is a stronger statement than `staging === 0`, which only says the first pass
- * removed what it found: this says a second pass finds no work at all.
+ * `finalize` is idempotent and the payload is consumed, so running it over its own output must
+ * find nothing left to do — nothing to derive, nothing to remove — and must not rewrite a byte.
+ * That is a stronger statement than `staging === 0`, which only says the first pass removed what
+ * it found: this says a second pass finds no work at all.
  */
 const settled = (built, name) => {
   const again = finalizeCss(built.css)
 
-  if (again.staging !== 0) failures.push(`${name}: ${again.staging} staging rules survived finalization`)
-  if (again.carriersFound !== 0) failures.push(`${name}: ${again.carriersFound} carriers were re-finalized`)
+  if (again.staging !== 0) failures.push(`${name}: ${again.staging} payload rules survived finalization`)
+  if (again.animations !== 0 || again.transitions !== 0) failures.push(`${name}: a composition was derived twice`)
   if (again.css !== built.css) failures.push(`${name}: finalizing the finalized CSS changed it`)
 }
 
@@ -133,6 +133,7 @@ const entry = (page, selector, pseudo = null) => page.evaluate(
     const lists = Object.fromEntries(parts.map(part => [part, style[part].split(',').map(value => value.trim())]))
 
     return {
+      duration: style.animationDuration,
       lengths: [...new Set(Object.values(lists).map(list => list.length))],
       name: style.animationName,
     }
@@ -152,23 +153,23 @@ const slots = slotReader(variantCss)
 
 settled(variantBuild, 'variant.css')
 
-if (variantBuild.carriersFound === 0) {
-  failures.push('variant.css: the finalizer found no carrier to write the aggregate into')
+if (variantBuild.animations === 0) {
+  failures.push('variant.css: the finalizer derived no composition')
 }
 
 const contexts = [
-  { detail: 'direct carrier', key: 'direct', selector: '#ctx-direct', utility: 'animate-rotate-45' },
-  { detail: '*:animations descendant', key: 'descendant', pseudo: null, selector: '#ctx-descendant > i', utility: 'animate-rotate-45' },
-  { detail: 'before:animations pseudo', key: 'pseudo', pseudo: '::before', selector: '#ctx-pseudo', utility: 'before:animate-scale-110' },
+  { detail: 'the utility itself', key: 'direct', selector: '#ctx-direct', utility: 'animate-rotate-45' },
+  { detail: '*:animate-* descendant', key: 'descendant', selector: '#ctx-descendant > i', utility: '*:animate-rotate-45' },
+  { detail: 'before:animate-* pseudo', key: 'pseudo', pseudo: '::before', selector: '#ctx-pseudo', utility: 'before:animate-scale-110' },
 ]
 
 const variantPage = await load(variantCss, `
-    <div id="ctx-direct" class="animations animate-rotate-45"></div>
-    <div id="ctx-descendant" class="*:animations"><i class="animate-rotate-45"></i></div>
-    <div id="ctx-pseudo" class="before:animations before:content-[''] before:animate-scale-110"></div>
+    <div id="ctx-direct" class="animate-rotate-45"></div>
+    <div id="ctx-descendant" class="*:animate-rotate-45"><i></i></div>
+    <div id="ctx-pseudo" class="before:content-[''] before:animate-scale-110"></div>
 `)
 
-console.log('\n  carrier contexts\n')
+console.log('\n  activation contexts\n')
 
 for (const context of contexts) {
   const measured = await entry(variantPage, context.selector, context.pseudo)
@@ -201,7 +202,26 @@ for (const context of contexts) {
 }
 
 /* ------------------------------------------------------------------------------------
- * 2. The direct carriers, the bare carrier, and the refused path (canonical corpus).
+ * 2. The substrate on a pseudo-element, and the precedence triangle over it.
+ * ---------------------------------------------------------------------------------- */
+
+console.log('\n  substrate\n')
+
+// The case that falsified `:where()`. A pseudo-element cannot appear inside it, so the defaults rule
+// was dropped as invalid, the substrate never arrived, and `var(--jumi-animation-name)` inside the
+// composition's list made the whole declaration invalid at computed-value time — the name read
+// `none` rather than reading wrong. The duration is asserted too, because that is the substrate
+// itself arriving rather than something else making the name resolve.
+const pseudo = await entry(variantPage, '#ctx-pseudo', '::before')
+const pseudoOk = Boolean(pseudo) && pseudo.duration.split(',').every(part => part.trim() === '1s')
+
+console.log(`    ${pseudoOk ? '✓' : '✗'} pseudo-element substrate  ${pseudo?.duration.slice(0, 44) ?? '(missing)'}`)
+
+if (!pseudoOk) failures.push(`pseudo-element: substrate resolved "${pseudo?.duration.slice(0, 44) ?? 'none'}", expected 1s per slot`)
+
+/* ------------------------------------------------------------------------------------
+ * 2. The contexts that are not a variant, and the mechanisms a selector reaches
+ *    (canonical corpus).
  * ---------------------------------------------------------------------------------- */
 
 const canonicalBuild = await compile('input.css')
@@ -209,6 +229,35 @@ const canonicalCss = canonicalBuild.css
 const canonicalSlots = slotReader(canonicalCss)
 
 settled(canonicalBuild, 'input.css')
+
+/**
+ * Three things can set `--jumi-animation-duration`, and each has to beat the one before it:
+ *
+ *   the default the finalizer wrote at the top of the layer    1s
+ *   a Jumi control utility                                     500ms
+ *   an arbitrary custom property                               750ms
+ *
+ * Read as the *resolved* duration rather than as a count of declarations, so this is the cascade
+ * end to end: the composition's `animation-duration` is a `var()` chain over that variable, and a
+ * browser that applied the wrong one shows it here.
+ */
+const precedence = await load(canonicalCss, `
+    <div id="precedence-default" class="animate-rotate-45"></div>
+    <div id="precedence-controlled" class="animate-rotate-45 animation-duration-500"></div>
+    <div id="precedence-arbitrary" class="animate-rotate-45 [--jumi-animation-duration:750ms]"></div>
+`)
+
+for (const [id, expected] of [['precedence-default', '1s'], ['precedence-controlled', '0.5s'], ['precedence-arbitrary', '0.75s']]) {
+  const value = await precedence.evaluate(
+    selector => getComputedStyle(document.querySelector(selector)).animationDuration,
+    `#${id}`,
+  )
+  const works = value.split(',').every(part => part.trim() === expected)
+
+  console.log(`    ${works ? '✓' : '✗'} ${id.padEnd(22)}${expected.padEnd(8)}${value.slice(0, 44)}`)
+
+  if (!works) failures.push(`precedence: #${id} resolved "${value.slice(0, 44)}", expected ${expected}`)
+}
 
 const utilities = [
   'animate-rotate-45',
@@ -218,14 +267,14 @@ const utilities = [
 ]
 
 const directPage = await load(canonicalCss, `
-    ${utilities.map((utility, index) => `<div id="c${index}" class="animations ${utility}"></div>`).join('\n    ')}
-    <div id="bare" class="animations"></div>
+    ${utilities.map((utility, index) => `<div id="c${index}" class="${utility}"></div>`).join('\n    ')}
+    <div id="bare" class="animation-duration-500"></div>
     <div id="applied" class="applied-motion"></div>
-    <div id="spacing" class="animations animate-padding-4 animate-margin-2"></div>
-    <div id="radius" class="animations animate-border-radius-sm"></div>
-    <h1 id="sel-is" class="animations [&:is(h1)]:animate-fade-in"></h1>
-    <div class="[&:is(h1)]:animate-fade-in"><h1 id="sel-is-descendant" class="animations"></h1></div>
-    <div id="sel-has" class="animations has-[>button]:animate-scale-110"><button></button></div>
+    <div id="spacing" class="animate-padding-4 animate-margin-2"></div>
+    <div id="radius" class="animate-border-radius-sm"></div>
+    <h1 id="sel-is" class="[&:is(h1)]:animate-fade-in"></h1>
+    <div class="[&:is(h1)]:animate-fade-in"><h1 id="sel-is-descendant"></h1></div>
+    <div id="sel-has" class="has-[>button]:animate-scale-110"><button></button></div>
 `)
 
 const direct = []
@@ -376,8 +425,8 @@ console.log(`    ${radiusResolved ? '✓' : '✗'} radius follows --radius-sm ->
 console.log(`    ${isResolved ? '✓' : '✗'} [&:is(h1)] matches the element -> ${sameElement.name.slice(0, 34)}`)
 console.log(`    ${descendantResolved ? '✗' : '✓'} [&:is(h1)] does not match a descendant (${descendantResolved ? 'it did' : 'nones only'})`)
 console.log(`    ${hasResolved ? '✓' : '✗'} has-[>button] matches the element -> ${hasChild.name.slice(0, 34)}`)
-console.log(`    ✓ finalization settles: ${variantBuild.staging + canonicalBuild.staging} staging rules`
-  + ` removed, ${variantBuild.carriersFound + canonicalBuild.carriersFound} carriers found, a second pass a no-op`)
+console.log(`    ✓ finalization settles: ${variantBuild.staging + canonicalBuild.staging} payload rules`
+  + ` consumed, a second pass a no-op`)
 
 const required = contexts.length + utilities.length + 6
 const passing = required - failures.length

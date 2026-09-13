@@ -21,7 +21,7 @@ Defaults are a 1-second duration, one iteration, normal direction, and forwards 
 ## One motion, many personalities
 
 ```html
-<div class="animations animate-rotate-90 animation-duration-1400 animation-timing-function-ease-in-out animation-direction-alternate animation-iteration-count-infinite">
+<div class="animate-rotate-90 animation-duration-1400 animation-timing-function-ease-in-out animation-direction-alternate animation-iteration-count-infinite">
   Back and forth.
 </div>
 ```
@@ -29,7 +29,7 @@ Defaults are a 1-second duration, one iteration, normal direction, and forwards 
 Use `animation-timing-function-linear` for steady rotation. Try `animation-timing-function-ease-out-back` for a curve with overshoot, or an arbitrary `cubic-bezier()` value for a custom feel.
 
 ```html
-<div class="animations animate-scale-110 animation-timing-function-ease-out-quint">
+<div class="animate-scale-110 animation-timing-function-ease-out-quint">
   Settle into place.
 </div>
 ```
@@ -39,7 +39,7 @@ Use `animation-timing-function-linear` for steady rotation. Try `animation-timin
 Append `/{property}` or `/{effect}` to timing controls:
 
 ```html
-<div class="animations animate-rotate-45 animate-scale-110 animation-duration-500 animation-duration-1200/rotate">
+<div class="animate-rotate-45 animate-scale-110 animation-duration-500 animation-duration-1200/rotate">
   Scale at 500ms. Rotate at 1200ms.
 </div>
 ```
@@ -47,8 +47,7 @@ Append `/{property}` or `/{effect}` to timing controls:
 When one property carries more than one animation, name each where you declare it with `/[name]`, and address it by that name:
 
 ```html
-<div class="animations
-  animate-rotate-[0:0deg,12:-8deg,100:-8deg]/[flick]
+<div class="animate-rotate-[0:0deg,12:-8deg,100:-8deg]/[flick]
   animate-rotate-[0:0deg,12:0deg,100:8deg]/[return]
   animation-composition-add/rotate
   animation-timing-function-ease-in-out-circ/flick
@@ -63,7 +62,7 @@ The label is yours to choose, and it becomes the variable name exactly as writte
 
 A label belongs to the element that declared it. Its variable is registered non-inheriting, so it does not travel into descendants, and two elements can use the same word for different values without knowing about each other.
 
-The three links do not behave alike across that boundary. A `/{property}` control on a wrapper does reach the animations inside it, because nothing declares `--jumi-{property}-animation-{part}` on the element, so the value it writes is inherited. A global control does not: every `animations` element declares the global defaults itself, and a declaration beats inheritance. A label never does.
+The three links do not behave alike across that boundary. A `/{property}` control on a wrapper does reach the animations inside it, because nothing declares `--jumi-{property}-animation-{part}` on the element, so the value it writes is inherited. A global control does not: every animating element declares the global defaults itself, and a declaration beats inheritance. A label never does.
 
 Reach for it when one easing is not enough. A single `animation-timing-function` applies to every segment of an animation, so pairing an eased flick with a linear return takes two animations, each with one moving segment. `animation-composition: add` lets both apply at once instead of the second replacing the first.
 
@@ -78,7 +77,7 @@ The name is written into the rule, so you can retime or re-ease that animation f
 A value can declare its own frames — an offset, a colon, a value — so one utility describes the whole motion:
 
 ```html
-<div class="animations animate-rotate-[0:0deg,50:0deg,100:45deg]
+<div class="animate-rotate-[0:0deg,50:0deg,100:45deg]
   animation-duration-2000
   animation-iteration-count-infinite">
   Rest, then turn one way over the second half.
@@ -92,7 +91,7 @@ A phrase owns its property, and its keyframe is named after the phrase, so nothi
 Placing an action inside the cycle, rather than spreading it across the whole of it, is what this is for. A step earlier in the phrase is a step later in the cycle:
 
 ```html
-<div class="animations animate-scale-[0:0.5,50:1.1,100:1]
+<div class="animate-scale-[0:0.5,50:1.1,100:1]
   animate-opacity-[0:0,50:1,100:1]
   animation-duration-2600
   animation-iteration-count-infinite">
@@ -105,14 +104,14 @@ A property that takes several values takes all of them at each frame, with `_` s
 This site's hero is built this way. A wrapper around each petal carries a slow, seamless winding, and the petal inside it carries the flick:
 
 ```html
-<div class="petal-position animations
+<div class="petal-position
   animate-rotate-[0:var(--angle),100:calc(var(--angle)_-_360deg)]
   animation-duration-[75s]
   animation-timing-function-linear
   animation-iteration-count-infinite"
   style="--angle:0deg">
 
-  <div class="petal animations
+  <div class="petal
     animate-rotate-[0:0deg,20:-8deg,100:-8deg]/[flick]
     animate-rotate-[0:0deg,20:0deg,100:8deg]/[return]
     animation-composition-add/rotate

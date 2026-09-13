@@ -58,7 +58,7 @@ writeFileSync(output, built.css)
  * What it cost, and what it produced
  * ---------------------------------------------------------------------------------- */
 
-const staging = [...emitted.matchAll(/[^{}]+\{[^{}]*--jumi-carrier-staging[^{}]*\}/g)]
+const staging = [...emitted.matchAll(/[^{}]+\{[^{}]*--jumi-staging-[^{}]*\}/g)]
 const stagingBytes = staging.reduce((total, match) => total + match[0].length, 0)
 const state = protocolState(built.css)
 const expected = expectedDeclarations(state)
@@ -68,18 +68,18 @@ const percent = (value, total) => `${Math.round(100 * value / total)}%`
 
 console.log(`\n  examples build\n`)
 console.log(`    slots           ${slots}`)
-console.log(`    carriers        ${built.carriersFound} rules the marker identified, ${built.carriersChanged} written into`
+console.log(`    compositions    ${built.animations + built.transitions} selectors the composition was written for`
   + ` (${state.animations} animations + ${state.transitions} transitions)`)
 console.log(`\n    build cost — what Tailwind emitted, before the finalizer touched it`)
-console.log(`      publications  ${staging.length} staging rules, one per slot registered after the first read`)
+console.log(`      publications  ${staging.length} payload rules, one per slot registered after the first read`)
 console.log(`      emitted       ${emitted.length.toLocaleString()} bytes`)
 console.log(`      staging       ${stagingBytes.toLocaleString()} bytes (${percent(stagingBytes, emitted.length)} of the emission)`)
 console.log(`      keyframes     ${(emitted.match(/@keyframes /g) ?? []).length}`)
 console.log(`\n    shipped — what a browser downloads`)
 console.log(`      bytes         ${built.css.length.toLocaleString()} bytes`)
 console.log(`      aggregate     ${state.declarationBytes.toLocaleString()} bytes (${percent(state.declarationBytes, built.css.length)}),`
-  + ` ${state.animations} carriers × ${slots} entries × ${PARTS.length} lists`
-  + (state.transitions ? `, ${state.transitions} transitions carriers` : ''))
+  + ` ${state.animations} compositions × ${slots} entries × ${PARTS.length} lists`
+  + (state.transitions ? `, ${state.transitions} transition composition` : ''))
 console.log(`      protocol      ${state.declarations} declarations written, no build-time name left`)
 console.log(`      file          ${path.relative(root, output)}\n`)
 
@@ -87,8 +87,8 @@ console.log(`      file          ${path.relative(root, output)}\n`)
  * The protocol invariant — the same ones the frozen corpora are held to, on the real corpus
  * ---------------------------------------------------------------------------------- */
 
-// Without this, `output.css` could ship the transport, or a carrier that was recognised and never
-// written, and still look fine here.
+// Without this, `output.css` could ship the transport, or a composition that was derived for no
+// selector, and still look fine here.
 const leaked = Object.entries(state.leaks).filter(([, count]) => count > 0)
 const failures = []
 
@@ -97,12 +97,12 @@ if (leaked.length) {
 }
 
 if (!state.animations && !state.transitions) {
-  failures.push('no carrier was finalized — the marker never reached the output')
+  failures.push('no composition was derived — the payload never reached the output')
 }
 
 if (state.declarations !== expected) {
   failures.push(`${state.declarations} materialized declarations for`
-    + ` ${state.animations} animations + ${state.transitions} transitions carriers, expected ${expected}`)
+    + ` ${state.animations} animations + ${state.transitions} transitions compositions, expected ${expected}`)
 }
 
 if (failures.length) {

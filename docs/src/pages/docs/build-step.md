@@ -20,7 +20,7 @@ Wire up only the plugin and your utilities compile, your page has no animations,
 `animations` is a gathering class. It has to produce one list per animation longhand, covering every `animate-*` utility on the element:
 
 ```html
-<div class="animations animate-rotate-45 animate-fade-in">…</div>
+<div class="animate-rotate-45 animate-fade-in">…</div>
 ```
 
 ```css

@@ -38,18 +38,18 @@ import createPlugin from 'tailwindcss/plugin'
 export function getCreator(api: Api): Creator {
   return createJumiModel({
     sink: {
-      // Staging, not output. The aggregate cannot be published at a literal selector: its
-      // entries reference the slot variables the `animate-*` utilities declare on the
-      // element, so it only resolves where the carrier ended up — and Tailwind decides that,
-      // by re-parenting the carrier body for a variant or copying it for `@apply`. Neither
-      // `.animations` nor `:root` reaches those places; both were measured.
-      //
-      // So the carrier marks itself (see `animationUtility`) and this rule carries the data
-      // to `@/helpers/carriers`, which injects it into every marked rule in the emitted
-      // stylesheet and removes this one. Nothing in a browser ever reads it, which is why its
-      // selector does not matter — `:root` is chosen to make that obvious.
-      aggregate: variables => api.addBase({ ':root': { [stagingMarker]: '1', ...variables } }),
       keyframes: rules => api.addUtilities(rules),
+      // Staging, not output. The data cannot be published where it is read: every entry is a
+      // `var()` over a slot variable the `animate-*` utilities declare on the element, so the
+      // same declaration on `:root` resolves once and every element inherits that literal —
+      // measured, and it silently stops the stagger system. So the payload sits here, where
+      // nothing consumes it, and `@/helpers/carriers` reads it off the emitted stylesheet and
+      // builds the rules a browser actually needs. Its selector therefore does not matter;
+      // `:root` is chosen to make that obvious.
+      payload: (kind, variables) => api.addBase({
+        ':root': Object.fromEntries(Object.entries(variables)
+          .map(([name, value]) => [`${stagingMarker}${kind}-${name}`, value])),
+      }),
       property: name => api.addBase({ [`@property ${name}`]: { inherits: 'false', syntax: '"*"' } }),
     },
     theme: (key, values) => resolveTheme(api, key, values),

@@ -487,22 +487,13 @@ export interface Creator {
    * The aggregate as ten flat longhand lists, in the model's order.
    *
    * This is the **oracle**, not an emission path. What the host publishes is the
-   * same lists as staging under `--jumi-aggregate-*`, and this getter is what that
-   * staging is checked against — every list assertion in the tests is written
+   * same lists as payload under `--jumi-staging-animations-*`, and this getter is what
+   * that payload is checked against — every list assertion in the tests is written
    * against these lists, and a differential test compares the two after every
    * mutation. Nothing emits this shape: the ten lists reach a browser as the
-   * carrier's own `animation-*` longhands.
+   * declarations `@/helpers/carriers` synthesizes from the payload.
    */
   get animations(): CssInJs;
-  /**
-   * What Tailwind emits for `.animations`: a constant rule that marks the element
-   * as a carrier and declares the controls an animation falls back to. Constant on
-   * purpose — Tailwind caches a candidate's output, so nothing in it may depend on
-   * which slots exist. The longhands are deliberately absent: they hold the
-   * aggregate list, which only resolves on the element, so the finalizer writes
-   * them there.
-   */
-  get animationUtility(): CssInJs;
   color(attribute: AnimatableStandardPropertyType, parts?: PropertyParts, options?: { paint?: boolean }): MatchComponentsPropertyFunction;
   effect(attribute: string): string;
   readonly effects: string[];
@@ -514,7 +505,6 @@ export interface Creator {
   stagger(part: string, expression: (context: StaggerContext) => string): MatchUtilitiesPropertyFunction;
   theme: (key: TailwindTheme, values?: Collection) => Record<string, string>;
   transition(part: string): MatchUtilitiesPropertyFunction;
-  get transitions(): CssInJs;
 }
 
 export type CSSFunction
@@ -946,8 +936,8 @@ export type MatchUtilitiesPropertyFunction = (
 ) => CssInJs | CssInJs[]
 
 export type MatchUtilitiesPropertyKey =
-  | 'animate-stagger-backward' | 'animate-stagger-forward' | 'animations'
-  | 'transitions' | AnimationPropertyType | TransitionPropertyType
+  | 'animate-stagger-backward' | 'animate-stagger-forward'
+  | AnimationPropertyType | TransitionPropertyType
 
 export interface MatchUtilitiesPropertyValue extends MatchUtilitiesOptions {
   fn: MatchUtilitiesPropertyFunction

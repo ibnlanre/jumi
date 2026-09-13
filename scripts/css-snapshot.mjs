@@ -11,22 +11,18 @@
  *
  * Two corpora, because they answer different questions:
  *
- *   canonical   an ordinary unprefixed carrier. Its bytes are the contract: any change at
- *               all is a change to decide, and it stays readable because publication is
- *               linear there.
- *   variant     the prefixed carrier forms — `*:animations`, `before:animations`,
- *               `hover:animations`. Those sort before every `animate-*` candidate, which is
- *               what puts aggregate publication on its quadratic path: the data is read
- *               while almost no slots exist, and every slot after that re-publishes the whole
- *               list. It was 1.47 MB for 60 slots with 96% of the file repeated bookkeeping.
+ *   canonical   ordinary Jumi markup — motion utilities and nothing else. Its bytes are the
+ *               contract: any change at all is a change to decide.
+ *   variant     the awkward selectors — a descendant, a pseudo-element, a state, a media
+ *               condition. A composition is written onto exactly the selector an activation
+ *               declares, so these are the shapes where the inferred list has to be right.
  *               Measured and budgeted rather than byte-snapshotted.
  *
- * The metrics separate the two halves of that story, because they are no longer the same
- * number: `rawBytes`, `publishEvents` and `stagingBytes` describe the *build* — what Tailwind
- * emitted, staging and all — while `bytes`, `aggregateBytes` and `aggregateShare` describe
- * what *ships*, after the finalizer has moved the aggregate into the carriers and deleted the
- * staging. A quadratic build cost that no longer reaches the file is the whole result, and
- * recording only one of the two numbers would hide it.
+ * The metrics separate the two halves of that story, because they are not the same number:
+ * `rawBytes`, `publishEvents` and `stagingBytes` describe the *build* — what Tailwind emitted,
+ * payload and all — while `bytes`, `aggregateBytes` and `aggregateShare` describe what *ships*,
+ * after the finalizer has built the composition and deleted the payload. Recording only one of
+ * the two would hide the difference, which is the whole point of paying for the transport.
  *
  * The corpora are frozen deliberately: scanning the docs instead would make every docs edit a
  * CSS failure. The byte snapshot says *that* something changed; the structure table says *what
@@ -50,8 +46,8 @@ const snapshot = path.join(dir, 'snapshot.css')
 const structureFile = path.join(dir, 'structure.json')
 const update = process.argv.includes('--update')
 
-/** A staging rule: the aggregate the model published, before the finalizer consumed it. */
-const STAGING = /[^{}]+\{[^{}]*--jumi-carrier-staging[^{}]*\}/g
+/** A payload rule: the staged declarations the model published, before the finalizer consumed it. */
+const STAGING = /[^{}]+\{[^{}]*--jumi-staging-[^{}]*\}/g
 
 /** A CSS colour literal — what a theme value looks like before it is a token. */
 const COLOR_LITERAL = /^(?:#|(?:rgba?|hsla?|lab|lch|oklab|oklch|color|color-mix|light-dark)\()|^(?:currentColor|transparent|canvastext)$/i
@@ -103,33 +99,29 @@ function measure(built) {
   const staging = [...built.raw.matchAll(STAGING)]
   const state = protocolState(css)
 
-  // Two halves, two objects, because they answer different questions and the numbers no longer
+  // Two halves, two objects, because they answer different questions and the numbers do not
   // agree — kept apart rather than merged so that stays visible in the code that measures them.
   //
-  // What ships. The aggregate is one copy of each list per carrier, materialized into the
-  // carrier's own longhands, and `aggregateWrites / carriers` is the number that says no
-  // *publication* reached the file (the ten longhands a carrier applies, and nothing more).
-  // `protocol` is the invariant, and a leak is a failure by construction: the transport would be
-  // shipping in place of the declarations a browser reads.
+  // What ships. There is one composition rule per kind, holding one copy of each list, on a
+  // selector list of every rule that activates it; `aggregateWrites / (animations + transitions)`
+  // is the number that says no *publication* reached the file. `protocol` is the invariant, and a
+  // leak is a failure by construction: the transport would be shipping in place of the
+  // declarations a browser reads.
   const shipped = {
     aggregateBytes: state.declarationBytes,
     aggregateShare: Math.round(100 * state.declarationBytes / css.length),
     aggregateWrites: state.declarations,
-    // Carriers counted off the output, by kind: the marker is erased, so each is identified by the
-    // declaration only it has — `animation-name`, or the composed `transition`.
+    // Composition rules counted off the output, by kind: each is identified by the declaration
+    // only that kind has — `animation-name`, or the composed `transition`.
     animations: state.animations,
     bytes: css.length,
-    // Carrier rules the finalizer recognized by the marker, and how many of those it rewrote. The
-    // number that used to be one — it is whatever Tailwind made of the classes, and no longer
-    // something Jumi chooses. The two differ only when a carrier had nothing to change, which is
-    // why they are kept apart: the completed count is not the written count.
-    carriersChanged: built.carriersChanged,
-    carriersFound: built.carriersFound,
-    carriersInOutput: state.animations + state.transitions,
     keyframes: (css.match(/@keyframes jumi-/g) ?? []).length,
     media: (css.match(/@media /g) ?? []).length,
     properties: (css.match(/@property --jumi-/g) ?? []).length,
     protocol: state.leaks,
+    // How many selectors the compositions were written for: the activating rules the finalizer
+    // derived from the emitted CSS. Zero is the ordinary result for a page with no motion in it.
+    selectors: built.animations + built.transitions,
     slots: aggregateSlots(css),
     supports: (css.match(/@supports /g) ?? []).length,
     transitions: state.transitions,
@@ -180,28 +172,26 @@ function report(before, after, indent = 2) {
  * regress quietly, and these are the three things that can:
  *
  *   a publication surviving into the output   (the aggregate declared outside a carrier)
- *   a carrier the finalizer claimed but never wrote (the marker is erased, so only the longhands
- *                                                    can confirm it)
+ *   a selector the finalizer did not write onto (a composition built for rules it never saw)
  *   the transport surviving finalization      (a build-time name reaching the browser)
  *   the shipped file growing with the build   (the two halves collapsing back together)
  *
- * What is *not* bounded is the aggregate's share of the file, and that is deliberate: a
- * carrier reads the aggregate, so it has to declare it, and Tailwind decides how many carriers
- * there are. Two carriers holding the same ten lists is 2× the aggregate in the output and
- * perfectly correct — the number that can only ever be wrong is whether a *third* copy exists,
- * which is what the first check asks.
+ * What is *not* bounded is the aggregate's share of the file, and that is deliberate: the
+ * composition reads the aggregate, so it has to hold it, and the lists grow with the slot count.
+ * The number that can only ever be wrong is whether a *second* copy exists, which is what the
+ * arithmetic below asks.
  */
 const variantChecks = [
   {
-    detail: measured => `${measured.aggregateWrites} declarations for`
-      + ` ${measured.animations} animations + ${measured.transitions} transitions carriers`,
-    holds: measured => measured.carriersFound > 0 && measured.aggregateWrites === expectedDeclarations(measured),
-    what: 'each carrier holds the whole list for the parts it declares, and nothing else',
+    detail: measured => `${measured.selectors} selectors`
+      + ` for ${measured.animations} animations + ${measured.transitions} transitions compositions`,
+    holds: measured => measured.selectors > 0 && measured.animations > 0,
+    what: 'the composition is written for the rules that activate it',
   },
   {
-    detail: measured => `${measured.carriersInOutput} carriers in the output, ${measured.carriersFound} found`,
-    holds: measured => measured.carriersInOutput === measured.carriersFound,
-    what: 'the finalizer recognized every carrier it reported, and erased every marker',
+    detail: measured => `${measured.aggregateWrites} declarations, ${expectedDeclarations(measured)} expected`,
+    holds: measured => measured.aggregateWrites === expectedDeclarations(measured),
+    what: 'each kind holds the whole list for the parts it declares, and nothing else',
   },
   {
     detail: measured => Object.entries(measured.protocol).map(([name, count]) => `${count} ${name}`).join(', '),

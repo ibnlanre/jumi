@@ -40,16 +40,17 @@ const jumiModule = await import(path.join(root, 'dist', 'postcss.js'))
 const { default: jumi, jumiFinalizer } = jumiModule
 
 /* ------------------------------------------------------------------------------------
- * A fixture with every carrier context, compiled through PostCSS
+ * A fixture with every activation shape, compiled through PostCSS
  * ---------------------------------------------------------------------------------- */
 
 mkdirSync(dir, { recursive: true })
 writeFileSync(path.join(dir, 'index.html'), `
-<div id="direct" class="animations animate-rotate-45"></div>
-<div id="descendant" class="*:animations"><i class="animate-rotate-45"></i></div>
-<div id="pseudo" class="before:animations before:content-[''] before:animate-scale-110"></div>
+<div id="direct" class="animate-rotate-45"></div>
+<div id="descendant" class="*:animate-rotate-45"><i></i></div>
+<div id="pseudo" class="before:content-[''] before:animate-scale-110"></div>
 <div id="applied" class="applied-motion"></div>
-<div id="motionless" class="transitions"></div>
+<div id="motionless" class="transition-duration-500"></div>
+<div id="transitioning" class="transition-duration-500/background-color"></div>
 `)
 
 /** The bundle a stylesheet registers by path, since the fixtures are not an installed package. */
@@ -61,7 +62,7 @@ const registered = `@import "tailwindcss" source(none);
 @source "./index.html";
 
 .applied-motion {
-  @apply animations animate-rotate-45;
+  @apply animate-rotate-45;
 }
 `
 
@@ -76,21 +77,51 @@ writeFileSync(path.join(dir, 'in.css'), registered)
 
 const failures = []
 
+/**
+ * How many selectors a composition was written for, read off the rule that declares the part.
+ *
+ * Counting rules instead would say nothing: there is exactly one composition per kind, and the
+ * whole question is which selectors it carries. A descendant, a pseudo-element and a rule `@apply`
+ * inlined are all in that list, and none of them names the element the utility was written on.
+ */
+const compositionSelectors = (css, part) => {
+  let count = 0
+
+  postcss.parse(css).walkRules((rule) => {
+    if (count || !rule.nodes?.some(node => node.type === 'decl' && node.prop === part)) return
+
+    count = rule.selector.split(/,\s*\n/).length
+  })
+
+  return count
+}
+
 /** What the protocol requires of any emitted stylesheet, whatever produced it. */
 const structure = (label, css) => {
   const { animations, declarations, leaks, transitions } = protocolState(css)
   const leaked = Object.entries(leaks).filter(([, count]) => count > 0)
   const slots = (css.match(/--jumi-[\w-]+-animation-name:/g) ?? []).length
   const expected = expectedDeclarations({ animations, transitions })
-  const held = animations >= 4 && declarations === expected && !leaked.length
+  // Four ways in — the utility itself, a descendant variant, a pseudo-element variant, and the
+  // rule `@apply` inlined — and one for transitions.
+  const selectors = compositionSelectors(css, 'animation-name')
+  const transitionSelectors = compositionSelectors(css, 'transition')
+  const held = selectors === 4 && transitionSelectors === 1 && declarations === expected && !leaked.length
 
   console.log(`\n    ${held ? '✓' : '✗'} ${label}: ${css.length.toLocaleString()} bytes,`
-    + ` ${animations} + ${transitions} carriers, ${declarations} declarations written, ${slots} slots,`
+    + ` ${selectors} animation + ${transitionSelectors} transition selectors,`
+    + ` ${declarations} declarations written, ${slots} slots,`
     + ` ${leaked.length ? `${leaked.map(([name, count]) => `${count} ${name}`).join(', ')} left` : 'no protocol left'}`)
 
   if (leaked.length) failures.push(`${label}: the transport reached the output — ${leaked.map(([name, count]) => `${count} ${name}`).join(', ')}`)
-  if (animations < 4) failures.push(`${label}: ${animations} carriers, expected the four contexts`)
-  if (declarations !== expected) failures.push(`${label}: ${declarations} declarations for ${animations} + ${transitions} carriers, expected ${expected}`)
+  if (selectors !== 4) failures.push(`${label}: the animation composition covers ${selectors} selectors, expected the four activation shapes`)
+  if (transitionSelectors !== 1) failures.push(`${label}: the transition composition covers ${transitionSelectors} selectors, expected the one motion`)
+  if (declarations !== expected) failures.push(`${label}: ${declarations} declarations, expected ${expected}`)
+  // A global control declares a different property and names no motion, so it must stay inert: it
+  // is the case that separates "activates a slot" from "mentions a Jumi variable".
+  if (/--jumi-transition-duration: 500ms/.test(css) && transitionSelectors !== 1) {
+    failures.push(`${label}: a global control was read as an activation`)
+  }
 
   // The data has to be the compiled one: a slot for a scanned candidate, in every carrier.
   if (!/jumi-rotate-/.test(css)) failures.push(`${label}: no slot for animate-rotate-45 — Tailwind did not run`)

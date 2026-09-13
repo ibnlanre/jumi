@@ -1,3 +1,4 @@
+import type { CarrierKind } from '@/helpers/carriers'
 import type {
   AnimatableStandardPropertyType,
   Collection,
@@ -27,21 +28,22 @@ export type ModelOptions = {
 /** Everything the model needs from its host: where theme values come from, and
  * the two things it emits. Nothing else in this module knows the host. */
 export type ModelSink = {
-  /** Publish the aggregate slot lists — one custom property per longhand, holding the list
-   * every carrier must read.
-   *
-   * This is **staging**, not output. It has to be re-emittable, because a slot registered
-   * after a pass has published would otherwise never reach the stylesheet: Tailwind will not
-   * revisit the candidate it cached. And it cannot be output, because the aggregate only
-   * resolves where the carrier ended up — each entry is a `var()` over a slot variable the
-   * `animate-*` utilities declare on the element, and Tailwind decides that placement by
-   * re-parenting the carrier body for a variant or copying it for `@apply`. The adapter puts
-   * it somewhere clearly not consumed; `@/helpers/carriers` reads it out of the finished
-   * stylesheet, writes it into every marked carrier, and removes the rule.
-   */
-  aggregate(variables: Collection<string>): void
   /** Emit keyframe rules. */
   keyframes(rules: Collection<CssInJs>): void
+  /** Publish what a kind's composition needs, as data that is never output.
+   *
+   * This is **staging**. It has to be re-emittable, because a slot registered after a pass has
+   * published would otherwise never reach the stylesheet — Tailwind will not revisit the candidate
+   * it cached — and it cannot be output, because the composition only resolves where the
+   * activations are: every entry is a `var()` over a slot variable that exists on the element.
+   *
+   * A payload names every entry `--jumi-staging-<kind>-<declaration>` — the kind in the **name**,
+   * so two payloads coalesced into one rule cannot collide — and what the declaration *is* decides
+   * how it is read: a longhand is composition, a custom property is a default the element resolves
+   * through. Those defaults have to be declared on the element rather than once on `:root`, because
+   * they compose custom properties the slot utilities write there.
+   */
+  payload(kind: CarrierKind, variables: Collection<string>): void
   /** Register a slot's activation name as non-inheriting. */
   property(name: string): void
 }
@@ -351,69 +353,109 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
     return merge(animation, baseAnimationVars)
   }
 
-  /** The variable a longhand's aggregate list is published under. */
-  const aggregateVariable = (part: string) => `--jumi-aggregate-${part}`
-
   /** Every longhand a slot contributes an entry to. */
   const aggregateParts = [...slotParts, 'animation-name']
 
   let registrations = 0
-  // -1 means no pass has published yet; then the utility's own read covers it.
+  // -1 means nothing has published yet, so the first change still has to.
   let publishedAt = -1
 
   /**
-   * The aggregate as data: for each longhand, the exact list every carrier must read.
+   * What the animations composition declares, as data — keyed by the **declaration** it becomes,
+   * because that is the one thing the far end cannot invent.
    *
-   * Flat lists, and published only to be *consumed* — the carrier marks itself in the utility
-   * body, and `@/helpers/carriers` reads these out of the emitted stylesheet, materializes them
-   * into every marked rule's longhands, and removes this one. The browser never reads it, which
-   * is what makes it safe to publish the data outside the carrier: a rule nothing consumes cannot
-   * wrong.
+   * Flat lists, staged only to be *consumed*: `@/helpers/carriers` reads them off the finished
+   * stylesheet and builds the rule that carries them. The browser never reads this, which is what
+   * makes it safe to publish the data away from the element it belongs to — a rule nothing
+   * consumes cannot be wrong.
    */
-  const aggregateVariables = (): Collection<string> => {
+  const animationPayload = (): Collection<string> => {
     const lists = computeAnimationVariable()
 
     return Object.fromEntries([
       ...aggregateParts
         .filter(part => typeof lists[part] === 'string')
-        .map(part => [aggregateVariable(part), lists[part] as string]),
-      // The transitions carrier applies a list for the same reason `animations` does — it depends
-      // on which utilities exist — so it travels the same channel and gets the same freshness.
-      // Publishing it is free when the page has no `transitions` carrier: no rule declares the
-      // part, so the finalizer has nowhere to write it.
-      [aggregateVariable('transition'), transitionList()],
+        .map(part => [part, lists[part] as string]),
+      // A real property rather than a custom one, and it rides the same channel anyway: a staged
+      // name carries the declaration it becomes, so `interpolate-size` needs no special case and
+      // cannot drift from the name it is written under.
+      ['interpolate-size', css('var', '--jumi-interpolate-size')],
     ])
   }
 
   /**
-   * Publish the aggregate if the slot set has moved since it was last published.
-   *
-   * Called when the utility is read (a fresh pass) and whenever a slot appears after a pass
-   * has already published — Tailwind will not revisit the candidate it cached, so a slot
-   * that arrives late needs a fresh publication to reach the stylesheet at all.
-   *
-   * What is published is **staging**, not output. The carrier marks itself in the utility
-   * body, and `@/helpers/carriers` reads these lists out of the emitted stylesheet, writes
-   * them into every marked rule, and removes this one. So the cost of a publication is
-   * bounded by the size of the list rather than by how many carriers exist, and the browser
-   * never reads this rule — which is what makes it safe to put the data outside the carrier.
+   * What the transitions composition declares, from the same reasoning. The list depends on which
+   * motions exist, so it travels with the same freshness: a motion registered after a pass has
+   * published has to be able to reach the stylesheet.
    */
-  const publishAggregate = () => {
+  const transitionPayload = (): Collection<string> => ({
+    'transition': transitionList(),
+    'transition-behavior': css('var', '--jumi-transition-behavior'),
+  })
+
+  /**
+   * The defaults an animating element resolves through, published once per property.
+   *
+   * Incremental rather than a snapshot, because the set only ever grows: a full republication on
+   * every pass would write every earlier property's defaults again each time, making the transport
+   * quadratic in the number of properties for no gain.
+   */
+  const substrated = new Set<string>()
+  let transitionSubstrate = false
+
+  const publishSubstrate = () => {
+    const variables: Collection<string> = {}
+
+    for (const attribute of sorted(properties)) {
+      if (substrated.has(attribute)) continue
+      substrated.add(attribute)
+
+      for (const [property, value] of Object.entries(assemble(attribute))) {
+        if (value !== undefined) variables[property] = value
+      }
+    }
+
+    if (Object.keys(variables).length) sink.payload('animations', variables)
+
+    if (transitionSubstrate) return
+    transitionSubstrate = true
+
+    const transitions: Collection<string> = {}
+
+    for (const [property, value] of Object.entries(assemble('transition'))) {
+      if (value !== undefined) transitions[property] = value
+    }
+
+    sink.payload('transitions', transitions)
+  }
+
+  /**
+   * Publish the payload if the slot set has moved since it was last published.
+   *
+   * Called once while the model is being built, and again whenever a slot appears after a pass has
+   * already published. Publishing at construction is not an optimization: nothing reads the model
+   * any more, so without it a stylesheet with no slots at all would publish nothing, and a build
+   * that never ran the finalizer would leave no trace of the protocol for the checks to find.
+   */
+  const publish = () => {
+    publishSubstrate()
+
     if (publishedAt === registrations) return
     publishedAt = registrations
 
-    sink.aggregate(aggregateVariables())
+    sink.payload('animations', animationPayload())
+    sink.payload('transitions', transitionPayload())
   }
 
   /**
    * Aggregate state changed: republish if a pass has already published.
    *
    * Named for what it means rather than for slots, because a motion is one of the things that has
-   * to reach a carrier late and a slot is no longer the only one.
+   * to reach a composition late and a slot is no longer the only one.
    */
   const aggregateChanged = () => {
     registrations += 1
-    if (publishedAt !== -1) publishAggregate()
+    if (publishedAt !== -1) publish()
   }
 
   const register = (attribute: AnimatableStandardPropertyType) => {
@@ -458,47 +500,6 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
       const animation = computeAnimationVariable()
 
       return merge(animation, assembled)
-    },
-
-    /**
-     * What Tailwind emits for `.animations`: a constant rule that marks the element as a
-     * carrier, names the parts it applies, and declares the controls they fall back to.
-     *
-     * Constant is the point. Tailwind caches a candidate's output, so a rule that
-     * changed as slots appeared could be reused stale; reading this is also what
-     * publishes the data, so a pass with no tweens at all still publishes an
-     * aggregate for the carrier to materialize.
-     *
-     * The ten `animation-*` declarations are reads, not values: each one names a part in the
-     * staging namespace and falls back to the matching control. They are how the carrier says
-     * which parts it wants — `@/helpers/carriers` replaces every one of them it was given data
-     * for, and erases the marker — so they are also why a browser sees no transport in a
-     * finished stylesheet, and why a carrier that was never finalized still animates the
-     * control defaults instead of nothing.
-     */
-    get animationUtility(): CssInJs {
-      publishAggregate()
-
-      const consumers = Object.fromEntries([
-        ...slotParts.map(part => [part, css('var', aggregateVariable(part), css('var', `--jumi-${part}`))]),
-        ['animation-name', css('var', aggregateVariable('animation-name'), css('var', '--jumi-animation-name'))],
-      ])
-
-      const assembled = sorted(properties).reduce((acc, attribute) =>
-        merge(acc, assemble(attribute)), {} as CssInJs)
-
-      return merge({
-        // A marker, so a carrier rule can be recognised *after* Tailwind has applied
-        // variants to it. A variant re-parents this body (`variants.ts`: `r.nodes =
-        // selectors.map(selector => rule(selector, r.nodes))`), so the marker travels to
-        // `:is(.animations > *)` and `.animations::before` — and that is what lets Jumi's
-        // finalizer materialize the list where it resolves, instead of publishing it at a
-        // literal selector it cannot follow. Build-time only: the finalizer removes it, so
-        // it never reaches the browser.
-        '--jumi-carrier': 'animations',
-        ...consumers,
-        'interpolate-size': css('var', '--jumi-interpolate-size'),
-      }, assembled)
     },
 
     color: (attribute, parts = [], options: { paint?: boolean } = {}): MatchComponentsPropertyFunction => {
@@ -672,21 +673,14 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
       }
     },
 
-    get transitions(): CssInJs {
-      publishAggregate()
-
-      return merge({
-        // The same marker discipline as `animations`, and the same reason: this body is constant,
-        // and the list it applies is staged and materialized late. The `transition` declaration is
-        // both the fallback and the carrier's declaration of interest — it is the property the
-        // finalizer writes the composed list into, which is also what stops an `animations`
-        // carrier from being handed it.
-        '--jumi-carrier': 'transitions',
-        'transition': css('var', '--jumi-transition'),
-        'transition-behavior': css('var', '--jumi-transition-behavior'),
-      }, assemble('transition') as CssInJs)
-    },
   }
+
+  // Publish once, before anything can read the model.
+  //
+  // Nothing reads it as a side effect any more — a utility used to, and the candidate that asked for
+  // it is gone. Without this a page with no Jumi motion at all would stage nothing, and a build that
+  // never ran the finalizer would leave no trace of the protocol behind for the checks to find.
+  publish()
 
   return creator
 }

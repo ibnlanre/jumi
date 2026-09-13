@@ -6,10 +6,10 @@ description: Jumi is a motion vocabulary for Tailwind CSS. Start with an effect,
 
 ## A little class goes a long way
 
-Bring an element into view with a single named effect. Add `animations` to activate Jumi on that element, then choose its motion and timing.
+Bring an element into view with a single named effect. Choose its motion and timing — the utilities compose automatically.
 
 ```html
-<div class="animations animate-bounce-in animation-duration-[800ms]">
+<div class="animate-bounce-in animation-duration-[800ms]">
   Hello, movement.
 </div>
 ```
@@ -25,17 +25,16 @@ Jumi generates CSS at build time. Your animations run in the browser's CSS engin
 | Controls | `animation-duration-[800ms]` | Timing, repetition, direction, and playback |
 | Transitions | `transition-duration-[300ms]` | Motion between changes of state |
 
-Use `animations` to activate animations and `transitions` to activate transitions. These opt-ins assemble the relevant CSS declarations on the element.
+Animation and transition utilities compose automatically. Add the motion or transition properties you need; no setup class is required.
 
-That assembly is the whole job of those two classes. One element can carry as many utilities as you like — each one declares its own value, and `animations` gathers them into the animation lists the browser needs. It is also the single handle for switching motion off across a surface, which is how [reduced motion](/docs/accessibility/) is handled.
+That assembly is the whole job, and it is Jumi's rather than yours. One element can carry as many utilities as you like — each one declares its own value, and the composition gathers them into the animation lists the browser needs. To switch motion off across a surface, target the elements themselves, which is how [reduced motion](/docs/accessibility/) is handled.
 
 ## Compose something personal
 
 Each property can have its own duration. This element rotates over 800 milliseconds while its scale changes over 1.2 seconds.
 
 ```html
-<div class="animations
-  animate-rotate-45 animate-scale-110
+<div class="animate-rotate-45 animate-scale-110
   animation-duration-[800ms]/rotate
   animation-duration-[1200ms]/scale
   animation-direction-alternate

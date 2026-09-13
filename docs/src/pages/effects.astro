@@ -11,8 +11,8 @@ import effects from '../data/effects.json';
     <div class="effect-grid">
       {effects.map(({name, className}, index) => <article class="effect-card" data-name={name} data-demo>
         <div class="effect-card-top"><span>{String(index+1).padStart(3,'0')}</span><button class="effect-play" aria-label={`Play ${name}`}>▷</button></div>
-        <div class:list={['effect-stage', ['green','apricot','lilac'][index % 3]]}><span class:list={['effect-glyph', 'animations', className, 'animation-duration-[1200ms]']} aria-hidden="true">✳</span></div>
-        <h2>{name}</h2><div class="effect-class"><code>{className}</code><button data-copy={`<div class="motion-safe:animations ${className} animation-duration-[1200ms]">Move me</div>`} aria-label={`Copy ${name} example`}>Copy</button></div>
+        <div class:list={['effect-stage', ['green','apricot','lilac'][index % 3]]}><span class:list={['effect-glyph', className, 'animation-duration-[1200ms]']} aria-hidden="true">✳</span></div>
+        <h2>{name}</h2><div class="effect-class"><code>{className}</code><button data-copy={`<div class="motion-safe:${className} animation-duration-[1200ms]">Move me</div>`} aria-label={`Copy ${name} example`}>Copy</button></div>
       </article>)}
     </div>
     <p id="empty-effects" hidden>No effects match. Try a shorter name or a different collection.</p>

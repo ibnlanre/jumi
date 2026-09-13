@@ -32,11 +32,13 @@
   --radius-sm: 0.9rem;
 }
 
-/* `@apply` inlines utilities and never a base rule, so this carrier declares the
-   consumer longhands and its own slots but never the aggregate, and resolves to
-   nothing. Measured: `scripts/behaviour-check.mjs` pins it as a known gap. It is not
-   a reason to publish the data document-wide — `:root` measured `none` here too,
-   because a `var()` chain in a custom property resolves where it is declared. */
+/* `@apply` inlines utilities and never a base rule. It used to be a known gap: the carrier was a
+   utility, so `@apply animations` inlined the composition machinery without the aggregate that
+   makes it resolve — and `behaviour-check` pinned that as a documented failure. There is no
+   carrier to inline any more, so this now inlines the activation itself and works: the
+   `.applied-motion` rule declares a slot, which is what makes it an activating selector. What it
+   does *not* do is put the class on the element, so the record is that the activation moved into
+   the stylesheet rather than that the gap was closed. */
 .applied-motion {
-  @apply animations animate-rotate-45;
+  @apply animate-rotate-45;
 }

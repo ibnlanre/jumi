@@ -730,7 +730,36 @@ last, semantic ownership first.
 
 ## Guardrails
 
-- Carrier classes are preserved unless we find a genuinely better place for their
-  responsibility. Answer *where does it move?* before proposing otherwise.
-- Any new host capability we start relying on gets a row in the inventory above,
-  with a classification, in the same change.
+- Carrier classes are gone: `animations` and `transitions` left userland and the composition is
+  inferred from the emitted activation declarations. `legacy:check` fails the gate if either name
+  reappears in an example, a fixture or the docs, because a resurrected carrier would be *inert*
+  rather than broken — a page that still animates from its motion utilities would look fine.
+- Any new host capability we start relying on gets a row in the inventory above, with a
+  classification, in the same change.
+
+## Closed: the carrier left userland
+
+An element animates because it carries a motion utility. Jumi derives the participating selectors
+from the rules that declare a slot's activation variable, and writes two rules per active kind — the
+defaults that open the utilities layer, and the composition that closes it. Zero activators emits
+nothing. `architecture/carrier-locality.md` carries the architecture, the four rejected placements
+(`addBase`, `addUtilities`, `:root`, `:where(group)`), the universal-carrier measurement, and why
+`@apply` stopped being a caveat without being fixed.
+
+The decision that outlived the classes is a product rule, and it is deliberate rather than an
+incidental consequence of removing them:
+
+> **Controls configure motion; they do not create motion.**
+
+```html
+<!-- configures duration only; no transition by itself -->
+<div class="transition-duration-500">
+
+<!-- transitions all changing properties for 500ms -->
+<div class="transition-property/all transition-duration-500">
+```
+
+`animation-duration-500` has always meant the first of those. `transitions` was quietly doing two
+jobs — enabling composition *and* supplying an implicit `all` transition — and only the first was
+removed by this migration. The second would have been hidden magic, so it is written out instead.
+That is an intentional part of the 1.0 API, and the transitions page teaches it as such.

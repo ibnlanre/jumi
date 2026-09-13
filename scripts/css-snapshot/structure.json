@@ -1,68 +1,60 @@
 {
   "canonical": {
-    "aggregateBytes": 52951,
-    "aggregateShare": 59,
-    "aggregateWrites": 21,
-    "animations": 2,
-    "bytes": 89796,
-    "carriersChanged": 3,
-    "carriersFound": 3,
-    "carriersInOutput": 3,
+    "animations": 1,
+    "bytes": 65124,
     "keyframes": 33,
     "media": 5,
     "properties": 51,
     "protocol": {
-      "aggregate": 0,
-      "carrier": 0,
       "staging": 0
     },
+    "selectors": 44,
     "slots": 33,
     "supports": 5,
     "transitions": 1,
+    "aggregateBytes": 26642,
+    "aggregateShare": 41,
+    "aggregateWrites": 11,
     "publishEvents": 34,
-    "rawBytes": 505491,
-    "stagingBytes": 466572,
+    "rawBytes": 512153,
+    "stagingBytes": 481924,
     "colorValues": {
-      "literal": 1,
+      "literal": 6,
       "token": 6
     },
     "themeResolution": {
       "formula": 4,
-      "literal": 71,
+      "literal": 150,
       "token": 12
     }
   },
   "carrierVariant": {
-    "aggregateBytes": 59260,
-    "aggregateShare": 69,
-    "aggregateWrites": 40,
-    "animations": 4,
-    "bytes": 85659,
-    "carriersChanged": 4,
-    "carriersFound": 4,
-    "carriersInOutput": 4,
+    "animations": 1,
+    "bytes": 35165,
     "keyframes": 18,
     "media": 1,
     "properties": 36,
     "protocol": {
-      "aggregate": 0,
-      "carrier": 0,
       "staging": 0
     },
+    "selectors": 20,
     "slots": 18,
     "supports": 5,
     "transitions": 0,
+    "aggregateBytes": 14815,
+    "aggregateShare": 42,
+    "aggregateWrites": 10,
     "publishEvents": 19,
-    "rawBytes": 178911,
-    "stagingBytes": 148494,
+    "rawBytes": 173969,
+    "stagingBytes": 157750,
     "colorValues": {
-      "literal": 0,
+      "literal": 2,
       "token": 2
     },
     "themeResolution": {
       "formula": 0,
-      "literal": 37,
-      "token": 4
+      "literal": 80,
+      "token": 3
     }
   }
 }

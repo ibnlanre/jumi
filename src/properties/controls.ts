@@ -202,10 +202,6 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
       modifiers,
       values: animationTimingFunction,
     },
-    'animations': {
-      fn: () => creator.animationUtility,
-      values: empty.string,
-    },
     'transition-behavior': {
       fn: (value) => {
         return ({
@@ -233,10 +229,6 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
       fn: transition('timing-function'),
       modifiers: cssProperties,
       values: animationTimingFunction,
-    },
-    'transitions': {
-      fn: () => creator.transitions,
-      values: empty.string,
     },
   }
 

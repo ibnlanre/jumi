@@ -12,7 +12,7 @@ and stagger motion across children—all from your markup.
 **[Run the docs site](#the-documentation-site)**
 
 ```html
-<div class="motion-safe:animations animate-bounce-in animation-duration-800">
+<div class="motion-safe:animate-bounce-in animation-duration-800">
   Make your move.
 </div>
 ```
@@ -87,10 +87,10 @@ const { css } = finalizeCss(readFileSync('dist/output.css', 'utf8'))
 writeFileSync('dist/output.css', css)
 ```
 
-Add `animations` to activate motion, then choose an effect:
+Choose an effect, then its timing:
 
 ```html
-<div class="animations animate-reveal-swipe animation-duration-900">
+<div class="animate-reveal-swipe animation-duration-900">
   A little class. A lot of character.
 </div>
 ```
@@ -103,7 +103,7 @@ reduced-motion preference. Keep the element visible in its unanimated state.
 Effects are a starting point. Property utilities let you author your own motion:
 
 ```html
-<div class="animations animate-rotate-45 animate-scale-110 animation-duration-800/rotate animation-duration-1200/scale animation-direction-alternate animation-iteration-count-infinite">
+<div class="animate-rotate-45 animate-scale-110 animation-duration-800/rotate animation-duration-1200/scale animation-direction-alternate animation-iteration-count-infinite">
   Two rhythms. One element.
 </div>
 ```
@@ -128,9 +128,9 @@ the timing of the compound property's slot.
 
 ```html
 <div class="animate-stagger-forward-120/3">
-  <div class="animations animate-fade-in-up">One</div>
-  <div class="animations animate-fade-in-up">Two</div>
-  <div class="animations animate-fade-in-up">Three</div>
+  <div class="animate-fade-in-up">One</div>
+  <div class="animate-fade-in-up">Two</div>
+  <div class="animate-fade-in-up">Three</div>
 </div>
 ```
 
@@ -142,7 +142,7 @@ Omit the count when targeting browsers that support `sibling-index()` and
 ## Make state changes feel considered
 
 ```html
-<button class="transitions transition-property/scale transition-duration-300 hover:scale-110 focus-visible:scale-110">
+<button class="transition-property/scale transition-duration-300 hover:scale-110 focus-visible:scale-110">
   Take a closer look.
 </button>
 ```

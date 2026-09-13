@@ -91,8 +91,7 @@ writeFileSync('dist/output.css', css)
 ## 03 — Make an entrance
 
 ```html
-<div class="motion-safe:animations
-  animate-fade-in-up
+<div class="motion-safe:animate-fade-in-up
   animation-duration-[600ms]">
   Nice to see you.
 </div>
@@ -125,7 +124,8 @@ Write complete class names in your source. Tailwind cannot discover a class asse
 
 ## If nothing moves
 
-- Check that the element includes `animations` or `motion-safe:animations`.
+- Check that the element carries the motion utility, and that the variant is on that utility —
+  `motion-safe:animate-*` — rather than on an ancestor.
 - Check that your build includes the integration, not only the plugin. `@plugin "@ibnlanre/jumi"` on its own leaves the stylesheet unfinished, and the animations then compile to nothing, without an error.
 - Check that your stylesheet is imported by your app.
 - Use explicit units for arbitrary timing values: `animation-duration-[800ms]`.

@@ -63,17 +63,17 @@ if (!composed.includes('jumi') || !composed.some(name => name?.includes('tailwin
 console.log(`· jumi() composes: ${composed.join(', ')}`)
 
 /* ------------------------------------------------------------------------------------
- * A fixture with every carrier context, plus one that grows while the server runs.
+ * A fixture with every activation context, plus one that grows while the server runs.
  * ---------------------------------------------------------------------------------- */
 
 const CONTEXTS = `
-    <div id="direct" class="animations animate-rotate-45"></div>
-    <div id="descendant" class="*:animations"><i class="animate-rotate-45"></i></div>
-    <div id="pseudo" class="before:animations before:content-[''] before:animate-scale-110"></div>
+    <div id="direct" class="animate-rotate-45"></div>
+    <div id="descendant" class="*:animate-rotate-45"><i></i></div>
+    <div id="pseudo" class="before:content-[''] before:animate-scale-110"></div>
     <div id="applied" class="applied-motion"></div>
-    <div id="bare" class="animations"></div>
-    <div id="grown" class="animations"></div>
-    <div id="transitioning" class="transitions transition-property/background-color transition-duration-[300ms]"></div>
+    <div id="bare" class="animation-duration-500"></div>
+    <div id="grown" class="animation-duration-500"></div>
+    <div id="transitioning" class="transition-property/background-color transition-duration-[300ms]"></div>
 `
 
 /** The same shape as `behaviour:check`: the contexts are the product promise. */
@@ -98,7 +98,7 @@ const stylesheet = `@import "tailwindcss" source(none);
 @source "./index.html";
 
 .applied-motion {
-  @apply animations animate-rotate-45;
+  @apply animate-rotate-45;
 }
 `
 
@@ -108,8 +108,8 @@ const stylesheet = `@import "tailwindcss" source(none);
  * with the directive written by hand, and the two have to compile to the same CSS.
  */
 const registered = {
-  entry: '@import "tailwindcss" source(none);\n\n@source "./index.html";\n\n.applied-motion {\n  @apply animations animate-rotate-45;\n}\n',
-  explicit: '@import "tailwindcss" source(none);\n@plugin "jumi";\n\n@source "./index.html";\n\n.applied-motion {\n  @apply animations animate-rotate-45;\n}\n',
+  entry: '@import "tailwindcss" source(none);\n\n@source "./index.html";\n\n.applied-motion {\n  @apply animate-rotate-45;\n}\n',
+  explicit: '@import "tailwindcss" source(none);\n@plugin "jumi";\n\n@source "./index.html";\n\n.applied-motion {\n  @apply animate-rotate-45;\n}\n',
 }
 
 mkdirSync(dir, { recursive: true })
@@ -148,7 +148,7 @@ writeFileSync(path.join(explicitDir, 'style.css'), `@import "tailwindcss" source
 @plugin "${path.join(root, 'dist', 'index.js')}";
 
 .applied-motion {
-  @apply animations animate-rotate-45;
+  @apply animate-rotate-45;
 }
 `)
 
@@ -189,7 +189,7 @@ const resolving = name => name.split(',').map(part => part.trim()).filter(part =
  * AST is consulted, which is the point of asking a browser.
  */
 const transitioning = (page, selector = '#transitioning') => page.evaluate(
-  selector => {
+  (selector) => {
     const element = document.querySelector(selector)
 
     return element ? getComputedStyle(element).transitionProperty : '(absent)'
@@ -247,12 +247,12 @@ const structure = (label, css) => {
   const expected = expectedDeclarations({ animations, transitions })
 
   console.log(`\n    ${!leaked.length && animations ? '✓' : '✗'} ${label}: ${css.length.toLocaleString()} bytes,`
-    + ` ${animations} + ${transitions} carriers, ${declarations} declarations written,`
+    + ` ${animations} + ${transitions} compositions, ${declarations} declarations written,`
     + ` ${leaked.length ? `${leaked.map(([name, count]) => `${count} ${name}`).join(', ')} left` : 'no protocol left'}`)
 
   if (leaked.length) failures.push(`${label}: the transport reached the output — ${leaked.map(([name, count]) => `${count} ${name}`).join(', ')}`)
-  if (!animations) failures.push(`${label}: no carrier reached the output`)
-  if (declarations !== expected) failures.push(`${label}: ${declarations} declarations for ${animations} + ${transitions} carriers, expected ${expected}`)
+  if (!animations) failures.push(`${label}: no composition reached the output`)
+  if (declarations !== expected) failures.push(`${label}: ${declarations} declarations for ${animations} + ${transitions} compositions, expected ${expected}`)
 
   return css
 }
@@ -298,7 +298,7 @@ if (!transitionsBefore.includes('background-color')) {
 // Jumi's staging both have to produce a *new* aggregate, and the only proof is the computed value.
 // Both carriers grow at once, because a slot and a motion are the same class of state.
 const grownClasses = CONTEXTS
-  .replace('id="grown" class="animations"', 'id="grown" class="animations animate-shake"')
+  .replace('id="grown" class="animation-duration-500"', 'id="grown" class="animate-shake"')
   .replace(
     'transition-property/background-color transition-duration',
     'transition-property/background-color transition-property/scale transition-duration',

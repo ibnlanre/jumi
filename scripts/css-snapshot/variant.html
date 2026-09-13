@@ -2,43 +2,41 @@
 <html>
   <body>
     <!--
-      The carrier-variant corpus — the legitimate worst case, kept apart from the
-      canonical fixture on purpose.
+      The variant corpus — the awkward selectors, kept apart from the canonical fixture on
+      purpose.
 
-      `*:animations`, `before:animations` and `hover:animations` are how a surface
-      opts its descendants in, so they are ordinary Jumi usage. But a prefixed form
-      sorts before every `animate-*` candidate, so the aggregate is read while
-      almost no slots exist, and every slot registered afterwards re-publishes the
-      whole list. That is the quadratic path: it produced 1.47 MB for 60 slots in
-      the examples build, with 96% of the file being repeated bookkeeping.
+      A variant resolves to a selector with a pseudo-class, a combinator or a nested condition,
+      and the composition is written onto exactly the selector the activation declares. So these
+      are the shapes where the inferred selector list has to be right: a descendant, a
+      pseudo-element, a state, and a media condition.
 
-      This corpus exists so that path stays visible and cannot quietly get worse —
-      `css-check` holds it to a recorded budget. The canonical fixture deliberately
-      excludes these forms so its byte metric stays readable.
+      It used to exist to bound a quadratic path — a prefixed carrier sorted before every
+      `animate-*` candidate, so the data was read while almost no slots existed and every later
+      slot re-published the whole list. That path is gone: the composition is built once, after
+      every activation is known, so how early a selector sorts cannot change how often anything is
+      published. The corpus stays because the *selectors* are still the awkward part, and
+      `css-check` holds its bytes to a recorded budget.
     -->
-    <div class="animations animate-accent-color-amber-400 animate-background-color-red-500 animate-border-radius-lg animate-border-width-2 animate-bounce-in animate-fade-in animate-rotate-45 animate-rotate-[0:0deg,20:-8deg,100:-8deg]/[flick] animate-rotate-[0:0deg,20:0deg,100:8deg]/[return] animate-scale-110 animate-shake animate-slide-in-up animate-opacity-50 animate-box-shadow-sm animation-duration-[1200ms]"></div>
+    <div class="animate-accent-color-amber-400 animate-background-color-red-500 animate-border-radius-lg animate-border-width-2 animate-bounce-in animate-fade-in animate-rotate-45 animate-rotate-[0:0deg,20:-8deg,100:-8deg]/[flick] animate-rotate-[0:0deg,20:0deg,100:8deg]/[return] animate-scale-110 animate-shake animate-slide-in-up animate-opacity-50 animate-box-shadow-sm animation-duration-[1200ms]"></div>
 
-    <div class="*:animations before:animations hover:animations animate-letter-spacing-tight animate-fade-in-up animate-zoom-in"></div>
+    <div class="*:animate-letter-spacing-tight before:animate-fade-in-up hover:animate-zoom-in"></div>
 
     <!--
-      Carrier contexts. The aggregate has to be evaluated on the element that owns
-      the slot variables, whatever Tailwind does to place the carrier there — and a
-      prefixed carrier gets placed somewhere else entirely. `behaviour:check`
-      asserts all three of these in a browser; the fourth context, `@apply`, is
-      deliberately unsupported and asserted as such.
+      The three contexts a composition has to reach. Each is an ordinary motion utility, so each
+      is a selector the finalizer writes onto — including the two that do not name the element
+      itself, which is what a carrier class used to be needed for.
     -->
-    <div id="ctx-direct" class="animations animate-rotate-45"></div>
+    <div id="ctx-direct" class="animate-rotate-45"></div>
 
-    <div id="ctx-descendant" class="*:animations">
-      <i class="animate-rotate-45"></i>
+    <div id="ctx-descendant" class="*:animate-rotate-45">
+      <i></i>
     </div>
 
-    <div id="ctx-pseudo" class="before:animations before:content-[''] before:animate-scale-110"></div>
+    <div id="ctx-pseudo" class="before:content-[''] before:animate-scale-110"></div>
 
-    <div class="animations animate-stagger-forward-100/4">
-      <i class="animations animate-scale-y-[0.2]"></i>
-      <i class="animations animate-scale-y-[0.2]"></i>
-      <i class="animations animate-scale-y-[0.2]"></i>
+    <div class="animate-stagger-forward-100/4">
+      <i class="animate-scale-y-[0.2]"></i>
+      <i class="animate-scale-y-[0.2]"></i>
     </div>
   </body>
 </html>

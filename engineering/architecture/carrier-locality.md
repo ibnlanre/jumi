@@ -576,3 +576,229 @@ What each carrier can be caught by differs, which is what makes the gate pass-le
 per-rule: an unfinalized `animations` carrier still reads through the transport, so the leftover
 `--jumi-aggregate-*` name is a second signal, while an unfinalized `transitions` carrier declares
 only the fallback — the marker is the *only* thing that says it was never completed.
+
+---
+
+# The carrier leaves userland
+
+Everything above describes the protocol as it stood when the question was *where the carrier ends up*.
+This section supersedes it: the carrier stopped being a class, and with it `--jumi-carrier`, the
+public `animations` / `transitions` utilities, and the whole marker mechanism. The earlier sections
+are kept because the reasoning is still the reasoning — the transport, the per-stylesheet boundary,
+the element-local resolution — but the locator changed, and so did what a browser is handed.
+
+## The change, in one line
+
+> An element animates because it carries a motion utility. Jumi infers the participating selectors
+> from that.
+
+`animations` and `transitions` are gone. A rule **activates** a kind when it declares the generated
+variable a slot is named by:
+
+```css
+.animate-rotate-45 { --jumi-rotate-3zWYd-animation-name: jumi-rotate-3zWYd; … }
+.transition-property/background-color { --jumi-background-color-transition-property: background-color; }
+```
+
+Deliberately not "mentions a Jumi variable". A control declares a different property —
+`.animation-duration-500 { --jumi-rotate-animation-duration: 500ms }` — so it stays inert, and that
+is the product rule rather than a detail of the scan:
+
+> **Controls configure motion; they do not create motion.**
+
+`transition-duration-500` no longer implies "transition everything". It says what duration to use if
+some transition property is actually activated, which is the same thing `animation-duration-500` has
+always meant for animations.
+
+## What the finalizer emits
+
+Two rules per active kind, at two ends of the utilities layer, both constructed by the pass rather
+than inherited from wherever Tailwind happened to sort a candidate:
+
+```css
+@layer utilities {
+  .animate-rotate-45 { --jumi-animation-duration: 1s; … }          ← defaults, first in the layer
+  .animate-rotate-45 { --jumi-rotate-a-animation-name: …; }        ← the activations
+  .animation-duration-500 { --jumi-animation-duration: 500ms; }    ← the controls
+  .animate-rotate-45 { animation-name: …; interpolate-size: …; }   ← the composition, last
+}
+```
+
+- **Placement is the whole guarantee.** A default is the weakest thing the pass writes: everything
+  that exists to override it is an ordinary utility in the same layer and comes later, so order
+  settles precedence structurally instead of by luck.
+- **Zero activators emits nothing.** No empty rule, and no marker left behind on a stylesheet that
+  is not wrong.
+- **The payload is still per-stylesheet transport**, and is still removed. It is now
+  `--jumi-staging-<kind>-<declaration>`, and the kind is in **every entry name** rather than in a
+  marker's value — see the falsification below.
+
+### Why two rules and not one
+
+The two rules share a selector list, which is exactly the thing that invites the question — so the
+answer belongs next to them. They need **opposite positions in the layer**, and a rule has one.
+
+- The defaults must **lose** to the controls. `.animation-duration-500` is an ordinary utility in
+  this same layer, so the defaults have to be declared before everything else in it.
+- The composition must **win** over the author's utilities. An arbitrary `[animation:mine_1s]` on the
+  same element has to lose, and it only does because the composition is declared after them.
+
+Merged, one side is always wrong, and both have been measured:
+
+```
+merged at the end    → the defaults beat the controls    1s where the control says 500ms
+merged at the start  → the composition loses to author  the Tailwind arbitrary utility wins
+```
+
+The other lever is weight rather than position, and it is not available either, because
+**specificity belongs to the selector, not to a declaration**: a single rule has a single weight, so
+the defaults and the composition cannot be weaker and stronger than each other from inside the same
+selector list. `:where()` is the construct that would express it — and it is the one that fails,
+because a pseudo-element cannot appear inside it and `before:` / `after:` are ordinary usage. That
+rejection is the fourth row of the table below.
+
+So the split is the price of position being the only remaining lever: the defaults open the layer,
+the composition closes it. `incremental:check` asserts the pair as a set — "exactly one defaults
+rule and one composition per active kind" — so a future maintainer who merges them gets a gate
+failure instead of a silent precedence change.
+
+The duplicated selector list is the measurable cost, and it is small: **1,376 characters** — about
+1.4 KB, roughly 2% of the 65 KB canonical snapshot. Anyone looking for bytes in this area should
+start at the aggregate's per-element evaluation cost instead, which is a far larger number and is
+recorded below.
+
+What *would* genuinely collapse the two rules, and what it would cost:
+
+```css
+/* today */   var(--jumi-rotate-animation-duration, var(--jumi-animation-duration))
+/* merged */  var(--jumi-rotate-animation-duration, var(--jumi-animation-duration, 1s))
+```
+
+Inlining the defaults as `var()` fallbacks deletes every declaration the defaults rule carries, so
+one composition rule suffices. It also deletes the element-local declaration, and with it the guard
+that keeps a global control on a wrapper out of the animations inside it: with nothing declared on
+the element, an ancestor's `--jumi-animation-duration` would resolve there by inheritance, which is
+the opposite of the scope rule `controls.md` states. That is a trade of behaviour for bytes, not a
+cleanup.
+
+## Why the alternatives were rejected
+
+Each of these looks simpler on paper. They are recorded because every one of them was proposed,
+built, and measured, and the reasons are specific rather than stylistic.
+
+| approach | what it was for | why it failed |
+| --- | --- | --- |
+| `addBase` | hosting the carrier unconditionally | **Wrong layer.** A `@layer components` declaration that loses to a utility-layer carrier *beats* a base-layer one: specificities match and the layer decides. Measured across five competing contexts; `base` differed in exactly one. |
+| `addUtilities` | hosting the carrier in the utility layer | **Candidate-gated, and sorted too late.** A static utility added by a plugin is emitted only when its class is a candidate — a probe class was absent from the output until it was put in `@source inline` — and when present it sorts *after* the controls, so the defaults beat the very rules they exist to lose to (`1s` where today is `500ms`). It also rejects anything but a single class name. |
+| `:root` substrate | publishing the defaults once instead of per element | **`var()` resolves where it is declared.** `--jumi-animation-delay` is `var(--jumi-stagger-animation-delay, 0s)`; on `:root` it resolves once, to the default, and every element inherits that literal — the stagger value never arrives (`0s` where the element gives `150ms`). The same applies to `--jumi-animation`, `--jumi-margin` and the rest. This is what forces the defaults onto the animating element. |
+| `:where(group)` | letting the controls win regardless of position | **A pseudo-element cannot appear inside it.** `before:` and `after:` are ordinary usage, so the defaults rule was dropped as invalid; the substrate never arrived; `var(--jumi-animation-name)` inside the composition list then made the whole declaration invalid at computed-value time, and the name computed to `none`. |
+| a universal carrier (`*, ::before, ::after`) | dropping the opt-in entirely, by making every element carry the composition | **Correct, and it scales with the page rather than with the animations.** See below. |
+| **finalizer synthesis** | — | Works: right layer, supports pseudos, keeps the defaults element-local, and needs no carrier marker at all. |
+
+### The universal carrier, and why "every element" is the wrong unit
+
+`scripts/spike-global-carrier.mjs` asked whether the composition could simply live on `*`. It is the
+most attractive-looking option on paper — no opt-in, no inference, nothing to derive — and it is
+*correctness-equivalent*: every case behaved identically to the opt-in, across elements,
+`::before`, `*:` descendants, nesting, transitions, a native `animation:` shorthand (which wins, a
+universal rule being zero specificity), and a control class with no tween. The one difference ran
+the other way — `@apply`ing a Jumi utility without a carrier produced nothing under the opt-in and
+worked under the universal form.
+
+It fails on cost, and the shape of the failure is what retired it. Chromium, against a byte-matched
+control whose declarations match nothing:
+
+```
+recalc above control          opt-in   universal   substrate split
+1,000 elements, 10 slots        0.4ms       2.1ms           1.4ms
+1,000 elements, 100 slots       2.2ms       4.5ms           3.7ms
+10,000 elements, 10 slots       0.6ms      15.9ms          10.0ms
+10,000 elements, 100 slots      2.3ms      18.9ms          12.9ms
+```
+
+Three things fall out of it, and the third is the one that decided the architecture:
+
+- **The opt-in is flat in element count** — five elements carry the composition whatever the page
+  size — while a universal rule scales with the page. That is the only thing the opt-in was
+  protecting, and it is a real thing to protect.
+- **About a third of the universal cost is the `--jumi-*` substrate**, which is inherited and so
+  computed and passed down by every element. Declaring the constants once instead is free and
+  equally correct. That is the "substrate split" column, and it is the measurement that later
+  became the `:root` proposal — which the section above records as independently falsified, because
+  those constants turn out to compose element-local `var()` chains and cannot live on the root
+  after all.
+- **What remains is the ten list-valued longhands on every element, and the expense is the
+  matching, not the list.** Going from 10 slots to 100 grows the universal cost only 10.0 → 12.9 ms,
+  so trimming the aggregate would buy almost nothing. Splitting the substrate reduced the tax; it
+  did not remove it.
+
+So "every element" is the wrong unit. What replaced it is not a smaller universal rule but **no
+universal rule at all**: the activated selectors, derived — which is the opt-in's cost profile with
+the opt-in's discipline removed.
+
+One more, found the same way and worth its own line: **the kind cannot live in a marker's value.**
+That was the first version, and it read correctly for as long as every payload stayed its own rule —
+then `@tailwindcss/postcss` coalesced them. Two markers declared the same property with different
+values, one won, and the animation composition was handed the transition's declarations while the
+transition composition was never built. The node path never showed it. A **name** cannot collide
+with a different name, which is why the kind is in every entry name now.
+
+## The placement differential
+
+The compositions move to two ends of the layer, so the question is whether that changes any winner.
+Measured against the carrier as emitted, over six competing declarations and five candidate
+positions:
+
+```
+competing declaration          in place   start    end   before   after
+@layer components                  jumi    jumi   jumi     jumi    jumi
+@layer utilities (author)          MINE    MINE   MINE     MINE    MINE
+unlayered author CSS               MINE    MINE   MINE     MINE    MINE
+Tailwind arbitrary utility         jumi    MINE   jumi     jumi    jumi   ← differs
+author @utility                    jumi    jumi   jumi     jumi    jumi
+nothing competing                  jumi    jumi   jumi     jumi    jumi
+```
+
+The start of the layer is the only position falsified, and only against Tailwind's own arbitrary
+utilities. `end` is what the pass uses: the activation-adjacent positions depend on where an
+activation happens to sit, and an activation nested in `@media` would put the composition inside the
+condition.
+
+## What it cost, and what it saved
+
+Every number measured on this repository after the migration.
+
+| corpus | before | after |
+| --- | --- | --- |
+| examples app | ~267 KB | 120,762 bytes |
+| canonical snapshot | 89,796 bytes | 65,124 bytes |
+| variant corpus | 85,659 bytes | 35,165 bytes |
+
+The variant corpus is the interesting one: it existed to bound a quadratic path, where a prefixed
+carrier sorted before every `animate-*` candidate so the data was read while almost no slots existed
+and every later slot re-published the whole list. Building the composition once, after every
+activation is known, removes the path entirely — 85.7 KB to 35.6 KB, and the corpus is now about
+awkward selectors rather than about cost.
+
+None of this is a user-facing claim yet. It is regression evidence, and `css:check` holds two of the
+three to a byte.
+
+## What is still not fixed
+
+The aggregate's evaluation cost. An animated element resolves every position in the
+stylesheet-wide slot vector, and flattening or hoisting those chains moves the number by 11–19%
+while changing semantics for shared controls. Placement does not move it by more than a few percent.
+Reducing it means reducing the number of positions an element resolves, which is a change to what a
+slot universe *is* — and it is the one number a user would feel first. Recorded, deliberately not
+attempted for 1.0.
+
+## The evidence, and where it lives
+
+`scripts/spike-carrier-placement.mjs` and `scripts/spike-inference-placement.mjs` are retired. The
+first settled that an implicit carrier is viable and that `addBase` is not a safe home; the second
+pinned the insertion point and falsified `utilities:start`. Both describe an architecture that no
+longer exists — the carrier is gone — and their conclusions are the sections above. The production
+path now reproduces every invariant they established: `behaviour:check` asserts the pseudo-element
+and the precedence triangle in a browser, `incremental:check` asserts that exactly two rules are
+derived per kind and that Tailwind's cached rules do not move, and `css:check` holds the bytes.
+
