@@ -147,6 +147,15 @@ export const getMatchTween: GetMatchComponents = (creator) => {
   const matchTween: Partial<MatchComponents> = {
     'animate': {
       fn: (value) => {
+        // A candidate with no name reaches here, and it is not hypothetical: `animate-` is also the
+        // root every property utility hangs off, and source that assembles a class by concatenation
+        // — `animate-${name}` in a template literal, which is ordinary React — scans as a bare
+        // `animate-` stub. There are no keyframes for a name Jumi does not have, and asking for them
+        // crashed the whole build with `Cannot convert undefined or null to object`, thrown from
+        // inside Tailwind's `addUtilities` where nothing points back here. An unknown candidate is
+        // ignored, which is what the host does with any utility it cannot resolve.
+        if (!Object.hasOwn(cssEffects, value)) return {}
+
         return ({
           [`--jumi-${value}-animation-name`]: effect(value),
         })

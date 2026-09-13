@@ -45,6 +45,7 @@ the host's parser *and* its ordering. That is the half-migration shape to avoid.
 | `-animate-bottom-4` | `"calc(calc(var(--spacing) * 4) * -1)"` | negation, **composed onto Jumi's already-resolved value** |
 | `animate-opacity-50`, twice | **one** call | nothing — the host dedupes before matching |
 | `animate-bounce-in`, twice | one call (`animate` ← `"bounce-in"`) | nothing — effects are a matcher too, not static CSS |
+| `animate-` alone — what `animate-${name}` in a template literal scans as | one call (`animate` ← `""`) | nothing. The empty name arrives as an ordinary value, and a matcher that then looks up a keyframe it does not have for that name takes down the **whole build** — from inside `addUtilities`, with no frame pointing back at the matcher. Guarded in `src/properties/tween.ts`, pinned by `src/properties/tween.test.ts` |
 | `animations` | one call (`animations` ← `""`) | nothing |
 
 The context object carries exactly one key — `{ modifier }`. There is no variant, no source
