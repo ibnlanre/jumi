@@ -30,14 +30,20 @@ import effects from '../data/effects.json';
       (document.querySelector('#empty-effects') as HTMLElement).hidden = visible !== 0;
     };
     search.addEventListener('input', filter);
-    cards.forEach(card => card.querySelector('button.effect-play')?.addEventListener('click', () => {
+    cards.forEach(card => {
       const glyph = card.querySelector<HTMLElement>('.effect-glyph')!;
-      glyph.style.animation = 'none';
-      card.classList.remove('is-playing');
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        glyph.style.removeProperty('animation'); card.classList.add('is-playing');
-      }));
-      glyph.addEventListener('animationend', () => card.classList.remove('is-playing'), { once: true });
-    }));
+      // Attached once per glyph, not once per click. A second click cancels the animation in
+      // flight, and a cancelled animation fires `animationcancel` rather than `animationend` — so a
+      // per-click listener marked `{ once: true }` would never be removed, and clicking one card
+      // repeatedly would stack handlers on it.
+      glyph.addEventListener('animationend', () => card.classList.remove('is-playing'));
+      card.querySelector('button.effect-play')?.addEventListener('click', () => {
+        glyph.style.animation = 'none';
+        card.classList.remove('is-playing');
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          glyph.style.removeProperty('animation'); card.classList.add('is-playing');
+        }));
+      });
+    });
   </script>
 </Layout>
