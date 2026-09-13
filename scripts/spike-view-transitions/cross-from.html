@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Jumi · cross-document view transition — from</title>
+    <!--
+      Cross-document, zero JavaScript: the only opt-in is the at-rule below. The server substitutes
+      `{{TYPES}}` (empty, or `types: slide;`) and `{{SHEET}}` (which pseudo-element stylesheet to
+      link), so one fixture pair covers the baseline, the type-guarded variant and the retargeted
+      Jumi composition.
+    -->
+    <style>
+      @view-transition { navigation: auto; {{TYPES}} }
+
+      body { margin: 0; font: 600 14px/1.2 system-ui, sans-serif; }
+      main { display: flex; gap: 24px; padding: 24px; align-items: flex-start; }
+      .tile {
+        background: #4f46e5; border-radius: 12px; color: #fff;
+        display: grid; height: 96px; place-items: center; width: 96px;
+      }
+      .hero { background: #db2777; view-transition-name: hero; }
+      a { color: #4f46e5; font-weight: 700; }
+    </style>
+    <link rel="stylesheet" href="/jumi.css" />
+    <link rel="stylesheet" href="{{SHEET}}" />
+  </head>
+  <body>
+    <main>
+      <div class="tile hero">hero</div>
+      <div class="tile">from</div>
+      <div class="tile">a</div>
+      <a id="go" href="/cross-to.html">to b</a>
+    </main>
+  </body>
+</html>

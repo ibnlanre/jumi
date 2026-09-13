@@ -59,6 +59,7 @@
     "postcss:check": "node scripts/postcss-check.mjs",
     "spike:candidates": "node scripts/spike-candidates.mjs",
     "spike:variants": "node scripts/spike-variants.mjs",
+    "spike:view-transitions": "node scripts/spike-view-transitions.mjs",
     "candidate:diff": "node scripts/candidate-diff.mjs",
     "check": "pnpm run check-types && pnpm exec eslint src scripts && pnpm run test:run && pnpm run theme:map && pnpm run css:check && pnpm run incremental:check && pnpm run behaviour:check && pnpm run vite:check && pnpm run postcss:check && pnpm run legacy:check && pnpm run stories:check"
   },

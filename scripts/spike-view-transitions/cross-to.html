@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Jumi · cross-document view transition — to</title>
+    <style>
+      @view-transition { navigation: auto; {{TYPES}} }
+
+      body { margin: 0; font: 600 14px/1.2 system-ui, sans-serif; }
+      main { display: flex; gap: 24px; padding: 24px; align-items: flex-start; }
+      .tile {
+        background: #059669; border-radius: 12px; color: #fff;
+        display: grid; height: 96px; place-items: center; width: 96px;
+      }
+      /* Moved in the layout, so the shared element has somewhere to travel to. */
+      .hero { background: #db2777; margin-left: 240px; margin-top: 64px; view-transition-name: hero; }
+
+      /* The type guard, in its documented form: the pseudo-class matches the root element, and the
+         view-transition pseudo-element hangs off it. */
+      html:active-view-transition-type(slide)::view-transition-new(root) { animation-name: vt-slide; }
+      @keyframes vt-slide { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+    <link rel="stylesheet" href="/jumi.css" />
+    <link rel="stylesheet" href="{{SHEET}}" />
+    <script>
+      /**
+       * The destination-side recorder. `pagereveal` fires before the first paint of the incoming
+       * document and carries the live `ViewTransition`, which is the only way to observe a
+       * cross-document transition from inside the page — there is no script in the outgoing
+       * document by design, and the pseudo tree is not in the DOM.
+       */
+      window.__vtTrace = []
+
+      window.addEventListener('pagereveal', (event) => {
+        window.__vtTrace.push({ at: 'pagereveal', hasTransition: Boolean(event.viewTransition), ...snapshot() })
+
+        if (!event.viewTransition) return
+
+        event.viewTransition.ready.then(() => {
+          window.__vtTrace.push({ at: 'ready', ...snapshot() })
+
+          let ticks = 0
+          const tick = () => {
+            window.__vtTrace.push({ at: `tick${ticks}`, ...snapshot() })
+
+            if (++ticks < 24) requestAnimationFrame(tick)
+          }
+
+          requestAnimationFrame(tick)
+        })
+      })
+
+      function snapshot() {
+        const pseudos = {}
+
+        for (const pseudo of [
+          '::view-transition-group(root)',
+          '::view-transition-old(root)',
+          '::view-transition-new(root)',
+          '::view-transition-group(hero)',
+          '::view-transition-old(hero)',
+          '::view-transition-new(hero)',
+        ]) {
+          const cs = getComputedStyle(document.documentElement, pseudo)
+
+          pseudos[pseudo] = cs.length === 0
+            ? { resolved: false }
+            : { resolved: true, name: cs.animationName, opacity: cs.opacity, transform: cs.transform }
+        }
+
+        const matches = (selector) => {
+          try {
+            return document.documentElement.matches(selector)
+          } catch {
+            return null
+          }
+        }
+
+        return {
+          active: matches(':active-view-transition'),
+          typed: matches(':active-view-transition-type(slide)'),
+          pseudos,
+          animations: document.getAnimations()
+            .filter(a => (a.effect?.pseudoElement ?? '').startsWith('::view-transition'))
+            .map(a => `${a.effect.pseudoElement} ${a.animationName ?? ''}`.trim()),
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <main>
+      <div class="tile hero">hero</div>
+      <div class="tile">to b</div>
+      <div class="tile">z</div>
+      <a id="back" href="/cross-from.html">back to a</a>
+    </main>
+  </body>
+</html>

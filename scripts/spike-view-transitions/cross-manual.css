@@ -1,0 +1,35 @@
+/*
+  The zero-JavaScript cross-document baseline: author animations that replace the UA defaults at
+  every level of the generated pseudo tree except the group.
+ *
+ * The group is left alone on purpose. Chromium drives `::view-transition-group(hero)` with its own
+ * animation that carries the shared element from its old box to its new one; replacing
+ * `animation-name` there replaces that travel, so the two cases are measured separately in
+ * `cross-group.css`.
+ */
+
+::view-transition-old(root) { animation: lab-out 900ms ease both; }
+::view-transition-new(root) { animation: lab-in 900ms ease both; }
+
+::view-transition-old(hero) { animation: lab-hero-out 900ms ease both; }
+::view-transition-new(hero) { animation: lab-hero-in 900ms ease both; }
+
+@keyframes lab-out {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(-80px); }
+}
+
+@keyframes lab-in {
+  from { opacity: 0; transform: translateX(80px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes lab-hero-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.4); }
+}
+
+@keyframes lab-hero-in {
+  from { opacity: 0; transform: scale(1.6); }
+  to { opacity: 1; transform: scale(1); }
+}

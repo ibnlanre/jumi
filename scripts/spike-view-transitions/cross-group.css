@@ -1,0 +1,39 @@
+/*
+  The same baseline as `cross-manual.css`, plus an author animation on the group. This is the case
+  that asks what happens when a Jumi-style composition is aimed at `::view-transition-group(name)`:
+  the group's own animation is what makes a shared element travel between its old and new box, so
+  replacing it should replace the travel, not add to it.
+ */
+
+::view-transition-old(root) { animation: lab-out 900ms ease both; }
+::view-transition-new(root) { animation: lab-in 900ms ease both; }
+
+::view-transition-old(hero) { animation: lab-hero-out 900ms ease both; }
+::view-transition-new(hero) { animation: lab-hero-in 900ms ease both; }
+
+::view-transition-group(hero) { animation: lab-group 900ms ease both; }
+
+@keyframes lab-out {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(-80px); }
+}
+
+@keyframes lab-in {
+  from { opacity: 0; transform: translateX(80px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes lab-hero-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.4); }
+}
+
+@keyframes lab-hero-in {
+  from { opacity: 0; transform: scale(1.6); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes lab-group {
+  from { transform: translateX(0) scale(1); }
+  to { transform: translateX(0) scale(1.8); }
+}

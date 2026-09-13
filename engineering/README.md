@@ -29,6 +29,7 @@ engineering/
 | `research/deployment.md` | the Vercel contract, and the 2026-09-12 diagnosis of a stale deploy |
 | `research/scanner-inventory.md` | candidate discovery: what the host hands a matcher, per candidate |
 | `research/upstream-limitation.md` | a parked investigation into a host limitation |
+| `research/view-transitions.md` | the View Transition API measured against the emitted model: the composition retargets onto the pseudo-elements, and cannot be reached from the source element |
 | `roadmap/migration.md` | the migration: its phases, what closed, and what was decided along the way |
 
 ## Rules of the split
@@ -72,6 +73,15 @@ stylesheet. The conclusion is in `architecture/carrier-locality.md`.
 Kept, because they still reproduce current behaviour: `spike-candidates` (candidate parsing and
 order), `spike-variants` (the host variant model, 12/12), and `spike-precedence.html` (a browser
 probe for `animation-composition` semantics — a language fact, not Jumi's).
+
+`spike-view-transitions` is kept for the same reason as `spike-precedence.html`, and it is the
+larger version of it: it probes the platform, not Jumi, and the platform facts it records — that
+`::view-transition-*` pseudo-elements accept the emitted composition unchanged, that a value
+declared on the source element cannot reach them, that an author animation on
+`::view-transition-group(name)` replaces a shared element's travel — are not facts about a design
+Jumi might abandon. Its fixtures are templated by the harness's own server rather than duplicated
+per variant, and it is the *only* spike here that needs a served origin: a cross-document transition
+requires a same-origin navigation, and `file://` cannot provide one.
 
 `spike-marker-elimination` was retired the same day, under the rule it was written to satisfy: its
 question was answered — a semantic fallback declaration survives variants and `@apply`, but is not
