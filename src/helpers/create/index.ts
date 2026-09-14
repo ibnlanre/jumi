@@ -14,7 +14,7 @@
  */
 import type { Api, Creator, GetMatchComponents, GetMatchUtilities } from '@/types'
 
-import { createJumiModel } from '@/core'
+import { createJumiModel, nameable } from '@/core'
 import { stagingMarker } from '@/helpers/carriers'
 import {
   identityAccepted,
@@ -73,6 +73,20 @@ const jumi = createPlugin((api) => {
   const { matchComponents, matchUtilities, matchVariant } = api
 
   const creator = getCreator(api)
+
+  /**
+   * The modifiers a matcher takes, when it has not said.
+   *
+   * Every motion candidate may be **named** — `animate-fade-in/reveal`, `animate-opacity-50/reveal`,
+   * `animate-opacity-[0:0|100:1]/reveal` are one vocabulary, not three — and Tailwind refuses a bare
+   * modifier unless the matcher declares that it takes one. Measured: `modifiers: {}` accepts
+   * `/[reveal]` (arbitrary) and *drops the whole candidate* for `/reveal`, so the same candidate meant
+   * two different things depending on brackets, and the unbracketed spelling the docs teach emitted no
+   * animation at all. A bare modifier now reaches the fn, which names the slot; a matcher that reads
+   * its modifier as something else — a value suffix, a metric, a count — still declares its own.
+   */
+  const modifierSupport = (fn: (value: string, extra: { modifier: null | string }) => unknown) =>
+    nameable in fn ? ('any' as const) : ({})
 
   /**
    * View transitions, registered as a **variant** and not as a utility.
@@ -134,7 +148,7 @@ const jumi = createPlugin((api) => {
   const registerComponents = (utilities: ReturnType<GetMatchComponents>) => {
     for (const name in utilities) {
       const { fn, ...options } = utilities[name]
-      const { modifiers = {}, supportsNegativeValues = false, type = 'any', values } = options
+      const { modifiers = modifierSupport(fn), supportsNegativeValues = false, type = 'any', values } = options
       matchComponents({ [name]: fn }, { modifiers, supportsNegativeValues, type, values })
     }
   }
@@ -143,7 +157,7 @@ const jumi = createPlugin((api) => {
   const registerUtilities = (utilities: ReturnType<GetMatchUtilities>) => {
     for (const name in utilities) {
       const { fn, ...options } = utilities[name]
-      const { modifiers = {}, supportsNegativeValues = false, type = 'any', values } = options
+      const { modifiers = modifierSupport(fn), supportsNegativeValues = false, type = 'any', values } = options
       matchUtilities({ [name]: fn }, { modifiers, supportsNegativeValues, type, values })
     }
   }

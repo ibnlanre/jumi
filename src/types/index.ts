@@ -495,6 +495,15 @@ export interface Creator {
   readonly effects: string[];
   motion(attribute: string): string;
   readonly motions: string[];
+  /**
+   * Name a slot whose key is its attribute — an effect, a composed tween — so a named control
+   * addresses it: `animate-fade-in/reveal`, then `animation-duration-500/reveal`.
+   *
+   * Returns the declaration that records the name, which the host spreads into the rule it is
+   * already emitting. Names are addresses rather than identifiers, so two motions may share one, and
+   * a name that cannot be written as a custom-property segment is recorded but not linked.
+   */
+  name(attribute: string, name: string): CssInJs;
   readonly properties: string[];
   property(attribute: AnimatableStandardPropertyType, parts?: PropertyParts): MatchComponentsPropertyFunction;
   scope(part: string): MatchUtilitiesPropertyFunction;

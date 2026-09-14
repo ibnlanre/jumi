@@ -113,7 +113,7 @@ import { transformStyle } from '@/theme/transform-style'
 import { visibility } from '@/theme/visibility'
 
 export const getMatchTween: GetMatchComponents = (creator) => {
-  const { color, effect, property, theme } = creator
+  const { color, effect, name, property, theme } = creator
 
   /**
    * Consume the keyword modifier into the value (e.g. `/block`, `/span`,
@@ -146,7 +146,7 @@ export const getMatchTween: GetMatchComponents = (creator) => {
 
   const matchTween: Partial<MatchComponents> = {
     'animate': {
-      fn: (value) => {
+      fn: (value, { modifier }) => {
         // A candidate with no name reaches here, and it is not hypothetical: `animate-` is also the
         // root every property utility hangs off, and source that assembles a class by concatenation
         // — `animate-${name}` in a template literal, which is ordinary React — scans as a bare
@@ -158,8 +158,14 @@ export const getMatchTween: GetMatchComponents = (creator) => {
 
         return ({
           [`--jumi-${value}-animation-name`]: effect(value),
+          // An effect is a motion, so it is named like one: `animate-fade-in/reveal` makes the slot
+          // answer to `reveal`, and `animation-duration-500/reveal` addresses it. The declaration is
+          // the model's, because the name's links and its addressability are the model's.
+          ...(modifier ? name(value, modifier) : {}),
         })
       },
+      // Effects take a name, so Tailwind must let a bare one through.
+      modifiers: 'any',
       values: cssEffects,
     },
     'animate-accent-color': {

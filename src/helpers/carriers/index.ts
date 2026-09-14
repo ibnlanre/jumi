@@ -100,6 +100,14 @@ import postcss from 'postcss'
 export type CarrierKind = 'animations' | 'transitions'
 
 /**
+ * A name the model refused to link, stated as a declaration of its own.
+ *
+ * The refusal travels in the **property** name rather than the value because CSS cannot keep a
+ * name's leading or trailing whitespace in a value, and the property is the fact.
+ */
+const REFUSED_NAME = /^--jumi-name-.+-refused$/
+
+/**
  * The prefix every staged declaration is written under, and the only thing a host needs to
  * recognize a payload. It reaches no browser, so it never has to be a property a browser applies.
  */
@@ -476,6 +484,42 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
       }
 
       rule.append(postcss.decl({ prop: `--jumi-${reading.slot}-animation-range`, value: reading.range }))
+    }
+  })
+
+  // Phase 1a — names, reported rather than published.
+  //
+  // `animate-fade-in/reveal` records its name in the rule it was written in — `--jumi-<slot>-label` —
+  // and the composition reads it as the narrowest link of that slot's chain. Neither of those needs
+  // this pass. What does is the case the model refuses: a name becomes a custom-property segment
+  // (`--jumi-<name>-animation-duration`), where a whitespace character cannot be written at all —
+  // measured, `css.escape('a b')` is `a\ b`, which is legal CSS but ends PostCSS's identifier, so the
+  // build fails with `Unknown word b-animation-duration`. The model drops the link to keep that from
+  // happening, states the refusal in a declaration of its own, and has no channel to say so; this is
+  // the channel. The *property* carries the fact because CSS cannot carry a name's leading whitespace
+  // in a value — see `refusedName` in `@/core`.
+  //
+  // Deliberately *not* here: an "unused name" warning. Controls configure motion, they do not create
+  // it — `animation-duration-500` with nothing to animate is inert, and `animation-duration-500/reveal`
+  // with no motion named `reveal` is inert in exactly the same way. A conditional motion
+  // (`motion-safe:animate-fade-in/reveal` beside an unconditional control) is a real pattern, not an
+  // error, and warning about it would teach authors to stop naming things.
+  const reported = new Set<string>()
+
+  root.walkRules((rule) => {
+    for (const declaration of ownDeclarations(rule)) {
+      if (!REFUSED_NAME.test(declaration.prop) || reported.has(declaration.prop)) continue
+
+      reported.add(declaration.prop)
+
+      // Reconstructed, because the whitespace that made the name unusable is exactly what a CSS value
+      // cannot keep: PostCSS moves a leading one into `raws.between`. Quoting the name as it arrived is
+      // the difference between a message about the author's class and a message about a stray `x`.
+      const leading = ' '.repeat(Math.max(0, (declaration.raws.between ?? ': ').length - 2))
+
+      finalized.warnings.push(
+        `"${leading}${declaration.value}" is not a name a control can address: a name cannot contain whitespace. Write it bare — \`/reveal\` — because in the bracketed form Tailwind reads \`_\` as a space.`,
+      )
     }
   })
 

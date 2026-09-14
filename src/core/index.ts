@@ -87,11 +87,11 @@ type Frame = {
 }
 
 /** One animation in the composition, addressed by its attribute and, optionally,
- * the variable that declares its name. `label` is the name its declaration gave
- * it with `/[flick]`, which is the same word a control addresses it by. */
+ * the variable that declares its name. `names` are the words its declarations gave
+ * it — `animate-fade-in/reveal` — which are the same words a control addresses it by. */
 type Slot = {
   attribute: string
-  label?: string | undefined
+  names?: string[] | undefined
   nameVar?: string | undefined
 }
 
@@ -112,6 +112,31 @@ const slotParts = [
   'animation-timeline',
   'animation-timing-function',
 ] as const
+
+/**
+ * Whether a name is one a control can address.
+ *
+ * Measured, and it is not a style rule: a name becomes a custom-property segment
+ * (`--jumi-<name>-animation-duration`), and **PostCSS ends the identifier at an escaped space** —
+ * `css.escape('a b')` is `a\ b`, which is legal CSS but does not survive the parse. The build fails
+ * with `Unknown word b-animation-duration`, so a name containing whitespace cannot be written at all.
+ * Refusing to write it is what keeps a name from being able to break a build; the pass in
+ * `@/helpers/carriers` reports it, because the model has no channel to warn through.
+ */
+export const addressableName = (name: string) => name.length > 0 && !/[\s\u0000-\u001F\u007F]/.test(name)
+
+/**
+ * A slot's key: the name a slot is addressed by throughout the model, and the middle of its
+ * variable names. `attribute-id` for a phrase or a single value (identity is the value), the
+ * attribute for a composed tween or an effect (identity is the property or the effect).
+ */
+const slotKey = (attribute: string, id?: string) => (id ? `${attribute}-${id}` : attribute)
+
+/**
+ * A matcher that reads its modifier as a **name** — every motion candidate — carries this tag, so the
+ * host can declare `modifiers: 'any'` for it without keeping a second list of matcher names in step.
+ */
+export const nameable = Symbol('jumi.nameable')
 
 /**
  * Jumi's semantic model — every decision between a candidate's value and the CSS
@@ -203,18 +228,78 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
   // OPTIMIZATION: Using a Set allows O(1) deduplication and move-to-end,
   // replacing the O(N) Array indexOf/splice logic. JS Sets maintain insertion order.
   const values = new Map<AnimatableStandardPropertyType, Set<string>>()
-  // The name a declaration gave its slot — `/[flick]` on a phrase — keyed
-  // `attribute:id`. The control side spells the same word in `/[flick]`, so the
-  // two meet on one element-local variable instead of a number that depends on
-  // what else the page happens to animate.
-  const labels = new Map<string, string>()
+  // The names a declaration gave its slot — `animate-fade-in/reveal` — keyed by the slot's
+  // **key**: `attribute-id` for a phrase or a single value, the attribute for a composed tween or an
+  // effect. A control spells the same word in `/reveal`, so the two meet on one element-local
+  // variable instead of a number that depends on what else the page happens to animate.
+  //
+  // A list, not one name, because a name is an **address** and not an identifier: nothing forbids two
+  // candidates naming the same motion, and keeping only the last would make `animation-duration-500`
+  // with either name work while the other stayed silent. Addressability does not depend on
+  // uniqueness either — two motions may share a name, and then one control reaches both.
+  const names = new Map<string, string[]>()
 
   const composed = new Set<AnimatableStandardPropertyType>()
 
   // Deterministic alphabetical ordering for Sets of attribute/effect names.
   const sorted = <T extends string>(set: Set<T>): Array<T> => [...set].sort()
 
-  const perValue = (attribute: AnimatableStandardPropertyType, value: string): CssInJs => {
+  /**
+   * Record a name that cannot be addressed, so the build can report it.
+   *
+   * A control whose name cannot be written — `/[_x]` reaches the model as ` x`, because `_` is
+   * Tailwind's space in an arbitrary value — has nothing to configure: the motion side drops the same
+   * name, so the control would address no slot even if it were written. What it must not do is write
+   * the custom property anyway, which is a build failure rather than a silent no-op (see
+   * `addressableName`).
+   *
+   * The **fact** is in the property name and not in the value, which is a correction rather than a
+   * style: CSS text cannot carry a name's leading or trailing whitespace in a declaration's value —
+   * PostCSS moves it into `raws.between` — so a value-based record stayed silent for exactly the names
+   * `_` produces. The value still carries the name as written, for the message; the hash in the key
+   * keeps two refused names from overwriting one another, and dedupes the report when both sides
+   * record the same one.
+   */
+  const refusedName = (name: string): CssInJs => ({
+    [cssEscape(`--jumi-name-${shorthash2(name)}-refused`)]: name,
+  })
+
+  /**
+   * Name a slot: record the address, register the links it adds, and say so in the rule.
+   *
+   * The declaration is returned rather than written because the rule it belongs to is the host's:
+   * it is the same statement the phrase branch already published, so a name is readable — and
+   * checkable — in the finished stylesheet whatever kind of motion declared it.
+   */
+  const nameSlot = (key: string, attribute: string, name: string): CssInJs => {
+    // A name that cannot be written is recorded rather than linked: the motion still runs, unnamed,
+    // and the build reports the name it could not use.
+    if (!addressableName(name)) return refusedName(name)
+
+    const recorded = names.get(key) ?? []
+
+    if (!recorded.includes(name)) {
+      recorded.push(name)
+      names.set(key, recorded)
+    }
+
+    // Registered non-inheriting for the reason a phrase name is: a name addresses ONE motion, on the
+    // element that declared it, so a descendant that happens to use the same word must not answer to
+    // it. Skipped when the name is the attribute itself, because that name is the property scope's,
+    // and a scope cascades into subtrees on purpose.
+    if (name !== attribute) {
+      for (const part of slotParts) registerName(cssEscape(`--jumi-${name}-${part}`))
+    }
+
+    // After the name is recorded, not before: a candidate compiled once a pass has already published
+    // republishes on the change, and a publish that ran before this line would carry a composition
+    // with no link to the name — silently, and only for late candidates.
+    aggregateChanged()
+
+    return { [cssEscape(`--jumi-${key}-label`)]: name }
+  }
+
+  const perValue = (attribute: AnimatableStandardPropertyType, value: string, name?: string): CssInJs => {
     const id = shorthash2(value)
     let ids = values.get(attribute)
 
@@ -236,6 +321,7 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
     return {
       [`--jumi-${attribute}-${id}-animation-name`]: `jumi-${attribute}-${id}`,
       [`--jumi-${attribute}-${id}`]: value,
+      ...(name ? nameSlot(slotKey(attribute, id), attribute, name) : {}),
     }
   }
   /**
@@ -290,20 +376,23 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
     return css('var', variable, expanded)
   }
 
-  function animationParts(attribute: string, nameVar?: string, label?: string): CssInJs {
+  function animationParts(attribute: string, nameVar?: string, names?: string[]): CssInJs {
     // Every `animation-*` longhand that applies to ONE animation in the list, so
     // a slot can be timed, sequenced and composed on its own. Three links,
-    // narrowest first: the label a declaration gave this animation, then the
-    // property's own control, then the global default. `/[rotate]` writes the
-    // middle link; `/[flick]` — the same word the declaration used — writes the
-    // first. Only a labelled slot offers that first link: an unlabelled one has
-    // no name to be addressed by, so it keeps the shorter chain.
+    // narrowest first: each name a declaration gave this animation, then the
+    // property's own control, then the global default. `/rotate` writes the middle
+    // link; `/flick` — the same word the declaration used — writes the first.
+    // Only a named slot offers that first link: an unnamed one has no name to be
+    // addressed by, so it keeps the shorter chain.
     const timing = (part: string) => {
       const chain = css('var', `--jumi-${attribute}-${part}`, css('var', `--jumi-${part}`))
 
-      return label === undefined
-        ? chain
-        : css('var', cssEscape(`--jumi-${label}-${part}`), chain)
+      if (names === undefined) return chain
+
+      // One link per name, outermost first. Names are disjoint addresses rather than a priority
+      // order, so which link is outer cannot be observed — what matters is that every name the slot
+      // declared reaches it.
+      return names.reduce((links, name) => css('var', cssEscape(`--jumi-${name}-${part}`), links), chain)
     }
 
     const name = css('var', nameVar ?? `--jumi-${attribute}-animation-name`, css('var', '--jumi-animation-name'))
@@ -330,7 +419,11 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
 
     for (const [attribute, ids] of values) {
       for (const id of ids) {
-        slots.push({ attribute, nameVar: `--jumi-${attribute}-${id}-animation-name` })
+        slots.push({
+          attribute,
+          names: names.get(slotKey(attribute, id)),
+          nameVar: `--jumi-${attribute}-${id}-animation-name`,
+        })
       }
     }
 
@@ -339,19 +432,19 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
     // and therefore claims a slot of its own.
     for (const attribute of composed) shared.add(attribute)
 
-    for (const attribute of sorted(shared)) slots.push({ attribute })
+    for (const attribute of sorted(shared)) slots.push({ attribute, names: names.get(attribute) })
 
     for (const [attribute, byId] of phrases) {
       for (const id of byId.keys()) {
         slots.push({
           attribute,
-          label: labels.get(`${attribute}:${id}`),
+          names: names.get(slotKey(attribute, id)),
           nameVar: `--jumi-${attribute}-${id}-animation-name`,
         })
       }
     }
 
-    for (const attribute of sorted(effects)) slots.push({ attribute })
+    for (const attribute of sorted(effects)) slots.push({ attribute, names: names.get(attribute) })
 
     return slots
   }
@@ -367,8 +460,8 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
     // var chain. The `--jumi-animation-*` defaults the chains fall back to are
     // declared by the defaults rule the finalizer derives, on the element.
     const animation = slots.length
-      ? slots.reduce((acc, { attribute, label, nameVar }) => {
-          const parts = animationParts(attribute, nameVar, label)
+      ? slots.reduce((acc, { attribute, names, nameVar }) => {
+          const parts = animationParts(attribute, nameVar, names)
           for (const part in parts) {
             acc[part] = acc[part] ? `${acc[part]}, ${parts[part]}` : parts[part]
           }
@@ -549,7 +642,14 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
 
     color: (attribute, parts = [], options: { paint?: boolean } = {}): MatchComponentsPropertyFunction => {
       const fn = creator.property(attribute, parts)
-      return value => fn(options.paint ? toPaintHex(value) : value, { modifier: null })
+      // The modifier is handed through rather than dropped: a colour tween is a motion like any
+      // other, so `animate-background-color-red/reveal` names it the same way `animate-opacity-50/…`
+      // does. It used to be consumed and discarded, which is how "every motion may be named" and
+      // "colours are the exception" could both look true.
+      const painted: MatchComponentsPropertyFunction = (value, { modifier }) =>
+        fn(options.paint ? toPaintHex(value) : value, { modifier })
+
+      return Object.assign(painted, { [nameable]: true as const })
     },
 
     effect(attribute): string {
@@ -576,10 +676,12 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
 
     get motions(): string[] { return sorted(motions) },
 
+    name: (attribute, name) => nameSlot(attribute, attribute, name),
+
     get properties(): string[] { return sorted(properties) },
 
     property: (attribute, parts = []): MatchComponentsPropertyFunction => {
-      return (value, { modifier }) => {
+      const fn: MatchComponentsPropertyFunction = (value, { modifier }) => {
         const frameList = parsePhrase(value)
 
         // A phrase declares this animation's frames, so it owns the keyframe —
@@ -602,20 +704,10 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
           emitKeyframe(`jumi-${attribute}-${id}`, phraseKeyframe(attribute, id, frameList))
           aggregateChanged()
 
-          // `/[flick]` names this slot, so a control — or your own CSS — can
-          // address it on its own. Every link the chain then reads is registered
-          // non-inheriting, for the reason a phrase name is: a label names ONE
-          // animation, on the element that declared it, so a descendant that
-          // happens to use the same word must not answer to it. Skipped when the
-          // label is the attribute itself, because that name is the property
-          // scope's, and a scope cascades into subtrees on purpose.
-          if (modifier) {
-            labels.set(`${attribute}:${id}`, modifier)
-
-            if (modifier !== attribute) {
-              for (const part of slotParts) registerName(cssEscape(`--jumi-${modifier}-${part}`))
-            }
-          }
+          // `animate-opacity-[0:0|100:1]/reveal` names this slot, so a control — or your own CSS —
+          // can address it on its own. Skipped when the name is the attribute itself, because that
+          // name is the property scope's, and a scope cascades into subtrees on purpose.
+          const named = modifier ? nameSlot(slotKey(attribute, id), attribute, modifier) : {}
 
           const variables = frameList.reduce((acc, { offset, value: frame }) => {
             const suffix = `${id}-${offset}`
@@ -635,18 +727,18 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
 
           return {
             [`--jumi-${attribute}-${id}-animation-name`]: `jumi-${attribute}-${id}`,
-            // The frame variables are keyed by a hash of the phrase, which nobody
-            // can write by hand. The label is the address a person CAN write, so
-            // the rule states it: read the slot's name here, then set
-            // `--jumi-${attribute}-${label}-…` from your own CSS.
-            ...(modifier ? { [`--jumi-${attribute}-${id}-label`]: modifier } : {}),
+            // The frame variables are keyed by a hash of the phrase, which nobody can write by hand.
+            // The name is the address a person CAN write, so the rule states it: read the slot's
+            // name here, then set `--jumi-${name}-…` from your own CSS. Also what the pass reads to
+            // report a name it cannot address.
+            ...named,
             ...variables,
           }
         }
 
         register(attribute)
 
-        if (!parts.length) return perValue(attribute, value)
+        if (!parts.length) return perValue(attribute, value, modifier ?? undefined)
 
         composed.add(attribute)
         registerName(`--jumi-${attribute}-animation-name`)
@@ -661,20 +753,28 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
 
         return {
           [`--jumi-${attribute}-animation-name`]: `jumi-${attribute}`,
+          ...(modifier ? nameSlot(attribute, attribute, modifier) : {}),
           ...variables,
         }
       }
+
+      // Tagged, not wrapped: the host has to know which matchers read their modifier as a *name*,
+      // because that is what decides whether Tailwind accepts a bare `/reveal` on them at all. No
+      // second list of matcher names can stay in step with four hundred entries.
+      return Object.assign(fn, { [nameable]: true as const })
     },
 
     scope(part: string): MatchUtilitiesPropertyFunction {
       return (value, { modifier }) => {
         if (!modifier) return { [`--jumi-${part}`]: value }
 
-        // The modifier names a property — `rotate` — or the label a declaration
-        // gave one of its animations — `rotate-flick`, from
-        // `animate-rotate-[…]/[rotate-flick]`. Either way it is one word, so the
-        // variable is just the modifier and the part. Escaped, because a custom
-        // property name cannot carry a stray dot or space.
+        // The modifier names a property — `rotate` — or the name a declaration gave one of its
+        // animations — `flick`, from `animate-rotate-[…]/flick`. Either way it is one word, so the
+        // variable is just the modifier and the part. Escaped, because a custom property name
+        // cannot carry a stray dot — and refused outright when it carries whitespace, which is not
+        // a name any motion could have answered to and is not a declaration PostCSS can parse.
+        if (!addressableName(modifier)) return refusedName(modifier)
+
         return { [cssEscape(`--jumi-${modifier}-${part}`)]: value }
       }
     },
@@ -713,8 +813,13 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
     transition(part: string): MatchUtilitiesPropertyFunction {
       return (value, { modifier }) => {
         if (!modifier) return { ...(value && { [`--jumi-transition-${part}`]: value }) }
+        // Same refusal, same reason: a motion name is the middle of a custom property's name here
+        // too, and the declaration it would produce is the one PostCSS cannot parse.
+        if (!addressableName(modifier)) return refusedName(modifier)
+
         creator.motion(modifier)
-        return { [`--jumi-${modifier}-transition-${part}`]: part === 'property' ? modifier : value }
+
+        return { [cssEscape(`--jumi-${modifier}-transition-${part}`)]: part === 'property' ? modifier : value }
       }
     },
 
