@@ -979,9 +979,7 @@ export type NonAnimatableStandardPropertyType
 
 export type NonStandardAnimtionPropertyType
   = | 'animation-range-end-offset'
-    | 'animation-range-end-timeline'
     | 'animation-range-start-offset'
-    | 'animation-range-start-timeline'
     | 'animation-timeline-axis'
     | 'animation-timeline-inset'
     | 'animation-timeline-inset-end'

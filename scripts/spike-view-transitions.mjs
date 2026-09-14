@@ -1301,7 +1301,7 @@ await probe('P21', 'identity serialization: which values are a usable transition
       matchesBuilt: built.old.includes(constructed),
       // The reserved words are rejected explicitly: they are *valid values* that are not names.
       note,
-      reserved: ['none', 'auto', 'initial', 'inherit', 'unset', 'revert'].includes(identity),
+      reserved: ['auto', 'inherit', 'initial', 'none', 'revert', 'unset'].includes(identity),
       started: started.ready ?? started.error,
       ...declared,
     })

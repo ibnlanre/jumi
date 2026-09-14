@@ -183,7 +183,7 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-animation-range',
   },
   'animation-range-end': {
-    dependencies: ['animation-range-end-timeline', 'animation-range-end-offset'],
+    dependencies: ['animation-range-end-offset'],
     value: animationRangeEnd,
     variable: '--jumi-animation-range-end',
   },
@@ -191,22 +191,14 @@ export const propertyVariables: DependencyGraph = {
     value: '100%',
     variable: '--jumi-animation-range-end-offset',
   },
-  'animation-range-end-timeline': {
-    value: 'normal',
-    variable: '--jumi-animation-range-end-timeline',
-  },
   'animation-range-start': {
-    dependencies: ['animation-range-start-timeline', 'animation-range-start-offset'],
+    dependencies: ['animation-range-start-offset'],
     value: animationRangeStart,
     variable: '--jumi-animation-range-start',
   },
   'animation-range-start-offset': {
     value: '0%',
     variable: '--jumi-animation-range-start-offset',
-  },
-  'animation-range-start-timeline': {
-    value: 'normal',
-    variable: '--jumi-animation-range-start-timeline',
   },
   'animation-timeline': {
     dependencies: ['animation-timeline-scroll', 'animation-timeline-view'],

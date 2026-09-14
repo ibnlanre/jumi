@@ -163,6 +163,27 @@ function report(before, after, indent = 2) {
 }
 
 /**
+ * Every row where the recorded structure no longer describes the stylesheet it was recorded beside.
+ *
+ * Compared rather than trusted because it had been **neither**. The bytes are pinned by the `diff`
+ * above, so a change in the emission always fails this stage — but a change in the *measuring code*
+ * does not, and that is what happened: this file read `animations: 0, slots: 0` for both corpora
+ * long after `compositionRules` was rewritten to find the composition structurally, because nothing
+ * read the structure at all. A record a reader might trust and no check compares is worse than no
+ * record, so it is compared field by field now, and a mismatch is re-recorded deliberately with
+ * `pnpm css:snapshot` rather than absorbed silently.
+ */
+const drift = (before, after, path = []) => Object.entries(after).flatMap(([key, value]) => {
+  const was = before?.[key]
+  const where = [...path, key].join('.')
+
+  if (value && typeof value === 'object') return drift(was && typeof was === 'object' ? was : {}, value, [...path, key])
+  if (was === undefined || was === value) return []
+
+  return [`${where} ${JSON.stringify(was)} → ${JSON.stringify(value)}`]
+})
+
+/**
  * Safety bounds, not desired performance. They exist so the cost cannot quietly get *worse*;
  * passing them is not evidence the architecture is good.
  *
@@ -221,6 +242,7 @@ if (!existsSync(snapshot) && !update) {
 
 const previous = existsSync(structureFile) ? JSON.parse(readFileSync(structureFile, 'utf8')) : null
 const failures = []
+let drifted = 0
 
 // --- canonical: byte-for-byte, because its job is to notice any change at all ---
 const canonicalBuild = await corpus('input.css')
@@ -235,11 +257,31 @@ writeFileSync(canonicalOut, canonicalCss)
 console.log('· structure (canonical)')
 report(previous?.canonical, canonical)
 
+if (previous?.canonical) {
+  const moved = drift(previous.canonical, canonical)
+
+  if (moved.length) {
+    console.error(`✗ the recorded structure does not describe this stylesheet: ${moved.join(', ')}`)
+    console.error('  Re-record it with `pnpm css:snapshot` if the measurement is intended.')
+    drifted += moved.length
+  }
+}
+
 // --- variant: measured and budgeted, because its job is to bound a cost ---
 const variant = measure(await corpus('variant.css'))
 
 console.log('· structure (carrier variant)')
 report(previous?.carrierVariant, variant)
+
+if (previous?.carrierVariant) {
+  const moved = drift(previous.carrierVariant, variant)
+
+  if (moved.length) {
+    console.error(`✗ the recorded structure does not describe this stylesheet: ${moved.join(', ')}`)
+    console.error('  Re-record it with `pnpm css:snapshot` if the measurement is intended.')
+    drifted += moved.length
+  }
+}
 
 for (const check of variantChecks) {
   if (check.holds(variant)) continue
@@ -257,12 +299,15 @@ if (failures.length) {
 if (update) {
   writeFileSync(structureFile, `${JSON.stringify({ canonical, carrierVariant: variant }, null, 2)}\n`)
   console.log(`✓ recorded — ${path.relative(root, snapshot)} (${canonical.bytes} bytes) + structure.json`)
+
+  // Re-recording is what a drift asks for, so it clears one; a budget failure is not cleared here,
+  // because satisfying one is the workstream rather than an edit to the record.
   process.exit(failures.length ? 1 : 0)
 }
 
 if (readFileSync(snapshot, 'utf8') === canonicalCss) {
   console.log(`✓ css snapshot unchanged (${canonical.bytes} bytes shipped from ${canonical.rawBytes} emitted)`)
-  process.exit(failures.length ? 1 : 0)
+  process.exit(failures.length || drifted ? 1 : 0)
 }
 
 console.error('✗ css snapshot changed — the emitted CSS differs from the recorded one:\n')

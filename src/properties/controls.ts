@@ -6,7 +6,7 @@ import { animationDirection } from '@/theme/animation-direction'
 import { animationFillMode } from '@/theme/animation-fill-mode'
 import { animationIterationCount } from '@/theme/animation-iteration-count'
 import { animationPlayState } from '@/theme/animation-play-state'
-import { animationRange, animationRangeTimeline } from '@/theme/animation-range'
+import { animationRange, animationRangeName } from '@/theme/animation-range'
 import { animationTimeline } from '@/theme/animation-timeline'
 import { animationTimelineAxis } from '@/theme/animation-timeline-axis'
 import { animationTimelineInset } from '@/theme/animation-timeline-inset'
@@ -98,13 +98,18 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
       values: animationPlayState,
     },
     'animation-range': {
-      fn: (value) => {
-        return ({
-          '--jumi-animation-range': value,
-        })
-      },
+      fn: scope('animation-range'),
+      modifiers,
+      type: ['length', 'percentage', 'any'],
       values: animationRange,
     },
+    // A half is written **whole**: `animation-range-start-entry` writes `entry`, which is a complete
+    // start value, and `animation-range-start-[entry_25%]` writes a complete one with an offset in
+    // it. The offset control below writes the same variable, because a bare offset is also a
+    // complete half — there is no grammar to compose, and therefore no absent piece to default.
+    //
+    // What is deliberately absent from `values` is `normal`: measured, a half of `normal` joined to
+    // the other half's offset is not a legal `animation-range`, and the whole declaration is dropped.
     'animation-range-end': {
       fn: (value) => {
         return ({
@@ -112,7 +117,7 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
         })
       },
       type: ['length', 'percentage', 'any'],
-      values: animationRange,
+      values: animationRangeName,
     },
     'animation-range-end-offset': {
       fn: (value) => {
@@ -123,14 +128,6 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
       type: ['length', 'percentage'],
       values: percentage,
     },
-    'animation-range-end-timeline': {
-      fn: (value) => {
-        return ({
-          '--jumi-animation-range-end-timeline': value,
-        })
-      },
-      values: animationRangeTimeline,
-    },
     'animation-range-start': {
       fn: (value) => {
         return ({
@@ -138,7 +135,7 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
         })
       },
       type: ['length', 'percentage', 'any'],
-      values: animationRange,
+      values: animationRangeName,
     },
     'animation-range-start-offset': {
       fn: (value) => {
@@ -148,14 +145,6 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
       },
       type: ['length', 'percentage'],
       values: percentage,
-    },
-    'animation-range-start-timeline': {
-      fn: (value) => {
-        return ({
-          '--jumi-animation-range-start-timeline': value,
-        })
-      },
-      values: animationRangeTimeline,
     },
     'animation-timeline': {
       fn: scope('animation-timeline'),
@@ -176,7 +165,10 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
           '--jumi-animation-timeline-inset-end': value,
         })
       },
-      type: 'length',
+      // A `<length-percentage>`, and the percentage is the common case — "start tracking when the
+      // element is 20% into the viewport". `length` alone silently refused every percentage:
+      // measured, `animation-timeline-inset-end-[10%]` emitted nothing while `[2rem]` emitted.
+      type: ['length', 'percentage'],
       values: animationTimelineInset,
     },
     'animation-timeline-inset-start': {
@@ -185,7 +177,8 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
           '--jumi-animation-timeline-inset-start': value,
         })
       },
-      type: 'length',
+      // See the end half: the value is a `<length-percentage>` and percentages were being refused.
+      type: ['length', 'percentage'],
       values: animationTimelineInset,
     },
     'animation-timeline-scroller': {

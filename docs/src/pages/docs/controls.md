@@ -141,11 +141,58 @@ That is the shorter spelling when one phrase is used on several elements, and it
 
 ## Timelines and composition
 
-Jumi also exposes global `animation-timeline`, `animation-composition`, and animation-range controls. These are separate CSS declarations from the core animation shorthand. Treat them as progressive enhancements and verify them in the browsers you support.
+Three declarations, three questions, and keeping them apart is the whole of this feature:
+
+```text
+animation  ────────►  what motion happens
+animation-timeline ─►  what drives its progress
+animation-range ────►  where on that driver the motion runs
+```
+
+A motion is not written differently because a scroll drives it. The same `animate-fade-in` is scrubbed by scroll position instead of by time the moment a timeline names the driver:
+
+```html
+<div class="animate-fade-in animation-timeline-view">
+```
+
+`animation-timeline-scroll` follows the nearest scroller, `animation-timeline-view` tracks the element through its scrollport, and `animation-timeline-[--name]` consumes a timeline the page declares in its own CSS. A timeline can be given to one animation on an element and not its neighbour with `/{property}` or `/{label}`, exactly as the timing controls are.
+
+A range then places the motion along that driver. The arbitrary form is the value itself, so it is the one to reach for whenever a range has an offset in it:
+
+```html
+animation-range-[entry_0%_cover_50%]
+animation-range-start-[entry_25%]
+animation-range-end-[exit_75%]
+```
+
+For a range with no offset, the range names are the utilities:
+
+```html
+animation-range-entry
+animation-range-cover
+animation-range-contain
+animation-range-exit
+animation-range-start-entry
+animation-range-end-exit
+```
+
+and an offset on its own is its own utility: `animation-range-start-offset-25` makes the motion start 25% into the default range.
+
+**Fallback:** If the browser does not support scroll-driven timelines, the animation falls back to the document timeline and runs as a normal time-based animation.
+
+That is a real fallback rather than a transparent one: the animation and its final state are kept, but a view-driven entrance plays on load instead of tracking entry. When you want scroll-driven or nothing, put the motion and its timeline behind one capability query:
+
+```html
+<div class="supports-[animation-timeline:scroll()]:animate-fade-in supports-[animation-timeline:scroll()]:animation-timeline-scroll">
+```
+
+Inside the query the pair applies together and the motion is scrubbed; outside it neither applies, so the element keeps its base state and the motion never runs. There is no separate strict syntax for this — the guard is the whole mechanism, and it works because both halves are ordinary utilities.
 
 Composition is not how Jumi combines several values of one property — a phrase is. Use `animation-composition` to blend an animation with a value already on the element, or to apply two animations of one property at once, as in the labelled example above.
 
-Composition and timeline are assembled per animation, alongside duration, delay, easing, iteration, direction, fill and playback, so `/{property}` and `/{label}` reach them the same way.
+Composition, timeline and range are assembled per animation, alongside duration, delay, easing, iteration, direction, fill and playback, so `/{property}` and `/{label}` reach them the same way.
+
+On a scroll-driven animation the time controls are reinterpreted rather than ignored: 100% of the timeline is the animation's own end, so `animation-delay` becomes a share of the scroll that also shortens the motion, and `animation-iteration-count` divides the range. Stagger is delay-based, so a staggered group is staggered along the scroll the same way — each child's motion is compressed into its own share. Reach for `animation-range` when you want to place a motion deliberately.
 
 ## Pause long-running motion
 

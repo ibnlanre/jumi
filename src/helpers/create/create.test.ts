@@ -402,6 +402,17 @@ describe('animations wiring', () => {
     )
     expect(animations['animation-timeline']).toContain('var(--jumi-rotate-flick-animation-timeline, ')
 
+    // Range is the third list of that shape, and it is a list *per animation*:
+    // position 0 may carry a real range while position 1 falls through to the
+    // global default. That is the shape the regression in
+    // `src/composition/animation-range.test.ts` is about — a default that does
+    // not parse takes the whole declaration, and with it a neighbour's range.
+    expect(animations['animation-range']).toContain('var(--jumi-rotate-flick-animation-range, ')
+    expect(animations['animation-range']).toContain(
+      'var(--jumi-rotate-animation-range, var(--jumi-animation-range))',
+    )
+    expect(String(animations['animation-range']).split('var(--jumi-rotate-animation-range').length - 1).toBe(2)
+
     // An unlabelled slot has no name to be addressed by, so it keeps the
     // shorter chain and falls straight through to the attribute's control.
     expect(animations['animation-duration']).toContain(
@@ -606,6 +617,7 @@ describe('the payload', () => {
     'animation-iteration-count',
     'animation-name',
     'animation-play-state',
+    'animation-range',
     'animation-timeline',
     'animation-timing-function',
   ]

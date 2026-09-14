@@ -29,11 +29,12 @@
 import postcss from 'postcss'
 
 /**
- * The ten `animation-*` longhands the model stages a list for, and therefore the ten the finalizer
- * materializes into every carrier that declares them.
+ * The eleven `animation-*` longhands the model stages a list for, and therefore the eleven the
+ * finalizer materializes into every carrier that declares them.
  *
- * A hoisted animations composition declares none of them — it declares the `animation` shorthand,
- * which is not in this list — so `PARTS` no longer counts it. See `expectedDeclarations`.
+ * A hoisted animations composition declares the `animation` shorthand instead, which is not in this
+ * list — so `PARTS` no longer counts it, and the longhands it *does* write by name are the ones in
+ * `RESET_BY_SHORTHAND`. See `expectedDeclarations`.
  */
 export const PARTS = [
   'animation-composition',
@@ -44,6 +45,7 @@ export const PARTS = [
   'animation-iteration-count',
   'animation-name',
   'animation-play-state',
+  'animation-range',
   'animation-timeline',
   'animation-timing-function',
 ]
@@ -56,10 +58,14 @@ export const PARTS = [
 export const TRANSITION_PARTS = ['transition']
 
 /**
- * The two the `animation` shorthand *resets* and cannot set, so a hoisted composition declares them
- * as separate lists after the shorthand. They are the longhands a composition still writes by name.
+ * What a hoisted composition declares as separate lists after the shorthand, and therefore the
+ * longhands it still writes by name.
+ *
+ * Three, and the reason is not the same for all of them: measured in Chromium 153, the `animation`
+ * shorthand *resets* `animation-timeline` and `animation-range` (declared before it, a timeline
+ * computes back to `auto` and a range to `normal`) and does not reset `animation-composition`.
  */
-const RESET_BY_SHORTHAND = ['animation-composition', 'animation-timeline']
+const RESET_BY_SHORTHAND = ['animation-composition', 'animation-range', 'animation-timeline']
 
 /**
  * One materialized declaration, value and all. The leading guard is load-bearing: without it
@@ -191,10 +197,10 @@ export function compositionScope(css, kind = 'animations') {
  * How many materialized declarations a finished stylesheet is expected to hold, given how many
  * compositions it has. Exported so the checks cannot drift from each other on the arithmetic.
  *
- * A hoisted animations composition declares the shorthand — which is not one of the ten longhands,
- * so `PARTS` does not count it — plus the two the shorthand resets. That it carries *every* slot is
- * no longer proved by counting declarations; it is proved by the list being one shallow reference
- * per slot, which `aggregateSlots` reads.
+ * A hoisted animations composition declares the shorthand — which is not one of the eleven
+ * longhands, so `PARTS` does not count it — plus the three it writes by name. That it carries
+ * *every* slot is no longer proved by counting declarations; it is proved by the list being one
+ * shallow reference per slot, which `aggregateSlots` reads.
  */
 export function expectedDeclarations({ animations, transitions }) {
   return animations * RESET_BY_SHORTHAND.length + transitions * TRANSITION_PARTS.length

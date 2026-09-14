@@ -108,6 +108,7 @@ const slotParts = [
   'animation-fill-mode',
   'animation-iteration-count',
   'animation-play-state',
+  'animation-range',
   'animation-timeline',
   'animation-timing-function',
 ] as const
@@ -133,7 +134,7 @@ const slotParts = [
  */
 export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Creator {
   const effects = new Set<string>()
-  const properties = new Set<string>(['animation', 'animation-composition', 'animation-timeline', 'interpolate-size'])
+  const properties = new Set<string>(['animation', 'animation-composition', 'animation-range', 'animation-timeline', 'interpolate-size'])
   const motions = new Set<string>()
   // Keyframes already emitted — by animation name for values, composed tweens and
   // phrases, by effect name for effects. Emission happens where a slot becomes
@@ -382,13 +383,14 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
           'animation-iteration-count': css('var', '--jumi-animation-iteration-count'),
           'animation-name': css('var', '--jumi-animation-name'),
           'animation-play-state': css('var', '--jumi-animation-play-state'),
+          'animation-range': css('var', '--jumi-animation-range'),
           'animation-timeline': css('var', '--jumi-animation-timeline'),
           'animation-timing-function': css('var', '--jumi-animation-timing-function'),
         }
 
-    // Composition and timeline now live in the slot list, so they are declared
-    // here only for elements that animate nothing at all. Leaving them in both
-    // would let this single value overwrite the per-slot list.
+    // Composition, range and timeline now live in the slot list, so they are
+    // declared here only for elements that animate nothing at all. Leaving them
+    // in both would let this single value overwrite the per-slot list.
     const baseAnimationVars = {
       'interpolate-size': css('var', '--jumi-interpolate-size'),
     }

@@ -27,7 +27,6 @@
  * Run: `pnpm spike:vt-concurrency`
  */
 import { createServer } from 'node:http'
-
 import { chromium } from 'playwright'
 
 const html = `<!doctype html>

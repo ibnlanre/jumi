@@ -1,13 +1,15 @@
 import type { Container, Declaration, Root, Rule } from 'postcss'
 
+import type {
+  Product,
+  ViewTransitionStaging,
+} from './view-transition'
 import type { Collection } from '@/types'
 
 import {
-    emitViewTransitions,
-    isStagingSelector,
-    type Product,
-    viewTransitionStaging,
-    type ViewTransitionStaging,
+  emitViewTransitions,
+  isStagingSelector,
+  viewTransitionStaging,
 } from './view-transition'
 
 import postcss from 'postcss'
@@ -153,9 +155,13 @@ const ACTIVATION: Record<CarrierKind, RegExp> = {
 
 /**
  * The eight components an `animation` shorthand carries — and therefore the eight a per-slot value
- * can hold. The two that are missing are missing for a reason: the shorthand *resets*
- * `animation-composition` and `animation-timeline` and cannot set them, so they stay in their own
- * lists and are declared **after** the shorthand.
+ * can hold. The three that are missing are missing for a reason: they are separate lists, declared
+ * **after** the shorthand, because the shorthand cannot carry them.
+ *
+ * Measured, not assumed (Chromium 153): `animation-timeline` and `animation-range` are *reset* by
+ * the shorthand — declared before it, a timeline computes back to `auto` and a range to `normal` —
+ * while `animation-composition` survives it. All three are written after it anyway, so the emission
+ * does not depend on which of them a given engine happens to reset.
  */
 const SHORTHAND = [
   'animation-name',
@@ -168,8 +174,11 @@ const SHORTHAND = [
   'animation-play-state',
 ]
 
-/** Reset by the shorthand, so they follow it rather than being carried inside it. */
-const AFTER_SHORTHAND = ['animation-composition', 'animation-timeline']
+/**
+ * Written after the shorthand rather than carried inside it — two because it resets them, one
+ * because it cannot set it.
+ */
+const AFTER_SHORTHAND = ['animation-composition', 'animation-range', 'animation-timeline']
 
 /**
  * What an unset position falls back to, per component.

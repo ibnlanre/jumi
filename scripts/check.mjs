@@ -55,6 +55,7 @@ const STAGES = [
   { about: 'incremental builds stay correct and local', label: 'incremental', run: ['run', 'incremental:check'] },
   { about: 'a real browser resolves a real carrier', label: 'behaviour', run: ['run', 'behaviour:check'] },
   { about: 'the emitted view transition actually travels', label: 'view-transition', run: ['run', 'view-transition:check'] },
+  { about: 'a retargeted slot scrubs, and a range lands where it was addressed', label: 'scroll-driven', run: ['run', 'scroll-driven:check'] },
   { about: 'the Vite integration, dev and every build shape', label: 'vite', run: ['run', 'vite:check'] },
   { about: 'the PostCSS integration, in every configuration', label: 'postcss', run: ['run', 'postcss:check'] },
   { about: 'no carrier class in a shipped surface', label: 'legacy', run: ['run', 'legacy:check'] },

@@ -1,59 +1,59 @@
 {
   "canonical": {
-    "aggregateBytes": 5586,
-    "aggregateShare": 7,
-    "aggregateWrites": 3,
-    "animations": 0,
-    "bytes": 76059,
+    "aggregateBytes": 7902,
+    "aggregateShare": 10,
+    "aggregateWrites": 4,
+    "animations": 1,
+    "bytes": 78884,
     "keyframes": 33,
     "media": 5,
-    "properties": 84,
+    "properties": 86,
     "protocol": {
       "staging": 0
     },
     "selectors": 44,
-    "slots": 0,
+    "slots": 33,
     "supports": 5,
     "transitions": 1,
     "publishEvents": 34,
-    "rawBytes": 514847,
-    "stagingBytes": 481917,
+    "rawBytes": 556238,
+    "stagingBytes": 523137,
     "colorValues": {
       "literal": 6,
       "token": 6
     },
     "themeResolution": {
       "formula": 4,
-      "literal": 185,
+      "literal": 190,
       "token": 12
     }
   },
   "carrierVariant": {
-    "aggregateBytes": 2971,
-    "aggregateShare": 8,
-    "aggregateWrites": 2,
-    "animations": 0,
-    "bytes": 38781,
+    "aggregateBytes": 4281,
+    "aggregateShare": 11,
+    "aggregateWrites": 3,
+    "animations": 1,
+    "bytes": 40600,
     "keyframes": 18,
     "media": 1,
-    "properties": 54,
+    "properties": 56,
     "protocol": {
       "staging": 0
     },
     "selectors": 20,
-    "slots": 0,
+    "slots": 18,
     "supports": 5,
     "transitions": 0,
     "publishEvents": 19,
-    "rawBytes": 175441,
-    "stagingBytes": 157751,
+    "rawBytes": 189247,
+    "stagingBytes": 171386,
     "colorValues": {
       "literal": 2,
       "token": 2
     },
     "themeResolution": {
       "formula": 0,
-      "literal": 95,
+      "literal": 100,
       "token": 3
     }
   }

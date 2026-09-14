@@ -64,8 +64,17 @@ const ignoresConfig = defineConfig({
     // same sense `dist` is. Found the moment `docs/src` joined the lint stage — the linter tried to parse
     // `version.json` as JavaScript.
     '**/data/**',
-    // A fixture and its builds, written by `pnpm vite:check` on every run: outputs, not source.
-    '**/scripts/**',
+    // Generated output a harness writes beside itself, not source: the Vite fixture and its builds,
+    // and the scratch corpora (also gitignored).
+    //
+    // Deliberately **not** `**/scripts/**`, which is what this used to be. ESLint 9 *errors* when a
+    // path it is handed is entirely ignored, and the gate's lint stage is handed `scripts` — so the
+    // ignore turned the stage into a failure before it checked anything, and `pnpm check` stopped
+    // there with the ten stages below it unrun. Measured 2026-09-14. The harnesses under `scripts/`
+    // are source and are linted again; only these are output.
+    '**/scripts/tmp-*/**',
+    '**/scripts/.*-*/**',
+    '**/scripts/vite-check/**',
   ],
 })
 
