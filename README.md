@@ -178,4 +178,13 @@ pnpm run check-types
 pnpm run bundle
 ```
 
-Created by [Ridwan Olanrewaju](https://github.com/ibnlanre). Package license: MIT.
+Created by [Ridwan Olanrewaju](https://github.com/ibnlanre).
+
+## License and support
+
+MIT. Commercial use needs no permission and no payment, and only the copyright notice has to travel with the
+code — that is deliberate, because a CSS library is more useful when nobody has to ask.
+
+If it earns a place in something you ship, [sponsoring the work](https://github.com/sponsors/ibnlanre) is what
+keeps it maintained. That is a request rather than a condition: the licence is unchanged for anyone who does not,
+and no attribution beyond the notice is expected either way.
