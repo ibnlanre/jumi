@@ -497,6 +497,9 @@ const NAMED_ARMS = [
   ['c', 'animate-fade-in/reveal animate-scale-110/loop animation-duration-900/loop'],
   // Names its own motion, and is named by nothing: every name in the sheet must miss it.
   ['d', 'animate-fade-in animation-duration-900/loop animation-duration-500/elsewhere'],
+  // A name shared by two *phrases* — the motion source whose slot key carries a hash, so this is where
+  // a name and a slot key could part company — plus one phrase that took no name, which must stay out.
+  ['e', 'animate-opacity-[0:0|100:1]/enter animate-rotate-[0:0deg|100:90deg]/enter animation-duration-500/enter animate-scale-[0:1|100:2]'],
 ]
 
 const NAMED_CANDIDATES = [...new Set(NAMED_ARMS.flatMap(([, classes]) => classes.split(/\s+/).filter(Boolean)))]
@@ -532,14 +535,23 @@ const reversed = await namedDurations([...NAMED_CANDIDATES].reverse())
 const durationOf = (readings, id, prefix) =>
   Object.entries(readings[id] ?? {}).find(([name]) => name.startsWith(prefix))?.[1]
 
+/** Every reading that differs between the two builds, named, so a failure says what moved. */
+const orderDrift = Object.entries(forward).flatMap(([id, reading]) =>
+  Object.entries(reading)
+    .filter(([name, duration]) => reversed[id]?.[name] !== duration)
+    .map(([name, duration]) => `#${id} ${name}: ${duration} vs ${reversed[id]?.[name] ?? 'absent'}`))
+
 const naming = [
   ['the name it declared reaches its own motion', durationOf(forward, 'a', 'jumi-fade-in') === '0.3s'],
   ['and a name declared on another element never does', durationOf(forward, 'b', 'jumi-fade-in') === '0.7s'],
   ['a motion nothing named stays unreachable', durationOf(forward, 'd', 'jumi-fade-in') === '1s'],
   ['one name reaches both motions that declared it, and only those',
     durationOf(forward, 'c', 'jumi-scale-') === '0.9s' && durationOf(forward, 'c', 'jumi-fade-in') === '1s'],
-  ['candidate order cannot decide which name wins',
-    JSON.stringify(forward) === JSON.stringify(reversed)],
+  ['and it does the same for two phrases, whose slots carry hashed keys',
+    durationOf(forward, 'e', 'jumi-opacity-') === '0.5s'
+    && durationOf(forward, 'e', 'jumi-rotate-') === '0.5s'
+    && durationOf(forward, 'e', 'jumi-scale-') === '1s'],
+  ['candidate order cannot decide which name wins', orderDrift.length === 0, orderDrift.join(' | ')],
 ]
 
 for (const [claim, ok] of naming) if (!ok) failures.push(`naming: ${claim}`)
@@ -573,7 +585,7 @@ console.log(`    ✓ finalization settles: ${variantBuild.staging + canonicalBui
 
 console.log('\n  naming')
 
-for (const [claim, ok] of naming) console.log(`    ${ok ? '✓' : '✗'} ${claim}`)
+for (const [claim, ok, detail] of naming) console.log(`    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`)
 
 // Every assertion above that can fail, so the summary line is the count it claims to be: the three
 // activation contexts, the pseudo substrate, the direct carriers, bare, applied, spacing, radius,

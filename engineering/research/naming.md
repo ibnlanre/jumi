@@ -128,11 +128,44 @@ not create it; `animation-duration-500/reveal` with no `reveal` is inert in the 
 (`motion-safe:animate-fade-in/reveal`) is a pattern, not an author error, and a warning there would
 teach authors to stop naming things.
 
+## Range composition parity — closed the same day
+
+The variant qualifies one *slot*, so it publishes under that slot's **key**: `attribute-id` for a
+phrase or a single value, the attribute for an effect or a composed tween. The chains read
+`--jumi-<attribute>-animation-range`, which is right for the last two and wrong for the first two —
+so a phrase's range emitted, validated, and did nothing. Measured, before the fix:
+
+| motion | publishes | chain read |
+| --- | --- | --- |
+| `animate-fade-in` (effect) | `--jumi-fade-in-animation-range` | `var(--jumi-fade-in-animation-range, …)` ✓ |
+| `animate-opacity-50` (single value) | `--jumi-opacity-cMr-animation-range` | `var(--jumi-opacity-animation-range, …)` ✗ |
+| `animate-opacity-[0:0\|100:1]` (phrase) | `--jumi-opacity-sluPU-animation-range` | `var(--jumi-opacity-animation-range, …)` ✗ |
+| `animate-scale-x-110` (composed) | `--jumi-scale-animation-range` | `var(--jumi-scale-animation-range, …)` ✓ |
+| a phrase named `/reveal` | both | `var(--jumi-slot-opacity-sluPU-…, var(--jumi-opacity-…` ✗ — the name link is not the publication |
+
+The range part now takes one extra link, and only when the key is not the attribute:
+
+```text
+name address (if named)  →  --jumi-<key>-animation-range  →  --jumi-<attribute>-animation-range  →  --jumi-animation-range
+```
+
+Nothing else needs it, and that is a fact rather than a preference: the range variant is the only thing
+that publishes per slot *after* the composition is built. Adding the link for every part would have been
+uniform and would have cost a `var()` lookup per part per element.
+
+Held by four browser arms in `pnpm scroll-driven:check` — effect, single value, phrase, and named phrase
+— each asserting the intended slot is compressed to the range while the motion beside it keeps the whole
+one: `0 0.5 1` against `0.25 0.5 0.75` across ¼ ½ ¾. The same arms on the pre-fix build report `—`
+(no animation resolves the range), which is exactly what a user would have seen.
+
+Cost: the aggregate grows 4359 → 4864 bytes on the corpus (+11.6% of the composition, +1.1% of output),
+for the slots that can use it.
+
 ## Known gaps
 
 - `_` means a space inside `[brackets]` and an underscore when bare. Nothing Jumi can do — it is
   Tailwind's value charset — so the docs teach the bare form and the warning says what happened.
-- The range composition variant publishes `--jumi-<slot-key>-animation-range`, and the chains read
-  `<property>`-keyed links, so the variant's publication is read for effects (where the slot key *is*
-  the attribute) and not for phrases (where the key carries a hash). Unverified in a browser, and
-  unrelated to naming; the slot address this work added is what a fix would ride on.
+- Phrase slots are ordered in the composition by *insertion*, so the `animation-name` list can come out
+  in a different order under a different candidate order. Harmless — each position carries its own
+  chain, and a test that compares two builds must compare per name rather than per serialization, which
+  is what `behaviour:check`'s naming section now does.

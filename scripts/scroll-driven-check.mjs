@@ -50,6 +50,13 @@ const { build, compiler } = await import('./lib/compile.mjs')
 const { splitTopLevel } = await import('./lib/css.mjs')
 
 /** The arms. Each one is a claim about a control, and the classes are the whole of the input. */
+const MOTION_KINDS = [
+  ['an effect', 'animate-fade-in'],
+  ['a single value', 'animate-opacity-50'],
+  ['a phrase', 'animate-opacity-[0:0|100:1]'],
+  ['a named phrase', 'animate-opacity-[0:0|100:1]/reveal'],
+]
+
 const ARMS = [
   // The feature.
   { classes: 'animate-fade-in animate-rotate-45 animation-timeline-scroll animation-range-[25%_75%]/rotate', id: 'ranged' },
@@ -97,6 +104,15 @@ const ARMS = [
   { classes: 'animate-fade-in animation-range-entry:animation-delay-[150ms]', id: 'variantNoMotion' },
   // The utility spelling of a value the variant also accepts, which is the shape that must stay quiet.
   { classes: 'animate-fade-in animation-range-entry', id: 'utilityBare' },
+  // **Parity.** The variant qualifies one *slot*, so it publishes under that slot's key — and a
+  // phrase's key is `attribute-id`, not the attribute. Measured before these arms existed: a phrase's
+  // publication went to `--jumi-opacity-sluPU-animation-range` while its chain read
+  // `--jumi-opacity-animation-range`, so the range emitted, validated, and did nothing at all.
+  // Effects hid it, because for an effect the key *is* the attribute.
+  ...MOTION_KINDS.map(([, motion], at) => ({
+    classes: `animate-rotate-45 ${motion} animation-timeline-scroll animation-range-[25%_75%]:${motion}`,
+    id: `motionKind${at}`,
+  })),
 ]
 
 const CANDIDATES = [...new Set(ARMS.flatMap(arm => arm.classes.split(/\s+/).filter(Boolean)))]
@@ -206,14 +222,20 @@ const rangeEntries = splitTopLevel(rangeValue)
 const shorthandValue = (composition?.nodes ?? []).find(node => node.prop === 'animation')?.value ?? ''
 const shorthandEntries = splitTopLevel(shorthandValue)
 
-// One entry per animation, and each entry reads *that* slot's variable with the element's default
-// behind it. The expected count comes from the shorthand beside it rather than from a constant kept
-// here: an arm added to this file changes how many slots an element has, and a hand-kept 2 would then
-// fail for the wrong reason — which is what happened the moment the range variant was added.
+// One entry per animation, and every entry ends at the element's default — through the slot's own
+// publications first. The links before the property's control are per-slot addresses that only exist
+// when something fills them: a name (`/<name>`) and the range variant's own publication, which is
+// keyed by the slot rather than by the attribute so that two slots of one property stay apart. What
+// this pins is the *tail*: whatever the links are, the entry is a var chain that falls back to the
+// element-wide range and not to a literal, because a literal would freeze the per-element control.
+//
+// The expected count comes from the shorthand beside it rather than from a constant kept here: an arm
+// added to this file changes how many slots an element has, and a hand-kept 2 would then fail for the
+// wrong reason — which is what happened the moment the range variant was added.
 check(
-  'the range list reads one entry per animation, through that slot\'s own variable',
+  'the range list reads one entry per animation, each falling back to the element\'s own range',
   rangeEntries.length === shorthandEntries.length
-  && rangeEntries.every(entry => /^var\(--jumi-[a-z0-9-]+-animation-range, var\(--jumi-animation-range\)\)$/.test(entry.trim())),
+  && rangeEntries.every(entry => /^var\(--jumi-[A-Za-z0-9-]+-animation-range, .*var\(--jumi-animation-range\)\)+$/.test(entry.trim())),
   `${rangeEntries.length} range entries for ${shorthandEntries.length} animations, first ${rangeEntries[0]?.slice(0, 48)}`,
 )
 
@@ -591,10 +613,26 @@ check(
   `motion-safe: sm: hover: at ¼ ½ ¾ → ${show(stackedFade)}`,
 )
 
+// Parity across motion sources. The public promise is that `animation-range-entry:animate-fade-in` and
+// `animation-range-entry:animate-opacity-[0:0|100:1]` are the same kind of composition, so each kind is
+// measured the same way as the effect — ranged on the slot it was written on, whole on its neighbour.
+// A user can see whether a range took effect; which internal key it published under is not their
+// concern, and it was the whole of the bug.
+for (const [at, [kind, motion]] of MOTION_KINDS.entries()) {
+  const id = `motionKind${at}`
+  const ranged = await series(page, id, kind === 'an effect' ? 'jumi-fade-' : 'jumi-opacity-', [0.25, 0.5, 0.75])
+  const neighbour = await series(page, id, 'jumi-rotate-', [0.25, 0.5, 0.75])
+
+  check(
+    `the range reaches ${kind}, and leaves the motion beside it alone`,
+    round(ranged[0]) === 0 && Math.abs(ranged[1] - 0.5) < 0.05 && Math.abs(ranged[2] - 1) < 0.05
+    && Math.abs(neighbour[0] - 0.25) < 0.05 && Math.abs(neighbour[1] - 0.5) < 0.05
+    && Math.abs(neighbour[2] - 0.75) < 0.05,
+    `${motion}: ranged at ¼ ½ ¾ → ${show(ranged)}, neighbour → ${show(neighbour)}`,
+  )
+}
+
 const pair = await at(page, 0.5, 'variantPair')
-// Mapped by *name*, not by count: a composed position with no animation serializes its range as `0%`
-// alone and contributes nothing to `getAnimations()`, so a positional match against that list is off
-// by one the moment an element has a slot it does not activate.
 const pairPositions = pair.names.split(',').map(name => name.trim())
 const pairList = pair.range.split(/,(?![^(]*\))/).map(entry => entry.trim())
 const fadeInAt = pairPositions.indexOf('jumi-fade-in')

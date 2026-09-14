@@ -382,32 +382,32 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
   }
 
   function animationParts(attribute: string, nameVar?: string, key?: string): CssInJs {
-    // Every `animation-*` longhand that applies to ONE animation in the list, so
-    // a slot can be timed, sequenced and composed on its own. Three links,
-    // narrowest first: the slot's own address — which is where a *name* is
-    // installed, by the rule that declared the name — then the property's control,
-    // then the global default.
-    //
-    // The slot key and not the name, and that is the whole of the locality rule. A
-    // name is element-local (`.animate-fade-in/reveal` names the motion for the
-    // elements that match *that* rule), so it cannot appear in a chain at all: a
-    // chain is shared by every element that matches the composition, and a name
-    // seen anywhere in the build — on another page, another component, another
-    // element — would then be an address everywhere. Measured: with the name in the
-    // chain, `animation-duration-900/loop` reached a motion named `reveal` on an
-    // element that never used `loop`, and which of the two won depended on the order
-    // candidates happened to be compiled in.
-    //
-    // `--jumi-slot-<key>-<part>` is declared on the activation rule itself — the rule
-    // the author wrote — and it is what the rule's own `-label` declaration fills.
-    // Same shape as the range composition variant's publication, for the same reason:
-    // the fact belongs to the rule, so the rule is where it is written.
+    // Three links, narrowest first: the address a *name* installed, then a per-slot publication,
+    // then the property's control, then the global default. Folded from the inside out, so the most
+    // specific link is outermost and each one falls through to the next.
     const timing = (part: string) => {
-      const scope = css('var', `--jumi-${attribute}-${part}`, css('var', `--jumi-${part}`))
+      const links: string[] = []
 
-      return addressed.has(key ?? attribute)
-        ? css('var', cssEscape(`--jumi-slot-${key}-${part}`), scope)
-        : scope
+      // What `/<name>` installed, on the rule that declared the name. Only a named slot has it.
+      if (addressed.has(key ?? attribute)) links.push(cssEscape(`--jumi-slot-${key}-${part}`))
+
+      // The range composition variant, which publishes under the slot's **key** and not its
+      // attribute: `attribute-id` for a phrase or a single value, where one attribute names a
+      // property several slots share and only the key identifies which of them was qualified.
+      //
+      // Read here for exactly that reason, and it is not a detail: measured, a phrase's publication
+      // went to `--jumi-opacity-sluPU-animation-range` while its chain read
+      // `--jumi-opacity-animation-range`, so `animation-range-entry:animate-opacity-[0:0|100:1]`
+      // emitted, validated, and did nothing. Effects and composed tweens hid it, because for them the
+      // key *is* the attribute. Nothing else publishes per slot after the composition is built.
+      if (part === 'animation-range' && key && key !== attribute) links.push(cssEscape(`--jumi-${key}-${part}`))
+
+      links.push(`--jumi-${attribute}-${part}`)
+
+      return links.reduceRight(
+        (fallback, link) => css('var', link, fallback),
+        css('var', `--jumi-${part}`),
+      )
     }
 
     const name = css('var', nameVar ?? `--jumi-${attribute}-animation-name`, css('var', '--jumi-animation-name'))
