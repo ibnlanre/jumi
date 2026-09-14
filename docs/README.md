@@ -17,7 +17,8 @@ the root `vercel.json` — see `engineering/research/deployment.md`.
 
 ## How the site is built
 
-`scripts/prepare-docs.mjs` copies the bundled plugin into the ignored `docs/vendor/` directory and
+`scripts/prepare-docs.mjs` copies the bundled plugin, integration and runtime into the ignored
+`docs/vendor/` directory — each with its declaration, because the files that import them are typed — and
 writes `src/data/effects.json` from Jumi's keyframe catalog. Run `docs:prepare` after editing the
 library while the development server is running.
 

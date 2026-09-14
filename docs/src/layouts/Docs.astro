@@ -2,7 +2,7 @@
 import Layout from './Layout.astro';
 import { version } from '../data/version.json';
 const { frontmatter } = Astro.props;
-const links = [['/docs/', 'Introduction'], ['/docs/installation/', 'Installation'], ['/docs/build-step/', 'The build step'], ['/docs/properties/', 'Composing motion'], ['/docs/controls/', 'Timing & controls'], ['/docs/stagger/', 'Stagger'], ['/docs/transitions/', 'Transitions'], ['/docs/view-transitions/', 'View transitions'], ['/docs/accessibility/', 'Accessible motion'], ['/effects/', 'Effect catalog ↗']];
+const links = [['/docs/', 'Introduction'], ['/docs/installation/', 'Installation'], ['/docs/build-step/', 'The build step'], ['/docs/properties/', 'Composing motion'], ['/docs/controls/', 'Timing & controls'], ['/docs/stagger/', 'Stagger'], ['/docs/transitions/', 'Transitions'], ['/docs/view-transitions/', 'View transitions'], ['/docs/same-document-transitions/', 'Same-document'], ['/docs/accessibility/', 'Accessible motion'], ['/effects/', 'Effect catalog ↗']];
 ---
 <Layout title={`${frontmatter.title} — Jumi`} description={frontmatter.description} docs>
   <div class="docs-shell">

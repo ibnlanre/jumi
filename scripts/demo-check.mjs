@@ -14,11 +14,14 @@
  * The third thing it caught is not a bug in the emission and cannot be one: while a transition runs, the
  * browser's pseudo tree covers the viewport and takes the pointer hit outright — `elementsFromPoint` returns
  * a bare `html` — so no card sees a click, and the page answers it by hand instead. That rescue has been
- * wrong twice, and both arms now exist to keep it right. A gesture inside the projection is *held* until the
- * geometry settles rather than dropped — dropping it was reported as "sometimes it works, sometimes it
- * doesn't", because what a reader got depended only on how fast they had clicked before. And the mode switch
- * is answered without the projection gate the cards need: the switch does not move, so nothing about a click
- * on it is ambiguous, and gating it dropped the switch during every native swap.
+ * wrong twice, and both arms now exist to keep it right. A gesture inside the projection is answered where
+ * it lands, by a second transition that supersedes the first: dropping it was reported as "sometimes it
+ * works, sometimes it doesn't", because what a reader got depended only on how fast they had clicked before,
+ * and holding it until the geometry settled made the page feel a quarter of a second behind. The lifecycle
+ * that made holding necessary — which transition is current, and what a second call does to the first — is
+ * `runViewTransition`'s, and the arms below assert the boundary it opens is filled by the call that survives.
+ * The mode switch is answered without the projection gate the cards used to need: the switch does not move,
+ * so nothing about a click on it is ambiguous, and gating it dropped the switch during every native swap.
  *
  * Run: pnpm demo:check
  */
@@ -232,32 +235,45 @@ check('while a transition runs the pseudo tree holds the hit outright',
 
 // A raw mouse click, not `page.click`: Playwright's actionability check waits for an element to be able
 // to receive a pointer event, so it would sit out the transition instead of measuring it.
+const beforeGesture = await page.evaluate(() => window.__transitions.length)
+
 await page.mouse.click(foxtrot.x, foxtrot.y)
 await page.waitForTimeout(40)
 
 const midFlight = await page.evaluate(() => document.querySelector('.demo-card[data-active]')?.dataset.id)
 
-// Past the browser's own 250ms projection, so a gesture that was held has been applied by now.
+/**
+ * Answered where it lands, by a *second* transition that supersedes the first.
+ *
+ * This was held until the projection settled first, for one reason: the platform aborts the transition in
+ * flight and the aborted call's callback still runs, so the survivor could animate a boundary it had not
+ * filled in. That is `runViewTransition`'s job now — the page asks for `supersede` and the wrapper passes the
+ * caller's mutation inside the boundary it opens — so the gesture applies in the frame it arrives instead of
+ * a quarter of a second later. Asserting the change alone would pass on a version that jumped the layout with
+ * no transition at all, so the call itself is read out of the record: the *surviving* call's callback is
+ * where the change happened, which is the failure the old hand-rolled version shipped.
+ */
+check('a click inside the projection lands there and then',
+  midFlight === 'foxtrot',
+  `active became ${midFlight} within 40ms of the gesture`)
+
+const promoted = await page.evaluate(() => window.__transitions.at(-1))
+
+check('by superseding the transition in flight, with the change inside the new boundary',
+  (await page.evaluate(() => window.__transitions.length)) === beforeGesture + 1
+  && promoted?.activeInCallback === 'echo' && promoted?.activeAfter === 'foxtrot',
+  `${await page.evaluate(() => window.__transitions.length)} call(s) across the gesture; the call that`
+  + ` survived saw ${promoted?.activeInCallback} in its callback and ${promoted?.activeAfter} after it`)
+
 await page.waitForTimeout(400)
 
 const landed = await page.evaluate(() => document.querySelector('.demo-card[data-active]')?.dataset.id)
 
-/**
- * Held, not dropped — and the distinction is the whole of a reported bug.
- *
- * The gesture was declined inside the projection first, on the reasoning that the card under the pointer is
- * not the card on screen. That reasoning is sound about *which* card and wrong about *whether* to answer:
- * dropping the gesture is not caution, it is silence, and which one the reader got depended on nothing but
- * how fast they had clicked before. The card is resolved immediately and the move waits, because the
- * resolution cannot change — the layout change has already happened — and only the moment can.
- */
-check('a click inside the projection is held, not dropped',
-  midFlight === 'echo' && landed === 'foxtrot',
-  `active stayed ${midFlight} while the cards were mid-flight, then became ${landed}`)
+check('and it is still that card once the dissolve is over', landed === 'foxtrot', `active ${landed}`)
 
 await page.waitForTimeout(1200)
 
-/* ------------------------------- the same gesture on the dissolve, which needs no holding at all */
+/* ------------------------- the same gesture on the dissolve, where no projection is left to gate on */
 
 await page.click('.demo-card[data-id="bravo"]')
 await page.waitForTimeout(400)

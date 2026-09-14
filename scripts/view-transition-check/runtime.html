@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+  <head>
+    <title>runViewTransition</title>
+  </head>
+  <body>
+    <p>Driven from outside the page. This fixture is the only one here with a script, and it has one because
+      the thing under test <em>is</em> a script.</p>
+    <script type="module">
+      import { runViewTransition } from '/jumi-runtime.js'
+
+      // Counted, not trusted: deciding how many transitions to start is the wrapper's whole job, and a
+      // count taken from the wrapper would agree with the wrapper.
+      const counts = { calls: 0 }
+      const platform = document.startViewTransition.bind(document)
+
+      document.startViewTransition = (callback) => {
+        counts.calls += 1
+
+        return platform(callback)
+      }
+
+      window.__unhandled = []
+
+      addEventListener('unhandledrejection', event => window.__unhandled.push(String(event.reason)))
+
+      window.__probe = {
+        counts,
+        reset: () => { counts.calls = 0; window.__unhandled.length = 0 },
+        run: runViewTransition,
+      }
+    </script>
+  </body>
+</html>

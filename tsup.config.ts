@@ -3,7 +3,7 @@ import type { Options } from 'tsup'
 const options: Options = {
   clean: true,
   dts: true,
-  entry: ['src/index.ts', 'src/postcss.ts', 'src/vite.ts'],
+  entry: ['src/index.ts', 'src/postcss.ts', 'src/vite.ts', 'src/view-transition.ts'],
   esbuildOptions(options) {
     options.banner = {
       js: '"use client"',

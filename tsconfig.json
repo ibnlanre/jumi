@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "allowJs": false,
+    "allowImportingTsExtensions": true,
     "allowSyntheticDefaultImports": true,
     "checkJs": false,
     "jsx": "react-jsx",
@@ -27,6 +28,9 @@
       "@/*": ["./src/*"],
       "~/*": ["./*"]
     },
+    "plugins": [
+      { "name": "@astrojs/ts-plugin" }
+    ],
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
@@ -38,9 +42,11 @@
   "include": [
     "./**/*.ts",
     "./**/*.tsx",
+    ".astro/types.d.ts",
     ".storybook",
     "vitest.config.mts",
     "vitest.setup.ts",
     "tsup.config.ts"
-  ]
+  ],
+  "extends": "astro/tsconfigs/base",
 }

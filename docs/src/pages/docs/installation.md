@@ -101,6 +101,23 @@ writeFileSync('dist/output.css', css)
 not requested reduced motion. The element stays visible otherwise, because only the animation is
 conditional.
 
+## 04 — Add the runtime only where you need it
+
+Jumi is CSS and build-time right up to the point where your own state changes inside one document — a card
+taking the corner, a panel opening, a list reordering. That half needs someone to say *when* the change
+happens, and it lives behind its own subpath so the root package stays free of runtime code:
+
+```ts
+import { runViewTransition } from '@ibnlanre/jumi/view-transition'
+
+runViewTransition(() => {
+  setActive('bravo')
+})
+```
+
+[Same-document transitions](/docs/same-document-transitions/) is the whole of it: the synchronous-callback
+rule, what happens when it is called twice, and the outcomes it returns.
+
 ## Using Astro
 
 Use Jumi's Vite integration in your Astro configuration:

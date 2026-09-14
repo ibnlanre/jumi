@@ -21,6 +21,11 @@
       "types": "./dist/vite.d.ts",
       "import": "./dist/vite.js",
       "require": "./dist/vite.cjs"
+    },
+    "./view-transition": {
+      "types": "./dist/view-transition.d.ts",
+      "import": "./dist/view-transition.js",
+      "require": "./dist/view-transition.cjs"
     }
   },
   "type": "module",
@@ -63,6 +68,7 @@
     "spike:variants": "node scripts/spike-variants.mjs",
     "spike:view-transitions": "node scripts/spike-view-transitions.mjs",
     "spike:vt-syntax": "node scripts/spike-vt-syntax.mjs",
+    "spike:vt-concurrency": "node scripts/spike-vt-concurrency.mjs",
     "spike:cdp-cost": "node scripts/spike-cdp-cost.mjs",
     "spike:local-list": "node scripts/spike-local-list.mjs",
     "spike:recalc": "node scripts/spike-recalc.mjs",
@@ -147,6 +153,7 @@
     "url": "https://github.com/ibnlanre/jumi"
   },
   "dependencies": {
+    "@astrojs/ts-plugin": "^1.10.11",
     "culori": "^4.0.2",
     "shorthash2": "^1.0.5"
   },

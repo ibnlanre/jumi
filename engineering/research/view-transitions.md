@@ -940,6 +940,25 @@ stage: a gate that only works on the machine that last built is not a gate. Meas
 green, from a tree with `dist/`, `docs/dist`, `docs/vendor`, `docs/.astro` and `docs/node_modules/.vite`
 all deleted.
 
+**The same trap, twice, and the second time it closed two gaps.** The vendored modules under `docs/vendor/`
+are what the site imports, and nothing in the gate generated them — so a missing declaration was a silent
+loss of types rather than a failure, and the demo's own script was in a `<script>` block inside `.astro`,
+which `tsc` cannot parse and `docs:build` strips without checking. A real error shipped there
+(`pseudoElement` read off `Animation.effect`, declared as the wider `AnimationEffect`) with a green gate,
+found by the editor and by nothing else. Both are closed by *where the code lives*, not by loosening
+anything: the demo's behaviour moved to `docs/src/demo/view-transitions.ts` and the site config became
+`docs/astro.config.ts`, both of which the root project already includes — `allowJs` is `false`, so the
+import cannot resolve without the vendored declaration, which makes it load-bearing — and `docs:prepare`
+joined the gate second, right after `bundle`, for the same reason `bundle` is first. Measured: 14 stages
+green from a tree with `dist/`, `docs/vendor` and `docs/src/data` deleted; and deleting
+`docs/vendor/jumi-view-transition.d.ts` alone now fails `types` with `TS7016`, which is the assertion that
+the gap is closed rather than moved.
+
+**The one thing that still cannot be checked this way** is an `.astro` script block itself: `tsc` has no
+`.astro` parser, so nothing short of `astro check` (a new dependency) reaches it. Which is why the page now
+holds an import and the code holds the logic — a rule worth keeping for any page whose script has to be
+right rather than merely plausible.
+
 **A comment that overclaimed.** `src/vite.ts` skipped finalizing any stylesheet without the carrier
 payload marker, and the comment justified the extra `jumi-vt-` test with "a stylesheet whose only motion
 is a view transition stages no carrier payload". That is false — measured, a view-transition candidate
@@ -1173,7 +1192,7 @@ Measured with real mouse events:
 So nothing is missing from the emission and nothing needs scheduling. The event arrives — it just arrives
 at the document rather than at the button, because the pseudo tree replaces the page's hit-testing for the
 duration. That is the difference between this and a lost event, and it is what makes the page answerable:
-a document-level listener sees the click, and `move()` is called from there when the geometry allows.
+a document-level listener sees the click, and `move()` is called from there.
 
 **Where it went wrong first, since the reasoning was plausible.** The reading taken was "the lock is as
 long as the slowest pseudo animation, Jumi's default is 1s against a 250ms projection, therefore the
@@ -1198,20 +1217,29 @@ Three things the handler has to get right, each from a measurement rather than a
 - **Resolution is geometric, because the DOM cannot answer.** `elementsFromPoint` returns a bare `html`
   while a transition runs, so the card under the pointer is found by testing the point against each card's
   live box.
-- **The gesture is held, not dropped.** The layout change runs inside the transition's callback, before the
-  first animated frame — measured: the callback at 1608, `ready` at 1611 — so for the first 250ms the live
-  layout is where the cards are *going*, and the card under the pointer is not the card on screen. The first
-  version declined a click in that window on exactly that reasoning, which is sound about *which* card and
-  wrong about *whether* to answer: dropping a gesture is not caution, it is silence. It came back as "a bit
-  unpredictable, sometimes it works, sometimes it doesn't", and the timing map is precisely the gate —
-  **50ms nothing, 150ms nothing, 300ms onwards yes** — so what a reader got depended on nothing but how fast
-  they had clicked before. The card is now resolved immediately, because the resolution cannot change (the
-  point maps to the destination either way), and the *move* waits for the projection. `projecting()` gates
-  the action, never the decision.
-- **Nothing queues.** Starting a transition while one is active finishes the first immediately, so an
-  interrupt is free. (The superseded transition's `ready` *rejects* when it is interrupted before it is
-  ever ready, which is why the readout chain has a `catch`: an unhandled rejection in a page whose console
-  is asserted clean is a real failure, not noise.)
+- **The gesture is answered where it lands.** The layout change runs inside the transition's callback, before
+the first animated frame — measured: the callback at 1608, `ready` at 1611 — so for the first 250ms the live
+layout is where the cards are *going*, and the card under the pointer is not the card on screen. The first
+version declined a click in that window on exactly that reasoning, which is sound about *which* card and
+wrong about *whether* to answer: dropping a gesture is not caution, it is silence. It came back as "a bit
+unpredictable, sometimes it works, sometimes it doesn't", and the timing map is precisely the gate —
+**50ms nothing, 150ms nothing, 300ms onwards yes** — so what a reader got depended on nothing but how fast
+they had clicked before. The second version held the *move* until the projection settled: honest about the
+resolution (the point maps to the destination either way, so the card never changes) and still a quarter of a
+second behind the finger. The demo keeps neither. The click is one call —
+`runViewTransition(() => { active = id; apply() }, { concurrency: 'supersede' })` — the platform aborts the
+transition in flight, and the wrapper passes the mutation inside the boundary *it* opens. What the hold
+existed to protect is asserted instead of hand-rolled: `demo:check` reads the surviving call out of its own
+record, *"the call that survived saw `echo` in its callback and `foxtrot` after it"*, which is the failure
+the hand-rolled version shipped.
+- **Nothing queues, and nothing awaits the transition.** Starting a transition while one is active finishes
+the first immediately, so an interrupt is free. An interrupted transition's `ready` **rejects** — measured,
+and the reason `runViewTransition` derives its outcome from `ready` rather than from `finished`, which
+resolves either way. The readout used to chain `transition.ready` with a `catch` for that rejection; the
+transition object belongs to the wrapper now, so the page reads the same moment off `animationstart` on the
+root element instead (the tree's animations fire there, with `pseudoElement` set), and a rejection nobody is
+watching cannot exist at all. The one animation to exclude by name is `-ua-mix-blend-mode-plus-lighter`,
+which starts on the same pseudo as the motion does.
 
 The handler answers the mode switch as well as the cards, because the overlay hides it identically and a
 reach for the switch is the gesture that follows a move. But the two must be resolved under *different*

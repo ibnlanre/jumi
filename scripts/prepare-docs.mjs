@@ -1,11 +1,11 @@
 import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises'
 
 /**
- * The docs site is a real Jumi consumer, so it needs the same two pieces a user does: the Tailwind
- * plugin (registered in CSS via `@plugin`) and the integration (`jumi()`, in the Vite config).
- * Both are vendored from `dist/` because the docs are not a package in this workspace and cannot
- * resolve `jumi/vite`. Without the second one the carriers receive no aggregate and every
- * documented effect animates nothing — silently, since a carrier that resolves `none` looks like a
+ * The docs site is a real Jumi consumer, so it needs the same pieces a user does: the Tailwind plugin
+ * (registered in CSS via `@plugin`), the integration (`jumi()`, in the Vite config), and the runtime the
+ * demo's script imports. All three are vendored from `dist/` because the docs are not a package in this
+ * workspace and cannot resolve `jumi/vite`. Without the integration the carriers receive no aggregate and
+ * every documented effect animates nothing — silently, since a carrier that resolves `none` looks like a
  * carrier with no slots.
  */
 const root = new URL('../', import.meta.url)
@@ -18,6 +18,28 @@ await mkdir(new URL('docs/src/data/', root), { recursive: true })
 await mkdir(new URL('docs/vendor/', root), { recursive: true })
 await writeFile(new URL('docs/src/data/effects.json', root), JSON.stringify(names.map(name => ({ className: `animate-${name}`, name })), null, 2) + '\n')
 await writeFile(new URL('docs/src/data/version.json', root), JSON.stringify({ version }, null, 2) + '\n')
-await copyFile(new URL('dist/index.js', root), new URL('docs/vendor/jumi.js', root))
-await copyFile(new URL('dist/vite.js', root), new URL('docs/vendor/jumi-vite.js', root))
-console.log(`Prepared Jumi plugin, finalizer, version ${version} and ${names.length} effects for documentation.`)
+/**
+ * The modules the site imports, under the names it imports them by — each copied **with its declaration**.
+ *
+ * The distinction is not cosmetic. A module vendored without one is *inferred* from the bundle, and that
+ * inference accepts whatever shape the bundle happens to have: with the runtime vendored as a lone `.js`,
+ * `runViewTransition(async () => …)` compiled in the demo and any spelling of `concurrency` compiled with it,
+ * which is the whole contract of both. This is the only place that contract is exercised, so the declaration
+ * comes along — from the same build, so a copy that goes stale goes stale *with* the code it describes.
+ *
+ * The name matters as much as the file: `x.js` resolves to `x.d.ts` beside it, so `dist/index.js` becoming
+ * `jumi.js` means its declaration has to be `jumi.d.ts`, not `index.d.ts`. The `.d.cts` files in `dist` are
+ * for the package's CommonJS consumers and have no counterpart here, because the site imports ESM.
+ */
+const vendored = [
+  ['dist/index.js', 'docs/vendor/jumi.js'],
+  ['dist/vite.js', 'docs/vendor/jumi-vite.js'],
+  ['dist/view-transition.js', 'docs/vendor/jumi-view-transition.js'],
+]
+
+for (const [from, to] of vendored) {
+  await copyFile(new URL(from, root), new URL(to, root))
+  await copyFile(new URL(from.replace(/\.js$/, '.d.ts'), root), new URL(to.replace(/\.js$/, '.d.ts'), root))
+}
+
+console.log(`Prepared ${vendored.length} Jumi modules with their declarations, version ${version} and ${names.length} effects for documentation.`)

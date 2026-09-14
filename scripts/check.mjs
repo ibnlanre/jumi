@@ -38,8 +38,17 @@ const STAGES = [
   // it has checked anything. Measured on a clean tree: without this stage `pnpm check` cannot run at
   // all. A gate that only works on the machine that last built is not a gate.
   { about: 'the shipped bundle, which every stage below loads', label: 'bundle', run: ['run', 'bundle'] },
+  // Also a prerequisite rather than a check, and for the same reason as `bundle`: the site's own sources
+  // are in this TypeScript project (`include: ["./**/*.ts"]` covers `docs/`), and they import the vendored
+  // modules. `docs/astro.config.ts` imports `./vendor/jumi-vite.js`, the demo's module imports
+  // `../../vendor/jumi-view-transition.js`, and `allowJs` is false — so without the vendored declarations
+  // the very next stage fails with `Cannot find module`. That is the point rather than a nuisance: it is
+  // what makes a missing declaration a gate failure instead of a silent loss of types, which is how the
+  // demo's script went unchecked (`tsc` cannot parse `.astro`) and how `docs/vendor/` could once have
+  // disappeared without anything noticing.
+  { about: 'the vendored modules the site imports, with their declarations', label: 'prepare', run: ['run', 'docs:prepare'] },
   { about: 'the public surface compiles', label: 'types', run: ['run', 'check-types'] },
-  { about: 'src and scripts are clean', label: 'lint', run: ['exec', 'eslint', 'src', 'scripts'] },
+  { about: 'src, scripts and the site sources are clean', label: 'lint', run: ['exec', 'eslint', 'src', 'scripts', 'docs/src', 'docs/astro.config.ts'] },
   { about: 'the finalizer, the model and the CSS helper', label: 'unit', run: ['run', 'test:run'] },
   { about: 'the theme maps still resolve', label: 'theme', run: ['run', 'theme:map'] },
   { about: 'the byte snapshot, over two frozen corpora', label: 'css', run: ['run', 'css:check'] },
