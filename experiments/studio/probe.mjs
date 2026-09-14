@@ -1,0 +1,13 @@
+import { chromium } from 'playwright';
+import { compiler, build, root } from '../../scripts/lib/compile.mjs';
+const classes=['animate-opacity-[0:0|40:0.8|100:1]/enter','animation-duration-[1000ms]/enter','animation-delay-[200ms]/enter','animation-timing-function-linear/enter','animation-fill-mode-both/enter','animate-rotate-[0:0deg|100:90deg]/turn','animation-duration-[1000ms]/turn','animation-timing-function-linear/turn'];
+const compiled=build(await compiler(`@import "tailwindcss"; @plugin "${root}/dist/index.js";`,root),classes);
+const browser=await chromium.launch();
+const page=await browser.newPage();
+await page.setContent('<style>div{opacity:.123!important}</style><iframe sandbox="allow-same-origin"></iframe>');
+await page.locator('iframe').evaluate((frame,{css,classes})=>{frame.srcdoc=`<style>${css}</style><style>body{margin:0}.box{width:100px;height:100px;background:red}svg{width:200px;height:200px}</style><div id="parent"><div id="html" class="box ${classes.slice(0,5).join(' ')}"></div><div id="sibling" class="box"></div></div><svg><g><rect id="svg" x="20" y="20" width="60" height="60" fill="lime" class="${classes.slice(0,5).join(' ')}" /></g></svg>`;},{css:compiled.css,classes});
+await page.waitForFunction(()=>document.querySelector('iframe').contentDocument?.querySelector('#svg'));
+const result=await page.locator('iframe').evaluate(async frame=>{const d=frame.contentDocument,w=frame.contentWindow;const html=d.querySelector('#html'),svg=d.querySelector('#svg');for(const a of d.getAnimations()){a.pause();a.currentTime=600;}await new Promise(r=>requestAnimationFrame(r));const before=html.getBoundingClientRect().toJSON();const values=[w.getComputedStyle(html).opacity,w.getComputedStyle(svg).opacity];const style=d.createElement('style');style.textContent='#parent,#sibling{visibility:hidden!important}#html{visibility:visible!important}';d.head.append(style);return{values,before,after:html.getBoundingClientRect().toJSON(),tree:html.parentElement.id,sibling:w.getComputedStyle(d.querySelector('#sibling')).visibility,animations:d.getAnimations().length}});
+console.log(JSON.stringify(result,null,2));
+if(result.values.some(v=>Math.abs(Number(v)-.8)>.001)||result.tree!=='parent'||result.before.x!==result.after.x||result.before.width!==result.after.width)throw Error('Probe mismatch');
+await browser.close();
