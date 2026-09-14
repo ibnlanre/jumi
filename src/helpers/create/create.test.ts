@@ -676,12 +676,13 @@ describe('the payload', () => {
     expect(staged['animation-name'])
       .toBe(`var(--jumi-opacity-${id}-animation-name, var(--jumi-animation-name))`)
 
-    // A real property rides the same channel as a longhand, so it needs no special case and cannot
-    // drift from the name it is written under.
-    expect(staged['interpolate-size']).toBe('var(--jumi-interpolate-size)')
-
-    expect(Object.keys(staged).sort())
-      .toEqual([...parts, 'interpolate-size'].sort())
+    // The payload is exactly the aggregate parts and nothing else. `interpolate-size` used to ride this
+    // channel as a real property; it does not any more, because it is **inherited** — written on a carrier
+    // it opts the whole descendant subtree in, and a child's own `width: 200px → auto` transition starts
+    // interpolating because an ancestor happens to animate. Measured, and this assertion is what stops it
+    // coming back.
+    expect(Object.keys(staged).sort()).toEqual([...parts].sort())
+    expect(staged['interpolate-size']).toBeUndefined()
   })
 
   it('stages the defaults under their own names, for the element that resolves them', () => {
@@ -789,7 +790,7 @@ describe('the payload', () => {
     // way to state it for the lists whose entries are per-attribute rather than
     // per-slot (`animation-composition` lists the same chain twice when one
     // property has two slots, so its order is not observable at all).
-    expect(Object.keys(reregistered)).toHaveLength([...parts, 'interpolate-size'].length)
+    expect(Object.keys(reregistered)).toHaveLength(parts.length)
     expect(reregistered).toEqual(order)
     expect(reregistered).not.toEqual(appended)
 
@@ -849,13 +850,12 @@ describe('the payload', () => {
 
     expect(compositions).toHaveLength(mutations.length + 1)
 
-    // And a payload is bounded — one declaration per longhand, plus the property the composition
-    // also declares, whatever the slot count. The lists get longer; the payload does not get
-    // bigger. This is the property the linked representation existed to provide, and stating it
-    // here means a change that reintroduces per-slot publication fails loudly rather than quietly
-    // growing the stylesheet.
+    // And a payload is bounded — one declaration per longhand, whatever the slot count. The lists get
+    // longer; the payload does not get bigger. This is the property the linked representation existed to
+    // provide, and stating it here means a change that reintroduces per-slot publication fails loudly
+    // rather than quietly growing the stylesheet.
     for (const entry of compositions) {
-      expect(Object.keys(entry)).toHaveLength(parts.length + 1)
+      expect(Object.keys(entry)).toHaveLength(parts.length)
     }
   })
 })

@@ -7,17 +7,25 @@ second, invent nothing.
 ## Summary
 
 **The platform can interpolate between a keyword size and a definite one, behind exactly one declaration —
-and a Jumi build is already opted in wherever a motion exists.** There is no new subsystem to design:
+and Jumi deliberately does not turn it on for you.** There is no new subsystem to design:
 
 ```text
-interpolate-size: allow-keywords  → an inherited opt-in that makes auto / min-content / max-content / fit-content
-                                    interpolable against a length
-calc-size(auto, size + 1rem)      → a per-declaration escape hatch needing no opt-in at all
+interpolate-size-allow-keywords   → an ordinary utility, because the declaration is inherited and reaches a
+                                    whole subtree: the author opts in, and knows what they are opting in to
+calc-size(auto, size + 1rem)      → a per-declaration escape hatch needing no opt-in at all, no Jumi concept
 ```
 
-The two are independent: the inherited opt-in is a document- or element-level switch, `calc-size()` is
-written into the value itself. What is left is not architecture but coverage — two of Jumi's size
-properties refuse the keyword, and no utility reaches the switch (§5).
+The first version of this record claimed the opt-in was already handled — "any element that animates anything
+is already opted in, and nothing outside a carrier is". **That claim was wrong, and the way it was wrong is
+the most useful thing in this document**: it tested a carrier and a sibling, and never a descendant. A
+carrier's whole subtree was being opted in by an unrelated animation (§4). The opt-in now belongs to the
+author, and the consequence is visible in the markup rather than hidden in a substrate:
+
+```html
+<div class="interpolate-size-allow-keywords animate-width-auto w-[200px]">…</div>
+```
+
+What is left is coverage, not architecture, and the size family is now consistent about `auto` (§5).
 
 ## 1 · What turns it on
 
@@ -39,14 +47,18 @@ A transition behaves identically: `height: 0 → auto` with `allow-keywords` pro
 in the interpolation of a size, not in either of the two ways a size can change.** That is the opposite of
 what the entry/exit spike found for `display`, where the mechanism sits in the *transition* path only.
 
-## 2 · What is not interpolable
+## 2 · What is not interpolable, which is worth documenting
 
-`min-content → max-content` under `allow-keywords` sampled `43.30px 43.30px 293.67px 293.67px 293.67px` —
-**a discrete flip at the midpoint, with the opt-in on.** Intrinsic keyword against intrinsic keyword has no
-number to travel through; the opt-in only pairs a keyword with a *length*.
+| pair | with `allow-keywords` |
+| --- | --- |
+| `200px ↔ auto` | smooth |
+| `200px ↔ min-content` | smooth — the keyword pairs with a *length* |
+| `min-content ↔ max-content` | **still discrete** — `43.30px 43.30px 293.67px 293.67px 293.67px` |
 
-The practical consequence is that an author cannot smoothly resize between two content-derived sizes with
-this mechanism, and Jumi does not need to make one.
+The opt-in does not make every intrinsic value pair numerically interpolable. `min-content → max-content`
+sampled a discrete flip at the midpoint *with the opt-in on*: two content-derived sizes have no number to
+travel through. An author cannot smoothly resize between two content-derived sizes with this mechanism, and
+Jumi does not need to invent one.
 
 ## 3 · `calc-size()` is a second, independent mechanism
 
@@ -58,50 +70,94 @@ this mechanism, and Jumi does not need to make one.
 So the escape hatch is per-declaration and inherits nothing: it works in a keyframe, on an element whose
 document never mentions `interpolate-size`. Nothing in Jumi emits `calc-size(` today (§5).
 
-## 4 · Jumi, read rather than assumed
+## 4 · Jumi, read rather than assumed — and the leak that reading missed
 
-Measured by compiling Jumi's own plugin and reading the finished stylesheet, then loading that stylesheet in
-the browser with a carrier and a non-carrier side by side:
+Measured by compiling Jumi's own plugin and loading the finished stylesheet in the browser.
 
-| reading | result |
-| --- | --- |
-| `interpolate-size` on an element with a motion | **`allow-keywords`** |
-| `interpolate-size` on an element with no motion | `numeric-only` (the initial value) |
-| `animate-width-auto`, base `width: 200px`, sampled | `200px 281.69px 360.47px 392.08px 400px` — **it interpolates**, eased by the default timing function |
+### What was wrong
 
-The mechanism is Jumi's existing composition, which already carries a real property alongside the animation
-longhands: `--jumi-interpolate-size: allow-keywords` ships in the defaults, and
-`interpolate-size: var(--jumi-interpolate-size)` is written by the composition payload onto the carriers. So
-**any element that animates anything is already opted in, and nothing outside a carrier is** — which is the
-right default in both directions, and it means keyword-size motion works today through the ordinary
-utilities:
+`interpolate-size` was written on every carrier by the composition payload, and the platform made it
+**inherited**. The right differential is not a carrier against a sibling — it is a carrier's **descendant**
+against a control outside the subtree:
 
 ```html
-<div class="animate-width-auto w-[200px]">…</div>
+<div id="parent" class="animate-opacity-50"><div id="child" class="width-transition">…</div></div>
+<div id="control"><div id="control-child" class="width-transition">…</div></div>
 ```
 
-with no declaration the author has to know about. That is the whole of the integration story: **none.**
+Same child CSS on both sides, `width: 200px` with `transition: width 600ms linear`, both toggled to
+`width: auto`, the child's only ancestor motion being `animate-opacity-50` — an animation with no relationship
+to size at all:
 
-## 5 · The gaps, as measured rather than suspected
+| element | `interpolate-size` | its own `200px → auto` |
+| --- | --- | --- |
+| `#parent` — the carrier | `allow-keywords` | — |
+| `#child` — **no motion of its own** | **`allow-keywords`** | **1 transition started**, interpolating `211px → 300px → 394px` |
+| `#control-child` — no carrier above it | `numeric-only` | **0 transitions started**, jumps to `400px` |
+
+So an unrelated ancestor animation changed how a child's own ordinary CSS transition behaved. That is not a
+configuration default; it is Jumi editing the semantics of CSS it does not own, in a subtree, silently. The
+contract it created was:
+
+```text
+Jumi motion element → opt its entire descendant subtree into intrinsic-size interpolation
+```
+
+### The fix, and its verification
+
+The declaration left the generic composition payload and the defaults rule, and became an explicit utility —
+written as the **real property** rather than a `--jumi-*` variable, because a control configures a motion Jumi
+is running while this changes how the browser treats the author's own CSS. Same fixture, after the change:
+
+| reading | before | after |
+| --- | --- | --- |
+| an element with a motion | `allow-keywords` | **`numeric-only`** |
+| the same plus `interpolate-size-allow-keywords` | — | `allow-keywords` |
+| an element with no motion | `numeric-only` | `numeric-only` |
+| `animate-width-auto` alone, `200px → auto` | interpolated | **snaps at the midpoint** (`200px 200px 400px 400px 400px`) |
+| the same with the utility | — | interpolates (`200px 281.7px 360.5px 392.1px 400px`) |
+| `#child` under an unrelated carrier | 1 transition, interpolating | **0 transitions** — identical to the control |
+| `#opted-child` under an explicitly opted-in parent | — | 1 transition, interpolating |
+
+The last row is the point of the design rather than a return of the bug: the opt-in is inherited because
+that is what CSS says, and it is now an informed choice written in the markup instead of a side effect of
+declaring an animation. `interpolate-size-numeric-only` is offered for the same reason — it is how a subtree
+stops inheriting one.
+
+The unit test that asserted `interpolate-size` rode the payload was turned into the opposite assertion, so
+reintroducing it fails loudly rather than quietly.
+
+## 5 · The size family, swept
 
 Build-differential readings — a candidate whose stylesheet is byte-identical to a build without it emitted
-nothing at all, which is a refusal, and is a different fact from a rule that happens not to write a size:
+nothing, which is a refusal, and is a different fact from a rule that happens not to write a size. The
+browser's own grammar is the authority on whether the keyword is legal for the property.
 
-| candidate | result |
-| --- | --- |
-| `animate-width-auto`, `animate-width-[auto]` | emitted; writes `width: var(--jumi-width-…)` |
-| `animate-height-auto` | emitted |
-| `animate-inline-size-auto` | emitted |
-| `animate-block-size-auto` | **refused — emitted nothing at all** |
-| `animate-min-width-auto` | **refused — emitted nothing at all** |
-| `animate-interpolate-size-allow-keywords`, `[…]-[allow-keywords]`, `animation-interpolate-size-allow-keywords` | all refused |
+| property | CSS accepts `auto` | before | after |
+| --- | --- | --- | --- |
+| `width`, `height` | yes | `animate-X-auto` emitted | unchanged |
+| `inline-size` | yes | `animate-X-auto` emitted | unchanged |
+| `block-size` | yes | refused as `-auto`; answered to **bare** `animate-block-size` | `animate-block-size-auto` emitted |
+| `min-width`, `min-height`, `min-inline-size`, `min-block-size` | yes | **all refused** | all emit `animate-X-auto` |
+| `max-width`, `max-height`, `max-inline-size`, `max-block-size` | **no** — CSS spells it `none` | refused | unchanged, correctly |
+| `size` | n/a (an at-rule descriptor) | refused | unchanged |
 
-The refusals are Jumi's, not the host's: `block-auto`, `min-w-auto`, `min-h-auto`, `size-auto`, `w-auto`,
-`h-auto` and `inline-auto` are **all** available as Tailwind utilities in the same build. `animate-block-size`
-and `animate-width` declare the same type list (`['length', 'percentage', 'any']`), so what differs is the
-declared `values:` source — `empty.auto` and `theme('minWidth')` against `theme('height')` and a local
-`inlineSize` list. Naming the cause is as far as this spike goes: it is a value-coverage question, not a
-design one, and it is left for a decision rather than fixed here.
+Two causes, both in `values:` rather than in the browser or Tailwind:
+
+- **A `DEFAULT` key answers to the bare spelling.** `values: empty.auto` is `{ DEFAULT: 'auto' }`, which is
+  Tailwind's bare-utility convention, so `block-size` answered to `animate-block-size` while its logical twin
+  `inline-size` answered to `animate-inline-size-auto` — two properties with identical grammars differing in
+  *spelling*. `block-size` now takes the same vocabulary as `inline-size`.
+- **`auto` is not a theme token.** Tailwind spells `min-w-auto` as a utility rather than a theme value, so
+  `theme('minWidth')` has no key for it and the `min-*` family could not name the keyword at all. They now
+  spread the theme and add `auto` last, deliberately: it is CSS grammar, and it wins if the theme ever grows
+  a key for it.
+
+The `max-*` family staying closed is not an oversight: `CSS.supports('max-width', 'auto')` is false, and the
+property's keyword is `none` — which `empty.none` already provides.
+
+No new intrinsic-size abstraction was added, and no `calc-size()` syntax: arbitrary values already carry the
+native grammar, and `calc-size()` is measured working in §3 without any opt-in.
 
 ## Instrument notes
 
@@ -122,3 +178,15 @@ Five fixture bugs, every one of which reads exactly like a platform limitation:
   obvious reading is "Jumi already opts in" — but the match was the *variable registration*, not the
   declaration. Matching the value (`interpolate-size:\s*allow-keywords`) is what made the claim true, and
   then finding *which* rule carried it is what made it useful.
+- **The instrument that could not have caught the leak, by construction.** The carrier-versus-sibling
+  fixture was the wrong shape for an *inherited* property, and it passed. "Integration story: none" was a
+  conclusion drawn from a measurement that could not have contradicted it — the cheapest fix is not a better
+  assertion but a different *pair* of elements, which is why the descendant and an outside control now sit in
+  the same fixture.
+- **A harness count that was a text search.** Removing one declaration from the payload made the Vite stage
+  report "6 declarations for 2 + 1 compositions, expected 7" — and the transition composition plainly declared
+  `transition:`, present in the text, surviving the prelude strip, visible in its own parsed nodes. The
+  file-wide `LONGHAND` regex had always been one short somewhere and the old totals had absorbed it. The count
+  now comes from the rules `compositionRules`/`transitionRules` find structurally, with the old file-wide
+  reading kept as a reported `unaccounted` value — the same lesson this file already learned about detecting
+  compositions, applied to counting them.

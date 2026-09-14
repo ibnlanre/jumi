@@ -14,6 +14,11 @@
  *   4. is `calc-size()` a second mechanism, or the same one reached differently?
  *   5. does a transition and a keyframe behave the same way?
  *   6. does the value survive `var()` substitution — which is the shape every Jumi carrier has?
+ *   7. what does a carrier compute *for its descendants*, and does their own CSS then behave differently
+ *      from an identical control outside that subtree? (The question the first version of this spike did not
+ *      ask, and the file-wide opt-in survived because of it.)
+ *   8. is `auto` reachable for every size property whose grammar accepts it, under the spelling its siblings
+ *      use?
  *
  * Fixture notes, kept out of the template on purpose (a backtick inside a browser fixture ends the
  * template, and that mistake has been made ten times): the animated property here is a real CSS property,
@@ -41,13 +46,13 @@ execFileSync('pnpm', ['run', 'bundle'], { cwd: root, stdio: 'pipe' })
 const CASES = [
   { about: 'width, auto → 200px, nothing opt-in', id: 'plain', to: '200px' },
   { about: 'the same, interpolate-size on the element', id: 'keyword', opt: 'interpolate-size: allow-keywords', to: '200px' },
-  { about: 'height, 0 → auto, allow-keywords', id: 'height', opt: 'interpolate-size: allow-keywords', from: '0', to: 'auto', watch: 'height' },
+  { about: 'height, 0 → auto, allow-keywords', from: '0', id: 'height', opt: 'interpolate-size: allow-keywords', to: 'auto', watch: 'height' },
   { about: 'block-size, auto → 120px, allow-keywords', id: 'logical', opt: 'interpolate-size: allow-keywords', to: '120px', watch: 'block-size' },
   { about: 'inline-size, auto → 90px, allow-keywords', id: 'inline', opt: 'interpolate-size: allow-keywords', to: '90px', watch: 'inline-size' },
-  { about: 'min-content → max-content, allow-keywords', id: 'keywordpair', opt: 'interpolate-size: allow-keywords', from: 'min-content', to: 'max-content', watch: 'width' },
-  { about: 'fit-content → 240px, allow-keywords', id: 'fit', opt: 'interpolate-size: allow-keywords', from: 'fit-content', to: '240px', watch: 'width' },
-  { about: 'calc-size(auto, size + 40px) → 200px, nothing opt-in', id: 'calcsize', from: 'calc-size(auto, size + 40px)', to: '200px' },
-  { about: 'calc-size with a percentage, nothing opt-in', id: 'calcpct', from: 'calc-size(any, 50% - 20px)', to: '200px' },
+  { about: 'min-content → max-content, allow-keywords', from: 'min-content', id: 'keywordpair', opt: 'interpolate-size: allow-keywords', to: 'max-content', watch: 'width' },
+  { about: 'fit-content → 240px, allow-keywords', from: 'fit-content', id: 'fit', opt: 'interpolate-size: allow-keywords', to: '240px', watch: 'width' },
+  { about: 'calc-size(auto, size + 40px) → 200px, nothing opt-in', from: 'calc-size(auto, size + 40px)', id: 'calcsize', to: '200px' },
+  { about: 'calc-size with a percentage, nothing opt-in', from: 'calc-size(any, 50% - 20px)', id: 'calcpct', to: '200px' },
   { about: 'var(--jumi-width) → auto, allow-keywords', id: 'carried', opt: 'interpolate-size: allow-keywords', to: 'auto', var: '200px' },
 ]
 
@@ -245,7 +250,7 @@ const css = build(await compiler(entry, project), wanted).css
  * state from a previous build can make the diff look non-zero.
  */
 const baseline = build(await compiler(entry, project), []).css
-const emits = async candidate => (await build(await compiler(entry, project), [candidate])).css
+const emits = async candidate => (await build(await compiler(entry, project), typeof candidate === 'string' ? [candidate] : candidate)).css
 const postcss = (await import('postcss')).default
 
 for (const candidate of wanted) {
@@ -257,7 +262,7 @@ for (const candidate of wanted) {
   }
 
   const written = []
-  postcss.parse(alone).walkDecls(declaration => {
+  postcss.parse(alone).walkDecls((declaration) => {
     if (/^(width|height|block-size|inline-size|min-width)$/.test(declaration.prop)) {
       written.push(`${declaration.prop}: ${declaration.value}`)
     }
@@ -266,12 +271,34 @@ for (const candidate of wanted) {
   line(candidate, written.length ? [...new Set(written)].join('; ') : 'emitted a rule, but no size declaration')
 }
 
-// The same question with Jumi out of it: does the host theme register the keyword at all for this property?
-const keyword = ['w-auto', 'h-auto', 'block-auto', 'inline-auto', 'min-w-auto', 'min-h-auto', 'size-auto']
+// The size family, swept the way the CTO asked for it: the browser's own grammar as the authority on
+// whether `auto` is a legal value, against Jumi's vocabulary and the spelling it is reachable under. A
+// `DEFAULT` key in a value map is Tailwind's bare-utility convention, so `{ DEFAULT: 'auto' }` answers to
+// `animate-block-size` and *not* to `animate-block-size-auto` — which is a spelling difference, not a
+// capability one, and this table is what tells the two apart.
+const FAMILY = [
+  'width', 'height',
+  'min-width', 'min-height',
+  'max-width', 'max-height',
+  'inline-size', 'block-size',
+  'min-inline-size', 'min-block-size',
+  'max-inline-size', 'max-block-size',
+  'size',
+]
+const grammar = await page.evaluate(
+  properties => properties.map(property => ({ acceptsAuto: CSS.supports(property, 'auto'), property })),
+  FAMILY,
+)
 
-for (const candidate of keyword) {
-  const alone = await emits(candidate)
-  line(`host: ${candidate}`, alone.length === baseline.length ? 'refused by the theme' : 'the theme has this value')
+for (const { acceptsAuto, property } of grammar) {
+  const named = await emits(`animate-${property}-auto`)
+  const bare = await emits(`animate-${property}`)
+
+  line(`animate-${property}[-auto]`, [
+    acceptsAuto ? 'CSS accepts auto' : 'CSS does not use auto',
+    named.length === baseline.length ? 'named refused' : 'named emitted',
+    bare.length === baseline.length ? 'bare refused' : 'bare emitted',
+  ].join(' · '))
 }
 
 line('interpolate-size: allow-keywords in the output', /interpolate-size:\s*allow-keywords/.test(css) ? 'yes' : 'no')
@@ -302,28 +329,107 @@ line('var(--jumi-width) → auto on the element', curve(carried.samples))
 console.log('\n4 · the same motion through Jumi\'s real output, in the browser')
 console.log('─'.repeat(100))
 
-const jumiCss = await emits('animate-width-auto')
+const jumiCss = await emits(['animate-width-auto', 'animate-opacity-50', 'interpolate-size-allow-keywords'])
 const jumiHtml = `<!doctype html>
 <html><head><meta charset="utf-8"><style>
 ${jumiCss}
   body { margin: 0; font: 12px/1.4 system-ui; }
   #board { width: 400px; }
-  #box { width: 200px; background: #333; }
+  /* A motion whose target is a keyword, with and without the opt-in the platform requires. */
+  #box, #opted { width: 200px; background: #333; }
   #plain { width: 200px; }
+  /* Locality: the same ordinary transition, once under a carrier and once outside one. */
+  #parent, #control, #opted-parent { width: 400px; }
+  .width-transition { width: 200px; background: #555; transition: width 600ms linear; }
+  .width-transition.wide { width: auto; }
 </style></head>
 <body>
-<div id="board"><div id="box" class="animate-width-auto">content, so auto resolves to the board</div></div>
+<div id="board">
+  <div id="box" class="animate-width-auto">content, so auto resolves to the board</div>
+  <div id="opted" class="interpolate-size-allow-keywords animate-width-auto">content, so auto resolves to the board</div>
+</div>
 <div id="plain">content</div>
+<div id="parent" class="animate-opacity-50"><div id="child" class="width-transition">content</div></div>
+<div id="control"><div id="control-child" class="width-transition">content</div></div>
+<div id="opted-parent" class="interpolate-size-allow-keywords animate-opacity-50"><div id="opted-child" class="width-transition">content</div></div>
 <script>
   const frame = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
 
   window.__read = () => ({
     carrier: getComputedStyle(document.getElementById('box')).getPropertyValue('interpolate-size'),
+    opted: getComputedStyle(document.getElementById('opted')).getPropertyValue('interpolate-size'),
     plain: getComputedStyle(document.getElementById('plain')).getPropertyValue('interpolate-size'),
   })
 
-  window.__seek = async (fractions) => {
-    const node = document.getElementById('box')
+  /**
+   * The locality question, measured rather than inferred: what does a descendant of a carrier compute,
+   * and does its own transition then behave differently from an identical one outside that subtree?
+   */
+  window.__locality = async () => {
+    const parent = document.getElementById('parent')
+    const child = document.getElementById('child')
+    const siblingControl = document.getElementById('control-child')
+    const optedParent = document.getElementById('opted-parent')
+    const optedChild = document.getElementById('opted-child')
+    const read = node => ({
+      animationName: getComputedStyle(node).animationName,
+      interpolateSize: getComputedStyle(node).getPropertyValue('interpolate-size'),
+    })
+    const before = {
+      child: read(child),
+      control: read(siblingControl),
+      opted: read(optedChild),
+      optedParent: read(optedParent),
+      parent: read(parent),
+    }
+
+    child.classList.add('wide')
+    siblingControl.classList.add('wide')
+    optedChild.classList.add('wide')
+    await frame()
+
+    // Whether a transition exists at all is the sharpest reading there is: a keyword pair that cannot be
+    // interpolated does not get a transition object, so 1 against 0 is the difference between the two.
+    const started = {
+      child: [...document.getAnimations()].filter(animation => animation.effect?.target === child).length,
+      control: [...document.getAnimations()].filter(animation => animation.effect?.target === siblingControl).length,
+      opted: [...document.getAnimations()].filter(animation => animation.effect?.target === optedChild).length,
+    }
+    const pairs = []
+
+    await new Promise(resolve => {
+      const tick = () => {
+        const running = [...document.getAnimations()].filter(animation => animation.effect?.target === optedChild)
+        if (!running.length || pairs.length > 90) return resolve()
+
+        const progress = running[0].effect.getComputedTiming().progress
+        pairs.push({
+          at: typeof progress === 'number' ? Math.round(progress * 100) / 100 : String(progress),
+          child: getComputedStyle(child).width,
+          control: getComputedStyle(siblingControl).width,
+          opted: getComputedStyle(optedChild).width,
+        })
+
+        requestAnimationFrame(tick)
+      }
+
+      requestAnimationFrame(tick)
+    })
+
+    return {
+      after: {
+        child: getComputedStyle(child).width,
+        control: getComputedStyle(siblingControl).width,
+        opted: getComputedStyle(optedChild).width,
+      },
+      before,
+      pairs,
+      started,
+    }
+  }
+
+  window.__seek = async (id, fractions) => {
+    const node = document.getElementById(id)
     const animations = [...document.getAnimations()].filter(animation => animation.effect?.target === node)
     if (!animations.length) return { samples: [] }
 
@@ -359,10 +465,32 @@ await jumiPage.waitForFunction(() => window.__ready === true)
 
 const read = await jumiPage.evaluate(() => window.__read())
 line('interpolate-size, an element with a motion', read.carrier || 'not declared')
+line('interpolate-size, the same plus the opt-in', read.opted || 'not declared')
 line('interpolate-size, an element with no motion', read.plain || 'not declared')
 
-const jumiMotion = await jumiPage.evaluate(({ fractions }) => window.__seek(fractions), { fractions: FRACTIONS })
-line('animate-width-auto, width 200px → auto', `${curve(jumiMotion.samples)} · ${jumiMotion.timeline}`)
+const jumiMotion = await jumiPage.evaluate(({ fractions }) => window.__seek('box', fractions), { fractions: FRACTIONS })
+line('animate-width-auto alone, 200px → auto', curve(jumiMotion.samples))
+
+const optedMotion = await jumiPage.evaluate(({ fractions }) => window.__seek('opted', fractions), { fractions: FRACTIONS })
+line('…with interpolate-size-allow-keywords', curve(optedMotion.samples))
+
+// ── 5 · locality: does a carrier opt its whole subtree in? ───────────────────────────────────────────
+console.log('\n5 · locality — a carrier, its child, and a control outside the subtree')
+console.log('─'.repeat(100))
+
+const locality = await jumiPage.evaluate(() => window.__locality())
+const pair = (samples, key) => samples
+  .filter((sample, index) => index % 8 === 0 || index === samples.length - 1)
+  .map(sample => `${sample.at}:${sample[key]}`).join(' ')
+
+line('parent — carrier, no opt-in', `animation-name: ${locality.before.parent.animationName} · interpolate-size: ${locality.before.parent.interpolateSize || 'not declared'}`)
+line('child, no motion of its own', `animation-name: ${locality.before.child.animationName} · interpolate-size: ${locality.before.child.interpolateSize || 'not declared'}`)
+line('control-child, no carrier above it', `animation-name: ${locality.before.control.animationName} · interpolate-size: ${locality.before.control.interpolateSize || 'not declared'}`)
+line('opted-parent, opted in explicitly', `animation-name: ${locality.before.optedParent.animationName} · interpolate-size: ${locality.before.optedParent.interpolateSize || 'not declared'}`)
+line('opted-child, under the opted-in parent', `animation-name: ${locality.before.opted.animationName} · interpolate-size: ${locality.before.opted.interpolateSize || 'not declared'}`)
+line('child 200px → auto, no opt-in anywhere', `${locality.started.child} transition(s) started · ${pair(locality.pairs, 'child') || `settled at ${locality.after.child}`}`)
+line('control-child 200px → auto', `${locality.started.control} transition(s) started · ${pair(locality.pairs, 'control') || `settled at ${locality.after.control}`}`)
+line('opted-child 200px → auto, opted in above', `${locality.started.opted} transition(s) started · ${pair(locality.pairs, 'opted') || `settled at ${locality.after.opted}`}`)
 
 await jumiServer.close()
 

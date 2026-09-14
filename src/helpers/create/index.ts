@@ -12,7 +12,7 @@
  * `effects`, `labels`, `registered`) live exactly as long as that compiler
  * does. `@/core` documents what that implies.
  */
-import type { Api, Collection, Creator, GetMatchComponents, GetMatchUtilities, MatchComponentsPropertyFunction } from '@/types'
+import type { Api, Creator, GetMatchComponents, GetMatchUtilities, MatchComponentsOptions, MatchComponentsPropertyValue, MatchPropertyFunction, Modifiers } from '@/types'
 
 import { createJumiModel, isPhrase, nameable } from '@/core'
 import { stagingMarker } from '@/helpers/carriers'
@@ -25,6 +25,8 @@ import { resolveTheme } from '@/helpers/create/theme'
 import { getMatchControls } from '@/properties/controls'
 import { getMatchTween } from '@/properties/tween'
 import { animationRangeName } from '@/theme/animation-range'
+import { interpolateSize } from '@/theme/interpolate-size'
+import { viewTransition } from '@/theme/view-transition'
 
 import createPlugin from 'tailwindcss/plugin'
 
@@ -85,19 +87,11 @@ const jumi = createPlugin((api) => {
    * animation at all. A bare modifier now reaches the fn, which names the slot; a matcher that reads
    * its modifier as something else — a value suffix, a metric, a count — still declares its own.
    */
-  const modifierSupport = (fn: (value: string, extra: { modifier: null | string }) => unknown) =>
-    nameable in fn ? ('any' as const) : ({})
+  const modifierSupport = (fn: MatchPropertyFunction): Modifiers => nameable in fn ? ('any') : ({})
 
-  const registerPhrases = (options: {
-    fn: MatchComponentsPropertyFunction
-    modifiers: 'any' | Collection<string>
-    name: string
-    supportsNegativeValues: boolean
-    type: string | string[]
-  }) => {
-    const { fn, modifiers, name, supportsNegativeValues, type } = options
+  const registerPhrases = (name: string, options: Required<MatchComponentsPropertyValue>) => {
+    const { fn, modifiers, supportsNegativeValues, type, values } = options
     const typed = Array.isArray(type) ? type : [type]
-
 
     if (typed.includes('any') || typed.includes('*')) return
 
@@ -107,7 +101,7 @@ const jumi = createPlugin((api) => {
       // is the one that knows the value. This handler exists for arbitrary values only, and a phrase is
       // always arbitrary — so leaving `values` out is what stops a theme value from being routed here
       // and then declined.
-      { modifiers, supportsNegativeValues, type: 'any', values: {} },
+      { modifiers, supportsNegativeValues, type: 'any', values },
     )
   }
 
@@ -145,7 +139,7 @@ const jumi = createPlugin((api) => {
     if (!identityAccepted(modifier)) return viewTransitionInvalidMarker('name')
 
     return viewTransitionMarker(side, modifier)
-  }, { values: { new: 'new', old: 'old' } })
+  }, { values: viewTransition })
 
   /**
    * Ranges, registered as a **variant**, and it is the opposite of the one above in the way that
@@ -173,7 +167,7 @@ const jumi = createPlugin((api) => {
       const { fn, ...options } = utilities[name]
       const { modifiers = modifierSupport(fn), supportsNegativeValues = false, type = 'any', values } = options
       matchComponents({ [name]: fn }, { modifiers, supportsNegativeValues, type, values })
-      registerPhrases({ fn, modifiers, name, supportsNegativeValues, type })
+      registerPhrases(name, { fn, modifiers, supportsNegativeValues, type, values: {} })
     }
   }
   registerComponents(getMatchTween(creator))
@@ -186,6 +180,24 @@ const jumi = createPlugin((api) => {
     }
   }
   registerUtilities(getMatchControls(creator))
+
+  /**
+   * The one declaration Jumi writes that changes CSS Jumi does not own.
+   *
+   * `interpolate-size` is **inherited**, which is why it is not part of the motion substrate: written on a
+   * carrier it reaches every descendant, so a child with no motion of its own would find its own ordinary
+   * `width: 200px → auto` transition interpolating because an ancestor happens to animate. Measured, and the
+   * reason this is the author's opt-in rather than a default.
+   *
+   * It is written as the real property rather than as a `--jumi-*` variable on purpose. A control configures
+   * a motion Jumi is running; this changes how the browser treats the author's own CSS, so it has to be
+   * declared on the element and mean what CSS says it means. `numeric-only` is offered because that is how a
+   * subtree stops inheriting it.
+   */
+  matchUtilities(
+    { 'interpolate-size': (value: string) => ({ 'interpolate-size': value }) },
+    { values: interpolateSize },
+  )
 })
 
 export default jumi as ReturnType<typeof createPlugin>

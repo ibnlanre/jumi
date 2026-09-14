@@ -917,28 +917,39 @@ export type KeyframeVariables = Record<StandardPropertyKeyframesVariable, string
 
 export type MatchComponents = Record<MatchComponentsPropertyKey, MatchComponentsPropertyValue>
 
-export type MatchComponentsPropertyFunction = (value: string, extra: { modifier: null | string }) => CssInJs
+export interface MatchComponentsOptions extends Partial<MatchOptions> {
+  values: MatchOptionsValues
+}
+
+export type MatchComponentsPropertyFunction = MatchPropertyFunction<CssInJs>
 
 export type MatchComponentsPropertyKey
   = | 'animate' | `animate-${AnimatableStandardPropertyType}` | `animate-${NonStandardPropertyType}`
 
-export interface MatchComponentsPropertyValue extends MatchUtilitiesOptions {
+export interface MatchComponentsPropertyValue extends MatchComponentsOptions {
   fn: MatchComponentsPropertyFunction
+}
+
+export type MatchOptions = {
+  modifiers: Modifiers
+  supportsNegativeValues: boolean
+  type: string | string[]
+}
+
+export type MatchOptionsValues = Collection<string> & {
+  __BARE_VALUE__?: (value: NamedUtilityValue) => string | undefined;
 }
 
 export type MatchProperty = Record<MatchUtilitiesPropertyKey, MatchUtilitiesPropertyValue>
 
-export interface MatchUtilitiesOptions {
-  modifiers?: 'any' | Collection<string>
-  supportsNegativeValues?: boolean
+export type MatchPropertyFunction<T = unknown> = (value: string, extra: { modifier: null | string }) => T
+
+export interface MatchUtilitiesOptions extends Partial<MatchOptions> {
   type?: Array<DataType> | DataType
-  values: Collection<string>
+  values: MatchOptionsValues
 }
 
-export type MatchUtilitiesPropertyFunction = (
-  value: string,
-  extra: { modifier: null | string },
-) => CssInJs | CssInJs[]
+export type MatchUtilitiesPropertyFunction = MatchPropertyFunction<CssInJs | CssInJs[]>
 
 export type MatchUtilitiesPropertyKey =
   | 'animate-stagger-backward' | 'animate-stagger-forward'
@@ -947,13 +958,15 @@ export type MatchUtilitiesPropertyKey =
 export interface MatchUtilitiesPropertyValue extends MatchUtilitiesOptions {
   fn: MatchUtilitiesPropertyFunction
 }
-
 export type MatrixFunction
   = | 'calc'
     | 'calc-size'
     | 'matrix3d'
     | 'matrix'
     | 'perspective'
+
+
+export type Modifiers =  'any' | Collection<string>
 
 export type NamedUtilityValue = {
   fraction: null | string

@@ -207,31 +207,51 @@ export function expectedDeclarations({ animations, transitions }) {
 }
 
 /**
+ * The parts the counter above sees, in order.
+ *
+ * Exported for the diagnostic rather than the assertion: a total that does not fit the expectation cannot
+ * say whether a longhand went missing or an extra rule was counted, and those need opposite fixes.
+ */
+export function countedParts(css) {
+  return [...declarationsOnly(css).matchAll(LONGHAND)].map(match => match[0].split(':')[0].trim())
+}
+
+/**
  * What a finished stylesheet says about the protocol.
  *
  * `leaks` is the invariant — three build-time names, all expected at zero, none of them a property
  * a browser applies, and counted over the whole file because that is where they must not appear.
  * `animations` and `transitions` count each carrier by the declaration it alone has, because the
- * marker is erased; `declarations` and `declarationBytes` are every part materialized and how much
- * of the file they are. Together they still say "each carrier got the whole list for the parts it
- * declares, and nothing else" — so a part written into the wrong carrier shows up as a count that
- * does not fit.
+ * marker is erased.
+ *
+ * `declarations` and `declarationBytes` are the parts materialized **in the compositions themselves**,
+ * counted on the rules `compositionRules`/`transitionRules` found. They used to be counted by the
+ * `LONGHAND` regex over the whole file, and that is not reliable enough to assert against: measured on
+ * the Vite fixtures, a transition composition that plainly declares `transition:` — present in the text,
+ * surviving the prelude strip, visible in the rule's own nodes — was not counted, so a count that had
+ * always been right read as one short the moment an unrelated declaration left the payload. Structural
+ * counting cannot disagree with the rules it is counting. `unaccounted` keeps the old file-wide reading
+ * as a *report*: it is the difference between the two, so a part written into a rule that is not a
+ * composition still shows up here rather than disappearing.
  */
 export function protocolState(css) {
-  const bodies = declarationsOnly(css)
-  const materialized = [...bodies.matchAll(LONGHAND)]
+  const rules = [...compositionRules(css), ...transitionRules(css)]
+  const materialized = rules.flatMap(rule => (rule.nodes ?? []).filter(node => node.type === 'decl'
+    && (PARTS.includes(node.prop) || TRANSITION_PARTS.includes(node.prop))))
+  const anywhere = [...declarationsOnly(css).matchAll(LONGHAND)]
 
   return {
     // Both kinds are counted structurally now, and for the same reason: the marker is erased, so the
     // shape of the synthesized rule is the only thing left that says it was synthesized rather than
     // authored.
     animations: compositionRules(css).length,
-    declarationBytes: materialized.reduce((total, match) => total + match[0].length, 0),
+    declarationBytes: materialized.reduce((total, node) => total + `${node.prop}:${node.value}`.length, 0),
     declarations: materialized.length,
     leaks: {
       staging: (css.match(/--jumi-staging-/g) ?? []).length,
     },
     transitions: transitionRules(css).length,
+    unaccounted: anywhere.length - materialized.length,
   }
 }
 

@@ -29,7 +29,7 @@ import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright'
 import { build, createServer, preview } from 'vite'
 
-import { expectedDeclarations, protocolState } from './lib/css.mjs'
+import { compositionRules, countedParts, expectedDeclarations, protocolState, transitionRules } from './lib/css.mjs'
 
 import path from 'node:path'
 
@@ -267,7 +267,20 @@ const structure = (label, css) => {
 
   if (leaked.length) failures.push(`${label}: the transport reached the output — ${leaked.map(([name, count]) => `${count} ${name}`).join(', ')}`)
   if (!animations) failures.push(`${label}: no composition reached the output`)
-  if (declarations !== expected) failures.push(`${label}: ${declarations} declarations for ${animations} + ${transitions} compositions, expected ${expected}`)
+  if (declarations !== expected) {
+    // Say which properties each composition declared, and which the counter saw. The totals alone cannot
+    // distinguish "a longhand is missing" from "an extra rule was counted", and those need opposite fixes.
+    const declared = [...compositionRules(css), ...transitionRules(css)]
+      .map(rule => (rule.nodes ?? [])
+        .filter(node => node.type === 'decl' && /^(animation|transition)/.test(node.prop))
+        .map(node => node.prop).join('+'))
+      .join(' | ')
+    const counted = countedParts(css)
+
+    failures.push(`${label}: ${declarations} declarations for ${animations} + ${transitions} compositions, expected ${expected}`
+      + ` — declared: ${declared}`
+      + ` — counted: ${counted.join('+')}`)
+  }
 
   /**
    * View transitions, asserted here so every build shape gets them rather than one dedicated arm.

@@ -406,7 +406,11 @@ export const getMatchTween: GetMatchComponents = (creator) => {
     'animate-block-size': {
       fn: property('block-size'),
       type: ['length', 'percentage', 'any'],
-      values: empty.auto,
+      // The same vocabulary as `inline-size`, because CSS treats them as the same grammar. `empty.auto`
+      // here answered to the *bare* `animate-block-size` and refused `animate-block-size-auto` — a
+      // spelling difference between two logical properties with identical value sets, measured, and not a
+      // distinction worth having.
+      values: inlineSize,
     },
     'animate-border': {
       fn: property('border'),
@@ -1664,25 +1668,29 @@ export const getMatchTween: GetMatchComponents = (creator) => {
       fn: property('min-block-size'),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
-      values: theme('minHeight'),
+      values: theme('minHeight', { auto: 'auto' }),
     },
     'animate-min-height': {
       fn: property('min-height'),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
-      values: theme('minHeight'),
+      values: theme('minHeight', { auto: 'auto' }),
     },
     'animate-min-inline-size': {
       fn: property('min-inline-size'),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
-      values: theme('minWidth'),
+      values: theme('minWidth', { auto: 'auto' }),
     },
     'animate-min-width': {
       fn: property('min-width'),
       supportsNegativeValues: true,
       type: ['length', 'percentage', 'any'],
-      values: theme('minWidth'),
+      // `auto` last, deliberately: it is CSS grammar rather than a theme token — Tailwind spells
+      // `min-w-auto` as a utility, so the theme namespace has no key for it — and the keyword wins if the
+      // theme ever grows one. Measured: `CSS.supports('min-width', 'auto')` is true and
+      // `animate-min-width-auto` was refused before this.
+      values: theme('minWidth', { auto: 'auto' }),
     },
     'animate-mix-blend-mode': {
       fn: property('mix-blend-mode'),

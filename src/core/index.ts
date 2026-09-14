@@ -496,14 +496,13 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
           'animation-timing-function': css('var', '--jumi-animation-timing-function'),
         }
 
-    // Composition, range and timeline now live in the slot list, so they are
-    // declared here only for elements that animate nothing at all. Leaving them
-    // in both would let this single value overwrite the per-slot list.
-    const baseAnimationVars = {
-      'interpolate-size': css('var', '--jumi-interpolate-size'),
-    }
-
-    return merge(animation, baseAnimationVars)
+    // `interpolate-size` is deliberately not declared here, and the reason is not stylistic. It is
+    // **inherited**, so writing it on a carrier opts the whole descendant subtree in: measured, a child
+    // with no motion of its own computed `allow-keywords` and its own `width: 200px → auto` transition
+    // interpolated, while an identical transition outside the subtree did not start at all. Jumi owns the
+    // motion it writes; it does not get to change how the browser treats CSS it does not. An element opts
+    // in with the `interpolate-size-*` utility, and knows it is opting its descendants in too.
+    return animation
   }
 
   /** Every longhand a slot contributes an entry to. */
@@ -529,10 +528,6 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
       ...aggregateParts
         .filter(part => typeof lists[part] === 'string')
         .map(part => [part, lists[part] as string]),
-      // A real property rather than a custom one, and it rides the same channel anyway: a staged
-      // name carries the declaration it becomes, so `interpolate-size` needs no special case and
-      // cannot drift from the name it is written under.
-      ['interpolate-size', css('var', '--jumi-interpolate-size')],
     ])
   }
 

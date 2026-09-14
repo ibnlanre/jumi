@@ -18,6 +18,22 @@ Property utilities follow `animate-{property}-{value}`. Values come from the rel
 
 Simple property animations generate a `to` keyframe. The starting point comes from the element's underlying styles. Set a useful starting value when the default does not interpolate as you expect.
 
+### Keyword sizes belong to the platform
+
+`auto`, `min-content`, `max-content` and `fit-content` interpolate only with `interpolate-size: allow-keywords`. Jumi does not set it for you, because the declaration is **inherited**: setting it on an element opts in everything beneath it, and that should be your decision rather than a side effect of animating something.
+
+```html
+<div class="interpolate-size-allow-keywords animate-width-auto w-[200px]">Keyword target</div>
+```
+
+Without it the keyword still applies, but as a discrete change — the property holds its starting value and flips at the midpoint. `interpolate-size-numeric-only` stops a subtree inheriting the switch.
+
+A value that carries its own intrinsic size needs no switch at all:
+
+```html
+<div class="animate-width-[calc-size(auto,size+2rem)]">Arbitrary intrinsic value</div>
+```
+
 ## Separate properties, separate rhythms
 
 ```html
