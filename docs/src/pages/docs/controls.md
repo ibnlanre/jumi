@@ -165,6 +165,22 @@ A motion is not written differently because a scroll drives it. The same `animat
 
 `animation-timeline-scroll` follows the nearest scroller, `animation-timeline-view` tracks the element through its scrollport, and `animation-timeline-[--name]` consumes a timeline the page declares in its own CSS. A timeline can be given to one animation on an element and not its neighbour with `/{property}` or `/{label}`, exactly as the timing controls are.
 
+### Choosing the scroller, and where tracking starts
+
+Three controls say more about the driver itself. `animation-timeline-scroller` picks which scroller a `scroll()` timeline takes — `-nearest`, `-root` for the document, or `-self` — and `animation-timeline-axis` picks the axis it follows:
+
+```html
+<div class="animate-fade-in animation-timeline-scroll animation-timeline-scroller-root animation-timeline-axis-inline">
+```
+
+For a `view` timeline, the insets place where tracking begins and ends inside the scrollport:
+
+```html
+<article class="animate-fade-in animation-timeline-view animation-timeline-inset-start-[10%] animation-timeline-inset-end-[25%]">
+```
+
+Both insets take a `<length-percentage>`, and it is usually a percentage: start tracking once the element is 10% into the scrollport and stop at 25%. Everything here is a control — it configures a timeline, it does not give one, so it does nothing on an element that names no driver.
+
 ### Declaring a named timeline
 
 The declaration side is plain CSS on the scroller, and Jumi does not wrap it. Name the timeline where the scrolling happens, then consume it from anywhere inside that element:
@@ -215,7 +231,7 @@ animation-range-start-entry
 animation-range-end-exit
 ```
 
-and an offset on its own is its own utility: `animation-range-start-offset-25` makes the motion start 25% into the default range.
+and an offset on its own is its own utility: `animation-range-start-offset-25` makes the motion start 25% into the default range, and `animation-range-end-offset-75` ends it 75% in.
 
 Those utilities place the element's animations. To place **one** of them and leave its neighbours where they are, the same vocabulary works as a prefix on the motion itself:
 

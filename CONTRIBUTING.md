@@ -412,6 +412,34 @@ the check that knows.
 
 ---
 
+## Releasing
+
+The version decision is **explicit**. Commit prefixes generate the mechanical record, but they do not decide how
+big a release is — a `fix:` can be the most important change in a release, and an architectural judgement is not
+something a prefix should be trusted to make.
+
+```bash
+pnpm check                                    # the gate, all sixteen stages
+pnpm run docs:build                           # the only path that builds every page
+pnpm run release:minor                        # writes the version to package.json, and nothing else
+pnpm run changelog                            # prepends the release, stamped with that version
+git add -A && git commit -m "chore(release): v1.0.0"
+git tag v1.0.0
+pnpm publish
+```
+
+Four things about that flow are load-bearing:
+
+- **The bump comes before the changelog.** The generator stamps the release header from `package.json`, so
+  running it first labels the release with the *previous* version.
+- **`release:*` does not commit or tag.** It runs `pnpm version <bump> --no-git-tag-version`, which edits
+  `package.json` and stops — so the release is one commit and one tag, not two of each.
+- **The boundary is a tag.** Everything written in `CHANGELOG.md` before the first tag is curated by hand and is
+  left exactly as written; generation prepends above it. With no tag at all the generator would rewrite the
+  entire history, so `pnpm run changelog` refuses to run until one exists.
+- **Never run the generator with `-r 0`.** That mode overwrites the file instead of prepending to it — it is how
+  the hand-written 1.0.0 notes were destroyed once. To *inspect* output, use the CLI directly with `--stdout`.
+
 ## Quality Standards
 
 ### Performance

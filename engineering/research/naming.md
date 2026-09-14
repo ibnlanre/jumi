@@ -2,7 +2,7 @@
 
 Every motion candidate may carry a name: `animate-fade-in/reveal`,
 `animate-opacity-50/reveal`, `animate-opacity-[0:0|100:1]/reveal`,
-`animate-scale-x-110/reveal`, `animate-background-color-red/reveal`. The name goes after a slash,
+`animate-scale-x-110/reveal`, `animate-background-color-red-500/reveal`. The name goes after a slash,
 `[brackets]` are only for a name that needs them, and a control addresses the motion by the same
 word: `animation-duration-500/reveal`.
 

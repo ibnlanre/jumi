@@ -32,6 +32,32 @@ The transition starts when the property's underlying value changes. Unlike a nam
 
 The same holds for animations: `animation-duration-500` says how long an animation should take if the element has one, and does not give it one.
 
+## Delay, easing, and discrete properties
+
+`transition-delay` and `transition-timing-function` are the other two halves of the same shape as `transition-duration`, and both take the `/{property}` scope:
+
+```html
+<button class="transition-property/background-color
+  transition-property/scale
+  transition-duration-[200ms]/background-color
+  transition-delay-[80ms]/background-color
+  transition-timing-function-ease-out/scale
+  bg-lime-300 hover:bg-lime-200
+  hover:scale-110">
+  A delayed colour and a lifted card.
+</button>
+```
+
+A property the browser cannot interpolate — `display` is the usual one — does not transition at all unless you say it may:
+
+```html
+<div class="transition-property/display transition-duration-300 transition-behavior-allow-discrete">
+```
+
+With that, the flip is placed so the content stays on screen: at the start on the way in, at the end on the way out. That is what makes appear-and-disappear work as a transition rather than as an animation. The one thing it cannot supply is the before-style a first render has nothing to travel from — `@starting-style` is plain CSS and belongs in your own stylesheet, next to the markup it describes. `transition-behavior-normal` is the default.
+
+Where the property is unknown, the declaration is ignored, and a discrete property simply does not transition — the change still happens, instantly. Everything else on this page is unaffected, since nothing else here is conditional on it.
+
 ## Independent timing
 
 ```html

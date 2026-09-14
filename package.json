@@ -3,8 +3,8 @@
   "version": "1.0.0-beta.1",
   "description": "A comprehensive CSS animation library built as a TailwindCSS plugin",
   "packageManager": "pnpm@9.14.4",
-  "main": "dist/index.js",
-  "module": "dist/index.esm.js",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
@@ -31,11 +31,16 @@
   "type": "module",
   "files": [
     "dist",
+    "CHANGELOG.md",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
     "docs:prepare": "node scripts/prepare-docs.mjs",
+    "changelog": "node scripts/changelog.mjs",
+    "release:patch": "pnpm version patch --no-git-tag-version",
+    "release:minor": "pnpm version minor --no-git-tag-version",
+    "release:major": "pnpm version major --no-git-tag-version",
     "stories:prepare": "node scripts/prepare-stories.mjs",
     "stories:check": "node scripts/stories-check.mjs",
     "docs:dev": "astro dev --root docs",
@@ -79,11 +84,13 @@
     "spike:inventory": "node scripts/spike-motion-inventory.mjs",
     "spike:named-timelines": "node scripts/spike-named-timelines.mjs",
     "spike:surface-audit": "node scripts/spike-surface-audit.mjs",
+    "hardening:audit": "node scripts/hardening-audit.mjs",
     "spike:intrinsic-layout": "node scripts/spike-intrinsic-layout.mjs",
     "spike:cdp-cost": "node scripts/spike-cdp-cost.mjs",
     "spike:local-list": "node scripts/spike-local-list.mjs",
     "spike:recalc": "node scripts/spike-recalc.mjs",
     "measure:real-page": "node scripts/measure-real-page.mjs",
+    "spike:real-page": "node scripts/spike-real-page.mjs",
     "candidate:diff": "node scripts/candidate-diff.mjs",
     "check": "node scripts/check.mjs"
   },
@@ -129,6 +136,8 @@
     "@vitest/coverage-v8": "4.0.9",
     "@vitest/eslint-plugin": "^1.4.2",
     "astro": "^7.3.2",
+    "conventional-changelog": "^8.1.3",
+    "conventional-changelog-conventionalcommits": "^10.4.0",
     "css.escape": "^1.5.1",
     "csstype": "^3.2.1",
     "eslint": "^9.39.1",
