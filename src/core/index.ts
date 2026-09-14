@@ -1,12 +1,12 @@
 import type { CarrierKind } from '@/helpers/carriers'
 import type {
-    AnimatableStandardPropertyType,
-    Collection,
-    Creator,
-    CssInJs,
-    MatchComponentsPropertyFunction,
-    MatchUtilitiesPropertyFunction,
-    StaggerContext,
+  AnimatableStandardPropertyType,
+  Collection,
+  Creator,
+  CssInJs,
+  MatchComponentsPropertyFunction,
+  MatchUtilitiesPropertyFunction,
+  StaggerContext,
 } from '@/types'
 
 import { assemble } from '@/helpers/assemble'
@@ -60,6 +60,15 @@ export type ModelSink = {
    * is the hero orbit's `animate-rotate-[360deg]` leaking into nested petals, which then spun at the
    * petal's duration. There is no configuration an author could want there, and no `var()` fallback
    * that can prevent it, because a fallback applies only when a property is unset.
+   *
+   * A reset is the other tool for this, and it is the one that was used before registration existed:
+   * write the base variables back to their initial values on every element, and let the utility on the
+   * child supersede the reset. That is where the derived defaults rule comes from, and it still works
+   * for configuration, because configuration has a known value to write. It cannot work for state: a
+   * reset is a *rule*, so it would have to enumerate the activation names, and the set is not known
+   * when a utility is emitted — slots accumulate across a build, and one can be created after a pass
+   * has already published its lists. One rule per slot matching every element, against one
+   * registration per name that matches nothing.
    *
    * `behaviour:check` asserts this in a browser: a nested animating element must run its own slot
    * and not its ancestor's.

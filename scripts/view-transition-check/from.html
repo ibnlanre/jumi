@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Jumi · view transitions — from</title>
+    <!--
+      Nothing here is scripted, and nothing here names a transition. The at-rule below is the whole
+      opt-in to a cross-document transition; `view-transition-name` is nowhere in this file, because
+      the finalizer emits it from the candidates on the elements. That is the point of the fixture:
+      an author writes Jumi candidates, and the pass writes the identity.
+
+      `motion-safe:` is on the hero on purpose. Jumi strips that wrapper from the identity and keeps
+      it on the motion, and the only way to see the difference is a document that carries it and a
+      browser asked for `reduce`.
+    -->
+    <style>
+      @view-transition { navigation: auto; }
+
+      body { margin: 0; font: 600 14px/1.2 system-ui, sans-serif; }
+      main { display: flex; gap: 24px; padding: 24px; align-items: flex-start; }
+      .tile {
+        border-radius: 12px; color: #fff; display: grid;
+        height: 96px; place-items: center; width: 96px;
+      }
+      .hero { background: #db2777; }
+      .card { background: #0d9488; }
+      /* A pair whose two sides disagree about when they apply: the outgoing side asks for a wide
+         viewport and the incoming side does not, so below the breakpoint the element still travels
+         and only one of its sides is Jumi's. */
+      .mixed { background: #7c3aed; }
+      /* A duration control with no motion beside it, which must not make the element participate. */
+      .inert { background: #64748b; }
+      a { color: #4f46e5; font-weight: 700; }
+    </style>
+    <link rel="stylesheet" href="/jumi.css" />
+  </head>
+  <body>
+    <main>
+      <div class="tile hero motion-safe:view-transition-old/hero:animate-fade-out motion-safe:view-transition-new/hero:animate-fade-in">hero</div>
+      <div class="tile card sm:view-transition-old/card:animate-fade-out sm:view-transition-new/card:animate-fade-in">card</div>
+      <div class="tile mixed sm:view-transition-old/mixed:animate-fade-out view-transition-new/mixed:animate-fade-in">mixed</div>
+      <div class="tile inert view-transition-old/inert:animation-duration-300">control only</div>
+      <a id="go" href="/to.html">to</a>
+    </main>
+  </body>
+</html>

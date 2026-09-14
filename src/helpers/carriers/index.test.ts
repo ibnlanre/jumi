@@ -156,7 +156,7 @@ describe('the finalizer', () => {
   it('leaves a stylesheet that staged nothing exactly as it found it', () => {
     const css = '/* keep me */\n.animate-rotate-45 { --jumi-rotate-a-animation-name: jumi-rotate-a; }'
 
-    expect(finalizeCss(css)).toEqual({ animations: 0, css, staging: 0, transitions: 0 })
+    expect(finalizeCss(css)).toEqual({ animations: 0, css, staging: 0, transitions: 0, viewTransitions: 0, warnings: [] })
   })
 
   it('invents nothing from a payload that nothing activates', () => {
@@ -227,7 +227,7 @@ describe('the finalizer', () => {
 
     // Neither is a declaration, so there is no payload to read — and a string that names the marker
     // must not become one. Nothing is synthesized, because nothing was published.
-    expect(finalizeCss(css)).toEqual({ animations: 0, css, staging: 0, transitions: 0 })
+    expect(finalizeCss(css)).toEqual({ animations: 0, css, staging: 0, transitions: 0, viewTransitions: 0, warnings: [] })
   })
 
   it('keeps a value that only looks like it ends early', () => {
@@ -266,7 +266,7 @@ describe('the finalizer', () => {
 
     // The first pass removed every payload rule, so the second finds nothing to read and nothing to
     // add. Collecting facts before mutating the AST is what makes this hold.
-    expect(twice).toEqual({ animations: 0, css: once.css, staging: 0, transitions: 0 })
+    expect(twice).toEqual({ animations: 0, css: once.css, staging: 0, transitions: 0, viewTransitions: 0, warnings: [] })
   })
 
   it('prefers an aggregate handed to it over the one in the stylesheet', () => {

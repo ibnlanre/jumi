@@ -55,6 +55,7 @@
 
         for (const pseudo of [
           '::view-transition-group(root)',
+          '::view-transition-image-pair(root)',
           '::view-transition-old(root)',
           '::view-transition-new(root)',
           '::view-transition-group(hero)',
@@ -65,7 +66,14 @@
 
           pseudos[pseudo] = cs.length === 0
             ? { resolved: false }
-            : { resolved: true, name: cs.animationName, opacity: cs.opacity, transform: cs.transform }
+            : {
+                markers: markers(cs),
+                mixBlendMode: cs.mixBlendMode,
+                name: cs.animationName,
+                opacity: cs.opacity,
+                resolved: true,
+                transform: cs.transform,
+              }
         }
 
         const matches = (selector) => {
@@ -80,10 +88,37 @@
           active: matches(':active-view-transition'),
           typed: matches(':active-view-transition-type(slide)'),
           pseudos,
+          // Which document's stylesheet this page actually linked. A run where the pseudo markers
+          // are all empty is ambiguous on its own; this says the sheet arrived.
+          sheets: {
+            from: getComputedStyle(document.documentElement).getPropertyValue('--probe-from-loaded').trim(),
+            to: getComputedStyle(document.documentElement).getPropertyValue('--probe-to-loaded').trim(),
+          },
           animations: document.getAnimations()
             .filter(a => (a.effect?.pseudoElement ?? '').startsWith('::view-transition'))
             .map(a => `${a.effect.pseudoElement} ${a.animationName ?? ''}`.trim()),
         }
+      }
+
+      /**
+       * The ownership markers, named explicitly because `getComputedStyle` cannot enumerate custom
+       * properties — `.length` counts the longhands it knows, not the variables an author set. Each
+       * side writes its own four names, so "both documents applied" and "one won the cascade" read
+       * differently rather than identically.
+       */
+      function markers(cs) {
+        const found = {}
+
+        for (const name of [
+          '--probe-from-old', '--probe-from-new', '--probe-from-pair', '--probe-from-group',
+          '--probe-to-old', '--probe-to-new', '--probe-to-pair', '--probe-to-group',
+        ]) {
+          const value = cs.getPropertyValue(name).trim()
+
+          if (value) found[name] = value
+        }
+
+        return found
       }
     </script>
   </head>

@@ -1,0 +1,790 @@
+#!/usr/bin/env node
+/**
+ * View-transition check — is the *emitted* path a working view transition?
+ *
+ * The syntax spike proved the design against a hand-written stylesheet. That is not the same claim as
+ * "the library emits it", and the difference is exactly where the two decisions this pass makes
+ * become observable: which candidates name an element, and which wrappers survive onto the pseudo
+ * tree. Neither is visible in text that looks plausible — a wrong identity rule produces a stylesheet
+ * that parses, a page that renders, and a shared element that never travels.
+ *
+ * So this runs the real two steps a build runs. Tailwind emits from candidates the author would
+ * write; the finalizer that ships completes it; the result is served to Chromium and the transition
+ * is started by a link click. Then it asks the browser three questions no text check can answer:
+ *
+ *   does the element participate      `::view-transition-group(hero)` exists only if an identity was
+ *                                     actually written onto the element, so this is the assertion
+ *                                     that `view-transition-name` came out of the finalizer rather
+ *                                     than out of the fixture — and the fixture names nothing
+ *   does Jumi's motion run on it      the pseudo animation's name is a Jumi keyframe rather than the
+ *                                     browser's own cross-fade
+ *   does a control alone cause it     it must not. This is Jumi's oldest invariant — controls
+ *                                     configure motion, they do not create it — and it is why the pass
+ *                                     separates motion-bearing candidates from control-only ones.
+ *                                     Proven in a browser because `animation-duration-300` on its own
+ *                                     produces CSS that looks entirely reasonable.
+ *
+ * Two more arms, both of which would pass for the wrong reason if they were only asserted in text:
+ *
+ *   `reduce`                          the hero's candidates are `motion-safe:`-wrapped, so under
+ *                                     reduced motion the identity must still be emitted — the element
+ *                                     travels — while Jumi's animation must not run. Getting that
+ *                                     backwards is silent in either direction: strip too much and
+ *                                     nothing participates, strip too little and `reduce` deletes the
+ *                                     transition instead of quieting it.
+ *   `@supports` guard                 every arm above runs through `@supports selector(…)`. A guard
+ *                                     that evaluated false would take the whole emission with it, and
+ *                                     the pages would still render perfectly.
+ *
+ * The fixtures carry no JavaScript and name no transition: the observation is injected with
+ * `addInitScript`, so what is under test is a document a build produced and nothing else.
+ *
+ * Run: pnpm view-transition:check
+ */
+import { execFileSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
+import { createServer } from 'node:http'
+import { fileURLToPath } from 'node:url'
+import { chromium } from 'playwright'
+
+import path from 'node:path'
+import postcss from 'postcss'
+
+const here = path.dirname(fileURLToPath(import.meta.url))
+const root = path.join(here, '..')
+const fixtures = path.join(here, 'view-transition-check')
+
+/**
+ * Bundle first, and this is not a formality.
+ *
+ * Everything below loads `dist/`, so a check that skips this step tests whatever was last built — which
+ * is how a stale artifact reported a bug that had already been fixed, in this very file, once. The
+ * carrier instrument bundles for the same reason.
+ */
+console.log('· bundling')
+execFileSync('pnpm', ['run', 'bundle'], { cwd: root, stdio: 'pipe' })
+
+const { build, compiler, finalizeCss } = await import('./lib/compile.mjs')
+
+/**
+ * The candidates, which are the author's whole contribution.
+ *
+ * `motion-safe:` is on the hero and nowhere else, on purpose: it is the wrapper Jumi strips from the
+ * identity while keeping it on the motion, and the only way to see the difference is a document that
+ * carries it and a browser asked for `reduce`. `sm:` is on the card for the opposite reason — it is the
+ * wrapper that must be kept on both — and the widths below are what tell a kept condition from an
+ * ignored one. It is on **both** of the card's candidates, because a pair with one unconditional side
+ * is unconditional by construction: each motion-bearing candidate names the element, so the
+ * unconditional one would name it outside the query. `mixed` is that pair on purpose — `sm:` on the
+ * outgoing side and nothing on the incoming one — and the two viewport arms below are what tell a
+ * wrapper that reached the motion from one that only reached the name. `inert` carries a duration
+ * control and no motion, and is the one candidate here that must produce nothing at all.
+ */
+const CANDIDATES = [
+  'motion-safe:view-transition-old/hero:animate-fade-out',
+  'motion-safe:view-transition-new/hero:animate-fade-in',
+  'sm:view-transition-old/card:animate-fade-out',
+  'sm:view-transition-new/card:animate-fade-in',
+  'sm:view-transition-old/mixed:animate-fade-out',
+  'view-transition-new/mixed:animate-fade-in',
+  'view-transition-old/inert:animation-duration-300',
+]
+
+const instance = await compiler(
+  `@import "tailwindcss" source(none);\n@plugin "${path.join(root, 'dist/index.js')}";\n`,
+  root,
+)
+
+const emitted = build(instance, CANDIDATES)
+
+// A second *pass*, not a second build. Over its own output the finalizer has to be a no-op, because
+// Vite runs it on every transform — and a fresh build would prove nothing, since Tailwind would simply
+// have staged the candidates again.
+const again = finalizeCss(emitted.css)
+
+/* ------------------------------------------------------------------ the emitted text */
+
+const checks = []
+
+const check = (label, pass, detail = '') => {
+  checks.push({ detail, label, pass })
+}
+
+/**
+ * Read the emission structurally rather than by pattern.
+ *
+ * The same lesson the carrier instruments learned: `view-transition-name: hero` appearing somewhere is
+ * not the fact that matters. What matters is which conditions sit around it, and a regex over a
+ * generated stylesheet cannot answer that reliably enough to be trusted with the one decision that
+ * separates a travelling element from a deleted transition.
+ */
+const parsed = postcss.parse(emitted.css)
+const identities = []
+const pseudos = []
+
+parsed.walkRules((rule) => {
+  const conditions = []
+
+  for (let node = rule.parent; node && node.type !== 'root'; node = node.parent) {
+    if (node.type === 'atrule') conditions.unshift(`@${node.name} ${node.params}`.trim())
+  }
+
+  const declarations = (rule.nodes ?? []).filter(node => node.type === 'decl')
+
+  if (declarations.some(node => node.prop === 'view-transition-name')) {
+    identities.push({
+      conditions,
+      name: declarations.find(node => node.prop === 'view-transition-name').value,
+      selector: rule.selector,
+    })
+  }
+
+  if (rule.selector.includes('::view-transition-')) {
+    pseudos.push({
+      conditions,
+      declarations: declarations.map(node => node.prop),
+      selector: rule.selector,
+    })
+  }
+})
+
+check('the pass wrote products', emitted.viewTransitions > 0, `${emitted.viewTransitions} rules`)
+
+/**
+ * The per-side rules, told from the owning rules by **what they declare** rather than by how many
+ * selectors they have.
+ *
+ * Counting selectors looks equivalent and is not: an owning rule lists every side that shares its
+ * condition set, and a condition set can hold exactly one — so a one-selector owning rule would be
+ * classified as a side rule, and the blend assertion below would read a rule that carries no blend.
+ * The owning rules are the ones that declare `animation`; a side rule never does.
+ */
+const sides = pseudos.filter(entry => !entry.declarations.includes('animation'))
+
+// The staging marker is a build-time name with the same zero-occurrence invariant the carrier
+// protocol has: surviving it means the pages carry a class that matches nothing.
+check(
+  'no staging marker survives',
+  !emitted.css.includes('jumi-vt-'),
+  'zero occurrences of `.jumi-vt-`',
+)
+
+for (const identity of ['hero', 'card']) {
+  const found = identities.filter(entry => entry.name === identity)
+
+  check(
+    `the identity for \`${identity}\` was emitted`,
+    found.length > 0,
+    `${found.length} rule(s): ${found.map(entry => entry.selector).join(', ') || 'none'}`,
+  )
+}
+
+// The invariant, read off the text. A control-only candidate produces no identity — and if it did, the
+// element carrying it would participate in a transition nothing asked for.
+check(
+  'a control alone names no element',
+  !identities.some(entry => entry.name === 'inert'),
+  identities.map(entry => entry.name).join(', ') || 'no identities',
+)
+
+// The strip. `motion-safe:` must not survive as a condition on an identity, because a
+// `view-transition-name` under `no-preference` is exactly the shape that deletes participation under
+// `reduce` rather than quieting the motion — measured, P22.
+check(
+  'no identity is wrapped in Jumi\'s own query',
+  !identities.some(entry => entry.conditions.some(condition => condition.includes('prefers-reduced-motion'))),
+  identities.map(entry => `${entry.name} ${entry.conditions.join(' › ') || '(unconditional)'}`).join(' | '),
+)
+
+// And the other half of the rule: the wrapper is kept where the author asked for it, which is what
+// makes the `motion-safe:` in the fixture meaningful rather than merely ignored.
+check(
+  'the motion keeps the condition its identity dropped',
+  pseudos.some(entry => entry.conditions.some(condition => condition.includes('no-preference'))),
+  pseudos[0]?.conditions.join(' › ') ?? 'no pseudo rules',
+)
+
+// An author's own condition is kept on the identity, which is the claim the narrow-viewport arm below
+// then tests in a browser: a condition that is written down but never honoured looks identical in text
+// to one that is honoured, and only a viewport that fails it can tell them apart.
+check(
+  'an author\'s own condition is kept on the identity',
+  identities.some(entry => entry.name === 'card' && entry.conditions.some(c => c.includes('width >= 40rem'))),
+  identities.filter(entry => entry.name === 'card')
+    .map(entry => entry.conditions.join(' › ') || '(unconditional)').join(' | '),
+)
+
+check(
+  'the pseudos are guarded',
+  pseudos.length > 0
+  && pseudos.every(entry => entry.conditions.some(condition => condition.startsWith('@supports selector('))),
+  pseudos[0]?.conditions.join(' › ') ?? 'none',
+)
+
+check(
+  'the UA blend is re-declared on both sides',
+  // The shared rule carries the substrate and the aggregate and lists every side, so it is the one
+  // pseudo rule that must *not* have a blend; the per-side rules are the ones that must.
+  sides.length > 0 && sides.every(entry => entry.declarations.includes('mix-blend-mode')),
+  sides.map(entry => entry.selector).join(' | ') || 'no per-side rules',
+)
+
+// The group is the browser's, and reaching it replaces the shared element's travel with whatever Jumi
+// wrote (measured, P12). Nothing in the emission may name it.
+check(
+  'the group is left alone',
+  !pseudos.some(entry => entry.selector.includes('::view-transition-group(')),
+  pseudos.map(entry => entry.selector).join(' | ') || 'no pseudo rules',
+)
+
+// The pass runs on every Vite transform, so a second pass over its own output has to be a no-op. It
+// is, by construction: the marker is what it collects, and the marker is gone.
+check(
+  'the emitted stylesheet finalizes to itself',
+  again.css === emitted.css && again.viewTransitions === 0,
+  `${again.viewTransitions} rules on a second pass`,
+)
+
+/* ------------------------------------------------------------------ the browser */
+
+const server = createServer((request, response) => {
+  const url = new URL(request.url, 'http://127.0.0.1')
+  const name = url.pathname === '/' ? '/from.html' : url.pathname
+
+  if (name === '/jumi.css') {
+    response.writeHead(200, { 'cache-control': 'no-store', 'content-type': 'text/css' }).end(emitted.css)
+
+    return
+  }
+
+  try {
+    const body = readFileSync(path.join(fixtures, path.basename(name)), 'utf8')
+
+    response.writeHead(200, { 'cache-control': 'no-store', 'content-type': 'text/html' }).end(body)
+  }
+  catch {
+    response.writeHead(404).end('no fixture')
+  }
+})
+
+await new Promise(resolve => server.listen(0, '127.0.0.1', resolve))
+
+const base = `http://127.0.0.1:${server.address().port}`
+
+/**
+ * The observation, injected rather than authored.
+ *
+ * `pagereveal` is the only place a cross-document transition can be observed from inside the page: the
+ * outgoing document has no script by design, and the pseudo tree is not in the DOM. This listener
+ * reads and never writes, and the fixture it runs in is HTML and CSS only — which is the claim being
+ * checked.
+ *
+ * Existence is read from `document.getAnimations()`, not from `getComputedStyle`: the latter returns a
+ * declaration object for any pseudo-element, including one that was never created, so it cannot answer
+ * whether a group exists. That mistake has already cost this investigation a pass.
+ */
+const RECORDER = () => {
+  window.__vt = []
+
+  const snapshot = names => ({
+    animations: document.getAnimations()
+      .filter(animation => (animation.effect?.pseudoElement ?? '').startsWith('::view-transition'))
+      .map(animation => `${animation.effect.pseudoElement} ${animation.animationName ?? ''}`.trim()),
+    named: Object.fromEntries(names.map((name) => {
+      const element = document.querySelector(`.${name}`)
+
+      return [name, element
+        ? getComputedStyle(element).getPropertyValue('view-transition-name').trim()
+        : null]
+    })),
+  })
+
+  window.addEventListener('pagereveal', (event) => {
+    window.__vt.push({
+      at: 'reveal',
+      hasTransition: Boolean(event.viewTransition),
+      ...snapshot(['hero', 'card', 'inert']),
+    })
+
+    if (!event.viewTransition) return
+
+    void event.viewTransition.ready.then(() => {
+      window.__vt.push({ at: 'ready', ...snapshot(['hero', 'card', 'inert']) })
+    })
+  })
+}
+
+/** One navigation: a plain link click, which is the only kind that starts a cross-document one. */
+const navigate = async (browser, reducedMotion, width = 900) => {
+  const context = await browser.newContext({ reducedMotion, viewport: { height: 600, width } })
+  const page = await context.newPage()
+
+  await page.addInitScript(RECORDER)
+  await page.goto(`${base}/from.html`)
+  await page.waitForLoadState('load')
+  await page.click('#go')
+  await page.waitForTimeout(1400)
+
+  const trace = await page.evaluate(() => window.__vt ?? [])
+
+  await context.close()
+
+  return trace
+}
+
+/** The last state that still held live pseudo animations, which is where the transition is readable. */
+const live = trace => [...trace].reverse()
+  .find(entry => entry.animations.some(animation => animation.startsWith('::view-transition')))
+  ?? [...trace].reverse().find(entry => entry.hasTransition)
+
+const browser = await chromium.launch()
+
+const trace = await navigate(browser, 'no-preference')
+const settled = live(trace)
+const animations = settled?.animations ?? []
+const named = name => animations.filter(entry => entry.includes(`(${name})`))
+
+/** The animation name a given pseudo runs, which is the whole question for the motion arms. */
+const ran = (prefix) => {
+  const [target] = animations.filter(entry => entry.startsWith(prefix))
+
+  return target ? target.slice(prefix.length).trim() : ''
+}
+
+check(
+  'a cross-document transition started',
+  // Read from the whole trace, not from the entry `live()` picks: `hasTransition` is a fact about
+  // `pagereveal`, and the entry that still held animations is often a later one that never saw it.
+  trace.some(entry => entry.hasTransition),
+  `${trace.length} trace entries, ${trace.filter(entry => entry.hasTransition).length} with a transition`,
+)
+
+check(
+  'the emitted identity named the hero',
+  named('hero').some(entry => entry.startsWith('::view-transition-group(hero)')),
+  named('hero').join(' | ') || 'no hero pseudo animations',
+)
+
+check(
+  'the emitted identity named the card',
+  named('card').some(entry => entry.startsWith('::view-transition-group(card)')),
+  named('card').join(' | ') || 'no card pseudo animations',
+)
+
+check(
+  'the identity reached the element as a declaration',
+  settled?.named.hero === 'hero',
+  `computed on .hero: \`${settled?.named.hero || 'empty'}\``,
+)
+
+check(
+  'Jumi\'s motion runs on the outgoing side',
+  ran('::view-transition-old(hero)').startsWith('jumi-fade-out'),
+  ran('::view-transition-old(hero)') || 'none',
+)
+
+check(
+  'Jumi\'s motion runs on the incoming side',
+  ran('::view-transition-new(hero)').startsWith('jumi-fade-in'),
+  ran('::view-transition-new(hero)') || 'none',
+)
+
+// The invariant, in a browser. `inert` carries a duration control and no motion, so no identity was
+// emitted for it and the browser builds nothing for it.
+check(
+  'a control alone did not make the element participate',
+  named('inert').length === 0,
+  named('inert').join(' | ') || 'no `inert` pseudo animations',
+)
+
+// The group is the browser's own travel. If the emission had aimed at it, the animation name here
+// would be a Jumi keyframe — and the shared element would animate in place instead of moving (P12).
+check(
+  'the browser\'s own travel was not replaced',
+  named('hero').filter(entry => entry.startsWith('::view-transition-group(hero)'))
+    .every(entry => !entry.includes(' jumi-')),
+  named('hero').filter(entry => entry.startsWith('::view-transition-group')).join(' | ') || 'no group animation',
+)
+
+/* ------------------------------------------------------------------ an author's own condition */
+
+/**
+ * The narrow viewport.
+ *
+ * `sm:` is the wrapper that must be kept — on both the identity and the motion — and this is the arm
+ * that tells a kept condition from an ignored one. At a width the query fails, the card must not
+ * participate at all, because that is what the author asked for. In text the two cases are identical:
+ * `view-transition-name: card` inside `@media (width >= 40rem)` and the same declaration without the
+ * wrapper both read as present, and only a viewport that fails the query distinguishes them.
+ *
+ * The hero, whose wrapper was `motion-safe:` and was stripped, must still participate here — the same
+ * point from the other direction.
+ */
+const narrow = live(await navigate(browser, 'no-preference', 500))
+const narrowAnimations = narrow?.animations ?? []
+
+check(
+  'an author\'s condition is honoured, not just written down',
+  narrowAnimations.some(entry => entry.startsWith('::view-transition-group(hero)'))
+  && !narrowAnimations.some(entry => entry.startsWith('::view-transition-group(card)')),
+  `hero ${narrowAnimations.filter(e => e.includes('group(hero)')).length},`
+  + ` card ${narrowAnimations.filter(e => e.includes('group(card)')).length} at 500px`,
+)
+
+/**
+ * The differential for the mixed pair: same document, same stylesheet, two viewports, and the only
+ * thing that changes is whether one side is Jumi's.
+ *
+ * This is the arm that pins a wrapper reaching the *motion* rather than only the name. Both sides were
+ * wrapped the same way in the emitted CSS in an earlier version of this pass, and at 500px the outgoing
+ * side would still have run Jumi's keyframe while claiming to be conditioned — a difference visible
+ * only by comparing the two viewports against each other.
+ */
+const mixedRan = (trace) => {
+  const state = live(trace)
+  const side = (name) => {
+    const [found] = (state?.animations ?? []).filter(entry => entry.startsWith(`::view-transition-${name}(mixed)`))
+
+    return found ? found.slice(`::view-transition-${name}(mixed)`.length).trim() : ''
+  }
+
+  return { new: side('new'), old: side('old') }
+}
+
+const wide = mixedRan(trace)
+const narrowMixed = mixedRan(await navigate(browser, 'no-preference', 500))
+
+check(
+  'a wrapper reaches the motion, not only the name',
+  // Above the breakpoint both sides are Jumi's; below it, only the unconditioned one is, and the
+  // conditioned side goes back to the browser's own cross-fade rather than vanishing.
+  [wide.old, wide.new].every(name => name.startsWith('jumi-fade-'))
+  && narrowMixed.new.startsWith('jumi-fade-in')
+  && !narrowMixed.old.startsWith('jumi-fade-'),
+  `900px old=${wide.old || 'none'} new=${wide.new || 'none'};`
+  + ` 500px old=${narrowMixed.old || 'none'} new=${narrowMixed.new || 'none'}`,
+)
+
+check(
+  'a conditioned side falls back to the browser rather than to nothing',
+  narrowMixed.old.startsWith('-ua-view-transition-'),
+  `500px, outgoing side: ${narrowMixed.old || 'no animation at all'}`,
+)
+
+/* ------------------------------------------------------------------ reduced motion */
+
+const reduced = live(await navigate(browser, 'reduce'))
+const reducedAnimations = reduced?.animations ?? []
+
+check(
+  'under `reduce` the element still participates',
+  reducedAnimations.some(entry => entry.startsWith('::view-transition-group(hero)')),
+  reducedAnimations.filter(entry => entry.includes('(hero)')).join(' | ') || 'no hero pseudo animations',
+)
+
+check(
+  'under `reduce` Jumi\'s motion does not run',
+  reducedAnimations.every(entry => !entry.includes(' jumi-')),
+  reducedAnimations.join(' | ') || 'no pseudo animations',
+)
+
+await browser.close()
+server.close()
+
+/* ------------------------------------------------------------------ the loud channel */
+
+/**
+ * A refusal has to reach the person building, and the pass cannot do that itself: `finalize` is pure
+ * and returns its warnings, so each adapter translates them into its host's channel. That translation
+ * is the whole difference between "Jumi refused your candidate" and a page that quietly does something
+ * else — so it is asserted here rather than assumed, through the adapter that ships.
+ *
+ * The PostCSS adapter is the one that can be driven in-process. The Vite adapter reports the same
+ * returned list through `this.warn`; that it wires them is visible in one line of `src/vite.ts`, and
+ * the list itself is the part with logic in it.
+ */
+const refused = await compiler(
+  `@import "tailwindcss" source(none);\n@plugin "${path.join(root, 'dist/index.js')}";\n`,
+  root,
+)
+
+const REFUSED = ['motion-reduce:view-transition-old/hero:animate-fade-out']
+const refuses = build(refused, REFUSED)
+
+check(
+  'a refusal is reported rather than silently dropped',
+  refuses.warnings.length === 1 && refuses.warnings[0].includes('never runs there'),
+  refuses.warnings[0] ?? 'no warning',
+)
+
+const { jumiFinalizer } = await import(path.join(root, 'dist/postcss.js'))
+
+/**
+ * The adapter alone, over what Tailwind emitted — **not** over the finalized stylesheet.
+ *
+ * The distinction is the test. The warning is produced by the pass that reads the staging, so running
+ * a second finalizer over its own output finds nothing to refuse and would report nothing; the arm
+ * would pass for the wrong reason or fail for one. `instance.build` is the raw emission, which is
+ * exactly what an adapter is handed in a real build.
+ */
+const raw = refused.build(REFUSED)
+const result = await postcss([jumiFinalizer()]).process(raw, { from: 'refused.css' })
+
+check(
+  'the PostCSS adapter surfaces it as a warning',
+  result.warnings().some(warning => warning.text.includes('never runs there')),
+  result.warnings().map(warning => warning.text).join(' | ') || 'no warnings on the result',
+)
+
+/* ------------------------------------------------------------------ incremental builds */
+
+/**
+ * The lifetimes that could betray this pass, and the one that does not belong to it.
+ *
+ * The risk worth testing is compiler-lifetime state: Jumi holds one model per plugin instance, and its
+ * `values`, `phrases`, `registered` and `seen` registries accumulate for as long as that compiler lives,
+ * so a stale identity would be exactly the kind of thing to survive a rebuild unnoticed. The pass is
+ * built to hold **nothing** about view transitions and to read every fact out of the emitted stylesheet,
+ * which makes staleness impossible in principle — these arms are what make it a fact.
+ *
+ * The scenario "remove the candidate and rebuild" cannot be expressed through `Compiler.build()`, and
+ * that is a finding rather than a limitation of the arms: measured below, a long-lived compiler's build
+ * is **additive**. `inst.build([])` after `inst.build([old])` returns byte-identical output, because
+ * Tailwind carries the candidate set forward — the same property `incremental:check` already relies on,
+ * and the same reason a dev session keeps a class until it is reloaded. So the arms here test the two
+ * things that are actually Jumi's:
+ *
+ *   a fresh build with a smaller candidate set     has no trace of what is not in it
+ *   the pass, across changing inputs               has no memory between them
+ *
+ * and one measurement that is Tailwind's, pinned so that the next person does not spend an afternoon
+ * writing an "incremental removal" scenario that quietly tests the wrong component.
+ */
+const entry = `@import "tailwindcss" source(none);\n@plugin "${path.join(root, 'dist/index.js')}";\n`
+
+const OLD = 'view-transition-old/hero:animate-fade-out'
+const NEW = 'view-transition-new/hero:animate-fade-in'
+
+const fresh = async candidates => finalizeCss((await compiler(entry, root)).build(candidates)).css
+
+/**
+ * What a build says about one identity, read from the **rules** rather than from the text.
+ *
+ * Substring tests are wrong here for a reason this file has already paid for once: the `@supports`
+ * guard names a pseudo-element, so `css.includes('::view-transition-old(hero)')` is true for an
+ * emission that contains no old-side rule at all — the guard alone satisfies it. A side is a rule whose
+ * selector starts with the pseudo, and nothing else in the output looks like that.
+ */
+const shape = (css) => {
+  const selectors = []
+
+  postcss.parse(css).walkRules((rule) => {
+    selectors.push(rule.selector.replace(/\s+/g, ' ').trim())
+  })
+
+  return {
+    identity: selectors.some(selector => selector === '.view-transition-old\\/hero\\:animate-fade-out'
+      || selector === '.view-transition-new\\/hero\\:animate-fade-in'),
+    marked: selectors.some(selector => selector.includes('.jumi-vt-')),
+    new: selectors.some(selector => selector.startsWith('::view-transition-new(hero)')),
+    old: selectors.some(selector => selector.startsWith('::view-transition-old(hero)')),
+  }
+}
+
+const onlyOld = shape(await fresh([OLD]))
+const onlyNew = shape(await fresh([NEW]))
+const neither = shape(await fresh(['animate-fade-in']))
+
+check(
+  'a build with one side emits that side and no other',
+  onlyOld.identity && onlyOld.old && !onlyOld.new,
+  JSON.stringify(onlyOld),
+)
+
+check(
+  'a build whose candidate set lacks a side leaves no trace of it',
+  // The identity survives — the incoming side asks for it — and the outgoing side goes back to being
+  // the browser's, rather than being left behind by a build that no longer names it.
+  onlyNew.identity && onlyNew.new && !onlyNew.old,
+  JSON.stringify(onlyNew),
+)
+
+check(
+  'a build with no view-transition candidate at all emits nothing',
+  !neither.identity && !neither.marked && !neither.old && !neither.new,
+  JSON.stringify(neither),
+)
+
+/**
+ * Statelessness, which is the property all of the above rest on.
+ *
+ * Finalize the full stylesheet, then a smaller one, then the full one again. If the pass remembered
+ * anything between calls — a name, a selector, a slot — the third result would differ from the first,
+ * and no amount of testing a single build would have found it.
+ */
+const full = instance.build(CANDIDATES)
+const smaller = instance.build([OLD])
+
+const first = finalizeCss(full)
+const middle = finalizeCss(smaller)
+const last = finalizeCss(full)
+
+check(
+  'the pass carries no state between inputs',
+  last.css === first.css && last.viewTransitions === first.viewTransitions
+  && middle.css !== first.css,
+  `full ${first.css.length} → smaller ${middle.css.length} → full ${last.css.length}`,
+)
+
+check(
+  'a long-lived compiler\'s build is additive, and that is the host\'s, not the pass\'s',
+  // Pinned deliberately. It reads like a bug in the finalizer the first time it is met — a removed
+  // candidate keeps its identity — and it is not: the candidate is still in the stylesheet, and the
+  // finalizer faithfully emits what it is given. Anything that wants a genuine shrink has to build on a
+  // fresh compiler, which is what every arm above does.
+  (() => {
+    const instance_ = instance
+
+    return instance_.build([OLD]) === instance_.build([])
+  })(),
+  'Tailwind carries the candidate set forward, so a dev session keeps a class until it reloads',
+)
+
+/* ------------------------------------------------------------------ the published examples */
+
+/**
+ * Every class the documentation page names has to exist.
+ *
+ * `docs:build` is not in the gate, and Tailwind ignores a class it cannot resolve — so a page whose
+ * examples have drifted from the library renders perfectly while teaching a feature that does not exist.
+ * That is the failure `stories:check` exists for on the Storybook side; this is the same claim for the
+ * one page that has no coverage.
+ *
+ * The classes are **read out of the page**, not copied here. A hand-kept list catches the library moving
+ * away from the page and misses the page moving away from the library, which is the direction that
+ * actually happens.
+ */
+const page = readFileSync(path.join(root, 'docs/src/pages/docs/view-transitions.md'), 'utf8')
+
+/**
+ * Compile one candidate alone, on a compiler of its own, and hand back **both** sides of the pipeline.
+ *
+ * A compiler per call, because a long-lived one's build is additive: the second class would be measured
+ * inside the first one's stylesheet and every class would appear to resolve.
+ *
+ * Both sides, because resolving and emitting are different questions. A lone duration control resolves
+ * perfectly well and emits nothing — the page's claim about it is the second of those.
+ */
+const compileAlone = async (candidates) => {
+  const raw = (await compiler(entry, root)).build(candidates)
+
+  return { raw, ...finalizeCss(raw) }
+}
+
+/** How a class reaches the selector: every character an identifier cannot hold is escaped. */
+const asSelector = candidate => `.${candidate.replace(/[^A-Za-z0-9_-]/g, character => `\\${character}`)}`
+
+const blocks = [...page.matchAll(/```html\n([\s\S]*?)```/g)].map(block => block[1])
+const classes = [...page.matchAll(/class="([^"]+)"/g)].map(match => match[1])
+const found = blocks.flatMap(block => [...block.matchAll(/class="([^"]+)"/g)].map(match => match[1]))
+const tokens = [...new Set(found.flatMap(value => value.split(/\s+/).filter(Boolean)))]
+
+const unknown = []
+
+for (const token of tokens) {
+  const { raw } = await compileAlone([token])
+
+  // The selector is the signal, and the obvious alternatives are both wrong. `--jumi-` is published in
+  // the carrier payload for *any* input, including a class that does not exist; and the finalized output
+  // has had the staging removed, which is where a lone control keeps the only name it writes.
+  if (!raw.includes(asSelector(token))) unknown.push(token)
+}
+
+check(
+  'every class the documentation names resolves',
+  // `classes.length === found.length` is the anti-skip clause: every `class` attribute in the page has to
+  // be inside a block the extractor understood, so a fence it fails to recognise shows up as a mismatch
+  // rather than as a quietly shorter list. Without it the arm could pass while reading half the page.
+  tokens.length > 0 && !unknown.length && classes.length === found.length,
+  unknown.length
+    ? `${unknown.length} unknown: ${unknown.join(', ')}`
+    : `${tokens.length} classes in ${blocks.length} examples`
+      + ` (${found.length}/${classes.length} class attributes in recognised blocks)`,
+)
+
+/**
+ * And the two the page names as things that do **not** work.
+ *
+ * Asserted separately because resolving and emitting are different questions: a lone duration control
+ * resolves perfectly well, and the page's claim about it is that it leaves the element out of the
+ * transition. A check that only asked "does it compile" would agree with the page while the page was
+ * wrong.
+ */
+for (const [claim, candidate] of [
+  ['a control alone does not make the element participate', 'view-transition-old/hero:animation-duration-300'],
+  ['a source-state variant is refused', 'hover:view-transition-old/hero:animate-fade-out'],
+]) {
+  const { viewTransitions } = await compileAlone([candidate])
+
+  check(`the page's claim holds: ${claim}`, viewTransitions === 0, `${candidate} → ${viewTransitions} rules`)
+}
+
+/* ------------------------------------------------------------------ the two adapters */
+
+/**
+ * Byte equivalence between the pass and the two hosts that call it.
+ *
+ * The finalizer is where this feature lives, so "Vite and PostCSS agree" is not a formality: they hand
+ * it different things — PostCSS an AST it already parsed, Vite a string — and a difference between them
+ * would show up as a feature that works in development and not in a build. The carrier protocol has
+ * this assertion already; the view-transition emission is new code on the same path.
+ */
+const { jumiFinalizer: postcssFinalizer } = await import(path.join(root, 'dist/postcss.js'))
+const { jumiFinalizer: viteFinalizer } = await import(path.join(root, 'dist/vite.js'))
+
+const emission = instance.build(CANDIDATES)
+const expected = finalizeCss(emission).css
+const viaPostcss = (await postcss([postcssFinalizer()]).process(emission, { from: 'adapters.css' })).css
+
+const viteWarnings = []
+const transformed = viteFinalizer().transform.call(
+  { warn: message => viteWarnings.push(message) },
+  emission,
+  'adapters.css',
+)
+
+check(
+  'Vite and PostCSS produce the same bytes as the pass',
+  viaPostcss === expected && transformed?.code === expected,
+  `pass ${expected.length}, postcss ${viaPostcss.length}, vite ${transformed?.code?.length ?? -1}`,
+)
+
+check(
+  'the Vite adapter reports a refusal too',
+  (() => {
+    const refusedRaw = refused.build(REFUSED)
+    const warnings = []
+
+    viteFinalizer().transform.call({ warn: message => warnings.push(message) }, refusedRaw, 'x.css')
+
+    return warnings.some(message => message.includes('never runs there'))
+  })(),
+  'the same returned list, through the other host',
+)
+
+/* ------------------------------------------------------------------ report */
+
+for (const { detail, label, pass } of checks) {
+  console.log(`${pass ? '✓' : '✗'} ${label}${detail ? ` — ${detail}` : ''}`)
+}
+
+if (emitted.warnings.length) {
+  console.log(`\n· the finalizer reported ${emitted.warnings.length} refusal(s):`)
+  for (const warning of emitted.warnings) console.log(`  ${warning}`)
+}
+
+const failed = checks.filter(entry => !entry.pass).length
+
+console.log(`\n${checks.length - failed}/${checks.length} assertions passed`)
+
+if (failed) process.exit(1)

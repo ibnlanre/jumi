@@ -16,6 +16,11 @@ import type { Api, Creator, GetMatchComponents, GetMatchUtilities } from '@/type
 
 import { createJumiModel } from '@/core'
 import { stagingMarker } from '@/helpers/carriers'
+import {
+  identityAccepted,
+  viewTransitionInvalidMarker,
+  viewTransitionMarker,
+} from '@/helpers/carriers/view-transition'
 import { resolveTheme } from '@/helpers/create/theme'
 import { getMatchControls } from '@/properties/controls'
 import { getMatchTween } from '@/properties/tween'
@@ -64,9 +69,45 @@ export function getCreator(api: Api): Creator {
 }
 
 const jumi = createPlugin((api) => {
-  const { matchComponents, matchUtilities } = api
+  const { matchComponents, matchUtilities, matchVariant } = api
 
   const creator = getCreator(api)
+
+  /**
+   * View transitions, registered as a **variant** and not as a utility.
+   *
+   * Read it the way Tailwind's own `group-hover/button:` is read: a variant parameterised by a
+   * modifier, so `view-transition-old/hero:animate-fade-out` is the ordinary `animate-fade-out`
+   * wrapped by a variant whose value is the side and whose modifier is the identity. Everything after
+   * the `:` therefore stays an ordinary candidate — every existing Jumi motion, control, label,
+   * arbitrary value and composition feature works through it unchanged, and none of them needs to
+   * learn a second vocabulary. That is the whole reason for the shape.
+   *
+   * What the callback returns is a **marker**, not an animation: `&:where(.jumi-vt-old-hero)` matches
+   * no page, so the motion never reaches the element the author wrote, and the author's own class
+   * stays in the selector for the finalizer to recover the other three facts from. The declarations
+   * are data until `@/helpers/carriers` replays them onto `::view-transition-old(hero)`, which is the
+   * only place they can run.
+   *
+   * Both refusals return the same never-matching marker rather than `&`, and returning `&` is the
+   * mistake worth naming: it would apply the motion to the source element, where it would run as a
+   * second animation over the real one — plausible-looking output and a wrong page. Nothing this
+   * variant refuses may ever reach an element.
+   *
+   * The first branch is not about the author. Tailwind invokes this callback once at configuration
+   * time with a sentinel value and no candidate, and the `values` option does not filter it, so
+   * anything it *records* needs a guard. Refusing by value means the sentinel produces a marker that
+   * no candidate instantiates — which is why the finalizer reads the identities out of the
+   * stylesheet instead of remembering them here. There is nothing to remember, so there is nothing
+   * to forget.
+   */
+  matchVariant('view-transition', (side, { modifier }) => {
+    if (side !== 'old' && side !== 'new') return viewTransitionInvalidMarker('name')
+    if (!modifier) return viewTransitionInvalidMarker('missing')
+    if (!identityAccepted(modifier)) return viewTransitionInvalidMarker('name')
+
+    return viewTransitionMarker(side, modifier)
+  }, { values: { new: 'new', old: 'old' } })
 
   const registerComponents = (utilities: ReturnType<GetMatchComponents>) => {
     for (const name in utilities) {

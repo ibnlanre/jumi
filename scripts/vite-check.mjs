@@ -74,6 +74,18 @@ const CONTEXTS = `
     <div id="bare" class="animation-duration-500"></div>
     <div id="grown" class="animation-duration-500"></div>
     <div id="transitioning" class="transition-property/background-color transition-duration-[300ms]"></div>
+
+    <!--
+      View transitions, and they are here for a reason that is not coverage for their own sake. Several
+      cards with the *same* motion is the shape a CSS optimizer merges into one rule with a selector
+      list — and a pass that reads one marker per rule refuses every card in the page when that happens.
+      It did: the docs build handed the emitter one rule carrying six cards, and every instrument here
+      passed while the feature did nothing in a browser. Measured through the real bundler rather than
+      the CLI, because the CLI does not merge.
+    -->
+    <div id="vt-a" class="view-transition-old/vt-a:animate-fade-out view-transition-new/vt-a:animate-fade-in"></div>
+    <div id="vt-b" class="view-transition-old/vt-b:animate-fade-out view-transition-new/vt-b:animate-fade-in"></div>
+    <div id="vt-c" class="view-transition-old/vt-c:animate-fade-out view-transition-new/vt-c:animate-fade-in"></div>
 `
 
 /** The same shape as `behaviour:check`: the contexts are the product promise. */
@@ -240,6 +252,9 @@ const matrix = async (label, url, slots) => {
   return page
 }
 
+/** The identities the view-transition fixture carries, one per card. */
+const VIEW_TRANSITIONS = ['vt-a', 'vt-b', 'vt-c']
+
 /** What the protocol requires of any emitted stylesheet, whatever produced it. */
 const structure = (label, css) => {
   const { animations, declarations, leaks, transitions } = protocolState(css)
@@ -253,6 +268,33 @@ const structure = (label, css) => {
   if (leaked.length) failures.push(`${label}: the transport reached the output — ${leaked.map(([name, count]) => `${count} ${name}`).join(', ')}`)
   if (!animations) failures.push(`${label}: no composition reached the output`)
   if (declarations !== expected) failures.push(`${label}: ${declarations} declarations for ${animations} + ${transitions} compositions, expected ${expected}`)
+
+  /**
+   * View transitions, asserted here so every build shape gets them rather than one dedicated arm.
+   *
+   * The three cards declare the *same* motion deliberately: that is what a CSS optimizer merges into a
+   * single rule with a selector list, and a pass that reads one marker per rule refuses all three while
+   * reporting each politely — a bug that read like an authoring mistake, passed every instrument in this
+   * repository, and left the feature doing nothing in a browser. Through the bundler and not the CLI,
+   * because the CLI does not merge.
+   */
+  const named = VIEW_TRANSITIONS.filter(id => new RegExp(`view-transition-name:\\s*${id}\\b`).test(css))
+  const animated = VIEW_TRANSITIONS.filter(id => css.includes(`::view-transition-old(${id})`))
+
+  console.log(`    ${named.length === VIEW_TRANSITIONS.length && animated.length === VIEW_TRANSITIONS.length ? '✓' : '✗'}`
+    + ` ${label}: view transitions ${named.length}/${VIEW_TRANSITIONS.length} named,`
+    + ` ${animated.length}/${VIEW_TRANSITIONS.length} animated,`
+    + ` ${css.includes('jumi-vt-') ? 'staging LEFT' : 'no staging'}`)
+
+  if (named.length !== VIEW_TRANSITIONS.length) {
+    failures.push(`${label}: ${named.length} of ${VIEW_TRANSITIONS.length} view-transition identities reached the output`)
+  }
+
+  if (animated.length !== VIEW_TRANSITIONS.length) {
+    failures.push(`${label}: ${animated.length} of ${VIEW_TRANSITIONS.length} view-transition sides reached the output`)
+  }
+
+  if (css.includes('jumi-vt-')) failures.push(`${label}: view-transition staging reached the output`)
 
   return css
 }

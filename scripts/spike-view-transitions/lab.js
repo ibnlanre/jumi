@@ -31,6 +31,10 @@ const READ = [
   'animationDirection',
   'animationFillMode',
   'animationTimingFunction',
+  // The property the UA's `-ua-mix-blend-mode-plus-lighter` animates on old/new. An author
+  // animation replaces that UA animation, so this is what says whether the snapshots still
+  // composite additively or fall back to `normal` — which is the cross-fade bleed question.
+  'mixBlendMode',
   'opacity',
   'transform',
 ]
@@ -137,6 +141,44 @@ const OPS = {
 let current = null
 
 export const api = {
+  /**
+   * The declarations that activate a slot for `selector`, verbatim.
+   *
+   * This is the third thing a view-transition retarget needs, and the hoist is why. The composition
+   * reads `--jumi-slot-<slot>`, and that publication does not live on the composition — it lives on
+   * the rule that declares the slot's activation, which is a utility selector that a pseudo-element
+   * never matches. Replaying the substrate and the aggregate alone leaves every position falling back
+   * to `none`: the composition applies, and nothing animates.
+   *
+   * The whole body comes back rather than the activation variable alone, because the publication
+   * chain reads the activation and both are written by the same rule.
+   */
+  activation(selector) {
+    const walk = (rule) => {
+      const out = [rule]
+
+      if (rule.cssRules) for (const child of rule.cssRules) out.push(...walk(child))
+
+      return out
+    }
+
+    for (const sheet of document.styleSheets) {
+      let rules = []
+
+      try {
+        rules = [...sheet.cssRules].flatMap(walk)
+      }
+      catch { continue }
+
+      const found = rules.find(rule => rule.selectorText === selector
+        && [...rule.style].some(name => name.startsWith('--jumi-slot-')))
+
+      if (found) return { declarations: found.style.cssText, selector }
+    }
+
+    return { declarations: null, selector }
+  },
+
   /** Pause every pseudo animation and seek it, then measure. Returns how many were driven. */
   advance(t, pseudos = []) {
     const list = document.getAnimations().filter(a => (a.effect?.pseudoElement ?? '').startsWith(PSEUDO))
@@ -161,10 +203,13 @@ export const api = {
   /**
    * The two halves of the emitted composition, found by shape rather than by name.
    *
-   * A Jumi build emits the substrate (the slot variables and the `--jumi-animation-*` defaults) in
-   * one rule and the aggregate (`animation-name: var(--jumi-…-animation-name, var(--jumi-animation-name)), …`)
-   * in another; both carry the same utility selector list. The lab returns their declaration text
-   * so a retarget test replays the real thing.
+   * A Jumi build emits the substrate — the `--jumi-animation-*` defaults and the slot variables — in
+   * one rule, and the aggregate in another. What the aggregate *is* changed when the composition
+   * became a hoist: it used to declare the ten `animation-*` longhands, and it now declares the
+   * `animation` shorthand, the two longhands the shorthand resets, and one shallow
+   * `var(--jumi-slot-<slot>, none)` per position. So the finder is structural — shorthand plus the
+   * two resets plus a slot reference — and not "the rule whose `animation-name` mentions Jumi",
+   * which silently returned `null` here for a whole pass after the hoist landed.
    */
   jumi() {
     const sheet = [...document.styleSheets].find(s => (s.href ?? '').endsWith('/jumi.css'))
@@ -184,12 +229,29 @@ export const api = {
     const value = (rule, property) => rule.style.getPropertyValue(property)
 
     const substrate = styled.find(rule => value(rule, '--jumi-animation-name') === 'none')
-    const aggregate = styled.find(rule => value(rule, 'animation-name').includes('var(--jumi-')
-      && value(rule, 'animation-name').includes('--jumi-animation-name'))
+
+    /**
+     * Found by declaration text, not by `getPropertyValue('animation')`.
+     *
+     * An `animation` shorthand whose value contains `var()` cannot be expanded into longhands, and
+     * CSSOM then serializes the shorthand as the empty string — so the obvious lookup returns `''`
+     * for exactly the rule this is looking for. The text is the only place the shorthand is legible,
+     * and the order check (the shorthand, then the two longhands it resets) is what distinguishes the
+     * synthesized rule from any utility that happens to declare an animation.
+     */
+    const aggregate = styled.find((rule) => {
+      const text = rule.style.cssText
+      const shorthand = text.search(/(?<![\w-])animation\s*:/)
+      const resets = Math.max(text.indexOf('animation-composition'), text.indexOf('animation-timeline'))
+
+      return shorthand >= 0 && resets > shorthand && text.includes('var(--jumi-slot-')
+    })
     const keyframes = flat.filter(rule => rule.type === CSSRule.KEYFRAMES_RULE).map(rule => rule.name)
+    const hoisted = styled.filter(rule => [...rule.style].some(name => name.startsWith('--jumi-slot-')))
 
     return {
       aggregate: aggregate ? aggregate.style.cssText : null,
+      hoistedRules: hoisted.length,
       keyframes,
       selectors: {
         aggregate: aggregate ? aggregate.selectorText.slice(0, 96) : null,

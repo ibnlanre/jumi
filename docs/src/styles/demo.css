@@ -1,0 +1,11 @@
+/* The showcase page's own entry, and the only source it scans: nothing else on the site should get a
+   say in what this page compiles. `source(none)` plus one `@source` is the same shape `catalog.css`
+   uses, for the same reason.
+
+   This entry exists for one thing — the six cards' view transition candidates — and it is also the only
+   place in this repository where those candidates go through an optimizing CSS pipeline rather than a
+   CLI. That difference found a real bug: the optimizer merged the staged rules into one rule with a
+   selector list, which the emitter read as a single malformed candidate. `vite:check` now carries the
+   shape, and `src/helpers/carriers/view-transition.test.ts` states it directly. */
+@import 'tailwindcss' source(none);
+@source '../pages/demo/view-transitions.astro';

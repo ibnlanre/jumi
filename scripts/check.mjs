@@ -32,6 +32,12 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
  * reason `run` is an argv tail rather than a script name.
  */
 const STAGES = [
+  // First, and it is a prerequisite rather than a check. The root `tailwind.config.ts` imports
+  // `./dist/index.js`, and every harness from `css` down loads the finalizer out of it, so on a fresh
+  // clone the `types` stage fails with `Cannot find module './dist/index.js'` and the gate stops before
+  // it has checked anything. Measured on a clean tree: without this stage `pnpm check` cannot run at
+  // all. A gate that only works on the machine that last built is not a gate.
+  { about: 'the shipped bundle, which every stage below loads', label: 'bundle', run: ['run', 'bundle'] },
   { about: 'the public surface compiles', label: 'types', run: ['run', 'check-types'] },
   { about: 'src and scripts are clean', label: 'lint', run: ['exec', 'eslint', 'src', 'scripts'] },
   { about: 'the finalizer, the model and the CSS helper', label: 'unit', run: ['run', 'test:run'] },
@@ -39,6 +45,7 @@ const STAGES = [
   { about: 'the byte snapshot, over two frozen corpora', label: 'css', run: ['run', 'css:check'] },
   { about: 'incremental builds stay correct and local', label: 'incremental', run: ['run', 'incremental:check'] },
   { about: 'a real browser resolves a real carrier', label: 'behaviour', run: ['run', 'behaviour:check'] },
+  { about: 'the emitted view transition actually travels', label: 'view-transition', run: ['run', 'view-transition:check'] },
   { about: 'the Vite integration, dev and every build shape', label: 'vite', run: ['run', 'vite:check'] },
   { about: 'the PostCSS integration, in every configuration', label: 'postcss', run: ['run', 'postcss:check'] },
   { about: 'no carrier class in a shipped surface', label: 'legacy', run: ['run', 'legacy:check'] },

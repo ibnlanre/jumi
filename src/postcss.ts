@@ -53,8 +53,11 @@ export default function jumi(options?: { plugin?: string, tailwind?: PluginOptio
  */
 export function jumiFinalizer(): Plugin {
   return {
-    OnceExit(root) {
-      finalize(root)
+    OnceExit(root, { result }) {
+      // A refused candidate is otherwise indistinguishable from one that worked — the page renders
+      // either way — so it goes to PostCSS's own warning channel, which reaches the terminal of
+      // whoever is building. The pass itself stays pure and returns them.
+      for (const warning of finalize(root).warnings) result.warn(warning)
     },
 
     postcssPlugin: 'jumi',

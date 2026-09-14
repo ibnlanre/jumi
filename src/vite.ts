@@ -62,9 +62,19 @@ export function jumiFinalizer(): Plugin {
     name: 'jumi',
 
     transform(code, id) {
-      if (!id.includes('.css') || !code.includes(stagingMarker)) return null
+      // Two conditions for one reason, and the second is insurance rather than a case that occurs.
+      // Measured: a view-transition candidate always stages a carrier payload too, because the utility
+      // it wraps registers a slot. So `stagingMarker` alone would not skip a view transition *today* —
+      // but a guard that only looks for the payload marker would skip one silently if that ever stopped
+      // being true, and the failure would be a feature that works everywhere except a build.
+      if (!id.includes('.css')) return null
+      if (!code.includes(stagingMarker) && !code.includes('jumi-vt-')) return null
 
-      const { css, staging } = finalizeCss(code)
+      const { css, staging, warnings } = finalizeCss(code)
+
+      // A refused candidate is otherwise indistinguishable from one that worked, because the page
+      // renders either way. Vite's own channel, so it reaches whoever is running the build.
+      for (const warning of warnings) this.warn(warning)
 
       // Finalized already, or nothing to do: returning the same string would only make Vite
       // invalidate and re-serialize a module that did not change.

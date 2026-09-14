@@ -33,7 +33,7 @@ no CSS value, and collides with nothing in the host's own syntax.
 
 Tailwind rejects `{` and `}` in an arbitrary value, so the object-literal spelling (`[{0:16deg}]`)
 silently produces nothing. It accepts `@`, `,`, `|`, `:`, `_` and `%` intact, and `_` arrives at the
-plugin already converted to a space. A value is a phrase iff it matches
+plugin already converted to a space. A value is a phrase if it matches
 `^\s*\d+(?:\.\d+)?(?:\s*,\s*\d+(?:\.\d+)?)*\s*:`; no plain CSS value starts `digits:`, and
 ratios use a slash.
 

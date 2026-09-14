@@ -29,7 +29,7 @@ engineering/
 | `research/deployment.md` | the Vercel contract, and the 2026-09-12 diagnosis of a stale deploy |
 | `research/scanner-inventory.md` | candidate discovery: what the host hands a matcher, per candidate |
 | `research/upstream-limitation.md` | a parked investigation into a host limitation |
-| `research/view-transitions.md` | the View Transition API measured against the emitted model: the composition retargets onto the pseudo-elements, and cannot be reached from the source element |
+| `research/view-transitions.md` | the View Transition API measured against the emitted model: the composition retargets onto the pseudo-elements and cannot be reached from the source element, the incoming document governs the tree cross-document, the group stays browser-owned, and the hoist means the slot publication must be re-materialized alongside the composition — then the shipped emitter, its eleven invariants, and the falsifications that hold them |
 | `research/style-cost.md` | what the aggregate costs DevTools: 863 KB of protocol response for one selected element at 228 slots, 82% of it the declaration payload, and the hoisted representation that removes 61% of it and 60% of the recalc — confirmed by hand at 47 s → 2.7 s in the Inspector, and by the shipped build at 965,683 → 419,673 bytes with 228/228 live animations unchanged |
 | `roadmap/migration.md` | the migration: its phases, what closed, and what was decided along the way |
 
@@ -83,6 +83,12 @@ declared on the source element cannot reach them, that an author animation on
 Jumi might abandon. Its fixtures are templated by the harness's own server rather than duplicated
 per variant, and it is the *only* spike here that needs a served origin: a cross-document transition
 requires a same-origin navigation, and `file://` cannot provide one.
+
+`spike-vt-syntax` is the same workstream one layer down, and it probes the *host* rather than the
+platform: given a spelling for "animate the old side of `hero` with this motion", does Tailwind resolve
+the candidate, what does it hand Jumi's matcher, and does a label written in one class resolve to the
+slots named in another. It compiles one candidate per build on purpose — a candidate the host drops
+leaves no row in a batch, which is indistinguishable from one that resolved and did nothing.
 
 `spike-cdp-cost`, `spike-recalc` and `spike-local-list` are kept under the same rule, and together
 they are one question seen from three sides. `spike-cdp-cost` measures the aggregate through the

@@ -2,6 +2,14 @@ import type { Container, Declaration, Root, Rule } from 'postcss'
 
 import type { Collection } from '@/types'
 
+import {
+    emitViewTransitions,
+    isStagingSelector,
+    type Product,
+    viewTransitionStaging,
+    type ViewTransitionStaging,
+} from './view-transition'
+
 import postcss from 'postcss'
 
 /**
@@ -248,6 +256,18 @@ export type Finalized = {
   staging: number
   /** The same for transitions, from the rules that declare a motion's transition chain. */
   transitions: number
+  /** How many rules the view-transition pass wrote — identities plus pseudo-element rules. */
+  viewTransitions: number
+  /**
+   * A candidate the author wrote that this pass could not honour, with the reason.
+   *
+   * Returned rather than printed, because this function is pure and the host owns the loud channel:
+   * the PostCSS and Vite adapters turn each one into a `result.warn`, which survives to the terminal
+   * of whoever is building. A refusal that were only a console call here would be invisible in a
+   * bundler's output, and a refused candidate is otherwise indistinguishable from one that worked —
+   * the page renders either way.
+   */
+  warnings: string[]
 }
 
 /** The declarations of a rule itself, ignoring anything nested inside it. */
@@ -379,7 +399,7 @@ const hoist = (staged: Collection<string>, rules: Rule[]) => {
 
 export function finalize(root: Root, aggregate?: Collection<string>): Finalized {
   const payload: Collection<Collection<string>> = {}
-  const finalized: Finalized = { animations: 0, staging: 0, transitions: 0 }
+  const finalized: Finalized = { animations: 0, staging: 0, transitions: 0, viewTransitions: 0, warnings: [] }
 
   // Phase 1 — read the payload, and take the rules that carried it out of the document. Removal
   // during a walk is why this is an AST and not a string: the rule can go wherever it is nested.
@@ -405,6 +425,61 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
     ;(payload.animations ??= {})[longhand] = value
   }
 
+  // Phase 1b — the view-transition staging rules, read and taken out of the document.
+  //
+  // They are staging in the same sense a carrier payload is: the marker class matches no page, so
+  // their declarations are data and not output. They are read *here* rather than after the
+  // composition, because phase 2 finds activators by the declaration they hold and a staged motion
+  // holds one — left in place, every view-transition candidate would contribute
+  // `.…:where(.jumi-vt-old-hero)` to the element composition's selector list, which matches nothing.
+  //
+  // The rules are kept, not dropped. A staged rule *is* the motion, and it is replayed onto the
+  // pseudo tree later in this pass; removing it only takes it out of the element's cascade.
+  const stagedTransitions: ViewTransitionStaging[] = []
+  let transitionLayer: Container = root
+
+  root.walkRules((rule) => {
+    // One entry per staged **selector**, because a CSS optimizer merges rules that declare the same
+    // thing: the docs build hands this pass one rule carrying six cards' staged selectors in a list,
+    // where the CLI hands it six rules of one selector each. Measured — and it was the difference
+    // between the feature working and quietly refusing every candidate in a page.
+    const staging = viewTransitionStaging(rule)
+
+    if (!staging.length) return
+
+    // Read before the removal, because a detached rule has no ancestors to walk — and the at-rule
+    // ancestry is what decides whether a wrapper transfers onto the pseudo tree at all.
+    stagedTransitions.push(...staging)
+    if (stagedTransitions.length === staging.length) transitionLayer = layerFor(root, rule)
+
+    const remaining = rule.selectors.filter(selector => !isStagingSelector(selector))
+
+    // A rule carrying staging *and* something else: the rest of it is not this pass's to delete. In
+    // practice the variant produces all-staging rules, so this is the safe side of a case that should
+    // not arise rather than a case being handled.
+    if (remaining.length) {
+      rule.selectors = remaining
+
+      return
+    }
+
+    const parent = rule.parent
+
+    rule.remove()
+
+    // A staged rule is often the only thing inside the condition wrapping it, and taking it out leaves
+    // `@media (width >= 40rem) { }` behind. That is this pass's litter rather than the author's, so it
+    // goes — but a layer is never removed, because `@layer utilities` means something even empty.
+    let node = parent
+
+    while (node && node.type === 'atrule' && node.name !== 'layer' && !node.nodes?.length) {
+      const next = node.parent
+
+      node.remove()
+      node = next
+    }
+  })
+
   // Phase 2 — the rules that activate a slot, per kind, in document order.
   //
   // A rule contributes its selector once. Several rules can carry the same one — a utility emitted
@@ -422,13 +497,83 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
   })
 
   // Phase 3 — synthesize what a browser applies, and leave nothing of the transport behind.
+  //
+  // Two consumers, one set of data. The element composition is what this pass has always written;
+  // the view-transition emission needs the *same* substrate and the same aggregate, because a pseudo
+  // tree is an element as far as the cascade is concerned — same `--jumi-slot-*` resolution, same
+  // `var()` fallbacks. So the data is built once, and whether the element composition exists is a
+  // separate question from whether the data does: a page whose only motion is a view transition
+  // activates no slot on any element and still needs both halves for the pseudo tree.
+  const data: Record<CarrierKind, { aggregate: Product[], substrate: Product[] }> = {
+    animations: { aggregate: [], substrate: [] },
+    transitions: { aggregate: [], substrate: [] },
+  }
+
   for (const kind of Object.keys(ACTIVATION) as CarrierKind[]) {
     const rules = activators[kind]
     const staged = payload[kind]
 
     // No payload means the stylesheet never staged one, which is not this pass's to invent: the
     // transport is still in the output, and the zero-occurrence invariant is what says so.
-    if (!rules?.length || !staged) continue
+    if (!staged) continue
+
+    // The animations aggregate is the one written as a **hoist**. Its payload is ten lists of every
+    // slot in the stylesheet while an element activates one or two of them, so the deep chains move
+    // onto the rules that activate the slot and the composition is left holding one shallow
+    // reference per position. `transitions` composes a single shorthand already, so it is written
+    // exactly as it was — this change is deliberately scoped to the aggregate that was measured.
+    //
+    // The staged view-transition rules are hoisted with the same call, and that is not a
+    // convenience. A staged motion declares an activation, so it *is* an activator — it is just an
+    // activator whose composition is written onto a pseudo tree instead of onto the element. The
+    // publication the hoist appends (`--jumi-slot-<slot>`) is exactly what the emission has to
+    // replay; without it the emitted composition applies and animates nothing, which is the failure
+    // this pass already paid for once on the element side.
+    const hoisted = kind === 'animations'
+      ? hoist(staged, [...(rules ?? []), ...new Set(stagedTransitions.map(entry => entry.rule))])
+      : null
+    const { aggregate, substrate } = data[kind]
+
+    for (const [name, value] of Object.entries(staged)) {
+      // A name that is itself a custom property is a default the element resolves through, and it
+      // has to be declared *on the element*: it composes other custom properties the slot
+      // utilities write there — `--jumi-animation-delay` reads `--jumi-stagger-animation-delay`,
+      // which the stagger rule sets on the element — and a custom property containing `var()`
+      // resolves where it is **declared**. Published on `:root` it resolves once, to the default,
+      // and every element inherits that literal. Measured, and it stops the stagger system.
+      if (name.startsWith('--')) {
+        substrate.push({ prop: name, value })
+
+        continue
+      }
+
+      if (hoisted) continue
+
+      aggregate.push({ prop: name, value })
+    }
+
+    if (hoisted) {
+      // The shorthand first, and the two it resets after it: `animation` sets `animation-composition`
+      // and `animation-timeline` back to their initial values, so a rule that declares them before it
+      // has already lost them by the time the cascade is done.
+      aggregate.push({ prop: 'animation', value: hoisted })
+
+      for (const part of AFTER_SHORTHAND) {
+        if (staged[part]) aggregate.push({ prop: part, value: staged[part] })
+      }
+
+      for (const [name, value] of Object.entries(staged)) {
+        if (name.startsWith('--') || SHORTHAND.includes(name) || AFTER_SHORTHAND.includes(name)) continue
+
+        // Anything else the payload carries is not a position — `interpolate-size` is the one that
+        // exists today — and is written verbatim, as it always was.
+        aggregate.push({ prop: name, value })
+      }
+    }
+
+    // The element side stops here when nothing activates a slot on an element. The data above is
+    // still what the view-transition emission reads.
+    if (!rules?.length) continue
 
     const selectors = [...new Set(rules.map(rule => rule.selector))]
     const group = selectors.join(',\n')
@@ -444,48 +589,8 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
     // then made the whole declaration invalid at computed-value time on that pseudo-element.
     const defaults = postcss.rule({ selector: group })
 
-    // The animations aggregate is the one written as a **hoist**. Its payload is ten lists of every
-    // slot in the stylesheet while an element activates one or two of them, so the deep chains move
-    // onto the rules that activate the slot and the composition is left holding one shallow
-    // reference per position. `transitions` composes a single shorthand already, so it is written
-    // exactly as it was — this change is deliberately scoped to the aggregate that was measured.
-    const hoisted = kind === 'animations' ? hoist(staged, rules) : null
-
-    for (const [name, value] of Object.entries(staged)) {
-      // A name that is itself a custom property is a default the element resolves through, and it
-      // has to be declared *on the element*: it composes other custom properties the slot
-      // utilities write there — `--jumi-animation-delay` reads `--jumi-stagger-animation-delay`,
-      // which the stagger rule sets on the element — and a custom property containing `var()`
-      // resolves where it is **declared**. Published on `:root` it resolves once, to the default,
-      // and every element inherits that literal. Measured, and it stops the stagger system.
-      if (name.startsWith('--')) {
-        defaults.append(postcss.decl({ prop: name, value }))
-        continue
-      }
-
-      if (hoisted) continue
-
-      composition.append(postcss.decl({ prop: name, value }))
-    }
-
-    if (hoisted) {
-      // The shorthand first, and the two it resets after it: `animation` sets `animation-composition`
-      // and `animation-timeline` back to their initial values, so a rule that declares them before it
-      // has already lost them by the time the cascade is done.
-      composition.append(postcss.decl({ prop: 'animation', value: hoisted }))
-
-      for (const part of AFTER_SHORTHAND) {
-        if (staged[part]) composition.append(postcss.decl({ prop: part, value: staged[part] }))
-      }
-
-      for (const [name, value] of Object.entries(staged)) {
-        if (name.startsWith('--') || SHORTHAND.includes(name) || AFTER_SHORTHAND.includes(name)) continue
-
-        // Anything else the payload carries is not a position — `interpolate-size` is the one that
-        // exists today — and is written verbatim, as it always was.
-        composition.append(postcss.decl({ prop: name, value }))
-      }
-    }
+    for (const { prop, value } of aggregate) composition.append(postcss.decl({ prop, value }))
+    for (const { prop, value } of substrate) defaults.append(postcss.decl({ prop, value }))
 
     // A composition with no declarations is not one: a payload of nothing but defaults cannot
     // animate anything, and an empty rule would be noise in the output.
@@ -504,6 +609,22 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
     layer.append(composition)
 
     finalized[kind] = selectors.length
+  }
+
+  // Phase 4 — what a browser needs in order to pair the two sides and animate them, which no
+  // candidate could have written: the identity belongs on the author's element and the animation on a
+  // pseudo tree keyed by that identity. Reported rather than thrown, so one refused candidate names
+  // itself and the rest of the page still builds.
+  if (stagedTransitions.length) {
+    const emission = emitViewTransitions(
+      root,
+      stagedTransitions,
+      rule => activates(rule, ACTIVATION.animations),
+      { ...data.animations, layer: transitionLayer },
+    )
+
+    finalized.viewTransitions = emission.emitted
+    finalized.warnings.push(...emission.warnings)
   }
 
   return finalized

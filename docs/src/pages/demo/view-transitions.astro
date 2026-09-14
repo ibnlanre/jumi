@@ -1,0 +1,344 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import '../../styles/demo.css';
+
+/**
+ * The six cards, and their Jumi candidates written out one by one.
+ *
+ * The repetition is load-bearing rather than lazy: Tailwind scans this file as **text**, so a name
+ * built by interpolation — `view-transition-old/${id}:animate-fade-out` — compiles to nothing at all,
+ * silently, and the demo would appear to work while animating none of the cards. The same constraint is
+ * why the mode switch reads the candidates back off the element instead of rebuilding them.
+ *
+ * Each card gets its **own** name. One name shared by six elements aborts the whole transition — the
+ * browser refuses a duplicate `view-transition-name` outright — so the name is the card's identity, not
+ * the collection's.
+ *
+ * **No duration control anywhere, and the 1s default is load-bearing.** The browser's own projection is
+ * 250ms, so the motion outlives the movement by three quarters of a second — and that overhang is the
+ * effect this page exists to show. The box arrives at 250ms; the dissolve keeps the change unresolved
+ * for the rest of it, which is what makes the shift read as one continuous glide. Matching the motion to
+ * the projection instead collapses the whole thing into a snap, and the projection stops looking like
+ * layout and starts looking like a cut.
+ *
+ * A motion that long used to cost a dead page: while a transition runs, the browser's pseudo tree covers
+ * the viewport and takes every pointer event, so a click never reaches a card and the page ignores you
+ * for the full second. That is handled by hand in the script below — the event is still dispatched, just
+ * not to the element under the pointer — which is what makes the long motion affordable rather than a
+ * trade. `scripts/demo-check.mjs` asserts both halves: the cards never see the click, and the page
+ * honours it anyway.
+ */
+const CARDS = [
+  { candidates: 'view-transition-old/alpha:animate-fade-out view-transition-new/alpha:animate-fade-in', id: 'alpha', label: 'Alpha' },
+  { candidates: 'view-transition-old/bravo:animate-fade-out view-transition-new/bravo:animate-fade-in', id: 'bravo', label: 'Bravo' },
+  { candidates: 'view-transition-old/charlie:animate-fade-out view-transition-new/charlie:animate-fade-in', id: 'charlie', label: 'Charlie' },
+  { candidates: 'view-transition-old/delta:animate-fade-out view-transition-new/delta:animate-fade-in', id: 'delta', label: 'Delta' },
+  { candidates: 'view-transition-old/echo:animate-fade-out view-transition-new/echo:animate-fade-in', id: 'echo', label: 'Echo' },
+  { candidates: 'view-transition-old/foxtrot:animate-fade-out view-transition-new/foxtrot:animate-fade-in', id: 'foxtrot', label: 'Foxtrot' },
+];
+---
+
+<Layout title="Layout projection — Jumi" description="Six cards, a real layout shift, and a switch between the browser's own snapshot motion and Jumi's.">
+  <main id="main" class="demo">
+    <p class="eyebrow">SHOWCASE / LAYOUT PROJECTION</p>
+    <h1 class="demo-title">The browser moves it.<br /><em>Jumi dresses it.</em></h1>
+    <p class="demo-lede">
+      Pick a card. It takes the corner, its neighbours reflow, and the cards that move are followed
+      across the change rather than snapped into place. The movement is the browser's — the geometry of
+      the old and new layouts, projected. What each card <em>does</em> while that happens is Jumi's.
+      Switch to the browser's own behaviour to see the difference.
+    </p>
+
+    <div class="demo-modes" role="group" aria-label="Snapshot motion">
+      <button type="button" class="demo-mode" data-mode="jumi" aria-pressed="true">Jumi</button>
+      <button type="button" class="demo-mode" data-mode="native" aria-pressed="false">Browser default</button>
+    </div>
+
+    <div class="demo-grid">
+      {CARDS.map(card => (
+        <button
+          type="button"
+          class="demo-card"
+          class:list={[card.candidates]}
+          data-id={card.id}
+          data-jumi={card.candidates}
+          data-active={card.id === 'alpha' ? '' : undefined}
+          aria-pressed={card.id === 'alpha'}
+        >{card.label}</button>
+      ))}
+    </div>
+
+    <p class="demo-readout" role="status" aria-live="polite">
+      Outgoing snapshot: <b id="demo-motion">waiting for a move</b>
+    </p>
+  </main>
+
+  <style is:global>
+    /*
+      The page's own layout, in plain CSS rather than utilities, because the whole subject is geometry
+      and this is the geometry. `order` on the active card is what makes the shift a *projection* rather
+      than a resize: the card does not move in the document, it moves in the grid, and the browser
+      follows it from where it was to where it now is.
+    */
+    .demo { padding: 56px 4.5% 110px; }
+    .demo-title { font-family: 'Manrope', sans-serif; font-size: clamp(44px, 5.4vw, 76px); font-weight: 500; letter-spacing: -.06em; line-height: 1.06; margin: 20px 0 24px; }
+    .demo-title em { color: var(--lime); font-family: Georgia, serif; font-weight: 400; }
+    .demo-lede { color: #bbc0b3; font-size: 16px; line-height: 1.7; max-width: 620px; margin-bottom: 30px; }
+    .demo-lede em { color: var(--paper); font-style: italic; }
+
+    .demo-modes { display: inline-flex; border: 1px solid var(--line); border-radius: 30px; padding: 4px; margin-bottom: 26px; }
+    .demo-mode { background: none; border: 0; border-radius: 30px; color: var(--muted); font-size: 14px; padding: 9px 18px; }
+    .demo-mode[aria-pressed='true'] { background: var(--lime); color: var(--ink); }
+
+    .demo-grid { display: grid; gap: 14px; grid-auto-rows: 104px; grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 780px; }
+    .demo-card {
+      align-items: center; background: #1c2018; border: 1px solid var(--line); border-radius: 10px;
+      color: var(--muted); display: flex; font-family: 'Manrope', sans-serif; font-size: 19px;
+      justify-content: center; letter-spacing: -.03em; padding: 0;
+    }
+    .demo-card[data-active] { background: var(--lime); border-color: var(--lime); color: var(--ink); grid-column: span 2; grid-row: span 2; order: -1; }
+    .demo-card:hover { border-color: var(--muted); color: var(--paper); }
+    .demo-card[data-active]:hover { color: var(--ink); }
+
+    .demo-readout { color: var(--muted); font-size: 14px; margin-top: 24px; }
+    .demo-readout b { color: var(--lime); font-family: monospace; font-weight: 400; }
+
+    /*
+      What you would write by hand to get the geometry projection without Jumi: one
+      `view-transition-name` per card, in a rule per card. Six lines for six cards, and a seventh every
+      time the collection changes — which is the cost the candidates above remove.
+
+      The names are deliberately **not** the ones Jumi uses. A pseudo-element is identified by its
+      name, so Jumi's emitted motion attaches to `::view-transition-old(alpha)` no matter which class
+      put the name there — hand-writing `alpha` here would leave Jumi's motion running and the two
+      modes would look identical. With a name of its own, the browser-default side really is only the
+      browser's: it still projects the geometry, and it falls back to the cross-fade it ships with.
+    */
+    [data-demo-mode='native'] .demo-card[data-id='alpha'] { view-transition-name: plain-alpha; }
+    [data-demo-mode='native'] .demo-card[data-id='bravo'] { view-transition-name: plain-bravo; }
+    [data-demo-mode='native'] .demo-card[data-id='charlie'] { view-transition-name: plain-charlie; }
+    [data-demo-mode='native'] .demo-card[data-id='delta'] { view-transition-name: plain-delta; }
+    [data-demo-mode='native'] .demo-card[data-id='echo'] { view-transition-name: plain-echo; }
+    [data-demo-mode='native'] .demo-card[data-id='foxtrot'] { view-transition-name: plain-foxtrot; }
+
+    @media (max-width: 700px) {
+      .demo { padding-top: 30px; }
+      .demo-grid { grid-auto-rows: 76px; }
+      .demo-card { font-size: 15px; }
+    }
+  </style>
+
+  <script>
+    const grid = document.querySelector<HTMLElement>('.demo-grid')!;
+    const cards = [...document.querySelectorAll<HTMLButtonElement>('.demo-card')];
+    const readout = document.querySelector<HTMLElement>('#demo-motion')!;
+    const modes = [...document.querySelectorAll<HTMLButtonElement>('.demo-mode')];
+
+    /**
+     * Which snapshot motion is in play.
+     *
+     * `jumi` is the default because it is the feature. `native` is the same layout shift with the names
+     * written by hand — the comparison the page exists to make — and the only difference in the DOM is
+     * which classes the cards carry, so nothing else can account for what changes.
+     */
+    let mode: 'jumi' | 'native' = 'jumi';
+    let active = 'alpha';
+    let inFlight: ViewTransition | null = null;
+
+    /** A gesture made while the cards were mid-flight, waiting for the geometry to settle. */
+    let deferred: null | string = null;
+
+    const setMode = (next: 'jumi' | 'native') => {
+      mode = next;
+      document.documentElement.dataset.demoMode = next;
+
+      for (const card of cards) {
+        // Removed and re-added rather than toggled, because the candidates are what *name* the element
+        // and one name per card is the whole mechanism: leaving both sets on would give every card two
+        // names, and the browser refuses duplicates outright.
+        for (const token of [...card.classList]) if (token.startsWith('view-transition-')) card.classList.remove(token);
+        if (next === 'jumi') card.classList.add(...(card.dataset.jumi ?? '').split(' ').filter(Boolean));
+      }
+
+      for (const button of modes) button.setAttribute('aria-pressed', String(button.dataset.mode === next));
+      readout.textContent = 'waiting for a move';
+    };
+
+    const apply = () => {
+      for (const card of cards) {
+        const on = card.dataset.id === active;
+        card.toggleAttribute('data-active', on);
+        card.setAttribute('aria-pressed', String(on));
+      }
+    };
+
+    /**
+     * The projection still in flight: the browser travelling the snapshots from their old boxes to their
+     * new ones.
+     *
+     * A different question from whether the page is still transitioning — the projection lasts 250ms
+     * whatever Jumi does, while the snapshot motion carries on for as long as it is given — and the
+     * difference is the reason the handler below exists. For that quarter of a second the painted layout
+     * and the real one disagree: the layout change runs inside the transition's callback, so the element
+     * under the pointer is where the card is *going*.
+     */
+    const projections = () => document.getAnimations().filter(animation =>
+      animation.effect instanceof KeyframeEffect
+      && (animation.effect.pseudoElement ?? '').startsWith('::view-transition-group(')
+      && animation.playState !== 'finished');
+
+    /**
+     * Which transition is current, by identity rather than by a boolean.
+     *
+     * Starting a transition finishes the one already running, so that one's `finished` resolves *after* the
+     * newer one has begun — and clearing a flag from it would clear the newer transition's instead.
+     */
+    const track = (transition: ViewTransition) => {
+      inFlight = transition;
+      void transition.finished.finally(() => { if (inFlight === transition) inFlight = null; });
+    };
+
+    /**
+     * The move, inside the transaction boundary.
+     *
+     * `startViewTransition` is not decoration here — it is the feature. The layout change has to happen
+     * inside its callback for the browser to capture the before and after at all, which is why a demo of
+     * this cannot avoid JavaScript the way the cross-document case can.
+     */
+    const move = (id: string) => {
+      if (!id || id === active) return;
+
+      const change = () => { active = id; apply(); };
+
+      if (!document.startViewTransition) { change(); return; }
+
+      const transition = document.startViewTransition(change);
+
+      track(transition);
+
+      void transition.ready.then(() => {
+        // The name the card holds in this mode, which is the thing to look up: Jumi names the card
+        // after the candidate, the page names it after itself.
+        const identity = mode === 'jumi' ? id : `plain-${id}`;
+
+        // Named rather than counted, and named the way the page talks about it: the browser's own
+        // cross-fade is `-ua-…`, Jumi's is a keyframe of its own. This is the one line that says which
+        // of the two modes just ran without asking anyone to open a DevTools panel.
+        //
+        // Both narrowings are load-bearing and neither is decoration. `animationName` only exists on a
+        // CSS animation, and `pseudoElement` only exists on a keyframe effect — `Animation.effect` is
+        // typed as the wider `AnimationEffect`, so reading it without asking is a type error rather than
+        // a runtime one, and the browser's own cross-fade is a CSS animation too, which is why the first
+        // test does not exclude it.
+        const outgoing = document.getAnimations().find((animation): animation is CSSAnimation =>
+          animation instanceof CSSAnimation
+          && animation.effect instanceof KeyframeEffect
+          && animation.effect.pseudoElement === `::view-transition-old(${identity})`);
+
+        const name = outgoing?.animationName ?? '';
+        readout.textContent = name.startsWith('jumi-') ? name : 'the browser\'s own cross-fade';
+      }).catch(() => {
+        // A move that interrupts this one before it ever became ready supersedes it, and `ready` rejects
+        // rather than resolving — measured, not assumed. There is nothing to report: the newer move is
+        // the one whose readout matters, and it writes its own a frame later.
+      });
+    };
+
+    for (const card of cards) card.addEventListener('click', () => move(card.dataset.id ?? ''));
+
+    /**
+     * A click during a transition, which no card can receive.
+     *
+     * While a transition runs, the browser's pseudo tree covers the viewport and takes the hit outright:
+     * `elementFromPoint` resolves to `<html>` for the whole duration and even `elementsFromPoint` returns
+     * a bare `html`, so there is no element to resolve — a card's own listener never fires, and the click
+     * reads as the page ignoring you. The event is still dispatched to the *document*, though, so it can
+     * be resolved by hand, and that is what makes a 1s motion affordable instead of a dead second.
+     *
+     * Nothing queues. A move interrupts the transition in flight, which the platform does itself: starting
+     * a transition while one is active finishes the first one immediately — measured: its `finished`
+     * resolves in the same millisecond as the second call, and the second update callback still runs.
+     */
+    document.addEventListener('click', (event) => {
+      if (!inFlight) return;
+
+      /**
+       * The overlay holding the hit is not a side effect to work around — it is the signal.
+       *
+       * While a transition runs, the click's target is `<html>`: the pseudo tree replaces the page's
+       * hit-testing, so nothing else receives it. A click whose target is still an element was delivered
+       * normally, and that element's own listener has already answered it.
+       *
+       * Acting on it here anyway starts a *second* transition, which aborts the first — and because the
+       * update callback runs in a later rendering update rather than synchronously, `active` has not been
+       * updated yet when this handler runs, so `move()`'s guard does not catch it. Measured, one click:
+       * two `startViewTransition` calls 2ms apart, the first aborted, the aborted one's callback making the
+       * DOM change, and the surviving one animating a boundary it did not fill in. That works only as long
+       * as the browser runs the aborted call's callback *after* the surviving call's capture — an ordering
+       * nothing guarantees, and the failure it risks is precisely a swap that changes the layout and
+       * animates nothing.
+       */
+      if (event.target !== document.documentElement) return;
+
+      const { clientX, clientY } = event;
+
+      const contains = (element: HTMLElement) => {
+        const { height, width, x, y } = element.getBoundingClientRect();
+
+        return clientX >= x && clientX <= x + width && clientY >= y && clientY <= y + height;
+      };
+
+      // The mode switch is answered *first*, and deliberately not gated on the projection the way the
+      // cards are. It does not move while a transition runs, so unlike a card there is nothing ambiguous
+      // about a click on it — and since the browser's own motion lasts exactly as long as the projection,
+      // every click on the switch during a native swap lands inside that window. Gating it dropped the
+      // switch silently and the next swap then ran the mode the page was already in, which is a reported
+      // bug and not a hypothetical one: "after switching from Browser default to Jumi, the first swap
+      // behaves like it's still Browser default."
+      //
+      // Switching mid-transition is safe rather than merely survivable: the names the running transition
+      // captured are already resolved into its pseudo tree, so a new `view-transition-name` belongs to the
+      // next move and leaves the current one alone.
+      const button = modes.find(contains);
+
+      if (button) { setMode(button.dataset.mode as 'jumi' | 'native'); return; }
+
+      // The cards, on the other hand, are mid-flight — so this is held until the geometry settles rather
+      // than applied now.
+      //
+      // The *card* is resolved immediately, because the resolution does not change: the layout change has
+      // already happened, so the point maps to where the card is going whether it is read now or a quarter
+      // of a second later. It is the moment that changes, and a gesture collected and applied a quarter of
+      // a second later is still an answer while a gesture dropped is not. Dropping read as unpredictable
+      // from the outside — "sometimes it works, sometimes it doesn't", decided by how fast the reader
+      // clicked — and the map of it is 50ms and 150ms nothing, 300ms onwards yes.
+      const card = cards.find(contains);
+
+      if (!card) return;
+
+      const [projection] = projections();
+
+      if (!projection) { move(card.dataset.id ?? ''); return; }
+
+      deferred = card.dataset.id ?? null;
+
+      void projection.finished.then(() => {
+        const id = deferred;
+
+        deferred = null;
+
+        if (id) move(id);
+      }).catch(() => {
+        // A newer move replaced this transition before the projection finished, and the newer move is the
+        // one to keep — by definition, since it is the one the reader asked for last.
+        deferred = null;
+      });
+    });
+
+    for (const button of modes) button.addEventListener('click', () => setMode(button.dataset.mode as 'jumi' | 'native'));
+
+    // Set once so the cards begin in the mode the page describes. `grid` is read only to keep the
+    // selector honest — a demo that silently did nothing would otherwise look identical.
+    if (grid) setMode('jumi');
+  </script>
+</Layout>
