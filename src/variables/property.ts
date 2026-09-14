@@ -78,7 +78,7 @@ import { textShadow } from '@/composition/text-shadow'
 import {
   matrix,
   matrix3d,
-  perspective,
+  perspective3d,
   rotate3d,
   scale3d,
   skew,
@@ -2146,8 +2146,12 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-paint-order',
   },
   'perspective': {
-    value: perspective,
+    value: 'none',
     variable: '--jumi-perspective',
+  },
+  'perspective-3d': {
+    value: perspective3d,
+    variable: '--jumi-perspective-3d',
   },
   'perspective-origin': {
     value: 'center',
@@ -2661,7 +2665,7 @@ export const propertyVariables: DependencyGraph = {
   },
   'transform': {
     dependencies: [
-      'perspective',
+      'perspective-3d',
       'matrix',
       'matrix-3d',
       'rotate-3d',

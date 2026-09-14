@@ -1141,6 +1141,7 @@ export type NonStandardPropertyType
     | 'offset-position-y'
     | 'offset-position-y-edge'
     | 'offset-position-y-offset'
+    | 'perspective-3d'
     | 'position-area-x'
     | 'position-area-y'
     | 'rotate-3d'

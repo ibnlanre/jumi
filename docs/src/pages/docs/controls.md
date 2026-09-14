@@ -165,6 +165,37 @@ A motion is not written differently because a scroll drives it. The same `animat
 
 `animation-timeline-scroll` follows the nearest scroller, `animation-timeline-view` tracks the element through its scrollport, and `animation-timeline-[--name]` consumes a timeline the page declares in its own CSS. A timeline can be given to one animation on an element and not its neighbour with `/{property}` or `/{label}`, exactly as the timing controls are.
 
+### Declaring a named timeline
+
+The declaration side is plain CSS on the scroller, and Jumi does not wrap it. Name the timeline where the scrolling happens, then consume it from anywhere inside that element:
+
+```css
+.overflow-y-auto {
+  scroll-timeline-name: --feed;
+  scroll-timeline-axis: block;
+}
+```
+
+```html
+<div class="h-64 overflow-y-auto">
+  <article class="animation-timeline-[--feed] animate-opacity-100">…</article>
+</div>
+```
+
+Two things are worth being precise about, because both are easy to get subtly wrong.
+
+```text
+--feed in scroll-timeline-name   → a <dashed-ident> timeline name
+--feed in animation-timeline     → a reference to that name
+var(--feed)                      → a custom property reference, which is a different thing
+(--feed)                         → Tailwind's shorthand for var(--feed), so also a custom property
+```
+
+The dashed syntax looks like a custom property and is not one: `scroll-timeline-name` computes to `none` on a child of the scroller rather than inheriting, and nothing about `var()` applies. Bracket the name — `animation-timeline-[--feed]` — because it is an arbitrary CSS value, which is exactly what the name is. The parenthesised spelling is not an alternative for it: `(--feed)` means `var(--feed)`, a custom property reference rather than a timeline name, and on the timeline control it carries no declaration at all. Two similar-looking spellings, two unrelated meanings — bracketed for a name.
+
+A named timeline is visible to the **descendants** of the element that declares it, and to nothing else: not to its siblings, not to the rest of the document. `timeline-scope` is the property that would widen that, and in current Chromium it parses and computes without widening resolution, so there is no cross-subtree workflow to build on yet — declare the timeline on an element the animated content lives inside.
+
+
 A range then places the motion along that driver. The arbitrary form is the value itself, so it is the one to reach for whenever a range has an offset in it:
 
 ```html

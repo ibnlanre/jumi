@@ -55,6 +55,53 @@ and both sit next to behaviour Jumi already has (`transform-origin` as a motion,
 composition part). This is coverage work, not design work — which is precisely the category that is safe to
 finish before freezing and unsafe to guess about after.
 
+### Shipped
+
+The split the CTO described is now implemented, and it is the variable naming rather than the class naming
+that had to change:
+
+```text
+CSS `perspective` property        → --jumi-perspective      → animate-perspective-distant / -[400px]
+transform function perspective()  → --jumi-perspective-3d   → animate-transform-[perspective(400px)]
+```
+
+which makes the family parallel with the pattern `tween.ts` already established:
+
+```text
+--jumi-rotate        --jumi-rotate-3d
+--jumi-scale         --jumi-scale-3d
+--jumi-translate     --jumi-translate-3d
+--jumi-perspective   --jumi-perspective-3d
+```
+
+The transform composition reads `--jumi-perspective-3d`; before the rename it read `--jumi-perspective`, so the
+standalone property could not have taken that slot without both writing the same variable. Measured as a
+contract rather than a name — the slots each route touches:
+
+| build | slots |
+| --- | --- |
+| `animate-perspective-[400px]` | `--jumi-perspective`, its own per-value key, its own composition part — **no `-3d`** |
+| `animate-transform-[perspective(400px)]` | `--jumi-perspective-3d` — **and nothing else** |
+| both in one build | both sets, side by side |
+
+Verified spellings: `animate-perspective-distant` and `animate-perspective-[400px]` emit;
+`animate-perspective-origin-center` and `-origin-[50%_50%]` emit; `animate-perspective-3d-[400px]` is
+**refused on purpose** — the transform-function route stays `animate-transform-[perspective(400px)]`, so no
+`-3d` utility was added. Animating the property itself was already measured as interpolating in the browser
+(inventory §2, `100px → 250px → 400px`), so what this fixes is reachability, not animatability.
+
+**Not `animate-perspective-400`.** The named vocabulary for `perspective` is Tailwind's, and it is
+`dramatic`, `near`, `normal`, `midrange`, `distant` — there is no numeric scale. `animate-perspective-400` is
+refused **because the host refuses `perspective-400` too**, which is the audit rule working in the other
+direction: a name the host does not have is not a Jumi gap. Use `animate-perspective-distant` or
+`animate-perspective-[400px]`.
+
+One caveat carried deliberately: `animate-perspective-origin` takes its named values from
+`theme('transformOrigin')`, because `theme('perspectiveOrigin')` resolved to a map with no named values at all
+(measured — `animate-perspective-origin-center` was refused with it) and the position vocabulary is identical.
+The cost is that a theme overriding only `--perspective-origin-*` is not seen here; that is a resolver strategy
+to add deliberately, not something to guess at while closing a coverage gap.
+
 ## 2 · Does Jumi duplicate the host?
 
 Every utility Jumi registers outside the tween family was probed with a representative set of values, built

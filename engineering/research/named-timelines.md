@@ -106,6 +106,92 @@ cross-subtree capability is not available, so there is nothing for Jumi to integ
 documented, it should be documented as native CSS — which also keeps it honest: an author writing
 `scroll-timeline-name: --feed` on their scroller learns the actual requirement rather than a Jumi alias for it.
 
+## 4 · The decision
+
+```text
+fix perspective / perspective-origin coverage      done — surface-audit.md
+document named timelines with native CSS           done — docs/src/pages/docs/controls.md
+keep animation-timeline-[--feed] as the spelling   verified: writes --jumi-animation-timeline: --feed
+do not add (...) sugar for timeline names          animation-timeline-(--feed) writes no declaration
+do not add timeline-scope utilities yet            parses and computes, widens nothing here
+```
+
+Three of those are measurements rather than preferences. `animation-timeline-[--feed]` emits and writes
+`--jumi-animation-timeline: --feed`; the parenthesised form emits a rule that declares nothing, which is the
+same dead end the plugin-API probe predicted from the other side; and `timeline-scope` is inert, so there is no
+behaviour for a utility to expose.
+
+The conceptual note is the one worth keeping in the docs, because it is the error a clever spelling would
+invite:
+
+```text
+--feed in animation-timeline   → a <dashed-ident> timeline name
+var(--feed)                    → a custom property reference
+
+not the same thing
+```
+
+A timeline name has dashed-ident syntax and subtree visibility, which makes it look like a custom property,
+and it is not one: it does not cascade (§2), and `var()` semantics do not apply to it. A `(...)` sugar would
+teach exactly the wrong mental model — custom-property access — for something that is not a custom property.
+`[...]`, by contrast, says "arbitrary CSS value", which is precisely what the name is.
+
+### The spellings a utility-based example would need, tried
+
+| candidate | result |
+| --- | --- |
+| `animation-timeline-[--feed]` | writes `--jumi-animation-timeline: --feed` |
+| `animation-timeline---feed` | **refused** — a bare dashed-ident never reaches the matcher |
+| `scroll-timeline-name-[--feed]`, `scroll-timeline-name---feed` | refused — no declaration utility exists |
+| `scroll-timeline-name/--feed` | refused |
+| `scroll-timeline-axis-block`, `view-timeline-name-[--view]`, `timeline-scope-[--feed]` | refused |
+| `animation-timeline-scroll` | writes `--jumi-animation-timeline: var(--jumi-animation-timeline-scroll)` |
+| `animation-timeline-scroll/--feed` | **writes nothing at the element level** |
+
+The last two rows are the important pair. A slash in Jumi addresses the **motion** with that name — that is the
+whole naming mechanism — so `scroll-timeline-name/--feed` would read as "the `scroll-timeline-name` control,
+applied to the motion named `--feed`", which is close to the opposite of setting a timeline name. The slash is
+also why an unbracketed spelling cannot work: the value has to be an arbitrary value to carry a `<dashed-ident>`
+at all, so `[...]` is not decoration, it is what makes the name expressible.
+
+The declaration-side utilities do not exist in any spelling, and neither the bracketed nor the slash form is a
+near miss — both are refusals today, which is also why the page cannot name them: the documentation claim gate
+resolves every `class="…"` in the docs and refused an illustrative `scroller` class for exactly this reason.
+
+### If they are ever added, they are declaration-only
+
+The classification to preserve, so a future addition does not quietly become something else:
+
+```text
+interpolate-size-allow-keywords   → a declaration-only utility: no slot, no /name, no carrier required
+animation-duration-500/foo        → a motion control: writes a slot variable, scoped by name
+```
+
+The declaration side belongs to the first kind. `scroll-timeline-name: --feed` exists on a scroller that Jumi
+does not animate, it changes nothing about any motion, and it must work on an element that carries no Jumi
+motion at all — which a carrier-scoped control cannot do. No slot scoping, no `/name`, no carrier requirement.
+
+The naming that would fit is property-first and control-shaped — `scroll-timeline-axis-block`,
+`scroll-timeline-name-[--feed]` — with no slash anywhere in it. They are deferred, not rejected: cheap syntax
+still expands the public surface, the documentation surface, the testing surface and the compatibility
+promises, so the shorthand waits until named timelines are common enough in real use to earn it.
+
+### The frozen split
+
+```text
+animation-timeline-[--feed]        → consume a named timeline: part of Jumi's motion model
+scroll-timeline-name: --feed       → declare it, in CSS, on the scroller: ordinary platform setup
+```
+
+The consumer is Jumi's; the declaration exists on another element and belongs to the platform. The page teaches
+it that way deliberately — the real platform model rather than an alias that hides it — and the distinction the
+`(...)` shorthand would blur is the reason the consumer spelling has to stay bracketed:
+
+```text
+--feed inside [--feed]   → a timeline name, a <dashed-ident>
+(--feed)                 → Tailwind's custom-property shorthand, meaning var(--feed)
+```
+
 ## Instrument notes
 
 Three readings were wrong before they were right, and the shape of the error is the same each time — **an

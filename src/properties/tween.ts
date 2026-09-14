@@ -2010,6 +2010,22 @@ export const getMatchTween: GetMatchComponents = (creator) => {
       type: ['any'],
       values: paintOrder,
     },
+    'animate-perspective': {
+      fn: property('perspective'),
+      supportsNegativeValues: true,
+      type: ['length', 'any'],
+      values: theme('perspective'),
+    },
+    'animate-perspective-origin': {
+      fn: property('perspective-origin'),
+      type: ['length', 'percentage', 'position', 'any'],
+      // `transformOrigin` rather than a `perspectiveOrigin` key: the position vocabulary is identical, and
+      // `theme('transformOrigin')` is a key the resolver demonstrably resolves, where `perspectiveOrigin`
+      // returned a map with no named values at all (measured — `animate-perspective-origin-center` was
+      // refused with it). The caveat is that a theme which overrides only `--perspective-origin-*` is not
+      // seen here; that is a strategy to add deliberately, not to guess at while closing a coverage gap.
+      values: theme('transformOrigin'),
+    },
     'animate-position': {
       fn: property('position'),
       type: ['any'],

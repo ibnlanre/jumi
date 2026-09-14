@@ -1,7 +1,15 @@
 import { css } from '@/helpers/css'
 import { join } from '@/helpers/join'
 
-export const perspective = css('perspective', 'none')
+/**
+ * The `perspective()` **transform function**, not the CSS property of the same name.
+ *
+ * The two are different destinations and Jumi names them apart, the way `rotate` and `rotate3d(...)` are:
+ * the property is `perspective` (its own slot, `--jumi-perspective`), and this contribution to the composed
+ * `transform` value is `perspective-3d` (`--jumi-perspective-3d`). Before the standalone property had a
+ * motion, one name covered both, and the part was the one holding it.
+ */
+export const perspective3d = css('perspective', 'none')
 
 export const matrix = css('matrix', join([
   css('var', '--jumi-matrix-a'),
@@ -56,7 +64,7 @@ export const translate3d = css('translate3d', join([
 ], ', '))
 
 export const transform = join([
-  css('var', '--jumi-perspective'),
+  css('var', '--jumi-perspective-3d'),
   css('var', '--jumi-matrix'),
   css('var', '--jumi-matrix-3d'),
   css('var', '--jumi-rotate-3d'),
