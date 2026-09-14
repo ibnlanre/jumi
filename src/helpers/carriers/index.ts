@@ -6,6 +6,7 @@ import type {
 } from './view-transition'
 import type { Collection } from '@/types'
 
+import { RANGE_GRAMMAR, rangeAccepted, rangeReadings } from './animation-range'
 import {
   emitViewTransitions,
   isStagingSelector,
@@ -436,6 +437,48 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
 
   // Phase 1b — the view-transition staging rules, read and taken out of the document.
   //
+  // Phase 1a — the range **composition** variant, published onto the motion it qualifies.
+  //
+  // `animation-range-entry:animate-fade-in` is an ordinary motion wrapped by a variant that returns
+  // the identity selector, so the wrapped utility is emitted where a page applies it and the two facts
+  // this needs are read off that rule: the range from the class the author typed, and the slot from the
+  // activation the rule declares. One declaration per ranged slot is all it takes — the composition's
+  // position for that slot already reads `var(--jumi-<slot>-animation-range, …)`.
+  //
+  // It runs *before* the view-transition staging below, because that walk removes the rules it takes:
+  // a range stacked onto a view transition would otherwise vanish without a word.
+  root.walkRules((rule) => {
+    for (const reading of rangeReadings(rule)) {
+      if (!rangeAccepted(reading.range)) {
+        finalized.warnings.push(
+          `${reading.source}: "${reading.range}" is not a range Jumi can write. Use ${RANGE_GRAMMAR}.`,
+        )
+
+        continue
+      }
+
+      if (!reading.slot) {
+        finalized.warnings.push(
+          reading.motions > 1
+            ? `${reading.source}: this rule declares ${reading.motions} motions, so a range cannot be told apart between them — put the variant on an animate-* candidate.`
+            : `${reading.source}: a range qualifies a motion, and this candidate declares none — put the variant on an animate-* candidate.`,
+        )
+
+        continue
+      }
+
+      if (rule.selectors.every(isStagingSelector)) {
+        finalized.warnings.push(
+          `${reading.source}: a range cannot qualify a view transition motion yet, so it was dropped.`,
+        )
+
+        continue
+      }
+
+      rule.append(postcss.decl({ prop: `--jumi-${reading.slot}-animation-range`, value: reading.range }))
+    }
+  })
+
   // They are staging in the same sense a carrier payload is: the marker class matches no page, so
   // their declarations are data and not output. They are read *here* rather than after the
   // composition, because phase 2 finds activators by the declaration they hold and a staged motion

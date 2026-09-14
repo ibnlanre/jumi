@@ -178,6 +178,16 @@ animation-range-end-exit
 
 and an offset on its own is its own utility: `animation-range-start-offset-25` makes the motion start 25% into the default range.
 
+Those utilities place the element's animations. To place **one** of them and leave its neighbours where they are, the same vocabulary works as a prefix on the motion itself:
+
+```html
+<div class="animate-fade-in animate-rotate-45 animation-timeline-scroll animation-range-[25%_75%]:animate-fade-in">
+```
+
+The fade is scrubbed between 25% and 75% of the scroll while the rotation beside it still fills the whole range. The two spellings compose rather than compete — a ranged motion falls back to the element's range, which falls back to the whole range — so `animation-range-entry:animate-fade-in` says *this animation uses the entry range*, and `animation-range-entry` says *this element's animations do*.
+
+A range Jumi cannot write is reported and dropped: the motion it qualified still runs, on the default range. That matters most for a range that looks legal and is not — `normal` joined to an offset, as in `animation-range-[normal_0%]`, is dropped by the engine without a word, so the warning is the only thing that tells you the range you wrote is not the range you got.
+
 **Fallback:** If the browser does not support scroll-driven timelines, the animation falls back to the document timeline and runs as a normal time-based animation.
 
 That is a real fallback rather than a transparent one: the animation and its final state are kept, but a view-driven entrance plays on load instead of tracking entry. When you want scroll-driven or nothing, put the motion and its timeline behind one capability query:

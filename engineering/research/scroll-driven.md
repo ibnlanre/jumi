@@ -442,6 +442,22 @@ values actually repeat — the evidence that should decide whether any of them e
 later. The frozen public story is `animation-timeline-scroll` / `-view` / `-[--name]` for the driver,
 the arbitrary range forms for anything compound, and named range utilities for the six range names.
 
+**And one addition after the story was frozen: the same vocabulary as a prefix on one motion.** An
+`animation-range-*` utility places the element's animations; `animation-range-entry:animate-fade-in`
+places *one* of them and leaves its neighbours where they are:
+
+```text
+animation-range-entry:animate-fade-in          this animation uses the entry range
+animation-range-[25%_75%]:animate-fade-in      this animation runs between 25% and 75%
+animation-range-entry                          this element's animations do
+```
+
+The two compose through the slot chain rather than competing for one meaning, so no utility was
+removed to make room. The full record — the shape, the five arms the spike measured, the traps, and
+the two harness pitfalls the gate hit — is `engineering/research/scroll-variant.md`; the gate holds 13
+assertions for it inside stage 11, including the CTO's stacking test. It sits **beside** the range
+utilities by decision, not by omission.
+
 ## Three corrections that were not measurements
 
 - `src/helpers/carriers/index.ts`'s `AFTER_SHORTHAND` comment said the shorthand resets

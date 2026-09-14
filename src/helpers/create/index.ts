@@ -24,6 +24,7 @@ import {
 import { resolveTheme } from '@/helpers/create/theme'
 import { getMatchControls } from '@/properties/controls'
 import { getMatchTween } from '@/properties/tween'
+import { animationRangeName } from '@/theme/animation-range'
 
 import createPlugin from 'tailwindcss/plugin'
 
@@ -108,6 +109,27 @@ const jumi = createPlugin((api) => {
 
     return viewTransitionMarker(side, modifier)
   }, { values: { new: 'new', old: 'old' } })
+
+  /**
+   * Ranges, registered as a **variant**, and it is the opposite of the one above in the way that
+   * matters: its contribution is the identity.
+   *
+   * `animation-range-entry:animate-fade-in` says *this animation uses the entry range*, where
+   * `animation-range-entry` alone says *this element's animations do*. Both spellings exist and they
+   * compose through the fallback chain rather than competing for one meaning.
+   *
+   * What the callback returns is `&` — not a marker — because the element has to animate: the variant
+   * classifies a motion rather than relocating it. The range it names is then read out of the
+   * **selector** it produced, and the slot out of the **activation** the wrapped utility declared, by
+   * the pass in `@/helpers/carriers`. That split is not a preference: a variant callback never sees the
+   * utility it wraps, so it cannot know which slot it is qualifying however it is written.
+   *
+   * The value is deliberately not validated here. A variant callback has no warning channel, and
+   * Tailwind calls it once at configuration time with a sentinel value and no candidate at all —
+   * identity has nothing to record, so there is nothing for that call to corrupt. Judgement belongs to
+   * the pass that can name the candidate it refused.
+   */
+  matchVariant('animation-range', () => '&', { values: animationRangeName })
 
   const registerComponents = (utilities: ReturnType<GetMatchComponents>) => {
     for (const name in utilities) {
