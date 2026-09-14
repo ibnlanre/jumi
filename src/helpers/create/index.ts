@@ -12,9 +12,9 @@
  * `effects`, `labels`, `registered`) live exactly as long as that compiler
  * does. `@/core` documents what that implies.
  */
-import type { Api, Creator, GetMatchComponents, GetMatchUtilities } from '@/types'
+import type { Api, Collection, Creator, GetMatchComponents, GetMatchUtilities, MatchComponentsPropertyFunction } from '@/types'
 
-import { createJumiModel, nameable } from '@/core'
+import { createJumiModel, isPhrase, nameable } from '@/core'
 import { stagingMarker } from '@/helpers/carriers'
 import {
   identityAccepted,
@@ -88,6 +88,29 @@ const jumi = createPlugin((api) => {
   const modifierSupport = (fn: (value: string, extra: { modifier: null | string }) => unknown) =>
     nameable in fn ? ('any' as const) : ({})
 
+  const registerPhrases = (options: {
+    fn: MatchComponentsPropertyFunction
+    modifiers: 'any' | Collection<string>
+    name: string
+    supportsNegativeValues: boolean
+    type: string | string[]
+  }) => {
+    const { fn, modifiers, name, supportsNegativeValues, type } = options
+    const typed = Array.isArray(type) ? type : [type]
+
+
+    if (typed.includes('any') || typed.includes('*')) return
+
+    matchComponents(
+      { [name]: (value, extra) => (isPhrase(value) ? fn(value, extra) : {}) },
+      // No named values, deliberately: a *named* candidate must keep going to the typed handler, which
+      // is the one that knows the value. This handler exists for arbitrary values only, and a phrase is
+      // always arbitrary — so leaving `values` out is what stops a theme value from being routed here
+      // and then declined.
+      { modifiers, supportsNegativeValues, type: 'any', values: {} },
+    )
+  }
+
   /**
    * View transitions, registered as a **variant** and not as a utility.
    *
@@ -150,6 +173,7 @@ const jumi = createPlugin((api) => {
       const { fn, ...options } = utilities[name]
       const { modifiers = modifierSupport(fn), supportsNegativeValues = false, type = 'any', values } = options
       matchComponents({ [name]: fn }, { modifiers, supportsNegativeValues, type, values })
+      registerPhrases({ fn, modifiers, name, supportsNegativeValues, type })
     }
   }
   registerComponents(getMatchTween(creator))

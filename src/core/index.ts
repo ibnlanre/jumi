@@ -873,6 +873,16 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
  * as a plain tween. No plain CSS value begins `number:`, and ratios are written
  * with a slash, so the leading test is unambiguous.
  */
+/**
+ * Whether a value is a phrase — a value that declares its own frames rather than naming a CSS scalar.
+ *
+ * Exported because the host needs the same test: a phrase is not a CSS value of any type, so a matcher
+ * that declares one never sees it (Tailwind validates the arbitrary value before the function runs),
+ * and the way a phrase reaches Jumi is a *second* handler under the same utility prefix that takes only
+ * phrases. Both sides have to agree on what one is, so the grammar is stated once.
+ */
+export const isPhrase = (value: string) => parsePhrase(value) !== null
+
 function parsePhrase(value: string): Frame[] | null {
   if (!/^\s*\d+(?:\.\d+)?(?:\s*,\s*\d+(?:\.\d+)?)*\s*:/.test(value)) return null
 

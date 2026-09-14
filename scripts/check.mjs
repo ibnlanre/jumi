@@ -52,6 +52,7 @@ const STAGES = [
   { about: 'the finalizer, the model and the CSS helper', label: 'unit', run: ['run', 'test:run'] },
   { about: 'the theme maps still resolve', label: 'theme', run: ['run', 'theme:map'] },
   { about: 'the byte snapshot, over two frozen corpora', label: 'css', run: ['run', 'css:check'] },
+  { about: 'a phrase takes the bypass, a scalar keeps the host type check', label: 'phrase', run: ['run', 'phrase:check'] },
   { about: 'incremental builds stay correct and local', label: 'incremental', run: ['run', 'incremental:check'] },
   { about: 'a real browser resolves a real carrier', label: 'behaviour', run: ['run', 'behaviour:check'] },
   { about: 'the emitted view transition actually travels', label: 'view-transition', run: ['run', 'view-transition:check'] },

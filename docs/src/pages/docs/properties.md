@@ -60,6 +60,38 @@ An effect can animate several properties. Combining two effects that both write 
 </div>
 ```
 
+## Follow a path
+
+A motion path is a property you declare and a property you animate, and keeping those two apart is the whole of it. The path is where the motion happens; the distance is how far along it the element has got. Declare the path, animate the distance:
+
+```html
+<div class="[offset-path:path('M0,0_L200,0_L200,200')]
+  animate-offset-distance-100
+  animation-duration-2000">
+```
+
+The geometry is arbitrary, so anything the platform accepts is available: `path()`, `ray()`, `circle()`, `ellipse()`, `inset()`, `polygon()`, and the box keywords `border-box`, `padding-box`, `content-box`. `offset-path:border-box` needs no geometry at all — the element travels its own border box.
+
+Three properties describe the geometry, and they are written once rather than animated: `offset-path`, `offset-rotate` — `auto` turns the element to follow the tangent — and `offset-anchor`, which decides which point of the element rides the path. All of them are ordinary utilities with an arbitrary value, so nothing new has to be learned:
+
+```html
+<div class="[offset-path:circle(60px)] [offset-position:50%_50%]
+  [offset-rotate:auto]
+  animate-offset-distance-100
+  animation-duration-[4s]
+  animation-iteration-count-infinite">
+```
+
+Because the driver is an ordinary animation, everything else composes with it. Scroll works unchanged:
+
+```html
+<div class="[offset-path:path('M0,0_L200,0_L200,200')]
+  animation-timeline-scroll
+  animation-range-[25%_75%]:animate-offset-distance-100">
+```
+
+**A note for the adventurous.** `offset-path` is itself animatable *between two compatible paths* — the same command list, different coordinates — so a path can morph as it is travelled. Animating it from `none`, though, is a discrete step: the element does not ease onto the path, it appears on it halfway through. Declare the path.
+
 ## CSS still sets the boundaries
 
 A utility cannot make a non-animatable CSS property interpolate. Some properties change discretely, and properties such as width can trigger layout work. Use transform and opacity for frequent decorative motion where they suit the effect, and test more complex properties on your target devices.

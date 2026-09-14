@@ -72,6 +72,8 @@
     "spike:vt-concurrency": "node scripts/spike-vt-concurrency.mjs",
     "spike:scroll-driven": "node scripts/spike-scroll-driven.mjs",
     "spike:scroll-variant": "node scripts/spike-scroll-variant.mjs",
+    "spike:motion-paths": "node scripts/spike-motion-paths.mjs",
+    "phrase:check": "node scripts/phrase-check.mjs",
     "spike:cdp-cost": "node scripts/spike-cdp-cost.mjs",
     "spike:local-list": "node scripts/spike-local-list.mjs",
     "spike:recalc": "node scripts/spike-recalc.mjs",

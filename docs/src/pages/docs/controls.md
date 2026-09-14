@@ -94,6 +94,8 @@ Frames are separated by commas, each written `<offset>:<value>`. The offset is a
 
 A phrase owns its property, and its keyframe is named after the phrase, so nothing else can share it. Two elements running the same phrase run the same keyframe; a different phrase gets a keyframe of its own. No other markup can change what your animation does — which is also why you write one phrase per property per element rather than layering several.
 
+A phrase works wherever a value works, for any property in the table — including the ones whose values are lengths or colours, such as `animate-offset-distance-[0:0%|100:100%]` or `animate-background-color-[0:red|100:blue]`. The two spellings are validated differently, and deliberately so: an ordinary arbitrary value is checked against the property's CSS type, so `animate-offset-distance-[50%]` is accepted and `animate-offset-distance-[abc]` is not, while a phrase is checked against Jumi's own grammar — `offset:value` pairs — and its values are left to the browser.
+
 Placing an action inside the cycle, rather than spreading it across the whole of it, is what this is for. A step earlier in the phrase is a step later in the cycle:
 
 ```html
