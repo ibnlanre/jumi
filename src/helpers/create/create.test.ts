@@ -380,45 +380,45 @@ describe('animations wiring', () => {
       ].join(', '),
     )
   })
-  it('gives a labelled slot its own control link', () => {
+  it('gives every slot its own address, and never carries a name in the aggregate', () => {
     const { creator } = setup()
 
-    creator.property('rotate')('0:0deg|58:0deg', { modifier: 'rotate-flick' })
+    creator.property('rotate')('0:0deg|58:0deg', { modifier: 'flick' })
     creator.property('rotate')('0:0deg|100:90deg', { modifier: null })
     const animations = creator.animations
+    const flick = `--jumi-slot-rotate-${shorthash2('0:0deg|58:0deg')}`
 
-    // A labelled slot reads its label's variable first, so `/[rotate-flick]`
-    // times that animation on its own — which is how two animations of one
-    // property, summed by `animation-composition: add`, are timed apart. The
-    // label is the whole handle: the property is not repeated in front of it.
+    // Each position reads *its own* slot variable before the property's control, so one animation of
+    // a property can be timed without the other — which is how two animations summed by
+    // `animation-composition: add` are timed apart.
     expect(animations['animation-duration']).toContain(
-      'var(--jumi-rotate-flick-animation-duration, var(--jumi-rotate-animation-duration, var(--jumi-animation-duration)))',
+      `var(${flick}-animation-duration, var(--jumi-rotate-animation-duration, var(--jumi-animation-duration)))`,
     )
 
-    // Composition and timeline apply to one animation, so they are chained the
-    // same way — that is what lets `add` compose a single slot.
+    // Composition and timeline apply to one animation, so they are chained the same way.
     expect(animations['animation-composition']).toContain(
-      'var(--jumi-rotate-flick-animation-composition, var(--jumi-rotate-animation-composition, var(--jumi-animation-composition)))',
+      `var(${flick}-animation-composition, var(--jumi-rotate-animation-composition, var(--jumi-animation-composition)))`,
     )
-    expect(animations['animation-timeline']).toContain('var(--jumi-rotate-flick-animation-timeline, ')
+    expect(animations['animation-timeline']).toContain(`var(${flick}-animation-timeline, `)
 
-    // Range is the third list of that shape, and it is a list *per animation*:
-    // position 0 may carry a real range while position 1 falls through to the
-    // global default. That is the shape the regression in
-    // `src/composition/animation-range.test.ts` is about — a default that does
-    // not parse takes the whole declaration, and with it a neighbour's range.
-    expect(animations['animation-range']).toContain('var(--jumi-rotate-flick-animation-range, ')
+    // Range is the third list of that shape, and it is a list *per animation*: position 0 may carry
+    // a real range while position 1 falls through to the global default.
+    expect(animations['animation-range']).toContain(`var(${flick}-animation-range, `)
     expect(animations['animation-range']).toContain(
       'var(--jumi-rotate-animation-range, var(--jumi-animation-range))',
     )
     expect(String(animations['animation-range']).split('var(--jumi-rotate-animation-range').length - 1).toBe(2)
 
-    // An unlabelled slot has no name to be addressed by, so it keeps the
-    // shorter chain and falls straight through to the attribute's control.
-    expect(animations['animation-duration']).toContain(
-      'var(--jumi-rotate-animation-duration, var(--jumi-animation-duration)))',
-    )
-    expect(animations['animation-duration']).not.toContain('var(--jumi-rotate-0-animation-duration')
+    // **And the name is nowhere in it.** This is the invariant, not an absence of detail: the
+    // aggregate is one declaration block shared by every element that matches the composition, so a
+    // name written into a chain is a name every element answers to — including elements that called
+    // the motion something else, or nothing at all. Measured before the split: with two elements
+    // naming one effect `reveal` and `loop`, `animation-duration-900/loop` reached the `reveal` one,
+    // and which name won depended on the order the candidates were compiled in.
+    expect(String(animations['animation-duration'])).not.toContain('flick')
+    expect(String(animations['animation-composition'])).not.toContain('flick')
+    expect(String(animations['animation-range'])).not.toContain('flick')
+    expect(String(animations['animation-timeline'])).not.toContain('flick')
   })
 })
 

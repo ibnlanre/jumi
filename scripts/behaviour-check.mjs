@@ -50,7 +50,17 @@ execFileSync('pnpm', ['run', 'bundle'], { cwd: root, stdio: 'pipe' })
 
 // Bundling comes first because the helper loads the finalizer out of `dist/`: the harness
 // exercises the artifact that ships, not the source it was built from.
-const { corpus, finalizeCss } = await import('./lib/compile.mjs')
+const { build, compiler, corpus, finalizeCss } = await import('./lib/compile.mjs')
+
+/**
+ * An entry for a build whose candidates are supplied here rather than scanned from a fixture —
+ * needed by the naming section, which has to compile the *same* page in two candidate orders and a
+ * fixture is one fixed list.
+ */
+const ENTRY = `
+@import "tailwindcss";
+@plugin "${path.join(root, 'dist', 'index.js')}";
+`
 
 /** Compile a corpus, finalize it, and say what the finalizer did. */
 const compile = async (name) => {
@@ -469,6 +479,71 @@ if (!nestingOk) {
   )
 }
 
+/* ------------------------------------------------------------------------------------
+ * 9. A name addresses one motion, on the element that declared it.
+ *
+ * The differential the CTO asked for, and it is the reason this section exists at all: the first
+ * implementation of naming attached the name to the slot in the **aggregate**, so a name seen
+ * anywhere in the build became an address everywhere — measured, `animation-duration-900/loop`
+ * reached an element whose fade-in was named `reveal`, and which of the two names won depended on
+ * the order the candidates happened to be compiled in.
+ *
+ * The fix is that the name is installed on the rule that declared it, so this runs the whole page
+ * twice, in opposite candidate orders, and requires the same answer both times.
+ * ---------------------------------------------------------------------------------- */
+const NAMED_ARMS = [
+  ['a', 'animate-fade-in/reveal animation-duration-300/reveal animation-duration-900/loop'],
+  ['b', 'animate-fade-in/loop animation-duration-700/loop'],
+  ['c', 'animate-fade-in/reveal animate-scale-110/loop animation-duration-900/loop'],
+  // Names its own motion, and is named by nothing: every name in the sheet must miss it.
+  ['d', 'animate-fade-in animation-duration-900/loop animation-duration-500/elsewhere'],
+]
+
+const NAMED_CANDIDATES = [...new Set(NAMED_ARMS.flatMap(([, classes]) => classes.split(/\s+/).filter(Boolean)))]
+
+/** The duration each live animation resolves to, per element, by name position. */
+const namedDurations = async (candidates) => {
+  const built = build(await compiler(ENTRY, root), candidates)
+  const page = await load(built.css, NAMED_ARMS
+    .map(([id, classes]) => `<div id="named-${id}" class="${classes}"></div>`)
+    .join('\n'))
+
+  const readings = {}
+
+  for (const [id] of NAMED_ARMS) {
+    const reading = await page.evaluate((selector) => {
+      const style = getComputedStyle(document.querySelector(selector))
+      const names = style.animationName.split(',').map(name => name.trim())
+      const durations = style.animationDuration.split(',').map(value => value.trim())
+
+      return Object.fromEntries(names.map((name, at) => [name, durations[at] ?? '?']))
+    }, `#named-${id}`)
+
+    readings[id] = reading
+  }
+
+  await page.close()
+
+  return readings
+}
+
+const forward = await namedDurations(NAMED_CANDIDATES)
+const reversed = await namedDurations([...NAMED_CANDIDATES].reverse())
+const durationOf = (readings, id, prefix) =>
+  Object.entries(readings[id] ?? {}).find(([name]) => name.startsWith(prefix))?.[1]
+
+const naming = [
+  ['the name it declared reaches its own motion', durationOf(forward, 'a', 'jumi-fade-in') === '0.3s'],
+  ['and a name declared on another element never does', durationOf(forward, 'b', 'jumi-fade-in') === '0.7s'],
+  ['a motion nothing named stays unreachable', durationOf(forward, 'd', 'jumi-fade-in') === '1s'],
+  ['one name reaches both motions that declared it, and only those',
+    durationOf(forward, 'c', 'jumi-scale-') === '0.9s' && durationOf(forward, 'c', 'jumi-fade-in') === '1s'],
+  ['candidate order cannot decide which name wins',
+    JSON.stringify(forward) === JSON.stringify(reversed)],
+]
+
+for (const [claim, ok] of naming) if (!ok) failures.push(`naming: ${claim}`)
+
 await browser.close()
 
 /* ------------------------------------------------------------------------------------
@@ -496,10 +571,14 @@ console.log(`    ${nestingOk ? '✓' : '✗'} a nested animation runs its own sl
 console.log(`    ✓ finalization settles: ${variantBuild.staging + canonicalBuild.staging} payload rules`
   + ` consumed, a second pass a no-op`)
 
+console.log('\n  naming')
+
+for (const [claim, ok] of naming) console.log(`    ${ok ? '✓' : '✗'} ${claim}`)
+
 // Every assertion above that can fail, so the summary line is the count it claims to be: the three
 // activation contexts, the pseudo substrate, the direct carriers, bare, applied, spacing, radius,
 // the three relationship-variant cases, and non-inheritance.
-const required = contexts.length + utilities.length + 9
+const required = contexts.length + utilities.length + 9 + naming.length
 const passing = required - failures.length
 
 console.log(`\n  ${passing}/${required} required contexts and carriers behave`)

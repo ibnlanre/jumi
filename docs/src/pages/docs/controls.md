@@ -44,11 +44,13 @@ Append `/{property}` or `/{effect}` to timing controls:
 </div>
 ```
 
-When one property carries more than one animation, name each where you declare it with `/[name]`, and address it by that name:
+Any motion can be named, and the name goes after a slash: `animate-fade-in/reveal`, `animate-opacity-50/reveal`, `animate-rotate-[0:0deg|12:-8deg|100:-8deg]/reveal`. `[brackets]` are only for a name that needs them — a name is one word, so you can write it directly.
+
+When one property carries more than one animation, name each where you declare it and address it by that name:
 
 ```html
-<div class="animate-rotate-[0:0deg|12:-8deg|100:-8deg]/[flick]
-  animate-rotate-[0:0deg|12:0deg|100:8deg]/[return]
+<div class="animate-rotate-[0:0deg|12:-8deg|100:-8deg]/flick
+  animate-rotate-[0:0deg|12:0deg|100:8deg]/return
   animation-composition-add/rotate
   animation-timing-function-ease-in-out-circ/flick
   animation-timing-function-linear/return">
@@ -56,15 +58,19 @@ When one property carries more than one animation, name each where you declare i
 </div>
 ```
 
-`/[flick]` gives that animation a name, and the same name on a control times it on its own. Each animation reads its own label first, then the property's control, then the global one, so anything else in the list is left alone — and naming one does not change its phrase.
+`/flick` gives that animation a name, and the same name on a control times it on its own. Each animation reads its own name first, then the property's control, then the global one, so anything else in the list is left alone — and naming one does not change its phrase.
 
-The label is yours to choose, and it becomes the variable name exactly as written — nothing is prepended. Labels and property names are one namespace, which is what lets `/rotate` and `/[flick]` be written the same way on a control: `--jumi-rotate-animation-timing-function` is the variable every rotate animation reads, so `rotate` is the name all of them answer to, and a label is a name one of them answers to. Give each animation you want to time apart its own word.
+A name belongs to the motion that declared it, on the element that wrote it. Two elements may use the same word for different motions, and naming a motion elsewhere in your stylesheet never widens what this element answers to. Two motions on one element may also share a name, and then a control written for that name reaches both — which is how a transition of several properties is tuned as one thing.
 
-A label belongs to the element that declared it. Its variable is registered non-inheriting, so it does not travel into descendants, and two elements can use the same word for different values without knowing about each other.
+The name is yours to choose, and it becomes the variable name exactly as written — nothing is prepended. Names and property names are one namespace, which is what lets `/rotate` and `/flick` be written the same way on a control: `--jumi-rotate-animation-timing-function` is the variable every rotate animation reads, so `rotate` is the name all of them answer to, and a name is a word one of them answers to. Give each animation you want to time apart its own word.
 
-The three links do not behave alike across that boundary. A `/{property}` control on a wrapper does reach the animations inside it, because nothing declares `--jumi-{property}-animation-{part}` on the element, so the value it writes is inherited. A global control does not: every animating element declares the global defaults itself, and a declaration beats inheritance. A label never does.
+Naming is registered non-inheriting: a name does not travel into descendants, so a wrapper and the element inside it can use the same word without knowing about each other.
 
-Reach for it when one easing is not enough. A single `animation-timing-function` applies to every segment of an animation, so pairing an eased flick with a linear return takes two animations, each with one moving segment. `animation-composition: add` lets both apply at once instead of the second replacing the first.
+The three links do not behave alike across that boundary. A `/{property}` control on a wrapper does reach the animations inside it, because nothing declares `--jumi-{property}-animation-{part}` on the element, so the value it writes is inherited. A global control does not: every animating element declares the global defaults itself, and a declaration beats inheritance. A name never does.
+
+Naming a motion that is not there is not an error: controls configure motion, they do not create it, so `animation-duration-500/reveal` with nothing named `reveal` on the element does nothing at all — exactly like `animation-duration-500`. That is what makes a named control beside a conditional motion (`motion-safe:animate-fade-in/reveal`) ordinary rather than suspect. A name that cannot be written, though, is reported and dropped: a name becomes part of a custom property's name, and whitespace cannot appear there — which is what an underscore becomes inside `[brackets]`, so write a name bare.
+
+Reach for naming when one easing is not enough. A single `animation-timing-function` applies to every segment of an animation, so pairing an eased flick with a linear return takes two animations, each with one moving segment. `animation-composition: add` lets both apply at once instead of the second replacing the first.
 
 The name is written into the rule, so you can retime or re-ease that animation from your own CSS without touching the markup:
 
@@ -112,8 +118,8 @@ This site's hero is built this way. A wrapper around each petal carries a slow, 
   style="--angle:0deg">
 
   <div class="petal
-    animate-rotate-[0:0deg|20:-8deg|100:-8deg]/[flick]
-    animate-rotate-[0:0deg|20:0deg|100:8deg]/[return]
+    animate-rotate-[0:0deg|20:-8deg|100:-8deg]/flick
+    animate-rotate-[0:0deg|20:0deg|100:8deg]/return
     animation-composition-add/rotate
     animation-duration-3000
     animation-timing-function-[cubic-bezier(.4,0,.6,1)]/flick

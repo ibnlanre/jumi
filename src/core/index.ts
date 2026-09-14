@@ -87,11 +87,11 @@ type Frame = {
 }
 
 /** One animation in the composition, addressed by its attribute and, optionally,
- * the variable that declares its name. `names` are the words its declarations gave
- * it — `animate-fade-in/reveal` — which are the same words a control addresses it by. */
+ * the variable that declares its name. `key` is the slot's own address, which is what a
+ * per-element control chain reads before the property scope and the global default. */
 type Slot = {
   attribute: string
-  names?: string[] | undefined
+  key?: string | undefined
   nameVar?: string | undefined
 }
 
@@ -225,21 +225,19 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
       sink.property(hoisted)
     }
   }
-  // OPTIMIZATION: Using a Set allows O(1) deduplication and move-to-end,
-  // replacing the O(N) Array indexOf/splice logic. JS Sets maintain insertion order.
   const values = new Map<AnimatableStandardPropertyType, Set<string>>()
-  // The names a declaration gave its slot — `animate-fade-in/reveal` — keyed by the slot's
-  // **key**: `attribute-id` for a phrase or a single value, the attribute for a composed tween or an
-  // effect. A control spells the same word in `/reveal`, so the two meet on one element-local
-  // variable instead of a number that depends on what else the page happens to animate.
-  //
-  // A list, not one name, because a name is an **address** and not an identifier: nothing forbids two
-  // candidates naming the same motion, and keeping only the last would make `animation-duration-500`
-  // with either name work while the other stayed silent. Addressability does not depend on
-  // uniqueness either — two motions may share a name, and then one control reaches both.
-  const names = new Map<string, string[]>()
 
   const composed = new Set<AnimatableStandardPropertyType>()
+
+  /**
+   * The slots some candidate gave a name to.
+   *
+   * A boolean per slot, and deliberately not the names: a name never reaches the composition — that
+   * is the locality rule — so all the aggregate may know is that this slot has an address to read,
+   * which is a link in its chain rather than a value in it. Measured: adding the link for every slot
+   * cost 51% more staged bytes for the whole corpus, and only named slots can use it.
+   */
+  const addressed = new Set<string>()
 
   // Deterministic alphabetical ordering for Sets of attribute/effect names.
   const sorted = <T extends string>(set: Set<T>): Array<T> => [...set].sort()
@@ -265,36 +263,43 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
   })
 
   /**
-   * Name a slot: record the address, register the links it adds, and say so in the rule.
+   * Name a slot: install an address for the elements that wrote the name, and say so in the rule.
    *
-   * The declaration is returned rather than written because the rule it belongs to is the host's:
-   * it is the same statement the phrase branch already published, so a name is readable — and
-   * checkable — in the finished stylesheet whatever kind of motion declared it.
+   * Nothing here reaches the aggregate, and that is the point. A name is element-local —
+   * `animate-fade-in/reveal` names the motion for the elements matching *that* rule — so the address
+   * it installs is the slot-keyed variable the composition's chains already read
+   * (`--jumi-slot-<key>-<part>`), filled from the name's own variable. Both are registered
+   * non-inheriting: a descendant that animates the same property must not answer to a name declared
+   * above it, which is the same rule the activation variables follow.
+   *
+   * A name the build cannot write — whitespace — is recorded instead of linked, so the motion still
+   * runs and the pass can report what it could not use.
+   *
+   * Returns the declaration that records the name, because the rule it belongs to is the host's for
+   * an effect: the host spreads it into the rule it is already emitting.
    */
   const nameSlot = (key: string, attribute: string, name: string): CssInJs => {
-    // A name that cannot be written is recorded rather than linked: the motion still runs, unnamed,
-    // and the build reports the name it could not use.
     if (!addressableName(name)) return refusedName(name)
 
-    const recorded = names.get(key) ?? []
+    for (const part of slotParts) {
+      // The slot's address is always registered: it is how a name reaches one motion, and a
+      // descendant that animates the same property must not answer to a name declared above it.
+      registerName(cssEscape(`--jumi-slot-${key}-${part}`))
 
-    if (!recorded.includes(name)) {
-      recorded.push(name)
-      names.set(key, recorded)
+      // The name's own variable is registered the same way, with one exemption: when the name *is*
+      // the attribute, that variable is the property scope's (`--jumi-rotate-animation-duration`),
+      // and a scope cascades into subtrees on purpose. Registering it here would quietly turn
+      // `animate-rotate-[…]/rotate` into a private address.
+      if (name !== attribute) registerName(cssEscape(`--jumi-${name}-${part}`))
     }
 
-    // Registered non-inheriting for the reason a phrase name is: a name addresses ONE motion, on the
-    // element that declared it, so a descendant that happens to use the same word must not answer to
-    // it. Skipped when the name is the attribute itself, because that name is the property scope's,
-    // and a scope cascades into subtrees on purpose.
-    if (name !== attribute) {
-      for (const part of slotParts) registerName(cssEscape(`--jumi-${name}-${part}`))
+    // Publicly visible state, so a republish is owed: the slot's chain gains its address link only
+    // when the slot is named, and a name recorded after a pass has published would otherwise be an
+    // address nothing reads. Measured on the differential: the link is what carries the name.
+    if (!addressed.has(key)) {
+      addressed.add(key)
+      aggregateChanged()
     }
-
-    // After the name is recorded, not before: a candidate compiled once a pass has already published
-    // republishes on the change, and a publish that ran before this line would carry a composition
-    // with no link to the name — silently, and only for late candidates.
-    aggregateChanged()
 
     return { [cssEscape(`--jumi-${key}-label`)]: name }
   }
@@ -376,23 +381,33 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
     return css('var', variable, expanded)
   }
 
-  function animationParts(attribute: string, nameVar?: string, names?: string[]): CssInJs {
+  function animationParts(attribute: string, nameVar?: string, key?: string): CssInJs {
     // Every `animation-*` longhand that applies to ONE animation in the list, so
     // a slot can be timed, sequenced and composed on its own. Three links,
-    // narrowest first: each name a declaration gave this animation, then the
-    // property's own control, then the global default. `/rotate` writes the middle
-    // link; `/flick` — the same word the declaration used — writes the first.
-    // Only a named slot offers that first link: an unnamed one has no name to be
-    // addressed by, so it keeps the shorter chain.
+    // narrowest first: the slot's own address — which is where a *name* is
+    // installed, by the rule that declared the name — then the property's control,
+    // then the global default.
+    //
+    // The slot key and not the name, and that is the whole of the locality rule. A
+    // name is element-local (`.animate-fade-in/reveal` names the motion for the
+    // elements that match *that* rule), so it cannot appear in a chain at all: a
+    // chain is shared by every element that matches the composition, and a name
+    // seen anywhere in the build — on another page, another component, another
+    // element — would then be an address everywhere. Measured: with the name in the
+    // chain, `animation-duration-900/loop` reached a motion named `reveal` on an
+    // element that never used `loop`, and which of the two won depended on the order
+    // candidates happened to be compiled in.
+    //
+    // `--jumi-slot-<key>-<part>` is declared on the activation rule itself — the rule
+    // the author wrote — and it is what the rule's own `-label` declaration fills.
+    // Same shape as the range composition variant's publication, for the same reason:
+    // the fact belongs to the rule, so the rule is where it is written.
     const timing = (part: string) => {
-      const chain = css('var', `--jumi-${attribute}-${part}`, css('var', `--jumi-${part}`))
+      const scope = css('var', `--jumi-${attribute}-${part}`, css('var', `--jumi-${part}`))
 
-      if (names === undefined) return chain
-
-      // One link per name, outermost first. Names are disjoint addresses rather than a priority
-      // order, so which link is outer cannot be observed — what matters is that every name the slot
-      // declared reaches it.
-      return names.reduce((links, name) => css('var', cssEscape(`--jumi-${name}-${part}`), links), chain)
+      return addressed.has(key ?? attribute)
+        ? css('var', cssEscape(`--jumi-slot-${key}-${part}`), scope)
+        : scope
     }
 
     const name = css('var', nameVar ?? `--jumi-${attribute}-animation-name`, css('var', '--jumi-animation-name'))
@@ -421,7 +436,7 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
       for (const id of ids) {
         slots.push({
           attribute,
-          names: names.get(slotKey(attribute, id)),
+          key: slotKey(attribute, id),
           nameVar: `--jumi-${attribute}-${id}-animation-name`,
         })
       }
@@ -432,19 +447,19 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
     // and therefore claims a slot of its own.
     for (const attribute of composed) shared.add(attribute)
 
-    for (const attribute of sorted(shared)) slots.push({ attribute, names: names.get(attribute) })
+    for (const attribute of sorted(shared)) slots.push({ attribute, key: slotKey(attribute) })
 
     for (const [attribute, byId] of phrases) {
       for (const id of byId.keys()) {
         slots.push({
           attribute,
-          names: names.get(slotKey(attribute, id)),
+          key: slotKey(attribute, id),
           nameVar: `--jumi-${attribute}-${id}-animation-name`,
         })
       }
     }
 
-    for (const attribute of sorted(effects)) slots.push({ attribute, names: names.get(attribute) })
+    for (const attribute of sorted(effects)) slots.push({ attribute, key: slotKey(attribute) })
 
     return slots
   }
@@ -460,8 +475,8 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
     // var chain. The `--jumi-animation-*` defaults the chains fall back to are
     // declared by the defaults rule the finalizer derives, on the element.
     const animation = slots.length
-      ? slots.reduce((acc, { attribute, names, nameVar }) => {
-          const parts = animationParts(attribute, nameVar, names)
+      ? slots.reduce((acc, { attribute, key, nameVar }) => {
+          const parts = animationParts(attribute, nameVar, key)
           for (const part in parts) {
             acc[part] = acc[part] ? `${acc[part]}, ${parts[part]}` : parts[part]
           }

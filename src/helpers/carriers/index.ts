@@ -13,6 +13,7 @@ import {
   viewTransitionStaging,
 } from './view-transition'
 
+import cssEscape from 'css.escape'
 import postcss from 'postcss'
 
 /**
@@ -207,6 +208,15 @@ const FALLBACK: Record<string, string> = {
   'animation-play-state': 'running',
   'animation-timing-function': 'linear',
 }
+
+/**
+ * The parts a name installs on the rule that declared it: every slot part except `animation-name`,
+ * which no control addresses — there is no `/<name>` spelling for an animation's name.
+ */
+const namedParts = [
+  ...SHORTHAND.filter(part => part !== 'animation-name'),
+  ...AFTER_SHORTHAND,
+]
 
 /**
  * The slot a hoisted value belongs to, read off the activation variable.
@@ -405,6 +415,34 @@ const hoist = (staged: Collection<string>, rules: Rule[]) => {
 
       published.add(prop)
       rule.append(postcss.decl({ prop, value }))
+    }
+
+    // A named activation installs the name as this slot's address — **on this rule**, which is the
+    // whole of the locality rule. The composition's chains read `--jumi-slot-<slot>-<part>`, so filling
+    // it here means the name reaches the elements that wrote `.animate-fade-in/reveal` and no others.
+    //
+    // The alternative — putting the name in the chain itself — cannot be made element-local: a chain is
+    // shared by every element matching the composition, so a name seen anywhere in the build became an
+    // address everywhere, and which name won depended on candidate order. Measured: `#a` with
+    // `animate-fade-in/reveal animation-duration-300/reveal animation-duration-900/loop` computed
+    // `0.9s` forward and `0.3s` reversed, and `loop` named on another element reached it either way.
+    for (const declaration of own) {
+      const match = ACTIVATED_SLOT.exec(declaration.prop)
+
+      if (!match) continue
+
+      const name = own.find(candidate => candidate.prop === cssEscape(`--jumi-${match[1]}-label`))?.value
+
+      if (!name) continue
+
+      for (const part of namedParts) {
+        const prop = cssEscape(`--jumi-slot-${match[1]}-${part}`)
+
+        if (published.has(prop)) continue
+
+        published.add(prop)
+        rule.append(postcss.decl({ prop, value: `var(${cssEscape(`--jumi-${name}-${part}`)})` }))
+      }
     }
   }
 
