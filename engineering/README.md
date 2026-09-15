@@ -26,6 +26,7 @@ engineering/
 | `architecture/instances.md` | the one derivation of a motion instance from a rule, the two conflation defects that made it a rule rather than a convention, and the test that holds it |
 | `architecture/phrases.md` | the shipped phrase grammar, and the host value-parser constraints it works within |
 | `decisions/hooks-proposal.md` | a lifecycle-hooks proposal that was never implemented |
+| `decisions/segment-easing.md` | segment easing: why it can only be keyframe-local (a `var()` there is dropped, measured), the seven measurements that fix its semantics, the syntax candidates and the one recommended — proposal, not built |
 | `decisions/CTO.md` | the running record of architectural direction and its approvals |
 | `research/deployment.md` | the Vercel contract, and the 2026-09-12 diagnosis of a stale deploy |
 | `research/scanner-inventory.md` | candidate discovery: what the host hands a matcher, per candidate |
