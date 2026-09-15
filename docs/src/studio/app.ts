@@ -1,28 +1,31 @@
 import type { ControlEntry, PropertyEntry } from './catalog'
 import type { Controls, StudioProject, Track } from './model'
 
+import { bezier, curveDrawing, curveValue, easingMarkup } from './easing'
 import {
   addFrame,
   candidates,
   defaults,
   documentHtml,
   escapeHtml as esc,
+  exportedTrackClasses,
   flatten,
   markup,
   moveFrames,
   parentOf,
   parseClasses,
-  trackClasses,
   uid,
   validateProject,
 } from './model'
 import { SceneSandbox } from './sandbox'
 import { makeScene } from './scenes'
+import { setupWorkspace, showInspector, workspaceTab } from './workspace'
 const $ = <T extends HTMLElement = HTMLElement>(id: string) =>
   document.getElementById(id) as T
 const input = (id: string) => $<HTMLInputElement>(id)
 const select = (id: string) => $<HTMLSelectElement>(id)
 const copy = <T>(value: T): T => structuredClone(value)
+setupWorkspace()
 const storageKey = 'jumi-studio-project-v1'
 let controls: ControlEntry[] = [],
   project = makeScene(),
@@ -43,9 +46,10 @@ let compileTimer: ReturnType<typeof setTimeout>,
 let timelineStart = 0
 let applying = false,
   hovered: null | string = null,
-  outputTab = 'html',
+  outputTab = workspaceTab(),
   renderingInspector = false,
   timelineZoom = 1
+const outputScroll = new Map<string, { left: number; top: number }>()
 const future: string[] = [],
   past: string[] = []
 const sandbox = new SceneSandbox($<HTMLIFrameElement>('scene-frame'), project)
@@ -104,10 +108,23 @@ function setSelection(id: string, multi = false) {
   if (!project.editor.selected.length) project.editor.selected = [id]
   activeTrack = project.tracks.find(t => t.nodeId === id)?.id ?? ''
   selectedFrames = []
+  for (
+    let n = parentOf(project.scene.root, id);
+    n;
+    n = parentOf(project.scene.root, n.id)
+  )
+    project.editor.collapsed = project.editor.collapsed.filter(c => c !== n!.id)
+  showInspector('element', false)
   sandbox.project = project
   sandbox.isolate()
   persist()
   render()
+  document
+    .querySelector(`[data-node="${id}"]`)
+    ?.scrollIntoView({ block: 'nearest' })
+  document
+    .querySelector(`[data-source="${id}"]`)
+    ?.scrollIntoView({ block: 'nearest' })
 }
 function stop() {
   playing = false
@@ -223,6 +240,11 @@ function propertyMeta() {
 }
 function render() {
   $('project-name').textContent = project.title
+  select('scene-picker').value = flatten(project.scene.root).some(
+    n => n.id === 'petal-1',
+  )
+    ? 'hero'
+    : 'signal'
   input('project-duration').value = String(project.duration)
   input('scene-width').value = String(project.scene.width)
   input('scene-height').value = String(project.scene.height)
@@ -342,6 +364,7 @@ function addTrack() {
       }
       project.tracks.push(t)
       activeTrack = t.id
+      showInspector('keyframe')
       selectedFrames = [t.frames[1].id]
     }
   })
@@ -396,7 +419,7 @@ function drawOverlays() {
   const origin = originId ? sandbox.origin(originId) : null
   if (origin)
     boxes.push(
-      `<span class="origin-dot" style="left:${origin.x}px;top:${origin.y}px"></span>`,
+      `<button class="origin-dot" data-overlay-handle="origin" aria-label="Drag transform origin" title="Drag transform origin" style="left:${origin.x}px;top:${origin.y}px"></button>`,
     )
   $('scene-overlays').innerHTML = boxes.join('')
 }
@@ -459,7 +482,7 @@ function outputText() {
     return node
       ? project.tracks
           .filter(t => t.nodeId === node.id)
-          .flatMap(trackClasses)
+          .flatMap(t => exportedTrackClasses(t, project))
           .join('\n')
       : ''
   }
@@ -542,13 +565,31 @@ function renderInspector() {
         .join(
           '',
         )}</datalist><div class="keyframe-actions"><button data-action="keyframe">+ At playhead</button><button data-action="delete-frames" ${selectedFrames.length ? '' : 'disabled'}>Delete</button></div><p class="muted" style="margin-top:10px">${t.frames.length} frames · ${selectedFrames.length} selected. Values use CSS units, not theme token names.</p></div></div>`
+    const raw = document.querySelector('[data-control="easing"]')!
+    raw.parentElement!.insertAdjacentHTML('beforebegin', easingMarkup(c.easing))
+    raw.parentElement!.insertAdjacentHTML(
+      'afterend',
+      `<p class="time-note" id="motion-local-time">Scene ${playhead.toFixed(0)}ms · local ${(playhead - c.delay).toFixed(0)}ms</p>`,
+    )
   } finally {
     renderingInspector = false
   }
 }
 function renderOutput() {
   try {
-    $('output-code').textContent = outputText()
+    if (outputTab === 'html') {
+      const lines = markup(project).split('\n')
+      $('output-code').innerHTML =
+        '<div class="source-hint">Click a tag to select · Hover to locate · ⌘/Ctrl-click to isolate · Shift-click to add</div>' +
+        lines
+          .map(line => {
+            const id = / id="([^" ]+)"/.exec(line)?.[1]
+            return id
+              ? `<button class="source-row" data-source="${id}" aria-current="${project.editor.selected.includes(id)}">${esc(line)}</button>`
+              : `<span class="source-row">${esc(line)}</span>`
+          })
+          .join('')
+    } else $('output-code').textContent = outputText()
   } catch (e) {
     $('output-code').textContent = String(e)
   }
@@ -562,7 +603,19 @@ function renderOutput() {
 }
 function renderTimeline() {
   const tracks = visibleTracks()
-  timelineStart = Math.min(0, ...tracks.map(t => t.controls.delay))
+    .slice()
+    .sort((a, b) => {
+      const nodes = flatten(project.scene.root).map(n => n.id)
+      return (
+        nodes.indexOf(a.nodeId) - nodes.indexOf(b.nodeId) ||
+        a.name.localeCompare(b.name)
+      )
+    })
+  let previousName = '',
+    previousNode = ''
+  timelineStart = input('show-preroll')?.checked
+    ? Math.min(0, ...tracks.map(t => t.controls.delay))
+    : 0
   const span = project.duration - timelineStart
   const nodeMap = new Map(flatten(project.scene.root).map(n => [n.id, n.name]))
   const ticks = Array.from(
@@ -572,7 +625,7 @@ function renderTimeline() {
   ).join('')
   $('timeline-body').style.width = `${timelineZoom * 100}%`
   $('timeline-body').innerHTML =
-    `<div class="ruler-row"><div class="ruler-label">OBJECT / PROPERTY</div><div class="ruler">${ticks}<input type="range" id="playhead-scrub" min="0" max="${project.duration}" step="1" value="${playhead}" aria-label="Timeline playhead" /></div></div>${
+    `<div class="ruler-row"><div class="ruler-label">OBJECT / PROPERTY</div><div class="ruler">${ticks}<input type="range" id="playhead-scrub" min="${timelineStart}" max="${project.duration}" step="1" value="${playhead}" aria-label="Timeline playhead" /></div></div>${
       tracks.length
         ? tracks
             .map(t => {
@@ -586,13 +639,25 @@ function renderTimeline() {
                   0,
                   ((t.controls.delay - timelineStart) / span) * 100,
                 )
-              return `<div class="track-row ${t.id === activeTrack ? 'active' : ''}" data-track="${t.id}"><div class="track-label"><button data-track-select="${t.id}">${esc(t.utility.slice(8))}<small>${esc(nodeMap.get(t.nodeId) || t.nodeId)} / ${esc(t.name)}</small></button><button data-track-up="${t.id}" aria-label="Move ${esc(t.utility.slice(8))} track up">↑</button><button data-track-delete="${t.id}" aria-label="Delete ${esc(t.utility.slice(8))} track">×</button></div><div class="track-lane" data-lane="${t.id}"><span class="track-span" style="left:${start}%;width:${Math.max(0, end - start)}%"></span>${t.frames
-                .map(f => {
-                  const time =
-                    t.controls.delay + (t.controls.duration * f.offset) / 100
-                  return `<button class="keyframe ${selectedFrames.includes(f.id) ? 'selected' : ''}" data-frame="${f.id}" data-frame-track="${t.id}" style="left:${((time - timelineStart) / span) * 100}%" aria-label="${esc(t.utility.slice(8))} keyframe ${f.offset}%" title="${f.offset}% · ${esc(f.value)} · ${Math.round(time)}ms"></button>`
-                })
-                .join('')}</div></div>`
+              const heading =
+                (previousNode !== t.nodeId
+                  ? `<div class="timeline-group"><button data-select="${t.nodeId}">${esc(nodeMap.get(t.nodeId) || t.nodeId)}</button></div>`
+                  : '') +
+                (previousNode !== t.nodeId || previousName !== t.name
+                  ? `<div class="timeline-group timeline-motion">/ ${esc(t.name)}${t.controls.delay < 0 ? ` · ${Math.abs(t.controls.delay)}ms advanced at scene zero` : ''}</div>`
+                  : '')
+              previousNode = t.nodeId
+              previousName = t.name
+              return (
+                heading +
+                `<div class="track-row ${t.id === activeTrack ? 'active' : ''}" data-track="${t.id}"><div class="track-label"><button data-track-select="${t.id}">${esc(t.utility.slice(8))}<small>${esc(nodeMap.get(t.nodeId) || t.nodeId)} / ${esc(t.name)}</small></button><button data-track-up="${t.id}" aria-label="Move ${esc(t.utility.slice(8))} track up">↑</button><button data-track-delete="${t.id}" aria-label="Delete ${esc(t.utility.slice(8))} track">×</button></div><div class="track-lane" data-lane="${t.id}"><span class="track-span" style="left:${start}%;width:${Math.max(0, end - start)}%"></span>${t.frames
+                  .map(f => {
+                    const time =
+                      t.controls.delay + (t.controls.duration * f.offset) / 100
+                    return `<button class="keyframe ${selectedFrames.includes(f.id) ? 'selected' : ''}" data-frame="${f.id}" data-frame-track="${t.id}" style="left:${((time - timelineStart) / span) * 100}%" aria-label="${esc(t.utility.slice(8))} keyframe ${f.offset}%" title="${f.offset}% · ${esc(f.value)} · ${Math.round(time)}ms"></button>`
+                  })
+                  .join('')}</div></div>`
+              )
             })
             .join('')
         : '<div class="empty-timeline">Select a layer and add a property to begin.</div>'
@@ -603,7 +668,7 @@ function renderTimeline() {
 }
 function seek(time: number) {
   stop()
-  playhead = Math.min(project.duration, Math.max(0, time))
+  playhead = Math.min(project.duration, Math.max(timelineStart, time))
   if (sandbox.ready) sandbox.seek(playhead)
   updateTime()
   drawOverlays()
@@ -674,6 +739,10 @@ function updateTime() {
   )
   $('time-display').innerHTML =
     `${(playhead / 1000).toFixed(3)} <small>/ ${(project.duration / 1000).toFixed(3)} s</small>`
+  const motion = currentTrack()
+  if ($('motion-local-time') && motion)
+    $('motion-local-time').textContent =
+      `Scene ${playhead.toFixed(0)}ms · local ${(playhead - motion.controls.delay).toFixed(0)}ms`
   const slider = input('playhead-scrub')
   if (slider) slider.value = String(playhead)
   const lane = document.querySelector<HTMLElement>('.ruler'),
@@ -725,6 +794,14 @@ document.addEventListener('click', async event => {
   const button = (event.target as Element).closest<HTMLButtonElement>('button')
   if (!button) return
   const d = button.dataset
+  if (d.source) {
+    setSelection(d.source, event.shiftKey)
+    if (event.metaKey || event.ctrlKey)
+      editorChange(() => {
+        project.editor.isolation = 'subtree'
+      })
+    return
+  }
   if (d.select) {
     setSelection(d.select, (event as MouseEvent).shiftKey)
     return
@@ -740,8 +817,12 @@ document.addEventListener('click', async event => {
     return
   }
   if (d.trackSelect) {
+    const track = project.tracks.find(t => t.id === d.trackSelect)
+    if (track && !project.editor.selected.includes(track.nodeId))
+      setSelection(track.nodeId)
     activeTrack = d.trackSelect
     selectedFrames = []
+    showInspector('motion')
     renderInspector()
     renderTimeline()
     renderInfo()
@@ -769,8 +850,14 @@ document.addEventListener('click', async event => {
     return
   }
   if (d.output) {
+    outputScroll.set(outputTab, {
+      left: $('output-code').scrollLeft,
+      top: $('output-code').scrollTop,
+    })
     outputTab = d.output
     renderOutput()
+    const position = outputScroll.get(outputTab)
+    $('output-code').scrollTo(position?.left ?? 0, position?.top ?? 0)
     return
   }
   switch (d.action) {
@@ -805,6 +892,7 @@ document.addEventListener('click', async event => {
       fitSelection()
       break
     case 'focus-property':
+      showInspector('element')
       input('property-search').focus()
       break
     case 'import-classes':
@@ -832,7 +920,7 @@ document.addEventListener('click', async event => {
       }
       change(() => {
         for (const id of project.editor.selected)
-          project.scene.css += `\n#${id} { transform-origin: ${value}; }`
+          project.scene.css = originRule(project.scene.css, id, value)
       })
       break
     }
@@ -1061,7 +1149,15 @@ document.addEventListener('pointerdown', event => {
   if (!target || event.button !== 0) return
   event.preventDefault()
   stop()
+  const previousFrames = [...selectedFrames]
+  const selectedTrack = project.tracks.find(
+    t => t.id === target.dataset.frameTrack,
+  )!
+  if (!project.editor.selected.includes(selectedTrack.nodeId))
+    setSelection(selectedTrack.nodeId, event.shiftKey)
   activeTrack = target.dataset.frameTrack!
+  showInspector('keyframe')
+  if (event.shiftKey) selectedFrames = previousFrames
   const id = target.dataset.frame!
   if (event.shiftKey)
     selectedFrames = selectedFrames.includes(id)
@@ -1069,7 +1165,9 @@ document.addEventListener('pointerdown', event => {
       : [...selectedFrames, id]
   else if (!selectedFrames.includes(id)) selectedFrames = [id]
   const before = JSON.stringify(project),
-    lane = target.closest<HTMLElement>('.track-lane')!,
+    lane = document.querySelector<HTMLElement>(
+      `[data-lane="${selectedTrack.id}"]`,
+    )!,
     original = copy(project),
     start = event.clientX,
     width = lane.getBoundingClientRect().width
@@ -1113,6 +1211,13 @@ document.addEventListener('pointerdown', event => {
   window.addEventListener('pointerup', end, { once: true })
 })
 document.addEventListener('keydown', event => {
+  if (
+    event.defaultPrevented ||
+    (event.target as Element).closest(
+      '[data-ease-handle],[role=separator],[role=tab]',
+    )
+  )
+    return
   const tag = (event.target as HTMLElement).tagName
   if (
     ['INPUT', 'SELECT', 'TEXTAREA'].includes(tag) ||
@@ -1189,3 +1294,176 @@ Object.defineProperty(window, '__jumiStudio', {
   },
 })
 render()
+
+// Workspace interactions share the same authoring state and browser preview.
+$('output-code').addEventListener('pointerover', event => {
+  hovered =
+    (event.target as Element).closest<HTMLElement>('[data-source]')?.dataset
+      .source ?? null
+  drawOverlays()
+})
+$('output-code').addEventListener('pointerleave', () => {
+  hovered = null
+  drawOverlays()
+})
+document
+  .querySelector('.timeline-toolbar')!
+  .insertAdjacentHTML(
+    'beforeend',
+    '<label title="Inspect frames before scene time zero"><input type="checkbox" id="show-preroll" /> Pre-roll</label>',
+  )
+input('show-preroll').addEventListener('change', () => {
+  renderTimeline()
+  if (playhead < timelineStart) seek(timelineStart)
+})
+function setEasing(value: string) {
+  const track = currentTrack()
+  if (!track || !CSS.supports('animation-timing-function', value)) return
+  change(() => {
+    project.tracks
+      .filter(t => t.nodeId === track.nodeId && t.name === track.name)
+      .forEach(t => {
+        t.controls.easing = value
+      })
+  })
+}
+document.addEventListener('input', event => {
+  const target = event.target as HTMLInputElement
+  if (target.id === 'ease-search')
+    document
+      .querySelectorAll<HTMLButtonElement>('[data-ease-preset]')
+      .forEach(b => {
+        b.hidden = !b.textContent?.includes(target.value.toLowerCase())
+      })
+})
+document.addEventListener('click', event => {
+  const button = (event.target as Element).closest<HTMLElement>(
+    '[data-ease-preset]',
+  )
+  if (button) setEasing(button.dataset.easePreset!)
+})
+document.addEventListener('change', event => {
+  const target = event.target as HTMLInputElement
+  if (renderingInspector) return
+  if (target.dataset.easeCoordinate !== undefined) {
+    const points = bezier(currentTrack()?.controls.easing ?? '')
+    if (!points) return
+    points[Number(target.dataset.easeCoordinate)] = Number(target.value)
+    if (bezier(curveValue(points))) setEasing(curveValue(points))
+    else message('Bézier X coordinates must be between 0 and 1.')
+  }
+})
+document.addEventListener('keydown', event => {
+  const target = (event.target as Element).closest<HTMLElement>(
+    '[data-ease-handle]',
+  )
+  if (!target || !event.key.startsWith('Arrow')) return
+  event.preventDefault()
+  const p = bezier(currentTrack()?.controls.easing ?? '')!
+  const index = Number(target.dataset.easeHandle) * 2
+  if (event.key === 'ArrowLeft' || event.key === 'ArrowRight')
+    p[index] = Math.max(
+      0,
+      Math.min(1, p[index] + (event.key === 'ArrowRight' ? 0.01 : -0.01)),
+    )
+  else p[index + 1] += event.key === 'ArrowUp' ? 0.01 : -0.01
+  setEasing(curveValue(p))
+  document
+    .querySelector<HTMLElement>(`[data-ease-handle="${index / 2}"]`)
+    ?.focus()
+})
+document.addEventListener('pointerdown', event => {
+  const handle = (event.target as Element).closest<HTMLElement>(
+    '[data-ease-handle]',
+  )
+  if (!handle || event.button !== 0) return
+  event.preventDefault()
+  stop()
+  const before = JSON.stringify(project),
+    index = Number(handle.dataset.easeHandle) * 2,
+    track = currentTrack()!,
+    points = bezier(track.controls.easing)!
+  const svg = document.querySelector<SVGSVGElement>('#ease-curve')!,
+    matrix = svg.getScreenCTM()!.inverse()
+  // Capture on the stable SVG; the curve/handles may redraw during the drag.
+  svg.setPointerCapture(event.pointerId)
+  const move = (e: PointerEvent) => {
+    const point = new DOMPoint(e.clientX, e.clientY).matrixTransform(matrix)
+    points[index] = Math.max(0, Math.min(1, (point.x - 30) / 180))
+    points[index + 1] = (150 - point.y) / 120
+    const value = curveValue(points)
+    project.tracks
+      .filter(t => t.nodeId === track.nodeId && t.name === track.name)
+      .forEach(t => {
+        t.controls.easing = value
+      })
+    $('ease-drawing').innerHTML = curveDrawing(points)
+    document.querySelector<HTMLInputElement>('[data-control=easing]')!.value =
+      value
+    document
+      .querySelectorAll<HTMLInputElement>('[data-ease-coordinate]')
+      .forEach((el, i) => {
+        el.value = String(Math.round(points[i] * 1000) / 1000)
+      })
+    scheduleCompile()
+  }
+  const end = () => {
+    svg.removeEventListener('pointermove', move)
+    remember(before)
+    persist()
+    renderInspector()
+    scheduleCompile()
+  }
+  svg.addEventListener('pointermove', move)
+  svg.addEventListener('pointerup', end, { once: true })
+  svg.addEventListener('pointercancel', end, { once: true })
+})
+function originRule(base: string, id: string, value: string) {
+  const marker = `/* Studio origin ${id} */`
+  const start = base.indexOf(marker)
+  if (start >= 0) {
+    const end = base.indexOf('}', start)
+    base = base.slice(0, start) + base.slice(end + 1)
+  }
+  return base.trimEnd() + `\n${marker}\n#${id} { transform-origin: ${value}; }`
+}
+document.addEventListener('pointerdown', event => {
+  const handle = (event.target as Element).closest<HTMLElement>(
+    '[data-overlay-handle="origin"]',
+  )
+  if (!handle || event.button !== 0 || !currentNode()) return
+  event.preventDefault()
+  stop()
+  const id = currentNode()!.id,
+    geometry = sandbox.originHandle(id)
+  if (!geometry) {
+    message('Use exact origin values for this geometry.')
+    return
+  }
+  const base = project.scene.css,
+    before = JSON.stringify(project),
+    shell = $('frame-shell').getBoundingClientRect(),
+    zoom = project.viewport.zoom
+  const overlay = $('scene-overlays')
+  overlay.setPointerCapture(event.pointerId)
+  const move = (e: PointerEvent) => {
+    const value = geometry.value(
+      (e.clientX - shell.x) / zoom,
+      (e.clientY - shell.y) / zoom,
+    )
+    project.scene.css = originRule(base, id, value)
+    sandbox.doc.getElementById('scene-base')!.textContent = project.scene.css
+    if (input('origin-value')) input('origin-value').value = value
+    drawOverlays()
+  }
+  const end = () => {
+    overlay.removeEventListener('pointermove', move)
+    remember(before)
+    persist()
+    renderInfo()
+    renderOutput()
+  }
+  overlay.addEventListener('pointermove', move)
+  overlay.addEventListener('pointerup', end, { once: true })
+  overlay.addEventListener('pointercancel', end, { once: true })
+})

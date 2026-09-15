@@ -5,6 +5,8 @@ import {
   addFrame,
   candidates,
   documentHtml,
+  exportedTrackClasses,
+  jumiDefaults,
   moveFrames,
   parseClasses,
   trackClasses,
@@ -13,6 +15,35 @@ import {
 import { makeScene } from './scenes'
 const { properties } = readCatalog()
 describe('Studio public output contract', () => {
+  it('omits semantic defaults but preserves non-default author intent', () => {
+    const p = makeScene('signal'),
+      t = p.tracks[0]
+    t.controls = { ...jumiDefaults }
+    expect(trackClasses(t)).toHaveLength(1)
+    expect(
+      parseClasses(trackClasses(t).join(' '), t.nodeId, properties)[0].controls,
+    ).toEqual(jumiDefaults)
+    t.controls.duration = 1200
+    t.controls.fill = 'both'
+    expect(trackClasses(t)).toHaveLength(3)
+    expect(trackClasses(t).join(' ')).toContain('animation-duration-[1200ms]')
+    expect(trackClasses(t).join(' ')).toContain('animation-fill-mode-both')
+  })
+  it('preserves explicit default overrides in scenes with inherited timing or stagger', () => {
+    const p = makeScene('signal'),
+      t = p.tracks[0]
+    t.controls = { ...jumiDefaults }
+    expect(exportedTrackClasses(t, p)).toHaveLength(1)
+    p.scene.root.attributes.class += ' animate-stagger-150'
+    expect(exportedTrackClasses(t, p)).toContain(
+      `animation-delay-[0ms]/${t.name}`,
+    )
+    p.scene.root.attributes.class = 'scene'
+    p.scene.css += ':root { --jumi-animation-duration: 4s; }'
+    expect(exportedTrackClasses(t, p)).toContain(
+      `animation-duration-[1000ms]/${t.name}`,
+    )
+  })
   it('derives composed properties and value types from the actual registrations', () => {
     expect(
       properties.find(p => p.utility === 'animate-opacity')?.types,

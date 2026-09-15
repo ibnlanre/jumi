@@ -1,4 +1,6 @@
 import type { PropertyEntry } from './catalog'
+
+import { propertyVariables } from '@/variables/property'
 export type Controls = {
   composition: string
   delay: number
@@ -57,6 +59,29 @@ export const defaults: Controls = {
   easing: 'ease-in-out',
   fill: 'both',
   iterations: '1',
+}
+// Public Jumi fallback values, separate from the defaults for new Studio tracks.
+export const jumiDefaults: Controls = {
+  composition: propertyVariables['animation-composition'].value,
+  delay: 0, // Valid only without a stagger/control override; see exportedTrackClasses.
+  direction: propertyVariables['animation-direction'].value,
+  duration: parseFloat(propertyVariables['animation-duration'].value) * 1000,
+  easing: propertyVariables['animation-timing-function'].value,
+  fill: propertyVariables['animation-fill-mode'].value,
+  iterations: propertyVariables['animation-iteration-count'].value,
+}
+export function exportedTrackClasses(
+  track: Track,
+  project: StudioProject,
+): string[] {
+  // CSS cascade and inherited/property-scoped controls can change the fallback.
+  const authored =
+    project.scene.css +
+    flatten(project.scene.root)
+      .map(n => Object.values(n.attributes).join(' '))
+      .join(' ')
+  const preserve = /--jumi-|animation[-:]|animate-stagger|@theme/.test(authored)
+  return trackClasses(track, preserve)
 }
 export const uid = () =>
   `m${globalThis.crypto.randomUUID().replaceAll('-', '').slice(0, 10)}`
@@ -118,7 +143,7 @@ export function candidates(project: StudioProject): string[] {
       ...flatten(project.scene.root).flatMap(n =>
         (n.attributes.class || '').split(/\s+/).filter(Boolean),
       ),
-      ...project.tracks.flatMap(trackClasses),
+      ...project.tracks.flatMap(t => exportedTrackClasses(t, project)),
     ]),
   ].sort()
 }
@@ -152,10 +177,12 @@ export function markup(project: StudioProject): string {
     const attrs = {
       ...node.attributes,
       class: [
-        node.attributes.class || '',
-        ...project.tracks
-          .filter(t => t.nodeId === node.id)
-          .flatMap(trackClasses),
+        ...new Set([
+          node.attributes.class || '',
+          ...project.tracks
+            .filter(t => t.nodeId === node.id)
+            .flatMap(t => exportedTrackClasses(t, project)),
+        ]),
       ]
         .filter(Boolean)
         .join(' '),
@@ -212,7 +239,7 @@ export function phrase(track: Track): string {
     })
     .join('|')
 }
-export function trackClasses(track: Track): string[] {
+export function trackClasses(track: Track, preserveDefaults = false): string[] {
   if (!/^animate-[a-z][a-z0-9-]*$/.test(track.utility))
     throw new Error('Choose a registered Jumi property.')
   if (!/^[a-zA-Z][a-zA-Z0-9-]*$/.test(track.name))
@@ -232,15 +259,23 @@ export function trackClasses(track: Track): string[] {
     )
   if (!/^(infinite|\d+(\.\d+)?)$/.test(c.iterations) || c.iterations === '0')
     throw new Error('Iterations must be positive or infinite.')
+  const entries: [keyof Controls, string][] = [
+    ['duration', `animation-duration-[${c.duration}ms]/${track.name}`],
+    ['delay', `animation-delay-[${c.delay}ms]/${track.name}`],
+    [
+      'easing',
+      `animation-timing-function-[${cssValue(c.easing)}]/${track.name}`,
+    ],
+    ['iterations', `animation-iteration-count-[${c.iterations}]/${track.name}`],
+    ['direction', `animation-direction-${c.direction}/${track.name}`],
+    ['fill', `animation-fill-mode-${c.fill}/${track.name}`],
+    ['composition', `animation-composition-${c.composition}/${track.name}`],
+  ]
   return [
     `${track.utility}-[${phrase(track)}]/${track.name}`,
-    `animation-duration-[${c.duration}ms]/${track.name}`,
-    `animation-delay-[${c.delay}ms]/${track.name}`,
-    `animation-timing-function-[${cssValue(c.easing)}]/${track.name}`,
-    `animation-iteration-count-[${c.iterations}]/${track.name}`,
-    `animation-direction-${c.direction}/${track.name}`,
-    `animation-fill-mode-${c.fill}/${track.name}`,
-    `animation-composition-${c.composition}/${track.name}`,
+    ...entries
+      .filter(([key]) => preserveDefaults || c[key] !== jumiDefaults[key])
+      .map(([, value]) => value),
   ]
 }
 const allowedTags = new Set(
@@ -273,7 +308,7 @@ export function parseClasses(
         frames.push({ id: uid(), offset: Number(offset), value: decode(f[2]) })
     }
     result.push({
-      controls: { ...defaults },
+      controls: { ...jumiDefaults },
       frames,
       id: uid(),
       kind: 'animation',
@@ -314,7 +349,7 @@ export function parseClasses(
       } else (t.controls as unknown as Record<string, string>)[key] = value
     }
   }
-  result.forEach(trackClasses)
+  result.forEach(t => trackClasses(t))
   return result
 }
 export function validateProject(

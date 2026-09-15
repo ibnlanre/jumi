@@ -70,6 +70,7 @@ const seek = async time => {
   }, time)
 }
 const control = async (name, value) => {
+  await page.locator('button[data-inspector=motion]').click()
   const el = page.locator('[data-control="' + name + '"]')
   await el.fill(String(value))
   await el.dispatchEvent('change')
@@ -78,6 +79,92 @@ const control = async (name, value) => {
 try {
   await page.goto('http://127.0.0.1:' + server.address().port + '/studio/')
   await ready()
+  check(
+    'workspace fills viewport',
+    await page.evaluate(
+      () =>
+        document.querySelector('#studio-app').getBoundingClientRect().height ===
+          innerHeight && document.documentElement.scrollHeight === innerHeight,
+    ),
+  )
+  const canvasWidth = (await page.locator('#canvas-viewport').boundingBox())
+    .width
+  await page.locator('[aria-label="Toggle left dock"]').click()
+  check(
+    'collapsing a dock gives its space to the canvas',
+    (await page.locator('#canvas-viewport').boundingBox()).width >
+      canvasWidth + 100,
+  )
+  await page.locator('[aria-label="Toggle left dock"]').click()
+  const resizer = page.locator('[data-resize=bottom]'),
+    r = await resizer.boundingBox()
+  await page.mouse.move(r.x + r.width / 2, r.y + 3)
+  await page.mouse.down()
+  await page.mouse.move(r.x + r.width / 2, r.y - 60)
+  await page.mouse.up()
+  check(
+    'bottom dock resizes by direct manipulation',
+    (await page.locator('#bottom-dock').boundingBox()).height > 320,
+  )
+  for (const side of ['left', 'right']) {
+    const separator = page.locator('[data-resize=' + side + ']')
+    const beforeSize = Number(await separator.getAttribute('aria-valuenow'))
+    await separator.focus()
+    await page.keyboard.press(side === 'left' ? 'ArrowRight' : 'ArrowLeft')
+    check(
+      side + ' dock supports keyboard resizing',
+      Number(await separator.getAttribute('aria-valuenow')) > beforeSize,
+    )
+  }
+  const canvasHeight = (await page.locator('#canvas-viewport').boundingBox())
+    .height
+  await page.locator('[aria-label="Toggle bottom dock"]').click()
+  check(
+    'collapsing bottom dock expands canvas vertically',
+    (await page.locator('#canvas-viewport').boundingBox()).height >
+      canvasHeight + 200,
+  )
+  await page.locator('[aria-label="Toggle bottom dock"]').click()
+  await page.locator('[data-output=html]').click()
+  check(
+    'bottom tabs show one surface at a time',
+    !(await page.locator('.timeline-panel').isVisible()) &&
+      (await page.locator('#output-code').isVisible()),
+  )
+  await page.locator('[data-source="petal-4"]').click()
+  check(
+    'source tags select the stable Studio node',
+    await page.evaluate(
+      () => window.__jumiStudio.project.editor.selected[0] === 'petal-4',
+    ),
+  )
+  await page.locator('#scene-tree [data-select="petal-2"]').click()
+  check(
+    'tree selection marks the corresponding source',
+    (await page
+      .locator('[data-source="petal-2"]')
+      .getAttribute('aria-current')) === 'true',
+  )
+  await page.locator('[data-source="petal-4"]').hover()
+  check(
+    'source hover highlights the live element',
+    (await page.locator('.selection-box.is-hover').count()) > 0,
+  )
+  await page.locator('[data-output=timeline]').click()
+  check(
+    'scene ruler starts at zero despite negative delays',
+    (await page.locator('#playhead-scrub').getAttribute('min')) === '0',
+  )
+  await page.locator('#show-preroll').check()
+  check(
+    'negative time requires explicit pre-roll',
+    Number(await page.locator('#playhead-scrub').getAttribute('min')) < 0,
+  )
+  await page.locator('#show-preroll').uncheck()
+  check(
+    'timeline groups named motion under its element',
+    (await page.locator('.timeline-motion').count()) > 0,
+  )
   check(
     'registry-derived inspector includes motion paths and SVG',
     await page.evaluate(
@@ -128,9 +215,72 @@ try {
     'HTML isolation preserves bounds and parent',
     JSON.stringify(before) === JSON.stringify(after),
   )
+  await page.locator('button[data-left-tab=context]').click()
   await page.locator('#isolation').selectOption('none')
+  await page.locator('button[data-left-tab=layers]').click()
   await page.locator('#scene-picker').selectOption('signal')
   await ready()
+  await page.locator('#scene-tree [data-select="dot-a"]').click()
+  await page.locator('button[data-inspector=motion]').click()
+  await page.locator('#ease-search').fill('elastic')
+  await page
+    .locator('[data-ease-preset]')
+    .filter({ hasText: 'ease-elastic' })
+    .click()
+  await ready()
+  check(
+    'Jumi easing presets serialize real CSS values',
+    await page.evaluate(() =>
+      window.__jumiStudio.project.tracks[0].controls.easing.includes('-0.55'),
+    ),
+  )
+  const handle = page.locator('[data-ease-handle="0"]'),
+    hb = await handle.boundingBox()
+  await page.mouse.move(hb.x + hb.width / 2, hb.y + hb.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(hb.x + 20, hb.y - 15, { steps: 4 })
+  await page.mouse.up()
+  await ready()
+  check(
+    'curve handles update authored easing',
+    await page.evaluate(
+      () =>
+        window.__jumiStudio.project.tracks[0].controls.easing !==
+        'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+    ),
+  )
+  await page.locator('button[data-inspector=element]').click()
+  const origin = page.locator('[data-overlay-handle=origin]'),
+    ob = await origin.boundingBox()
+  await page.mouse.move(ob.x + ob.width / 2, ob.y + ob.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(ob.x + 25, ob.y + 20, { steps: 4 })
+  await page.mouse.up()
+  const movedOrigin = await origin.boundingBox()
+  check(
+    'origin handle follows the pointer in scene coordinates',
+    Math.abs(movedOrigin.x + movedOrigin.width / 2 - (ob.x + 25)) < 3 &&
+      Math.abs(movedOrigin.y + movedOrigin.height / 2 - (ob.y + 20)) < 3,
+  )
+  check(
+    'origin drag writes native reproducible CSS',
+    await page.evaluate(() =>
+      window.__jumiStudio.project.scene.css.includes(
+        '/* Studio origin dot-a */',
+      ),
+    ),
+  )
+  await page.frameLocator('#scene-frame').locator('#dot-a').click()
+  await page
+    .frameLocator('#scene-frame')
+    .locator('#dot-a')
+    .click({ modifiers: ['Alt'] })
+  check(
+    'Alt-click reaches an underlying layer',
+    await page.evaluate(
+      () => window.__jumiStudio.project.editor.selected[0] !== 'dot-a',
+    ),
+  )
   await page.frameLocator('#scene-frame').locator('#dot-b').click()
   check(
     'canvas click selects the actual SVG element',
@@ -146,6 +296,7 @@ try {
       box: el.getBoundingClientRect().toJSON(),
       parent: el.parentElement.id,
     }))
+  await page.locator('button[data-left-tab=context]').click()
   await page.locator('#isolation').selectOption('selection')
   check(
     'sibling context is ghosted without dimming the selected child',
@@ -163,22 +314,18 @@ try {
     'SVG isolation preserves bounds and hierarchy',
     JSON.stringify(svgBefore) === JSON.stringify(svgAfter),
   )
+  await page.locator('button[data-left-tab=context]').click()
   await page.locator('#isolation').selectOption('none')
+  await page.locator('button[data-left-tab=layers]').click()
   await control('duration', 1000)
   await control('delay', 200)
   await control('easing', 'linear')
   await control('iterations', '1')
   await seek(600)
+  await page.locator('button[data-inspector=keyframe]').click()
   await page.locator('#frame-value').fill('.8')
   await page.locator('[data-action="keyframe"]').first().click()
   await ready()
-  console.log(
-    await page.evaluate(() => ({
-      message: document.querySelector('#studio-message').textContent,
-      time: window.__jumiStudio.time,
-      track: window.__jumiStudio.project.tracks.find(t => t.nodeId === 'dot-a'),
-    })),
-  )
   check(
     'keyframe insertion is delay-relative (600ms to 40%)',
     await page.evaluate(() =>
@@ -237,6 +384,7 @@ try {
     ),
   )
   await page.locator('#scene-tree [data-select="dot-b"]').click()
+  await page.locator('button[data-left-tab=layers]').click()
   await control('duration', 1000)
   await control('delay', 700)
   await control('easing', 'linear')
@@ -292,6 +440,10 @@ try {
           .length === 2,
     ),
   )
+  await page.locator('button[data-inspector=motion]').click()
+  await page.locator('[data-ease-coordinate="1"]').fill('1.3')
+  await page.locator('[data-ease-coordinate="1"]').dispatchEvent('change')
+  await ready()
   await page.evaluate(
     () =>
       (window.__studioNode = document
@@ -327,6 +479,16 @@ try {
   await seek(0)
   const stored = await page.evaluate(() =>
     JSON.stringify(window.__jumiStudio.project),
+  )
+  check(
+    'latest edit is saved before reload',
+    await page.evaluate(
+      s =>
+        JSON.stringify(
+          JSON.parse(localStorage.getItem('jumi-studio-project-v1')).tracks,
+        ) === JSON.stringify(JSON.parse(s).tracks),
+      stored,
+    ),
   )
   await page.reload()
   await ready()
@@ -430,11 +592,27 @@ try {
   )
   const folder = path.join(root, 'artifacts/studio')
   await mkdir(folder, { recursive: true })
+  await page.locator('button[data-left-tab=layers]').click()
+  await page.locator('#scene-picker').selectOption('hero')
+  await ready()
+  await page.locator('button[data-inspector=motion]').click()
+  await page.locator('[data-action=fit-scene]').click()
   await page.screenshot({
     fullPage: true,
     path: path.join(folder, 'desktop.png'),
   })
   await page.setViewportSize({ height: 844, width: 390 })
+  await page.waitForTimeout(100)
+  check(
+    'narrow workspace keeps the canvas available',
+    await page
+      .locator('#studio-app')
+      .evaluate(
+        el =>
+          el.classList.contains('left-closed') &&
+          el.classList.contains('right-closed'),
+      ),
+  )
   check(
     'narrow layout does not overflow the page',
     await page.evaluate(

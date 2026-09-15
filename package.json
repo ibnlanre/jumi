@@ -45,6 +45,7 @@
     "release:minor": "pnpm version minor --no-git-tag-version",
     "release:major": "pnpm version major --no-git-tag-version",
     "stories:prepare": "node scripts/prepare-stories.mjs",
+    "studio:check": "pnpm run docs:build && node scripts/studio-check.mjs",
     "stories:check": "node scripts/stories-check.mjs",
     "docs:dev": "astro dev --root docs",
     "docs:build": "pnpm run bundle && pnpm run docs:prepare && astro build --root docs",

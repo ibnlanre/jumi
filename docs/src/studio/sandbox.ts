@@ -1,6 +1,6 @@
 import type { StudioProject } from './model'
 
-import { documentHtml, flatten, parentOf, trackClasses } from './model'
+import { documentHtml, exportedTrackClasses, flatten, parentOf } from './model'
 export class SceneSandbox {
   animations: Animation[] = []
   frame: HTMLIFrameElement
@@ -115,9 +115,12 @@ export class SceneSandbox {
     this.ready = true
     this.doc.addEventListener('click', event => {
       event.preventDefault()
-      const e = (event.target as Element).closest('[id]')
-      if (e && this.selectable(e.id))
-        this.onSelect(e.id, (event as MouseEvent).shiftKey)
+      const ids = this.pick(event.clientX, event.clientY)
+      const previous = this.project.editor.selected[0]
+      const id = event.altKey
+        ? ids[(ids.indexOf(previous) + 1) % ids.length]
+        : ids[0]
+      if (id) this.onSelect(id, event.shiftKey)
     })
     this.doc.addEventListener('dblclick', event => {
       event.preventDefault()
@@ -221,6 +224,45 @@ export class SceneSandbox {
     }
   }
 
+  /** Measure the origin handle's local-to-scene basis once per drag. */
+  originHandle(id: string) {
+    const el = this.element(id)
+    const start = this.origin(id)
+    if (!el || !start) return null
+    const style = el.style,
+      priority = style.getPropertyPriority('transform-origin'),
+      saved = style.getPropertyValue('transform-origin')
+    const [x, y] = this.frame
+      .contentWindow!.getComputedStyle(el)
+      .transformOrigin.split(' ')
+      .map(parseFloat)
+    try {
+      style.setProperty('transform-origin', `${x + 1}px ${y}px`, 'important')
+      const dx = this.origin(id)
+      style.setProperty('transform-origin', `${x}px ${y + 1}px`, 'important')
+      const dy = this.origin(id)
+      if (!dx || !dy) return null
+      const matrix = new DOMMatrix([
+        dx.x - start.x,
+        dx.y - start.y,
+        dy.x - start.x,
+        dy.y - start.y,
+        start.x,
+        start.y,
+      ]).inverse()
+      if (![matrix.a, matrix.b, matrix.c, matrix.d].every(Number.isFinite))
+        return null
+      return {
+        value: (sx: number, sy: number) => {
+          const p = new DOMPoint(sx, sy).matrixTransform(matrix)
+          return `${Math.round((x + p.x) * 100) / 100}px ${Math.round((y + p.y) * 100) / 100}px`
+        },
+      }
+    } finally {
+      if (saved) style.setProperty('transform-origin', saved, priority)
+      else style.removeProperty('transform-origin')
+    }
+  }
   patch(project: StudioProject, css: string) {
     this.project = project
     if (!this.ready) return
@@ -235,7 +277,7 @@ export class SceneSandbox {
             n.attributes.class || '',
             ...project.tracks
               .filter(t => t.nodeId === n.id)
-              .flatMap(trackClasses),
+              .flatMap(t => exportedTrackClasses(t, project)),
           ].join(' '),
         )
     }
@@ -245,6 +287,17 @@ export class SceneSandbox {
 
   pause() {
     for (const a of this.animations) a.pause()
+  }
+  pick(x: number, y: number): string[] {
+    const ids: string[] = []
+    for (const hit of this.doc.elementsFromPoint(x, y)) {
+      if (this.selectable(hit.id) && !ids.includes(hit.id)) ids.push(hit.id)
+    }
+    for (const id of [...ids]) {
+      for (let el = this.element(id)?.parentElement; el; el = el.parentElement)
+        if (this.selectable(el.id) && !ids.includes(el.id)) ids.push(el.id)
+    }
+    return ids
   }
   play(ms: number) {
     const now = this.doc.timeline.currentTime
