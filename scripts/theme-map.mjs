@@ -138,33 +138,36 @@ const candidates = {
 }
 
 /** Ask the host what it hands the plugin for each key. */
-const hostValues = async (keys) => {
+const hostValues = async keys => {
   // Inside the repo, because the probe's `@import "tailwindcss"` resolves from
   // here — and `@plugin` needs a real path next to it.
   const dir = mkdtempSync(path.join(here, '.theme-map-'))
   const dump = path.join(dir, 'theme.json')
 
-  writeFileSync(path.join(dir, 'probe.js'), [
-    'import { writeFileSync } from "node:fs"',
-    '',
-    'export default {',
-    '  handler(api) {',
-    `    const keys = ${JSON.stringify(keys)}`,
-    '    const dump = {}',
-    '    for (const key of keys) {',
-    '      try {',
-    '        const values = api.theme(key) ?? {}',
-    '        dump[key] = Object.fromEntries(',
-    '          Object.entries(values).filter(([name]) => name !== "__CSS_VALUES__"),',
-    '        )',
-    '      }',
-    '      catch { dump[key] = null }',
-    '    }',
-    `    writeFileSync(${JSON.stringify(dump)}, JSON.stringify(dump))`,
-    '  },',
-    '}',
-    '',
-  ].join('\n'))
+  writeFileSync(
+    path.join(dir, 'probe.js'),
+    [
+      'import { writeFileSync } from "node:fs"',
+      '',
+      'export default {',
+      '  handler(api) {',
+      `    const keys = ${JSON.stringify(keys)}`,
+      '    const dump = {}',
+      '    for (const key of keys) {',
+      '      try {',
+      '        const values = api.theme(key) ?? {}',
+      '        dump[key] = Object.fromEntries(',
+      '          Object.entries(values).filter(([name]) => name !== "__CSS_VALUES__"),',
+      '        )',
+      '      }',
+      '      catch { dump[key] = null }',
+      '    }',
+      `    writeFileSync(${JSON.stringify(dump)}, JSON.stringify(dump))`,
+      '  },',
+      '}',
+      '',
+    ].join('\n'),
+  )
 
   const css = [
     '@import "tailwindcss" source(none);',
@@ -190,7 +193,10 @@ const hostValues = async (keys) => {
  * produces almost none of them. `theme.css` is the full vocabulary.
  */
 const hostTokens = () => {
-  const css = readFileSync(path.join(root, 'node_modules/tailwindcss/theme.css'), 'utf8')
+  const css = readFileSync(
+    path.join(root, 'node_modules/tailwindcss/theme.css'),
+    'utf8',
+  )
   const tokens = new Map()
 
   for (const match of css.matchAll(/(--[\w-]+):\s*([^;]+);/g)) {
@@ -200,15 +206,16 @@ const hostTokens = () => {
   return tokens
 }
 
-/** `0.25rem * 4` → `1rem`, so a spacing formula can be checked arithmetically. */const spacingProduct = (name, base) => {
-  const factor = Number(name)
-  const amount = Number.parseFloat(base)
+/** `0.25rem * 4` → `1rem`, so a spacing formula can be checked arithmetically. */ const spacingProduct =
+  (name, base) => {
+    const factor = Number(name)
+    const amount = Number.parseFloat(base)
 
-  if (!Number.isFinite(factor) || !Number.isFinite(amount)) return null
-  if (!base.endsWith('rem')) return null
+    if (!Number.isFinite(factor) || !Number.isFinite(amount)) return null
+    if (!base.endsWith('rem')) return null
 
-  return `${factor * amount}rem`
-}
+    return `${factor * amount}rem`
+  }
 
 const keys = vocabulary()
 const values = await hostValues(keys.map(([key]) => key))
@@ -228,11 +235,14 @@ for (const [key, calls] of keys) {
       .filter(([name, value]) => tokens.get(`--${prefix}-${name}`) === value)
       .map(([name]) => name)
 
-    if (matched.length && (!best || matched.length > best.matched.length)) best = { matched, prefix }
+    if (matched.length && (!best || matched.length > best.matched.length))
+      best = { matched, prefix }
   }
 
   const spaced = spacing
-    ? entries.filter(([name, value]) => spacingProduct(name, spacing) === value).map(([name]) => name)
+    ? entries
+        .filter(([name, value]) => spacingProduct(name, spacing) === value)
+        .map(([name]) => name)
     : []
 
   const tokenMatched = best?.matched.length ?? 0
@@ -240,7 +250,10 @@ for (const [key, calls] of keys) {
   const parts = []
 
   if (tokenMatched) {
-    const sample = best.matched.length < entries.length ? ` (e.g. ${best.matched.slice(0, 3).join(', ')})` : ''
+    const sample =
+      best.matched.length < entries.length
+        ? ` (e.g. ${best.matched.slice(0, 3).join(', ')})`
+        : ''
     parts.push(`--${best.prefix}-*${sample}`)
   }
   if (spaced.length) parts.push('calc(var(--spacing) * n)')
@@ -248,11 +261,16 @@ for (const [key, calls] of keys) {
   if (covered < entries.length) {
     // Name the exceptions while there are few enough to decide individually.
     const left = entries
-      .filter(([name, value]) => value !== tokens.get(`--${best?.prefix}-${name}`)
-        && spacingProduct(name, spacing ?? '') !== value)
+      .filter(
+        ([name, value]) =>
+          value !== tokens.get(`--${best?.prefix}-${name}`) &&
+          spacingProduct(name, spacing ?? '') !== value,
+      )
       .map(([name]) => name)
 
-    parts.push(`literal (${entries.length - covered}${left.length <= 4 ? `: ${left.join(', ')}` : ''})`)
+    parts.push(
+      `literal (${entries.length - covered}${left.length <= 4 ? `: ${left.join(', ')}` : ''})`,
+    )
   }
 
   rows.push({
@@ -264,27 +282,49 @@ for (const [key, calls] of keys) {
     // "the namespace exists but no emitted utility references it".
     prefix: best?.prefix ?? null,
     spaced: spaced.length,
-    verdict: entries.length === 0 ? 'empty' : covered === entries.length ? 'all' : covered ? 'partial' : 'none',
+    verdict:
+      entries.length === 0
+        ? 'empty'
+        : covered === entries.length
+          ? 'all'
+          : covered
+            ? 'partial'
+            : 'none',
   })
 }
 const width = Math.max(...rows.map(row => row.key.length))
-const covered = rows.reduce((total, row) => total + (row.verdict === 'all' ? row.entries : 0), 0)
-const literal = rows.reduce((total, row) => total + (row.verdict === 'partial' ? row.entries : 0), 0)
+const covered = rows.reduce(
+  (total, row) => total + (row.verdict === 'all' ? row.entries : 0),
+  0,
+)
+const literal = rows.reduce(
+  (total, row) => total + (row.verdict === 'partial' ? row.entries : 0),
+  0,
+)
 
 console.log(`${'key'.padEnd(width)}  calls  values  verdict  mapping`)
 console.log('─'.repeat(width + 40))
 
 for (const row of rows) {
   console.log(
-    `${row.key.padEnd(width)}  ${String(row.calls).padStart(5)}  ${String(row.entries).padStart(6)}  `
-    + `${row.verdict.padEnd(7)}  ${row.mapping}`,
+    `${row.key.padEnd(width)}  ${String(row.calls).padStart(5)}  ${String(row.entries).padStart(6)}  ` +
+      `${row.verdict.padEnd(7)}  ${row.mapping}`,
   )
 }
 
-const tally = rows.reduce((acc, row) => ({ ...acc, [row.verdict]: (acc[row.verdict] ?? 0) + 1 }), {})
+const tally = rows.reduce(
+  (acc, row) => ({ ...acc, [row.verdict]: (acc[row.verdict] ?? 0) + 1 }),
+  {},
+)
 
-console.log(`\n${rows.length} keys: ${Object.entries(tally).map(([k, v]) => `${v} ${k}`).join(', ')}`)
-console.log(`values fully mappable: ${covered}, in partially mapped keys: ${literal}`)
+console.log(
+  `\n${rows.length} keys: ${Object.entries(tally)
+    .map(([k, v]) => `${v} ${k}`)
+    .join(', ')}`,
+)
+console.log(
+  `values fully mappable: ${covered}, in partially mapped keys: ${literal}`,
+)
 console.log(`spacing base: ${spacing}`)
 
 /* ------------------------------------------------------------------------------------
@@ -298,8 +338,12 @@ console.log(`spacing base: ${spacing}`)
 
 /** The keys Jumi resolves through the spacing formula, read from the source that declares them. */
 const implemented = () => {
-  const source = readFileSync(path.join(root, 'src/helpers/create/theme.ts'), 'utf8')
-  const block = /themeSpacing = new Set\(\[([\s\S]*?)\]\)/.exec(source)?.[1] ?? ''
+  const source = readFileSync(
+    path.join(root, 'src/helpers/create/theme.ts'),
+    'utf8',
+  )
+  const block =
+    /themeSpacing = new Set\(\[([\s\S]*?)\]\)/.exec(source)?.[1] ?? ''
 
   return new Set([...block.matchAll(/'([A-Za-z]+)'/g)].map(match => match[1]))
 }
@@ -312,8 +356,10 @@ const extra = [...jumi].filter(key => !host.has(key))
 console.log(`\nspacing: implemented ${jumi.size}, measured ${host.size}`)
 console.log(`  implemented: ${[...jumi].join(', ')}`)
 
-if (missing.length) console.log(`  measured and not implemented: ${missing.join(', ')}`)
-if (extra.length) console.log(`  implemented and not measured: ${extra.join(', ')}`)
+if (missing.length)
+  console.log(`  measured and not implemented: ${missing.join(', ')}`)
+if (extra.length)
+  console.log(`  implemented and not measured: ${extra.join(', ')}`)
 if (!missing.length && !extra.length) console.log('  no drift')
 
 /* ------------------------------------------------------------------------------------
@@ -371,18 +417,35 @@ const utility = {
 
 /** What the source claims: which key resolves to which namespace, and which names stay literal. */
 const claims = () => {
-  const source = readFileSync(path.join(root, 'src/helpers/create/theme.ts'), 'utf8')
+  const source = readFileSync(
+    path.join(root, 'src/helpers/create/theme.ts'),
+    'utf8',
+  )
   const block = /themeTokens[^=]*= \{([\s\S]*?)\n\}/.exec(source)?.[1] ?? ''
   const found = []
 
-  for (const entry of block.matchAll(/^ {2}(\w+): \{(.*)\},$/gm)) {
-    const namespace = /namespace: '([^']+)'/.exec(entry[2])?.[1]
-    const list = /literal: \[([^\]]*)\]/.exec(entry[2])?.[1]
+  // An entry is read from its key to the next key, rather than off one line. The formatter is free to
+  // break `maxWidth` across three lines when its literal list outgrows the print width, and a
+  // line-anchored entry regex loses the key on the day that happens — silently, because a key that was
+  // never derived is a key this report simply has no claim to compare against.
+  const starts = [...block.matchAll(/^ {2}(\w+): \{/gm)]
+
+  for (const [index, entry] of starts.entries()) {
+    const end = starts[index + 1]?.index ?? block.length
+    // Prose between two entries must not read as the entry above it: a comment that says
+    // `namespace:` is a sentence, not a declaration.
+    const body = block
+      .slice(entry.index + entry[0].length, end)
+      .replace(/^\s*\/\/.*$/gm, '')
+    const namespace = /namespace: '([^']+)'/.exec(body)?.[1]
+    const list = /literal: \[([^\]]*)\]/.exec(body)?.[1]
 
     if (namespace) {
       found.push({
         key: entry[1],
-        literal: list ? [...list.matchAll(/'([^']+)'/g)].map(match => match[1]) : [],
+        literal: list
+          ? [...list.matchAll(/'([^']+)'/g)].map(match => match[1])
+          : [],
         namespace,
       })
     }
@@ -401,26 +464,37 @@ const announced = new Map(claims().map(claim => [claim.key, claim]))
 const suspects = keys
   .map(([key]) => ({
     key,
-    namespace: announced.get(key)?.namespace ?? rows.find(row => row.key === key)?.prefix ?? null,
+    namespace:
+      announced.get(key)?.namespace ??
+      rows.find(row => row.key === key)?.prefix ??
+      null,
     prefix: utility[key] ?? kebab(key),
   }))
   .filter(suspect => suspect.namespace)
 
 for (const suspect of suspects) {
   suspect.names = Object.keys(values[suspect.key] ?? {}).filter(claimable)
-  suspect.selector = name => `${suspect.prefix}-${name === 'DEFAULT' ? '' : name}`.replace(/-$/, '')
+  suspect.selector = name =>
+    `${suspect.prefix}-${name === 'DEFAULT' ? '' : name}`.replace(/-$/, '')
 }
 
 const scan = mkdtempSync(path.join(here, '.theme-map-'))
-const instance = await compile('@import "tailwindcss" source(none);', { base: scan, onDependency() {} })
+const instance = await compile('@import "tailwindcss" source(none);', {
+  base: scan,
+  onDependency() {},
+})
 const emitted = instance.build(
-  [...new Set(suspects.flatMap(suspect => suspect.names.map(suspect.selector)))].filter(Boolean),
+  [
+    ...new Set(
+      suspects.flatMap(suspect => suspect.names.map(suspect.selector)),
+    ),
+  ].filter(Boolean),
 )
 
 rmSync(scan, { force: true, recursive: true })
 
 /** The rule body for `selector`, or nothing when the utility was not emitted at all. */
-const rule = (selector) => {
+const rule = selector => {
   for (const form of [`.${selector} {`, `.${selector}{`]) {
     const at = emitted.indexOf(form)
 
@@ -433,8 +507,8 @@ const rule = (selector) => {
 for (const suspect of suspects) {
   const bodies = suspect.names.map(name => rule(suspect.selector(name)))
 
-  suspect.tokens = suspect.names.filter(
-    (name, index) => bodies[index]?.includes(`var(--${suspect.namespace}-${name})`),
+  suspect.tokens = suspect.names.filter((name, index) =>
+    bodies[index]?.includes(`var(--${suspect.namespace}-${name})`),
   )
   // A wrong utility name would measure zero and look exactly like a literal, so a key nobody
   // emitted a rule for is reported as unmeasured rather than as intentionally literal.
@@ -446,7 +520,7 @@ for (const suspect of suspects) {
  * formula, both, or neither. Neither is a strategy too — it is the decision to keep the host's own
  * output, which is what the report then has to justify.
  */
-const strategy = (key) => {
+const strategy = key => {
   const claim = announced.get(key)
   const spaced = jumi.has(key)
 
@@ -455,7 +529,7 @@ const strategy = (key) => {
   return spaced ? 'formula' : 'literal'
 }
 
-const measured = (suspect) => {
+const measured = suspect => {
   if (!suspect) return '—'
   if (!suspect.reachable) return 'unmeasured'
   if (!suspect.tokens.length) return 'none'
@@ -482,7 +556,7 @@ const agrees = (declared, found) => {
  * names the wrong exception still has the right length, and that is how `DEFAULT` would get lost.
  * A bare number counts as a literal without being listed: it is never a namespace name.
  */
-const contradictions = (suspect) => {
+const contradictions = suspect => {
   const claim = announced.get(suspect.key)
 
   if (!claim || !suspect.reachable) return []
@@ -500,10 +574,15 @@ const contradictions = (suspect) => {
   return found
 }
 
-const namespace_width = Math.max(9, ...suspects.map(suspect => suspect.namespace.length + 4))
+const namespace_width = Math.max(
+  9,
+  ...suspects.map(suspect => suspect.namespace.length + 4),
+)
 
 console.log('\nclassification: what every key Jumi consumes resolves to\n')
-console.log(`${'key'.padEnd(width)}  strategy  measured   ${'namespace'.padEnd(namespace_width)}  token names`)
+console.log(
+  `${'key'.padEnd(width)}  strategy  measured   ${'namespace'.padEnd(namespace_width)}  token names`,
+)
 
 let drifted = 0
 let unmeasured = 0
@@ -519,19 +598,22 @@ for (const [key] of keys) {
   if (found === 'unmeasured') unmeasured += 1
 
   console.log(
-    `${key.padEnd(width)}  ${declared.padEnd(8)}  ${(ok ? found : `${found} ⚠`).padEnd(10)}  `
-    + `${(suspect ? `--${suspect.namespace}-*` : '—').padEnd(namespace_width)}  `
-    + `${suspect ? `${suspect.tokens.length}/${suspect.names.length}` : '—'}`,
+    `${key.padEnd(width)}  ${declared.padEnd(8)}  ${(ok ? found : `${found} ⚠`).padEnd(10)}  ` +
+      `${(suspect ? `--${suspect.namespace}-*` : '—').padEnd(namespace_width)}  ` +
+      `${suspect ? `${suspect.tokens.length}/${suspect.names.length}` : '—'}`,
   )
 
-  for (const note of notes.slice(0, 3)) console.log(`${''.padEnd(width + 13)}⚠ ${note}`)
+  for (const note of notes.slice(0, 3))
+    console.log(`${''.padEnd(width + 13)}⚠ ${note}`)
 }
 
 /** Why a key stays literal, which is the only part of the strategy that needs a reason. */
-const reason = (suspect) => {
+const reason = suspect => {
   if (!suspect) return 'no candidate namespace resembles these values'
-  if (!suspect.reachable) return `unmeasured: no \`${suspect.prefix}-*\` utility to check`
-  if (!suspect.tokens.length) return `--${suspect.namespace}-* exists, but the emitted utility inlines it`
+  if (!suspect.reachable)
+    return `unmeasured: no \`${suspect.prefix}-*\` utility to check`
+  if (!suspect.tokens.length)
+    return `--${suspect.namespace}-* exists, but the emitted utility inlines it`
 
   return 'partly token-backed'
 }
@@ -541,15 +623,26 @@ console.log('\nliteral by decision, with the reason:\n')
 for (const [key] of keys) {
   if (strategy(key) !== 'literal') continue
 
-  console.log(`  ${key.padEnd(width)}  ${reason(suspects.find(candidate => candidate.key === key))}`)
+  console.log(
+    `  ${key.padEnd(width)}  ${reason(suspects.find(candidate => candidate.key === key))}`,
+  )
 }
 
 const counts = {}
-for (const [key] of keys) counts[strategy(key)] = (counts[strategy(key)] ?? 0) + 1
+for (const [key] of keys)
+  counts[strategy(key)] = (counts[strategy(key)] ?? 0) + 1
 
-console.log(`\n${keys.length} keys classified: ${Object.entries(counts).map(([name, count]) => `${count} ${name}`).join(', ')}`)
-console.log(`${drifted ? `${drifted} strategies contradicted by the emitted CSS` : 'no drift: every strategy matches the emitted CSS'}`)
-console.log(`${unmeasured ? `${unmeasured} keys could not be measured` : 'no unmeasured namespace candidates'}`)
+console.log(
+  `\n${keys.length} keys classified: ${Object.entries(counts)
+    .map(([name, count]) => `${count} ${name}`)
+    .join(', ')}`,
+)
+console.log(
+  `${drifted ? `${drifted} strategies contradicted by the emitted CSS` : 'no drift: every strategy matches the emitted CSS'}`,
+)
+console.log(
+  `${unmeasured ? `${unmeasured} keys could not be measured` : 'no unmeasured namespace candidates'}`,
+)
 
 // `pnpm check` runs this, so a strategy and the emitted CSS disagreeing is a failure and not a
 // report: the classification is only worth keeping if something stops it from drifting.

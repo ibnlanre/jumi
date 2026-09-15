@@ -54,9 +54,15 @@ const htmlFor = () => `<!doctype html>
   /* Rendered from the start: a display:none element gets no animations at all. */
   #board > * { display: block; width: 40px; height: 20px; background: #333; margin: 4px; }
   #tail { height: 1400px; }
-${CASES.map(([property, from, to]) => `  #${property.replaceAll('-', '')} { ${property}: ${from}; }
+${CASES.map(
+  ([
+    property,
+    from,
+    to,
+  ]) => `  #${property.replaceAll('-', '')} { ${property}: ${from}; }
   @keyframes leave-${property.replaceAll('-', '')} { to { ${property}: ${to} } }
-  #${property.replaceAll('-', '')} { animation: leave-${property.replaceAll('-', '')} 1s linear both; }`).join('\n')}
+  #${property.replaceAll('-', '')} { animation: leave-${property.replaceAll('-', '')} 1s linear both; }`,
+).join('\n')}
   /* The same motion, three separate questions. */
   #filled { display: block; animation: leave-display 1s linear none; }
   #iterated { display: block; animation: leave-display 1s linear both; animation-iteration-count: 3; }
@@ -156,10 +162,12 @@ ${CASES.map(([property, from, to]) => `  #${property.replaceAll('-', '')} { ${pr
 </script>
 </body></html>`
 
-const server = (await import('node:http')).createServer((request, response) => {
-  response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
-  response.end(htmlFor())
-}).listen(0)
+const server = (await import('node:http'))
+  .createServer((request, response) => {
+    response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
+    response.end(htmlFor())
+  })
+  .listen(0)
 
 const browser = await chromium.launch()
 const page = await browser.newPage()
@@ -176,14 +184,30 @@ const FRACTIONS = [0, 0.25, 0.5, 0.75, 1]
 
 for (const [property, from, to] of CASES) {
   const id = property.replaceAll('-', '')
-  const animations = await page.evaluate(target => window.__animations(target), id)
-  const { samples } = await page.evaluate(({ fractions, target }) => window.__sample(target, fractions), { fractions: FRACTIONS, target: id })
+  const animations = await page.evaluate(
+    target => window.__animations(target),
+    id,
+  )
+  const { samples } = await page.evaluate(
+    ({ fractions, target }) => window.__sample(target, fractions),
+    { fractions: FRACTIONS, target: id },
+  )
 
-  const shown = samples.map(sample => sample[property === 'content-visibility' ? 'contentVisibility' : property]).join(' → ')
+  const shown = samples
+    .map(
+      sample =>
+        sample[
+          property === 'content-visibility' ? 'contentVisibility' : property
+        ],
+    )
+    .join(' → ')
 
-  line(`${property}: ${from} → ${to}`, animations.length
-    ? `Animation ✓ · ${shown}`
-    : `no Animation object · ${shown}`)
+  line(
+    `${property}: ${from} → ${to}`,
+    animations.length
+      ? `Animation ✓ · ${shown}`
+      : `no Animation object · ${shown}`,
+  )
 }
 
 // ── 2 · the entry direction, which is a different question ──────────────────────────────────────
@@ -192,63 +216,121 @@ console.log('─'.repeat(88))
 
 const entry = await page.evaluate(async () => {
   const node = document.getElementById('entry')
-  const animations = [...document.getAnimations()].filter(animation => animation.effect?.target === node)
+  const animations = [...document.getAnimations()].filter(
+    animation => animation.effect?.target === node,
+  )
 
-  return { animations: animations.length, display: getComputedStyle(node).display }
+  return {
+    animations: animations.length,
+    display: getComputedStyle(node).display,
+  }
 })
 
-line('display: none → block', entry.animations
-  ? `${entry.animations} Animation object(s), display ${entry.display}`
-  : `no Animation object — a display:none element is never computed, so nothing is created (display ${entry.display})`)
+line(
+  'display: none → block',
+  entry.animations
+    ? `${entry.animations} Animation object(s), display ${entry.display}`
+    : `no Animation object — a display:none element is never computed, so nothing is created (display ${entry.display})`,
+)
 
 // ── 3 · fill-mode, iteration, and a scroll timeline ─────────────────────────────────────────────
 console.log('\n3 · fill, iteration, and a scroll timeline')
 console.log('─'.repeat(88))
 
-const filled = await page.evaluate(({ fractions }) => window.__sample('filled', fractions), { fractions: [1] })
+const filled = await page.evaluate(
+  ({ fractions }) => window.__sample('filled', fractions),
+  { fractions: [1] },
+)
 line('fill: none, at the very end', `display ${filled.samples[0]?.display}`)
-line('fill: none, after the end (idle)', await page.evaluate(async () => {
-  for (const animation of document.getAnimations()) if (animation.effect?.target?.id === 'filled') animation.finish()
+line(
+  'fill: none, after the end (idle)',
+  await page.evaluate(async () => {
+    for (const animation of document.getAnimations())
+      if (animation.effect?.target?.id === 'filled') animation.finish()
 
-  await new Promise(resolve => requestAnimationFrame(resolve))
+    await new Promise(resolve => requestAnimationFrame(resolve))
 
-  return `display ${getComputedStyle(document.getElementById('filled')).display}`
-}))
+    return `display ${getComputedStyle(document.getElementById('filled')).display}`
+  }),
+)
 
-const iterated = await page.evaluate(({ fractions }) => window.__sample('iterated', fractions), { fractions: [0.1, 0.6, 1.1, 1.6, 2.1, 2.6] })
-line('3 iterations, six samples', iterated.samples.map(sample => `${sample.at}:${sample.display}`).join('  '))
+const iterated = await page.evaluate(
+  ({ fractions }) => window.__sample('iterated', fractions),
+  { fractions: [0.1, 0.6, 1.1, 1.6, 2.1, 2.6] },
+)
+line(
+  '3 iterations, six samples',
+  iterated.samples.map(sample => `${sample.at}:${sample.display}`).join('  '),
+)
 
-const scrolled = await page.evaluate(({ fractions }) => window.__sample('scrolled', fractions), { fractions: FRACTIONS })
-line('on a scroll timeline', `${scrolled.timeline} · ${scrolled.samples.map(sample => `${sample.at}:${sample.display}`).join('  ')}`)
+const scrolled = await page.evaluate(
+  ({ fractions }) => window.__sample('scrolled', fractions),
+  { fractions: FRACTIONS },
+)
+line(
+  'on a scroll timeline',
+  `${scrolled.timeline} · ${scrolled.samples.map(sample => `${sample.at}:${sample.display}`).join('  ')}`,
+)
 
 // Around the midpoint, with both endpoints written: the difference between "a discrete property flips at 50%"
 // and "it never interpolates at all" shows up only here.
-const bothFrames = await page.evaluate(({ fractions }) => window.__sample('bothframes', fractions), { fractions: [0.4, 0.5, 0.6, 1] })
-const bothVisibility = await page.evaluate(({ fractions }) => window.__sample('bothvisibility', fractions), { fractions: [0.4, 0.5, 0.6, 1] })
+const bothFrames = await page.evaluate(
+  ({ fractions }) => window.__sample('bothframes', fractions),
+  { fractions: [0.4, 0.5, 0.6, 1] },
+)
+const bothVisibility = await page.evaluate(
+  ({ fractions }) => window.__sample('bothvisibility', fractions),
+  { fractions: [0.4, 0.5, 0.6, 1] },
+)
 
-line('display, both frames written', bothFrames.samples.map(sample => `${sample.at}:${sample.display}`).join('  '))
-line('visibility, both frames written', bothVisibility.samples.map(sample => `${sample.at}:${sample.visibility}`).join('  '))
+line(
+  'display, both frames written',
+  bothFrames.samples.map(sample => `${sample.at}:${sample.display}`).join('  '),
+)
+line(
+  'visibility, both frames written',
+  bothVisibility.samples
+    .map(sample => `${sample.at}:${sample.visibility}`)
+    .join('  '),
+)
 
 // ── 4 · the top layer, where `overlay` means something ──────────────────────────────────────────
 console.log('\n4 · overlay, which only exists in the top layer')
 console.log('─'.repeat(88))
 
-const overlaySupport = await page.evaluate(() => window.__support([['overlay', 'auto'], ['overlay', 'none'], ['transition-behavior', 'allow-discrete']]))
+const overlaySupport = await page.evaluate(() =>
+  window.__support([
+    ['overlay', 'auto'],
+    ['overlay', 'none'],
+    ['transition-behavior', 'allow-discrete'],
+  ]),
+)
 
-for (const [property, value, ok] of overlaySupport) line(`${property}: ${value}`, ok ? 'supported' : 'REFUSED')
+for (const [property, value, ok] of overlaySupport)
+  line(`${property}: ${value}`, ok ? 'supported' : 'REFUSED')
 
 const modal = await page.evaluate(async () => {
   const node = document.getElementById('modal')
 
   node.showModal()
-  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+  await new Promise(resolve =>
+    requestAnimationFrame(() => requestAnimationFrame(resolve)),
+  )
 
-  const animations = [...document.getAnimations()].filter(animation => animation.effect?.target === node)
+  const animations = [...document.getAnimations()].filter(
+    animation => animation.effect?.target === node,
+  )
 
-  return { animations: animations.length, overlay: getComputedStyle(node).overlay }
+  return {
+    animations: animations.length,
+    overlay: getComputedStyle(node).overlay,
+  }
 })
 
-line('a modal dialog with a keyframe', `${modal.animations} Animation object(s), overlay ${modal.overlay}`)
+line(
+  'a modal dialog with a keyframe',
+  `${modal.animations} Animation object(s), overlay ${modal.overlay}`,
+)
 
 await browser.close()
 server.close()

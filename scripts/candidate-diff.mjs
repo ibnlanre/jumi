@@ -39,7 +39,10 @@ const corpora = [
   'examples/index.html',
 ]
 
-const stylesheets = ['scripts/css-snapshot/input.css', 'scripts/css-snapshot/variant.css']
+const stylesheets = [
+  'scripts/css-snapshot/input.css',
+  'scripts/css-snapshot/variant.css',
+]
 
 /** The wrapper captures the vocabulary Jumi registers, and the payload each candidate produces. */
 const wrapperSource = pluginPath => `
@@ -80,12 +83,14 @@ export default {
 `
 
 /** Every class-like string in a source file: `class="…"` attributes and `@apply …;` parameters. */
-const candidatesIn = (file) => {
+const candidatesIn = file => {
   const source = readFileSync(path.join(root, file), 'utf8')
   const found = []
 
-  for (const match of source.matchAll(/class="([^"]*)"/g)) found.push(...match[1].split(/\s+/))
-  for (const match of source.matchAll(/@apply\s+([^;]+);/g)) found.push(...match[1].split(/\s+/))
+  for (const match of source.matchAll(/class="([^"]*)"/g))
+    found.push(...match[1].split(/\s+/))
+  for (const match of source.matchAll(/@apply\s+([^;]+);/g))
+    found.push(...match[1].split(/\s+/))
 
   return found.filter(Boolean).sort()
 }
@@ -109,7 +114,11 @@ const options = {
   loadStylesheet: async (id, from) => {
     if (id !== 'tailwindcss') throw new Error(`unexpected stylesheet: ${id}`)
 
-    return { base: path.dirname(tailwind), content: readFileSync(tailwind, 'utf8'), path: tailwind }
+    return {
+      base: path.dirname(tailwind),
+      content: readFileSync(tailwind, 'utf8'),
+      path: tailwind,
+    }
   },
   onDependency() {},
 }
@@ -119,14 +128,14 @@ const css = `@import "tailwindcss" source(none);\n@plugin ${JSON.stringify(wrapp
 // The vocabulary, from one registration. Reused for every candidate: it is data, not state.
 await compile(css, options)
 
-const state = globalThis.__jumiCandidateDiff ??= { calls: [], vocabulary: [] }
+const state = (globalThis.__jumiCandidateDiff ??= { calls: [], vocabulary: [] })
 const vocabulary = state.vocabulary
 
 /**
  * One build per candidate, so a call is attributable to the candidate that produced it. A shared
  * instance would keep earlier rules and make the log ambiguous.
  */
-const payloadFor = async (raw) => {
+const payloadFor = async raw => {
   state.calls.length = 0
 
   const instance = await compile(css, options)
@@ -134,7 +143,9 @@ const payloadFor = async (raw) => {
 
   const [call] = state.calls
 
-  return call ? { modifier: call.modifier, name: call.name, value: call.value } : null
+  return call
+    ? { modifier: call.modifier, name: call.name, value: call.value }
+    : null
 }
 
 console.log('candidate differential — Tailwind payload vs Jumi parser\n')
@@ -156,11 +167,15 @@ const raws = [...new Set([...corpora.flatMap(candidatesIn), ...edges])]
 const applied = [...new Set(stylesheets.flatMap(candidatesIn))]
 
 const jumi = parser(vocabulary)
-const interesting = raws.filter(raw => raw.includes('animate') || raw === 'animations')
+const interesting = raws.filter(
+  raw => raw.includes('animate') || raw === 'animations',
+)
 
 console.log(`vocabulary: ${vocabulary.length} matchers registered by Jumi`)
-console.log(`candidates: ${interesting.length} Jumi-relevant, from ${raws.length} in the corpora`
-  + ` plus ${edges.length} edge cases`)
+console.log(
+  `candidates: ${interesting.length} Jumi-relevant, from ${raws.length} in the corpora` +
+    ` plus ${edges.length} edge cases`,
+)
 console.log(`@apply parameters in the same corpora: ${applied.length}`)
 
 let match = 0
@@ -171,7 +186,11 @@ for (const raw of interesting) {
   const mine = jumi(raw)
   // The observable payload is the triple. Negation is visible *through* the value, so the test
   // still covers it; `negative` is only how the parser arrives at it.
-  const shaped = mine && { modifier: mine.modifier, name: mine.root, value: mine.value }
+  const shaped = mine && {
+    modifier: mine.modifier,
+    name: mine.root,
+    value: mine.value,
+  }
 
   if (JSON.stringify(host) === JSON.stringify(shaped)) match += 1
   else deltas.push({ host, mine: shaped, raw })
@@ -181,7 +200,7 @@ for (const raw of interesting) {
 // examples are dead markup from the abandoned natural-language variant design. Jumi does not model
 // variant *validity* (it strips the prefix, by design), so these are reported separately rather than
 // counted as parser failures. Brackets matter: a phrase value contains `:` too.
-const prefixed = (raw) => {
+const prefixed = raw => {
   let depth = 0
 
   for (const character of raw) {
@@ -193,21 +212,31 @@ const prefixed = (raw) => {
   return false
 }
 
-const unmodelled = deltas.filter(delta => delta.host === null && prefixed(delta.raw))
+const unmodelled = deltas.filter(
+  delta => delta.host === null && prefixed(delta.raw),
+)
 const real = deltas.filter(delta => !unmodelled.includes(delta))
 
 for (const delta of real) {
   console.log(`\n  ${delta.raw}`)
-  console.log(`    tailwind  ${delta.host ? JSON.stringify(delta.host) : '(rejected)'}`)
-  console.log(`    jumi      ${delta.mine ? JSON.stringify(delta.mine) : '(rejected)'}`)
+  console.log(
+    `    tailwind  ${delta.host ? JSON.stringify(delta.host) : '(rejected)'}`,
+  )
+  console.log(
+    `    jumi      ${delta.mine ? JSON.stringify(delta.mine) : '(rejected)'}`,
+  )
 }
 
 for (const delta of unmodelled) {
-  console.log(`\n  ${delta.raw}  (the host rejects it on a variant nobody declares — examples cleanup)`)
+  console.log(
+    `\n  ${delta.raw}  (the host rejects it on a variant nobody declares — examples cleanup)`,
+  )
 }
 
-console.log(`\n${match}/${interesting.length} payloads identical`
-  + `${real.length ? `, ${real.length} real deltas` : ''}`
-  + `${unmodelled.length ? `, ${unmodelled.length} undeclared-variant candidates` : ''}`)
+console.log(
+  `\n${match}/${interesting.length} payloads identical` +
+    `${real.length ? `, ${real.length} real deltas` : ''}` +
+    `${unmodelled.length ? `, ${unmodelled.length} undeclared-variant candidates` : ''}`,
+)
 
 rmSync(dir, { force: true, recursive: true })

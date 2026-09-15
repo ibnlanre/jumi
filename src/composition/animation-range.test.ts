@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
+import { animationRange as composed } from '@/composition/animation-range'
 import { animationRange, animationRangeName } from '@/theme/animation-range'
 import { propertyVariables } from '@/variables/property'
-import { animationRange as composed } from '@/composition/animation-range'
 
 /**
  * The range vocabulary and the value it composes, which is the part of this feature that cannot be
@@ -51,13 +51,17 @@ describe('the range vocabulary', () => {
   })
 
   it('has no name that describes the CSS grammar instead of the motion', () => {
-    expect(Object.keys(animationRange).filter(name => name.includes('timeline'))).toEqual([])
+    expect(
+      Object.keys(animationRange).filter(name => name.includes('timeline')),
+    ).toEqual([])
   })
 })
 
 describe('the composed animation-range', () => {
   it('names two halves, in the order the property reads them', () => {
-    expect(composed).toBe('var(--jumi-animation-range-start) var(--jumi-animation-range-end)')
+    expect(composed).toBe(
+      'var(--jumi-animation-range-start) var(--jumi-animation-range-end)',
+    )
     expect(composed.indexOf('--jumi-animation-range-start')).toBeLessThan(
       composed.indexOf('--jumi-animation-range-end'),
     )
@@ -81,13 +85,16 @@ describe('the composed animation-range', () => {
       'animation-range-end-offset',
     ] as const
 
-    for (const half of halves) expect(propertyVariables[half].value).not.toContain('normal')
+    for (const half of halves)
+      expect(propertyVariables[half].value).not.toContain('normal')
   })
 
   it('keeps the grammar-shaped component gone, not merely unused', () => {
     // `-start-timeline` was the name half: a variable holding a range name, which only made sense
     // joined to an offset. A variable nothing writes is a name the next reader has to disprove.
-    expect(propertyVariables).not.toHaveProperty('animation-range-start-timeline')
+    expect(propertyVariables).not.toHaveProperty(
+      'animation-range-start-timeline',
+    )
     expect(propertyVariables).not.toHaveProperty('animation-range-end-timeline')
   })
 })

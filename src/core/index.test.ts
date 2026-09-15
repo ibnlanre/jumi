@@ -35,15 +35,35 @@ describe('what Jumi will accept as a phrase', () => {
   it('refuses anything that is not one, however much syntax it carries', () => {
     const notPhrases = [
       // Ordinary scalars, including the ones a typed matcher already refuses.
-      '50%', '4rem', 'abc', '.25', '#123456', '23deg',
+      '50%',
+      '4rem',
+      'abc',
+      '.25',
+      '#123456',
+      '23deg',
       // The near misses: a phrase is `number:value`, so anything else with a colon is not one.
-      '50%:0', 'calc(1px:2px)', 'url(data:image/png;base64,iVBORw0KGgo=)',
-      'color-mix(in srgb, red 50%, blue)', 'rgb(1,2,3)', 'light-dark(red, blue)',
-      'a:b', 'red:blue', '0:',
+      '50%:0',
+      'calc(1px:2px)',
+      'url(data:image/png;base64,iVBORw0KGgo=)',
+      'color-mix(in srgb, red 50%, blue)',
+      'rgb(1,2,3)',
+      'light-dark(red, blue)',
+      'a:b',
+      'red:blue',
+      '0:',
       // Partial and malformed syntax.
-      ':', ':50%', '0:', '|', '0:50%|', '|0:50%', '0:50%||100:1', ':|', '0:50%|100:',
+      ':',
+      ':50%',
+      '0:',
+      '|',
+      '0:50%|',
+      '|0:50%',
+      '0:50%||100:1',
+      ':|',
+      '0:50%|100:',
       // A value with a leading number is still not a phrase without the colon.
-      '0 50%', '0,50%',
+      '0 50%',
+      '0,50%',
     ]
 
     expect(notPhrases.filter(candidate => isPhrase(candidate))).toEqual([])
@@ -64,7 +84,20 @@ describe('what Jumi will accept as a phrase', () => {
  */
 describe('what Jumi will accept as a name', () => {
   it('accepts a word, and refuses whitespace', () => {
-    expect(['reveal', 'card', 'flick', 'return', 'hero-2', '2x', 'a_b', '_x', 'A-Z', 'a.b'].every(addressableName)).toBe(true)
+    expect(
+      [
+        'reveal',
+        'card',
+        'flick',
+        'return',
+        'hero-2',
+        '2x',
+        'a_b',
+        '_x',
+        'A-Z',
+        'a.b',
+      ].every(addressableName),
+    ).toBe(true)
 
     // `_` is Tailwind's space inside `[brackets]`, so these arrive as whitespace and cannot be written as
     // part of a custom property's name — the declaration would not parse, which used to fail the build.

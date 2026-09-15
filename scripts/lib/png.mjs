@@ -122,14 +122,20 @@ export function decodePng(buffer) {
   }
 
   if (!header) throw new Error('PNG has no IHDR')
-  if (header.bitDepth !== 8) throw new Error(`unsupported PNG bit depth ${header.bitDepth}`)
+  if (header.bitDepth !== 8)
+    throw new Error(`unsupported PNG bit depth ${header.bitDepth}`)
   if (header.interlace !== 0) throw new Error('interlaced PNG is not supported')
 
   const bytes = CHANNELS[header.colorType]
 
   if (!bytes) throw new Error(`unsupported PNG colour type ${header.colorType}`)
 
-  const flat = unfilter(inflateSync(Buffer.concat(parts)), header.width, header.height, bytes)
+  const flat = unfilter(
+    inflateSync(Buffer.concat(parts)),
+    header.width,
+    header.height,
+    bytes,
+  )
 
   // Normalise every supported colour type to RGBA, so a caller never has to know which one it got.
   const pixels = Buffer.alloc(header.width * header.height * 4)
@@ -142,14 +148,12 @@ export function decodePng(buffer) {
       pixels[i * 4 + 1] = flat[from]
       pixels[i * 4 + 2] = flat[from]
       pixels[i * 4 + 3] = 255
-    }
-    else if (bytes === 2) {
+    } else if (bytes === 2) {
       pixels[i * 4] = flat[from]
       pixels[i * 4 + 1] = flat[from]
       pixels[i * 4 + 2] = flat[from]
       pixels[i * 4 + 3] = flat[from + 1]
-    }
-    else {
+    } else {
       pixels[i * 4] = flat[from]
       pixels[i * 4 + 1] = flat[from + 1]
       pixels[i * 4 + 2] = flat[from + 2]
@@ -159,7 +163,12 @@ export function decodePng(buffer) {
 
   return {
     height: header.height,
-    pixelsAt: (x, y) => [...pixels.subarray((y * header.width + x) * 4, (y * header.width + x) * 4 + 4)],
+    pixelsAt: (x, y) => [
+      ...pixels.subarray(
+        (y * header.width + x) * 4,
+        (y * header.width + x) * 4 + 4,
+      ),
+    ],
     width: header.width,
   }
 }
@@ -188,12 +197,16 @@ export function samplePixel(buffer, x, y, radius = 0) {
 
       const pixel = pixelsAt(px, py)
 
-      for (let channel = 0; channel < 4; channel += 1) values[channel] += pixel[channel]
+      for (let channel = 0; channel < 4; channel += 1)
+        values[channel] += pixel[channel]
       count += 1
     }
   }
 
-  if (!count) throw new Error(`sample (${x}, ${y}) is outside the ${width}×${height} image`)
+  if (!count)
+    throw new Error(
+      `sample (${x}, ${y}) is outside the ${width}×${height} image`,
+    )
 
   return values.map(value => Math.round(value / count))
 }

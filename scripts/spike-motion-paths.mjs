@@ -92,28 +92,72 @@ const ARMS = [
   // The idiom: path set, distance driven by a Jumi single-value tween.
   { classes: 'animate-offset-distance-100', id: 'drive', path: PATH },
   // The same thing as a phrase, so the frames come from Jumi's own keyframe machinery.
-  { classes: 'animate-offset-distance-[0:0%|100:100%]', id: 'phrase', path: PATH },
+  {
+    classes: 'animate-offset-distance-[0:0%|100:100%]',
+    id: 'phrase',
+    path: PATH,
+  },
   // The idiom with the element turning to follow the path.
-  { classes: 'animate-offset-distance-100', id: 'spin', path: PATH, extra: 'offset-rotate: auto;' },
+  {
+    classes: 'animate-offset-distance-100',
+    extra: 'offset-rotate: auto;',
+    id: 'spin',
+    path: PATH,
+  },
   // Jumi animating the *path itself*, which is the question "declaration or driver".
-  { classes: `animate-offset-path-[${PATH.replaceAll(' ', '_')}] animate-offset-distance-100`, id: 'animatedPath' },
+  {
+    classes: `animate-offset-path-[${PATH.replaceAll(' ', '_')}] animate-offset-distance-100`,
+    id: 'animatedPath',
+  },
   // Jumi animating `offset-rotate` from its initial value, same question for the tangent.
-  { classes: 'animate-offset-rotate-[auto] animate-offset-distance-100', id: 'animatedRotate', path: PATH },
+  {
+    classes: 'animate-offset-rotate-[auto] animate-offset-distance-100',
+    id: 'animatedRotate',
+    path: PATH,
+  },
   // Two of the family driven at once, and a transform beside them.
-  { classes: 'animate-offset-distance-100 animate-translate-x-[40px]', id: 'withTransform', path: PATH },
+  {
+    classes: 'animate-offset-distance-100 animate-translate-x-[40px]',
+    id: 'withTransform',
+    path: PATH,
+  },
   // A ray, which is the one form that needs `offset-position` to mean anything.
-  { classes: 'animate-offset-distance-100', id: 'ray', extra: 'offset-path: ray(45deg); offset-position: 50% 50%;' },
+  {
+    classes: 'animate-offset-distance-100',
+    extra: 'offset-path: ray(45deg); offset-position: 50% 50%;',
+    id: 'ray',
+  },
   // A shape as the path: the element travels the shape's perimeter.
-  { classes: 'animate-offset-distance-100', id: 'circle', extra: 'offset-path: circle(60px); offset-position: 50% 50%;' },
+  {
+    classes: 'animate-offset-distance-100',
+    extra: 'offset-path: circle(60px); offset-position: 50% 50%;',
+    id: 'circle',
+  },
   // The box itself as the path — no geometry to author at all.
-  { classes: 'animate-offset-distance-100', id: 'box', extra: 'offset-path: border-box;' },
+  {
+    classes: 'animate-offset-distance-100',
+    extra: 'offset-path: border-box;',
+    id: 'box',
+  },
   // The anchor decides which point of the element sits on the path.
-  { classes: 'animate-offset-distance-100', id: 'anchor', path: PATH, extra: 'offset-anchor: center;' },
+  {
+    classes: 'animate-offset-distance-100',
+    extra: 'offset-anchor: center;',
+    id: 'anchor',
+    path: PATH,
+  },
   // Scroll drives the same motion, with a range to place the window on the scroll.
-  { classes: 'animate-offset-distance-100 animation-timeline-scroll animation-range-[25%_75%]', id: 'scrolled', path: PATH },
+  {
+    classes:
+      'animate-offset-distance-100 animation-timeline-scroll animation-range-[25%_75%]',
+    id: 'scrolled',
+    path: PATH,
+  },
 ]
 
-const CANDIDATES = [...new Set(ARMS.flatMap(arm => arm.classes.split(/\s+/).filter(Boolean)))]
+const CANDIDATES = [
+  ...new Set(ARMS.flatMap(arm => arm.classes.split(/\s+/).filter(Boolean))),
+]
 
 const emitted = build(await compiler(entry, root), CANDIDATES)
 
@@ -123,11 +167,16 @@ const htmlFor = css => `<!doctype html>
   #board { position: relative; width: 420px; height: 320px; background: #f6f6f6; margin: 8px; }
   /* Every arm is the same box, so a rect measures where the path put it. */
   #board > * { position: absolute; top: 0; left: 0; width: 20px; height: 20px; background: #333; }
-${ARMS.map((arm) => {
-    const declarations = [arm.path ? `offset-path: ${arm.path};` : '', arm.extra ?? ''].join(' ')
+${ARMS.map(arm => {
+  const declarations = [
+    arm.path ? `offset-path: ${arm.path};` : '',
+    arm.extra ?? '',
+  ].join(' ')
 
-    return declarations.trim() ? `  #${arm.id} { ${declarations} }` : ''
-  }).filter(Boolean).join('\n')}
+  return declarations.trim() ? `  #${arm.id} { ${declarations} }` : ''
+})
+  .filter(Boolean)
+  .join('\n')}
   #lead { height: 120px; }
   #tail { height: 1600px; }
   /* The control: the same motion, written by hand, sampled by the same instrument. If this one does
@@ -267,7 +316,10 @@ const origin = `http://127.0.0.1:${server.address().port}`
 const browser = await chromium.launch()
 
 const open = async (reducedMotion = 'no-preference') => {
-  const context = await browser.newContext({ reducedMotion, viewport: { height: 700, width: 1000 } })
+  const context = await browser.newContext({
+    reducedMotion,
+    viewport: { height: 700, width: 1000 },
+  })
   const page = await context.newPage()
 
   await page.goto(origin)
@@ -284,19 +336,29 @@ const line = (label, value) => console.log(`  ${label.padEnd(34)} ${value}`)
 console.log('\n1 · the family, value form by value form')
 console.log('─'.repeat(78))
 
-const support = await page.evaluate(list => window.__supports(list), [...PROPERTIES.map(property => [property, 'initial']), ...VALUES])
+const support = await page.evaluate(
+  list => window.__supports(list),
+  [...PROPERTIES.map(property => [property, 'initial']), ...VALUES],
+)
 
 for (const [property, value, ok] of support) {
   if (value === 'initial') line(property, ok ? 'supported' : 'NOT SUPPORTED')
 }
 
-for (const [property, value, ok] of support.filter(([, value]) => value !== 'initial')) {
+for (const [property, value, ok] of support.filter(
+  ([, value]) => value !== 'initial',
+)) {
   if (!ok) line(`${property}: ${value}`, 'REFUSED')
 }
 
-const refused = support.filter(([, value, ok]) => value !== 'initial' && !ok).length
+const refused = support.filter(
+  ([, value, ok]) => value !== 'initial' && !ok,
+).length
 
-line('value forms refused', refused === 0 ? 'none' : `${refused} of ${VALUES.length}`)
+line(
+  'value forms refused',
+  refused === 0 ? 'none' : `${refused} of ${VALUES.length}`,
+)
 
 // ── 2 · is it a motion path at all? ─────────────────────────────────────────────────────────────
 console.log('\n2 · where the element is, along the path')
@@ -311,31 +373,53 @@ for (const arm of ARMS) {
   )
 }
 
-const show = (id) => {
+const show = id => {
   const reading = positions[id]
 
   if (!reading || !reading.positions[0]) return `${id}: nothing resolves`
 
   const first = reading.positions[0]
-  const moves = reading.positions.map(({ x, y }) => `${x - first.x},${y - first.y}`)
+  const moves = reading.positions.map(
+    ({ x, y }) => `${x - first.x},${y - first.y}`,
+  )
 
   return `${id}: ${moves.join('  ')}${reading.animations > 1 ? `  (${reading.animations} animations)` : ''}`
 }
 
 /** Rotation is invisible on a square box, so the width is reported for the arms that turn. */
-const showWidth = (id) => (positions[id]?.positions ?? []).map(position => position.w).join(' ') || 'none'
+const showWidth = id =>
+  (positions[id]?.positions ?? []).map(position => position.w).join(' ') ||
+  'none'
 
-for (const id of ['control', 'drive', 'phrase', 'scrolled', 'spin', 'withTransform']) line(id, show(id).slice(id.length + 2))
+for (const id of [
+  'control',
+  'drive',
+  'phrase',
+  'scrolled',
+  'spin',
+  'withTransform',
+])
+  line(id, show(id).slice(id.length + 2))
 
-for (const id of ['spin', 'animatedRotate']) line(`${id} box width`, showWidth(id))
+for (const id of ['spin', 'animatedRotate'])
+  line(`${id} box width`, showWidth(id))
 
-line('control keyframes', JSON.stringify(await page.evaluate(() => window.__frames('control'))))
-line('drive keyframes', JSON.stringify(await page.evaluate(() => window.__frames('drive'))))
+line(
+  'control keyframes',
+  JSON.stringify(await page.evaluate(() => window.__frames('control'))),
+)
+line(
+  'drive keyframes',
+  JSON.stringify(await page.evaluate(() => window.__frames('drive'))),
+)
 
 for (const id of ['control', 'drive']) {
-  line(`${id} samples`, (positions[id]?.positions ?? [])
-    .map(position => `${position.distance}@${position.x},${position.y}`)
-    .join('  ') || 'none')
+  line(
+    `${id} samples`,
+    (positions[id]?.positions ?? [])
+      .map(position => `${position.distance}@${position.x},${position.y}`)
+      .join('  ') || 'none',
+  )
 }
 
 // ── 3 · declaration or driver? ──────────────────────────────────────────────────────────────────
@@ -343,9 +427,15 @@ console.log('\n3 · a property you set, against a property you drive')
 console.log('─'.repeat(78))
 
 line('path set, distance driven', show('drive').slice('drive: '.length))
-line('path animated by Jumi', show('animatedPath').slice('animatedPath: '.length))
+line(
+  'path animated by Jumi',
+  show('animatedPath').slice('animatedPath: '.length),
+)
 line('rotate set to auto', show('spin').slice('spin: '.length))
-line('rotate animated by Jumi', show('animatedRotate').slice('animatedRotate: '.length))
+line(
+  'rotate animated by Jumi',
+  show('animatedRotate').slice('animatedRotate: '.length),
+)
 
 for (const id of ['animatedPath', 'animatedRotate']) {
   const computed = await page.evaluate(arm => window.__computed(arm), id)
@@ -357,13 +447,20 @@ for (const id of ['animatedPath', 'animatedRotate']) {
 console.log('\n4 · shapes, rays, boxes and anchors')
 console.log('─'.repeat(78))
 
-for (const id of ['ray', 'circle', 'box', 'anchor']) line(id, show(id).slice(id.length + 2))
+for (const id of ['ray', 'circle', 'box', 'anchor'])
+  line(id, show(id).slice(id.length + 2))
 
 // ── 5 · does a scroll timeline drive it? ────────────────────────────────────────────────────────
 console.log('\n5 · the same motion on a scroll timeline, with a range')
 console.log('─'.repeat(78))
 
-const settle = target => target.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))
+const settle = target =>
+  target.evaluate(
+    () =>
+      new Promise(resolve =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      ),
+  )
 const scrolled = []
 
 // Sampling paused every animation it touched, so the scroll section would measure a frozen page.
@@ -380,9 +477,15 @@ for (const fraction of [0.25, 0.5, 0.75]) {
 
 const scrolledFirst = positions.scrolled.positions[0]
 
-line('scroll ¼ ½ ¾ (delta from start)', scrolled
-  .map(({ x, y }) => `${Math.round((x - scrolledFirst.x) * 10) / 10},${Math.round((y - scrolledFirst.y) * 10) / 10}`)
-  .join('  '))
+line(
+  'scroll ¼ ½ ¾ (delta from start)',
+  scrolled
+    .map(
+      ({ x, y }) =>
+        `${Math.round((x - scrolledFirst.x) * 10) / 10},${Math.round((y - scrolledFirst.y) * 10) / 10}`,
+    )
+    .join('  '),
+)
 
 // ── 6 · reduced motion ──────────────────────────────────────────────────────────────────────────
 console.log('\n6 · reduced motion')
@@ -394,9 +497,12 @@ const reducedReading = await reduced.evaluate(
   { fractions: [0, 0.5, 1], id: 'drive' },
 )
 
-line('under reduce, the platform', reducedReading.animations
-  ? `still runs it (${reducedReading.positions.map(position => position.x).join(' ')})`
-  : 'runs nothing')
+line(
+  'under reduce, the platform',
+  reducedReading.animations
+    ? `still runs it (${reducedReading.positions.map(position => position.x).join(' ')})`
+    : 'runs nothing',
+)
 
 await reduced.context().close()
 
@@ -405,18 +511,34 @@ console.log('\n7 · what the emission says')
 console.log('─'.repeat(78))
 
 line('bytes', `${emitted.css.length}`)
-line('warnings', emitted.warnings.length ? emitted.warnings.join(' | ') : 'none')
-line('keyframes for offset-distance', `${(emitted.css.match(/@keyframes jumi-offset-distance/g) ?? []).length}`)
-line('arms with no animation at all', Object.entries(positions)
-  .filter(([, reading]) => !reading?.animations)
-  .map(([id]) => id)
-  .join(', ') || 'none')
+line(
+  'warnings',
+  emitted.warnings.length ? emitted.warnings.join(' | ') : 'none',
+)
+line(
+  'keyframes for offset-distance',
+  `${(emitted.css.match(/@keyframes jumi-offset-distance/g) ?? []).length}`,
+)
+line(
+  'arms with no animation at all',
+  Object.entries(positions)
+    .filter(([, reading]) => !reading?.animations)
+    .map(([id]) => id)
+    .join(', ') || 'none',
+)
 
-const distance = /animation: var\(--jumi-slot-offset-distance[^;]*/.exec(emitted.css)
+const distance = /animation: var\(--jumi-slot-offset-distance[^;]*/.exec(
+  emitted.css,
+)
 
-line('the slot the distance is written on', distance ? distance[0].slice(0, 60) : 'not composed')
+line(
+  'the slot the distance is written on',
+  distance ? distance[0].slice(0, 60) : 'not composed',
+)
 
 await browser.close()
 server.close()
 
-console.log(`\n${ARMS.length} arms, ${VALUES.length} value forms, ${PROPERTIES.length} properties measured in Chromium.`)
+console.log(
+  `\n${ARMS.length} arms, ${VALUES.length} value forms, ${PROPERTIES.length} properties measured in Chromium.`,
+)

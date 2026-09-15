@@ -13,7 +13,10 @@ export const animationTimelineScrollValues = join([
   css('var', '--jumi-animation-timeline-scroller'),
 ])
 
-export const animationTimelineScroll = css('scroll', animationTimelineScrollValues)
+export const animationTimelineScroll = css(
+  'scroll',
+  animationTimelineScrollValues,
+)
 
 export const animationTimelineInset = join([
   css('var', '--jumi-animation-timeline-inset-start'),

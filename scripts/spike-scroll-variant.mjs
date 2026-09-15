@@ -66,10 +66,14 @@ const RANGES = {
  * candidate uses it. The callback therefore validates before it does anything, and the sentinel gets
  * a selector that matches nothing rather than a range nobody asked for.
  */
-const scratch = mkdtempSync(path.join(root, 'scripts', '.spike-scroll-variant-'))
+const scratch = mkdtempSync(
+  path.join(root, 'scripts', '.spike-scroll-variant-'),
+)
 const variantPlugin = path.join(scratch, 'variant.mjs')
 
-writeFileSync(variantPlugin, `
+writeFileSync(
+  variantPlugin,
+  `
 import jumi from ${JSON.stringify(path.join(root, 'dist', 'index.js'))}
 
 export default {
@@ -88,7 +92,8 @@ export default {
     }, { values: ${JSON.stringify(RANGES)} })
   },
 }
-`)
+`,
+)
 
 const entry = `
 @import "tailwindcss";
@@ -126,12 +131,14 @@ const compiler = (await import('./lib/compile.mjs')).compiler
 const instance = await compiler(entry, root)
 const emitted = instance.build(CANDIDATES)
 
-console.log(`\n${'─'.repeat(72)}\n1 · what a build emits for the variant\n${'─'.repeat(72)}`)
+console.log(
+  `\n${'─'.repeat(72)}\n1 · what a build emits for the variant\n${'─'.repeat(72)}`,
+)
 
 const sheet = postcss.parse(emitted)
 const variantRules = []
 
-sheet.walkRules((rule) => {
+sheet.walkRules(rule => {
   if (!rule.selector.includes('animation-range-')) return
 
   variantRules.push(rule)
@@ -139,11 +146,16 @@ sheet.walkRules((rule) => {
 
 for (const rule of variantRules) {
   const declarations = (rule.nodes ?? []).filter(node => node.type === 'decl')
-  const activation = declarations.find(node => /^--jumi-.+-animation-name$/.test(node.prop))
+  const activation = declarations.find(node =>
+    /^--jumi-.+-animation-name$/.test(node.prop),
+  )
 
   console.log(`\n  ${rule.selector}`)
-  for (const declaration of declarations) console.log(`    ${declaration.prop}: ${declaration.value}`)
-  console.log(`  → activation: ${activation ? `${activation.prop} (slot ${/^--jumi-(.+)-animation-name$/.exec(activation.prop)[1]})` : '(none)'}`)
+  for (const declaration of declarations)
+    console.log(`    ${declaration.prop}: ${declaration.value}`)
+  console.log(
+    `  → activation: ${activation ? `${activation.prop} (slot ${/^--jumi-(.+)-animation-name$/.exec(activation.prop)[1]})` : '(none)'}`,
+  )
 }
 
 // ── 2 · the decode the finalizer would have to do ───────────────────────────────────────────────
@@ -168,7 +180,7 @@ const ENCODED = /^animation-range-(.+)$/
  * Segments are split on the escaped colon, which is how a variant boundary is written; everything
  * inside `[...]` is part of its own segment and its colons are escaped with it.
  */
-const classToken = (selector) => {
+const classToken = selector => {
   for (let index = 1; index < selector.length; index += 1) {
     if (selector[index] === '\\') {
       index += 1
@@ -182,7 +194,7 @@ const classToken = (selector) => {
   return selector.slice(1)
 }
 
-const segments = (token) => {
+const segments = token => {
   const out = []
   let current = ''
 
@@ -216,7 +228,7 @@ const segments = (token) => {
  * Escapes come off, `_` is the space an arbitrary value cannot contain, and an arbitrary value's
  * brackets are the syntax rather than part of it.
  */
-const decode = (selector) => {
+const decode = selector => {
   const found = segments(classToken(selector))
     .map(segment => ENCODED.exec(segment))
     .find(match => match !== null)
@@ -225,21 +237,31 @@ const decode = (selector) => {
 
   const value = found[1].replace(/_/g, ' ')
 
-  return value.startsWith('[') && value.endsWith(']') ? value.slice(1, -1) : value
+  return value.startsWith('[') && value.endsWith(']')
+    ? value.slice(1, -1)
+    : value
 }
 
-console.log(`\n${'─'.repeat(72)}\n2 · the two facts, read off the rule\n${'─'.repeat(72)}`)
+console.log(
+  `\n${'─'.repeat(72)}\n2 · the two facts, read off the rule\n${'─'.repeat(72)}`,
+)
 
-const decoded = variantRules.map((rule) => {
+const decoded = variantRules.map(rule => {
   const declarations = (rule.nodes ?? []).filter(node => node.type === 'decl')
-  const activation = declarations.find(node => /^--jumi-.+-animation-name$/.test(node.prop))
-  const slot = activation ? /^--jumi-(.+)-animation-name$/.exec(activation.prop)[1] : null
+  const activation = declarations.find(node =>
+    /^--jumi-.+-animation-name$/.test(node.prop),
+  )
+  const slot = activation
+    ? /^--jumi-(.+)-animation-name$/.exec(activation.prop)[1]
+    : null
 
   return { range: decode(rule.selector), selector: rule.selector, slot }
 })
 
 for (const row of decoded) {
-  console.log(`  ${String(row.range ?? '(undecoded)').padEnd(24)} slot ${row.slot ?? '(none)'}   ${row.selector.slice(0, 64)}`)
+  console.log(
+    `  ${String(row.range ?? '(undecoded)').padEnd(24)} slot ${row.slot ?? '(none)'}   ${row.selector.slice(0, 64)}`,
+  )
 }
 
 // ── 3 · the publication, prototyped here rather than added to src ───────────────────────────────
@@ -248,18 +270,22 @@ for (const row of decoded) {
  * element resolves it, and the composition's position for that slot reads it. This is the same
  * publication the hoist performs for `--jumi-slot-<slot>`, one property over.
  */
-const publishRanges = (css) => {
+const publishRanges = css => {
   const tree = postcss.parse(css)
   const published = []
 
-  tree.walkRules((rule) => {
+  tree.walkRules(rule => {
     for (const selector of rule.selectors) {
       const range = decode(selector)
 
       if (!range) continue
 
-      const declarations = (rule.nodes ?? []).filter(node => node.type === 'decl')
-      const activation = declarations.find(node => /^--jumi-.+-animation-name$/.test(node.prop))
+      const declarations = (rule.nodes ?? []).filter(
+        node => node.type === 'decl',
+      )
+      const activation = declarations.find(node =>
+        /^--jumi-.+-animation-name$/.test(node.prop),
+      )
 
       // No activation means the rule carries no motion, so there is no slot to place.
       if (!activation) continue
@@ -287,14 +313,20 @@ for (const row of publications) console.log(`  ${row.prop}: ${row.range}`)
 const composition = postcss.parse(finalized.css)
 let list = null
 
-composition.walkRules((rule) => {
+composition.walkRules(rule => {
   const own = (rule.nodes ?? []).filter(node => node.type === 'decl')
 
-  if (own.some(node => node.prop === 'animation-range') && own.some(node => node.prop === 'animation')) list = own.find(node => node.prop === 'animation-range')
+  if (
+    own.some(node => node.prop === 'animation-range') &&
+    own.some(node => node.prop === 'animation')
+  )
+    list = own.find(node => node.prop === 'animation-range')
 })
 
 console.log(`\n  the composition's range list:\n    ${list?.value ?? '(none)'}`)
-console.log(`\n  per-slot publications surviving finalization: ${(finalized.css.match(/--jumi-(fade-in|fade-out|reveal|opacity)-animation-range/g) ?? []).join(' ')}`)
+console.log(
+  `\n  per-slot publications surviving finalization: ${(finalized.css.match(/--jumi-(fade-in|fade-out|reveal|opacity)-animation-range/g) ?? []).join(' ')}`,
+)
 
 // ── 4 · does it actually place two motions differently? ─────────────────────────────────────────
 const page = `<!doctype html>
@@ -353,15 +385,22 @@ const server = createServer((request, response) => {
 }).listen(0)
 
 const browser = await chromium.launch()
-const context = await browser.newContext({ viewport: { height: 700, width: 1000 } })
+const context = await browser.newContext({
+  viewport: { height: 700, width: 1000 },
+})
 const tab = await context.newPage()
 
 await tab.goto(`http://127.0.0.1:${server.address().port}`)
 await tab.waitForFunction(() => window.__ready === true)
 
-const at = async (share) => {
+const at = async share => {
   await tab.evaluate(value => window.__scroll(value), share)
-  await tab.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))
+  await tab.evaluate(
+    () =>
+      new Promise(resolve =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      ),
+  )
 
   return tab.evaluate(() => ({
     arbitrary: window.__read('arbitrary'),
@@ -381,17 +420,29 @@ for (const share of [0, 0.25, 0.5, 0.75, 1]) readings.push(await at(share))
 
 for (const [index, share] of [0, 0.25, 0.5, 0.75, 1].entries()) {
   const reading = readings[index]
-  const names = reading.ranged.running.map(animation => `${animation.name}=${round(animation.progress)}`)
+  const names = reading.ranged.running.map(
+    animation => `${animation.name}=${round(animation.progress)}`,
+  )
 
-  console.log(`  at ${String(share).padEnd(5)} ranged: ${names.join(' ').padEnd(46)} control: ${reading.control.running.map(animation => `${animation.name}=${round(animation.progress)}`).join(' ')}`)
+  console.log(
+    `  at ${String(share).padEnd(5)} ranged: ${names.join(' ').padEnd(46)} control: ${reading.control.running.map(animation => `${animation.name}=${round(animation.progress)}`).join(' ')}`,
+  )
 }
 
-console.log(`\n  published ranges — ranged: ${readings[2].ranged.fadeInRange || '(none)'} / ${readings[2].ranged.fadeOutRange || '(none)'}`)
-console.log(`  published ranges — arbitrary: ${readings[2].arbitrary.fadeInRange || '(none)'}`)
+console.log(
+  `\n  published ranges — ranged: ${readings[2].ranged.fadeInRange || '(none)'} / ${readings[2].ranged.fadeOutRange || '(none)'}`,
+)
+console.log(
+  `  published ranges — arbitrary: ${readings[2].arbitrary.fadeInRange || '(none)'}`,
+)
 console.log(`  computed animation-range — ranged: ${readings[2].ranged.list}`)
 console.log(`  computed animation-range — control: ${readings[2].control.list}`)
-console.log(`  computed animation-range — poisoned (entry beside nonsense): ${readings[2].poisoned.list}`)
-console.log(`  poisoned, per slot: fade-in ${readings[2].poisoned.fadeInRange || '(none)'} · fade-out ${readings[2].poisoned.fadeOutRange || '(none)'}`)
+console.log(
+  `  computed animation-range — poisoned (entry beside nonsense): ${readings[2].poisoned.list}`,
+)
+console.log(
+  `  poisoned, per slot: fade-in ${readings[2].poisoned.fadeInRange || '(none)'} · fade-out ${readings[2].poisoned.fadeOutRange || '(none)'}`,
+)
 
 await browser.close()
 server.close()

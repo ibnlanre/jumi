@@ -22,7 +22,8 @@ function encode({ colorType = 6, filter = 0, height, pixels, width }) {
       const value = pixels[y * stride + x]
       const a = x >= channels ? pixels[y * stride + x - channels] : 0
       const b = y > 0 ? pixels[(y - 1) * stride + x] : 0
-      const c = y > 0 && x >= channels ? pixels[(y - 1) * stride + x - channels] : 0
+      const c =
+        y > 0 && x >= channels ? pixels[(y - 1) * stride + x - channels] : 0
 
       const predictors = {
         0: () => 0,
@@ -74,13 +75,14 @@ function encode({ colorType = 6, filter = 0, height, pixels, width }) {
 
 /** Two rows of two RGB pixels, written as RGBA so the same values can be asserted either way. */
 const RGBA = [
-  10, 20, 30, 255, 40, 50, 60, 255,
-  70, 80, 90, 255, 100, 110, 120, 255,
+  10, 20, 30, 255, 40, 50, 60, 255, 70, 80, 90, 255, 100, 110, 120, 255,
 ]
 
 describe('decodePng', () => {
   it('reads RGBA pixels', () => {
-    const { height, pixelsAt, width } = decodePng(encode({ colorType: 6, height: 2, pixels: RGBA, width: 2 }))
+    const { height, pixelsAt, width } = decodePng(
+      encode({ colorType: 6, height: 2, pixels: RGBA, width: 2 }),
+    )
 
     expect([width, height]).toEqual([2, 2])
     expect(pixelsAt(0, 0)).toEqual([10, 20, 30, 255])
@@ -91,23 +93,37 @@ describe('decodePng', () => {
   it('expands RGB to RGBA with an opaque alpha', () => {
     const rgb = [10, 20, 30, 40, 50, 60]
 
-    expect(decodePng(encode({ colorType: 2, height: 1, pixels: rgb, width: 2 })).pixelsAt(1, 0))
-      .toEqual([40, 50, 60, 255])
+    expect(
+      decodePng(
+        encode({ colorType: 2, height: 1, pixels: rgb, width: 2 }),
+      ).pixelsAt(1, 0),
+    ).toEqual([40, 50, 60, 255])
   })
 
   it('expands greyscale across the channels', () => {
-    expect(decodePng(encode({ colorType: 0, height: 1, pixels: [7, 200], width: 2 })).pixelsAt(1, 0))
-      .toEqual([200, 200, 200, 255])
+    expect(
+      decodePng(
+        encode({ colorType: 0, height: 1, pixels: [7, 200], width: 2 }),
+      ).pixelsAt(1, 0),
+    ).toEqual([200, 200, 200, 255])
   })
 
   it('reverses every filter type', () => {
     // One encoder, five filters, one expected result — which is the only way to know that the
     // unfilter step is not right for None and quietly wrong for Paeth.
     for (const filter of [0, 1, 2, 3, 4]) {
-      const { pixelsAt } = decodePng(encode({ colorType: 6, filter, height: 2, pixels: RGBA, width: 2 }))
+      const { pixelsAt } = decodePng(
+        encode({ colorType: 6, filter, height: 2, pixels: RGBA, width: 2 }),
+      )
 
-      expect([pixelsAt(0, 0), pixelsAt(1, 0), pixelsAt(0, 1), pixelsAt(1, 1)], `filter ${filter}`).toEqual([
-        [10, 20, 30, 255], [40, 50, 60, 255], [70, 80, 90, 255], [100, 110, 120, 255],
+      expect(
+        [pixelsAt(0, 0), pixelsAt(1, 0), pixelsAt(0, 1), pixelsAt(1, 1)],
+        `filter ${filter}`,
+      ).toEqual([
+        [10, 20, 30, 255],
+        [40, 50, 60, 255],
+        [70, 80, 90, 255],
+        [100, 110, 120, 255],
       ])
     }
   })
@@ -117,7 +133,12 @@ describe('decodePng', () => {
   })
 
   it('refuses a bit depth it does not implement', () => {
-    const png = encode({ colorType: 6, height: 1, pixels: [0, 0, 0, 255], width: 1 })
+    const png = encode({
+      colorType: 6,
+      height: 1,
+      pixels: [0, 0, 0, 255],
+      width: 1,
+    })
 
     png[8 + 8 + 8] = 16
 
@@ -129,7 +150,9 @@ describe('samplePixel', () => {
   it('averages a block', () => {
     // A 2×2 of 10 and 100 per channel: the average of all four is 55, and a point sample would have
     // returned whichever corner it hit.
-    const pixels = [10, 10, 10, 255, 100, 100, 100, 255, 100, 100, 100, 255, 10, 10, 10, 255]
+    const pixels = [
+      10, 10, 10, 255, 100, 100, 100, 255, 100, 100, 100, 255, 10, 10, 10, 255,
+    ]
     const png = encode({ colorType: 6, height: 2, pixels, width: 2 })
 
     expect(samplePixel(png, 0, 0, 0)).toEqual([10, 10, 10, 255])
@@ -140,14 +163,21 @@ describe('samplePixel', () => {
   it('clamps a block that runs off the image instead of reading past it', () => {
     // Unclamped this returned `NaN`, and a `NaN` comparison is false — so an out-of-bounds sample
     // would have read as "the thing being looked for is absent" rather than as a broken measurement.
-    const pixels = [10, 10, 10, 255, 100, 100, 100, 255, 100, 100, 100, 255, 10, 10, 10, 255]
+    const pixels = [
+      10, 10, 10, 255, 100, 100, 100, 255, 100, 100, 100, 255, 10, 10, 10, 255,
+    ]
     const png = encode({ colorType: 6, height: 2, pixels, width: 2 })
 
     expect(samplePixel(png, 0, 0, 2)).toEqual([55, 55, 55, 255])
   })
 
   it('says so when the point is outside the image', () => {
-    const png = encode({ colorType: 6, height: 1, pixels: [0, 0, 0, 255], width: 1 })
+    const png = encode({
+      colorType: 6,
+      height: 1,
+      pixels: [0, 0, 0, 255],
+      width: 1,
+    })
 
     expect(() => samplePixel(png, 4, 4)).toThrow(/outside/)
   })

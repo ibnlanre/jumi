@@ -33,7 +33,7 @@ describe('assemble function', () => {
     it('should return all variables as CSS custom properties', () => {
       const result = assemble('backdrop-filter')
 
-      Object.keys(result).forEach((key) => {
+      Object.keys(result).forEach(key => {
         expect(key).toMatch(/^--jumi-/)
       })
     })
@@ -41,7 +41,7 @@ describe('assemble function', () => {
     it('should return string values for all variables', () => {
       const result = assemble('aspect-ratio')
 
-      Object.values(result).forEach((value) => {
+      Object.values(result).forEach(value => {
         expect(typeof value).toBe('string')
         expect(value.length).toBeGreaterThan(0)
       })
@@ -58,7 +58,9 @@ describe('assemble function', () => {
       const result = assemble('backdrop-filter')
 
       expect(result['--jumi-backdrop-filter-blur']).toContain('blur(')
-      expect(result['--jumi-backdrop-filter-brightness']).toContain('brightness(')
+      expect(result['--jumi-backdrop-filter-brightness']).toContain(
+        'brightness(',
+      )
       expect(result['--jumi-backdrop-filter-contrast']).toContain('contrast(')
     })
   })
@@ -99,8 +101,12 @@ describe('assemble function', () => {
     it('should resolve nested dependencies for backdrop-filter-drop-shadow', () => {
       const result = assemble('backdrop-filter')
 
-      expect(result).toHaveProperty('--jumi-backdrop-filter-drop-shadow-offset-x')
-      expect(result).toHaveProperty('--jumi-backdrop-filter-drop-shadow-offset-y')
+      expect(result).toHaveProperty(
+        '--jumi-backdrop-filter-drop-shadow-offset-x',
+      )
+      expect(result).toHaveProperty(
+        '--jumi-backdrop-filter-drop-shadow-offset-y',
+      )
       expect(result).toHaveProperty('--jumi-backdrop-filter-drop-shadow-blur')
       expect(result).toHaveProperty('--jumi-backdrop-filter-drop-shadow-color')
       expect(result).toHaveProperty('--jumi-backdrop-filter-drop-shadow')

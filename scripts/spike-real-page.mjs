@@ -50,7 +50,10 @@ const hoistable = /effects\.[^/]*\.css$/
 
 const server = createServer((request, response) => {
   const url = new URL(request.url, 'http://127.0.0.1')
-  const file = path.join(site, decodeURIComponent(url.pathname).replace(/\/$/, '/index.html'))
+  const file = path.join(
+    site,
+    decodeURIComponent(url.pathname).replace(/\/$/, '/index.html'),
+  )
 
   if (!file.startsWith(site) || !existsSync(file) || !statSync(file).isFile()) {
     response.writeHead(404).end('not found')
@@ -72,12 +75,20 @@ const server = createServer((request, response) => {
   const before = css.length
   const transformed = shallowOf(css, 'shorthand')
 
-  console.log(`· hoisted ${path.basename(file)}: ${before} → ${transformed.length} bytes`)
-  response.writeHead(200, { 'cache-control': 'no-store', 'content-type': type }).end(transformed)
+  console.log(
+    `· hoisted ${path.basename(file)}: ${before} → ${transformed.length} bytes`,
+  )
+  response
+    .writeHead(200, { 'cache-control': 'no-store', 'content-type': type })
+    .end(transformed)
 })
 
 server.listen(port, '127.0.0.1', () => {
-  console.log(`\n${hoist ? 'hoisted' : 'as built'} — http://127.0.0.1:${port}/effects/`)
-  console.log('Select an effect element in the Elements panel and time the Styles pane.')
+  console.log(
+    `\n${hoist ? 'hoisted' : 'as built'} — http://127.0.0.1:${port}/effects/`,
+  )
+  console.log(
+    'Select an effect element in the Elements panel and time the Styles pane.',
+  )
   console.log('Ctrl-C to stop.\n')
 })

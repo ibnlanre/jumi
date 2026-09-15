@@ -7,9 +7,7 @@ const config = {
     './stories/**/*.{js,jsx,ts,tsx}',
     './.storybook/**/*.{js,jsx,ts,tsx}',
   ],
-  plugins: [
-    jumi,
-  ],
+  plugins: [jumi],
 } satisfies Config
 
 export default config as Config

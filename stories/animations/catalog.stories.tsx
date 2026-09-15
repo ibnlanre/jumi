@@ -27,7 +27,9 @@ const familyStory = (family: string): Story => ({
   name: family,
   render: () => (
     <AnimationGrid
-      animations={families.find(entry => entry.family === family)?.effects ?? []}
+      animations={
+        families.find(entry => entry.family === family)?.effects ?? []
+      }
       title={family}
     />
   ),

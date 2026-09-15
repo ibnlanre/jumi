@@ -51,23 +51,23 @@ const SURFACES = [
 const TEXT = new Set(['.astro', '.css', '.html', '.js', '.md', '.mjs', '.ts'])
 
 /** Every file under a surface, or the file itself. */
-const walk = (target) => {
+const walk = target => {
   const absolute = path.join(root, target)
 
   let stats
   try {
     stats = statSync(absolute)
-  }
-  catch {
+  } catch {
     return []
   }
 
   if (stats.isFile()) return [absolute]
 
-  return readdirSync(absolute, { withFileTypes: true }).flatMap((entry) => {
+  return readdirSync(absolute, { withFileTypes: true }).flatMap(entry => {
     const child = path.join(target, entry.name)
 
-    if (entry.isDirectory()) return entry.name === 'node_modules' ? [] : walk(child)
+    if (entry.isDirectory())
+      return entry.name === 'node_modules' ? [] : walk(child)
 
     return TEXT.has(path.extname(entry.name)) ? [path.join(root, child)] : []
   })
@@ -79,10 +79,11 @@ const walk = (target) => {
  * Deliberately not the whole file. Tokenizing the whole file would flag the prose, and the prose is
  * where the words belong.
  */
-const classText = source => [
-  ...source.matchAll(/class(?:Name)?\s*=\s*"[^"]*"/g),
-  ...source.matchAll(/class(?:Name)?:list\s*=\s*\{[^}]*\}/g),
-].map(match => match[0])
+const classText = source =>
+  [
+    ...source.matchAll(/class(?:Name)?\s*=\s*"[^"]*"/g),
+    ...source.matchAll(/class(?:Name)?:list\s*=\s*\{[^}]*\}/g),
+  ].map(match => match[0])
 
 /**
  * The visible text of a code sample, with its syntax-highlight spans stripped.
@@ -93,8 +94,10 @@ const classText = source => [
  * after the carrier was gone, with every other harness green — so a code sample is read as what it
  * ultimately shows, not as the markup that shows it.
  */
-const codeText = source => [...source.matchAll(/<code[^>]*>([\s\S]*?)<\/code>/g)]
-  .map(match => match[1].replace(/<[^>]*>/g, ' '))
+const codeText = source =>
+  [...source.matchAll(/<code[^>]*>([\s\S]*?)<\/code>/g)].map(match =>
+    match[1].replace(/<[^>]*>/g, ' '),
+  )
 
 /**
  * The class names in a fragment, with a variant prefix stripped.
@@ -102,11 +105,12 @@ const codeText = source => [...source.matchAll(/<code[^>]*>([\s\S]*?)<\/code>/g)
  * `before:animations` is the same mistake as `animations` — the variant moved onto the carrier
  * instead of onto the motion — so the token is read from the last colon onwards.
  */
-const tokens = fragment => fragment
-  .replace(/class(?:Name)?(?::list)?\s*=\s*["{]/, '')
-  .split(/[^:\w-]+/)
-  .map(token => token.slice(token.lastIndexOf(':') + 1))
-  .filter(Boolean)
+const tokens = fragment =>
+  fragment
+    .replace(/class(?:Name)?(?::list)?\s*=\s*["{]/, '')
+    .split(/[^:\w-]+/)
+    .map(token => token.slice(token.lastIndexOf(':') + 1))
+    .filter(Boolean)
 
 const hits = []
 
@@ -115,25 +119,33 @@ for (const file of SURFACES.flatMap(walk)) {
 
   for (const fragment of [...classText(source), ...codeText(source)]) {
     for (const token of tokens(fragment)) {
-      if (LEGACY.has(token)) hits.push({ file: path.relative(root, file), token })
+      if (LEGACY.has(token))
+        hits.push({ file: path.relative(root, file), token })
     }
   }
 }
 
 const byFile = new Map()
 
-for (const hit of hits) byFile.set(hit.file, [...(byFile.get(hit.file) ?? []), hit.token])
+for (const hit of hits)
+  byFile.set(hit.file, [...(byFile.get(hit.file) ?? []), hit.token])
 
 if (hits.length) {
-  console.log('✗ a carrier class survives — it is inert, so nothing else will say so\n')
+  console.log(
+    '✗ a carrier class survives — it is inert, so nothing else will say so\n',
+  )
 
   for (const [file, names] of byFile) {
     console.log(`  ${file}  (${names.length})`)
     console.log(`    ${[...new Set(names)].join(', ')}`)
   }
 
-  console.log('\n  Delete the token. A motion utility already activates the slot it names, and a')
-  console.log('  variant belongs on that utility (`before:animate-*`), not on a carrier.')
+  console.log(
+    '\n  Delete the token. A motion utility already activates the slot it names, and a',
+  )
+  console.log(
+    '  variant belongs on that utility (`before:animate-*`), not on a carrier.',
+  )
   process.exit(1)
 }
 

@@ -24,7 +24,7 @@ function analyzeUsage() {
   const usedUtilities = new Set()
   const jumiUtilityPattern = /\b(?:animate(?:-[\w-]+)?)\b/g
 
-  htmlFiles.forEach((file) => {
+  htmlFiles.forEach(file => {
     const content = fs.readFileSync(file, 'utf8')
     const matches = content.match(jumiUtilityPattern) || []
     matches.forEach(match => usedUtilities.add(match))
@@ -65,9 +65,11 @@ function analyzeUsage() {
   console.log('🎯 UTILITY USAGE:')
   console.log(`   Unique utilities used: ${usedUtilities.size}`)
   console.log('   Used utilities:')
-  Array.from(usedUtilities).sort().forEach((utility) => {
-    console.log(`     - ${utility}`)
-  })
+  Array.from(usedUtilities)
+    .sort()
+    .forEach(utility => {
+      console.log(`     - ${utility}`)
+    })
   console.log()
 
   console.log('🎨 GENERATED KEYFRAMES:')
@@ -77,38 +79,51 @@ function analyzeUsage() {
 
   // 7. Map utilities to expected keyframes
   const expectedKeyframes = new Set()
-  usedUtilities.forEach((utility) => {
+  usedUtilities.forEach(utility => {
     if (utility === 'animate') {
       // This would need specific values, but we can't determine them from class names alone
-      console.log('⚠️  Found generic "animate" utility - specific keyframes depend on values used')
-    }
-    else if (utility.startsWith('animate-')) {
+      console.log(
+        '⚠️  Found generic "animate" utility - specific keyframes depend on values used',
+      )
+    } else if (utility.startsWith('animate-')) {
       const property = utility.replace('animate-', '')
       expectedKeyframes.add(`jumi-${property}`)
     }
   })
 
   console.log('❓ USAGE ANALYSIS:')
-  console.log(`   Expected keyframes based on utilities: ${expectedKeyframes.size}`)
+  console.log(
+    `   Expected keyframes based on utilities: ${expectedKeyframes.size}`,
+  )
   console.log(`   Actually generated keyframes: ${generatedKeyframes.size}`)
-  console.log(`   Over-generation: ${generatedKeyframes.size - expectedKeyframes.size} keyframes`)
-  console.log(`   Over-generation percentage: ${Math.round(((generatedKeyframes.size - expectedKeyframes.size) / generatedKeyframes.size) * 100)}%`)
+  console.log(
+    `   Over-generation: ${generatedKeyframes.size - expectedKeyframes.size} keyframes`,
+  )
+  console.log(
+    `   Over-generation percentage: ${Math.round(((generatedKeyframes.size - expectedKeyframes.size) / generatedKeyframes.size) * 100)}%`,
+  )
   console.log()
 
   console.log('💡 OPTIMIZATION RECOMMENDATIONS:')
   console.log('   1. The plugin generates ALL keyframes regardless of usage')
   console.log('   2. Consider implementing JIT generation for keyframes')
-  console.log('   3. Use Tailwind\'s purging to remove unused keyframes')
-  console.log('   4. Consider splitting keyframes into separate files for lazy loading')
+  console.log("   3. Use Tailwind's purging to remove unused keyframes")
+  console.log(
+    '   4. Consider splitting keyframes into separate files for lazy loading',
+  )
   console.log()
 
   console.log('🔧 POTENTIAL SAVINGS:')
   const unusedKeyframes = generatedKeyframes.size - expectedKeyframes.size
   const avgKeyframeSizeLines = 8 // estimated lines per keyframe
   const potentialSavedLines = unusedKeyframes * avgKeyframeSizeLines
-  const potentialSavedKB = Math.round((potentialSavedLines / totalLines) * fileSizeKB)
+  const potentialSavedKB = Math.round(
+    (potentialSavedLines / totalLines) * fileSizeKB,
+  )
   console.log(`   Unused keyframes: ~${unusedKeyframes}`)
-  console.log(`   Potential saved lines: ~${potentialSavedLines.toLocaleString()}`)
+  console.log(
+    `   Potential saved lines: ~${potentialSavedLines.toLocaleString()}`,
+  )
   console.log(`   Potential saved size: ~${potentialSavedKB}KB`)
   console.log()
 }
@@ -117,8 +132,7 @@ function analyzeUsage() {
 if (import.meta.url === `file://${process.argv[1]}`) {
   try {
     analyzeUsage()
-  }
-  catch (error) {
+  } catch (error) {
     console.error('❌ Error analyzing usage:', error.message)
     process.exit(1)
   }

@@ -62,11 +62,11 @@ export type ViewTransitionOptions = {
  * at once and comes back to the caller as its own error rather than as an outcome, because an async callback
  * passed to a synchronous API is a mistake and not a platform situation.
  */
-export type ViewTransitionOutcome
-  = | {
-    reason: 'aborted' | 'hidden' | 'in-flight' | 'unsupported'
-    transitioned: false
-  }
+export type ViewTransitionOutcome =
+  | {
+      reason: 'aborted' | 'hidden' | 'in-flight' | 'unsupported'
+      transitioned: false
+    }
   | { transitioned: true }
 
 /** A promise-returning update is not this API's shape, and saying so in the type is half of enforcing it. */
@@ -74,15 +74,19 @@ type Synchronous<T> = T extends PromiseLike<unknown> ? never : T
 
 class AsyncUpdateError extends TypeError {
   constructor() {
-    super('runViewTransition() requires a synchronous update: do not await, schedule a frame, or return a'
-      + ' promise from the update callback. A promise is handed to the browser as a pending callback, and'
-      + ' awaiting a rendering frame inside it deadlocks the transition permanently.')
+    super(
+      'runViewTransition() requires a synchronous update: do not await, schedule a frame, or return a' +
+        ' promise from the update callback. A promise is handed to the browser as a pending callback, and' +
+        ' awaiting a rendering frame inside it deadlocks the transition permanently.',
+    )
     this.name = 'AsyncUpdateError'
   }
 }
 
 const isThenable = (value: unknown): value is PromiseLike<unknown> =>
-  typeof value === 'object' && value !== null && typeof (value as PromiseLike<unknown>).then === 'function'
+  typeof value === 'object' &&
+  value !== null &&
+  typeof (value as PromiseLike<unknown>).then === 'function'
 
 /** The transition in flight for this document, which is what makes concurrency the library's business. */
 let current: null | ViewTransition = null
@@ -128,8 +132,7 @@ const repeatsCurrentInteraction = () => {
       interactionEnd ??= new MessageChannel()
       interactionEnd.port1.onmessage = endInteraction
       interactionEnd.port2.postMessage(0)
-    }
-    else setTimeout(endInteraction, 0)
+    } else setTimeout(endInteraction, 0)
   }
 
   return repeats
@@ -148,7 +151,10 @@ export function runViewTransition<T>(
 ): Promise<ViewTransitionOutcome> {
   const mutate = update as () => unknown
 
-  if (typeof document === 'undefined' || typeof document.startViewTransition !== 'function') {
+  if (
+    typeof document === 'undefined' ||
+    typeof document.startViewTransition !== 'function'
+  ) {
     mutate()
 
     return Promise.resolve({ reason: 'unsupported', transitioned: false })
@@ -167,7 +173,10 @@ export function runViewTransition<T>(
   const repeats = repeatsCurrentInteraction()
   const concurrency = options?.concurrency ?? 'auto'
 
-  if (current && (concurrency === 'coalesce' || (concurrency === 'auto' && repeats))) {
+  if (
+    current &&
+    (concurrency === 'coalesce' || (concurrency === 'auto' && repeats))
+  ) {
     mutate()
 
     return Promise.resolve({ reason: 'in-flight', transitioned: false })

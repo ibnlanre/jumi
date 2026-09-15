@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { execFileSync } from 'node:child_process'
 /**
  * The phrase contract, as a permanent gate stage.
  *
@@ -24,7 +25,6 @@
  * Run: pnpm phrase:check
  */
 import { readFileSync } from 'node:fs'
-import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
 import path from 'node:path'
@@ -56,11 +56,13 @@ const check = (label, condition, detail) => {
   asserted += 1
   if (!condition) failures.push(label)
 
-  console.log(`  ${condition ? '✓' : '✗'} ${label}${detail === undefined ? '' : ` — ${detail}`}`)
+  console.log(
+    `  ${condition ? '✓' : '✗'} ${label}${detail === undefined ? '' : ` — ${detail}`}`,
+  )
 }
 
 /** The class a selector starts with, walked rather than matched: a `]` inside a character class closes it. */
-const classToken = (selector) => {
+const classToken = selector => {
   if (selector[0] !== '.') return null
 
   for (let index = 1; index < selector.length; index += 1) {
@@ -83,10 +85,10 @@ const classToken = (selector) => {
  * when a handler declines the value. Counting rules rather than declarations reports refused candidates as
  * emitted, which is how `animate-font-family-[!]` first looked like a leak.
  */
-const classRules = (css) => {
+const classRules = css => {
   const found = new Map()
 
-  postcss.parse(css).walkRules((rule) => {
+  postcss.parse(css).walkRules(rule => {
     if (!rule.nodes?.length) return
 
     for (const selector of rule.selectors ?? []) {
@@ -99,17 +101,27 @@ const classRules = (css) => {
   return found
 }
 
-const ownerOf = (rules, candidate) => /--probe-owner: ([a-z]+)/.exec(rules.get(candidate) ?? '')?.[1] ?? null
+const ownerOf = (rules, candidate) =>
+  /--probe-owner: ([a-z]+)/.exec(rules.get(candidate) ?? '')?.[1] ?? null
 
 // ── 1 · the host contract the architecture rests on ─────────────────────────────────────────────
 console.log('\n· the host: two handlers, one prefix')
 
 const PROBE_CANDIDATES = [
-  'probe-a-[4rem]', 'probe-a-[abc]', 'probe-a-[0:0%|100:100%]',
-  'probe-b-[4rem]', 'probe-b-[abc]', 'probe-b-[0:0%|100:100%]',
-  'probe-b2-[4rem]', 'probe-b2-[abc]', 'probe-b2-[0:0%|100:100%]',
+  'probe-a-[4rem]',
+  'probe-a-[abc]',
+  'probe-a-[0:0%|100:100%]',
+  'probe-b-[4rem]',
+  'probe-b-[abc]',
+  'probe-b-[0:0%|100:100%]',
+  'probe-b2-[4rem]',
+  'probe-b2-[abc]',
+  'probe-b2-[0:0%|100:100%]',
   'probe-c-[abc]',
-  'probe-d-100', 'probe-d-[4rem]', 'probe-d-[abc]', 'probe-d-[0:0%|100:100%]',
+  'probe-d-100',
+  'probe-d-[4rem]',
+  'probe-d-[abc]',
+  'probe-d-[0:0%|100:100%]',
 ]
 
 const probed = build(await compiler(probeEntry, PROBE_DIR), PROBE_CANDIDATES)
@@ -118,13 +130,16 @@ const owner = candidate => ownerOf(probeRules, candidate)
 
 check(
   'a typed handler alone refuses a phrase, and accepts only its own type',
-  owner('probe-a-[4rem]') === 'typed' && owner('probe-a-[abc]') === null && owner('probe-a-[0:0%|100:100%]') === null,
+  owner('probe-a-[4rem]') === 'typed' &&
+    owner('probe-a-[abc]') === null &&
+    owner('probe-a-[0:0%|100:100%]') === null,
   `[4rem] → ${owner('probe-a-[4rem]')}, [abc] → ${owner('probe-a-[abc]') ?? 'no rule'}, phrase → ${owner('probe-a-[0:0%|100:100%]') ?? 'no rule'}`,
 )
 
 check(
   'a second handler beside it takes the phrase, and the typed one keeps the scalar',
-  owner('probe-b-[4rem]') === 'typed' && owner('probe-b-[0:0%|100:100%]') === 'phrase',
+  owner('probe-b-[4rem]') === 'typed' &&
+    owner('probe-b-[0:0%|100:100%]') === 'phrase',
   `[4rem] → ${owner('probe-b-[4rem]')}, phrase → ${owner('probe-b-[0:0%|100:100%]')}`,
 )
 
@@ -136,10 +151,11 @@ check(
 
 check(
   'registration order is irrelevant, which is what makes this safe to rely on',
-  ['[4rem]', '[abc]', '[0:0%|100:100%]'].every(value =>
-    owner(`probe-b-${value}`) === owner(`probe-b2-${value}`)),
-  `forward ${['[4rem]', '[abc]', '[0:0%|100:100%]'].map(value => owner(`probe-b-${value}`) ?? 'none').join(' / ')}`
-  + ` · reversed ${['[4rem]', '[abc]', '[0:0%|100:100%]'].map(value => owner(`probe-b2-${value}`) ?? 'none').join(' / ')}`,
+  ['[4rem]', '[abc]', '[0:0%|100:100%]'].every(
+    value => owner(`probe-b-${value}`) === owner(`probe-b2-${value}`),
+  ),
+  `forward ${['[4rem]', '[abc]', '[0:0%|100:100%]'].map(value => owner(`probe-b-${value}`) ?? 'none').join(' / ')}` +
+    ` · reversed ${['[4rem]', '[abc]', '[0:0%|100:100%]'].map(value => owner(`probe-b2-${value}`) ?? 'none').join(' / ')}`,
 )
 
 check(
@@ -150,7 +166,9 @@ check(
 
 check(
   'a named value goes to the typed handler, and a phrase to the phrase handler',
-  owner('probe-d-100') === 'typed' && owner('probe-d-[4rem]') === 'typed' && owner('probe-d-[0:0%|100:100%]') === 'phrase',
+  owner('probe-d-100') === 'typed' &&
+    owner('probe-d-[4rem]') === 'typed' &&
+    owner('probe-d-[0:0%|100:100%]') === 'phrase',
   `100 → ${owner('probe-d-100')}, [4rem] → ${owner('probe-d-[4rem]')}, phrase → ${owner('probe-d-[0:0%|100:100%]')}`,
 )
 
@@ -160,7 +178,10 @@ check(
 // typed tween matcher accepts a phrase — and not a number, because a number would be the thing that rots.
 console.log('\n· the table: every typed tween matcher')
 
-const table = readFileSync(path.join(root, 'src', 'properties', 'tween.ts'), 'utf8')
+const table = readFileSync(
+  path.join(root, 'src', 'properties', 'tween.ts'),
+  'utf8',
+)
 const TYPED = []
 
 {
@@ -176,7 +197,8 @@ const TYPED = []
     if (declared && current) {
       const types = declared[1]
 
-      if (!types.includes("'any'") && !types.includes("'*'")) TYPED.push([current, types])
+      if (!types.includes("'any'") && !types.includes("'*'"))
+        TYPED.push([current, types])
 
       current = null
     }
@@ -197,7 +219,9 @@ const swept = build(await compiler(jumiEntry, root), [
 ])
 
 const sweptRules = classRules(swept.css)
-const lost = TYPED.filter(([name]) => !sweptRules.has(`${name}-[0:initial|100:initial]`))
+const lost = TYPED.filter(
+  ([name]) => !sweptRules.has(`${name}-[0:initial|100:initial]`),
+)
 const loose = TYPED.filter(([name]) => sweptRules.has(`${name}-[abc]`))
 
 /**
@@ -208,13 +232,14 @@ const loose = TYPED.filter(([name]) => sweptRules.has(`${name}-[abc]`))
  * in two hundred lines is a stage nobody reads, so the count carries the scale and the names carry the
  * shape.
  */
-const sample = (names) => `${names.slice(0, 5).join(', ')}${names.length > 5 ? `, and ${names.length - 5} more` : ''}`
+const sample = names =>
+  `${names.slice(0, 5).join(', ')}${names.length > 5 ? `, and ${names.length - 5} more` : ''}`
 
 check(
   'every one of them accepts a valid phrase',
   lost.length === 0,
-  `${TYPED.length} matchers derived from the source, ${lost.length} refused`
-  + `${lost.length ? ` (${sample(lost.map(([name]) => name))})` : ''}`,
+  `${TYPED.length} matchers derived from the source, ${lost.length} refused` +
+    `${lost.length ? ` (${sample(lost.map(([name]) => name))})` : ''}`,
 )
 
 // Reported, not asserted. Whether an invalid scalar is refused is Tailwind's grammar for the property, and
@@ -222,14 +247,17 @@ check(
 // validation — `animate-font-family-[abc]` is a valid family name, and `animate-width-[abc]` is accepted
 // because that matcher's type list contains `any`. A count that moved would be worth a look; a matcher on
 // this list is not a defect.
-console.log(`  · accepted an invalid scalar (host grammar, not asserted): ${loose.length}`
-  + `${loose.length ? ` — ${sample(loose.map(([name]) => name))}` : ''}`)
+console.log(
+  `  · accepted an invalid scalar (host grammar, not asserted): ${loose.length}` +
+    `${loose.length ? ` — ${sample(loose.map(([name]) => name))}` : ''}`,
+)
 
 // The one representative that is both typed and strict: a length-percentage, which is where phrases were
 // first found to vanish.
 check(
   'a strict typed matcher still refuses an invalid scalar, and still takes a phrase',
-  !sweptRules.has('animate-offset-distance-[abc]') && sweptRules.has('animate-offset-distance-[0:0%|100:100%]'),
+  !sweptRules.has('animate-offset-distance-[abc]') &&
+    sweptRules.has('animate-offset-distance-[0:0%|100:100%]'),
   `[abc] → ${sweptRules.has('animate-offset-distance-[abc]') ? 'emitted' : 'no rule'}, phrase → ${sweptRules.has('animate-offset-distance-[0:0%|100:100%]') ? 'emitted' : 'no rule'}`,
 )
 
@@ -241,27 +269,46 @@ check(
 console.log('\n· values that resemble a phrase, but are not one')
 
 const LOOKALIKES = [
-  ['a data URL', 'animate-background-image-[url(data:image/png;base64,iVBORw0KGgo=)]'],
-  ['a colour function', 'animate-background-color-[color-mix(in_srgb,red_50%,blue)]'],
+  [
+    'a data URL',
+    'animate-background-image-[url(data:image/png;base64,iVBORw0KGgo=)]',
+  ],
+  [
+    'a colour function',
+    'animate-background-color-[color-mix(in_srgb,red_50%,blue)]',
+  ],
   ['a value with a colon and no offset', 'animate-width-[calc(1px:2px)]'],
 ]
 
-const lookalikes = build(await compiler(jumiEntry, root), LOOKALIKES.map(([, candidate]) => candidate))
+const lookalikes = build(
+  await compiler(jumiEntry, root),
+  LOOKALIKES.map(([, candidate]) => candidate),
+)
 const lookalikeRules = classRules(lookalikes.css)
 
 for (const [kind, candidate] of LOOKALIKES) {
-  check(`${kind} keeps the scalar route`, lookalikeRules.has(candidate), candidate)
+  check(
+    `${kind} keeps the scalar route`,
+    lookalikeRules.has(candidate),
+    candidate,
+  )
 }
 
-console.log(`\n  ${asserted - failures.length}/${asserted} phrase-contract behaviours hold`)
+console.log(
+  `\n  ${asserted - failures.length}/${asserted} phrase-contract behaviours hold`,
+)
 
 if (failures.length) {
   console.error('\n✗ phrases and scalars do not route as the contract says:')
 
   for (const failure of failures) console.error(`  ${failure}`)
 
-  console.error('\n  Scalars must keep the host\'s validation, and only phrases take the bypass.')
+  console.error(
+    "\n  Scalars must keep the host's validation, and only phrases take the bypass.",
+  )
   process.exit(1)
 }
 
-console.log('\n✓ scalars keep the host type check, phrases reach Jumi, and one shared prefix is enough')
+console.log(
+  '\n✓ scalars keep the host type check, phrases reach Jumi, and one shared prefix is enough',
+)

@@ -56,7 +56,10 @@ export const themeTokens: Record<string, TokenNamespace> = {
   dropShadow: { literal: ['DEFAULT', 'none'], namespace: 'drop-shadow' },
   letterSpacing: { namespace: 'tracking' },
   lineHeight: { literal: ['none'], namespace: 'leading' },
-  maxWidth: { literal: ['fit', 'full', 'max', 'min', 'none', 'prose', 'px'], namespace: 'container' },
+  maxWidth: {
+    literal: ['fit', 'full', 'max', 'min', 'none', 'prose', 'px'],
+    namespace: 'container',
+  },
   outlineColor: { namespace: 'color' },
 }
 

@@ -39,32 +39,37 @@ const CASES = [
     id: 'shorthand',
     open: 'display: block; opacity: 1',
     start: true,
-    style: 'display: none; opacity: 0; transition: opacity 300ms, display 300ms allow-discrete',
+    style:
+      'display: none; opacity: 0; transition: opacity 300ms, display 300ms allow-discrete',
   },
   {
     about: 'the same, allow-discrete as a longhand',
     id: 'longhand',
     open: 'display: block; opacity: 1',
     start: true,
-    style: 'display: none; opacity: 0; transition-property: opacity, display; transition-duration: 300ms; transition-behavior: allow-discrete',
+    style:
+      'display: none; opacity: 0; transition-property: opacity, display; transition-duration: 300ms; transition-behavior: allow-discrete',
   },
   {
     about: 'the same again, with no allow-discrete at all',
     id: 'refused',
     open: 'display: block; opacity: 1',
-    style: 'display: none; opacity: 0; transition: opacity 300ms, display 300ms',
+    style:
+      'display: none; opacity: 0; transition: opacity 300ms, display 300ms',
   },
   {
     about: 'content-visibility hidden → visible',
     id: 'contentVisibility',
     open: 'content-visibility: visible; opacity: 1',
-    style: 'content-visibility: hidden; opacity: 0; transition: opacity 300ms, content-visibility 300ms allow-discrete',
+    style:
+      'content-visibility: hidden; opacity: 0; transition: opacity 300ms, content-visibility 300ms allow-discrete',
   },
   {
     about: 'visibility hidden → visible',
     id: 'visibility',
     open: 'visibility: visible; opacity: 1',
-    style: 'visibility: hidden; opacity: 0; transition: opacity 300ms, visibility 300ms allow-discrete',
+    style:
+      'visibility: hidden; opacity: 0; transition: opacity 300ms, visibility 300ms allow-discrete',
   },
   {
     about: 'an ordinary style change, nothing discrete',
@@ -80,9 +85,11 @@ const htmlFor = () => `<!doctype html>
   body { margin: 0; font: 12px/1.4 system-ui; }
   #board { position: relative; padding: 8px; }
   #board > * { width: 40px; height: 20px; background: #333; margin: 4px; color: #333; font-size: 8px; }
-${CASES.map((item) => `  #${item.id} { ${item.style} }
+${CASES.map(
+  item => `  #${item.id} { ${item.style} }
   #${item.id}.open { ${item.open} }
-${item.start ? `  @starting-style { #${item.id}.open { opacity: 0; } }` : ''}`).join('\n')}
+${item.start ? `  @starting-style { #${item.id}.open { opacity: 0; } }` : ''}`,
+).join('\n')}
   /* A newly inserted element: the same styles, once with a starting style and once without. The first
      version of this probe gave the element no transition at all, so "no transition ran" was its own
      bug rather than an answer. */
@@ -176,10 +183,12 @@ ${CASES.map(item => `  <div id="${item.id}"></div>`).join('\n')}
 </script>
 </body></html>`
 
-const server = (await import('node:http')).createServer((request, response) => {
-  response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
-  response.end(htmlFor())
-}).listen(0)
+const server = (await import('node:http'))
+  .createServer((request, response) => {
+    response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
+    response.end(htmlFor())
+  })
+  .listen(0)
 
 const browser = await chromium.launch()
 const page = await browser.newPage()
@@ -188,21 +197,37 @@ await page.waitForFunction(() => window.__ready === true)
 
 const FRACTIONS = [0, 0.25, 0.5, 0.75, 1]
 const line = (label, value) => console.log(`  ${label.padEnd(38)} ${value}`)
-const show = samples => samples
-  .map(sample => `${sample.display === 'none' ? 'none' : sample.display}/${sample.opacity}${sample.visible ? '+' : '-'}`)
-  .join('  ')
+const show = samples =>
+  samples
+    .map(
+      sample =>
+        `${sample.display === 'none' ? 'none' : sample.display}/${sample.opacity}${sample.visible ? '+' : '-'}`,
+    )
+    .join('  ')
 
 // ── 1 & 2 & 4 · lifecycle, flip timing, and the two properties with their own rules ──────────────
 console.log('\n1 · entering and leaving, and where the flip lands')
 console.log('─'.repeat(86))
 
 for (const item of CASES) {
-  const opened = await page.evaluate(({ fractions, id }) => window.__transition(id, true, fractions), { fractions: FRACTIONS, id: item.id })
-  const closed = await page.evaluate(({ fractions, id }) => window.__transition(id, false, fractions), { fractions: FRACTIONS, id: item.id })
+  const opened = await page.evaluate(
+    ({ fractions, id }) => window.__transition(id, true, fractions),
+    { fractions: FRACTIONS, id: item.id },
+  )
+  const closed = await page.evaluate(
+    ({ fractions, id }) => window.__transition(id, false, fractions),
+    { fractions: FRACTIONS, id: item.id },
+  )
 
   line(item.about, `open ${opened.properties.join('+') || '—'}`)
-  line('  in  (display/opacity/visible)', opened.settled ? show(opened.samples) : 'no transition ran')
-  line('  out (display/opacity/visible)', closed.settled ? show(closed.samples) : 'no transition ran')
+  line(
+    '  in  (display/opacity/visible)',
+    opened.settled ? show(opened.samples) : 'no transition ran',
+  )
+  line(
+    '  out (display/opacity/visible)',
+    closed.settled ? show(closed.samples) : 'no transition ran',
+  )
 }
 
 // ── 3 · the four ways an element becomes present ────────────────────────────────────────────────
@@ -210,15 +235,27 @@ console.log('\n3 · @starting-style, and what it is for')
 console.log('─'.repeat(86))
 
 for (const starting of [false, true]) {
-  const inserted = await page.evaluate(start => window.__insert(start), starting)
+  const inserted = await page.evaluate(
+    start => window.__insert(start),
+    starting,
+  )
 
-  line(`a newly inserted element${starting ? ' with a starting style' : ''}`,
-    inserted.properties.join('+') || `no transition (opacity ${inserted.computed})`)
+  line(
+    `a newly inserted element${starting ? ' with a starting style' : ''}`,
+    inserted.properties.join('+') ||
+      `no transition (opacity ${inserted.computed})`,
+  )
 }
 
-line('from display:none (shorthand case)', 'covered above: the open state is entered from `display: none`')
+line(
+  'from display:none (shorthand case)',
+  'covered above: the open state is entered from `display: none`',
+)
 line('into the top layer (dialog)', 'see below')
-line('an ordinary style change (already present)', 'covered above: `opacity` only, one transition')
+line(
+  'an ordinary style change (already present)',
+  'covered above: `opacity` only, one transition',
+)
 
 const modal = await page.evaluate(async () => {
   const node = document.getElementById('modal')
@@ -226,51 +263,76 @@ const modal = await page.evaluate(async () => {
   node.classList.add('open')
   node.showModal()
 
-  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+  await new Promise(resolve =>
+    requestAnimationFrame(() => requestAnimationFrame(resolve)),
+  )
 
-  const running = [...document.getAnimations()].filter(animation => animation.effect?.target === node)
+  const running = [...document.getAnimations()].filter(
+    animation => animation.effect?.target === node,
+  )
 
-  return { properties: [...new Set(running.map(animation => animation.transitionProperty))], top: node.matches(':modal') }
+  return {
+    properties: [
+      ...new Set(running.map(animation => animation.transitionProperty)),
+    ],
+    top: node.matches(':modal'),
+  }
 })
 
-line('a dialog entering the top layer', `${modal.properties.join('+') || '—'} · :modal ${modal.top}`)
+line(
+  'a dialog entering the top layer',
+  `${modal.properties.join('+') || '—'} · :modal ${modal.top}`,
+)
 
 const popover = await page.evaluate(async () => {
   const node = document.getElementById('pop')
 
   node.showPopover()
 
-  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+  await new Promise(resolve =>
+    requestAnimationFrame(() => requestAnimationFrame(resolve)),
+  )
 
-  const running = [...document.getAnimations()].filter(animation => animation.effect?.target === node)
+  const running = [...document.getAnimations()].filter(
+    animation => animation.effect?.target === node,
+  )
 
   return {
     open: node.matches(':popover-open'),
-    properties: [...new Set(running.map(animation => animation.transitionProperty))],
     overlay: getComputedStyle(node).overlay,
+    properties: [
+      ...new Set(running.map(animation => animation.transitionProperty)),
+    ],
   }
 })
 
-line('a popover entering the top layer', `${popover.properties.join('+') || '—'} · overlay ${popover.overlay} · open ${popover.open}`)
+line(
+  'a popover entering the top layer',
+  `${popover.properties.join('+') || '—'} · overlay ${popover.overlay} · open ${popover.open}`,
+)
 
 // ── 5 · timelines ───────────────────────────────────────────────────────────────────────────────
 console.log('\n5 · can anything other than document time drive one?')
 console.log('─'.repeat(86))
 
-const timelines = await page.evaluate(() => window.__supports([
-  ['transition-timeline', 'scroll()'],
-  ['transition-behavior', 'allow-discrete'],
-  ['overlay', 'auto'],
-  ['content-visibility', 'hidden'],
-  ['@starting-style', 'x'],
-]))
+const timelines = await page.evaluate(() =>
+  window.__supports([
+    ['transition-timeline', 'scroll()'],
+    ['transition-behavior', 'allow-discrete'],
+    ['overlay', 'auto'],
+    ['content-visibility', 'hidden'],
+    ['@starting-style', 'x'],
+  ]),
+)
 
-for (const [property, value, ok] of timelines) line(`${property}: ${value}`, ok ? 'supported' : 'REFUSED')
+for (const [property, value, ok] of timelines)
+  line(`${property}: ${value}`, ok ? 'supported' : 'REFUSED')
 
 const scrollFlip = await page.evaluate(async () => {
   const sheet = document.createElement('style')
 
-  sheet.textContent = '@keyframes flip { to { display: block } } #probe { display: none; animation: flip 1s linear both; }'
+  sheet.textContent =
+    '@keyframes flip { to { display: block } } #probe { display: none; animation: flip 1s linear both; }'
   document.head.append(sheet)
 
   const node = document.createElement('div')
@@ -278,9 +340,13 @@ const scrollFlip = await page.evaluate(async () => {
   node.id = 'probe'
   document.body.append(node)
 
-  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+  await new Promise(resolve =>
+    requestAnimationFrame(() => requestAnimationFrame(resolve)),
+  )
 
-  const animations = [...document.getAnimations()].filter(animation => animation.effect?.target === node)
+  const animations = [...document.getAnimations()].filter(
+    animation => animation.effect?.target === node,
+  )
   const before = getComputedStyle(node).display
 
   // Halfway is where a discrete step lands, if a keyframe can carry one at all.
@@ -289,7 +355,9 @@ const scrollFlip = await page.evaluate(async () => {
     animation.currentTime = 500
   }
 
-  await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+  await new Promise(resolve =>
+    requestAnimationFrame(() => requestAnimationFrame(resolve)),
+  )
 
   const middle = getComputedStyle(node).display
 
@@ -299,9 +367,12 @@ const scrollFlip = await page.evaluate(async () => {
   return { animations: animations.length, before, middle }
 })
 
-line('a discrete property inside @keyframes', scrollFlip.animations
-  ? `animations ${scrollFlip.animations}, display ${scrollFlip.before} at 0 → ${scrollFlip.middle} at 50%`
-  : 'NOT MEASURED — the probe\'s animation never materialises, so this says nothing about the engine')
+line(
+  'a discrete property inside @keyframes',
+  scrollFlip.animations
+    ? `animations ${scrollFlip.animations}, display ${scrollFlip.before} at 0 → ${scrollFlip.middle} at 50%`
+    : "NOT MEASURED — the probe's animation never materialises, so this says nothing about the engine",
+)
 
 // ── 6 · Jumi's own substrate ────────────────────────────────────────────────────────────────────
 console.log('\n6 · Jumi, read rather than assumed')
@@ -324,18 +395,40 @@ const CANDIDATES = [
 
 const emitted = build(await compiler(entry, root), CANDIDATES)
 const rules = emitted.css.match(/[^{}]+\{[^{}]*\}/g) ?? []
-const composition = rules.filter(rule => /\btransition:\s/.test(rule)).pop() ?? ''
+const composition =
+  rules.filter(rule => /\btransition:\s/.test(rule)).pop() ?? ''
 const shorthandAt = composition.indexOf('transition:')
 const behaviorAt = composition.indexOf('transition-behavior')
 
-line('a control writes', (rules.find(rule => rule.includes('--jumi-transition-behavior')) ?? 'nothing').replace(/\s+/g, ' ').slice(0, 74))
-line('the composition declares', composition.replace(/\s+/g, ' ').slice(composition.indexOf('transition:'), composition.indexOf('transition:') + 74) || 'nothing')
-line('transition-behavior position', behaviorAt === -1
-  ? 'absent from the composition'
-  : `after the shorthand (${shorthandAt} < ${behaviorAt}) — the shorthand resets it, so this is the side that survives`)
-line('warnings', emitted.warnings.length ? emitted.warnings.join(' | ') : 'none')
+line(
+  'a control writes',
+  (rules.find(rule => rule.includes('--jumi-transition-behavior')) ?? 'nothing')
+    .replace(/\s+/g, ' ')
+    .slice(0, 74),
+)
+line(
+  'the composition declares',
+  composition
+    .replace(/\s+/g, ' ')
+    .slice(
+      composition.indexOf('transition:'),
+      composition.indexOf('transition:') + 74,
+    ) || 'nothing',
+)
+line(
+  'transition-behavior position',
+  behaviorAt === -1
+    ? 'absent from the composition'
+    : `after the shorthand (${shorthandAt} < ${behaviorAt}) — the shorthand resets it, so this is the side that survives`,
+)
+line(
+  'warnings',
+  emitted.warnings.length ? emitted.warnings.join(' | ') : 'none',
+)
 
 await browser.close()
 server.close()
 
-console.log(`\n${CASES.length} cases, ${FRACTIONS.length} samples each, in Chromium.`)
+console.log(
+  `\n${CASES.length} cases, ${FRACTIONS.length} samples each, in Chromium.`,
+)

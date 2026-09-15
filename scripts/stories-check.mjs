@@ -30,10 +30,18 @@ const failures = []
 
 // The registry, read exactly as `prepare-stories.mjs` reads it, so the two cannot disagree about
 // what the source of truth is.
-const registry = readFileSync(path.join(root, 'src/keyframes/effects.ts'), 'utf8')
-const known = new Set([...registry.matchAll(/'@keyframes jumi-([^']+)'/g)].map(match => match[1]))
+const registry = readFileSync(
+  path.join(root, 'src/keyframes/effects.ts'),
+  'utf8',
+)
+const known = new Set(
+  [...registry.matchAll(/'@keyframes jumi-([^']+)'/g)].map(match => match[1]),
+)
 
-if (!known.size) failures.push('src/keyframes/effects.ts: no effects found — the extraction has gone stale')
+if (!known.size)
+  failures.push(
+    'src/keyframes/effects.ts: no effects found — the extraction has gone stale',
+  )
 
 /* ------------------------------------------------------------------------------------
  * 1. The generated catalog is current
@@ -41,19 +49,34 @@ if (!known.size) failures.push('src/keyframes/effects.ts: no effects found — t
 
 const catalogPath = path.join(root, 'stories/animations/effects.generated.ts')
 const generated = readFileSync(catalogPath, 'utf8')
-const declared = new Set([...generated.matchAll(/"class":\s*"([^"]+)"/g)].map(match => match[1]))
+// Either quote style, and in either place: the catalog is read as text, and pinning the quotes meant
+// the check depended on a serialization detail rather than on the effects it is there to compare.
+// Reformatted output silently parsed as zero effects — which reads exactly like a file that is
+// missing every effect it should have. The value has to stay quoted, so the interface's own
+// `class: string` declaration is not read as an effect.
+const declared = new Set(
+  [
+    ...generated.matchAll(
+      /(?<![\w$-])(?:'|")?class(?:'|")?:\s*(?:'|")([^'"]+)(?:'|")/g,
+    ),
+  ].map(match => match[1]),
+)
 
 const ungenerated = [...known].filter(name => !declared.has(name))
 const invented = [...declared].filter(name => !known.has(name))
 
 if (ungenerated.length) {
-  failures.push(`effects.generated.ts is stale: ${ungenerated.length} effect(s) missing`
-    + ` — ${ungenerated.slice(0, 8).join(', ')}${ungenerated.length > 8 ? ', …' : ''}`)
+  failures.push(
+    `effects.generated.ts is stale: ${ungenerated.length} effect(s) missing` +
+      ` — ${ungenerated.slice(0, 8).join(', ')}${ungenerated.length > 8 ? ', …' : ''}`,
+  )
 }
 
 if (invented.length) {
-  failures.push(`effects.generated.ts names ${invented.length} effect(s) that do not exist`
-    + ` — ${invented.slice(0, 8).join(', ')}${invented.length > 8 ? ', …' : ''}`)
+  failures.push(
+    `effects.generated.ts names ${invented.length} effect(s) that do not exist` +
+      ` — ${invented.slice(0, 8).join(', ')}${invented.length > 8 ? ', …' : ''}`,
+  )
 }
 
 /* ------------------------------------------------------------------------------------
@@ -61,15 +84,16 @@ if (invented.length) {
  * ---------------------------------------------------------------------------------- */
 
 const files = []
-const walk = (target) => {
+const walk = target => {
   const absolute = path.join(root, target)
 
   if (statSync(absolute).isFile()) return [absolute]
 
-  return readdirSync(absolute, { withFileTypes: true }).flatMap((entry) => {
+  return readdirSync(absolute, { withFileTypes: true }).flatMap(entry => {
     const child = path.join(target, entry.name)
 
-    if (entry.isDirectory()) return entry.name === 'node_modules' ? [] : walk(child)
+    if (entry.isDirectory())
+      return entry.name === 'node_modules' ? [] : walk(child)
 
     return /\.tsx?$/.test(entry.name) ? [path.join(root, child)] : []
   })
@@ -95,28 +119,39 @@ for (const file of walk('stories')) {
     references.push({ file: relative, name: match[1].slice('animate-'.length) })
   }
 
-  for (const match of source.matchAll(/class:\s*'([^']+)'/g)) references.push({ file: relative, name: match[1] })
+  for (const match of source.matchAll(/class:\s*'([^']+)'/g))
+    references.push({ file: relative, name: match[1] })
 
-  for (const match of source.matchAll(/animation-(?:duration|delay)-(\d+\.\d+)/g)) {
-    fractional.push(`${relative}: animation-${match[0].includes('duration') ? 'duration' : 'delay'}-${match[1]}`)
+  for (const match of source.matchAll(
+    /animation-(?:duration|delay)-(\d+\.\d+)/g,
+  )) {
+    fractional.push(
+      `${relative}: animation-${match[0].includes('duration') ? 'duration' : 'delay'}-${match[1]}`,
+    )
   }
 }
 
 const unresolved = references.filter(({ name }) => !known.has(name))
 
 if (unprefixed.length) {
-  failures.push(`${unprefixed.length} \`animationClass\` value(s) are missing their \`animate-\` prefix`
-    + ` — ${unprefixed.slice(0, 4).join('; ')}`)
+  failures.push(
+    `${unprefixed.length} \`animationClass\` value(s) are missing their \`animate-\` prefix` +
+      ` — ${unprefixed.slice(0, 4).join('; ')}`,
+  )
 }
 
 if (unresolved.length) {
-  failures.push(`${unresolved.length} story reference(s) name an effect that does not exist`
-    + ` — ${[...new Set(unresolved.map(entry => `${entry.name} in ${entry.file}`))].slice(0, 6).join('; ')}`)
+  failures.push(
+    `${unresolved.length} story reference(s) name an effect that does not exist` +
+      ` — ${[...new Set(unresolved.map(entry => `${entry.name} in ${entry.file}`))].slice(0, 6).join('; ')}`,
+  )
 }
 
 if (fractional.length) {
-  failures.push(`${fractional.length} fractional duration/delay token(s): ${fractional.slice(0, 4).join(', ')}`
-    + ' (the scale is the host\'s `transitionDuration` / `transitionDelay`, in milliseconds)')
+  failures.push(
+    `${fractional.length} fractional duration/delay token(s): ${fractional.slice(0, 4).join(', ')}` +
+      " (the scale is the host's `transitionDuration` / `transitionDelay`, in milliseconds)",
+  )
 }
 
 /* ------------------------------------------------------------------------------------
@@ -137,15 +172,20 @@ const checks = [
   { detail: 'no fractional duration or delay', pass: !fractional.length },
 ]
 
-for (const check of checks) console.log(`    ${check.pass ? '✓' : '✗'} ${check.detail}`)
+for (const check of checks)
+  console.log(`    ${check.pass ? '✓' : '✗'} ${check.detail}`)
 
 if (failures.length) {
   console.error('\n✗ the Storybook does not match the effects Jumi ships:')
 
   for (const failure of failures) console.error(`  ${failure}`)
 
-  console.error('\n  An unknown `animate-*` class compiles to nothing and animates nothing, without an')
-  console.error('  error. Regenerate with `pnpm stories:prepare` if the effects changed.')
+  console.error(
+    '\n  An unknown `animate-*` class compiles to nothing and animates nothing, without an',
+  )
+  console.error(
+    '  error. Regenerate with `pnpm stories:prepare` if the effects changed.',
+  )
   process.exit(1)
 }
 

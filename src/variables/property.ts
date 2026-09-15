@@ -6,12 +6,20 @@ import {
   animationRangeEnd,
   animationRangeStart,
 } from '@/composition/animation-range'
-import { animationTimelineInset, animationTimelineScroll, animationTimelineView } from '@/composition/animation-timeline'
+import {
+  animationTimelineInset,
+  animationTimelineScroll,
+  animationTimelineView,
+} from '@/composition/animation-timeline'
 import { aspectRatio } from '@/composition/aspect-ratio'
 import { backdropFilter } from '@/composition/backdrop-filter'
 import { backdropFilterDropShadow } from '@/composition/backdrop-filter-drop-shadow'
 import { background } from '@/composition/background'
-import { backgroundPosition, backgroundPositionX, backgroundPositionY } from '@/composition/background-position'
+import {
+  backgroundPosition,
+  backgroundPositionX,
+  backgroundPositionY,
+} from '@/composition/background-position'
 import { backgroundRepeat } from '@/composition/background-repeat'
 import { backgroundSize } from '@/composition/background-size'
 import { border } from '@/composition/border'
@@ -21,7 +29,11 @@ import { borderBlockRadius } from '@/composition/border-block-radius'
 import { borderBlockStart } from '@/composition/border-block-start'
 import { borderBottom } from '@/composition/border-bottom'
 import { borderImage } from '@/composition/border-image'
-import { borderImageOutset, borderImageOutsetX, borderImageOutsetY } from '@/composition/border-image-outset'
+import {
+  borderImageOutset,
+  borderImageOutsetX,
+  borderImageOutsetY,
+} from '@/composition/border-image-outset'
 import { borderImageRepeat } from '@/composition/border-image-repeat'
 import { borderInline } from '@/composition/border-inline'
 import { borderInlineEnd } from '@/composition/border-inline-end'
@@ -31,7 +43,11 @@ import { borderLeft } from '@/composition/border-left'
 import { borderRadius } from '@/composition/border-radius'
 import { borderRight } from '@/composition/border-right'
 import { borderTop } from '@/composition/border-top'
-import { boxShadow, boxShadowInset, boxShadowOutset } from '@/composition/box-shadow'
+import {
+  boxShadow,
+  boxShadowInset,
+  boxShadowOutset,
+} from '@/composition/box-shadow'
 import { columnRule } from '@/composition/column-rule'
 import { columns } from '@/composition/columns'
 import { container } from '@/composition/container'
@@ -55,14 +71,34 @@ import { margin } from '@/composition/margin'
 import { marginBlock } from '@/composition/margin-block'
 import { marginInline } from '@/composition/margin-inline'
 import { marker } from '@/composition/marker'
-import { maskBorderOutset, maskBorderOutsetX, maskBorderOutsetY } from '@/composition/mask-border-outset'
+import {
+  maskBorderOutset,
+  maskBorderOutsetX,
+  maskBorderOutsetY,
+} from '@/composition/mask-border-outset'
 import { maskBorderRepeat } from '@/composition/mask-border-repeat'
-import { maskBorderSlice, maskBorderSliceX, maskBorderSliceY } from '@/composition/mask-border-slice'
+import {
+  maskBorderSlice,
+  maskBorderSliceX,
+  maskBorderSliceY,
+} from '@/composition/mask-border-slice'
 import { maskPosition } from '@/composition/mask-position'
 import { mathDepth } from '@/composition/math-depth'
-import { objectPosition, objectPositionX, objectPositionY } from '@/composition/object-position'
-import { offsetAnchor, offsetAnchorX, offsetAnchorY } from '@/composition/offset-anchor'
-import { offsePosition, offsetPositionX, offsetPositionY } from '@/composition/offset-position'
+import {
+  objectPosition,
+  objectPositionX,
+  objectPositionY,
+} from '@/composition/object-position'
+import {
+  offsetAnchor,
+  offsetAnchorX,
+  offsetAnchorY,
+} from '@/composition/offset-anchor'
+import {
+  offsePosition,
+  offsetPositionX,
+  offsetPositionY,
+} from '@/composition/offset-position'
 import { outline } from '@/composition/outline'
 import { overflow } from '@/composition/overflow'
 import { overscrollBehavior } from '@/composition/overscroll-behavior'
@@ -210,7 +246,10 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-animation-timeline-axis',
   },
   'animation-timeline-inset': {
-    dependencies: ['animation-timeline-inset-start', 'animation-timeline-inset-end'],
+    dependencies: [
+      'animation-timeline-inset-start',
+      'animation-timeline-inset-end',
+    ],
     value: animationTimelineInset,
     variable: '--jumi-animation-timeline-inset',
   },
@@ -387,7 +426,10 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-background-position',
   },
   'background-position-x': {
-    dependencies: ['background-position-x-edge', 'background-position-x-offset'],
+    dependencies: [
+      'background-position-x-edge',
+      'background-position-x-offset',
+    ],
     value: backgroundPositionX,
     variable: '--jumi-background-position-x',
   },
@@ -400,7 +442,10 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-background-position-x-offset',
   },
   'background-position-y': {
-    dependencies: ['background-position-y-edge', 'background-position-y-offset'],
+    dependencies: [
+      'background-position-y-edge',
+      'background-position-y-offset',
+    ],
     value: backgroundPositionY,
     variable: '--jumi-background-position-y',
   },
@@ -448,7 +493,11 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-border',
   },
   'border-block': {
-    dependencies: ['border-block-width', 'border-block-style', 'border-block-color'],
+    dependencies: [
+      'border-block-width',
+      'border-block-style',
+      'border-block-color',
+    ],
     value: borderBlock,
     variable: '--jumi-border-block',
   },
@@ -457,7 +506,11 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-border-block-color',
   },
   'border-block-end': {
-    dependencies: ['border-block-end-width', 'border-block-end-style', 'border-block-end-color'],
+    dependencies: [
+      'border-block-end-width',
+      'border-block-end-style',
+      'border-block-end-color',
+    ],
     value: borderBlockEnd,
     variable: '--jumi-border-block-end',
   },
@@ -483,7 +536,11 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-border-block-radius',
   },
   'border-block-start': {
-    dependencies: ['border-block-start-width', 'border-block-start-style', 'border-block-start-color'],
+    dependencies: [
+      'border-block-start-width',
+      'border-block-start-style',
+      'border-block-start-color',
+    ],
     value: borderBlockStart,
     variable: '--jumi-border-block-start',
   },
@@ -512,7 +569,11 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-border-block-width',
   },
   'border-bottom': {
-    dependencies: ['border-bottom-width', 'border-bottom-style', 'border-bottom-color'],
+    dependencies: [
+      'border-bottom-width',
+      'border-bottom-style',
+      'border-bottom-color',
+    ],
     value: borderBottom,
     variable: '--jumi-border-bottom',
   },
@@ -629,7 +690,11 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-border-image-width',
   },
   'border-inline': {
-    dependencies: ['border-inline-width', 'border-inline-style', 'border-inline-color'],
+    dependencies: [
+      'border-inline-width',
+      'border-inline-style',
+      'border-inline-color',
+    ],
     value: borderInline,
     variable: '--jumi-border-inline',
   },
@@ -638,7 +703,11 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-border-inline-color',
   },
   'border-inline-end': {
-    dependencies: ['border-inline-end-width', 'border-inline-end-style', 'border-inline-end-color'],
+    dependencies: [
+      'border-inline-end-width',
+      'border-inline-end-style',
+      'border-inline-end-color',
+    ],
     value: borderInlineEnd,
     variable: '--jumi-border-inline-end',
   },
@@ -664,7 +733,11 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-border-inline-radius',
   },
   'border-inline-start': {
-    dependencies: ['border-inline-start-width', 'border-inline-start-style', 'border-inline-start-color'],
+    dependencies: [
+      'border-inline-start-width',
+      'border-inline-start-style',
+      'border-inline-start-color',
+    ],
     value: borderInlineStart,
     variable: '--jumi-border-inline-start',
   },
@@ -693,7 +766,11 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-border-inline-width',
   },
   'border-left': {
-    dependencies: ['border-left-width', 'border-left-style', 'border-left-color'],
+    dependencies: [
+      'border-left-width',
+      'border-left-style',
+      'border-left-color',
+    ],
     value: borderLeft,
     variable: '--jumi-border-left',
   },
@@ -724,7 +801,11 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-border-radius',
   },
   'border-right': {
-    dependencies: ['border-right-width', 'border-right-style', 'border-right-color'],
+    dependencies: [
+      'border-right-width',
+      'border-right-style',
+      'border-right-color',
+    ],
     value: borderRight,
     variable: '--jumi-border-right',
   },
@@ -913,7 +994,11 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-column-gap',
   },
   'column-rule': {
-    dependencies: ['column-rule-width', 'column-rule-style', 'column-rule-color'],
+    dependencies: [
+      'column-rule-width',
+      'column-rule-style',
+      'column-rule-color',
+    ],
     value: columnRule,
     variable: '--jumi-column-rule',
   },
@@ -1344,7 +1429,11 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-grid-row-start',
   },
   'grid-template': {
-    dependencies: ['grid-template-areas', 'grid-template-columns', 'grid-template-rows'],
+    dependencies: [
+      'grid-template-areas',
+      'grid-template-columns',
+      'grid-template-rows',
+    ],
     value: gridTemplate,
     variable: '--jumi-grid-template',
   },
@@ -1489,7 +1578,11 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-line-height',
   },
   'list-style': {
-    dependencies: ['list-style-type', 'list-style-position', 'list-style-image'],
+    dependencies: [
+      'list-style-type',
+      'list-style-position',
+      'list-style-image',
+    ],
     value: listStyle,
     variable: '--jumi-list-style',
   },
@@ -1506,7 +1599,12 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-list-style-type',
   },
   'margin': {
-    dependencies: ['margin-top', 'margin-right', 'margin-bottom', 'margin-left'],
+    dependencies: [
+      'margin-top',
+      'margin-right',
+      'margin-bottom',
+      'margin-left',
+    ],
     value: margin,
     variable: '--jumi-margin',
   },
@@ -2091,7 +2189,12 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-overscroll-behavior-y',
   },
   'padding': {
-    dependencies: ['padding-top', 'padding-right', 'padding-bottom', 'padding-left'],
+    dependencies: [
+      'padding-top',
+      'padding-right',
+      'padding-bottom',
+      'padding-left',
+    ],
     value: padding,
     variable: '--jumi-padding',
   },
@@ -2770,7 +2873,11 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-vertical-align',
   },
   'view-timeline': {
-    dependencies: ['view-timeline-axis', 'view-timeline-name', 'view-timeline-inset'],
+    dependencies: [
+      'view-timeline-axis',
+      'view-timeline-name',
+      'view-timeline-inset',
+    ],
     value: viewTimeline,
     variable: '--jumi-view-timeline',
   },

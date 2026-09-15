@@ -33,7 +33,13 @@
  *
  * Run: node scripts/measure-real-page.mjs [--site=<dir>] [--json=<path>] [--compare=<path>]
  */
-import { createReadStream, existsSync, readFileSync, statSync, writeFileSync } from 'node:fs'
+import {
+  createReadStream,
+  existsSync,
+  readFileSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs'
 import { createServer } from 'node:http'
 import { fileURLToPath } from 'node:url'
 
@@ -42,7 +48,11 @@ import path from 'node:path'
 const here = path.dirname(fileURLToPath(import.meta.url))
 const root = path.join(here, '..')
 
-const arg = prefix => process.argv.slice(2).find(argument => argument.startsWith(`${prefix}=`))?.slice(prefix.length + 1)
+const arg = prefix =>
+  process.argv
+    .slice(2)
+    .find(argument => argument.startsWith(`${prefix}=`))
+    ?.slice(prefix.length + 1)
 
 const site = path.resolve(root, arg('--site') ?? path.join('docs', 'dist'))
 const jsonPath = arg('--json')
@@ -81,7 +91,10 @@ const TYPES = {
 
 const server = createServer((request, response) => {
   const url = new URL(request.url, 'http://127.0.0.1')
-  const file = path.join(site, decodeURIComponent(url.pathname).replace(/\/$/, '/index.html'))
+  const file = path.join(
+    site,
+    decodeURIComponent(url.pathname).replace(/\/$/, '/index.html'),
+  )
 
   if (!file.startsWith(site) || !existsSync(file) || !statSync(file).isFile()) {
     response.writeHead(404).end('not found')
@@ -105,7 +118,10 @@ const browser = await chromium.launch()
 // Headless Chromium reports `prefers-reduced-motion: reduce` by default, and the catalogue honours
 // it — every glyph then computes `animation-name: none` and a run against the shipped site reads as
 // 228 broken effects. State the preference rather than inherit the default.
-const page = await browser.newPage({ reducedMotion: 'no-preference', viewport: { height: 900, width: 1400 } })
+const page = await browser.newPage({
+  reducedMotion: 'no-preference',
+  viewport: { height: 900, width: 1400 },
+})
 const session = await page.context().newCDPSession(page)
 
 await session.send('DOM.enable')
@@ -121,7 +137,8 @@ await page.goto(`${base}/effects/`, { waitUntil: 'load' })
  * ones. The class is the page's, not a fixture's: this adds the state the page's own script adds.
  */
 await page.evaluate(() => {
-  for (const card of document.querySelectorAll('.effect-card')) card.classList.add('is-playing')
+  for (const card of document.querySelectorAll('.effect-card'))
+    card.classList.add('is-playing')
 })
 
 /**
@@ -132,18 +149,30 @@ await page.evaluate(() => {
  * the liveness test — a position the element does not activate computes to `none`, and under the
  * contract that position is not part of the answer.
  */
-const elements = await page.evaluate((parts) => {
+const elements = await page.evaluate(parts => {
   const glyphs = [...document.querySelectorAll('.effect-glyph')]
 
-  return glyphs.map((element) => {
+  return glyphs.map(element => {
     const style = getComputedStyle(element)
-    const list = property => style.getPropertyValue(property).split(',').map(part => part.trim())
+    const list = property =>
+      style
+        .getPropertyValue(property)
+        .split(',')
+        .map(part => part.trim())
     const lists = Object.fromEntries(parts.map(part => [part, list(part)]))
 
     return {
-      effect: [...element.classList].map(name => /^animate-(.+)$/.exec(name)?.[1]).filter(Boolean)[0] ?? null,
+      effect:
+        [...element.classList]
+          .map(name => /^animate-(.+)$/.exec(name)?.[1])
+          .filter(Boolean)[0] ?? null,
       live: lists['animation-name']
-        .map((name, i) => ({ name, values: Object.fromEntries(parts.map(part => [part, lists[part][i] ?? null])) }))
+        .map((name, i) => ({
+          name,
+          values: Object.fromEntries(
+            parts.map(part => [part, lists[part][i] ?? null]),
+          ),
+        }))
         .filter(entry => entry.name !== 'none'),
       // The count the aggregate resolved, live or not, so a representation that shrank it is visible.
       positions: lists['animation-name'].length,
@@ -167,11 +196,17 @@ const timed = async (nodeId, method, runs = 15) => {
 
   samples.sort((a, b) => a - b)
 
-  return { bytes, median: Math.round(samples[Math.floor(samples.length / 2)] * 10) / 10 }
+  return {
+    bytes,
+    median: Math.round(samples[Math.floor(samples.length / 2)] * 10) / 10,
+  }
 }
 
 const { root: document } = await session.send('DOM.getDocument', { depth: 0 })
-const { nodeId } = await session.send('DOM.querySelector', { nodeId: document.nodeId, selector: '.effect-glyph' })
+const { nodeId } = await session.send('DOM.querySelector', {
+  nodeId: document.nodeId,
+  selector: '.effect-glyph',
+})
 
 await timed(nodeId, 'CSS.getMatchedStylesForNode', 1)
 await timed(nodeId, 'CSS.getComputedStyleForNode', 1)
@@ -179,8 +214,15 @@ await timed(nodeId, 'CSS.getComputedStyleForNode', 1)
 const matched = await timed(nodeId, 'CSS.getMatchedStylesForNode')
 const computed = await timed(nodeId, 'CSS.getComputedStyleForNode')
 
-const css = readFileSync(path.join(site, readFileSync(path.join(site, 'effects', 'index.html'), 'utf8')
-  .match(/href="([^"]*effects\.[^"]*\.css)"/)[1].replace(/^\//, '')), 'utf8')
+const css = readFileSync(
+  path.join(
+    site,
+    readFileSync(path.join(site, 'effects', 'index.html'), 'utf8')
+      .match(/href="([^"]*effects\.[^"]*\.css)"/)[1]
+      .replace(/^\//, ''),
+  ),
+  'utf8',
+)
 
 const measured = {
   computedBytes: computed.bytes,
@@ -197,12 +239,19 @@ console.log(`\n  real catalogue — ${site}`)
 console.log(`    stylesheet      ${css.length.toLocaleString()} bytes`)
 console.log(`    elements        ${elements.length}`)
 console.log(`    positions       ${elements[0]?.positions ?? 0} per element`)
-console.log(`    matched styles  ${matched.bytes.toLocaleString()} bytes, ${matched.median} ms (median of 15)`)
-console.log(`    computed style  ${computed.bytes.toLocaleString()} bytes, ${computed.median} ms (median of 15)`)
+console.log(
+  `    matched styles  ${matched.bytes.toLocaleString()} bytes, ${matched.median} ms (median of 15)`,
+)
+console.log(
+  `    computed style  ${computed.bytes.toLocaleString()} bytes, ${computed.median} ms (median of 15)`,
+)
 
 const silent = elements.filter(element => element.live.length === 0)
-const misnamed = elements.filter(element => element.effect
-  && !element.live.some(entry => entry.name === `jumi-${element.effect}`))
+const misnamed = elements.filter(
+  element =>
+    element.effect &&
+    !element.live.some(entry => entry.name === `jumi-${element.effect}`),
+)
 
 /**
  * The assertion that needs no baseline, and the reason this instrument is worth keeping.
@@ -218,32 +267,51 @@ const misnamed = elements.filter(element => element.effect
  * element quietly runs the wrong timing. Comparing the resolved values against each other catches
  * that without a fixture, a baseline or a hard-coded number.
  */
-const durations = [...new Set(elements
-  .flatMap(element => element.live.map(entry => entry.values['animation-duration'])))]
-const uncontrolled = durations.length === 1 && durations[0] !== '0s' ? [] : durations
+const durations = [
+  ...new Set(
+    elements.flatMap(element =>
+      element.live.map(entry => entry.values['animation-duration']),
+    ),
+  ),
+]
+const uncontrolled =
+  durations.length === 1 && durations[0] !== '0s' ? [] : durations
 
 /** Named in full up to a point: a run that finds nothing is 228 names, and the count is the finding. */
-const list = names => (names.length > 12
-  ? `${names.slice(0, 12).join(', ')}, … (${names.length} total)`
-  : names.join(', '))
+const list = names =>
+  names.length > 12
+    ? `${names.slice(0, 12).join(', ')}, … (${names.length} total)`
+    : names.join(', ')
 
-console.log(`    live            ${elements.length - silent.length}/${elements.length} elements resolve an animation`)
-console.log(`    duration        ${durations.length === 1
-  ? `${durations[0]} on every live position`
-  : `${durations.length} distinct across live positions: ${durations.join(', ')}`}`)
+console.log(
+  `    live            ${elements.length - silent.length}/${elements.length} elements resolve an animation`,
+)
+console.log(
+  `    duration        ${
+    durations.length === 1
+      ? `${durations[0]} on every live position`
+      : `${durations.length} distinct across live positions: ${durations.join(', ')}`
+  }`,
+)
 
 if (silent.length) {
-  console.log(`\n✗ ${silent.length} elements resolve nothing: ${list(silent.map(e => e.effect))}`)
+  console.log(
+    `\n✗ ${silent.length} elements resolve nothing: ${list(silent.map(e => e.effect))}`,
+  )
 }
 
 if (misnamed.length) {
-  console.log(`\n✗ ${misnamed.length} elements resolve something other than their own effect:`
-    + ` ${list(misnamed.map(e => e.effect))}`)
+  console.log(
+    `\n✗ ${misnamed.length} elements resolve something other than their own effect:` +
+      ` ${list(misnamed.map(e => e.effect))}`,
+  )
 }
 
 if (uncontrolled.length !== 0) {
-  console.log(`\n✗ live positions disagree about their control — ${uncontrolled.join(', ')}.`
-    + ' A position that did not read its own control is a publication that did not arrive.')
+  console.log(
+    `\n✗ live positions disagree about their control — ${uncontrolled.join(', ')}.` +
+      ' A position that did not read its own control is a publication that did not arrive.',
+  )
 }
 
 const failures = []
@@ -270,9 +338,12 @@ if (comparePath) {
     const was = before.elements[index]
 
     if (!was) break
-    if (was.effect !== after.effect) diffs.push(`element ${index}: effect ${was.effect} → ${after.effect}`)
+    if (was.effect !== after.effect)
+      diffs.push(`element ${index}: effect ${was.effect} → ${after.effect}`)
     if (was.live.length !== after.live.length) {
-      diffs.push(`${after.effect}: ${was.live.length} live positions → ${after.live.length}`)
+      diffs.push(
+        `${after.effect}: ${was.live.length} live positions → ${after.live.length}`,
+      )
     }
 
     for (const [position, entry] of after.live.entries()) {
@@ -280,14 +351,18 @@ if (comparePath) {
 
       if (!old) break
       if (old.name !== entry.name) {
-        diffs.push(`${after.effect} position ${position}: ${old.name} → ${entry.name}`)
+        diffs.push(
+          `${after.effect} position ${position}: ${old.name} → ${entry.name}`,
+        )
 
         continue
       }
 
       for (const part of PARTS) {
         if (old.values[part] !== entry.values[part]) {
-          diffs.push(`${after.effect} position ${position} ${part}: ${old.values[part]} → ${entry.values[part]}`)
+          diffs.push(
+            `${after.effect} position ${position} ${part}: ${old.values[part]} → ${entry.values[part]}`,
+          )
         }
       }
     }
@@ -296,14 +371,21 @@ if (comparePath) {
   parity = {
     compared: elements.length,
     differences: diffs.length,
-    livePositions: elements.reduce((total, element) => total + element.live.length, 0),
+    livePositions: elements.reduce(
+      (total, element) => total + element.live.length,
+      0,
+    ),
   }
 
   console.log(`\n  parity against ${before.site ?? comparePath}`)
-  console.log(`    matched styles  ${before.matchedBytes.toLocaleString()} → ${matched.bytes.toLocaleString()} bytes`
-    + ` (${Math.round(100 * (matched.bytes - before.matchedBytes) / before.matchedBytes)}%)`)
+  console.log(
+    `    matched styles  ${before.matchedBytes.toLocaleString()} → ${matched.bytes.toLocaleString()} bytes` +
+      ` (${Math.round((100 * (matched.bytes - before.matchedBytes)) / before.matchedBytes)}%)`,
+  )
   console.log(`    matched ms      ${before.matchedMs} → ${matched.median}`)
-  console.log(`    live positions  ${parity.livePositions}, ${diffs.length} differences`)
+  console.log(
+    `    live positions  ${parity.livePositions}, ${diffs.length} differences`,
+  )
 
   if (diffs.length) {
     console.log('')
@@ -318,10 +400,20 @@ if (jsonPath) {
   console.log(`\n    written         ${jsonPath}`)
 }
 
-if (silent.length) failures.push(`${silent.length} elements resolve no animation`)
-if (misnamed.length) failures.push(`${misnamed.length} elements resolve another effect's animation`)
-if (uncontrolled.length !== 0) failures.push(`live positions disagree about their control: ${uncontrolled.join(', ')}`)
-if (parity?.differences) failures.push(`${parity.differences} live-position differences against the baseline`)
+if (silent.length)
+  failures.push(`${silent.length} elements resolve no animation`)
+if (misnamed.length)
+  failures.push(
+    `${misnamed.length} elements resolve another effect's animation`,
+  )
+if (uncontrolled.length !== 0)
+  failures.push(
+    `live positions disagree about their control: ${uncontrolled.join(', ')}`,
+  )
+if (parity?.differences)
+  failures.push(
+    `${parity.differences} live-position differences against the baseline`,
+  )
 
 await browser.close()
 server.close()
@@ -331,4 +423,6 @@ if (failures.length) {
   process.exit(1)
 }
 
-console.log(`\n✓ every element resolves its own animation${parity ? ', identically to the baseline' : ''}.\n`)
+console.log(
+  `\n✓ every element resolves its own animation${parity ? ', identically to the baseline' : ''}.\n`,
+)

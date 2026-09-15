@@ -36,7 +36,10 @@ export const registry = {
  * that is the point of principle 9.
  */
 export const arbitrary = [
-  { match: /^has-\[(.+)\]$/, selector: argument => `&:has(:is(${argument.replace(/_/g, ' ')}))` },
+  {
+    match: /^has-\[(.+)\]$/,
+    selector: argument => `&:has(:is(${argument.replace(/_/g, ' ')}))`,
+  },
   { match: /^\[(.+)\]$/, selector: argument => argument.replace(/_/g, ' ') },
 ]
 
@@ -47,7 +50,7 @@ export const arbitrary = [
  * `[&:is(h1)]:animate-fade-in` is one variant, not two. The candidate parser has the same rule,
  * which is a hint about where this shape keeps coming from: brackets are opaque at every layer.
  */
-const segments = (variant) => {
+const segments = variant => {
   const found = []
   let current = ''
   let depth = 0
@@ -76,7 +79,7 @@ const segments = (variant) => {
  * Opaque to everything else: a prefix the model does not know throws, because the whole point is
  * that its coverage is visible rather than assumed.
  */
-export const steps = (variant) => {
+export const steps = variant => {
   const found = []
 
   for (const name of segments(variant)) {
@@ -90,7 +93,9 @@ export const steps = (variant) => {
     const rule = arbitrary.find(candidate => candidate.match.test(name))
 
     if (rule) {
-      found.push({ selector: rule.selector(name.match(rule.match)[1].replace(/_/g, ' ')) })
+      found.push({
+        selector: rule.selector(name.match(rule.match)[1].replace(/_/g, ' ')),
+      })
       continue
     }
 

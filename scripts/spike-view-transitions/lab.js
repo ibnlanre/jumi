@@ -45,7 +45,7 @@ const READ = [
  * roughly doubles the answer, which is exactly the kind of off-by-a-factor that makes a
  * measurement unquotable.
  */
-const items = (value) => {
+const items = value => {
   let depth = 0
   let current = ''
   const out = []
@@ -69,14 +69,13 @@ const items = (value) => {
   return out.map(part => part.trim())
 }
 
-const read = (pseudo) => {
+const read = pseudo => {
   const out = { declared: 0, exists: false, pseudo }
   let cs = null
 
   try {
     cs = getComputedStyle(root, pseudo)
-  }
-  catch (error) {
+  } catch (error) {
     out.error = String(error)
 
     return out
@@ -102,16 +101,20 @@ const read = (pseudo) => {
   return out
 }
 
-const running = () => document.getAnimations()
-  .filter(animation => (animation.effect?.pseudoElement ?? '').startsWith(PSEUDO))
-  .map(animation => ({
-    duration: animation.effect.getTiming?.().duration ?? null,
-    frames: animation.effect.getKeyframes?.().length ?? null,
-    name: animation.animationName ?? null,
-    pseudo: animation.effect.pseudoElement,
-  }))
+const running = () =>
+  document
+    .getAnimations()
+    .filter(animation =>
+      (animation.effect?.pseudoElement ?? '').startsWith(PSEUDO),
+    )
+    .map(animation => ({
+      duration: animation.effect.getTiming?.().duration ?? null,
+      frames: animation.effect.getKeyframes?.().length ?? null,
+      name: animation.animationName ?? null,
+      pseudo: animation.effect.pseudoElement,
+    }))
 
-const tile = (item) => {
+const tile = item => {
   const el = document.createElement('div')
 
   el.className = `tile${item.cls ? ` ${item.cls}` : ''}`
@@ -124,14 +127,18 @@ const tile = (item) => {
 }
 
 const OPS = {
-  mount: (arg) => { for (const item of arg) stage.append(tile(item)) },
+  mount: arg => {
+    for (const item of arg) stage.append(tile(item))
+  },
   move: () => stage.classList.toggle('moved'),
   none: () => {},
   recolor: () => root.style.setProperty('--tile-bg', '#db2777'),
   remove: arg => document.getElementById(arg)?.remove(),
   shape: () => stage.firstElementChild.classList.toggle('tall'),
-  text: () => { stage.firstElementChild.replaceChildren('changed') },
-  unname: (arg) => {
+  text: () => {
+    stage.firstElementChild.replaceChildren('changed')
+  },
+  unname: arg => {
     const el = document.getElementById(arg)
 
     if (el) el.style.viewTransitionName = 'none'
@@ -154,10 +161,11 @@ export const api = {
    * chain reads the activation and both are written by the same rule.
    */
   activation(selector) {
-    const walk = (rule) => {
+    const walk = rule => {
       const out = [rule]
 
-      if (rule.cssRules) for (const child of rule.cssRules) out.push(...walk(child))
+      if (rule.cssRules)
+        for (const child of rule.cssRules) out.push(...walk(child))
 
       return out
     }
@@ -167,11 +175,15 @@ export const api = {
 
       try {
         rules = [...sheet.cssRules].flatMap(walk)
+      } catch {
+        continue
       }
-      catch { continue }
 
-      const found = rules.find(rule => rule.selectorText === selector
-        && [...rule.style].some(name => name.startsWith('--jumi-slot-')))
+      const found = rules.find(
+        rule =>
+          rule.selectorText === selector &&
+          [...rule.style].some(name => name.startsWith('--jumi-slot-')),
+      )
 
       if (found) return { declarations: found.style.cssText, selector }
     }
@@ -181,15 +193,18 @@ export const api = {
 
   /** Pause every pseudo animation and seek it, then measure. Returns how many were driven. */
   advance(t, pseudos = []) {
-    const list = document.getAnimations().filter(a => (a.effect?.pseudoElement ?? '').startsWith(PSEUDO))
+    const list = document
+      .getAnimations()
+      .filter(a => (a.effect?.pseudoElement ?? '').startsWith(PSEUDO))
 
     for (const animation of list) {
       animation.pause()
 
       try {
         animation.currentTime = t
+      } catch {
+        /* an animation that cannot seek is reported by the sample it leaves behind */
       }
-      catch { /* an animation that cannot seek is reported by the sample it leaves behind */ }
     }
 
     return { driven: list.length, ...this.measure(pseudos) }
@@ -212,14 +227,17 @@ export const api = {
    * which silently returned `null` here for a whole pass after the hoist landed.
    */
   jumi() {
-    const sheet = [...document.styleSheets].find(s => (s.href ?? '').endsWith('/jumi.css'))
+    const sheet = [...document.styleSheets].find(s =>
+      (s.href ?? '').endsWith('/jumi.css'),
+    )
 
     if (!sheet) return { error: 'jumi.css not found' }
 
-    const walk = (rule) => {
+    const walk = rule => {
       const out = [rule]
 
-      if (rule.cssRules) for (const child of rule.cssRules) out.push(...walk(child))
+      if (rule.cssRules)
+        for (const child of rule.cssRules) out.push(...walk(child))
 
       return out
     }
@@ -228,7 +246,9 @@ export const api = {
     const styled = flat.filter(rule => rule.selectorText)
     const value = (rule, property) => rule.style.getPropertyValue(property)
 
-    const substrate = styled.find(rule => value(rule, '--jumi-animation-name') === 'none')
+    const substrate = styled.find(
+      rule => value(rule, '--jumi-animation-name') === 'none',
+    )
 
     /**
      * Found by declaration text, not by `getPropertyValue('animation')`.
@@ -239,15 +259,26 @@ export const api = {
      * and the order check (the shorthand, then the two longhands it resets) is what distinguishes the
      * synthesized rule from any utility that happens to declare an animation.
      */
-    const aggregate = styled.find((rule) => {
+    const aggregate = styled.find(rule => {
       const text = rule.style.cssText
       const shorthand = text.search(/(?<![\w-])animation\s*:/)
-      const resets = Math.max(text.indexOf('animation-composition'), text.indexOf('animation-timeline'))
+      const resets = Math.max(
+        text.indexOf('animation-composition'),
+        text.indexOf('animation-timeline'),
+      )
 
-      return shorthand >= 0 && resets > shorthand && text.includes('var(--jumi-slot-')
+      return (
+        shorthand >= 0 &&
+        resets > shorthand &&
+        text.includes('var(--jumi-slot-')
+      )
     })
-    const keyframes = flat.filter(rule => rule.type === CSSRule.KEYFRAMES_RULE).map(rule => rule.name)
-    const hoisted = styled.filter(rule => [...rule.style].some(name => name.startsWith('--jumi-slot-')))
+    const keyframes = flat
+      .filter(rule => rule.type === CSSRule.KEYFRAMES_RULE)
+      .map(rule => rule.name)
+    const hoisted = styled.filter(rule =>
+      [...rule.style].some(name => name.startsWith('--jumi-slot-')),
+    )
 
     return {
       aggregate: aggregate ? aggregate.style.cssText : null,
@@ -255,9 +286,13 @@ export const api = {
       keyframes,
       selectors: {
         aggregate: aggregate ? aggregate.selectorText.slice(0, 96) : null,
-        aggregateCount: aggregate ? aggregate.selectorText.split(',').length : 0,
+        aggregateCount: aggregate
+          ? aggregate.selectorText.split(',').length
+          : 0,
         substrate: substrate ? substrate.selectorText.slice(0, 96) : null,
-        substrateCount: substrate ? substrate.selectorText.split(',').length : 0,
+        substrateCount: substrate
+          ? substrate.selectorText.split(',').length
+          : 0,
       },
       substrate: substrate ? substrate.style.cssText : null,
     }
@@ -265,7 +300,9 @@ export const api = {
 
   /** True when the browser built a pseudo-element with this name for the active transition. */
   live(pseudo) {
-    return document.getAnimations().some(animation => animation.effect?.pseudoElement === pseudo)
+    return document
+      .getAnimations()
+      .some(animation => animation.effect?.pseudoElement === pseudo)
   },
 
   /**
@@ -279,7 +316,7 @@ export const api = {
 
     if (!target) return found
 
-    const walk = (rule) => {
+    const walk = rule => {
       const animation = rule.style?.getPropertyValue('animation-name')
 
       if (rule.selectorText && animation) {
@@ -287,14 +324,22 @@ export const api = {
 
         try {
           matches = target.matches(rule.selectorText)
+        } catch {
+          /* a selector the parser rejects cannot match */
         }
-        catch { /* a selector the parser rejects cannot match */ }
 
         if (matches) {
           found.push({
             entries: items(animation).length,
-            jumi: [...new Set(items(animation).filter(part => part.startsWith('jumi-')))].slice(0, 4),
-            selector: rule.selectorText.length > 64 ? `${rule.selectorText.slice(0, 64)}…` : rule.selectorText,
+            jumi: [
+              ...new Set(
+                items(animation).filter(part => part.startsWith('jumi-')),
+              ),
+            ].slice(0, 4),
+            selector:
+              rule.selectorText.length > 64
+                ? `${rule.selectorText.slice(0, 64)}…`
+                : rule.selectorText,
           })
         }
       }
@@ -305,8 +350,9 @@ export const api = {
     for (const sheet of document.styleSheets) {
       try {
         for (const rule of sheet.cssRules) walk(rule)
+      } catch {
+        /* a cross-origin sheet is not readable, and there are none here */
       }
-      catch { /* a cross-origin sheet is not readable, and there are none here */ }
     }
 
     return found
@@ -317,10 +363,16 @@ export const api = {
     return {
       active: root.matches(':active-view-transition'),
       animations: running(),
-      pseudos: Object.fromEntries(pseudos.map(pseudo => [pseudo, read(pseudo)])),
+      pseudos: Object.fromEntries(
+        pseudos.map(pseudo => [pseudo, read(pseudo)]),
+      ),
       root: {
-        duration: getComputedStyle(root).getPropertyValue('--jumi-animation-duration').trim(),
-        slot: getComputedStyle(root).getPropertyValue('--jumi-fade-in-animation-name').trim(),
+        duration: getComputedStyle(root)
+          .getPropertyValue('--jumi-animation-duration')
+          .trim(),
+        slot: getComputedStyle(root)
+          .getPropertyValue('--jumi-fade-in-animation-name')
+          .trim(),
       },
     }
   },
@@ -334,7 +386,9 @@ export const api = {
   async start(op = 'none', arg = null) {
     current?.skipTransition?.()
 
-    const transition = document.startViewTransition(() => (OPS[op] ?? OPS.none)(arg))
+    const transition = document.startViewTransition(() =>
+      (OPS[op] ?? OPS.none)(arg),
+    )
 
     current = transition
 
@@ -342,9 +396,11 @@ export const api = {
       await transition.ready
 
       return { ready: true }
-    }
-    catch (error) {
-      return { error: `${error?.name ?? 'Error'}: ${error?.message ?? error}`, ready: false }
+    } catch (error) {
+      return {
+        error: `${error?.name ?? 'Error'}: ${error?.message ?? error}`,
+        ready: false,
+      }
     }
   },
 

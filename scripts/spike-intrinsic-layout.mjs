@@ -45,15 +45,69 @@ execFileSync('pnpm', ['run', 'bundle'], { cwd: root, stdio: 'pipe' })
  */
 const CASES = [
   { about: 'width, auto → 200px, nothing opt-in', id: 'plain', to: '200px' },
-  { about: 'the same, interpolate-size on the element', id: 'keyword', opt: 'interpolate-size: allow-keywords', to: '200px' },
-  { about: 'height, 0 → auto, allow-keywords', from: '0', id: 'height', opt: 'interpolate-size: allow-keywords', to: 'auto', watch: 'height' },
-  { about: 'block-size, auto → 120px, allow-keywords', id: 'logical', opt: 'interpolate-size: allow-keywords', to: '120px', watch: 'block-size' },
-  { about: 'inline-size, auto → 90px, allow-keywords', id: 'inline', opt: 'interpolate-size: allow-keywords', to: '90px', watch: 'inline-size' },
-  { about: 'min-content → max-content, allow-keywords', from: 'min-content', id: 'keywordpair', opt: 'interpolate-size: allow-keywords', to: 'max-content', watch: 'width' },
-  { about: 'fit-content → 240px, allow-keywords', from: 'fit-content', id: 'fit', opt: 'interpolate-size: allow-keywords', to: '240px', watch: 'width' },
-  { about: 'calc-size(auto, size + 40px) → 200px, nothing opt-in', from: 'calc-size(auto, size + 40px)', id: 'calcsize', to: '200px' },
-  { about: 'calc-size with a percentage, nothing opt-in', from: 'calc-size(any, 50% - 20px)', id: 'calcpct', to: '200px' },
-  { about: 'var(--jumi-width) → auto, allow-keywords', id: 'carried', opt: 'interpolate-size: allow-keywords', to: 'auto', var: '200px' },
+  {
+    about: 'the same, interpolate-size on the element',
+    id: 'keyword',
+    opt: 'interpolate-size: allow-keywords',
+    to: '200px',
+  },
+  {
+    about: 'height, 0 → auto, allow-keywords',
+    from: '0',
+    id: 'height',
+    opt: 'interpolate-size: allow-keywords',
+    to: 'auto',
+    watch: 'height',
+  },
+  {
+    about: 'block-size, auto → 120px, allow-keywords',
+    id: 'logical',
+    opt: 'interpolate-size: allow-keywords',
+    to: '120px',
+    watch: 'block-size',
+  },
+  {
+    about: 'inline-size, auto → 90px, allow-keywords',
+    id: 'inline',
+    opt: 'interpolate-size: allow-keywords',
+    to: '90px',
+    watch: 'inline-size',
+  },
+  {
+    about: 'min-content → max-content, allow-keywords',
+    from: 'min-content',
+    id: 'keywordpair',
+    opt: 'interpolate-size: allow-keywords',
+    to: 'max-content',
+    watch: 'width',
+  },
+  {
+    about: 'fit-content → 240px, allow-keywords',
+    from: 'fit-content',
+    id: 'fit',
+    opt: 'interpolate-size: allow-keywords',
+    to: '240px',
+    watch: 'width',
+  },
+  {
+    about: 'calc-size(auto, size + 40px) → 200px, nothing opt-in',
+    from: 'calc-size(auto, size + 40px)',
+    id: 'calcsize',
+    to: '200px',
+  },
+  {
+    about: 'calc-size with a percentage, nothing opt-in',
+    from: 'calc-size(any, 50% - 20px)',
+    id: 'calcpct',
+    to: '200px',
+  },
+  {
+    about: 'var(--jumi-width) → auto, allow-keywords',
+    id: 'carried',
+    opt: 'interpolate-size: allow-keywords',
+    to: 'auto',
+    var: '200px',
+  },
 ]
 
 /** The same document twice, differing only in where the opt-in is written. */
@@ -158,10 +212,12 @@ ${CASES.map(item => `  <div id="${item.id}">${item.id === 'keywordpair' ? 'min t
 </script>
 </body></html>`
 
-const server = (await import('node:http')).createServer((request, response) => {
-  response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
-  response.end(htmlFor({ root: request.url.includes('root') }))
-}).listen(0)
+const server = (await import('node:http'))
+  .createServer((request, response) => {
+    response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
+    response.end(htmlFor({ root: request.url.includes('root') }))
+  })
+  .listen(0)
 
 const browser = await chromium.launch()
 const page = await browser.newPage()
@@ -174,17 +230,28 @@ await rooted.waitForFunction(() => window.__ready === true)
 
 const FRACTIONS = [0, 0.25, 0.5, 0.75, 1]
 const line = (label, value) => console.log(`  ${label.padEnd(52)} ${value}`)
-const curve = samples => samples.map(sample => `${sample.at}:${sample.value}`).join(' ')
+const curve = samples =>
+  samples.map(sample => `${sample.at}:${sample.value}`).join(' ')
 
 const support = await page.evaluate(() => window.__support())
 
 console.log('\n0 · the version and what it advertises')
 console.log('─'.repeat(100))
-line('browser', await page.evaluate(() => navigator.userAgent.replace(/^.*(Chrome\/[\d.]+).*$/, '$1')))
-line('interpolate-size: allow-keywords', support.interpolateSize ? 'supported' : 'unsupported')
+line(
+  'browser',
+  await page.evaluate(() =>
+    navigator.userAgent.replace(/^.*(Chrome\/[\d.]+).*$/, '$1'),
+  ),
+)
+line(
+  'interpolate-size: allow-keywords',
+  support.interpolateSize ? 'supported' : 'unsupported',
+)
 line('calc-size(auto, size)', support.calcSize ? 'supported' : 'unsupported')
 
-console.log('\n1 · a keyword as one end of a length, and what turns interpolation on')
+console.log(
+  '\n1 · a keyword as one end of a length, and what turns interpolation on',
+)
 console.log('─'.repeat(100))
 
 for (const item of CASES) {
@@ -197,12 +264,16 @@ for (const item of CASES) {
   const moved = new Set(sampled.samples.map(sample => sample.value)).size
   const verdict = !sampled.samples.length
     ? 'no Animation −'
-    : moved <= 2 ? `snaps (${moved} value${moved === 1 ? '' : 's'})` : `interpolates (${moved} values)`
+    : moved <= 2
+      ? `snaps (${moved} value${moved === 1 ? '' : 's'})`
+      : `interpolates (${moved} values)`
 
   line(item.about, `${verdict} · ${curve(sampled.samples)}`)
 }
 
-console.log('\n2 · inheritance, and the same motion as a transition rather than a keyframe')
+console.log(
+  '\n2 · inheritance, and the same motion as a transition rather than a keyframe',
+)
 console.log('─'.repeat(100))
 
 const inherited = await rooted.evaluate(
@@ -211,19 +282,43 @@ const inherited = await rooted.evaluate(
 )
 
 line('nothing opt-in, opt-in on the root instead', curve(inherited.samples))
-line('the same element with no opt-in anywhere', curve(
-  (await page.evaluate(({ fractions }) => window.__sample('plain', fractions, 'width'), { fractions: FRACTIONS })).samples,
-))
+line(
+  'the same element with no opt-in anywhere',
+  curve(
+    (
+      await page.evaluate(
+        ({ fractions }) => window.__sample('plain', fractions, 'width'),
+        { fractions: FRACTIONS },
+      )
+    ).samples,
+  ),
+)
 
-const viaTransition = await page.evaluate(() => window.__transition('transitioned', 'height'))
+const viaTransition = await page.evaluate(() =>
+  window.__transition('transitioned', 'height'),
+)
 
-line('height 0 → auto, transition, allow-keywords', `${viaTransition.before} → ${viaTransition.samples
-  .filter((sample, index) => index % 8 === 0 || index === viaTransition.samples.length - 1)
-  .map(sample => `${sample.at}:${sample.value}`).join(' ')}`)
-line('height line-height → auto, keyframe, allow-keywords', curve((await page.evaluate(
-  ({ fractions }) => window.__sample('height', fractions, 'height'),
-  { fractions: FRACTIONS },
-)).samples))
+line(
+  'height 0 → auto, transition, allow-keywords',
+  `${viaTransition.before} → ${viaTransition.samples
+    .filter(
+      (sample, index) =>
+        index % 8 === 0 || index === viaTransition.samples.length - 1,
+    )
+    .map(sample => `${sample.at}:${sample.value}`)
+    .join(' ')}`,
+)
+line(
+  'height line-height → auto, keyframe, allow-keywords',
+  curve(
+    (
+      await page.evaluate(
+        ({ fractions }) => window.__sample('height', fractions, 'height'),
+        { fractions: FRACTIONS },
+      )
+    ).samples,
+  ),
+)
 
 console.log('\n3 · Jumi, read rather than assumed')
 console.log('─'.repeat(100))
@@ -250,7 +345,13 @@ const css = build(await compiler(entry, project), wanted).css
  * state from a previous build can make the diff look non-zero.
  */
 const baseline = build(await compiler(entry, project), []).css
-const emits = async candidate => (await build(await compiler(entry, project), typeof candidate === 'string' ? [candidate] : candidate)).css
+const emits = async candidate =>
+  (
+    await build(
+      await compiler(entry, project),
+      typeof candidate === 'string' ? [candidate] : candidate,
+    )
+  ).css
 const postcss = (await import('postcss')).default
 
 for (const candidate of wanted) {
@@ -262,13 +363,20 @@ for (const candidate of wanted) {
   }
 
   const written = []
-  postcss.parse(alone).walkDecls((declaration) => {
-    if (/^(width|height|block-size|inline-size|min-width)$/.test(declaration.prop)) {
+  postcss.parse(alone).walkDecls(declaration => {
+    if (
+      /^(width|height|block-size|inline-size|min-width)$/.test(declaration.prop)
+    ) {
       written.push(`${declaration.prop}: ${declaration.value}`)
     }
   })
 
-  line(candidate, written.length ? [...new Set(written)].join('; ') : 'emitted a rule, but no size declaration')
+  line(
+    candidate,
+    written.length
+      ? [...new Set(written)].join('; ')
+      : 'emitted a rule, but no size declaration',
+  )
 }
 
 // The size family, swept the way the CTO asked for it: the browser's own grammar as the authority on
@@ -277,16 +385,26 @@ for (const candidate of wanted) {
 // `animate-block-size` and *not* to `animate-block-size-auto` — which is a spelling difference, not a
 // capability one, and this table is what tells the two apart.
 const FAMILY = [
-  'width', 'height',
-  'min-width', 'min-height',
-  'max-width', 'max-height',
-  'inline-size', 'block-size',
-  'min-inline-size', 'min-block-size',
-  'max-inline-size', 'max-block-size',
+  'width',
+  'height',
+  'min-width',
+  'min-height',
+  'max-width',
+  'max-height',
+  'inline-size',
+  'block-size',
+  'min-inline-size',
+  'min-block-size',
+  'max-inline-size',
+  'max-block-size',
   'size',
 ]
 const grammar = await page.evaluate(
-  properties => properties.map(property => ({ acceptsAuto: CSS.supports(property, 'auto'), property })),
+  properties =>
+    properties.map(property => ({
+      acceptsAuto: CSS.supports(property, 'auto'),
+      property,
+    })),
   FAMILY,
 )
 
@@ -294,42 +412,70 @@ for (const { acceptsAuto, property } of grammar) {
   const named = await emits(`animate-${property}-auto`)
   const bare = await emits(`animate-${property}`)
 
-  line(`animate-${property}[-auto]`, [
-    acceptsAuto ? 'CSS accepts auto' : 'CSS does not use auto',
-    named.length === baseline.length ? 'named refused' : 'named emitted',
-    bare.length === baseline.length ? 'bare refused' : 'bare emitted',
-  ].join(' · '))
+  line(
+    `animate-${property}[-auto]`,
+    [
+      acceptsAuto ? 'CSS accepts auto' : 'CSS does not use auto',
+      named.length === baseline.length ? 'named refused' : 'named emitted',
+      bare.length === baseline.length ? 'bare refused' : 'bare emitted',
+    ].join(' · '),
+  )
 }
 
-line('interpolate-size: allow-keywords in the output', /interpolate-size:\s*allow-keywords/.test(css) ? 'yes' : 'no')
+line(
+  'interpolate-size: allow-keywords in the output',
+  /interpolate-size:\s*allow-keywords/.test(css) ? 'yes' : 'no',
+)
 
 if (/interpolate-size:\s*allow-keywords/.test(css)) {
   const at = css.indexOf('interpolate-size: allow-keywords')
-  line('  …and it comes from here', css.slice(Math.max(0, at - 70), at + 34).replace(/\s+/g, ' ').trim())
+  line(
+    '  …and it comes from here',
+    css
+      .slice(Math.max(0, at - 70), at + 34)
+      .replace(/\s+/g, ' ')
+      .trim(),
+  )
 }
 
 line('calc-size(...) in the output', /calc-size\(/.test(css) ? 'yes' : 'no')
 
 // Can Jumi express the opt-in itself, rather than leaving it to the author? The property is modelled, so
 // the question is which spelling reaches it — and whether it lands on the base style or only a keyframe.
-for (const spelling of ['animate-interpolate-size-allow-keywords', 'animate-interpolate-size-[allow-keywords]']) {
+for (const spelling of [
+  'animate-interpolate-size-allow-keywords',
+  'animate-interpolate-size-[allow-keywords]',
+]) {
   const alone = await emits(spelling)
-  line(spelling, alone.length === baseline.length
-    ? 'refused'
-    : `${/interpolate-size:\s*var\(--jumi-interpolate-size\)/.test(alone) ? 'accepted, written as a declaration' : 'accepted, but not written'}`)
+  line(
+    spelling,
+    alone.length === baseline.length
+      ? 'refused'
+      : `${/interpolate-size:\s*var\(--jumi-interpolate-size\)/.test(alone) ? 'accepted, written as a declaration' : 'accepted, but not written'}`,
+  )
 }
 
 const control = await emits('animation-interpolate-size-allow-keywords')
-line('animation-interpolate-size-allow-keywords', control.length === baseline.length ? 'refused' : 'accepted')
+line(
+  'animation-interpolate-size-allow-keywords',
+  control.length === baseline.length ? 'refused' : 'accepted',
+)
 
-const carried = await page.evaluate(({ fractions }) => window.__sample('carried', fractions, 'width'), { fractions: FRACTIONS })
+const carried = await page.evaluate(
+  ({ fractions }) => window.__sample('carried', fractions, 'width'),
+  { fractions: FRACTIONS },
+)
 line('var(--jumi-width) → auto on the element', curve(carried.samples))
 
 // ── 4 · end to end, on Jumi's own emitted utilities rather than a hand-written fixture ────────────────
-console.log('\n4 · the same motion through Jumi\'s real output, in the browser')
+console.log("\n4 · the same motion through Jumi's real output, in the browser")
 console.log('─'.repeat(100))
 
-const jumiCss = await emits(['animate-width-auto', 'animate-opacity-50', 'interpolate-size-allow-keywords'])
+const jumiCss = await emits([
+  'animate-width-auto',
+  'animate-opacity-50',
+  'interpolate-size-allow-keywords',
+])
 const jumiHtml = `<!doctype html>
 <html><head><meta charset="utf-8"><style>
 ${jumiCss}
@@ -454,43 +600,85 @@ ${jumiCss}
 </script>
 </body></html>`
 
-const jumiServer = (await import('node:http')).createServer((request, response) => {
-  response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
-  response.end(jumiHtml)
-}).listen(0)
+const jumiServer = (await import('node:http'))
+  .createServer((request, response) => {
+    response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
+    response.end(jumiHtml)
+  })
+  .listen(0)
 
 const jumiPage = await browser.newPage()
 await jumiPage.goto(`http://127.0.0.1:${jumiServer.address().port}`)
 await jumiPage.waitForFunction(() => window.__ready === true)
 
 const read = await jumiPage.evaluate(() => window.__read())
-line('interpolate-size, an element with a motion', read.carrier || 'not declared')
+line(
+  'interpolate-size, an element with a motion',
+  read.carrier || 'not declared',
+)
 line('interpolate-size, the same plus the opt-in', read.opted || 'not declared')
-line('interpolate-size, an element with no motion', read.plain || 'not declared')
+line(
+  'interpolate-size, an element with no motion',
+  read.plain || 'not declared',
+)
 
-const jumiMotion = await jumiPage.evaluate(({ fractions }) => window.__seek('box', fractions), { fractions: FRACTIONS })
+const jumiMotion = await jumiPage.evaluate(
+  ({ fractions }) => window.__seek('box', fractions),
+  { fractions: FRACTIONS },
+)
 line('animate-width-auto alone, 200px → auto', curve(jumiMotion.samples))
 
-const optedMotion = await jumiPage.evaluate(({ fractions }) => window.__seek('opted', fractions), { fractions: FRACTIONS })
+const optedMotion = await jumiPage.evaluate(
+  ({ fractions }) => window.__seek('opted', fractions),
+  { fractions: FRACTIONS },
+)
 line('…with interpolate-size-allow-keywords', curve(optedMotion.samples))
 
 // ── 5 · locality: does a carrier opt its whole subtree in? ───────────────────────────────────────────
-console.log('\n5 · locality — a carrier, its child, and a control outside the subtree')
+console.log(
+  '\n5 · locality — a carrier, its child, and a control outside the subtree',
+)
 console.log('─'.repeat(100))
 
 const locality = await jumiPage.evaluate(() => window.__locality())
-const pair = (samples, key) => samples
-  .filter((sample, index) => index % 8 === 0 || index === samples.length - 1)
-  .map(sample => `${sample.at}:${sample[key]}`).join(' ')
+const pair = (samples, key) =>
+  samples
+    .filter((sample, index) => index % 8 === 0 || index === samples.length - 1)
+    .map(sample => `${sample.at}:${sample[key]}`)
+    .join(' ')
 
-line('parent — carrier, no opt-in', `animation-name: ${locality.before.parent.animationName} · interpolate-size: ${locality.before.parent.interpolateSize || 'not declared'}`)
-line('child, no motion of its own', `animation-name: ${locality.before.child.animationName} · interpolate-size: ${locality.before.child.interpolateSize || 'not declared'}`)
-line('control-child, no carrier above it', `animation-name: ${locality.before.control.animationName} · interpolate-size: ${locality.before.control.interpolateSize || 'not declared'}`)
-line('opted-parent, opted in explicitly', `animation-name: ${locality.before.optedParent.animationName} · interpolate-size: ${locality.before.optedParent.interpolateSize || 'not declared'}`)
-line('opted-child, under the opted-in parent', `animation-name: ${locality.before.opted.animationName} · interpolate-size: ${locality.before.opted.interpolateSize || 'not declared'}`)
-line('child 200px → auto, no opt-in anywhere', `${locality.started.child} transition(s) started · ${pair(locality.pairs, 'child') || `settled at ${locality.after.child}`}`)
-line('control-child 200px → auto', `${locality.started.control} transition(s) started · ${pair(locality.pairs, 'control') || `settled at ${locality.after.control}`}`)
-line('opted-child 200px → auto, opted in above', `${locality.started.opted} transition(s) started · ${pair(locality.pairs, 'opted') || `settled at ${locality.after.opted}`}`)
+line(
+  'parent — carrier, no opt-in',
+  `animation-name: ${locality.before.parent.animationName} · interpolate-size: ${locality.before.parent.interpolateSize || 'not declared'}`,
+)
+line(
+  'child, no motion of its own',
+  `animation-name: ${locality.before.child.animationName} · interpolate-size: ${locality.before.child.interpolateSize || 'not declared'}`,
+)
+line(
+  'control-child, no carrier above it',
+  `animation-name: ${locality.before.control.animationName} · interpolate-size: ${locality.before.control.interpolateSize || 'not declared'}`,
+)
+line(
+  'opted-parent, opted in explicitly',
+  `animation-name: ${locality.before.optedParent.animationName} · interpolate-size: ${locality.before.optedParent.interpolateSize || 'not declared'}`,
+)
+line(
+  'opted-child, under the opted-in parent',
+  `animation-name: ${locality.before.opted.animationName} · interpolate-size: ${locality.before.opted.interpolateSize || 'not declared'}`,
+)
+line(
+  'child 200px → auto, no opt-in anywhere',
+  `${locality.started.child} transition(s) started · ${pair(locality.pairs, 'child') || `settled at ${locality.after.child}`}`,
+)
+line(
+  'control-child 200px → auto',
+  `${locality.started.control} transition(s) started · ${pair(locality.pairs, 'control') || `settled at ${locality.after.control}`}`,
+)
+line(
+  'opted-child 200px → auto, opted in above',
+  `${locality.started.opted} transition(s) started · ${pair(locality.pairs, 'opted') || `settled at ${locality.after.opted}`}`,
+)
 
 await jumiServer.close()
 

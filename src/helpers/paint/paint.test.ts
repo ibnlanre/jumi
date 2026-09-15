@@ -16,12 +16,16 @@ describe('toPaintHex', () => {
   it('resolves color-mix with transparent to a translucency hex8', () => {
     // Tailwind opacity modifier format: mixing with transparent un-premultiplies,
     // so the result is the color at the weighted alpha.
-    expect(toPaintHex('color-mix(in oklab, oklch(63.7% 0.237 25.331) 50%, transparent)')).toBe(
-      '#fb2c3680',
-    )
-    expect(toPaintHex('color-mix(in oklab, oklch(62.7% 0.265 303.9) 75%, transparent)')).toBe(
-      '#ad46ffbf',
-    )
+    expect(
+      toPaintHex(
+        'color-mix(in oklab, oklch(63.7% 0.237 25.331) 50%, transparent)',
+      ),
+    ).toBe('#fb2c3680')
+    expect(
+      toPaintHex(
+        'color-mix(in oklab, oklch(62.7% 0.265 303.9) 75%, transparent)',
+      ),
+    ).toBe('#ad46ffbf')
   })
 
   it('resolves color-mix between two opaque colors', () => {
@@ -33,9 +37,11 @@ describe('toPaintHex', () => {
 
   it('parses a hue interpolation method after the color space', () => {
     // `shorter hue` (and friends) sit between `in <space>` and the comma.
-    expect(toPaintHex('color-mix(in oklch shorter hue, oklch(0.7 0.1 20) 50%, white)')).toBe(
-      '#ecc1c6',
-    )
+    expect(
+      toPaintHex(
+        'color-mix(in oklch shorter hue, oklch(0.7 0.1 20) 50%, white)',
+      ),
+    ).toBe('#ecc1c6')
   })
 
   it('keeps achromatic mixing from becoming NaN', () => {
@@ -43,7 +49,9 @@ describe('toPaintHex', () => {
     // fallback in mixColors, `undefined * number` → NaN poisons the channels
     // and the mix fails. Chromium gives #edc1c0 for this input — visually
     // identical (both near-white pink).
-    expect(toPaintHex('color-mix(in oklch, oklch(0.7 0.1 20) 50%, white)')).toBe('#ecc1c6')
+    expect(
+      toPaintHex('color-mix(in oklch, oklch(0.7 0.1 20) 50%, white)'),
+    ).toBe('#ecc1c6')
   })
 
   it('passes non-color values through unchanged', () => {

@@ -123,14 +123,16 @@ const slotParts = [
  * Refusing to write it is what keeps a name from being able to break a build; the pass in
  * `@/helpers/carriers` reports it, because the model has no channel to warn through.
  */
-export const addressableName = (name: string) => name.length > 0 && !/[\s\u0000-\u001F\u007F]/.test(name)
+export const addressableName = (name: string) =>
+  name.length > 0 && !/[\s\u0000-\u001F\u007F]/.test(name)
 
 /**
  * A slot's key: the name a slot is addressed by throughout the model, and the middle of its
  * variable names. `attribute-id` for a phrase or a single value (identity is the value), the
  * attribute for a composed tween or an effect (identity is the property or the effect).
  */
-const slotKey = (attribute: string, id?: string) => (id ? `${attribute}-${id}` : attribute)
+const slotKey = (attribute: string, id?: string) =>
+  id ? `${attribute}-${id}` : attribute
 
 /**
  * A matcher that reads its modifier as a **name** — every motion candidate — carries this tag, so the
@@ -157,9 +159,18 @@ export const nameable = Symbol('jumi.nameable')
  * re-emission depends on it: a slot registered after a pass has published has to
  * be able to see the slots that pass registered.
  */
-export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Creator {
+export function createJumiModel({
+  sink,
+  theme: themeSource,
+}: ModelOptions): Creator {
   const effects = new Set<string>()
-  const properties = new Set<string>(['animation', 'animation-composition', 'animation-range', 'animation-timeline', 'interpolate-size'])
+  const properties = new Set<string>([
+    'animation',
+    'animation-composition',
+    'animation-range',
+    'animation-timeline',
+    'interpolate-size',
+  ])
   const motions = new Set<string>()
   // Keyframes already emitted — by animation name for values, composed tweens and
   // phrases, by effect name for effects. Emission happens where a slot becomes
@@ -173,7 +184,10 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
   // which is what makes the frames safe to trust. A keyframe shared per
   // attribute cannot work — every element animating that property would run the
   // union of everyone's offsets, and CSS has no way to skip a frame.
-  const phrases = new Map<AnimatableStandardPropertyType, Map<string, Frame[]>>()
+  const phrases = new Map<
+    AnimatableStandardPropertyType,
+    Map<string, Frame[]>
+  >()
   // Names already registered as non-inheriting.
   const registered = new Set<string>()
 
@@ -304,7 +318,11 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
     return { [cssEscape(`--jumi-${key}-label`)]: name }
   }
 
-  const perValue = (attribute: AnimatableStandardPropertyType, value: string, name?: string): CssInJs => {
+  const perValue = (
+    attribute: AnimatableStandardPropertyType,
+    value: string,
+    name?: string,
+  ): CssInJs => {
     const id = shorthash2(value)
     let ids = values.get(attribute)
 
@@ -320,7 +338,9 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
     ids.add(id)
 
     registerName(`--jumi-${attribute}-${id}-animation-name`)
-    emitKeyframe(`jumi-${attribute}-${id}`, { to: { [attribute]: css('var', `--jumi-${attribute}-${id}`) } })
+    emitKeyframe(`jumi-${attribute}-${id}`, {
+      to: { [attribute]: css('var', `--jumi-${attribute}-${id}`) },
+    })
     aggregateChanged()
 
     return {
@@ -348,11 +368,21 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
    * A phrase's keyframe: every frame folded into the one keyframe the phrase
    * owns, because a frame does not earn a keyframe of its own.
    */
-  const phraseKeyframe = (attribute: AnimatableStandardPropertyType, id: string, frames: Frame[]): CssInJs => {
+  const phraseKeyframe = (
+    attribute: AnimatableStandardPropertyType,
+    id: string,
+    frames: Frame[],
+  ): CssInJs => {
     const fallback = css('var', `--jumi-${attribute}`)
 
     return frames.reduce((acc, { offset, value }) => {
-      acc[`${offset}%`] = { [attribute]: propertyKeyframeValue(attribute, `${id}-${offset}`, fallback) }
+      acc[`${offset}%`] = {
+        [attribute]: propertyKeyframeValue(
+          attribute,
+          `${id}-${offset}`,
+          fallback,
+        ),
+      }
       return acc
     }, {} as CssInJs)
   }
@@ -364,7 +394,11 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
     sink.keyframes(effectKeyframes[attribute])
   }
 
-  function propertyKeyframeValue(attribute: AnimatableStandardPropertyType, suffix: string, fallback: string): string {
+  function propertyKeyframeValue(
+    attribute: AnimatableStandardPropertyType,
+    suffix: string,
+    fallback: string,
+  ): string {
     const variable = cssEscape(`--jumi-${attribute}-${suffix}`)
     const { dependencies = [], value = fallback } = propertyVariables[attribute]
 
@@ -375,13 +409,20 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
 
     const expanded = dependencies.reduce((result, dependency) => {
       const part = propertyVariables[dependency].variable
-      return result.replaceAll(`var(${part})`, `var(${cssEscape(`${part}-${suffix}`)}, var(${part}))`)
+      return result.replaceAll(
+        `var(${part})`,
+        `var(${cssEscape(`${part}-${suffix}`)}, var(${part}))`,
+      )
     }, value)
 
     return css('var', variable, expanded)
   }
 
-  function animationParts(attribute: string, nameVar?: string, key?: string): CssInJs {
+  function animationParts(
+    attribute: string,
+    nameVar?: string,
+    key?: string,
+  ): CssInJs {
     // Three links, narrowest first: the address a *name* installed, then a per-slot publication,
     // then the property's control, then the global default. Folded from the inside out, so the most
     // specific link is outermost and each one falls through to the next.
@@ -389,7 +430,8 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
       const links: string[] = []
 
       // What `/<name>` installed, on the rule that declared the name. Only a named slot has it.
-      if (addressed.has(key ?? attribute)) links.push(cssEscape(`--jumi-slot-${key}-${part}`))
+      if (addressed.has(key ?? attribute))
+        links.push(cssEscape(`--jumi-slot-${key}-${part}`))
 
       // The range composition variant, which publishes under the slot's **key** and not its
       // attribute: `attribute-id` for a phrase or a single value, where one attribute names a
@@ -400,7 +442,8 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
       // `--jumi-opacity-animation-range`, so `animation-range-entry:animate-opacity-[0:0|100:1]`
       // emitted, validated, and did nothing. Effects and composed tweens hid it, because for them the
       // key *is* the attribute. Nothing else publishes per slot after the composition is built.
-      if (part === 'animation-range' && key && key !== attribute) links.push(cssEscape(`--jumi-${key}-${part}`))
+      if (part === 'animation-range' && key && key !== attribute)
+        links.push(cssEscape(`--jumi-${key}-${part}`))
 
       links.push(`--jumi-${attribute}-${part}`)
 
@@ -410,7 +453,11 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
       )
     }
 
-    const name = css('var', nameVar ?? `--jumi-${attribute}-animation-name`, css('var', '--jumi-animation-name'))
+    const name = css(
+      'var',
+      nameVar ?? `--jumi-${attribute}-animation-name`,
+      css('var', '--jumi-animation-name'),
+    )
 
     return {
       ...Object.fromEntries(slotParts.map(part => [part, timing(part)])),
@@ -447,7 +494,8 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
     // and therefore claims a slot of its own.
     for (const attribute of composed) shared.add(attribute)
 
-    for (const attribute of sorted(shared)) slots.push({ attribute, key: slotKey(attribute) })
+    for (const attribute of sorted(shared))
+      slots.push({ attribute, key: slotKey(attribute) })
 
     for (const [attribute, byId] of phrases) {
       for (const id of byId.keys()) {
@@ -459,7 +507,8 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
       }
     }
 
-    for (const attribute of sorted(effects)) slots.push({ attribute, key: slotKey(attribute) })
+    for (const attribute of sorted(effects))
+      slots.push({ attribute, key: slotKey(attribute) })
 
     return slots
   }
@@ -488,12 +537,18 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
           'animation-direction': css('var', '--jumi-animation-direction'),
           'animation-duration': css('var', '--jumi-animation-duration'),
           'animation-fill-mode': css('var', '--jumi-animation-fill-mode'),
-          'animation-iteration-count': css('var', '--jumi-animation-iteration-count'),
+          'animation-iteration-count': css(
+            'var',
+            '--jumi-animation-iteration-count',
+          ),
           'animation-name': css('var', '--jumi-animation-name'),
           'animation-play-state': css('var', '--jumi-animation-play-state'),
           'animation-range': css('var', '--jumi-animation-range'),
           'animation-timeline': css('var', '--jumi-animation-timeline'),
-          'animation-timing-function': css('var', '--jumi-animation-timing-function'),
+          'animation-timing-function': css(
+            'var',
+            '--jumi-animation-timing-function',
+          ),
         }
 
     // `interpolate-size` is deliberately not declared here, and the reason is not stylistic. It is
@@ -611,12 +666,27 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
   }
 
   function transitionVariables(attribute: string): string {
-    return join([
-      css('var', `--jumi-${attribute}-transition-property`, attribute),
-      css('var', `--jumi-${attribute}-transition-duration`, css('var', '--jumi-transition-duration')),
-      css('var', `--jumi-${attribute}-transition-timing-function`, css('var', '--jumi-transition-timing-function')),
-      css('var', `--jumi-${attribute}-transition-delay`, css('var', '--jumi-transition-delay')),
-    ], ' ')
+    return join(
+      [
+        css('var', `--jumi-${attribute}-transition-property`, attribute),
+        css(
+          'var',
+          `--jumi-${attribute}-transition-duration`,
+          css('var', '--jumi-transition-duration'),
+        ),
+        css(
+          'var',
+          `--jumi-${attribute}-transition-timing-function`,
+          css('var', '--jumi-transition-timing-function'),
+        ),
+        css(
+          'var',
+          `--jumi-${attribute}-transition-delay`,
+          css('var', '--jumi-transition-delay'),
+        ),
+      ],
+      ' ',
+    )
   }
 
   /**
@@ -642,15 +712,21 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
      * channel publishes, and what the adapter stages for the finalizer.
      */
     get animations(): CssInJs {
-      const assembled = sorted(properties).reduce((acc, attribute) =>
-        merge(acc, assemble(attribute)), {} as CssInJs)
+      const assembled = sorted(properties).reduce(
+        (acc, attribute) => merge(acc, assemble(attribute)),
+        {} as CssInJs,
+      )
 
       const animation = computeAnimationVariable()
 
       return merge(animation, assembled)
     },
 
-    color: (attribute, parts = [], options: { paint?: boolean } = {}): MatchComponentsPropertyFunction => {
+    color: (
+      attribute,
+      parts = [],
+      options: { paint?: boolean } = {},
+    ): MatchComponentsPropertyFunction => {
       const fn = creator.property(attribute, parts)
       // The modifier is handed through rather than dropped: a colour tween is a motion like any
       // other, so `animate-background-color-red/reveal` names it the same way `animate-opacity-50/…`
@@ -670,7 +746,9 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
       return `jumi-${attribute}`
     },
 
-    get effects(): string[] { return sorted(effects) },
+    get effects(): string[] {
+      return sorted(effects)
+    },
 
     motion(attribute): string {
       if (motions.has(attribute)) return attribute
@@ -684,11 +762,15 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
       return attribute
     },
 
-    get motions(): string[] { return sorted(motions) },
+    get motions(): string[] {
+      return sorted(motions)
+    },
 
     name: (attribute, name) => nameSlot(attribute, attribute, name),
 
-    get properties(): string[] { return sorted(properties) },
+    get properties(): string[] {
+      return sorted(properties)
+    },
 
     property: (attribute, parts = []): MatchComponentsPropertyFunction => {
       const fn: MatchComponentsPropertyFunction = (value, { modifier }) => {
@@ -711,29 +793,41 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
 
           byId.set(id, frameList)
           registerName(`--jumi-${attribute}-${id}-animation-name`)
-          emitKeyframe(`jumi-${attribute}-${id}`, phraseKeyframe(attribute, id, frameList))
+          emitKeyframe(
+            `jumi-${attribute}-${id}`,
+            phraseKeyframe(attribute, id, frameList),
+          )
           aggregateChanged()
 
           // `animate-opacity-[0:0|100:1]/reveal` names this slot, so a control — or your own CSS —
           // can address it on its own. Skipped when the name is the attribute itself, because that
           // name is the property scope's, and a scope cascades into subtrees on purpose.
-          const named = modifier ? nameSlot(slotKey(attribute, id), attribute, modifier) : {}
+          const named = modifier
+            ? nameSlot(slotKey(attribute, id), attribute, modifier)
+            : {}
 
-          const variables = frameList.reduce((acc, { offset, value: frame }) => {
-            const suffix = `${id}-${offset}`
+          const variables = frameList.reduce(
+            (acc, { offset, value: frame }) => {
+              const suffix = `${id}-${offset}`
 
-            if (!parts.length) {
-              acc[cssEscape(`--jumi-${attribute}-${suffix}`)] = frame
+              if (!parts.length) {
+                acc[cssEscape(`--jumi-${attribute}-${suffix}`)] = frame
+                return acc
+              }
+
+              for (const part of parts) {
+                const [property, transform] = Array.isArray(part)
+                  ? part
+                  : [part]
+                acc[cssEscape(`--jumi-${property}-${suffix}`)] = transform
+                  ? transform(frame)
+                  : frame
+              }
+
               return acc
-            }
-
-            for (const part of parts) {
-              const [property, transform] = Array.isArray(part) ? part : [part]
-              acc[cssEscape(`--jumi-${property}-${suffix}`)] = transform ? transform(frame) : frame
-            }
-
-            return acc
-          }, {} as CssInJs)
+            },
+            {} as CssInJs,
+          )
 
           return {
             [`--jumi-${attribute}-${id}-animation-name`]: `jumi-${attribute}-${id}`,
@@ -748,11 +842,14 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
 
         register(attribute)
 
-        if (!parts.length) return perValue(attribute, value, modifier ?? undefined)
+        if (!parts.length)
+          return perValue(attribute, value, modifier ?? undefined)
 
         composed.add(attribute)
         registerName(`--jumi-${attribute}-animation-name`)
-        emitKeyframe(`jumi-${attribute}`, { to: { [attribute]: css('var', `--jumi-${attribute}`) } })
+        emitKeyframe(`jumi-${attribute}`, {
+          to: { [attribute]: css('var', `--jumi-${attribute}`) },
+        })
         aggregateChanged()
 
         const variables = parts.reduce((acc, part) => {
@@ -789,13 +886,20 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
       }
     },
 
-    stagger(part: string, expression: (context: StaggerContext) => string): MatchUtilitiesPropertyFunction {
+    stagger(
+      part: string,
+      expression: (context: StaggerContext) => string,
+    ): MatchUtilitiesPropertyFunction {
       return (value, { modifier }) => {
         const length = modifier ? Number.parseInt(modifier, 10) : null
 
         const adaptive = {
           '& > *': {
-            [`--jumi-stagger-${part}`]: expression({ index: null, length: null, value }),
+            [`--jumi-stagger-${part}`]: expression({
+              index: null,
+              length: null,
+              value,
+            }),
           },
         }
 
@@ -810,8 +914,14 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
         }
 
         return [
-          { '@supports (animation-delay: calc(sibling-index() * 1ms))': adaptive },
-          { '@supports not (animation-delay: calc(sibling-index() * 1ms))': fallback },
+          {
+            '@supports (animation-delay: calc(sibling-index() * 1ms))':
+              adaptive,
+          },
+          {
+            '@supports not (animation-delay: calc(sibling-index() * 1ms))':
+              fallback,
+          },
         ]
       }
     },
@@ -822,17 +932,20 @@ export function createJumiModel({ sink, theme: themeSource }: ModelOptions): Cre
 
     transition(part: string): MatchUtilitiesPropertyFunction {
       return (value, { modifier }) => {
-        if (!modifier) return { ...(value && { [`--jumi-transition-${part}`]: value }) }
+        if (!modifier)
+          return { ...(value && { [`--jumi-transition-${part}`]: value }) }
         // Same refusal, same reason: a motion name is the middle of a custom property's name here
         // too, and the declaration it would produce is the one PostCSS cannot parse.
         if (!addressableName(modifier)) return refusedName(modifier)
 
         creator.motion(modifier)
 
-        return { [cssEscape(`--jumi-${modifier}-transition-${part}`)]: part === 'property' ? modifier : value }
+        return {
+          [cssEscape(`--jumi-${modifier}-transition-${part}`)]:
+            part === 'property' ? modifier : value,
+        }
       }
     },
-
   }
 
   // Publish once, before anything can read the model.
@@ -946,7 +1059,7 @@ function splitFrames(value: string): string[] {
       continue
     }
 
-    if (char === '"' || char === '\'') quote = char
+    if (char === '"' || char === "'") quote = char
     else if (char === '(') depth++
     else if (char === ')') depth--
     else if (char === '|' && depth === 0) {

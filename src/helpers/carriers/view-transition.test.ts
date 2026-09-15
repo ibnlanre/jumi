@@ -23,7 +23,12 @@ import postcss from 'postcss'
  */
 
 /** A staged rule, in the shape the adapter emits: the author's class plus the marker. */
-const staged = (candidate: string, side: string, identity: string, declarations: string) => {
+const staged = (
+  candidate: string,
+  side: string,
+  identity: string,
+  declarations: string,
+) => {
   const name = candidate.replace(/[:/]/g, m => `\\${m}`)
 
   return `.${name}:where(.jumi-vt-${side}-${identity}) { ${declarations} }`
@@ -39,7 +44,7 @@ const staged = (candidate: string, side: string, identity: string, declarations:
 const stagingOf = (css: string) => {
   const found: postcss.Rule[] = []
 
-  postcss.parse(css).walkRules((rule) => {
+  postcss.parse(css).walkRules(rule => {
     found.push(rule)
   })
 
@@ -48,14 +53,18 @@ const stagingOf = (css: string) => {
   return found.flatMap(viewTransitionStaging)
 }
 
-const products = (css: string) => viewTransitionProducts(stagingOf(css), isMotion)
+const products = (css: string) =>
+  viewTransitionProducts(stagingOf(css), isMotion)
 
 const MOTION = '--jumi-fade-out-animation-name: jumi-fade-out'
 const CONTROL = '--jumi-animation-duration: 300ms'
 
 /** The classifier the finalizer passes in: a staged rule is motion-bearing if it activates a slot. */
-const isMotion = (rule: postcss.Rule) => (rule.nodes ?? []).some(node =>
-  node.type === 'decl' && /^--jumi-.+-animation-name$/.test(node.prop))
+const isMotion = (rule: postcss.Rule) =>
+  (rule.nodes ?? []).some(
+    node =>
+      node.type === 'decl' && /^--jumi-.+-animation-name$/.test(node.prop),
+  )
 
 /**
  * The measured grammar (P21), written as the table it was measured from.
@@ -67,21 +76,30 @@ const isMotion = (rule: postcss.Rule) => (rule.nodes ?? []).some(node =>
 describe('the accepted identity grammar', () => {
   it.each(['hero', 'my-card-2', '--foo', 'HERO', '_x', '-x', 'a1'])(
     'accepts `%s`, which the browser also accepts as both a name and a pseudo argument',
-    (identity) => {
+    identity => {
       expect(identityAccepted(identity)).toBe(true)
     },
   )
 
-  it.each(['none', 'auto', 'initial', 'inherit', 'unset', 'revert', 'revert-layer', 'NONE'])(
+  it.each([
+    'none',
+    'auto',
+    'initial',
+    'inherit',
+    'unset',
+    'revert',
+    'revert-layer',
+    'NONE',
+  ])(
     'rejects the reserved value `%s`, which parses and then builds no group',
-    (identity) => {
+    identity => {
       expect(identityAccepted(identity)).toBe(false)
     },
   )
 
   it.each(['1hero', 'hero)', 'hero{', 'a b', '', '-', '--'])(
     'rejects the malformed identifier `%s`, which would break the selector by concatenation',
-    (identity) => {
+    identity => {
       expect(identityAccepted(identity)).toBe(false)
     },
   )
@@ -94,7 +112,14 @@ describe('the accepted identity grammar', () => {
  */
 describe('a control alone does not create a product', () => {
   it('emits nothing for a control with no motion beside it', () => {
-    const found = products(staged('view-transition-old/hero:animation-duration-300', 'old', 'hero', CONTROL))
+    const found = products(
+      staged(
+        'view-transition-old/hero:animation-duration-300',
+        'old',
+        'hero',
+        CONTROL,
+      ),
+    )
 
     expect(found.units).toHaveLength(0)
     expect(found.identities).toHaveLength(0)
@@ -104,10 +129,22 @@ describe('a control alone does not create a product', () => {
   })
 
   it('contributes the control to a group a motion established', () => {
-    const found = products([
-      staged('view-transition-old/hero:animate-fade-out', 'old', 'hero', MOTION),
-      staged('view-transition-old/hero:animation-duration-300', 'old', 'hero', CONTROL),
-    ].join('\n'))
+    const found = products(
+      [
+        staged(
+          'view-transition-old/hero:animate-fade-out',
+          'old',
+          'hero',
+          MOTION,
+        ),
+        staged(
+          'view-transition-old/hero:animation-duration-300',
+          'old',
+          'hero',
+          CONTROL,
+        ),
+      ].join('\n'),
+    )
 
     expect(found.units).toHaveLength(1)
     expect(found.units[0].declarations.map(entry => entry.prop)).toEqual([
@@ -117,10 +154,22 @@ describe('a control alone does not create a product', () => {
   })
 
   it('keeps the two sides apart', () => {
-    const found = products([
-      staged('view-transition-old/hero:animate-fade-out', 'old', 'hero', MOTION),
-      staged('view-transition-new/hero:animation-duration-300', 'new', 'hero', CONTROL),
-    ].join('\n'))
+    const found = products(
+      [
+        staged(
+          'view-transition-old/hero:animate-fade-out',
+          'old',
+          'hero',
+          MOTION,
+        ),
+        staged(
+          'view-transition-new/hero:animation-duration-300',
+          'new',
+          'hero',
+          CONTROL,
+        ),
+      ].join('\n'),
+    )
 
     expect(found.units.map(entry => entry.side)).toEqual(['old'])
   })
@@ -132,9 +181,16 @@ describe('a control alone does not create a product', () => {
  */
 describe('which wrappers survive onto the pseudo tree', () => {
   const cases = [
-    { candidate: 'view-transition-old/hero:animate-fade-out', name: 'no wrapper' },
+    {
+      candidate: 'view-transition-old/hero:animate-fade-out',
+      name: 'no wrapper',
+    },
     { candidate: 'sm:view-transition-old/hero:animate-fade-out', name: 'sm' },
-    { candidate: 'supports-[display:grid]:view-transition-old/hero:animate-fade-out', name: 'supports' },
+    {
+      candidate:
+        'supports-[display:grid]:view-transition-old/hero:animate-fade-out',
+      name: 'supports',
+    },
   ]
 
   it.each(cases)('transfers $name', ({ candidate }) => {
@@ -148,7 +204,7 @@ describe('which wrappers survive onto the pseudo tree', () => {
   it.each([
     'hover:view-transition-old/hero:animate-fade-out',
     'focus:view-transition-old/hero:animate-fade-out',
-  ])('refuses `%s`, whose meaning is the source element\'s state', (candidate) => {
+  ])("refuses `%s`, whose meaning is the source element's state", candidate => {
     // Written out rather than through `staged()`, because the position of the state is the fixture. A
     // state variant wraps the marker rather than being wrapped by it — the emitted selector is
     // `.hover\:…:hover:where(.jumi-vt-old-hero)`, with the state before the marker — and that trailing
@@ -156,7 +212,9 @@ describe('which wrappers survive onto the pseudo tree', () => {
     // of the element.
     const state = candidate.slice(0, candidate.indexOf(':'))
     const name = candidate.replace(/[:/]/g, m => `\\${m}`)
-    const found = products(`.${name}:${state}:where(.jumi-vt-old-hero) { ${MOTION} }`)
+    const found = products(
+      `.${name}:${state}:where(.jumi-vt-old-hero) { ${MOTION} }`,
+    )
 
     expect(found.units).toHaveLength(0)
     expect(found.warnings).toHaveLength(1)
@@ -167,8 +225,8 @@ describe('which wrappers survive onto the pseudo tree', () => {
     // class. The test is the shape rather than the variant name, which is what makes it hold for a
     // variant Tailwind adds later.
     const found = products(
-      '.group-hover\\:view-transition-old\\/hero\\:animate-fade-out:is(:where(.group):hover *)'
-      + `:where(.jumi-vt-old-hero) { ${MOTION} }`,
+      '.group-hover\\:view-transition-old\\/hero\\:animate-fade-out:is(:where(.group):hover *)' +
+        `:where(.jumi-vt-old-hero) { ${MOTION} }`,
     )
 
     expect(found.units).toHaveLength(0)
@@ -185,12 +243,18 @@ describe('which wrappers survive onto the pseudo tree', () => {
  * because Jumi has already decided its own motion does not run under reduced motion.
  */
 describe('the reduced-motion queries', () => {
-  const wrapped = (query: string, inner: string) => `@media ${query} { ${inner} }`
+  const wrapped = (query: string, inner: string) =>
+    `@media ${query} { ${inner} }`
 
   it('drops `no-preference` from the identity and keeps it on the motion', () => {
     const source = wrapped(
       '(prefers-reduced-motion: no-preference)',
-      staged('motion-safe:view-transition-old/hero:animate-fade-out', 'old', 'hero', MOTION),
+      staged(
+        'motion-safe:view-transition-old/hero:animate-fade-out',
+        'old',
+        'hero',
+        MOTION,
+      ),
     )
     const found = products(source)
 
@@ -199,43 +263,84 @@ describe('the reduced-motion queries', () => {
     expect(found.warnings).toHaveLength(0)
   })
 
-  it('keeps an author\'s own condition on both', () => {
+  it("keeps an author's own condition on both", () => {
     const source = wrapped(
       '(width >= 40rem)',
-      staged('sm:view-transition-old/hero:animate-fade-out', 'old', 'hero', MOTION),
+      staged(
+        'sm:view-transition-old/hero:animate-fade-out',
+        'old',
+        'hero',
+        MOTION,
+      ),
     )
     const found = products(source)
 
-    expect(found.identities[0].conditions).toEqual([{ name: 'media', params: '(width >= 40rem)' }])
+    expect(found.identities[0].conditions).toEqual([
+      { name: 'media', params: '(width >= 40rem)' },
+    ])
     expect(found.units).toHaveLength(1)
     // "On both" is the load-bearing half, and it is the half that is easy to get wrong: the identity
     // carries the wrapper through the selector, and the *motion* has to carry it too or the unit is
     // emitted unconditionally while its name is not.
-    expect(found.units[0].conditions).toEqual([{ name: 'media', params: '(width >= 40rem)' }])
+    expect(found.units[0].conditions).toEqual([
+      { name: 'media', params: '(width >= 40rem)' },
+    ])
   })
 
   it('gives a mixed pair the conditions each side asked for', () => {
     const source = [
       wrapped(
         '(width >= 40rem)',
-        staged('sm:view-transition-old/hero:animate-fade-out', 'old', 'hero', MOTION),
+        staged(
+          'sm:view-transition-old/hero:animate-fade-out',
+          'old',
+          'hero',
+          MOTION,
+        ),
       ),
-      staged('view-transition-new/hero:animate-fade-in', 'new', 'hero', '--jumi-fade-in-animation-name: jumi-fade-in'),
+      staged(
+        'view-transition-new/hero:animate-fade-in',
+        'new',
+        'hero',
+        '--jumi-fade-in-animation-name: jumi-fade-in',
+      ),
     ].join('\n')
     const found = products(source)
 
     // Two units for the same identity, one per side, and only the old one is conditional — so below the
     // breakpoint the old side is the browser's and the new side is still Jumi's. Grouping the pair into
     // one unconditional product is the mistake this shape exists to prevent.
-    expect(found.units.map(unit => [unit.side, unit.conditions.length])).toEqual([['old', 1], ['new', 0]])
-    expect(found.identities.map(entry => [entry.identity, entry.conditions.length]))
-      .toEqual([['hero', 1], ['hero', 0]])
+    expect(
+      found.units.map(unit => [unit.side, unit.conditions.length]),
+    ).toEqual([
+      ['old', 1],
+      ['new', 0],
+    ])
+    expect(
+      found.identities.map(entry => [entry.identity, entry.conditions.length]),
+    ).toEqual([
+      ['hero', 1],
+      ['hero', 0],
+    ])
   })
 
-  it('does not let a control\'s own condition take a side from the browser', () => {
+  it("does not let a control's own condition take a side from the browser", () => {
     const source = [
-      wrapped('(width >= 40rem)', staged('sm:view-transition-old/hero:animation-duration-300', 'old', 'hero', CONTROL)),
-      staged('view-transition-old/hero:animate-fade-out', 'old', 'hero', MOTION),
+      wrapped(
+        '(width >= 40rem)',
+        staged(
+          'sm:view-transition-old/hero:animation-duration-300',
+          'old',
+          'hero',
+          CONTROL,
+        ),
+      ),
+      staged(
+        'view-transition-old/hero:animate-fade-out',
+        'old',
+        'hero',
+        MOTION,
+      ),
     ].join('\n')
     const found = products(source)
 
@@ -245,10 +350,15 @@ describe('the reduced-motion queries', () => {
     expect(found.units.map(unit => unit.motion)).toEqual([false, true])
   })
 
-  it('refuses `motion-reduce`, which contradicts Jumi\'s own policy', () => {
+  it("refuses `motion-reduce`, which contradicts Jumi's own policy", () => {
     const source = wrapped(
       '(prefers-reduced-motion: reduce)',
-      staged('motion-reduce:view-transition-old/hero:animate-fade-out', 'old', 'hero', MOTION),
+      staged(
+        'motion-reduce:view-transition-old/hero:animate-fade-out',
+        'old',
+        'hero',
+        MOTION,
+      ),
     )
     const found = products(source)
 
@@ -266,15 +376,28 @@ describe('the reduced-motion queries', () => {
    * nothing.
    */
   it.each([
-    ['missing', 'names no transition', 'view-transition-old\\:animate-fade-out'],
-    ['name', 'not one the browser accepts', 'view-transition-old\\/none\\:animate-fade-out'],
-  ])('refuses a %s identity, in its own words', (reason, expected, selector) => {
-    const marker = viewTransitionInvalidMarker(reason as 'missing' | 'name')
-    const found = products(`${marker.replace('&', `.${selector}`)} { ${MOTION} }`)
+    [
+      'missing',
+      'names no transition',
+      'view-transition-old\\:animate-fade-out',
+    ],
+    [
+      'name',
+      'not one the browser accepts',
+      'view-transition-old\\/none\\:animate-fade-out',
+    ],
+  ])(
+    'refuses a %s identity, in its own words',
+    (reason, expected, selector) => {
+      const marker = viewTransitionInvalidMarker(reason as 'missing' | 'name')
+      const found = products(
+        `${marker.replace('&', `.${selector}`)} { ${MOTION} }`,
+      )
 
-    expect(found.warnings).toHaveLength(1)
-    expect(found.warnings[0]).toContain(expected)
-  })
+      expect(found.warnings).toHaveLength(1)
+      expect(found.warnings[0]).toContain(expected)
+    },
+  )
 })
 
 /** The end-to-end shape, through the pass that ships rather than the products alone. */
@@ -282,7 +405,12 @@ describe('the emitted stylesheet', () => {
   const css = [
     '.animate-fade-out { --jumi-fade-out-animation-name: jumi-fade-out; }',
     staged('view-transition-old/hero:animate-fade-out', 'old', 'hero', MOTION),
-    staged('view-transition-old/inert:animation-duration-300', 'old', 'inert', CONTROL),
+    staged(
+      'view-transition-old/inert:animation-duration-300',
+      'old',
+      'inert',
+      CONTROL,
+    ),
   ].join('\n')
 
   const { css: out, viewTransitions } = finalizeCss(css)
@@ -303,7 +431,7 @@ describe('the emitted stylesheet', () => {
     expect(out).toContain('mix-blend-mode: plus-lighter')
   })
 
-  it('never touches the group, which is the browser\'s own travel', () => {
+  it("never touches the group, which is the browser's own travel", () => {
     expect(out).not.toContain('::view-transition-group(')
   })
 
@@ -314,7 +442,8 @@ describe('the emitted stylesheet', () => {
   })
 
   it('leaves a stylesheet with no view-transition candidate untouched', () => {
-    const plain = '.animate-fade-out { --jumi-fade-out-animation-name: jumi-fade-out; }'
+    const plain =
+      '.animate-fade-out { --jumi-fade-out-animation-name: jumi-fade-out; }'
     const result = finalizeCss(plain)
 
     expect(result.css).toBe(plain)
@@ -323,28 +452,43 @@ describe('the emitted stylesheet', () => {
   })
 
   it('produces the marker the parser reads back', () => {
-    expect(viewTransitionMarker('old', 'my-card-2')).toBe('&:where(.jumi-vt-old-my-card-2)')
+    expect(viewTransitionMarker('old', 'my-card-2')).toBe(
+      '&:where(.jumi-vt-old-my-card-2)',
+    )
   })
 
   it('round-trips every accepted identity through the marker and back', () => {
     // The adapter builds the marker and this pass parses it, so the two spellings of one convention
     // have to agree — and they are in different files' worth of code apart. A property rather than a
     // case, because the failure it guards is a silent divergence between build and parse.
-    for (const identity of ['hero', 'my-card-2', '--foo', 'HERO', '_x', '-x', 'a1']) {
+    for (const identity of [
+      'hero',
+      'my-card-2',
+      '--foo',
+      'HERO',
+      '_x',
+      '-x',
+      'a1',
+    ]) {
       for (const side of ['old', 'new'] as const) {
-        const selector = viewTransitionMarker(side, identity).replace('&', '.candidate')
+        const selector = viewTransitionMarker(side, identity).replace(
+          '&',
+          '.candidate',
+        )
 
         expect(identityAccepted(identity)).toBe(true)
 
         const found = products(`${selector} { ${MOTION} }`)
 
-        expect(found.identities).toEqual([{ conditions: [], identity, source: '.candidate' }])
+        expect(found.identities).toEqual([
+          { conditions: [], identity, source: '.candidate' },
+        ])
         expect(found.warnings).toEqual([])
       }
     }
   })
 
-  it('does not mistake an author\'s own class for staging', () => {
+  it("does not mistake an author's own class for staging", () => {
     // The one way this pass could delete something that is not its own. `isViewTransitionRule` decides
     // what leaves the document, and the marker's own documentation names `.jumi-vt-old-hero` — so a
     // prefix test would remove an author's rule that happens to use it.
@@ -373,8 +517,18 @@ describe('the emitted stylesheet', () => {
     // one stylesheet, or a fresh build against an incremental one, have to agree byte for byte.
     const css = [
       '.animate-fade-out { a: b; }',
-      staged('view-transition-old/hero:animate-fade-out', 'old', 'hero', MOTION),
-      staged('view-transition-new/card:animate-fade-in', 'new', 'card', '--jumi-fade-in-animation-name: jumi-fade-in'),
+      staged(
+        'view-transition-old/hero:animate-fade-out',
+        'old',
+        'hero',
+        MOTION,
+      ),
+      staged(
+        'view-transition-new/card:animate-fade-in',
+        'new',
+        'card',
+        '--jumi-fade-in-animation-name: jumi-fade-in',
+      ),
     ].join('\n')
 
     const first = finalizeCss(css).css
@@ -382,7 +536,9 @@ describe('the emitted stylesheet', () => {
     expect(finalizeCss(css).css).toBe(first)
     expect(finalizeCss(first).css).toBe(first)
     // And in the order the document declared them, not alphabetically.
-    expect(first.indexOf('view-transition-name: hero')).toBeLessThan(first.indexOf('view-transition-name: card'))
+    expect(first.indexOf('view-transition-name: hero')).toBeLessThan(
+      first.indexOf('view-transition-name: card'),
+    )
   })
 })
 
@@ -397,14 +553,28 @@ describe('the emitted stylesheet', () => {
  */
 describe('the design invariants', () => {
   it('a VT control never establishes participation', () => {
-    const found = products(staged('view-transition-old/hero:animation-duration-300', 'old', 'hero', CONTROL))
+    const found = products(
+      staged(
+        'view-transition-old/hero:animation-duration-300',
+        'old',
+        'hero',
+        CONTROL,
+      ),
+    )
 
     expect(found.identities).toHaveLength(0)
     expect(found.units).toHaveLength(0)
   })
 
   it('a motion-bearing candidate establishes its own identity', () => {
-    const found = products(staged('view-transition-old/hero:animate-fade-out', 'old', 'hero', MOTION))
+    const found = products(
+      staged(
+        'view-transition-old/hero:animate-fade-out',
+        'old',
+        'hero',
+        MOTION,
+      ),
+    )
 
     expect(found.identities.map(entry => entry.identity)).toEqual(['hero'])
     expect(found.identities.map(entry => entry.source)).toEqual([
@@ -413,18 +583,38 @@ describe('the design invariants', () => {
   })
 
   it('multiple candidates for one identity contribute independently, with no winner chosen', () => {
-    const found = products([
-      `@media (width >= 40rem) { ${
-        staged('sm:view-transition-old/card:animate-fade-out', 'old', 'card', MOTION)} }`,
-      staged('view-transition-new/card:animate-fade-in', 'new', 'card', '--jumi-fade-in-animation-name: jumi-fade-in'),
-    ].join('\n'))
+    const found = products(
+      [
+        `@media (width >= 40rem) { ${staged(
+          'sm:view-transition-old/card:animate-fade-out',
+          'old',
+          'card',
+          MOTION,
+        )} }`,
+        staged(
+          'view-transition-new/card:animate-fade-in',
+          'new',
+          'card',
+          '--jumi-fade-in-animation-name: jumi-fade-in',
+        ),
+      ].join('\n'),
+    )
 
     expect(found.identities).toHaveLength(2)
-    expect(found.identities.map(entry => entry.conditions.length)).toEqual([1, 0])
+    expect(found.identities.map(entry => entry.conditions.length)).toEqual([
+      1, 0,
+    ])
   })
 
   it('an absent side stays entirely browser-owned', () => {
-    const { css } = finalizeCss(staged('view-transition-old/hero:animate-fade-out', 'old', 'hero', MOTION))
+    const { css } = finalizeCss(
+      staged(
+        'view-transition-old/hero:animate-fade-out',
+        'old',
+        'hero',
+        MOTION,
+      ),
+    )
 
     expect(css).toContain('::view-transition-old(hero)')
     // Not merely unanimated: not mentioned at all. A side listed anywhere in the emitted block has had
@@ -433,20 +623,32 @@ describe('the design invariants', () => {
   })
 
   it('motion-safe suppresses Jumi motion and never transition identity', () => {
-    const source = `@media (prefers-reduced-motion: no-preference) { ${
-      staged('motion-safe:view-transition-old/hero:animate-fade-out', 'old', 'hero', MOTION)} }`
+    const source = `@media (prefers-reduced-motion: no-preference) { ${staged(
+      'motion-safe:view-transition-old/hero:animate-fade-out',
+      'old',
+      'hero',
+      MOTION,
+    )} }`
     const { css } = finalizeCss(source)
 
     expect(css).toContain('view-transition-name: hero')
     // The identity rule outside every condition, and the motion inside Jumi's own.
-    expect(css.match(/@media \(prefers-reduced-motion: no-preference\)/g)?.length).toBeGreaterThan(0)
-    expect(css.indexOf('view-transition-name: hero')).toBeLessThan(css.indexOf('@supports selector('))
+    expect(
+      css.match(/@media \(prefers-reduced-motion: no-preference\)/g)?.length,
+    ).toBeGreaterThan(0)
+    expect(css.indexOf('view-transition-name: hero')).toBeLessThan(
+      css.indexOf('@supports selector('),
+    )
   })
 
   it('motion-reduce is invalid for Jumi VT motion', () => {
     const { css, warnings } = finalizeCss(
-      `@media (prefers-reduced-motion: reduce) { ${
-        staged('motion-reduce:view-transition-old/hero:animate-fade-out', 'old', 'hero', MOTION)} }`,
+      `@media (prefers-reduced-motion: reduce) { ${staged(
+        'motion-reduce:view-transition-old/hero:animate-fade-out',
+        'old',
+        'hero',
+        MOTION,
+      )} }`,
     )
 
     expect(css).not.toContain('view-transition-name')
@@ -454,21 +656,39 @@ describe('the design invariants', () => {
   })
 
   it('Jumi never emits onto the group pseudo', () => {
-    const { css } = finalizeCss(staged('view-transition-old/hero:animate-fade-out', 'old', 'hero', MOTION))
+    const { css } = finalizeCss(
+      staged(
+        'view-transition-old/hero:animate-fade-out',
+        'old',
+        'hero',
+        MOTION,
+      ),
+    )
 
     expect(css).not.toContain('::view-transition-group(')
   })
 
-  it('Jumi restores `plus-lighter` whenever it replaces a side\'s UA animation', () => {
-    const { css } = finalizeCss(staged('view-transition-old/hero:animate-fade-out', 'old', 'hero', MOTION))
+  it("Jumi restores `plus-lighter` whenever it replaces a side's UA animation", () => {
+    const { css } = finalizeCss(
+      staged(
+        'view-transition-old/hero:animate-fade-out',
+        'old',
+        'hero',
+        MOTION,
+      ),
+    )
 
     expect(css).toContain('mix-blend-mode: plus-lighter')
   })
 
   it('prunes an at-rule it emptied, but never a layer', () => {
     const { css } = finalizeCss(
-      `@layer utilities { @media (width >= 40rem) { ${
-        staged('sm:view-transition-old/hero:animate-fade-out', 'old', 'hero', MOTION)} } }`,
+      `@layer utilities { @media (width >= 40rem) { ${staged(
+        'sm:view-transition-old/hero:animate-fade-out',
+        'old',
+        'hero',
+        MOTION,
+      )} } }`,
     )
 
     expect(css).toContain('@layer utilities')
@@ -478,12 +698,28 @@ describe('the design invariants', () => {
     // Two controls under conditions that agree on nothing, on one side. Both are emitted, so the cascade
     // decides exactly as it would on the element — which is the whole reason the declarations are
     // concatenated in document order instead of being reconciled here.
-    const { css } = finalizeCss([
-      staged('view-transition-old/hero:animate-fade-out', 'old', 'hero', MOTION),
-      staged('view-transition-old/hero:animation-duration-300', 'old', 'hero', CONTROL),
-      `@media (width >= 40rem) { ${
-        staged('sm:view-transition-old/hero:animation-duration-500', 'old', 'hero', '--jumi-animation-duration: 500ms')} }`,
-    ].join('\n'))
+    const { css } = finalizeCss(
+      [
+        staged(
+          'view-transition-old/hero:animate-fade-out',
+          'old',
+          'hero',
+          MOTION,
+        ),
+        staged(
+          'view-transition-old/hero:animation-duration-300',
+          'old',
+          'hero',
+          CONTROL,
+        ),
+        `@media (width >= 40rem) { ${staged(
+          'sm:view-transition-old/hero:animation-duration-500',
+          'old',
+          'hero',
+          '--jumi-animation-duration: 500ms',
+        )} }`,
+      ].join('\n'),
+    )
 
     expect(css).toContain('--jumi-animation-duration: 300ms')
     expect(css).toContain('--jumi-animation-duration: 500ms')
@@ -493,15 +729,23 @@ describe('the design invariants', () => {
     // The pass reads conditions off live rules and then takes those rules out of the document. It must
     // not also rewrite what it read: a second emission from the same staging has to produce the same
     // stylesheet, which is the property the incremental arms rest on.
-    const staging = stagingOf(`@media (width >= 40rem) { ${
-      staged('sm:view-transition-old/hero:animate-fade-out', 'old', 'hero', MOTION)} }`)
+    const staging = stagingOf(
+      `@media (width >= 40rem) { ${staged(
+        'sm:view-transition-old/hero:animate-fade-out',
+        'old',
+        'hero',
+        MOTION,
+      )} }`,
+    )
 
     const firstProducts = viewTransitionProducts(staging, isMotion)
     const secondProducts = viewTransitionProducts(staging, isMotion)
 
     expect(secondProducts.identities).toEqual(firstProducts.identities)
     expect(secondProducts.units).toEqual(firstProducts.units)
-    expect(firstProducts.units[0].conditions).toEqual([{ name: 'media', params: '(width >= 40rem)' }])
+    expect(firstProducts.units[0].conditions).toEqual([
+      { name: 'media', params: '(width >= 40rem)' },
+    ])
   })
 
   /**
@@ -520,7 +764,10 @@ describe('the design invariants', () => {
   it('reads a rule whose selector is a list, and takes all of it out', () => {
     const ids = ['alpha', 'bravo', 'charlie']
     const list = ids
-      .map(id => `.view-transition-old\\/${id}\\:animate-fade-out:where(.jumi-vt-old-${id})`)
+      .map(
+        id =>
+          `.view-transition-old\\/${id}\\:animate-fade-out:where(.jumi-vt-old-${id})`,
+      )
       .join(',\n')
     const css = [
       '.animate-fade-out { --jumi-fade-out-animation-name: jumi-fade-out; }',

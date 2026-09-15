@@ -22,13 +22,22 @@
  */
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 
+import * as prettier from 'prettier'
+
 const root = new URL('../', import.meta.url)
 
-const registry = await readFile(new URL('src/keyframes/effects.ts', root), 'utf8')
-const names = [...registry.matchAll(/'@keyframes jumi-([^']+)'/g)].map(match => match[1])
+const registry = await readFile(
+  new URL('src/keyframes/effects.ts', root),
+  'utf8',
+)
+const names = [...registry.matchAll(/'@keyframes jumi-([^']+)'/g)].map(
+  match => match[1],
+)
 
 if (!names.length) {
-  console.error('✗ no effects found in src/keyframes/effects.ts — the extraction has gone stale')
+  console.error(
+    '✗ no effects found in src/keyframes/effects.ts — the extraction has gone stale',
+  )
   process.exit(1)
 }
 
@@ -81,11 +90,13 @@ export const families: Array<Family> = ${JSON.stringify(
 /** `fade` → `Fade`, for a story export's identifier. */
 const identifier = family => family[0].toUpperCase() + family.slice(1)
 
-const exports = families.map(({ family }) => {
-  const label = identifier(family)
+const exports = families
+  .map(({ family }) => {
+    const label = identifier(family)
 
-  return `export const ${label}: Story = familyStory('${family}')`
-}).join('\n')
+    return `export const ${label}: Story = familyStory('${family}')`
+  })
+  .join('\n')
 
 const stories = `import type { Meta, StoryObj } from '@storybook/react-vite'
 
@@ -119,8 +130,29 @@ const familyStory = (family: string): Story => ({
 ${exports}
 `
 
-await mkdir(new URL('stories/animations/', root), { recursive: true })
-await writeFile(new URL('stories/animations/effects.generated.ts', root), data)
-await writeFile(new URL('stories/animations/catalog.stories.tsx', root), stories)
+const prettierOptions = await prettier.resolveConfig(
+  new URL('stories/animations/effects.generated.ts', root).pathname,
+)
 
-console.log(`Prepared ${names.length} effects in ${families.length} families for Storybook.`)
+/**
+ * Written the way the formatter writes it. A generated artifact the formatter disagrees with is a
+ * diff on every `pnpm lint`, and the file it would keep rewriting is the one `stories-check.mjs`
+ * reads as text — that check went red the first time the catalog was reformatted, because the
+ * generated keys were double-quoted and the extraction looked for exactly that.
+ */
+const format = (source, filepath) =>
+  prettier.format(source, { ...prettierOptions, filepath })
+
+await mkdir(new URL('stories/animations/', root), { recursive: true })
+await writeFile(
+  new URL('stories/animations/effects.generated.ts', root),
+  await format(data, 'stories/animations/effects.generated.ts'),
+)
+await writeFile(
+  new URL('stories/animations/catalog.stories.tsx', root),
+  await format(stories, 'stories/animations/catalog.stories.tsx'),
+)
+
+console.log(
+  `Prepared ${names.length} effects in ${families.length} families for Storybook.`,
+)

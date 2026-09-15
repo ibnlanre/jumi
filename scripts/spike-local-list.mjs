@@ -48,19 +48,27 @@ const experiment = async (name, { css, expected, html, property }) => {
 <body>${html}</body>
 </html>`)
 
-  const measured = await page.evaluate(({ expected, property }) => {
-    const read = id => getComputedStyle(document.getElementById(id)).getPropertyValue(property).trim()
+  const measured = await page.evaluate(
+    ({ expected, property }) => {
+      const read = id =>
+        getComputedStyle(document.getElementById(id))
+          .getPropertyValue(property)
+          .trim()
 
-    return {
-      all: read('all'),
-      expected,
-      // One element per combination, so a mechanism that works only for the single-utility case is
-      // visible rather than averaged away.
-      only: read('only'),
-      pair: read('pair'),
-      positions: [read('only'), read('pair'), read('all')].map(value => value.split(',').length),
-    }
-  }, { expected, property })
+      return {
+        all: read('all'),
+        expected,
+        // One element per combination, so a mechanism that works only for the single-utility case is
+        // visible rather than averaged away.
+        only: read('only'),
+        pair: read('pair'),
+        positions: [read('only'), read('pair'), read('all')].map(
+          value => value.split(',').length,
+        ),
+      }
+    },
+    { expected, property },
+  )
 
   results.push({ name, ...measured })
 }
@@ -93,15 +101,18 @@ const support = await page.evaluate(async () => {
 
   return {
     '@function': await probe(
-      selector => `@function --probe-color() returns <color> { result: red; } ${selector} { color: --probe-color(); }`,
+      selector =>
+        `@function --probe-color() returns <color> { result: red; } ${selector} { color: --probe-color(); }`,
       element => getComputedStyle(element).color,
     ),
     'if()': await probe(
-      selector => `${selector} { --q: 1; width: if(style(--q: 1): 10px; else: 20px); }`,
+      selector =>
+        `${selector} { --q: 1; width: if(style(--q: 1): 10px; else: 20px); }`,
       element => getComputedStyle(element).width,
     ),
     'registered list syntax': await probe(
-      selector => `@property --probe-ident { syntax: "<custom-ident>#"; inherits: false; initial-value: none; } ${selector} { --probe-ident: a; }`,
+      selector =>
+        `@property --probe-ident { syntax: "<custom-ident>#"; inherits: false; initial-value: none; } ${selector} { --probe-ident: a; }`,
       element => getComputedStyle(element).getPropertyValue('--probe-ident'),
     ),
     'sibling-count()': await probe(
@@ -214,9 +225,10 @@ await experiment('@container style(): respond to which utility is present', {
     @container style(--has-a: 1) { #only, #pair, #all { animation-name: a; } }
     @container style(--has-b: 1) { #only, #pair, #all { animation-name: b; } }
   `,
-  html: '<div class="a"><div id="only"></div></div>'
-    + '<div class="a b"><div id="pair"></div></div>'
-    + '<div class="a b c"><div id="all"></div></div>',
+  html:
+    '<div class="a"><div id="only"></div></div>' +
+    '<div class="a b"><div id="pair"></div></div>' +
+    '<div class="a b c"><div id="all"></div></div>',
   property: 'animation-name',
 })
 
@@ -258,14 +270,23 @@ await browser.close()
 console.log('primitive support')
 console.log(`   ${JSON.stringify(support)}`)
 
-console.log(`\n${'experiment'.padEnd(52)} ${'only'.padEnd(14)} ${'pair'.padEnd(14)} ${'all'.padEnd(14)} positions`)
+console.log(
+  `\n${'experiment'.padEnd(52)} ${'only'.padEnd(14)} ${'pair'.padEnd(14)} ${'all'.padEnd(14)} positions`,
+)
 
 for (const row of results) {
-  const cell = value => (value.length > 12 ? `${value.slice(0, 11)}…` : value).padEnd(14)
+  const cell = value =>
+    (value.length > 12 ? `${value.slice(0, 11)}…` : value).padEnd(14)
 
-  console.log(`   ${row.name.padEnd(52)} ${cell(row.only)} ${cell(row.pair)} ${cell(row.all)} ${row.positions.join('/')}`)
+  console.log(
+    `   ${row.name.padEnd(52)} ${cell(row.only)} ${cell(row.pair)} ${cell(row.all)} ${row.positions.join('/')}`,
+  )
 }
 
-console.log(`\nA mechanism works only if the three positions counts are 1, 2 and 3 — the element's own`)
-console.log(`subset. Anything that reports 1/1/1 is cascade selection; anything that reports a fixed`)
+console.log(
+  `\nA mechanism works only if the three positions counts are 1, 2 and 3 — the element's own`,
+)
+console.log(
+  `subset. Anything that reports 1/1/1 is cascade selection; anything that reports a fixed`,
+)
 console.log(`count regardless of the classes is a fixed-arity declaration.`)

@@ -8,25 +8,42 @@ const api = (themes: Record<string, Record<string, any>>) =>
   ({ theme: (key: string) => themes[key] }) as unknown as Api
 
 /** A spacing scale as the host hands it over: resolved multiples of `--spacing`. */
-const spacing = { padding: { 0: '0px', 0.5: '0.125rem', 1: '0.25rem', 4: '1rem', 96: '24rem', px: '1px' } }
+const spacing = {
+  padding: {
+    0: '0px',
+    0.5: '0.125rem',
+    1: '0.25rem',
+    4: '1rem',
+    96: '24rem',
+    px: '1px',
+  },
+}
 
 describe('resolveTheme', () => {
   it('resolves a host value to the token that carries it', () => {
     const themed = api({ colors: { 'red-500': 'oklch(63.7% 0.237 25.331)' } })
 
-    expect(resolveTheme(themed, 'colors')).toEqual({ 'red-500': 'var(--color-red-500)' })
+    expect(resolveTheme(themed, 'colors')).toEqual({
+      'red-500': 'var(--color-red-500)',
+    })
   })
 
   it('flattens a nested scale before resolving it', () => {
-    const themed = api({ colors: { red: { 500: 'oklch(63.7% 0.237 25.331)' } } })
+    const themed = api({
+      colors: { red: { 500: 'oklch(63.7% 0.237 25.331)' } },
+    })
 
-    expect(resolveTheme(themed, 'colors')).toEqual({ 'red-500': 'var(--color-red-500)' })
+    expect(resolveTheme(themed, 'colors')).toEqual({
+      'red-500': 'var(--color-red-500)',
+    })
   })
 
   it('uses the namespace the key is declared under', () => {
     const themed = api({ letterSpacing: { tight: '-0.025em' } })
 
-    expect(resolveTheme(themed, 'letterSpacing')).toEqual({ tight: 'var(--tracking-tight)' })
+    expect(resolveTheme(themed, 'letterSpacing')).toEqual({
+      tight: 'var(--tracking-tight)',
+    })
   })
 
   it('leaves Jumi\u2019s own vocabulary as a literal', () => {
@@ -34,7 +51,9 @@ describe('resolveTheme', () => {
     // `--color-context-fill` token to point at.
     const themed = api({ colors: { 'red-500': 'oklch(63.7% 0.237 25.331)' } })
 
-    expect(resolveTheme(themed, 'colors', { 'context-fill': 'context-fill' })).toEqual({
+    expect(
+      resolveTheme(themed, 'colors', { 'context-fill': 'context-fill' }),
+    ).toEqual({
       'context-fill': 'context-fill',
       'red-500': 'var(--color-red-500)',
     })
@@ -44,12 +63,18 @@ describe('resolveTheme', () => {
     // The token would carry the host's value, not the one Jumi was handed.
     const themed = api({ colors: { 'red-500': 'oklch(63.7% 0.237 25.331)' } })
 
-    expect(resolveTheme(themed, 'colors', { 'red-500': 'oklch(50% 0.1 20)' }))
-      .toEqual({ 'red-500': 'oklch(50% 0.1 20)' })
+    expect(
+      resolveTheme(themed, 'colors', { 'red-500': 'oklch(50% 0.1 20)' }),
+    ).toEqual({ 'red-500': 'oklch(50% 0.1 20)' })
   })
 
   it('keeps a name the namespace has no token for', () => {
-    const themed = api({ borderColor: { 'DEFAULT': 'currentColor', 'red-500': 'oklch(63.7% 0.237 25.331)' } })
+    const themed = api({
+      borderColor: {
+        'DEFAULT': 'currentColor',
+        'red-500': 'oklch(63.7% 0.237 25.331)',
+      },
+    })
 
     expect(resolveTheme(themed, 'borderColor')).toEqual({
       'DEFAULT': 'currentColor',
@@ -79,7 +104,15 @@ describe('resolveTheme', () => {
   })
 
   it('keeps the names in a spacing scale that are not multiples', () => {
-    const themed = api({ width: { '1/2': '50%', '4': '1rem', 'auto': 'auto', 'full': '100%', 'screen': '100vw' } })
+    const themed = api({
+      width: {
+        '1/2': '50%',
+        '4': '1rem',
+        'auto': 'auto',
+        'full': '100%',
+        'screen': '100vw',
+      },
+    })
 
     expect(resolveTheme(themed, 'width')).toEqual({
       '1/2': '50%',
@@ -93,7 +126,9 @@ describe('resolveTheme', () => {
   it('does not depend on what the host\u2019s scale says, because it is unusable under an override', () => {
     // Measured with `--spacing: 0.3rem`: `theme('margin')` returns the characters of the base
     // string, so a name like `2` arrives as `'3'`. Trusting it emitted `margin: 3`.
-    const themed = api({ margin: { 0: '0', 1: '.', 2: '3', 4: 'e', auto: 'auto' } })
+    const themed = api({
+      margin: { 0: '0', 1: '.', 2: '3', 4: 'e', auto: 'auto' },
+    })
 
     expect(resolveTheme(themed, 'margin')).toEqual({
       0: '0',
@@ -113,7 +148,9 @@ describe('resolveTheme', () => {
   it('leaves Jumi\u2019s own additions to a spacing scale as literals', () => {
     // `theme('inset', inset)`: `hero-gap` is Jumi's, so it is not a multiple of anything the host
     // said, and the rest of the scale still resolves.
-    expect(resolveTheme(api(spacing), 'padding', { 'hero-gap': '7rem' })).toEqual({
+    expect(
+      resolveTheme(api(spacing), 'padding', { 'hero-gap': '7rem' }),
+    ).toEqual({
       '0': '0px',
       '0.5': 'calc(var(--spacing) * 0.5)',
       '1': 'var(--spacing)',
@@ -139,7 +176,9 @@ describe('partial scales', () => {
   it('resolves one scale three ways at once', () => {
     // Measured against the emitted CSS: `leading-6` is `calc(var(--spacing) * 6)`,
     // `leading-tight` is `var(--leading-tight)`, and `leading-none` is `1`.
-    const themed = api({ lineHeight: { 3: '0.75rem', 6: '1.5rem', none: '1', tight: '1.25' } })
+    const themed = api({
+      lineHeight: { 3: '0.75rem', 6: '1.5rem', none: '1', tight: '1.25' },
+    })
 
     expect(resolveTheme(themed, 'lineHeight')).toEqual({
       3: 'calc(var(--spacing) * 3)',
@@ -209,7 +248,11 @@ describe('partial scales', () => {
     const themed = api({
       backdropBlur: { 0: '0', DEFAULT: '8px', none: '', sm: '8px' },
       blur: { 0: '0', DEFAULT: '8px', none: '', sm: '8px' },
-      dropShadow: { DEFAULT: '0 1px 2px rgb(0 0 0 / 0.1)', none: '0 0 #0000', sm: '0 1px 2px rgb(0 0 0 / 0.15)' },
+      dropShadow: {
+        DEFAULT: '0 1px 2px rgb(0 0 0 / 0.1)',
+        none: '0 0 #0000',
+        sm: '0 1px 2px rgb(0 0 0 / 0.15)',
+      },
     })
 
     expect(resolveTheme(themed, 'blur')).toEqual({
@@ -239,7 +282,13 @@ describe('partial scales', () => {
     // The trap this batch was measured to avoid: `--shadow-*` exists and looks exactly like
     // `--drop-shadow-*`, but `shadow-sm` inlines its value (`--tw-shadow: 0 1px 3px 0
     // var(--tw-shadow-color, …)`) while `drop-shadow-sm` references its token.
-    const themed = api({ boxShadow: { DEFAULT: '0 1px 3px 0 rgb(0 0 0 / 0.1)', none: 'none', sm: '0 1px 3px 0 rgb(0 0 0 / 0.1)' } })
+    const themed = api({
+      boxShadow: {
+        DEFAULT: '0 1px 3px 0 rgb(0 0 0 / 0.1)',
+        none: 'none',
+        sm: '0 1px 3px 0 rgb(0 0 0 / 0.1)',
+      },
+    })
 
     expect(resolveTheme(themed, 'boxShadow')).toEqual({
       DEFAULT: '0 1px 3px 0 rgb(0 0 0 / 0.1)',

@@ -1537,10 +1537,12 @@ export const effectKeyframes: Collection = {
   'neon': {
     '@keyframes jumi-neon': {
       '0%, 100%': {
-        filter: 'drop-shadow(0 0 5px currentColor) drop-shadow(0 0 10px currentColor)',
+        filter:
+          'drop-shadow(0 0 5px currentColor) drop-shadow(0 0 10px currentColor)',
       },
       '50%': {
-        filter: 'drop-shadow(0 0 10px currentColor) drop-shadow(0 0 20px currentColor) drop-shadow(0 0 30px currentColor)',
+        filter:
+          'drop-shadow(0 0 10px currentColor) drop-shadow(0 0 20px currentColor) drop-shadow(0 0 30px currentColor)',
       },
     },
   },
@@ -1838,15 +1840,18 @@ export const effectKeyframes: Collection = {
       },
       '25%': {
         opacity: '0.8',
-        transform: 'scale(0.8) translateX(-30px) translateY(-15px) rotate(45deg)',
+        transform:
+          'scale(0.8) translateX(-30px) translateY(-15px) rotate(45deg)',
       },
       '50%': {
         opacity: '0.6',
-        transform: 'scale(0.6) translateX(40px) translateY(-25px) rotate(-30deg)',
+        transform:
+          'scale(0.6) translateX(40px) translateY(-25px) rotate(-30deg)',
       },
       '75%': {
         opacity: '0.8',
-        transform: 'scale(0.8) translateX(-20px) translateY(20px) rotate(15deg)',
+        transform:
+          'scale(0.8) translateX(-20px) translateY(20px) rotate(15deg)',
       },
       '100%': {
         opacity: '1',

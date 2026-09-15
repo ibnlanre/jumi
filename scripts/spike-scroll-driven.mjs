@@ -47,7 +47,13 @@ import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright'
 
 import { build, compiler, root } from './lib/compile.mjs'
-import { ARMS, CANDIDATES, page as pageHtml, reader, TIMELINE_PROPERTIES } from './spike-scroll-driven/arms.mjs'
+import {
+  ARMS,
+  CANDIDATES,
+  page as pageHtml,
+  reader,
+  TIMELINE_PROPERTIES,
+} from './spike-scroll-driven/arms.mjs'
 
 import path from 'node:path'
 import postcss from 'postcss'
@@ -61,11 +67,12 @@ const SWEEP = [0, 0.25, 0.5, 0.75, 1]
  * The platform reports a progress-based timeline's own clock as a `CSSNumericValue` — `25%`, not
  * `250ms` — so a number formatter alone renders it as `NaN`. Units arrive spelled out.
  */
-const round = (value) => {
+const round = value => {
   if (value == null) return '—'
   if (typeof value === 'string') return value
   if (typeof value !== 'object') return `${Math.round(value * 100) / 100}`
-  if (value.unit != null) return `${Math.round(value.value * 100) / 100}${value.unit === 'percent' ? '%' : value.unit}`
+  if (value.unit != null)
+    return `${Math.round(value.value * 100) / 100}${value.unit === 'percent' ? '%' : value.unit}`
 
   return value.constructor?.name ?? String(value)
 }
@@ -73,12 +80,22 @@ const list = values => values.map(round).join(' ')
 
 /** Fixed-width rows, because these tables are read by eye and compared down a column. */
 const table = (rows, gap = '  ') => {
-  const widths = rows[0].map((_, column) => Math.max(...rows.map(row => String(row[column] ?? '').length)))
+  const widths = rows[0].map((_, column) =>
+    Math.max(...rows.map(row => String(row[column] ?? '').length)),
+  )
 
-  return rows.map(row => row.map((cell, column) => String(cell ?? '').padEnd(widths[column])).join(gap).trimEnd()).join('\n')
+  return rows
+    .map(row =>
+      row
+        .map((cell, column) => String(cell ?? '').padEnd(widths[column]))
+        .join(gap)
+        .trimEnd(),
+    )
+    .join('\n')
 }
 
-const heading = text => console.log(`\n${text}\n${'─'.repeat(Math.max(text.length, 60))}`)
+const heading = text =>
+  console.log(`\n${text}\n${'─'.repeat(Math.max(text.length, 60))}`)
 
 // ── the emission ────────────────────────────────────────────────────────────────────────────────
 const entry = `
@@ -89,14 +106,16 @@ const entry = `
 const instance = await compiler(entry, root)
 const emitted = build(instance, CANDIDATES)
 
-console.log(`scroll-driven spike · ${CANDIDATES.length} candidates · ${emitted.css.length} bytes emitted`)
+console.log(
+  `scroll-driven spike · ${CANDIDATES.length} candidates · ${emitted.css.length} bytes emitted`,
+)
 
 /** The composition, read out of the finished stylesheet rather than assumed. */
 const sheet = postcss.parse(emitted.css)
 const composition = (() => {
   let best = null
 
-  sheet.walkRules((rule) => {
+  sheet.walkRules(rule => {
     const own = (rule.nodes ?? []).filter(node => node.type === 'decl')
 
     if (!own.some(node => node.prop === 'animation')) return
@@ -107,7 +126,7 @@ const composition = (() => {
   return best
 })()
 
-const splitTop = (value) => {
+const splitTop = value => {
   const parts = []
   let current = ''
   let depth = 0
@@ -132,10 +151,17 @@ const splitTop = (value) => {
 }
 
 // ── the page ────────────────────────────────────────────────────────────────────────────────────
-const html = pageHtml(emitted.css, reader(
-  ARMS.filter(arm => arm.where !== 'plain').map(({ classes, id, where }) => ({ classes, id, where: where ?? 'lane' })),
-  TIMELINE_PROPERTIES,
-))
+const html = pageHtml(
+  emitted.css,
+  reader(
+    ARMS.filter(arm => arm.where !== 'plain').map(({ classes, id, where }) => ({
+      classes,
+      id,
+      where: where ?? 'lane',
+    })),
+    TIMELINE_PROPERTIES,
+  ),
+)
 
 const server = createServer((request, response) => {
   response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
@@ -147,7 +173,9 @@ const origin = `http://127.0.0.1:${server.address().port}`
 const browser = await chromium.launch()
 console.log(`chromium ${browser.version()}`)
 
-const context = await browser.newContext({ viewport: { height: 700, width: 1200 } })
+const context = await browser.newContext({
+  viewport: { height: 700, width: 1200 },
+})
 const page = await context.newPage()
 
 await page.goto(origin)
@@ -155,16 +183,28 @@ await page.waitForFunction(() => window.__ready === true)
 
 /** Scroll, then let the frame that applies it land: scroll-driven progress is read off the frame. */
 const scrollTo = async (target, fraction) => {
-  await page.evaluate(([where, at]) => {
-    const node = where === 'root' ? document.documentElement : document.getElementById(where)
-    const max = where === 'root'
-      ? document.documentElement.scrollHeight - innerHeight
-      : node.scrollHeight - node.clientHeight
+  await page.evaluate(
+    ([where, at]) => {
+      const node =
+        where === 'root'
+          ? document.documentElement
+          : document.getElementById(where)
+      const max =
+        where === 'root'
+          ? document.documentElement.scrollHeight - innerHeight
+          : node.scrollHeight - node.clientHeight
 
-    node.scrollTop = Math.round(at * max)
-  }, [target, fraction])
+      node.scrollTop = Math.round(at * max)
+    },
+    [target, fraction],
+  )
 
-  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))
+  await page.evaluate(
+    () =>
+      new Promise(resolve =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      ),
+  )
 }
 
 const read = id => page.evaluate(arm => window.__read(arm), id)
@@ -182,14 +222,16 @@ const sweep = async (id, target = 'root', positions = SWEEP) => {
   return out
 }
 
-const scrollTargetFor = id => (id === 'aPaneScroll' ? 'pane' : id === 'aSelfScroll' ? 'aSelfScroll' : 'root')
+const scrollTargetFor = id =>
+  id === 'aPaneScroll' ? 'pane' : id === 'aSelfScroll' ? 'aSelfScroll' : 'root'
 
 // ── 0 · what the platform claims ────────────────────────────────────────────────────────────────
 heading('0 · platform support')
 
 const support = await page.evaluate(() => window.__support())
 
-for (const [key, value] of Object.entries(support)) console.log(`  ${key.padEnd(20)} ${value}`)
+for (const [key, value] of Object.entries(support))
+  console.log(`  ${key.padEnd(20)} ${value}`)
 
 // ── 1 · the composition, read off the stylesheet ────────────────────────────────────────────────
 heading('1 · the composition a build writes')
@@ -205,16 +247,22 @@ const timelines = splitTop(parts['animation-timeline'] ?? '')
 
 console.log(`  slots (animation list)      ${slots}`)
 console.log(`  timeline entries            ${timelines.length}`)
-console.log(`  composition bytes           ${(composition?.toString().length ?? 0)}`)
+console.log(
+  `  composition bytes           ${composition?.toString().length ?? 0}`,
+)
 console.log(`  real longhands declared     ${Object.keys(parts).join(', ')}`)
-console.log(`\n  animation-timeline: ${(parts['animation-timeline'] ?? '—').slice(0, 200)}`)
+console.log(
+  `\n  animation-timeline: ${(parts['animation-timeline'] ?? '—').slice(0, 200)}`,
+)
 
 // ── 2 · retarget ────────────────────────────────────────────────────────────────────────────────
 heading('2 · retarget: the same motion, a different driver')
 
 const retargetArms = ARMS.filter(arm => arm.group === 'A')
 
-const retargetRows = [['arm', 'timeline', 'source', 'currentTime', 'progress', 'opacity']]
+const retargetRows = [
+  ['arm', 'timeline', 'source', 'currentTime', 'progress', 'opacity'],
+]
 
 for (const arm of retargetArms) {
   const readings = await sweep(arm.id, scrollTargetFor(arm.id))
@@ -238,10 +286,15 @@ for (const arm of retargetArms) {
 
   const reading = await read(arm.id)
 
-  console.log(`    ${arm.id.padEnd(14)} ${String(reading.computed['animation-timeline']).padEnd(34)} ${arm.note ?? ''}`)
+  console.log(
+    `    ${arm.id.padEnd(14)} ${String(reading.computed['animation-timeline']).padEnd(34)} ${arm.note ?? ''}`,
+  )
 }
 
-console.log('\n  the timeline clock, as the platform reports it: ' + JSON.stringify(await page.evaluate(() => window.__shape('aScroll'))))
+console.log(
+  '\n  the timeline clock, as the platform reports it: ' +
+    JSON.stringify(await page.evaluate(() => window.__shape('aScroll'))),
+)
 
 // ── 3 · the aggregate ───────────────────────────────────────────────────────────────────────────
 heading('3 · the aggregate: several slots, more than one timeline')
@@ -252,9 +305,13 @@ for (const arm of ARMS.filter(entry => entry.group === 'B')) {
 
   console.log(`\n  ${arm.id} — ${arm.note}`)
   console.log(`    computed animation-name      ${composed['animation-name']}`)
-  console.log(`    computed animation-timeline  ${composed['animation-timeline']}`)
+  console.log(
+    `    computed animation-timeline  ${composed['animation-timeline']}`,
+  )
 
-  const row = [['position', 'name', 'timeline', 'source', 'progress at 0 · ¼ · ½ · ¾ · 1']]
+  const row = [
+    ['position', 'name', 'timeline', 'source', 'progress at 0 · ¼ · ½ · ¾ · 1'],
+  ]
 
   readings[0].animations.forEach((animation, index) => {
     row.push([
@@ -262,11 +319,18 @@ for (const arm of ARMS.filter(entry => entry.group === 'B')) {
       animation.name,
       animation.timeline ?? '(none)',
       animation.source ?? '—',
-      readings.map(reading => round(reading.animations[index]?.progress)).join(' · '),
+      readings
+        .map(reading => round(reading.animations[index]?.progress))
+        .join(' · '),
     ])
   })
 
-  console.log(table(row, '  ').split('\n').map(line => `    ${line}`).join('\n'))
+  console.log(
+    table(row, '  ')
+      .split('\n')
+      .map(line => `    ${line}`)
+      .join('\n'),
+  )
 }
 
 // ── 4 · every control ───────────────────────────────────────────────────────────────────────────
@@ -276,18 +340,37 @@ const controls = [
   ['animation-duration-600', 'animation-duration', 'duration'],
   ['animation-duration-[auto]', 'animation-duration', 'duration (auto)'],
   ['animation-delay-200', 'animation-delay', 'delay'],
-  ['animation-timing-function-linear', 'animation-timing-function', 'timing-function'],
+  [
+    'animation-timing-function-linear',
+    'animation-timing-function',
+    'timing-function',
+  ],
   ['animation-direction-reverse', 'animation-direction', 'direction'],
-  ['animation-iteration-count-2', 'animation-iteration-count', 'iteration-count'],
+  [
+    'animation-iteration-count-2',
+    'animation-iteration-count',
+    'iteration-count',
+  ],
   ['animation-fill-mode-none', 'animation-fill-mode', 'fill-mode'],
   ['animation-play-state-paused', 'animation-play-state', 'play-state'],
   ['animation-composition-add', 'animation-composition', 'composition'],
 ]
 
-const controlRows = [['control', 'computed (document)', 'computed (scroll)', 'progress across a scroll sweep']]
+const controlRows = [
+  [
+    'control',
+    'computed (document)',
+    'computed (scroll)',
+    'progress across a scroll sweep',
+  ],
+]
 
 for (const [candidate, property, label] of controls) {
-  const arm = ARMS.find(entry => entry.classes === `animate-fade-in ${candidate} animation-timeline-scroll`)
+  const arm = ARMS.find(
+    entry =>
+      entry.classes ===
+      `animate-fade-in ${candidate} animation-timeline-scroll`,
+  )
 
   if (!arm) {
     controlRows.push([label, '(no arm)', '(no arm)', '—'])
@@ -296,7 +379,9 @@ for (const [candidate, property, label] of controls) {
   }
 
   const scrollReadings = await sweep(arm.id)
-  const documentArm = ARMS.find(entry => entry.classes === `animate-fade-in ${candidate}`)
+  const documentArm = ARMS.find(
+    entry => entry.classes === `animate-fade-in ${candidate}`,
+  )
   const documentReading = documentArm ? (await sweep(documentArm.id))[2] : null
 
   controlRows.push([
@@ -305,30 +390,54 @@ for (const [candidate, property, label] of controls) {
       ? `${documentReading.computed[property] ?? '—'} · timing ${documentReading.animations[0]?.duration}`
       : '—',
     `${scrollReadings[0].computed[property] ?? '—'} · timing ${scrollReadings[0].animations[0]?.duration}`,
-    list(scrollReadings.map(reading => reading.animations[0]?.progress))
-    + `   (delay ${scrollReadings[2].animations[0]?.delay}, iterations ${scrollReadings[2].animations[0]?.iterations}, direction ${scrollReadings[2].animations[0]?.direction}, fill ${scrollReadings[2].animations[0]?.fill}, ${scrollReadings[2].animations[0]?.playState})`,
+    list(scrollReadings.map(reading => reading.animations[0]?.progress)) +
+      `   (delay ${scrollReadings[2].animations[0]?.delay}, iterations ${scrollReadings[2].animations[0]?.iterations}, direction ${scrollReadings[2].animations[0]?.direction}, fill ${scrollReadings[2].animations[0]?.fill}, ${scrollReadings[2].animations[0]?.playState})`,
   ])
 }
 
 console.log(table(controlRows))
 
 // ── 4b · duration and delay, at a finer grain ───────────────────────────────────────────────────
-heading('4b · duration and delay: what a time value means once the driver is scroll')
+heading(
+  '4b · duration and delay: what a time value means once the driver is scroll',
+)
 
 const FINE = [0, 0.25, 0.5, 0.75, 1]
-const semanticsRows = [['arm', 'computed duration', 'computed delay', 'resolved duration per position', 'timeline %', 'progress per position']]
+const semanticsRows = [
+  [
+    'arm',
+    'computed duration',
+    'computed delay',
+    'resolved duration per position',
+    'timeline %',
+    'progress per position',
+  ],
+]
 
-for (const id of ['aScroll', 'cDurationS', 'cDuration2sS', 'cDurationAutoS', 'cDelayS', 'cDelay600S', 'bDurations']) {
+for (const id of [
+  'aScroll',
+  'cDurationS',
+  'cDuration2sS',
+  'cDurationAutoS',
+  'cDelayS',
+  'cDelay600S',
+  'bDurations',
+]) {
   const readings = await sweep(id, 'root', FINE)
 
   semanticsRows.push([
     id,
     readings[0].computed['animation-duration'],
     readings[0].computed['animation-delay'],
-    readings[0].animations.map(animation => round(animation.duration)).join(' '),
+    readings[0].animations
+      .map(animation => round(animation.duration))
+      .join(' '),
     list(readings.map(reading => reading.animations[0]?.currentTime)),
     readings[0].animations
-      .map((animation, index) => `${index} ${animation.name}: ${list(readings.map(reading => reading.animations[index]?.progress))}`)
+      .map(
+        (animation, index) =>
+          `${index} ${animation.name}: ${list(readings.map(reading => reading.animations[index]?.progress))}`,
+      )
       .join('   '),
   ])
 }
@@ -336,12 +445,23 @@ for (const id of ['aScroll', 'cDurationS', 'cDuration2sS', 'cDurationAutoS', 'cD
 console.log(table(semanticsRows))
 
 // ── 5 · animation-range ─────────────────────────────────────────────────────────────────────────
-heading('5 · animation-range: what Jumi writes, and what the platform does with a range')
+heading(
+  '5 · animation-range: what Jumi writes, and what the platform does with a range',
+)
 
-const rangeRows = [['arm', 'computed animation-range', 'progress across a 12-step scroll sweep']]
+const rangeRows = [
+  ['arm', 'computed animation-range', 'progress across a 12-step scroll sweep'],
+]
 const COARSE = [...Array(13).keys()].map(index => index / 12)
 
-for (const id of ['dRangeJumi', 'dRangeJumiArb', 'dPlainPct', 'dPlainNamed', 'dPlainMixed', 'dPlainLonghand']) {
+for (const id of [
+  'dRangeJumi',
+  'dRangeJumiArb',
+  'dPlainPct',
+  'dPlainNamed',
+  'dPlainMixed',
+  'dPlainLonghand',
+]) {
   const readings = await sweep(id, 'root', COARSE)
 
   rangeRows.push([
@@ -354,16 +474,39 @@ for (const id of ['dRangeJumi', 'dRangeJumiArb', 'dPlainPct', 'dPlainNamed', 'dP
 console.log(table(rangeRows))
 
 // ── 5b · the range value itself ─────────────────────────────────────────────────────────────────
-heading('5b · the range value: what is legal, and what a composed default would be')
+heading(
+  '5b · the range value: what is legal, and what a composed default would be',
+)
 
-const spellingRows = [['arm', 'declared animation-range', 'computed', 'progress across a 13-point sweep']]
+const spellingRows = [
+  [
+    'arm',
+    'declared animation-range',
+    'computed',
+    'progress across a 13-point sweep',
+  ],
+]
 
-for (const id of ['rNormal', 'rNormalOffsets', 'rOffsets', 'rCoverView', 'rNormalScroll', 'rCoverScroll']) {
+for (const id of [
+  'rNormal',
+  'rNormalOffsets',
+  'rOffsets',
+  'rCoverView',
+  'rNormalScroll',
+  'rCoverScroll',
+]) {
   const readings = await sweep(id, 'root', COARSE)
 
   spellingRows.push([
     id,
-    { rCoverScroll: 'cover 0% cover 100%', rCoverView: 'cover 0% cover 100%', rNormal: 'normal', rNormalOffsets: 'normal 0% normal 100%', rNormalScroll: 'normal', rOffsets: '0% 100%' }[id],
+    {
+      rCoverScroll: 'cover 0% cover 100%',
+      rCoverView: 'cover 0% cover 100%',
+      rNormal: 'normal',
+      rNormalOffsets: 'normal 0% normal 100%',
+      rNormalScroll: 'normal',
+      rOffsets: '0% 100%',
+    }[id],
     readings[6].computed['animation-range'],
     list(readings.map(reading => reading.animations[0]?.progress)),
   ])
@@ -371,82 +514,123 @@ for (const id of ['rNormal', 'rNormalOffsets', 'rOffsets', 'rCoverView', 'rNorma
 
 console.log(table(spellingRows))
 
-console.log('\n  and the range against the shorthand, which is where a reset would show:')
+console.log(
+  '\n  and the range against the shorthand, which is where a reset would show:',
+)
 for (const id of ['rOrderBefore', 'rOrderAfter']) {
   const reading = (await sweep(id, 'root', COARSE))[0]
 
-  console.log(`    ${id.padEnd(14)} declared 25% 75% → computed ${reading.computed['animation-range']}`)
+  console.log(
+    `    ${id.padEnd(14)} declared 25% 75% → computed ${reading.computed['animation-range']}`,
+  )
 }
 
 /** The two instruments a computed `normal` cannot separate: parse support, and a live substitution. */
-const parseSupport = await page.evaluate(() => Object.fromEntries([
-  'normal',
-  'normal 0%',
-  'normal 0% normal 100%',
-  '0% 100%',
-  'cover 0% cover 100%',
-  'entry 0% cover 50%',
-  // What a *component* spelling produces when `normal` is one of its values: the keyword joined to
-  // an offset, on one side only. The pair is the case that was measured illegal; these are the
-  // one-sided shapes a `-start-timeline-normal` control would write.
-  'normal 0% 100%',
-  '0% normal 100%',
-  // And the bare range names, which the whole-value control would write.
-  'entry',
-  'cover',
-  'contain',
-  'exit',
-  // The shapes a *half* control produces when it writes a complete start or end: a named range
-  // against the other half's default offset, and a name against a name.
-  'entry 100%',
-  'entry 50%',
-  'entry cover',
-  'entry-crossing 100%',
-  '0% entry',
-].map(value => [value, window.__parse('animation-range', value)])))
+const parseSupport = await page.evaluate(() =>
+  Object.fromEntries(
+    [
+      'normal',
+      'normal 0%',
+      'normal 0% normal 100%',
+      '0% 100%',
+      'cover 0% cover 100%',
+      'entry 0% cover 50%',
+      // What a *component* spelling produces when `normal` is one of its values: the keyword joined to
+      // an offset, on one side only. The pair is the case that was measured illegal; these are the
+      // one-sided shapes a `-start-timeline-normal` control would write.
+      'normal 0% 100%',
+      '0% normal 100%',
+      // And the bare range names, which the whole-value control would write.
+      'entry',
+      'cover',
+      'contain',
+      'exit',
+      // The shapes a *half* control produces when it writes a complete start or end: a named range
+      // against the other half's default offset, and a name against a name.
+      'entry 100%',
+      'entry 50%',
+      'entry cover',
+      'entry-crossing 100%',
+      '0% entry',
+    ].map(value => [value, window.__parse('animation-range', value)]),
+  ),
+)
 
 console.log('\n  CSS.supports("animation-range", …):')
-for (const [value, ok] of Object.entries(parseSupport)) console.log(`    ${value.padEnd(22)} ${ok}`)
+for (const [value, ok] of Object.entries(parseSupport))
+  console.log(`    ${value.padEnd(22)} ${ok}`)
 
-const substitutionRows = [['arm', 'declaration', 'computed animation-range', 'means']]
+const substitutionRows = [
+  ['arm', 'declaration', 'computed animation-range', 'means'],
+]
 
 for (const [id, note] of [
   ['rVarScoped', 'the live position keeps its range'],
   ['rVarGlobal', 'the fallback alone is the value'],
-  ['rVarMixed', 'one position set, one falling back — the emission\'s shape'],
+  ['rVarMixed', "one position set, one falling back — the emission's shape"],
   ['rVarMixedValid', 'the same list with a legal fallback, as the control'],
   ['rEmpty', 'a composed default where the name part is absent'],
   ['rEmptySet', 'the same composition with a name and an end offset'],
 ]) {
   const readings = await sweep(id, 'root', COARSE)
 
-  substitutionRows.push([id, 'var(...)', readings[6].computed['animation-range'], note])
+  substitutionRows.push([
+    id,
+    'var(...)',
+    readings[6].computed['animation-range'],
+    note,
+  ])
 }
 
 console.log(`\n${table(substitutionRows)}`)
 
 const fallbackSupport = await page.evaluate(() => ({
   'var(--x,)': window.__parse('animation-range', 'var(--x,)'),
-  'var(--x,) var(--y, 0%)': window.__parse('animation-range', 'var(--x,) var(--y, 0%)'),
-  'var(--x,) var(--y, 0%) var(--z,) var(--w, 100%)': window.__parse('animation-range', 'var(--x,) var(--y, 0%) var(--z,) var(--w, 100%)'),
+  'var(--x,) var(--y, 0%)': window.__parse(
+    'animation-range',
+    'var(--x,) var(--y, 0%)',
+  ),
+  'var(--x,) var(--y, 0%) var(--z,) var(--w, 100%)': window.__parse(
+    'animation-range',
+    'var(--x,) var(--y, 0%) var(--z,) var(--w, 100%)',
+  ),
 }))
 
 console.log('\n  parse support for the composed forms:')
-for (const [value, ok] of Object.entries(fallbackSupport)) console.log(`    ${value.padEnd(48)} ${ok}`)
+for (const [value, ok] of Object.entries(fallbackSupport))
+  console.log(`    ${value.padEnd(48)} ${ok}`)
 
 console.log('\n  the shorthand resets the two longhands it cannot set:')
 for (const id of ['dOrderBefore', 'dOrderAfter']) {
   const reading = (await sweep(id))[0]
 
-  console.log(`    ${id.padEnd(14)} animation-timeline ${String(reading.computed['animation-timeline']).padEnd(24)} animation-composition ${reading.computed['animation-composition']}`)
+  console.log(
+    `    ${id.padEnd(14)} animation-timeline ${String(reading.computed['animation-timeline']).padEnd(24)} animation-composition ${reading.computed['animation-composition']}`,
+  )
 }
 
 // ── 6 · named timelines ─────────────────────────────────────────────────────────────────────────
 heading('6 · named timelines: declaring, consuming, scope, collision')
 
-const namedRows = [['arm', 'computed animation-timeline', 'timeline', 'source', 'currentTime at pane 0 · ½ · 1']]
+const namedRows = [
+  [
+    'arm',
+    'computed animation-timeline',
+    'timeline',
+    'source',
+    'currentTime at pane 0 · ½ · 1',
+  ],
+]
 
-for (const id of ['eNamed', 'eNamedOutside', 'eNamedMissing', 'eViewSelf', 'eViewNamed', 'eDup', 'bArbNamed']) {
+for (const id of [
+  'eNamed',
+  'eNamedOutside',
+  'eNamedMissing',
+  'eViewSelf',
+  'eViewNamed',
+  'eDup',
+  'bArbNamed',
+]) {
   const readings = await sweep(id, 'pane', [0, 0.5, 1])
   const rootReadings = await sweep(id, 'root', [0, 0.5, 1])
 
@@ -464,22 +648,34 @@ console.log(table(namedRows))
 // ── 7 · reduced motion ──────────────────────────────────────────────────────────────────────────
 heading('7 · reduced motion: who stops scrolling from driving a motion')
 
-const quiet = await browser.newContext({ reducedMotion: 'reduce', viewport: { height: 700, width: 1200 } })
+const quiet = await browser.newContext({
+  reducedMotion: 'reduce',
+  viewport: { height: 700, width: 1200 },
+})
 const quietPage = await quiet.newPage()
 
 await quietPage.goto(origin)
 await quietPage.waitForFunction(() => window.__ready === true)
 
-const reducedRows = [['arm', 'context', 'timeline', 'currentTime at 0 · ½ · 1', 'animations']]
+const reducedRows = [
+  ['arm', 'context', 'timeline', 'currentTime at 0 · ½ · 1', 'animations'],
+]
 
 for (const id of ['fScroll', 'fClamped', 'fMotionSafe', 'aScroll']) {
   const out = []
 
   for (const fraction of [0, 0.5, 1]) {
-    await quietPage.evaluate((at) => {
-      document.documentElement.scrollTop = Math.round(at * (document.documentElement.scrollHeight - innerHeight))
+    await quietPage.evaluate(at => {
+      document.documentElement.scrollTop = Math.round(
+        at * (document.documentElement.scrollHeight - innerHeight),
+      )
     }, fraction)
-    await quietPage.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))
+    await quietPage.evaluate(
+      () =>
+        new Promise(resolve =>
+          requestAnimationFrame(() => requestAnimationFrame(resolve)),
+        ),
+    )
     out.push(await quietPage.evaluate(arm => window.__read(arm), id))
   }
 
@@ -523,25 +719,40 @@ await session.send('Performance.enable')
 await session.send('DOM.enable')
 await session.send('CSS.enable')
 
-const metrics = async () => Object.fromEntries((await session.send('Performance.getMetrics')).metrics.map(entry => [entry.name, entry.value]))
+const metrics = async () =>
+  Object.fromEntries(
+    (await session.send('Performance.getMetrics')).metrics.map(entry => [
+      entry.name,
+      entry.value,
+    ]),
+  )
 
 /** Recalc while scrolling, against the same sweep with the timeline arms hidden. */
 const scrollCost = async () => {
   const before = await metrics()
 
   for (let step = 0; step <= 40; step += 1) {
-    await page.evaluate((at) => {
-      document.documentElement.scrollTop = Math.round(at * (document.documentElement.scrollHeight - innerHeight))
+    await page.evaluate(at => {
+      document.documentElement.scrollTop = Math.round(
+        at * (document.documentElement.scrollHeight - innerHeight),
+      )
     }, step / 40)
-    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(resolve)))
+    await page.evaluate(
+      () => new Promise(resolve => requestAnimationFrame(resolve)),
+    )
   }
 
   const after = await metrics()
 
   return {
     layout: Math.round((after.LayoutCount ?? 0) - (before.LayoutCount ?? 0)),
-    recalc: Math.round((after.RecalcStyleCount ?? 0) - (before.RecalcStyleCount ?? 0)),
-    recalcMs: Math.round(((after.RecalcStyleDuration ?? 0) - (before.RecalcStyleDuration ?? 0)) * 1000),
+    recalc: Math.round(
+      (after.RecalcStyleCount ?? 0) - (before.RecalcStyleCount ?? 0),
+    ),
+    recalcMs: Math.round(
+      ((after.RecalcStyleDuration ?? 0) - (before.RecalcStyleDuration ?? 0)) *
+        1000,
+    ),
   }
 }
 
@@ -557,25 +768,45 @@ await page.evaluate(() => {
 const withoutTimelines = await scrollCost()
 
 await page.evaluate(() => {
-  for (const arm of document.querySelectorAll('#lane > *')) arm.className = arm.dataset.classes
+  for (const arm of document.querySelectorAll('#lane > *'))
+    arm.className = arm.dataset.classes
 })
 
-console.log(table([
-  ['page state', 'RecalcStyleCount', 'RecalcStyleDuration ms', 'LayoutCount'],
-  ['every timeline arm live', allTimelines.recalc, allTimelines.recalcMs, allTimelines.layout],
-  ['the same page, timelines removed', withoutTimelines.recalc, withoutTimelines.recalcMs, withoutTimelines.layout],
-]))
+console.log(
+  table([
+    ['page state', 'RecalcStyleCount', 'RecalcStyleDuration ms', 'LayoutCount'],
+    [
+      'every timeline arm live',
+      allTimelines.recalc,
+      allTimelines.recalcMs,
+      allTimelines.layout,
+    ],
+    [
+      'the same page, timelines removed',
+      withoutTimelines.recalc,
+      withoutTimelines.recalcMs,
+      withoutTimelines.layout,
+    ],
+  ]),
+)
 
 /** What the inspector is handed for one animated element — the measurement `style-cost.md` uses. */
-const matchedBytes = async (id) => {
-  const { root: documentRoot } = await session.send('DOM.getDocument', { depth: -1 })
-  const { nodeId } = await session.send('DOM.querySelector', { nodeId: documentRoot.nodeId, selector: `#${id}` })
+const matchedBytes = async id => {
+  const { root: documentRoot } = await session.send('DOM.getDocument', {
+    depth: -1,
+  })
+  const { nodeId } = await session.send('DOM.querySelector', {
+    nodeId: documentRoot.nodeId,
+    selector: `#${id}`,
+  })
   const matched = await session.send('CSS.getMatchedStylesForNode', { nodeId })
 
   return Buffer.byteLength(JSON.stringify(matched))
 }
 
-const inspectorRows = [['arm', 'slots', 'timeline entries', 'getMatchedStylesForNode bytes']]
+const inspectorRows = [
+  ['arm', 'slots', 'timeline entries', 'getMatchedStylesForNode bytes'],
+]
 
 for (const id of ['aDtm', 'aScroll', 'bMixed', 'bBoth']) {
   const reading = await read(id)
@@ -605,10 +836,20 @@ await page.reload()
 await page.waitForFunction(() => window.__ready === true)
 await scrollTo('root', 0.5)
 
-const reported = started.filter(event => event.animation.name?.startsWith('jumi-'))
+const reported = started.filter(event =>
+  event.animation.name?.startsWith('jumi-'),
+)
 
-console.log(`\n  Animation domain, ${reported.length} jumi animations announced`)
-console.log(`  fields on one of them: ${Object.keys(reported[0]?.animation ?? {}).sort().join(', ') || '(none)'}`)
+console.log(
+  `\n  Animation domain, ${reported.length} jumi animations announced`,
+)
+console.log(
+  `  fields on one of them: ${
+    Object.keys(reported[0]?.animation ?? {})
+      .sort()
+      .join(', ') || '(none)'
+  }`,
+)
 
 /**
  * Whether the driver keeps the animation on the compositor is the one question here that was NOT
@@ -624,7 +865,7 @@ console.log(`  fields on one of them: ${Object.keys(reported[0]?.animation ?? {}
  * The one positive signal in the same direction is measured, not inferred: a 40-step scroll costs
  * no style recalculation at all, with the timeline arms live or removed.
  */
-const tally = (events) => {
+const tally = events => {
   const counts = events.reduce((out, event) => {
     const name = event.animation.name ?? '(unnamed)'
 
@@ -635,7 +876,9 @@ const tally = (events) => {
 
   const entries = Object.entries(counts)
 
-  return entries.length ? entries.map(([name, count]) => `${name}=${count}`).join(' ') : '(none)'
+  return entries.length
+    ? entries.map(([name, count]) => `${name}=${count}`).join(' ')
+    : '(none)'
 }
 
 updated.length = 0
@@ -646,14 +889,22 @@ const whileTimePasses = tally(updated)
 updated.length = 0
 
 for (let step = 0; step <= 20; step += 1) {
-  await page.evaluate((at) => {
-    document.documentElement.scrollTop = Math.round(at * (document.documentElement.scrollHeight - innerHeight))
+  await page.evaluate(at => {
+    document.documentElement.scrollTop = Math.round(
+      at * (document.documentElement.scrollHeight - innerHeight),
+    )
   }, step / 20)
-  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(resolve)))
+  await page.evaluate(
+    () => new Promise(resolve => requestAnimationFrame(resolve)),
+  )
 }
 
-console.log(`\n  Animation.animationUpdated while time passes:  ${whileTimePasses}`)
-console.log(`  Animation.animationUpdated while scrolling:    ${tally(updated)}   ← the control is empty, so this instrument is vacuous`)
+console.log(
+  `\n  Animation.animationUpdated while time passes:  ${whileTimePasses}`,
+)
+console.log(
+  `  Animation.animationUpdated while scrolling:    ${tally(updated)}   ← the control is empty, so this instrument is vacuous`,
+)
 
 /** How the timeline list scales with slots: the only list that grows and is not hoisted. */
 const scaleCandidates = [
@@ -665,17 +916,27 @@ const scaleCss = build(await compiler(entry, root), scaleCandidates).css
 const scaleSheet = postcss.parse(scaleCss)
 let scaleComposition = null
 
-scaleSheet.walkRules((rule) => {
+scaleSheet.walkRules(rule => {
   const own = (rule.nodes ?? []).filter(node => node.type === 'decl')
 
   if (!own.some(node => node.prop === 'animation')) return
 
-  if (!scaleComposition || rule.selector.length > scaleComposition.selector.length) scaleComposition = rule
+  if (
+    !scaleComposition ||
+    rule.selector.length > scaleComposition.selector.length
+  )
+    scaleComposition = rule
 })
 
-const scaleParts = Object.fromEntries((scaleComposition?.nodes ?? []).filter(node => node.type === 'decl').map(node => [node.prop, node.value]))
+const scaleParts = Object.fromEntries(
+  (scaleComposition?.nodes ?? [])
+    .filter(node => node.type === 'decl')
+    .map(node => [node.prop, node.value]),
+)
 
-console.log(`\n  with 31 slots: animation list ${splitTop(scaleParts['animation'] ?? '').length} entries, animation-timeline ${splitTop(scaleParts['animation-timeline'] ?? '').length} entries, timeline list ${(scaleParts['animation-timeline'] ?? '').length} bytes, whole composition ${scaleComposition?.toString().length ?? 0} bytes`)
+console.log(
+  `\n  with 31 slots: animation list ${splitTop(scaleParts['animation'] ?? '').length} entries, animation-timeline ${splitTop(scaleParts['animation-timeline'] ?? '').length} entries, timeline list ${(scaleParts['animation-timeline'] ?? '').length} bytes, whole composition ${scaleComposition?.toString().length ?? 0} bytes`,
+)
 
 await session.detach()
 await browser.close()

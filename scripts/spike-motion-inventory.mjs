@@ -39,65 +39,200 @@ execFileSync('pnpm', ['run', 'bundle'], { cwd: root, stdio: 'pipe' })
  */
 const CANDIDATES = [
   // ── transforms and the coordinate space they happen in ──
-  { group: 'transform', from: 'none', prop: 'transform', to: 'translateX(50px)' },
-  { group: 'transform', from: '0% 0%', prop: 'transform-origin', to: '50% 50%' },
-  { group: 'transform', from: 'view-box', prop: 'transform-box', to: 'fill-box' },
-  { group: 'transform', from: '0px', prop: 'translate', to: '40px' },
-  { group: 'transform', from: '0deg', prop: 'rotate', to: '45deg' },
-  { group: 'transform', from: '1', prop: 'scale', to: '1.5' },
-  { group: 'transform', from: 'flat', prop: 'transform-style', to: 'preserve-3d' },
-  { group: 'transform', from: 'visible', prop: 'backface-visibility', to: 'hidden' },
+  {
+    from: 'none',
+    group: 'transform',
+    prop: 'transform',
+    to: 'translateX(50px)',
+  },
+  {
+    from: '0% 0%',
+    group: 'transform',
+    prop: 'transform-origin',
+    to: '50% 50%',
+  },
+  {
+    from: 'view-box',
+    group: 'transform',
+    prop: 'transform-box',
+    to: 'fill-box',
+  },
+  { from: '0px', group: 'transform', prop: 'translate', to: '40px' },
+  { from: '0deg', group: 'transform', prop: 'rotate', to: '45deg' },
+  { from: '1', group: 'transform', prop: 'scale', to: '1.5' },
+  {
+    from: 'flat',
+    group: 'transform',
+    prop: 'transform-style',
+    to: 'preserve-3d',
+  },
+  {
+    from: 'visible',
+    group: 'transform',
+    prop: 'backface-visibility',
+    to: 'hidden',
+  },
   // ── motion paths ──
-  { group: 'offset', from: 'ray(0deg)', prop: 'offset-path', to: 'ray(90deg)' },
-  { group: 'offset', from: '0%', prop: 'offset-distance', to: '80%' },
-  { group: 'offset', from: '0deg', prop: 'offset-rotate', to: '90deg' },
-  { group: 'offset', from: 'auto', prop: 'offset-anchor', to: '50% 50%' },
-  { group: 'offset', from: 'normal', prop: 'offset-position', to: '50% 50%' },
+  { from: 'ray(0deg)', group: 'offset', prop: 'offset-path', to: 'ray(90deg)' },
+  { from: '0%', group: 'offset', prop: 'offset-distance', to: '80%' },
+  { from: '0deg', group: 'offset', prop: 'offset-rotate', to: '90deg' },
+  { from: 'auto', group: 'offset', prop: 'offset-anchor', to: '50% 50%' },
+  { from: 'normal', group: 'offset', prop: 'offset-position', to: '50% 50%' },
   // ── depth ──
-  { group: 'depth', from: '100px', prop: 'perspective', to: '400px' },
-  { group: 'depth', from: '0% 0%', prop: 'perspective-origin', to: '50% 50%' },
+  { from: '100px', group: 'depth', prop: 'perspective', to: '400px' },
+  { from: '0% 0%', group: 'depth', prop: 'perspective-origin', to: '50% 50%' },
   // ── animation configuration ──
-  { group: 'animation', from: 'replace', prop: 'animation-composition', to: 'add' },
-  { group: 'animation', from: 'auto', prop: 'animation-timeline', to: 'scroll()' },
-  { group: 'animation', from: 'normal', prop: 'animation-range', to: 'entry 100%' },
-  { group: 'animation', from: 'normal', prop: 'animation-range-start', to: 'entry' },
-  { group: 'animation', from: 'normal', prop: 'animation-range-end', to: 'exit' },
-  { group: 'animation', from: '0s', prop: 'animation-delay', to: '1s' },
-  { group: 'animation', from: '1s', prop: 'animation-duration', to: '2s' },
-  { group: 'animation', from: 'linear', prop: 'animation-timing-function', to: 'ease-in' },
-  { group: 'animation', from: '1', prop: 'animation-iteration-count', to: '3' },
-  { group: 'animation', from: 'normal', prop: 'animation-direction', to: 'reverse' },
-  { group: 'animation', from: 'none', prop: 'animation-fill-mode', to: 'both' },
-  { group: 'animation', from: 'running', prop: 'animation-play-state', to: 'paused' },
+  {
+    from: 'replace',
+    group: 'animation',
+    prop: 'animation-composition',
+    to: 'add',
+  },
+  {
+    from: 'auto',
+    group: 'animation',
+    prop: 'animation-timeline',
+    to: 'scroll()',
+  },
+  {
+    from: 'normal',
+    group: 'animation',
+    prop: 'animation-range',
+    to: 'entry 100%',
+  },
+  {
+    from: 'normal',
+    group: 'animation',
+    prop: 'animation-range-start',
+    to: 'entry',
+  },
+  {
+    from: 'normal',
+    group: 'animation',
+    prop: 'animation-range-end',
+    to: 'exit',
+  },
+  { from: '0s', group: 'animation', prop: 'animation-delay', to: '1s' },
+  { from: '1s', group: 'animation', prop: 'animation-duration', to: '2s' },
+  {
+    from: 'linear',
+    group: 'animation',
+    prop: 'animation-timing-function',
+    to: 'ease-in',
+  },
+  { from: '1', group: 'animation', prop: 'animation-iteration-count', to: '3' },
+  {
+    from: 'normal',
+    group: 'animation',
+    prop: 'animation-direction',
+    to: 'reverse',
+  },
+  { from: 'none', group: 'animation', prop: 'animation-fill-mode', to: 'both' },
+  {
+    from: 'running',
+    group: 'animation',
+    prop: 'animation-play-state',
+    to: 'paused',
+  },
   // ── timelines, declared on the scroller rather than on the animated element ──
-  { group: 'timeline', from: 'none', prop: 'scroll-timeline-name', to: '--scroller' },
-  { group: 'timeline', from: 'block', prop: 'scroll-timeline-axis', to: 'inline' },
-  { group: 'timeline', from: 'none', prop: 'scroll-timeline', to: '--scroller block' },
-  { group: 'timeline', from: 'none', prop: 'view-timeline-name', to: '--viewer' },
-  { group: 'timeline', from: 'block', prop: 'view-timeline-axis', to: 'inline' },
-  { group: 'timeline', from: 'auto', prop: 'view-timeline-inset', to: '20%' },
-  { group: 'timeline', from: 'none', prop: 'view-timeline', to: '--viewer block' },
-  { group: 'timeline', from: 'none', prop: 'timeline-scope', to: '--scroller' },
+  {
+    from: 'none',
+    group: 'timeline',
+    prop: 'scroll-timeline-name',
+    to: '--scroller',
+  },
+  {
+    from: 'block',
+    group: 'timeline',
+    prop: 'scroll-timeline-axis',
+    to: 'inline',
+  },
+  {
+    from: 'none',
+    group: 'timeline',
+    prop: 'scroll-timeline',
+    to: '--scroller block',
+  },
+  {
+    from: 'none',
+    group: 'timeline',
+    prop: 'view-timeline-name',
+    to: '--viewer',
+  },
+  {
+    from: 'block',
+    group: 'timeline',
+    prop: 'view-timeline-axis',
+    to: 'inline',
+  },
+  { from: 'auto', group: 'timeline', prop: 'view-timeline-inset', to: '20%' },
+  {
+    from: 'none',
+    group: 'timeline',
+    prop: 'view-timeline',
+    to: '--viewer block',
+  },
+  { from: 'none', group: 'timeline', prop: 'timeline-scope', to: '--scroller' },
   // ── transitions ──
-  { group: 'transition', from: 'opacity', prop: 'transition-property', to: 'transform' },
-  { group: 'transition', from: '100ms', prop: 'transition-duration', to: '500ms' },
-  { group: 'transition', from: '0s', prop: 'transition-delay', to: '200ms' },
-  { group: 'transition', from: 'linear', prop: 'transition-timing-function', to: 'ease-in' },
-  { group: 'transition', from: 'normal', prop: 'transition-behavior', to: 'allow-discrete' },
+  {
+    from: 'opacity',
+    group: 'transition',
+    prop: 'transition-property',
+    to: 'transform',
+  },
+  {
+    from: '100ms',
+    group: 'transition',
+    prop: 'transition-duration',
+    to: '500ms',
+  },
+  { from: '0s', group: 'transition', prop: 'transition-delay', to: '200ms' },
+  {
+    from: 'linear',
+    group: 'transition',
+    prop: 'transition-timing-function',
+    to: 'ease-in',
+  },
+  {
+    from: 'normal',
+    group: 'transition',
+    prop: 'transition-behavior',
+    to: 'allow-discrete',
+  },
   // ── view transitions ──
-  { group: 'view', from: 'none', prop: 'view-transition-name', to: 'card' },
-  { group: 'view', from: 'none', prop: 'view-transition-class', to: 'card' },
-  { group: 'view', from: 'normal', prop: 'view-transition-group', to: 'contain' },
+  { from: 'none', group: 'view', prop: 'view-transition-name', to: 'card' },
+  { from: 'none', group: 'view', prop: 'view-transition-class', to: 'card' },
+  {
+    from: 'normal',
+    group: 'view',
+    prop: 'view-transition-group',
+    to: 'contain',
+  },
   // ── interpolation and the discrete lifecycle ──
-  { group: 'lifecycle', from: 'numeric-only', prop: 'interpolate-size', to: 'allow-keywords' },
-  { group: 'lifecycle', from: 'block', prop: 'display', to: 'none' },
-  { group: 'lifecycle', from: 'visible', prop: 'visibility', to: 'hidden' },
-  { group: 'lifecycle', from: 'visible', prop: 'content-visibility', to: 'hidden' },
-  { group: 'lifecycle', from: 'auto', prop: 'overlay', to: 'none' },
+  {
+    from: 'numeric-only',
+    group: 'lifecycle',
+    prop: 'interpolate-size',
+    to: 'allow-keywords',
+  },
+  { from: 'block', group: 'lifecycle', prop: 'display', to: 'none' },
+  { from: 'visible', group: 'lifecycle', prop: 'visibility', to: 'hidden' },
+  {
+    from: 'visible',
+    group: 'lifecycle',
+    prop: 'content-visibility',
+    to: 'hidden',
+  },
+  { from: 'auto', group: 'lifecycle', prop: 'overlay', to: 'none' },
   // ── adjacent: motion-adjacent, not motion ──
-  { group: 'adjacent', from: 'auto', prop: 'scroll-behavior', to: 'smooth' },
-  { group: 'adjacent', from: 'none', prop: 'scroll-snap-type', to: 'x mandatory' },
-  { group: 'adjacent', from: 'auto', prop: 'will-change', to: 'transform' },
+  { from: 'auto', group: 'adjacent', prop: 'scroll-behavior', to: 'smooth' },
+  {
+    from: 'none',
+    group: 'adjacent',
+    prop: 'scroll-snap-type',
+    to: 'x mandatory',
+  },
+  { from: 'auto', group: 'adjacent', prop: 'will-change', to: 'transform' },
 ]
 
 /**
@@ -166,10 +301,12 @@ ${CANDIDATES.map((item, index) => `  <div id="probe-${index}"></div>`).join('\n'
 </script>
 </body></html>`
 
-const server = (await import('node:http')).createServer((request, response) => {
-  response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
-  response.end(htmlFor())
-}).listen(0)
+const server = (await import('node:http'))
+  .createServer((request, response) => {
+    response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
+    response.end(htmlFor())
+  })
+  .listen(0)
 
 const browser = await chromium.launch()
 const page = await browser.newPage()
@@ -179,7 +316,10 @@ await page.waitForFunction(() => window.__ready === true)
 const line = (label, value) => console.log(`  ${label.padEnd(34)} ${value}`)
 
 // ── what Jumi exposes, read from the sources that own each kind ───────────────────────────────────────
-const controls = readFileSync(path.join(root, 'src', 'properties', 'controls.ts'), 'utf8')
+const controls = readFileSync(
+  path.join(root, 'src', 'properties', 'controls.ts'),
+  'utf8',
+)
 const controlKeys = new Set(
   [...controls.matchAll(/^\s*'([a-z-]+)':\s*\{/gm)].map(match => match[1]),
 )
@@ -190,7 +330,8 @@ const entry = `
 `
 const { build, compiler, root: project } = await import('./lib/compile.mjs')
 const baseline = build(await compiler(entry, project), []).css
-const emits = async candidate => (await build(await compiler(entry, project), [candidate])).css
+const emits = async candidate =>
+  (await build(await compiler(entry, project), [candidate])).css
 
 /**
  * The same build with no Jumi at all.
@@ -200,7 +341,8 @@ const emits = async candidate => (await build(await compiler(entry, project), [c
  */
 const hostEntry = '@import "tailwindcss";\n'
 const hostBaseline = build(await compiler(hostEntry, project), []).css
-const hostEmits = async candidate => (await build(await compiler(hostEntry, project), [candidate])).css
+const hostEmits = async candidate =>
+  (await build(await compiler(hostEntry, project), [candidate])).css
 
 const arbitrary = value => value.replace(/\s+/g, '_')
 
@@ -212,21 +354,29 @@ const arbitrary = value => value.replace(/\s+/g, '_')
 const CATALOGUES = ['src/types/index.ts', 'src/variables/property.ts']
 
 /** Every non-test source file that names the property as a string. */
-const ownerFiles = (name) => {
+const ownerFiles = name => {
   try {
-    return execFileSync('grep', ['-rl', `'${name}'`, path.join(root, 'src')], { encoding: 'utf8' })
-      .trim().split('\n').filter(Boolean)
+    return execFileSync('grep', ['-rl', `'${name}'`, path.join(root, 'src')], {
+      encoding: 'utf8',
+    })
+      .trim()
+      .split('\n')
+      .filter(Boolean)
       .map(file => path.relative(root, file))
       .filter(file => !file.endsWith('.test.ts'))
-  }
-  catch {
+  } catch {
     return []
   }
 }
 
-console.log(`motion inventory · ${CANDIDATES.length} candidates · ${controlKeys.size} controls read from source`)
+console.log(
+  `motion inventory · ${CANDIDATES.length} candidates · ${controlKeys.size} controls read from source`,
+)
 
-const legal = await page.evaluate(probes => probes.map(probe => window.__legal(probe)), CANDIDATES)
+const legal = await page.evaluate(
+  probes => probes.map(probe => window.__legal(probe)),
+  CANDIDATES,
+)
 const readings = await page.evaluate(
   probes => window.__probe(probes),
   CANDIDATES.map((item, index) => ({ id: `probe-${index}`, prop: item.prop })),
@@ -244,41 +394,59 @@ for (const [index, item] of CANDIDATES.entries()) {
 
   const legalEndpoints = legal[index]
   const reading = readings[index]
-  const jumiMotion = (await emits(`animate-${item.prop}-[${arbitrary(item.to)}]`)) !== baseline
-  const hostMotion = (await hostEmits(`animate-${item.prop}-[${arbitrary(item.to)}]`)) !== hostBaseline
-  const hostUtility = (await hostEmits(`${item.prop}-[${arbitrary(item.to)}]`)) !== hostBaseline
+  const jumiMotion =
+    (await emits(`animate-${item.prop}-[${arbitrary(item.to)}]`)) !== baseline
+  const hostMotion =
+    (await hostEmits(`animate-${item.prop}-[${arbitrary(item.to)}]`)) !==
+    hostBaseline
+  const hostUtility =
+    (await hostEmits(`${item.prop}-[${arbitrary(item.to)}]`)) !== hostBaseline
   const control = controlKeys.has(item.prop)
   const files = ownerFiles(item.prop)
   const handled = files.find(file => !CATALOGUES.includes(file))
   const modelled = files.some(file => CATALOGUES.includes(file))
 
   if (!legalEndpoints.from || !legalEndpoints.to) {
-    line(`animate-${item.prop}`, `unmeasured — fixture endpoints not legal (${legalEndpoints.from ? '' : 'from '}${legalEndpoints.to ? '' : 'to'})`)
+    line(
+      `animate-${item.prop}`,
+      `unmeasured — fixture endpoints not legal (${legalEndpoints.from ? '' : 'from '}${legalEndpoints.to ? '' : 'to'})`,
+    )
     continue
   }
 
   const behaviour = !reading.measured
     ? 'no Animation object'
-    : reading.values[1] !== reading.values[0] && reading.values[1] !== reading.values[2]
+    : reading.values[1] !== reading.values[0] &&
+        reading.values[1] !== reading.values[2]
       ? `interpolates (${reading.values.join(' → ')})`
       : `does not interpolate (${reading.values.join(' → ')})`
 
   const coverage = jumiMotion
     ? 'Jumi: motion'
-    : hostMotion ? 'host: animate utility'
-      : control ? 'Jumi: control'
-        : handled ? `Jumi: ${handled.replace('src/', '').replace('.ts', '')}`
-          : hostUtility ? 'host: property utility'
-            : modelled ? 'Jumi: modelled only' : '—'
+    : hostMotion
+      ? 'host: animate utility'
+      : control
+        ? 'Jumi: control'
+        : handled
+          ? `Jumi: ${handled.replace('src/', '').replace('.ts', '')}`
+          : hostUtility
+            ? 'host: property utility'
+            : modelled
+              ? 'Jumi: modelled only'
+              : '—'
 
   if (!jumiMotion && !control && !handled) gaps.push({ ...item, coverage })
 
   line(`animate-${item.prop}`, `${coverage.padEnd(17)} · ${behaviour}`)
 }
 
-console.log(`\nnot exposed by a Jumi motion, a control, or a named pass: ${gaps.length}`)
+console.log(
+  `\nnot exposed by a Jumi motion, a control, or a named pass: ${gaps.length}`,
+)
 for (const gap of gaps) {
-  console.log(`  ${gap.prop.padEnd(24)} ${gap.coverage.padEnd(24)} (${gap.group})`)
+  console.log(
+    `  ${gap.prop.padEnd(24)} ${gap.coverage.padEnd(24)} (${gap.group})`,
+  )
 }
 
 await browser.close()

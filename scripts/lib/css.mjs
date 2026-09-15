@@ -65,14 +65,21 @@ export const TRANSITION_PARTS = ['transition']
  * shorthand *resets* `animation-timeline` and `animation-range` (declared before it, a timeline
  * computes back to `auto` and a range to `normal`) and does not reset `animation-composition`.
  */
-const RESET_BY_SHORTHAND = ['animation-composition', 'animation-range', 'animation-timeline']
+const RESET_BY_SHORTHAND = [
+  'animation-composition',
+  'animation-range',
+  'animation-timeline',
+]
 
 /**
  * One materialized declaration, value and all. The leading guard is load-bearing: without it
  * `animation-name` matches inside `--jumi-animation-name`, and every control declaration on every
  * element would be counted as a carrier's data.
  */
-const LONGHAND = new RegExp(`(?<![\\w-])(?:${[...PARTS, ...TRANSITION_PARTS].join('|')})\\s*:\\s*[^;]*;?`, 'g')
+const LONGHAND = new RegExp(
+  `(?<![\\w-])(?:${[...PARTS, ...TRANSITION_PARTS].join('|')})\\s*:\\s*[^;]*;?`,
+  'g',
+)
 
 /**
  * A stylesheet with every at-rule prelude removed, so what remains can be counted as
@@ -120,7 +127,10 @@ export function aggregateList(css, part = 'animation') {
 
   if (!rule) return ''
 
-  return (rule.nodes ?? []).find(node => node.type === 'decl' && node.prop === part)?.value ?? ''
+  return (
+    (rule.nodes ?? []).find(node => node.type === 'decl' && node.prop === part)
+      ?.value ?? ''
+  )
 }
 
 /** The slots the browser applies: the entries in the aggregate list. */
@@ -151,11 +161,12 @@ export function compositionRules(css) {
   const root = typeof css === 'string' ? postcss.parse(css) : css
   const found = []
 
-  root.walkRules((rule) => {
+  root.walkRules(rule => {
     const declarations = (rule.nodes ?? []).filter(node => node.type === 'decl')
     const props = new Set(declarations.map(node => node.prop))
 
-    if (!props.has('animation-composition') || !props.has('animation-timeline')) return
+    if (!props.has('animation-composition') || !props.has('animation-timeline'))
+      return
 
     // The shorthand *resets* those two, so the synthesized rule declares them after it. Checking the
     // order is free here and it is the difference between "declares these three properties" and
@@ -188,9 +199,22 @@ export function compositionRules(css) {
  * formatting the emitter happens to be using.
  */
 export function compositionScope(css, kind = 'animations') {
-  const rule = kind === 'animations' ? compositionRules(css)[0] : transitionRules(css)[0]
+  const rule =
+    kind === 'animations' ? compositionRules(css)[0] : transitionRules(css)[0]
 
   return rule ? splitTopLevel(rule.selector).length : 0
+}
+
+/**
+ * The parts the counter above sees, in order.
+ *
+ * Exported for the diagnostic rather than the assertion: a total that does not fit the expectation cannot
+ * say whether a longhand went missing or an extra rule was counted, and those need opposite fixes.
+ */
+export function countedParts(css) {
+  return [...declarationsOnly(css).matchAll(LONGHAND)].map(match =>
+    match[0].split(':')[0].trim(),
+  )
 }
 
 /**
@@ -203,17 +227,10 @@ export function compositionScope(css, kind = 'animations') {
  * shallow reference per slot, which `aggregateSlots` reads.
  */
 export function expectedDeclarations({ animations, transitions }) {
-  return animations * RESET_BY_SHORTHAND.length + transitions * TRANSITION_PARTS.length
-}
-
-/**
- * The parts the counter above sees, in order.
- *
- * Exported for the diagnostic rather than the assertion: a total that does not fit the expectation cannot
- * say whether a longhand went missing or an extra rule was counted, and those need opposite fixes.
- */
-export function countedParts(css) {
-  return [...declarationsOnly(css).matchAll(LONGHAND)].map(match => match[0].split(':')[0].trim())
+  return (
+    animations * RESET_BY_SHORTHAND.length +
+    transitions * TRANSITION_PARTS.length
+  )
 }
 
 /**
@@ -236,8 +253,13 @@ export function countedParts(css) {
  */
 export function protocolState(css) {
   const rules = [...compositionRules(css), ...transitionRules(css)]
-  const materialized = rules.flatMap(rule => (rule.nodes ?? []).filter(node => node.type === 'decl'
-    && (PARTS.includes(node.prop) || TRANSITION_PARTS.includes(node.prop))))
+  const materialized = rules.flatMap(rule =>
+    (rule.nodes ?? []).filter(
+      node =>
+        node.type === 'decl' &&
+        (PARTS.includes(node.prop) || TRANSITION_PARTS.includes(node.prop)),
+    ),
+  )
   const anywhere = [...declarationsOnly(css).matchAll(LONGHAND)]
 
   return {
@@ -245,7 +267,10 @@ export function protocolState(css) {
     // shape of the synthesized rule is the only thing left that says it was synthesized rather than
     // authored.
     animations: compositionRules(css).length,
-    declarationBytes: materialized.reduce((total, node) => total + `${node.prop}:${node.value}`.length, 0),
+    declarationBytes: materialized.reduce(
+      (total, node) => total + `${node.prop}:${node.value}`.length,
+      0,
+    ),
     declarations: materialized.length,
     leaks: {
       staging: (css.match(/--jumi-staging-/g) ?? []).length,
@@ -269,15 +294,14 @@ export function splitTopLevel(value) {
       if (char === '\\') {
         current += char + (value[i + 1] ?? '')
         i += 1
-      }
-      else {
+      } else {
         if (char === quote) quote = ''
         current += char
       }
       continue
     }
 
-    if (char === '"' || char === '\'') {
+    if (char === '"' || char === "'") {
       quote = char
       current += char
       continue
@@ -311,8 +335,13 @@ export function transitionRules(css) {
   const root = typeof css === 'string' ? postcss.parse(css) : css
   const found = []
 
-  root.walkRules((rule) => {
-    if (rule.nodes?.some(node => node.type === 'decl' && node.prop === 'transition')) found.push(rule)
+  root.walkRules(rule => {
+    if (
+      rule.nodes?.some(
+        node => node.type === 'decl' && node.prop === 'transition',
+      )
+    )
+      found.push(rule)
   })
 
   return found

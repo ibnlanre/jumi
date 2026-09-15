@@ -122,11 +122,16 @@ const parsed = postcss.parse(emitted.css)
 const identities = []
 const pseudos = []
 
-parsed.walkRules((rule) => {
+parsed.walkRules(rule => {
   const conditions = []
 
-  for (let node = rule.parent; node && node.type !== 'root'; node = node.parent) {
-    if (node.type === 'atrule') conditions.unshift(`@${node.name} ${node.params}`.trim())
+  for (
+    let node = rule.parent;
+    node && node.type !== 'root';
+    node = node.parent
+  ) {
+    if (node.type === 'atrule')
+      conditions.unshift(`@${node.name} ${node.params}`.trim())
   }
 
   const declarations = (rule.nodes ?? []).filter(node => node.type === 'decl')
@@ -134,7 +139,8 @@ parsed.walkRules((rule) => {
   if (declarations.some(node => node.prop === 'view-transition-name')) {
     identities.push({
       conditions,
-      name: declarations.find(node => node.prop === 'view-transition-name').value,
+      name: declarations.find(node => node.prop === 'view-transition-name')
+        .value,
       selector: rule.selector,
     })
   }
@@ -148,7 +154,11 @@ parsed.walkRules((rule) => {
   }
 })
 
-check('the pass wrote products', emitted.viewTransitions > 0, `${emitted.viewTransitions} rules`)
+check(
+  'the pass wrote products',
+  emitted.viewTransitions > 0,
+  `${emitted.viewTransitions} rules`,
+)
 
 /**
  * The per-side rules, told from the owning rules by **what they declare** rather than by how many
@@ -191,16 +201,27 @@ check(
 // `view-transition-name` under `no-preference` is exactly the shape that deletes participation under
 // `reduce` rather than quieting the motion — measured, P22.
 check(
-  'no identity is wrapped in Jumi\'s own query',
-  !identities.some(entry => entry.conditions.some(condition => condition.includes('prefers-reduced-motion'))),
-  identities.map(entry => `${entry.name} ${entry.conditions.join(' › ') || '(unconditional)'}`).join(' | '),
+  "no identity is wrapped in Jumi's own query",
+  !identities.some(entry =>
+    entry.conditions.some(condition =>
+      condition.includes('prefers-reduced-motion'),
+    ),
+  ),
+  identities
+    .map(
+      entry =>
+        `${entry.name} ${entry.conditions.join(' › ') || '(unconditional)'}`,
+    )
+    .join(' | '),
 )
 
 // And the other half of the rule: the wrapper is kept where the author asked for it, which is what
 // makes the `motion-safe:` in the fixture meaningful rather than merely ignored.
 check(
   'the motion keeps the condition its identity dropped',
-  pseudos.some(entry => entry.conditions.some(condition => condition.includes('no-preference'))),
+  pseudos.some(entry =>
+    entry.conditions.some(condition => condition.includes('no-preference')),
+  ),
   pseudos[0]?.conditions.join(' › ') ?? 'no pseudo rules',
 )
 
@@ -208,16 +229,26 @@ check(
 // then tests in a browser: a condition that is written down but never honoured looks identical in text
 // to one that is honoured, and only a viewport that fails it can tell them apart.
 check(
-  'an author\'s own condition is kept on the identity',
-  identities.some(entry => entry.name === 'card' && entry.conditions.some(c => c.includes('width >= 40rem'))),
-  identities.filter(entry => entry.name === 'card')
-    .map(entry => entry.conditions.join(' › ') || '(unconditional)').join(' | '),
+  "an author's own condition is kept on the identity",
+  identities.some(
+    entry =>
+      entry.name === 'card' &&
+      entry.conditions.some(c => c.includes('width >= 40rem')),
+  ),
+  identities
+    .filter(entry => entry.name === 'card')
+    .map(entry => entry.conditions.join(' › ') || '(unconditional)')
+    .join(' | '),
 )
 
 check(
   'the pseudos are guarded',
-  pseudos.length > 0
-  && pseudos.every(entry => entry.conditions.some(condition => condition.startsWith('@supports selector('))),
+  pseudos.length > 0 &&
+    pseudos.every(entry =>
+      entry.conditions.some(condition =>
+        condition.startsWith('@supports selector('),
+      ),
+    ),
   pseudos[0]?.conditions.join(' › ') ?? 'none',
 )
 
@@ -225,7 +256,8 @@ check(
   'the UA blend is re-declared on both sides',
   // The shared rule carries the substrate and the aggregate and lists every side, so it is the one
   // pseudo rule that must *not* have a blend; the per-side rules are the ones that must.
-  sides.length > 0 && sides.every(entry => entry.declarations.includes('mix-blend-mode')),
+  sides.length > 0 &&
+    sides.every(entry => entry.declarations.includes('mix-blend-mode')),
   sides.map(entry => entry.selector).join(' | ') || 'no per-side rules',
 )
 
@@ -252,7 +284,12 @@ const server = createServer((request, response) => {
   const name = url.pathname === '/' ? '/from.html' : url.pathname
 
   if (name === '/jumi.css') {
-    response.writeHead(200, { 'cache-control': 'no-store', 'content-type': 'text/css' }).end(emitted.css)
+    response
+      .writeHead(200, {
+        'cache-control': 'no-store',
+        'content-type': 'text/css',
+      })
+      .end(emitted.css)
 
     return
   }
@@ -260,7 +297,11 @@ const server = createServer((request, response) => {
   // The runtime the wrapper arms below drive, served from the bundle rather than re-imported, so what runs
   // in the browser is what a project installs.
   if (name === '/jumi-runtime.js') {
-    response.writeHead(200, { 'cache-control': 'no-store', 'content-type': 'text/javascript' })
+    response
+      .writeHead(200, {
+        'cache-control': 'no-store',
+        'content-type': 'text/javascript',
+      })
       .end(readFileSync(path.join(root, 'dist/view-transition.js'), 'utf8'))
 
     return
@@ -269,9 +310,13 @@ const server = createServer((request, response) => {
   try {
     const body = readFileSync(path.join(fixtures, path.basename(name)), 'utf8')
 
-    response.writeHead(200, { 'cache-control': 'no-store', 'content-type': 'text/html' }).end(body)
-  }
-  catch {
+    response
+      .writeHead(200, {
+        'cache-control': 'no-store',
+        'content-type': 'text/html',
+      })
+      .end(body)
+  } catch {
     response.writeHead(404).end('no fixture')
   }
 })
@@ -296,19 +341,31 @@ const RECORDER = () => {
   window.__vt = []
 
   const snapshot = names => ({
-    animations: document.getAnimations()
-      .filter(animation => (animation.effect?.pseudoElement ?? '').startsWith('::view-transition'))
-      .map(animation => `${animation.effect.pseudoElement} ${animation.animationName ?? ''}`.trim()),
-    named: Object.fromEntries(names.map((name) => {
-      const element = document.querySelector(`.${name}`)
+    animations: document
+      .getAnimations()
+      .filter(animation =>
+        (animation.effect?.pseudoElement ?? '').startsWith('::view-transition'),
+      )
+      .map(animation =>
+        `${animation.effect.pseudoElement} ${animation.animationName ?? ''}`.trim(),
+      ),
+    named: Object.fromEntries(
+      names.map(name => {
+        const element = document.querySelector(`.${name}`)
 
-      return [name, element
-        ? getComputedStyle(element).getPropertyValue('view-transition-name').trim()
-        : null]
-    })),
+        return [
+          name,
+          element
+            ? getComputedStyle(element)
+                .getPropertyValue('view-transition-name')
+                .trim()
+            : null,
+        ]
+      }),
+    ),
   })
 
-  window.addEventListener('pagereveal', (event) => {
+  window.addEventListener('pagereveal', event => {
     window.__vt.push({
       at: 'reveal',
       hasTransition: Boolean(event.viewTransition),
@@ -325,7 +382,10 @@ const RECORDER = () => {
 
 /** One navigation: a plain link click, which is the only kind that starts a cross-document one. */
 const navigate = async (browser, reducedMotion, width = 900) => {
-  const context = await browser.newContext({ reducedMotion, viewport: { height: 600, width } })
+  const context = await browser.newContext({
+    reducedMotion,
+    viewport: { height: 600, width },
+  })
   const page = await context.newPage()
 
   await page.addInitScript(RECORDER)
@@ -342,9 +402,14 @@ const navigate = async (browser, reducedMotion, width = 900) => {
 }
 
 /** The last state that still held live pseudo animations, which is where the transition is readable. */
-const live = trace => [...trace].reverse()
-  .find(entry => entry.animations.some(animation => animation.startsWith('::view-transition')))
-  ?? [...trace].reverse().find(entry => entry.hasTransition)
+const live = trace =>
+  [...trace]
+    .reverse()
+    .find(entry =>
+      entry.animations.some(animation =>
+        animation.startsWith('::view-transition'),
+      ),
+    ) ?? [...trace].reverse().find(entry => entry.hasTransition)
 
 const browser = await chromium.launch()
 
@@ -354,7 +419,7 @@ const animations = settled?.animations ?? []
 const named = name => animations.filter(entry => entry.includes(`(${name})`))
 
 /** The animation name a given pseudo runs, which is the whole question for the motion arms. */
-const ran = (prefix) => {
+const ran = prefix => {
   const [target] = animations.filter(entry => entry.startsWith(prefix))
 
   return target ? target.slice(prefix.length).trim() : ''
@@ -370,13 +435,17 @@ check(
 
 check(
   'the emitted identity named the hero',
-  named('hero').some(entry => entry.startsWith('::view-transition-group(hero)')),
+  named('hero').some(entry =>
+    entry.startsWith('::view-transition-group(hero)'),
+  ),
   named('hero').join(' | ') || 'no hero pseudo animations',
 )
 
 check(
   'the emitted identity named the card',
-  named('card').some(entry => entry.startsWith('::view-transition-group(card)')),
+  named('card').some(entry =>
+    entry.startsWith('::view-transition-group(card)'),
+  ),
   named('card').join(' | ') || 'no card pseudo animations',
 )
 
@@ -387,13 +456,13 @@ check(
 )
 
 check(
-  'Jumi\'s motion runs on the outgoing side',
+  "Jumi's motion runs on the outgoing side",
   ran('::view-transition-old(hero)').startsWith('jumi-fade-out'),
   ran('::view-transition-old(hero)') || 'none',
 )
 
 check(
-  'Jumi\'s motion runs on the incoming side',
+  "Jumi's motion runs on the incoming side",
   ran('::view-transition-new(hero)').startsWith('jumi-fade-in'),
   ran('::view-transition-new(hero)') || 'none',
 )
@@ -409,10 +478,13 @@ check(
 // The group is the browser's own travel. If the emission had aimed at it, the animation name here
 // would be a Jumi keyframe — and the shared element would animate in place instead of moving (P12).
 check(
-  'the browser\'s own travel was not replaced',
-  named('hero').filter(entry => entry.startsWith('::view-transition-group(hero)'))
+  "the browser's own travel was not replaced",
+  named('hero')
+    .filter(entry => entry.startsWith('::view-transition-group(hero)'))
     .every(entry => !entry.includes(' jumi-')),
-  named('hero').filter(entry => entry.startsWith('::view-transition-group')).join(' | ') || 'no group animation',
+  named('hero')
+    .filter(entry => entry.startsWith('::view-transition-group'))
+    .join(' | ') || 'no group animation',
 )
 
 /* ------------------------------------------------------------------ an author's own condition */
@@ -433,11 +505,15 @@ const narrow = live(await navigate(browser, 'no-preference', 500))
 const narrowAnimations = narrow?.animations ?? []
 
 check(
-  'an author\'s condition is honoured, not just written down',
-  narrowAnimations.some(entry => entry.startsWith('::view-transition-group(hero)'))
-  && !narrowAnimations.some(entry => entry.startsWith('::view-transition-group(card)')),
-  `hero ${narrowAnimations.filter(e => e.includes('group(hero)')).length},`
-  + ` card ${narrowAnimations.filter(e => e.includes('group(card)')).length} at 500px`,
+  "an author's condition is honoured, not just written down",
+  narrowAnimations.some(entry =>
+    entry.startsWith('::view-transition-group(hero)'),
+  ) &&
+    !narrowAnimations.some(entry =>
+      entry.startsWith('::view-transition-group(card)'),
+    ),
+  `hero ${narrowAnimations.filter(e => e.includes('group(hero)')).length},` +
+    ` card ${narrowAnimations.filter(e => e.includes('group(card)')).length} at 500px`,
 )
 
 /**
@@ -449,12 +525,16 @@ check(
  * side would still have run Jumi's keyframe while claiming to be conditioned — a difference visible
  * only by comparing the two viewports against each other.
  */
-const mixedRan = (trace) => {
+const mixedRan = trace => {
   const state = live(trace)
-  const side = (name) => {
-    const [found] = (state?.animations ?? []).filter(entry => entry.startsWith(`::view-transition-${name}(mixed)`))
+  const side = name => {
+    const [found] = (state?.animations ?? []).filter(entry =>
+      entry.startsWith(`::view-transition-${name}(mixed)`),
+    )
 
-    return found ? found.slice(`::view-transition-${name}(mixed)`.length).trim() : ''
+    return found
+      ? found.slice(`::view-transition-${name}(mixed)`.length).trim()
+      : ''
   }
 
   return { new: side('new'), old: side('old') }
@@ -467,11 +547,11 @@ check(
   'a wrapper reaches the motion, not only the name',
   // Above the breakpoint both sides are Jumi's; below it, only the unconditioned one is, and the
   // conditioned side goes back to the browser's own cross-fade rather than vanishing.
-  [wide.old, wide.new].every(name => name.startsWith('jumi-fade-'))
-  && narrowMixed.new.startsWith('jumi-fade-in')
-  && !narrowMixed.old.startsWith('jumi-fade-'),
-  `900px old=${wide.old || 'none'} new=${wide.new || 'none'};`
-  + ` 500px old=${narrowMixed.old || 'none'} new=${narrowMixed.new || 'none'}`,
+  [wide.old, wide.new].every(name => name.startsWith('jumi-fade-')) &&
+    narrowMixed.new.startsWith('jumi-fade-in') &&
+    !narrowMixed.old.startsWith('jumi-fade-'),
+  `900px old=${wide.old || 'none'} new=${wide.new || 'none'};` +
+    ` 500px old=${narrowMixed.old || 'none'} new=${narrowMixed.new || 'none'}`,
 )
 
 check(
@@ -487,12 +567,15 @@ const reducedAnimations = reduced?.animations ?? []
 
 check(
   'under `reduce` the element still participates',
-  reducedAnimations.some(entry => entry.startsWith('::view-transition-group(hero)')),
-  reducedAnimations.filter(entry => entry.includes('(hero)')).join(' | ') || 'no hero pseudo animations',
+  reducedAnimations.some(entry =>
+    entry.startsWith('::view-transition-group(hero)'),
+  ),
+  reducedAnimations.filter(entry => entry.includes('(hero)')).join(' | ') ||
+    'no hero pseudo animations',
 )
 
 check(
-  'under `reduce` Jumi\'s motion does not run',
+  "under `reduce` Jumi's motion does not run",
   reducedAnimations.every(entry => !entry.includes(' jumi-')),
   reducedAnimations.join(' | ') || 'no pseudo animations',
 )
@@ -519,7 +602,8 @@ const refuses = build(refused, REFUSED)
 
 check(
   'a refusal is reported rather than silently dropped',
-  refuses.warnings.length === 1 && refuses.warnings[0].includes('never runs there'),
+  refuses.warnings.length === 1 &&
+    refuses.warnings[0].includes('never runs there'),
   refuses.warnings[0] ?? 'no warning',
 )
 
@@ -534,12 +618,17 @@ const { jumiFinalizer } = await import(path.join(root, 'dist/postcss.js'))
  * exactly what an adapter is handed in a real build.
  */
 const raw = refused.build(REFUSED)
-const result = await postcss([jumiFinalizer()]).process(raw, { from: 'refused.css' })
+const result = await postcss([jumiFinalizer()]).process(raw, {
+  from: 'refused.css',
+})
 
 check(
   'the PostCSS adapter surfaces it as a warning',
   result.warnings().some(warning => warning.text.includes('never runs there')),
-  result.warnings().map(warning => warning.text).join(' | ') || 'no warnings on the result',
+  result
+    .warnings()
+    .map(warning => warning.text)
+    .join(' | ') || 'no warnings on the result',
 )
 
 /* ------------------------------------------------------------------ incremental builds */
@@ -571,7 +660,8 @@ const entry = `@import "tailwindcss" source(none);\n@plugin "${path.join(root, '
 const OLD = 'view-transition-old/hero:animate-fade-out'
 const NEW = 'view-transition-new/hero:animate-fade-in'
 
-const fresh = async candidates => finalizeCss((await compiler(entry, root)).build(candidates)).css
+const fresh = async candidates =>
+  finalizeCss((await compiler(entry, root)).build(candidates)).css
 
 /**
  * What a build says about one identity, read from the **rules** rather than from the text.
@@ -581,19 +671,26 @@ const fresh = async candidates => finalizeCss((await compiler(entry, root)).buil
  * emission that contains no old-side rule at all — the guard alone satisfies it. A side is a rule whose
  * selector starts with the pseudo, and nothing else in the output looks like that.
  */
-const shape = (css) => {
+const shape = css => {
   const selectors = []
 
-  postcss.parse(css).walkRules((rule) => {
+  postcss.parse(css).walkRules(rule => {
     selectors.push(rule.selector.replace(/\s+/g, ' ').trim())
   })
 
   return {
-    identity: selectors.some(selector => selector === '.view-transition-old\\/hero\\:animate-fade-out'
-      || selector === '.view-transition-new\\/hero\\:animate-fade-in'),
+    identity: selectors.some(
+      selector =>
+        selector === '.view-transition-old\\/hero\\:animate-fade-out' ||
+        selector === '.view-transition-new\\/hero\\:animate-fade-in',
+    ),
     marked: selectors.some(selector => selector.includes('.jumi-vt-')),
-    new: selectors.some(selector => selector.startsWith('::view-transition-new(hero)')),
-    old: selectors.some(selector => selector.startsWith('::view-transition-old(hero)')),
+    new: selectors.some(selector =>
+      selector.startsWith('::view-transition-new(hero)'),
+    ),
+    old: selectors.some(selector =>
+      selector.startsWith('::view-transition-old(hero)'),
+    ),
   }
 }
 
@@ -637,13 +734,14 @@ const last = finalizeCss(full)
 
 check(
   'the pass carries no state between inputs',
-  last.css === first.css && last.viewTransitions === first.viewTransitions
-  && middle.css !== first.css,
+  last.css === first.css &&
+    last.viewTransitions === first.viewTransitions &&
+    middle.css !== first.css,
   `full ${first.css.length} → smaller ${middle.css.length} → full ${last.css.length}`,
 )
 
 check(
-  'a long-lived compiler\'s build is additive, and that is the host\'s, not the pass\'s',
+  "a long-lived compiler's build is additive, and that is the host's, not the pass's",
   // Pinned deliberately. It reads like a bug in the finalizer the first time it is met — a removed
   // candidate keeps its identity — and it is not: the candidate is still in the stylesheet, and the
   // finalizer faithfully emits what it is given. Anything that wants a genuine shrink has to build on a
@@ -687,17 +785,20 @@ const docPages = readdirSync(docRoot)
  * Both sides, because resolving and emitting are different questions. A lone duration control resolves
  * perfectly well and emits nothing — the page's claim about it is the second of those.
  */
-const compileAlone = async (candidates) => {
+const compileAlone = async candidates => {
   const raw = (await compiler(entry, root)).build(candidates)
 
   return { raw, ...finalizeCss(raw) }
 }
 
 /** How a class reaches the selector: every character an identifier cannot hold is escaped. */
-const asSelector = candidate => `.${candidate.replace(/[^A-Za-z0-9_-]/g, character => `\\${character}`)}`
+const asSelector = candidate =>
+  `.${candidate.replace(/[^A-Za-z0-9_-]/g, character => `\\${character}`)}`
 
-const blocksIn = source => [...source.matchAll(/```html\n([\s\S]*?)```/g)].map(block => block[1])
-const classesNamedIn = source => [...source.matchAll(/class="([^"]+)"/g)].map(match => match[1])
+const blocksIn = source =>
+  [...source.matchAll(/```html\n([\s\S]*?)```/g)].map(block => block[1])
+const classesNamedIn = source =>
+  [...source.matchAll(/class="([^"]+)"/g)].map(match => match[1])
 
 /**
  * A class in an example resolves in one of two ways, and the arm has to know both.
@@ -710,11 +811,19 @@ const classesNamedIn = source => [...source.matchAll(/class="([^"]+)"/g)].map(ma
  * which classes are not being tested.
  */
 const siteClasses = new Set(
-  readdirSync(path.join(root, 'docs/src/styles'), { encoding: 'utf8', recursive: true })
+  readdirSync(path.join(root, 'docs/src/styles'), {
+    encoding: 'utf8',
+    recursive: true,
+  })
     .filter(name => name.endsWith('.css'))
-    .flatMap(name => [...readFileSync(path.join(root, 'docs/src/styles', name), 'utf8')
-      .matchAll(/\.([A-Za-z_][\w-]*)/g)]
-      .map(match => match[1])),
+    .flatMap(name =>
+      [
+        ...readFileSync(
+          path.join(root, 'docs/src/styles', name),
+          'utf8',
+        ).matchAll(/\.([A-Za-z_][\w-]*)/g),
+      ].map(match => match[1]),
+    ),
 )
 
 // The stem, so a page-local class used behind a variant is still recognised. A `:` that follows a path segment
@@ -731,12 +840,15 @@ for (const [name, source] of docPages) {
   const blocks = blocksIn(source)
   const attributes = classesNamedIn(source)
   const found = blocks.flatMap(classesNamedIn)
-  const tokens = [...new Set(found.flatMap(value => value.split(/\s+/).filter(Boolean)))]
+  const tokens = [
+    ...new Set(found.flatMap(value => value.split(/\s+/).filter(Boolean))),
+  ]
 
   // Every `class` attribute in the page has to sit inside a block this extractor understood, so a fence it
   // fails to recognise shows up as a mismatch rather than as a quietly shorter list. Without it the arm could
   // pass while reading half a page.
-  if (attributes.length !== found.length) docSkipped.push(`${name} ${found.length}/${attributes.length}`)
+  if (attributes.length !== found.length)
+    docSkipped.push(`${name} ${found.length}/${attributes.length}`)
 
   docExamples += blocks.length
 
@@ -760,12 +872,19 @@ for (const [name, source] of docPages) {
 
 check(
   'every class the documentation names resolves',
-  docPages.length > 0 && docChecked > 0 && !docUnknown.length && !docSkipped.length,
+  docPages.length > 0 &&
+    docChecked > 0 &&
+    !docUnknown.length &&
+    !docSkipped.length,
   docUnknown.length
     ? `${docUnknown.length} unknown: ${docUnknown.join(', ')}`
-    : `${docChecked} classes in ${docExamples} examples across ${docPages.length} pages`
-      + (docSiteOwned.length ? `; the site's own: ${docSiteOwned.join(', ')}` : '')
-      + (docSkipped.length ? ` (class attributes outside recognised blocks: ${docSkipped.join(', ')})` : ''),
+    : `${docChecked} classes in ${docExamples} examples across ${docPages.length} pages` +
+        (docSiteOwned.length
+          ? `; the site's own: ${docSiteOwned.join(', ')}`
+          : '') +
+        (docSkipped.length
+          ? ` (class attributes outside recognised blocks: ${docSkipped.join(', ')})`
+          : ''),
 )
 
 /**
@@ -777,12 +896,22 @@ check(
  * wrong.
  */
 for (const [claim, candidate] of [
-  ['a control alone does not make the element participate', 'view-transition-old/hero:animation-duration-300'],
-  ['a source-state variant is refused', 'hover:view-transition-old/hero:animate-fade-out'],
+  [
+    'a control alone does not make the element participate',
+    'view-transition-old/hero:animation-duration-300',
+  ],
+  [
+    'a source-state variant is refused',
+    'hover:view-transition-old/hero:animate-fade-out',
+  ],
 ]) {
   const { viewTransitions } = await compileAlone([candidate])
 
-  check(`the page's claim holds: ${claim}`, viewTransitions === 0, `${candidate} → ${viewTransitions} rules`)
+  check(
+    `the page's claim holds: ${claim}`,
+    viewTransitions === 0,
+    `${candidate} → ${viewTransitions} rules`,
+  )
 }
 
 /**
@@ -793,16 +922,21 @@ for (const [claim, candidate] of [
  * import away from being false: a helper pulled into `src/index.ts` that happens to reach for `document` would
  * break it, and nothing else in the gate examines the root entry's bytes, so it would break quietly.
  */
-const entrySources = ['index', 'postcss', 'vite']
-  .map(name => [name, readFileSync(path.join(root, 'dist', `${name}.js`), 'utf8')])
+const entrySources = ['index', 'postcss', 'vite'].map(name => [
+  name,
+  readFileSync(path.join(root, 'dist', `${name}.js`), 'utf8'),
+])
 
 const domGlobal = /\b(addEventListener|document|requestAnimationFrame|window)\b/
 
 check(
   'and the runtime is the only entry that reaches for the DOM',
   entrySources.every(([, source]) => !domGlobal.test(source)),
-  entrySources.filter(([, source]) => domGlobal.test(source)).map(([name]) => name).join(', ')
-  || 'the root, Vite and PostCSS entries are free of browser globals',
+  entrySources
+    .filter(([, source]) => domGlobal.test(source))
+    .map(([name]) => name)
+    .join(', ') ||
+    'the root, Vite and PostCSS entries are free of browser globals',
 )
 
 /* ------------------------------------------------------------------ the two adapters */
@@ -815,12 +949,20 @@ check(
  * would show up as a feature that works in development and not in a build. The carrier protocol has
  * this assertion already; the view-transition emission is new code on the same path.
  */
-const { jumiFinalizer: postcssFinalizer } = await import(path.join(root, 'dist/postcss.js'))
-const { jumiFinalizer: viteFinalizer } = await import(path.join(root, 'dist/vite.js'))
+const { jumiFinalizer: postcssFinalizer } = await import(
+  path.join(root, 'dist/postcss.js')
+)
+const { jumiFinalizer: viteFinalizer } = await import(
+  path.join(root, 'dist/vite.js')
+)
 
 const emission = instance.build(CANDIDATES)
 const expected = finalizeCss(emission).css
-const viaPostcss = (await postcss([postcssFinalizer()]).process(emission, { from: 'adapters.css' })).css
+const viaPostcss = (
+  await postcss([postcssFinalizer()]).process(emission, {
+    from: 'adapters.css',
+  })
+).css
 
 const viteWarnings = []
 const transformed = viteFinalizer().transform.call(
@@ -841,7 +983,11 @@ check(
     const refusedRaw = refused.build(REFUSED)
     const warnings = []
 
-    viteFinalizer().transform.call({ warn: message => warnings.push(message) }, refusedRaw, 'x.css')
+    viteFinalizer().transform.call(
+      { warn: message => warnings.push(message) },
+      refusedRaw,
+      'x.css',
+    )
 
     return warnings.some(message => message.includes('never runs there'))
   })(),
@@ -860,7 +1006,10 @@ check(
  * guessing at. The type contract is still asserted at compile time in `src/view-transition.test.ts`; the
  * behaviour is asserted here.
  */
-const runtime = await browser.newContext({ reducedMotion: 'no-preference', viewport: { height: 900, width: 1200 } })
+const runtime = await browser.newContext({
+  reducedMotion: 'no-preference',
+  viewport: { height: 900, width: 1200 },
+})
 const runtimePage = await runtime.newPage()
 
 const runtimeErrors = []
@@ -870,19 +1019,25 @@ runtimePage.on('pageerror', error => runtimeErrors.push(String(error)))
 await runtimePage.goto(`${base}/runtime.html`)
 await runtimePage.waitForLoadState('load')
 
-const coalesced = await runtimePage.evaluate(() => (async () => {
-  const { counts, reset, run } = window.__probe
+const coalesced = await runtimePage.evaluate(() =>
+  (async () => {
+    const { counts, reset, run } = window.__probe
 
-  reset()
+    reset()
 
-  let updates = 0
+    let updates = 0
 
-  const one = run(() => { updates += 1 })
-  const two = run(() => { updates += 1 })
-  const outcomes = await Promise.all([one, two])
+    const one = run(() => {
+      updates += 1
+    })
+    const two = run(() => {
+      updates += 1
+    })
+    const outcomes = await Promise.all([one, two])
 
-  return { calls: counts.calls, outcomes, updates }
-})())
+    return { calls: counts.calls, outcomes, updates }
+  })(),
+)
 
 /**
  * The default, on the shape it exists for: two calls in one task.
@@ -894,9 +1049,10 @@ const coalesced = await runtimePage.evaluate(() => (async () => {
  */
 check(
   'the default coalesces two calls in one task: one transition, and neither update dropped',
-  coalesced.calls === 1 && coalesced.updates === 2
-  && coalesced.outcomes[0].transitioned === true
-  && coalesced.outcomes[1].reason === 'in-flight',
+  coalesced.calls === 1 &&
+    coalesced.updates === 2 &&
+    coalesced.outcomes[0].transitioned === true &&
+    coalesced.outcomes[1].reason === 'in-flight',
   `${coalesced.calls} transition(s), ${coalesced.updates} update(s): ${JSON.stringify(coalesced.outcomes)}`,
 )
 
@@ -907,25 +1063,29 @@ check(
  * `runViewTransition(change)` with no options is what the demo calls, and the second click has to supersede
  * without the page saying so. `demo:check` makes the same claim end to end, through a real mouse.
  */
-const deferred = await runtimePage.evaluate(() => (async () => {
-  const { counts, reset, run } = window.__probe
+const deferred = await runtimePage.evaluate(() =>
+  (async () => {
+    const { counts, reset, run } = window.__probe
 
-  reset()
+    reset()
 
-  await new Promise(resolve => setTimeout(resolve, 20))
+    await new Promise(resolve => setTimeout(resolve, 20))
 
-  const one = run(() => {})
-  const two = await new Promise(resolve => setTimeout(() => resolve(run(() => {})), 0))
-  const outcomes = await Promise.all([one, two])
+    const one = run(() => {})
+    const two = await new Promise(resolve =>
+      setTimeout(() => resolve(run(() => {})), 0),
+    )
+    const outcomes = await Promise.all([one, two])
 
-  return { calls: counts.calls, outcomes }
-})())
+    return { calls: counts.calls, outcomes }
+  })(),
+)
 
 check(
   'a call from a later task supersedes without being asked to, and names what it cut short',
-  deferred.calls === 2
-  && deferred.outcomes.some(outcome => outcome.reason === 'aborted')
-  && deferred.outcomes.some(outcome => outcome.transitioned === true),
+  deferred.calls === 2 &&
+    deferred.outcomes.some(outcome => outcome.reason === 'aborted') &&
+    deferred.outcomes.some(outcome => outcome.transitioned === true),
   `${deferred.calls} transitions: ${JSON.stringify(deferred.outcomes)}`,
 )
 
@@ -936,19 +1096,23 @@ check(
  * cleared in a microtask would read this as a new interaction and supersede — aborting a transition the
  * reader is watching, for a duplicate write of the same gesture.
  */
-const microtask = await runtimePage.evaluate(() => (async () => {
-  const { counts, reset, run } = window.__probe
+const microtask = await runtimePage.evaluate(() =>
+  (async () => {
+    const { counts, reset, run } = window.__probe
 
-  reset()
+    reset()
 
-  await new Promise(resolve => setTimeout(resolve, 20))
+    await new Promise(resolve => setTimeout(resolve, 20))
 
-  const one = run(() => {})
-  const two = await new Promise(resolve => queueMicrotask(() => resolve(run(() => {}))))
-  const outcomes = await Promise.all([one, two])
+    const one = run(() => {})
+    const two = await new Promise(resolve =>
+      queueMicrotask(() => resolve(run(() => {}))),
+    )
+    const outcomes = await Promise.all([one, two])
 
-  return { calls: counts.calls, outcomes }
-})())
+    return { calls: counts.calls, outcomes }
+  })(),
+)
 
 check(
   'a call deferred by a microtask is still the same interaction, so it coalesces',
@@ -956,19 +1120,23 @@ check(
   `${microtask.calls} transition(s): ${JSON.stringify(microtask.outcomes)}`,
 )
 
-const overridden = await runtimePage.evaluate(() => (async () => {
-  const { counts, reset, run } = window.__probe
+const overridden = await runtimePage.evaluate(() =>
+  (async () => {
+    const { counts, reset, run } = window.__probe
 
-  reset()
+    reset()
 
-  await new Promise(resolve => setTimeout(resolve, 20))
+    await new Promise(resolve => setTimeout(resolve, 20))
 
-  const one = run(() => {}, { concurrency: 'coalesce' })
-  const two = await new Promise(resolve => setTimeout(() => resolve(run(() => {}, { concurrency: 'coalesce' })), 0))
-  const outcomes = await Promise.all([one, two])
+    const one = run(() => {}, { concurrency: 'coalesce' })
+    const two = await new Promise(resolve =>
+      setTimeout(() => resolve(run(() => {}, { concurrency: 'coalesce' })), 0),
+    )
+    const outcomes = await Promise.all([one, two])
 
-  return { calls: counts.calls, outcomes }
-})())
+    return { calls: counts.calls, outcomes }
+  })(),
+)
 
 check(
   'and `coalesce` still means coalesce, whatever the timing',
@@ -976,47 +1144,59 @@ check(
   `${overridden.calls} transition(s): ${JSON.stringify(overridden.outcomes)}`,
 )
 
-const forced = await runtimePage.evaluate(() => (async () => {
-  const { counts, reset, run } = window.__probe
+const forced = await runtimePage.evaluate(() =>
+  (async () => {
+    const { counts, reset, run } = window.__probe
 
-  reset()
+    reset()
 
-  await new Promise(resolve => setTimeout(resolve, 20))
+    await new Promise(resolve => setTimeout(resolve, 20))
 
-  const one = run(() => {}, { concurrency: 'supersede' })
-  const two = run(() => {}, { concurrency: 'supersede' })
-  const outcomes = await Promise.all([one, two])
+    const one = run(() => {}, { concurrency: 'supersede' })
+    const two = run(() => {}, { concurrency: 'supersede' })
+    const outcomes = await Promise.all([one, two])
 
-  return { calls: counts.calls, outcomes }
-})())
+    return { calls: counts.calls, outcomes }
+  })(),
+)
 
 check(
   'and `supersede` still supersedes, even for two calls in one task',
-  forced.calls === 2
-  && forced.outcomes.some(outcome => outcome.reason === 'aborted')
-  && forced.outcomes.some(outcome => outcome.transitioned === true),
+  forced.calls === 2 &&
+    forced.outcomes.some(outcome => outcome.reason === 'aborted') &&
+    forced.outcomes.some(outcome => outcome.transitioned === true),
   `${forced.calls} transitions: ${JSON.stringify(forced.outcomes)}`,
 )
 
-const refusal = await runtimePage.evaluate(() => (async () => {
-  const { counts, reset, run } = window.__probe
+const refusal = await runtimePage.evaluate(() =>
+  (async () => {
+    const { counts, reset, run } = window.__probe
 
-  reset()
+    reset()
 
-  let message = ''
+    let message = ''
 
-  try { await run(async () => {}) }
-  catch (error) { message = String(error && error.message) }
+    try {
+      await run(async () => {})
+    } catch (error) {
+      message = String(error && error.message)
+    }
 
-  // The point of refusing: the promise is never handed to the platform, so the transition is abandoned rather
-  // than waiting for a rendering update it is itself holding. If it were handed over, this next call would
-  // never settle — measured, `await requestAnimationFrame()` inside an update wedges it permanently.
-  const after = await run(() => {})
+    // The point of refusing: the promise is never handed to the platform, so the transition is abandoned rather
+    // than waiting for a rendering update it is itself holding. If it were handed over, this next call would
+    // never settle — measured, `await requestAnimationFrame()` inside an update wedges it permanently.
+    const after = await run(() => {})
 
-  await new Promise(resolve => setTimeout(resolve, 50))
+    await new Promise(resolve => setTimeout(resolve, 50))
 
-  return { after, calls: counts.calls, message, unhandled: [...window.__unhandled] }
-})())
+    return {
+      after,
+      calls: counts.calls,
+      message,
+      unhandled: [...window.__unhandled],
+    }
+  })(),
+)
 
 check(
   'an async update is refused rather than handed to the browser',
@@ -1036,22 +1216,26 @@ check(
   refusal.unhandled.join(' | ') || 'none',
 )
 
-const unsupported = await runtimePage.evaluate(() => (async () => {
-  const { reset, run } = window.__probe
+const unsupported = await runtimePage.evaluate(() =>
+  (async () => {
+    const { reset, run } = window.__probe
 
-  reset()
+    reset()
 
-  const real = document.startViewTransition
+    const real = document.startViewTransition
 
-  document.startViewTransition = undefined
+    document.startViewTransition = undefined
 
-  let updates = 0
-  const outcome = await run(() => { updates += 1 })
+    let updates = 0
+    const outcome = await run(() => {
+      updates += 1
+    })
 
-  document.startViewTransition = real
+    document.startViewTransition = real
 
-  return { outcome, updates }
-})())
+    return { outcome, updates }
+  })(),
+)
 
 check(
   'without the platform it is an ordinary update, and says so',
@@ -1059,20 +1243,27 @@ check(
   JSON.stringify(unsupported.outcome),
 )
 
-const hidden = await runtimePage.evaluate(() => (async () => {
-  const { reset, run } = window.__probe
+const hidden = await runtimePage.evaluate(() =>
+  (async () => {
+    const { reset, run } = window.__probe
 
-  reset()
+    reset()
 
-  Object.defineProperty(Document.prototype, 'visibilityState', { configurable: true, get: () => 'hidden' })
+    Object.defineProperty(Document.prototype, 'visibilityState', {
+      configurable: true,
+      get: () => 'hidden',
+    })
 
-  let updates = 0
-  const outcome = await run(() => { updates += 1 })
+    let updates = 0
+    const outcome = await run(() => {
+      updates += 1
+    })
 
-  delete Document.prototype.visibilityState
+    delete Document.prototype.visibilityState
 
-  return { outcome, updates }
-})())
+    return { outcome, updates }
+  })(),
+)
 
 check(
   'and in a hidden document it applies the update instead of rejecting `ready`',
@@ -1094,32 +1285,40 @@ const probePage = await runtime.newPage()
 await probePage.goto(`${base}/runtime.html`)
 await probePage.waitForLoadState('load')
 
-const leaks = await probePage.evaluate(() => (async () => {
-  const probe = async (consumed) => {
-    window.__unhandled.length = 0
+const leaks = await probePage.evaluate(() =>
+  (async () => {
+    const probe = async consumed => {
+      window.__unhandled.length = 0
 
-    const transition = document.startViewTransition(() => { throw new TypeError('probe') })
+      const transition = document.startViewTransition(() => {
+        throw new TypeError('probe')
+      })
 
-    for (const name of consumed) transition[name].catch(() => {})
+      for (const name of consumed) transition[name].catch(() => {})
 
-    await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise(resolve => setTimeout(resolve, 100))
 
-    return window.__unhandled.length
-  }
+      return window.__unhandled.length
+    }
 
-  return {
-    all: await probe(['ready', 'updateCallbackDone', 'finished']),
-    two: await probe(['ready', 'finished']),
-  }
-})())
+    return {
+      all: await probe(['ready', 'updateCallbackDone', 'finished']),
+      two: await probe(['ready', 'finished']),
+    }
+  })(),
+)
 
 check(
-  'consuming two of the update error\'s three promises is not enough',
+  "consuming two of the update error's three promises is not enough",
   leaks.all === 0 && leaks.two >= 1,
   `all three consumed → ${leaks.all} unhandled; only \`ready\` and \`finished\` consumed → ${leaks.two} unhandled`,
 )
 
-check('the runtime arms throw nothing', runtimeErrors.length === 0, runtimeErrors.slice(0, 3).join(' | ') || 'clean')
+check(
+  'the runtime arms throw nothing',
+  runtimeErrors.length === 0,
+  runtimeErrors.slice(0, 3).join(' | ') || 'clean',
+)
 
 await runtime.close()
 
@@ -1134,7 +1333,9 @@ for (const { detail, label, pass } of checks) {
 }
 
 if (emitted.warnings.length) {
-  console.log(`\n· the finalizer reported ${emitted.warnings.length} refusal(s):`)
+  console.log(
+    `\n· the finalizer reported ${emitted.warnings.length} refusal(s):`,
+  )
   for (const warning of emitted.warnings) console.log(`  ${warning}`)
 }
 

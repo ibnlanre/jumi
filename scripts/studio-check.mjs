@@ -1,105 +1,458 @@
 #!/usr/bin/env node
+import { mkdir, readFile } from 'node:fs/promises'
+import { createServer } from 'node:http'
+import { chromium } from 'playwright'
+
+import { build, compiler, root } from './lib/compile.mjs'
+
 /** Build docs first. This gate serves the static artifact and independently recompiles its export. */
-import assert from 'node:assert/strict';
-import { createServer } from 'node:http';
-import { readFile, mkdir } from 'node:fs/promises';
-import path from 'node:path';
-import { chromium } from 'playwright';
-import { build, compiler, root } from './lib/compile.mjs';
-const dist=path.join(root,'docs/dist');
-const server=createServer(async(req,res)=>{try{let pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);if(pathname.endsWith('/'))pathname+='index.html';const file=path.resolve(dist,'.'+pathname);if(!file.startsWith(dist+path.sep))throw Error('outside root');const body=await readFile(file);res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':file.endsWith('.svg')?'image/svg+xml':'text/html');res.end(body);}catch{res.writeHead(404);res.end('Not found');}});
-await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
-const browser=await chromium.launch();
-const context=await browser.newContext({viewport:{width:1440,height:1000},permissions:['clipboard-read','clipboard-write']});
-const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
-let checks=0;
-function check(name,value){assert.ok(value,name);console.log('✓ '+name);checks++;}
-const ready=()=>page.waitForFunction(()=>window.__jumiStudio&&!window.__jumiStudio.pending&&!window.__jumiStudio.error,undefined,{timeout:30000});
-const value=selector=>page.frameLocator('#scene-frame').locator(selector).evaluate(el=>getComputedStyle(el).opacity);
-const seek=async time=>{await page.locator('#playhead-scrub').evaluate((el,t)=>{el.value=String(t);el.dispatchEvent(new Event('input',{bubbles:true}));},time);};
-const control=async(name,value)=>{const el=page.locator('[data-control="'+name+'"]');await el.fill(String(value));await el.dispatchEvent('change');await ready();};
-try{
-  await page.goto('http://127.0.0.1:'+server.address().port+'/studio/');await ready();
-  check('registry-derived inspector includes motion paths and SVG',await page.evaluate(()=>window.__jumiStudio.catalog.some(p=>p.utility==='animate-offset-distance')&&window.__jumiStudio.catalog.some(p=>p.utility==='animate-fill')));
-  await page.locator('#scene-tree [data-select="petal-1"]').click();
-  check('tree selection resolves the actual nested hero element',await page.evaluate(()=>window.__jumiStudio.project.editor.selected[0]==='petal-1'));
-  await page.locator('[data-collapse="position-1"]').click();
-  check('tree branches collapse',await page.locator('#scene-tree [data-select="petal-1"]').count()===0);
-  await page.locator('[data-collapse="position-1"]').click();
-  await page.locator('[data-lock="petal-1"]').click();
-  check('locking is tracked independently from motion',await page.evaluate(()=>window.__jumiStudio.project.editor.locked.includes('petal-1')));
-  await page.locator('[data-lock="petal-1"]').click();
-  const before=await page.frameLocator('#scene-frame').locator('#petal-1').evaluate(el=>({rect:el.getBoundingClientRect().toJSON(),parent:el.parentElement.id}));
-  await page.locator('[data-action="isolate"]').click();
-  const after=await page.frameLocator('#scene-frame').locator('#petal-1').evaluate(el=>({rect:el.getBoundingClientRect().toJSON(),parent:el.parentElement.id}));
-  check('HTML isolation preserves bounds and parent',JSON.stringify(before)===JSON.stringify(after));
-  await page.locator('#isolation').selectOption('none');
-  await page.locator('#scene-picker').selectOption('signal');await ready();
-  await page.frameLocator('#scene-frame').locator('#dot-b').click();
-  check('canvas click selects the actual SVG element',await page.evaluate(()=>window.__jumiStudio.project.editor.selected[0]==='dot-b'));
-  await page.locator('#scene-tree [data-select="dot-a"]').click();
-  const svgBefore=await page.frameLocator('#scene-frame').locator('#dot-a').evaluate(el=>({box:el.getBoundingClientRect().toJSON(),parent:el.parentElement.id}));
-  await page.locator('#isolation').selectOption('selection');
-  check('sibling context is ghosted without dimming the selected child',Math.abs(Number(await value('#dot-b'))-.16)<.001&&Math.abs(Number(await value('#dot-a'))-.2)<.001);
-  const svgAfter=await page.frameLocator('#scene-frame').locator('#dot-a').evaluate(el=>({box:el.getBoundingClientRect().toJSON(),parent:el.parentElement.id}));
-  check('SVG isolation preserves bounds and hierarchy',JSON.stringify(svgBefore)===JSON.stringify(svgAfter));
-  await page.locator('#isolation').selectOption('none');
-  await control('duration',1000);await control('delay',200);await control('easing','linear');await control('iterations','1');
-  await seek(600);
-  await page.locator('#frame-value').fill('.8');
-  await page.locator('[data-action="keyframe"]').first().click();await ready();
-  console.log(await page.evaluate(()=>({time:window.__jumiStudio.time,track:window.__jumiStudio.project.tracks.find(t=>t.nodeId==='dot-a'),message:document.querySelector('#studio-message').textContent})));
-  check('keyframe insertion is delay-relative (600ms to 40%)',await page.evaluate(()=>window.__jumiStudio.project.tracks.find(t=>t.nodeId==='dot-a').frames.some(f=>f.offset===40&&f.value==='.8')));
-  check('scrubbing uses actual CSS interpolation at the inserted frame',Math.abs(Number(await value('#dot-a'))-.8)<.001);
-  const key=page.locator('[aria-label="opacity keyframe 40%"]');
-  const keyBox=await key.boundingBox(),lane=await page.locator('.track-lane').first().boundingBox();
-  await page.mouse.move(keyBox.x+keyBox.width/2,keyBox.y+keyBox.height/2);await page.mouse.down();await page.mouse.move(keyBox.x+keyBox.width/2+lane.width*200/6000,keyBox.y+keyBox.height/2,{steps:5});await page.mouse.up();await ready();
-  check('dragging a keyframe changes its authored time',await page.evaluate(()=>window.__jumiStudio.project.tracks.find(t=>t.nodeId==='dot-a').frames.some(f=>f.offset===60&&f.value==='.8')));
-  await page.locator('[aria-label="opacity keyframe 60%"]').focus();await page.keyboard.press('Delete');await ready();
-  check('keyframe deletion edits the phrase',await page.evaluate(()=>!window.__jumiStudio.project.tracks.find(t=>t.nodeId==='dot-a').frames.some(f=>f.offset===60)));
-  await page.locator('[data-action="undo"]').click();await ready();
-  check('undo restores authored keyframes',await page.evaluate(()=>window.__jumiStudio.project.tracks.find(t=>t.nodeId==='dot-a').frames.some(f=>f.offset===60)));
-  await page.locator('#scene-tree [data-select="dot-b"]').click();await control('duration',1000);await control('delay',700);await control('easing','linear');await control('iterations','1');
-  await seek(600);
-  check('siblings can use independent timing',Math.abs(Number(await value('#dot-a'))-Number(await value('#dot-b')))>.2);
-  await page.locator('#scene-tree [data-select="dot-a"]').click({modifiers:['Shift']});
-  check('multiple selected elements expose multiple timeline tracks',await page.locator('.track-row').count()===2);
-  await page.locator('[data-action="sync"]').click();await ready();
-  check('shared timing writes controls to both siblings',await page.evaluate(()=>{const t=window.__jumiStudio.project.tracks.filter(t=>['dot-a','dot-b'].includes(t.nodeId));return t[0].controls.duration===t[1].controls.duration&&t[0].controls.delay===t[1].controls.delay;}));
-  await page.locator('[data-action="stagger"]').click();await ready();
-  check('sibling choreography produces explicit public delays',await page.evaluate(()=>{const t=window.__jumiStudio.project.tracks.filter(t=>['dot-a','dot-b'].includes(t.nodeId));return Math.abs(t[0].controls.delay-t[1].controls.delay)===150;}));
-  await page.locator('#scene-tree [data-select="headline"]').click();
-  await page.locator('#property-search').fill('opacity');await page.locator('#property-select').selectOption('animate-opacity');await page.locator('[data-action="add-track"]').click();await ready();
-  check('HTML can hold multiple independently authored properties',await page.evaluate(()=>window.__jumiStudio.project.tracks.filter(t=>t.nodeId==='headline').length===2));
-  await page.evaluate(()=>window.__studioNode=document.querySelector('#scene-frame').contentDocument.querySelector('#headline'));
-  await seek(500);await seek(700);
-  check('seeking does not replace scene nodes',await page.evaluate(()=>window.__studioNode===document.querySelector('#scene-frame').contentDocument.querySelector('#headline')));
-  await page.locator('[data-action="play"]').click();await page.waitForTimeout(160);await page.locator('[data-action="play"]').click();
-  check('playback advances the actual browser animations',await page.evaluate(()=>{const a=document.querySelector('#scene-frame').contentDocument.getAnimations();return window.__jumiStudio.time>700&&a.every(a=>a.playState==='paused');}));
-  await seek(0);
-  const stored=await page.evaluate(()=>JSON.stringify(window.__jumiStudio.project));
-  await page.reload();await ready();
-  // Fitting a freshly loaded viewport is display state, not authored motion.
-  check('local persistence restores author intent',await page.evaluate(s=>{const a=window.__jumiStudio.project,b=JSON.parse(s);return JSON.stringify(a.tracks)===JSON.stringify(b.tracks)&&JSON.stringify(a.scene)===JSON.stringify(b.scene);},stored));
-  const snapshot=await page.evaluate(()=>({project:window.__jumiStudio.project,html:window.__jumiStudio.exported,classes:[...new DOMParser().parseFromString(window.__jumiStudio.exported,'text/html').querySelectorAll('[class]')].flatMap(el=>[...el.classList])}));
-  check('output uses named Jumi phrases and has no editor isolation',snapshot.html.includes('animate-opacity-[')&&snapshot.html.includes('/pulse')&&!snapshot.html.includes('studio-isolation'));
-  const fresh=build(await compiler('@import "tailwindcss"; @plugin "'+root+'/dist/index.js";',root),snapshot.classes).css;
-  const independent=await context.newPage();
-  await independent.setContent(snapshot.html.replace(/(<style id="jumi-output">)[\s\S]*?(<\/style>)/,(_m,a,b)=>a+fresh+b));
-  const metrics=()=>[...document.querySelectorAll('#dot-a,#dot-b,#headline')].map(el=>{const s=getComputedStyle(el),b=el.getBoundingClientRect();return{id:el.id,opacity:Number(s.opacity),translate:s.translate,rotate:s.rotate,width:b.width,height:b.height,x:b.x,y:b.y};});
-  for(const time of [0,100,400,600,800,1200,1800,2500]){
-    await seek(time);await independent.evaluate(t=>{for(const a of document.getAnimations()){a.pause();a.currentTime=t;}},time);
-    const actual=await page.frameLocator('#scene-frame').locator('body').evaluate(metrics),expected=await independent.evaluate(metrics);
-    for(let i=0;i<actual.length;i++){for(const k of ['opacity','width','height','x','y'])assert.ok(Math.abs(actual[i][k]-expected[i][k])<.03,actual[i].id+' '+k+' at '+time+'ms: '+actual[i][k]+' != '+expected[i][k]);assert.equal(actual[i].translate,expected[i].translate);assert.equal(actual[i].rotate,expected[i].rotate);}
+import assert from 'node:assert/strict'
+import path from 'node:path'
+const dist = path.join(root, 'docs/dist')
+const server = createServer(async (req, res) => {
+  try {
+    let pathname = decodeURIComponent(
+      new URL(req.url, 'http://localhost').pathname,
+    )
+    if (pathname.endsWith('/')) pathname += 'index.html'
+    const file = path.resolve(dist, '.' + pathname)
+    if (!file.startsWith(dist + path.sep)) throw Error('outside root')
+    const body = await readFile(file)
+    res.setHeader(
+      'Content-Type',
+      file.endsWith('.js')
+        ? 'text/javascript'
+        : file.endsWith('.css')
+          ? 'text/css'
+          : file.endsWith('.svg')
+            ? 'image/svg+xml'
+            : 'text/html',
+    )
+    res.end(body)
+  } catch {
+    res.writeHead(404)
+    res.end('Not found')
   }
-  check('fresh external Jumi build matches Studio HTML/SVG at eight times',true);
-  await independent.close();
-  const download=page.waitForEvent('download');await page.locator('[data-action="export"]').click();check('standalone HTML can be downloaded',(await download).suggestedFilename()==='jumi-motion.html');
-  const folder=path.join(root,'artifacts/studio');await mkdir(folder,{recursive:true});
-  await page.screenshot({path:path.join(folder,'desktop.png'),fullPage:true});
-  await page.setViewportSize({width:390,height:844});
-  check('narrow layout does not overflow the page',await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1));
-  await page.screenshot({path:path.join(folder,'mobile.png'),fullPage:true});
-  check('no browser runtime exceptions',errors.length===0);
-  console.log('\n'+checks+' Studio browser checks passed; independent compilation parity verified.');
-}finally{await context.close();await browser.close();await new Promise(resolve=>server.close(resolve));}
+})
+await new Promise(resolve => server.listen(0, '127.0.0.1', resolve))
+const browser = await chromium.launch()
+const context = await browser.newContext({
+  permissions: ['clipboard-read', 'clipboard-write'],
+  viewport: { height: 1000, width: 1440 },
+})
+const errors = [],
+  page = await context.newPage()
+page.on('pageerror', e => errors.push(e.message))
+let checks = 0
+function check(name, value) {
+  assert.ok(value, name)
+  console.log('✓ ' + name)
+  checks++
+}
+const ready = () =>
+  page.waitForFunction(
+    () =>
+      window.__jumiStudio &&
+      !window.__jumiStudio.pending &&
+      !window.__jumiStudio.error,
+    undefined,
+    { timeout: 30000 },
+  )
+const value = selector =>
+  page
+    .frameLocator('#scene-frame')
+    .locator(selector)
+    .evaluate(el => getComputedStyle(el).opacity)
+const seek = async time => {
+  await page.locator('#playhead-scrub').evaluate((el, t) => {
+    el.value = String(t)
+    el.dispatchEvent(new Event('input', { bubbles: true }))
+  }, time)
+}
+const control = async (name, value) => {
+  const el = page.locator('[data-control="' + name + '"]')
+  await el.fill(String(value))
+  await el.dispatchEvent('change')
+  await ready()
+}
+try {
+  await page.goto('http://127.0.0.1:' + server.address().port + '/studio/')
+  await ready()
+  check(
+    'registry-derived inspector includes motion paths and SVG',
+    await page.evaluate(
+      () =>
+        window.__jumiStudio.catalog.some(
+          p => p.utility === 'animate-offset-distance',
+        ) &&
+        window.__jumiStudio.catalog.some(p => p.utility === 'animate-fill'),
+    ),
+  )
+  await page.locator('#scene-tree [data-select="petal-1"]').click()
+  check(
+    'tree selection resolves the actual nested hero element',
+    await page.evaluate(
+      () => window.__jumiStudio.project.editor.selected[0] === 'petal-1',
+    ),
+  )
+  await page.locator('[data-collapse="position-1"]').click()
+  check(
+    'tree branches collapse',
+    (await page.locator('#scene-tree [data-select="petal-1"]').count()) === 0,
+  )
+  await page.locator('[data-collapse="position-1"]').click()
+  await page.locator('[data-lock="petal-1"]').click()
+  check(
+    'locking is tracked independently from motion',
+    await page.evaluate(() =>
+      window.__jumiStudio.project.editor.locked.includes('petal-1'),
+    ),
+  )
+  await page.locator('[data-lock="petal-1"]').click()
+  const before = await page
+    .frameLocator('#scene-frame')
+    .locator('#petal-1')
+    .evaluate(el => ({
+      parent: el.parentElement.id,
+      rect: el.getBoundingClientRect().toJSON(),
+    }))
+  await page.locator('[data-action="isolate"]').click()
+  const after = await page
+    .frameLocator('#scene-frame')
+    .locator('#petal-1')
+    .evaluate(el => ({
+      parent: el.parentElement.id,
+      rect: el.getBoundingClientRect().toJSON(),
+    }))
+  check(
+    'HTML isolation preserves bounds and parent',
+    JSON.stringify(before) === JSON.stringify(after),
+  )
+  await page.locator('#isolation').selectOption('none')
+  await page.locator('#scene-picker').selectOption('signal')
+  await ready()
+  await page.frameLocator('#scene-frame').locator('#dot-b').click()
+  check(
+    'canvas click selects the actual SVG element',
+    await page.evaluate(
+      () => window.__jumiStudio.project.editor.selected[0] === 'dot-b',
+    ),
+  )
+  await page.locator('#scene-tree [data-select="dot-a"]').click()
+  const svgBefore = await page
+    .frameLocator('#scene-frame')
+    .locator('#dot-a')
+    .evaluate(el => ({
+      box: el.getBoundingClientRect().toJSON(),
+      parent: el.parentElement.id,
+    }))
+  await page.locator('#isolation').selectOption('selection')
+  check(
+    'sibling context is ghosted without dimming the selected child',
+    Math.abs(Number(await value('#dot-b')) - 0.16) < 0.001 &&
+      Math.abs(Number(await value('#dot-a')) - 0.2) < 0.001,
+  )
+  const svgAfter = await page
+    .frameLocator('#scene-frame')
+    .locator('#dot-a')
+    .evaluate(el => ({
+      box: el.getBoundingClientRect().toJSON(),
+      parent: el.parentElement.id,
+    }))
+  check(
+    'SVG isolation preserves bounds and hierarchy',
+    JSON.stringify(svgBefore) === JSON.stringify(svgAfter),
+  )
+  await page.locator('#isolation').selectOption('none')
+  await control('duration', 1000)
+  await control('delay', 200)
+  await control('easing', 'linear')
+  await control('iterations', '1')
+  await seek(600)
+  await page.locator('#frame-value').fill('.8')
+  await page.locator('[data-action="keyframe"]').first().click()
+  await ready()
+  console.log(
+    await page.evaluate(() => ({
+      message: document.querySelector('#studio-message').textContent,
+      time: window.__jumiStudio.time,
+      track: window.__jumiStudio.project.tracks.find(t => t.nodeId === 'dot-a'),
+    })),
+  )
+  check(
+    'keyframe insertion is delay-relative (600ms to 40%)',
+    await page.evaluate(() =>
+      window.__jumiStudio.project.tracks
+        .find(t => t.nodeId === 'dot-a')
+        .frames.some(f => f.offset === 40 && f.value === '.8'),
+    ),
+  )
+  check(
+    'scrubbing uses actual CSS interpolation at the inserted frame',
+    Math.abs(Number(await value('#dot-a')) - 0.8) < 0.001,
+  )
+  const key = page.locator('[aria-label="opacity keyframe 40%"]')
+  const keyBox = await key.boundingBox(),
+    lane = await page.locator('.track-lane').first().boundingBox()
+  await page.mouse.move(
+    keyBox.x + keyBox.width / 2,
+    keyBox.y + keyBox.height / 2,
+  )
+  await page.mouse.down()
+  await page.mouse.move(
+    keyBox.x + keyBox.width / 2 + (lane.width * 200) / 6000,
+    keyBox.y + keyBox.height / 2,
+    { steps: 5 },
+  )
+  await page.mouse.up()
+  await ready()
+  check(
+    'dragging a keyframe changes its authored time',
+    await page.evaluate(() =>
+      window.__jumiStudio.project.tracks
+        .find(t => t.nodeId === 'dot-a')
+        .frames.some(f => f.offset === 60 && f.value === '.8'),
+    ),
+  )
+  await page.locator('[aria-label="opacity keyframe 60%"]').focus()
+  await page.keyboard.press('Delete')
+  await ready()
+  check(
+    'keyframe deletion edits the phrase',
+    await page.evaluate(
+      () =>
+        !window.__jumiStudio.project.tracks
+          .find(t => t.nodeId === 'dot-a')
+          .frames.some(f => f.offset === 60),
+    ),
+  )
+  await page.locator('[data-action="undo"]').click()
+  await ready()
+  check(
+    'undo restores authored keyframes',
+    await page.evaluate(() =>
+      window.__jumiStudio.project.tracks
+        .find(t => t.nodeId === 'dot-a')
+        .frames.some(f => f.offset === 60),
+    ),
+  )
+  await page.locator('#scene-tree [data-select="dot-b"]').click()
+  await control('duration', 1000)
+  await control('delay', 700)
+  await control('easing', 'linear')
+  await control('iterations', '1')
+  await seek(600)
+  check(
+    'siblings can use independent timing',
+    Math.abs(Number(await value('#dot-a')) - Number(await value('#dot-b'))) >
+      0.2,
+  )
+  await page
+    .locator('#scene-tree [data-select="dot-a"]')
+    .click({ modifiers: ['Shift'] })
+  check(
+    'multiple selected elements expose multiple timeline tracks',
+    (await page.locator('.track-row').count()) === 2,
+  )
+  await page.locator('[data-action="sync"]').click()
+  await ready()
+  check(
+    'shared timing writes controls to both siblings',
+    await page.evaluate(() => {
+      const t = window.__jumiStudio.project.tracks.filter(t =>
+        ['dot-a', 'dot-b'].includes(t.nodeId),
+      )
+      return (
+        t[0].controls.duration === t[1].controls.duration &&
+        t[0].controls.delay === t[1].controls.delay
+      )
+    }),
+  )
+  await page.locator('[data-action="stagger"]').click()
+  await ready()
+  check(
+    'sibling choreography produces explicit public delays',
+    await page.evaluate(() => {
+      const t = window.__jumiStudio.project.tracks.filter(t =>
+        ['dot-a', 'dot-b'].includes(t.nodeId),
+      )
+      return Math.abs(t[0].controls.delay - t[1].controls.delay) === 150
+    }),
+  )
+  await page.locator('#scene-tree [data-select="headline"]').click()
+  await page.locator('#property-search').fill('opacity')
+  await page.locator('#property-select').selectOption('animate-opacity')
+  await page.locator('[data-action="add-track"]').click()
+  await ready()
+  check(
+    'HTML can hold multiple independently authored properties',
+    await page.evaluate(
+      () =>
+        window.__jumiStudio.project.tracks.filter(t => t.nodeId === 'headline')
+          .length === 2,
+    ),
+  )
+  await page.evaluate(
+    () =>
+      (window.__studioNode = document
+        .querySelector('#scene-frame')
+        .contentDocument.querySelector('#headline')),
+  )
+  await seek(500)
+  await seek(700)
+  check(
+    'seeking does not replace scene nodes',
+    await page.evaluate(
+      () =>
+        window.__studioNode ===
+        document
+          .querySelector('#scene-frame')
+          .contentDocument.querySelector('#headline'),
+    ),
+  )
+  await page.locator('[data-action="play"]').click()
+  await page.waitForTimeout(160)
+  await page.locator('[data-action="play"]').click()
+  check(
+    'playback advances the actual browser animations',
+    await page.evaluate(() => {
+      const a = document
+        .querySelector('#scene-frame')
+        .contentDocument.getAnimations()
+      return (
+        window.__jumiStudio.time > 700 && a.every(a => a.playState === 'paused')
+      )
+    }),
+  )
+  await seek(0)
+  const stored = await page.evaluate(() =>
+    JSON.stringify(window.__jumiStudio.project),
+  )
+  await page.reload()
+  await ready()
+  // Fitting a freshly loaded viewport is display state, not authored motion.
+  check(
+    'local persistence restores author intent',
+    await page.evaluate(s => {
+      const a = window.__jumiStudio.project,
+        b = JSON.parse(s)
+      return (
+        JSON.stringify(a.tracks) === JSON.stringify(b.tracks) &&
+        JSON.stringify(a.scene) === JSON.stringify(b.scene)
+      )
+    }, stored),
+  )
+  const snapshot = await page.evaluate(() => ({
+    classes: [
+      ...new DOMParser()
+        .parseFromString(window.__jumiStudio.exported, 'text/html')
+        .querySelectorAll('[class]'),
+    ].flatMap(el => [...el.classList]),
+    html: window.__jumiStudio.exported,
+    project: window.__jumiStudio.project,
+  }))
+  check(
+    'output uses named Jumi phrases and has no editor isolation',
+    snapshot.html.includes('animate-opacity-[') &&
+      snapshot.html.includes('/pulse') &&
+      !snapshot.html.includes('studio-isolation'),
+  )
+  const fresh = build(
+    await compiler(
+      '@import "tailwindcss"; @plugin "' + root + '/dist/index.js";',
+      root,
+    ),
+    snapshot.classes,
+  ).css
+  const independent = await context.newPage()
+  await independent.setContent(
+    snapshot.html.replace(
+      /(<style id="jumi-output">)[\s\S]*?(<\/style>)/,
+      (_m, a, b) => a + fresh + b,
+    ),
+  )
+  const metrics = () =>
+    [...document.querySelectorAll('#dot-a,#dot-b,#headline')].map(el => {
+      const b = el.getBoundingClientRect(),
+        s = getComputedStyle(el)
+      return {
+        height: b.height,
+        id: el.id,
+        opacity: Number(s.opacity),
+        rotate: s.rotate,
+        translate: s.translate,
+        width: b.width,
+        x: b.x,
+        y: b.y,
+      }
+    })
+  for (const time of [0, 100, 400, 600, 800, 1200, 1800, 2500]) {
+    await seek(time)
+    await independent.evaluate(t => {
+      for (const a of document.getAnimations()) {
+        a.pause()
+        a.currentTime = t
+      }
+    }, time)
+    const actual = await page
+        .frameLocator('#scene-frame')
+        .locator('body')
+        .evaluate(metrics),
+      expected = await independent.evaluate(metrics)
+    for (let i = 0; i < actual.length; i++) {
+      for (const k of ['opacity', 'width', 'height', 'x', 'y'])
+        assert.ok(
+          Math.abs(actual[i][k] - expected[i][k]) < 0.03,
+          actual[i].id +
+            ' ' +
+            k +
+            ' at ' +
+            time +
+            'ms: ' +
+            actual[i][k] +
+            ' != ' +
+            expected[i][k],
+        )
+      assert.equal(actual[i].translate, expected[i].translate)
+      assert.equal(actual[i].rotate, expected[i].rotate)
+    }
+  }
+  check(
+    'fresh external Jumi build matches Studio HTML/SVG at eight times',
+    true,
+  )
+  await independent.close()
+  const download = page.waitForEvent('download')
+  await page.locator('[data-action="export"]').click()
+  check(
+    'standalone HTML can be downloaded',
+    (await download).suggestedFilename() === 'jumi-motion.html',
+  )
+  const folder = path.join(root, 'artifacts/studio')
+  await mkdir(folder, { recursive: true })
+  await page.screenshot({
+    fullPage: true,
+    path: path.join(folder, 'desktop.png'),
+  })
+  await page.setViewportSize({ height: 844, width: 390 })
+  check(
+    'narrow layout does not overflow the page',
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth + 1,
+    ),
+  )
+  await page.screenshot({
+    fullPage: true,
+    path: path.join(folder, 'mobile.png'),
+  })
+  check('no browser runtime exceptions', errors.length === 0)
+  console.log(
+    '\n' +
+      checks +
+      ' Studio browser checks passed; independent compilation parity verified.',
+  )
+} finally {
+  await context.close()
+  await browser.close()
+  await new Promise(resolve => server.close(resolve))
+}

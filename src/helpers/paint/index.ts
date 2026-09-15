@@ -1,4 +1,11 @@
-import { type Color, converter, formatHex, formatHex8, type Mode, parse } from 'culori'
+import {
+  type Color,
+  converter,
+  formatHex,
+  formatHex8,
+  type Mode,
+  parse,
+} from 'culori'
 
 /**
  * Convert a CSS color (or `color-mix()`) string to a hex literal so SVG-paint
@@ -58,10 +65,10 @@ function mixColors(a: Color, b: Color, weight: number, mode: Mode): Color {
     const valA = ca[key] ?? 0
     const valB = cb[key] ?? 0
 
-    channels[key] = (valA * alphaA * weight) + (valB * alphaB * (1 - weight))
+    channels[key] = valA * alphaA * weight + valB * alphaB * (1 - weight)
   }
 
-  const alpha = (alphaA * weight) + (alphaB * (1 - weight))
+  const alpha = alphaA * weight + alphaB * (1 - weight)
 
   if (alpha > 0) {
     for (const key of Object.keys(channels)) {
@@ -76,7 +83,9 @@ function mixColors(a: Color, b: Color, weight: number, mode: Mode): Color {
 function resolveColorMix(value: string): Color | undefined {
   // `(?:[^,]*)` safely ignores hue interpolation methods (e.g. "shorter hue")
   // so `color-mix(in oklch shorter hue, ...)` doesn't fail parsing.
-  const match = value.match(/^color-mix\(\s*in\s+([a-z0-9-]+)(?:[^,]*),(.*)\)$/is)
+  const match = value.match(
+    /^color-mix\(\s*in\s+([a-z0-9-]+)(?:[^,]*),(.*)\)$/is,
+  )
   if (!match) return undefined
 
   const mode = SPACES[match[1].toLowerCase()]
@@ -97,8 +106,7 @@ function resolveColorMix(value: string): Color | undefined {
 
   try {
     return mixColors(a, b, weight, mode)
-  }
-  catch {
+  } catch {
     return undefined
   }
 }

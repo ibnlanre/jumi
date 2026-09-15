@@ -20,1245 +20,1245 @@ export interface Family {
 
 export const families: Array<Family> = [
   {
-    "effects": [
+    effects: [
       {
-        "class": "accordion",
-        "name": "accordion"
-      }
+        class: 'accordion',
+        name: 'accordion',
+      },
     ],
-    "family": "accordion"
+    family: 'accordion',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "arc-bottom-left",
-        "name": "arc-bottom-left"
+        class: 'arc-bottom-left',
+        name: 'arc-bottom-left',
       },
       {
-        "class": "arc-bottom-right",
-        "name": "arc-bottom-right"
+        class: 'arc-bottom-right',
+        name: 'arc-bottom-right',
       },
       {
-        "class": "arc-top-left",
-        "name": "arc-top-left"
+        class: 'arc-top-left',
+        name: 'arc-top-left',
       },
       {
-        "class": "arc-top-right",
-        "name": "arc-top-right"
-      }
+        class: 'arc-top-right',
+        name: 'arc-top-right',
+      },
     ],
-    "family": "arc"
+    family: 'arc',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "back-in",
-        "name": "back-in"
+        class: 'back-in',
+        name: 'back-in',
       },
       {
-        "class": "back-in-down",
-        "name": "back-in-down"
+        class: 'back-in-down',
+        name: 'back-in-down',
       },
       {
-        "class": "back-in-left",
-        "name": "back-in-left"
+        class: 'back-in-left',
+        name: 'back-in-left',
       },
       {
-        "class": "back-in-right",
-        "name": "back-in-right"
+        class: 'back-in-right',
+        name: 'back-in-right',
       },
       {
-        "class": "back-in-up",
-        "name": "back-in-up"
-      }
+        class: 'back-in-up',
+        name: 'back-in-up',
+      },
     ],
-    "family": "back"
+    family: 'back',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "blink",
-        "name": "blink"
-      }
+        class: 'blink',
+        name: 'blink',
+      },
     ],
-    "family": "blink"
+    family: 'blink',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "blur-in",
-        "name": "blur-in"
+        class: 'blur-in',
+        name: 'blur-in',
       },
       {
-        "class": "blur-out",
-        "name": "blur-out"
-      }
+        class: 'blur-out',
+        name: 'blur-out',
+      },
     ],
-    "family": "blur"
+    family: 'blur',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "bounce-in",
-        "name": "bounce-in"
+        class: 'bounce-in',
+        name: 'bounce-in',
       },
       {
-        "class": "bounce-in-down",
-        "name": "bounce-in-down"
+        class: 'bounce-in-down',
+        name: 'bounce-in-down',
       },
       {
-        "class": "bounce-in-left",
-        "name": "bounce-in-left"
+        class: 'bounce-in-left',
+        name: 'bounce-in-left',
       },
       {
-        "class": "bounce-in-right",
-        "name": "bounce-in-right"
+        class: 'bounce-in-right',
+        name: 'bounce-in-right',
       },
       {
-        "class": "bounce-in-up",
-        "name": "bounce-in-up"
+        class: 'bounce-in-up',
+        name: 'bounce-in-up',
       },
       {
-        "class": "bounce-out",
-        "name": "bounce-out"
+        class: 'bounce-out',
+        name: 'bounce-out',
       },
       {
-        "class": "bounce-out-down",
-        "name": "bounce-out-down"
+        class: 'bounce-out-down',
+        name: 'bounce-out-down',
       },
       {
-        "class": "bounce-out-left",
-        "name": "bounce-out-left"
+        class: 'bounce-out-left',
+        name: 'bounce-out-left',
       },
       {
-        "class": "bounce-out-right",
-        "name": "bounce-out-right"
+        class: 'bounce-out-right',
+        name: 'bounce-out-right',
       },
       {
-        "class": "bounce-out-up",
-        "name": "bounce-out-up"
-      }
+        class: 'bounce-out-up',
+        name: 'bounce-out-up',
+      },
     ],
-    "family": "bounce"
+    family: 'bounce',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "bubble",
-        "name": "bubble"
-      }
+        class: 'bubble',
+        name: 'bubble',
+      },
     ],
-    "family": "bubble"
+    family: 'bubble',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "circle-in",
-        "name": "circle-in"
+        class: 'circle-in',
+        name: 'circle-in',
       },
       {
-        "class": "circle-in-bottom-left",
-        "name": "circle-in-bottom-left"
+        class: 'circle-in-bottom-left',
+        name: 'circle-in-bottom-left',
       },
       {
-        "class": "circle-in-bottom-right",
-        "name": "circle-in-bottom-right"
+        class: 'circle-in-bottom-right',
+        name: 'circle-in-bottom-right',
       },
       {
-        "class": "circle-in-top-left",
-        "name": "circle-in-top-left"
+        class: 'circle-in-top-left',
+        name: 'circle-in-top-left',
       },
       {
-        "class": "circle-in-top-right",
-        "name": "circle-in-top-right"
+        class: 'circle-in-top-right',
+        name: 'circle-in-top-right',
       },
       {
-        "class": "circle-out",
-        "name": "circle-out"
+        class: 'circle-out',
+        name: 'circle-out',
       },
       {
-        "class": "circle-out-bottom-left",
-        "name": "circle-out-bottom-left"
+        class: 'circle-out-bottom-left',
+        name: 'circle-out-bottom-left',
       },
       {
-        "class": "circle-out-bottom-right",
-        "name": "circle-out-bottom-right"
+        class: 'circle-out-bottom-right',
+        name: 'circle-out-bottom-right',
       },
       {
-        "class": "circle-out-top-left",
-        "name": "circle-out-top-left"
+        class: 'circle-out-top-left',
+        name: 'circle-out-top-left',
       },
       {
-        "class": "circle-out-top-right",
-        "name": "circle-out-top-right"
-      }
+        class: 'circle-out-top-right',
+        name: 'circle-out-top-right',
+      },
     ],
-    "family": "circle"
+    family: 'circle',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "diamond-in",
-        "name": "diamond-in"
+        class: 'diamond-in',
+        name: 'diamond-in',
       },
       {
-        "class": "diamond-out",
-        "name": "diamond-out"
-      }
+        class: 'diamond-out',
+        name: 'diamond-out',
+      },
     ],
-    "family": "diamond"
+    family: 'diamond',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "distort",
-        "name": "distort"
-      }
+        class: 'distort',
+        name: 'distort',
+      },
     ],
-    "family": "distort"
+    family: 'distort',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "drip",
-        "name": "drip"
-      }
+        class: 'drip',
+        name: 'drip',
+      },
     ],
-    "family": "drip"
+    family: 'drip',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "elastic",
-        "name": "elastic"
-      }
+        class: 'elastic',
+        name: 'elastic',
+      },
     ],
-    "family": "elastic"
+    family: 'elastic',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "expand-down",
-        "name": "expand-down"
+        class: 'expand-down',
+        name: 'expand-down',
       },
       {
-        "class": "expand-left",
-        "name": "expand-left"
+        class: 'expand-left',
+        name: 'expand-left',
       },
       {
-        "class": "expand-right",
-        "name": "expand-right"
+        class: 'expand-right',
+        name: 'expand-right',
       },
       {
-        "class": "expand-up",
-        "name": "expand-up"
-      }
+        class: 'expand-up',
+        name: 'expand-up',
+      },
     ],
-    "family": "expand"
+    family: 'expand',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "explode",
-        "name": "explode"
-      }
+        class: 'explode',
+        name: 'explode',
+      },
     ],
-    "family": "explode"
+    family: 'explode',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "fade-in",
-        "name": "fade-in"
+        class: 'fade-in',
+        name: 'fade-in',
       },
       {
-        "class": "fade-in-down",
-        "name": "fade-in-down"
+        class: 'fade-in-down',
+        name: 'fade-in-down',
       },
       {
-        "class": "fade-in-left",
-        "name": "fade-in-left"
+        class: 'fade-in-left',
+        name: 'fade-in-left',
       },
       {
-        "class": "fade-in-right",
-        "name": "fade-in-right"
+        class: 'fade-in-right',
+        name: 'fade-in-right',
       },
       {
-        "class": "fade-in-up",
-        "name": "fade-in-up"
+        class: 'fade-in-up',
+        name: 'fade-in-up',
       },
       {
-        "class": "fade-out",
-        "name": "fade-out"
+        class: 'fade-out',
+        name: 'fade-out',
       },
       {
-        "class": "fade-out-down",
-        "name": "fade-out-down"
+        class: 'fade-out-down',
+        name: 'fade-out-down',
       },
       {
-        "class": "fade-out-left",
-        "name": "fade-out-left"
+        class: 'fade-out-left',
+        name: 'fade-out-left',
       },
       {
-        "class": "fade-out-right",
-        "name": "fade-out-right"
+        class: 'fade-out-right',
+        name: 'fade-out-right',
       },
       {
-        "class": "fade-out-up",
-        "name": "fade-out-up"
-      }
+        class: 'fade-out-up',
+        name: 'fade-out-up',
+      },
     ],
-    "family": "fade"
+    family: 'fade',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "fall-down",
-        "name": "fall-down"
+        class: 'fall-down',
+        name: 'fall-down',
       },
       {
-        "class": "fall-left",
-        "name": "fall-left"
+        class: 'fall-left',
+        name: 'fall-left',
       },
       {
-        "class": "fall-right",
-        "name": "fall-right"
+        class: 'fall-right',
+        name: 'fall-right',
       },
       {
-        "class": "fall-up",
-        "name": "fall-up"
-      }
+        class: 'fall-up',
+        name: 'fall-up',
+      },
     ],
-    "family": "fall"
+    family: 'fall',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "figure-eight",
-        "name": "figure-eight"
-      }
+        class: 'figure-eight',
+        name: 'figure-eight',
+      },
     ],
-    "family": "figure"
+    family: 'figure',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "flicker",
-        "name": "flicker"
-      }
+        class: 'flicker',
+        name: 'flicker',
+      },
     ],
-    "family": "flicker"
+    family: 'flicker',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "flip-card-x",
-        "name": "flip-card-x"
+        class: 'flip-card-x',
+        name: 'flip-card-x',
       },
       {
-        "class": "flip-card-y",
-        "name": "flip-card-y"
+        class: 'flip-card-y',
+        name: 'flip-card-y',
       },
       {
-        "class": "flip-diagonal",
-        "name": "flip-diagonal"
+        class: 'flip-diagonal',
+        name: 'flip-diagonal',
       },
       {
-        "class": "flip-in-bottom",
-        "name": "flip-in-bottom"
+        class: 'flip-in-bottom',
+        name: 'flip-in-bottom',
       },
       {
-        "class": "flip-in-left",
-        "name": "flip-in-left"
+        class: 'flip-in-left',
+        name: 'flip-in-left',
       },
       {
-        "class": "flip-in-right",
-        "name": "flip-in-right"
+        class: 'flip-in-right',
+        name: 'flip-in-right',
       },
       {
-        "class": "flip-in-top",
-        "name": "flip-in-top"
+        class: 'flip-in-top',
+        name: 'flip-in-top',
       },
       {
-        "class": "flip-in-x",
-        "name": "flip-in-x"
+        class: 'flip-in-x',
+        name: 'flip-in-x',
       },
       {
-        "class": "flip-in-y",
-        "name": "flip-in-y"
+        class: 'flip-in-y',
+        name: 'flip-in-y',
       },
       {
-        "class": "flip-wobble-x",
-        "name": "flip-wobble-x"
+        class: 'flip-wobble-x',
+        name: 'flip-wobble-x',
       },
       {
-        "class": "flip-wobble-y",
-        "name": "flip-wobble-y"
+        class: 'flip-wobble-y',
+        name: 'flip-wobble-y',
       },
       {
-        "class": "flip-x",
-        "name": "flip-x"
+        class: 'flip-x',
+        name: 'flip-x',
       },
       {
-        "class": "flip-x-elastic",
-        "name": "flip-x-elastic"
+        class: 'flip-x-elastic',
+        name: 'flip-x-elastic',
       },
       {
-        "class": "flip-y",
-        "name": "flip-y"
+        class: 'flip-y',
+        name: 'flip-y',
       },
       {
-        "class": "flip-y-elastic",
-        "name": "flip-y-elastic"
+        class: 'flip-y-elastic',
+        name: 'flip-y-elastic',
       },
       {
-        "class": "flip-zoom-x",
-        "name": "flip-zoom-x"
+        class: 'flip-zoom-x',
+        name: 'flip-zoom-x',
       },
       {
-        "class": "flip-zoom-y",
-        "name": "flip-zoom-y"
-      }
+        class: 'flip-zoom-y',
+        name: 'flip-zoom-y',
+      },
     ],
-    "family": "flip"
+    family: 'flip',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "floating",
-        "name": "floating"
-      }
+        class: 'floating',
+        name: 'floating',
+      },
     ],
-    "family": "floating"
+    family: 'floating',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "fold-in",
-        "name": "fold-in"
+        class: 'fold-in',
+        name: 'fold-in',
       },
       {
-        "class": "fold-out",
-        "name": "fold-out"
-      }
+        class: 'fold-out',
+        name: 'fold-out',
+      },
     ],
-    "family": "fold"
+    family: 'fold',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "glitch",
-        "name": "glitch"
-      }
+        class: 'glitch',
+        name: 'glitch',
+      },
     ],
-    "family": "glitch"
+    family: 'glitch',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "glow",
-        "name": "glow"
-      }
+        class: 'glow',
+        name: 'glow',
+      },
     ],
-    "family": "glow"
+    family: 'glow',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "heart-beat",
-        "name": "heart-beat"
-      }
+        class: 'heart-beat',
+        name: 'heart-beat',
+      },
     ],
-    "family": "heart"
+    family: 'heart',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "hue-shift",
-        "name": "hue-shift"
-      }
+        class: 'hue-shift',
+        name: 'hue-shift',
+      },
     ],
-    "family": "hue"
+    family: 'hue',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "implode",
-        "name": "implode"
-      }
+        class: 'implode',
+        name: 'implode',
+      },
     ],
-    "family": "implode"
+    family: 'implode',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "jello",
-        "name": "jello"
-      }
+        class: 'jello',
+        name: 'jello',
+      },
     ],
-    "family": "jello"
+    family: 'jello',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "letter-space-in",
-        "name": "letter-space-in"
+        class: 'letter-space-in',
+        name: 'letter-space-in',
       },
       {
-        "class": "letter-space-out",
-        "name": "letter-space-out"
-      }
+        class: 'letter-space-out',
+        name: 'letter-space-out',
+      },
     ],
-    "family": "letter"
+    family: 'letter',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "lift",
-        "name": "lift"
-      }
+        class: 'lift',
+        name: 'lift',
+      },
     ],
-    "family": "lift"
+    family: 'lift',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "magnetic",
-        "name": "magnetic"
-      }
+        class: 'magnetic',
+        name: 'magnetic',
+      },
     ],
-    "family": "magnetic"
+    family: 'magnetic',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "mask-bottom",
-        "name": "mask-bottom"
+        class: 'mask-bottom',
+        name: 'mask-bottom',
       },
       {
-        "class": "mask-bottom-left",
-        "name": "mask-bottom-left"
+        class: 'mask-bottom-left',
+        name: 'mask-bottom-left',
       },
       {
-        "class": "mask-bottom-right",
-        "name": "mask-bottom-right"
+        class: 'mask-bottom-right',
+        name: 'mask-bottom-right',
       },
       {
-        "class": "mask-center",
-        "name": "mask-center"
+        class: 'mask-center',
+        name: 'mask-center',
       },
       {
-        "class": "mask-left",
-        "name": "mask-left"
+        class: 'mask-left',
+        name: 'mask-left',
       },
       {
-        "class": "mask-right",
-        "name": "mask-right"
+        class: 'mask-right',
+        name: 'mask-right',
       },
       {
-        "class": "mask-top",
-        "name": "mask-top"
+        class: 'mask-top',
+        name: 'mask-top',
       },
       {
-        "class": "mask-top-left",
-        "name": "mask-top-left"
+        class: 'mask-top-left',
+        name: 'mask-top-left',
       },
       {
-        "class": "mask-top-right",
-        "name": "mask-top-right"
-      }
+        class: 'mask-top-right',
+        name: 'mask-top-right',
+      },
     ],
-    "family": "mask"
+    family: 'mask',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "melt",
-        "name": "melt"
-      }
+        class: 'melt',
+        name: 'melt',
+      },
     ],
-    "family": "melt"
+    family: 'melt',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "morph",
-        "name": "morph"
-      }
+        class: 'morph',
+        name: 'morph',
+      },
     ],
-    "family": "morph"
+    family: 'morph',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "neon",
-        "name": "neon"
-      }
+        class: 'neon',
+        name: 'neon',
+      },
     ],
-    "family": "neon"
+    family: 'neon',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "power-off",
-        "name": "power-off"
+        class: 'power-off',
+        name: 'power-off',
       },
       {
-        "class": "power-on",
-        "name": "power-on"
-      }
+        class: 'power-on',
+        name: 'power-on',
+      },
     ],
-    "family": "power"
+    family: 'power',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "pulsing",
-        "name": "pulsing"
-      }
+        class: 'pulsing',
+        name: 'pulsing',
+      },
     ],
-    "family": "pulsing"
+    family: 'pulsing',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "reveal-down",
-        "name": "reveal-down"
+        class: 'reveal-down',
+        name: 'reveal-down',
       },
       {
-        "class": "reveal-left",
-        "name": "reveal-left"
+        class: 'reveal-left',
+        name: 'reveal-left',
       },
       {
-        "class": "reveal-right",
-        "name": "reveal-right"
+        class: 'reveal-right',
+        name: 'reveal-right',
       },
       {
-        "class": "reveal-swipe",
-        "name": "reveal-swipe"
+        class: 'reveal-swipe',
+        name: 'reveal-swipe',
       },
       {
-        "class": "reveal-up",
-        "name": "reveal-up"
-      }
+        class: 'reveal-up',
+        name: 'reveal-up',
+      },
     ],
-    "family": "reveal"
+    family: 'reveal',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "ripple",
-        "name": "ripple"
-      }
+        class: 'ripple',
+        name: 'ripple',
+      },
     ],
-    "family": "ripple"
+    family: 'ripple',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "rotate-left",
-        "name": "rotate-left"
+        class: 'rotate-left',
+        name: 'rotate-left',
       },
       {
-        "class": "rotate-right",
-        "name": "rotate-right"
-      }
+        class: 'rotate-right',
+        name: 'rotate-right',
+      },
     ],
-    "family": "rotate"
+    family: 'rotate',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "rush-in-down",
-        "name": "rush-in-down"
+        class: 'rush-in-down',
+        name: 'rush-in-down',
       },
       {
-        "class": "rush-in-left",
-        "name": "rush-in-left"
+        class: 'rush-in-left',
+        name: 'rush-in-left',
       },
       {
-        "class": "rush-in-right",
-        "name": "rush-in-right"
+        class: 'rush-in-right',
+        name: 'rush-in-right',
       },
       {
-        "class": "rush-in-up",
-        "name": "rush-in-up"
+        class: 'rush-in-up',
+        name: 'rush-in-up',
       },
       {
-        "class": "rush-out-down",
-        "name": "rush-out-down"
+        class: 'rush-out-down',
+        name: 'rush-out-down',
       },
       {
-        "class": "rush-out-left",
-        "name": "rush-out-left"
+        class: 'rush-out-left',
+        name: 'rush-out-left',
       },
       {
-        "class": "rush-out-right",
-        "name": "rush-out-right"
+        class: 'rush-out-right',
+        name: 'rush-out-right',
       },
       {
-        "class": "rush-out-up",
-        "name": "rush-out-up"
-      }
+        class: 'rush-out-up',
+        name: 'rush-out-up',
+      },
     ],
-    "family": "rush"
+    family: 'rush',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "scatter",
-        "name": "scatter"
-      }
+        class: 'scatter',
+        name: 'scatter',
+      },
     ],
-    "family": "scatter"
+    family: 'scatter',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "shadow",
-        "name": "shadow"
-      }
+        class: 'shadow',
+        name: 'shadow',
+      },
     ],
-    "family": "shadow"
+    family: 'shadow',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "shake",
-        "name": "shake"
-      }
+        class: 'shake',
+        name: 'shake',
+      },
     ],
-    "family": "shake"
+    family: 'shake',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "shimmer",
-        "name": "shimmer"
-      }
+        class: 'shimmer',
+        name: 'shimmer',
+      },
     ],
-    "family": "shimmer"
+    family: 'shimmer',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "skew-down",
-        "name": "skew-down"
+        class: 'skew-down',
+        name: 'skew-down',
       },
       {
-        "class": "skew-in",
-        "name": "skew-in"
+        class: 'skew-in',
+        name: 'skew-in',
       },
       {
-        "class": "skew-left",
-        "name": "skew-left"
+        class: 'skew-left',
+        name: 'skew-left',
       },
       {
-        "class": "skew-left-down",
-        "name": "skew-left-down"
+        class: 'skew-left-down',
+        name: 'skew-left-down',
       },
       {
-        "class": "skew-left-up",
-        "name": "skew-left-up"
+        class: 'skew-left-up',
+        name: 'skew-left-up',
       },
       {
-        "class": "skew-out",
-        "name": "skew-out"
+        class: 'skew-out',
+        name: 'skew-out',
       },
       {
-        "class": "skew-right",
-        "name": "skew-right"
+        class: 'skew-right',
+        name: 'skew-right',
       },
       {
-        "class": "skew-right-down",
-        "name": "skew-right-down"
+        class: 'skew-right-down',
+        name: 'skew-right-down',
       },
       {
-        "class": "skew-right-up",
-        "name": "skew-right-up"
+        class: 'skew-right-up',
+        name: 'skew-right-up',
       },
       {
-        "class": "skew-up",
-        "name": "skew-up"
-      }
+        class: 'skew-up',
+        name: 'skew-up',
+      },
     ],
-    "family": "skew"
+    family: 'skew',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "slide-in-down",
-        "name": "slide-in-down"
+        class: 'slide-in-down',
+        name: 'slide-in-down',
       },
       {
-        "class": "slide-in-down-elastic",
-        "name": "slide-in-down-elastic"
+        class: 'slide-in-down-elastic',
+        name: 'slide-in-down-elastic',
       },
       {
-        "class": "slide-in-left",
-        "name": "slide-in-left"
+        class: 'slide-in-left',
+        name: 'slide-in-left',
       },
       {
-        "class": "slide-in-right",
-        "name": "slide-in-right"
+        class: 'slide-in-right',
+        name: 'slide-in-right',
       },
       {
-        "class": "slide-in-up",
-        "name": "slide-in-up"
+        class: 'slide-in-up',
+        name: 'slide-in-up',
       },
       {
-        "class": "slide-in-up-elastic",
-        "name": "slide-in-up-elastic"
+        class: 'slide-in-up-elastic',
+        name: 'slide-in-up-elastic',
       },
       {
-        "class": "slide-in-up-left",
-        "name": "slide-in-up-left"
+        class: 'slide-in-up-left',
+        name: 'slide-in-up-left',
       },
       {
-        "class": "slide-in-up-right",
-        "name": "slide-in-up-right"
+        class: 'slide-in-up-right',
+        name: 'slide-in-up-right',
       },
       {
-        "class": "slide-out-down",
-        "name": "slide-out-down"
+        class: 'slide-out-down',
+        name: 'slide-out-down',
       },
       {
-        "class": "slide-out-left",
-        "name": "slide-out-left"
+        class: 'slide-out-left',
+        name: 'slide-out-left',
       },
       {
-        "class": "slide-out-right",
-        "name": "slide-out-right"
+        class: 'slide-out-right',
+        name: 'slide-out-right',
       },
       {
-        "class": "slide-out-up",
-        "name": "slide-out-up"
+        class: 'slide-out-up',
+        name: 'slide-out-up',
       },
       {
-        "class": "slide-peek-down",
-        "name": "slide-peek-down"
+        class: 'slide-peek-down',
+        name: 'slide-peek-down',
       },
       {
-        "class": "slide-peek-left",
-        "name": "slide-peek-left"
+        class: 'slide-peek-left',
+        name: 'slide-peek-left',
       },
       {
-        "class": "slide-peek-right",
-        "name": "slide-peek-right"
+        class: 'slide-peek-right',
+        name: 'slide-peek-right',
       },
       {
-        "class": "slide-peek-up",
-        "name": "slide-peek-up"
+        class: 'slide-peek-up',
+        name: 'slide-peek-up',
       },
       {
-        "class": "slide-stack",
-        "name": "slide-stack"
-      }
+        class: 'slide-stack',
+        name: 'slide-stack',
+      },
     ],
-    "family": "slide"
+    family: 'slide',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "spinning",
-        "name": "spinning"
-      }
+        class: 'spinning',
+        name: 'spinning',
+      },
     ],
-    "family": "spinning"
+    family: 'spinning',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "spiral",
-        "name": "spiral"
+        class: 'spiral',
+        name: 'spiral',
       },
       {
-        "class": "spiral-back-in",
-        "name": "spiral-back-in"
+        class: 'spiral-back-in',
+        name: 'spiral-back-in',
       },
       {
-        "class": "spiral-back-out",
-        "name": "spiral-back-out"
+        class: 'spiral-back-out',
+        name: 'spiral-back-out',
       },
       {
-        "class": "spiral-in",
-        "name": "spiral-in"
+        class: 'spiral-in',
+        name: 'spiral-in',
       },
       {
-        "class": "spiral-out",
-        "name": "spiral-out"
+        class: 'spiral-out',
+        name: 'spiral-out',
       },
       {
-        "class": "spiral-path",
-        "name": "spiral-path"
-      }
+        class: 'spiral-path',
+        name: 'spiral-path',
+      },
     ],
-    "family": "spiral"
+    family: 'spiral',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "splash",
-        "name": "splash"
-      }
+        class: 'splash',
+        name: 'splash',
+      },
     ],
-    "family": "splash"
+    family: 'splash',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "spring-down",
-        "name": "spring-down"
+        class: 'spring-down',
+        name: 'spring-down',
       },
       {
-        "class": "spring-left",
-        "name": "spring-left"
+        class: 'spring-left',
+        name: 'spring-left',
       },
       {
-        "class": "spring-right",
-        "name": "spring-right"
+        class: 'spring-right',
+        name: 'spring-right',
       },
       {
-        "class": "spring-up",
-        "name": "spring-up"
-      }
+        class: 'spring-up',
+        name: 'spring-up',
+      },
     ],
-    "family": "spring"
+    family: 'spring',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "square-in",
-        "name": "square-in"
+        class: 'square-in',
+        name: 'square-in',
       },
       {
-        "class": "square-in-bottom-left",
-        "name": "square-in-bottom-left"
+        class: 'square-in-bottom-left',
+        name: 'square-in-bottom-left',
       },
       {
-        "class": "square-in-bottom-right",
-        "name": "square-in-bottom-right"
+        class: 'square-in-bottom-right',
+        name: 'square-in-bottom-right',
       },
       {
-        "class": "square-in-top-left",
-        "name": "square-in-top-left"
+        class: 'square-in-top-left',
+        name: 'square-in-top-left',
       },
       {
-        "class": "square-in-top-right",
-        "name": "square-in-top-right"
+        class: 'square-in-top-right',
+        name: 'square-in-top-right',
       },
       {
-        "class": "square-out",
-        "name": "square-out"
+        class: 'square-out',
+        name: 'square-out',
       },
       {
-        "class": "square-out-bottom-left",
-        "name": "square-out-bottom-left"
+        class: 'square-out-bottom-left',
+        name: 'square-out-bottom-left',
       },
       {
-        "class": "square-out-bottom-right",
-        "name": "square-out-bottom-right"
+        class: 'square-out-bottom-right',
+        name: 'square-out-bottom-right',
       },
       {
-        "class": "square-out-top-left",
-        "name": "square-out-top-left"
+        class: 'square-out-top-left',
+        name: 'square-out-top-left',
       },
       {
-        "class": "square-out-top-right",
-        "name": "square-out-top-right"
-      }
+        class: 'square-out-top-right',
+        name: 'square-out-top-right',
+      },
     ],
-    "family": "square"
+    family: 'square',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "swing",
-        "name": "swing"
-      }
+        class: 'swing',
+        name: 'swing',
+      },
     ],
-    "family": "swing"
+    family: 'swing',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "tada",
-        "name": "tada"
-      }
+        class: 'tada',
+        name: 'tada',
+      },
     ],
-    "family": "tada"
+    family: 'tada',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "throw-down",
-        "name": "throw-down"
+        class: 'throw-down',
+        name: 'throw-down',
       },
       {
-        "class": "throw-left",
-        "name": "throw-left"
+        class: 'throw-left',
+        name: 'throw-left',
       },
       {
-        "class": "throw-right",
-        "name": "throw-right"
+        class: 'throw-right',
+        name: 'throw-right',
       },
       {
-        "class": "throw-up",
-        "name": "throw-up"
-      }
+        class: 'throw-up',
+        name: 'throw-up',
+      },
     ],
-    "family": "throw"
+    family: 'throw',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "tilt",
-        "name": "tilt"
-      }
+        class: 'tilt',
+        name: 'tilt',
+      },
     ],
-    "family": "tilt"
+    family: 'tilt',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "triangle-in",
-        "name": "triangle-in"
+        class: 'triangle-in',
+        name: 'triangle-in',
       },
       {
-        "class": "triangle-in-bottom-left",
-        "name": "triangle-in-bottom-left"
+        class: 'triangle-in-bottom-left',
+        name: 'triangle-in-bottom-left',
       },
       {
-        "class": "triangle-in-bottom-right",
-        "name": "triangle-in-bottom-right"
+        class: 'triangle-in-bottom-right',
+        name: 'triangle-in-bottom-right',
       },
       {
-        "class": "triangle-in-top-left",
-        "name": "triangle-in-top-left"
+        class: 'triangle-in-top-left',
+        name: 'triangle-in-top-left',
       },
       {
-        "class": "triangle-in-top-right",
-        "name": "triangle-in-top-right"
+        class: 'triangle-in-top-right',
+        name: 'triangle-in-top-right',
       },
       {
-        "class": "triangle-out",
-        "name": "triangle-out"
+        class: 'triangle-out',
+        name: 'triangle-out',
       },
       {
-        "class": "triangle-out-bottom-left",
-        "name": "triangle-out-bottom-left"
+        class: 'triangle-out-bottom-left',
+        name: 'triangle-out-bottom-left',
       },
       {
-        "class": "triangle-out-bottom-right",
-        "name": "triangle-out-bottom-right"
+        class: 'triangle-out-bottom-right',
+        name: 'triangle-out-bottom-right',
       },
       {
-        "class": "triangle-out-top-left",
-        "name": "triangle-out-top-left"
+        class: 'triangle-out-top-left',
+        name: 'triangle-out-top-left',
       },
       {
-        "class": "triangle-out-top-right",
-        "name": "triangle-out-top-right"
-      }
+        class: 'triangle-out-top-right',
+        name: 'triangle-out-top-right',
+      },
     ],
-    "family": "triangle"
+    family: 'triangle',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "twist",
-        "name": "twist"
+        class: 'twist',
+        name: 'twist',
       },
       {
-        "class": "twist-in",
-        "name": "twist-in"
+        class: 'twist-in',
+        name: 'twist-in',
       },
       {
-        "class": "twist-out",
-        "name": "twist-out"
-      }
+        class: 'twist-out',
+        name: 'twist-out',
+      },
     ],
-    "family": "twist"
+    family: 'twist',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "typing",
-        "name": "typing"
-      }
+        class: 'typing',
+        name: 'typing',
+      },
     ],
-    "family": "typing"
+    family: 'typing',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "unfold-x",
-        "name": "unfold-x"
+        class: 'unfold-x',
+        name: 'unfold-x',
       },
       {
-        "class": "unfold-y",
-        "name": "unfold-y"
-      }
+        class: 'unfold-y',
+        name: 'unfold-y',
+      },
     ],
-    "family": "unfold"
+    family: 'unfold',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "unmask",
-        "name": "unmask"
+        class: 'unmask',
+        name: 'unmask',
       },
       {
-        "class": "unmask-bottom",
-        "name": "unmask-bottom"
+        class: 'unmask-bottom',
+        name: 'unmask-bottom',
       },
       {
-        "class": "unmask-bottom-left",
-        "name": "unmask-bottom-left"
+        class: 'unmask-bottom-left',
+        name: 'unmask-bottom-left',
       },
       {
-        "class": "unmask-bottom-right",
-        "name": "unmask-bottom-right"
+        class: 'unmask-bottom-right',
+        name: 'unmask-bottom-right',
       },
       {
-        "class": "unmask-left",
-        "name": "unmask-left"
+        class: 'unmask-left',
+        name: 'unmask-left',
       },
       {
-        "class": "unmask-right",
-        "name": "unmask-right"
+        class: 'unmask-right',
+        name: 'unmask-right',
       },
       {
-        "class": "unmask-top",
-        "name": "unmask-top"
+        class: 'unmask-top',
+        name: 'unmask-top',
       },
       {
-        "class": "unmask-top-left",
-        "name": "unmask-top-left"
+        class: 'unmask-top-left',
+        name: 'unmask-top-left',
       },
       {
-        "class": "unmask-top-right",
-        "name": "unmask-top-right"
-      }
+        class: 'unmask-top-right',
+        name: 'unmask-top-right',
+      },
     ],
-    "family": "unmask"
+    family: 'unmask',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "wave",
-        "name": "wave"
-      }
+        class: 'wave',
+        name: 'wave',
+      },
     ],
-    "family": "wave"
+    family: 'wave',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "wiggle",
-        "name": "wiggle"
-      }
+        class: 'wiggle',
+        name: 'wiggle',
+      },
     ],
-    "family": "wiggle"
+    family: 'wiggle',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "wobble",
-        "name": "wobble"
-      }
+        class: 'wobble',
+        name: 'wobble',
+      },
     ],
-    "family": "wobble"
+    family: 'wobble',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "wobbling",
-        "name": "wobbling"
-      }
+        class: 'wobbling',
+        name: 'wobbling',
+      },
     ],
-    "family": "wobbling"
+    family: 'wobbling',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "word-slide",
-        "name": "word-slide"
-      }
+        class: 'word-slide',
+        name: 'word-slide',
+      },
     ],
-    "family": "word"
+    family: 'word',
   },
   {
-    "effects": [
+    effects: [
       {
-        "class": "zoom-in",
-        "name": "zoom-in"
+        class: 'zoom-in',
+        name: 'zoom-in',
       },
       {
-        "class": "zoom-in-down",
-        "name": "zoom-in-down"
+        class: 'zoom-in-down',
+        name: 'zoom-in-down',
       },
       {
-        "class": "zoom-in-elastic",
-        "name": "zoom-in-elastic"
+        class: 'zoom-in-elastic',
+        name: 'zoom-in-elastic',
       },
       {
-        "class": "zoom-in-left",
-        "name": "zoom-in-left"
+        class: 'zoom-in-left',
+        name: 'zoom-in-left',
       },
       {
-        "class": "zoom-in-right",
-        "name": "zoom-in-right"
+        class: 'zoom-in-right',
+        name: 'zoom-in-right',
       },
       {
-        "class": "zoom-in-up",
-        "name": "zoom-in-up"
+        class: 'zoom-in-up',
+        name: 'zoom-in-up',
       },
       {
-        "class": "zoom-out",
-        "name": "zoom-out"
+        class: 'zoom-out',
+        name: 'zoom-out',
       },
       {
-        "class": "zoom-out-down",
-        "name": "zoom-out-down"
+        class: 'zoom-out-down',
+        name: 'zoom-out-down',
       },
       {
-        "class": "zoom-out-elastic",
-        "name": "zoom-out-elastic"
+        class: 'zoom-out-elastic',
+        name: 'zoom-out-elastic',
       },
       {
-        "class": "zoom-out-left",
-        "name": "zoom-out-left"
+        class: 'zoom-out-left',
+        name: 'zoom-out-left',
       },
       {
-        "class": "zoom-out-right",
-        "name": "zoom-out-right"
+        class: 'zoom-out-right',
+        name: 'zoom-out-right',
       },
       {
-        "class": "zoom-out-up",
-        "name": "zoom-out-up"
+        class: 'zoom-out-up',
+        name: 'zoom-out-up',
       },
       {
-        "class": "zoom-pulse",
-        "name": "zoom-pulse"
+        class: 'zoom-pulse',
+        name: 'zoom-pulse',
       },
       {
-        "class": "zoom-pulse-grow",
-        "name": "zoom-pulse-grow"
+        class: 'zoom-pulse-grow',
+        name: 'zoom-pulse-grow',
       },
       {
-        "class": "zoom-pulse-shrink",
-        "name": "zoom-pulse-shrink"
+        class: 'zoom-pulse-shrink',
+        name: 'zoom-pulse-shrink',
       },
       {
-        "class": "zoom-tilt-in",
-        "name": "zoom-tilt-in"
+        class: 'zoom-tilt-in',
+        name: 'zoom-tilt-in',
       },
       {
-        "class": "zoom-tilt-out",
-        "name": "zoom-tilt-out"
-      }
+        class: 'zoom-tilt-out',
+        name: 'zoom-tilt-out',
+      },
     ],
-    "family": "zoom"
-  }
+    family: 'zoom',
+  },
 ]

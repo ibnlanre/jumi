@@ -37,7 +37,11 @@ const STAGES = [
   // clone the `types` stage fails with `Cannot find module './dist/index.js'` and the gate stops before
   // it has checked anything. Measured on a clean tree: without this stage `pnpm check` cannot run at
   // all. A gate that only works on the machine that last built is not a gate.
-  { about: 'the shipped bundle, which every stage below loads', label: 'bundle', run: ['run', 'bundle'] },
+  {
+    about: 'the shipped bundle, which every stage below loads',
+    label: 'bundle',
+    run: ['run', 'bundle'],
+  },
   // Also a prerequisite rather than a check, and for the same reason as `bundle`: the site's own sources
   // are in this TypeScript project (`include: ["./**/*.ts"]` covers `docs/`), and they import the vendored
   // modules. `docs/astro.config.ts` imports `./vendor/jumi-vite.js`, the demo's module imports
@@ -46,37 +50,109 @@ const STAGES = [
   // what makes a missing declaration a gate failure instead of a silent loss of types, which is how the
   // demo's script went unchecked (`tsc` cannot parse `.astro`) and how `docs/vendor/` could once have
   // disappeared without anything noticing.
-  { about: 'the vendored modules the site imports, with their declarations', label: 'prepare', run: ['run', 'docs:prepare'] },
-  { about: 'the public surface compiles', label: 'types', run: ['run', 'check-types'] },
-  { about: 'src, scripts and the site sources are clean', label: 'lint', run: ['exec', 'eslint', 'src', 'scripts', 'docs/src', 'docs/astro.config.ts'] },
-  { about: 'the finalizer, the model and the CSS helper', label: 'unit', run: ['run', 'test:run'] },
-  { about: 'the theme maps still resolve', label: 'theme', run: ['run', 'theme:map'] },
-  { about: 'the byte snapshot, over two frozen corpora', label: 'css', run: ['run', 'css:check'] },
-  { about: 'a phrase takes the bypass, a scalar keeps the host type check', label: 'phrase', run: ['run', 'phrase:check'] },
-  { about: 'incremental builds stay correct and local', label: 'incremental', run: ['run', 'incremental:check'] },
-  { about: 'a real browser resolves a real carrier', label: 'behaviour', run: ['run', 'behaviour:check'] },
-  { about: 'the emitted view transition actually travels', label: 'view-transition', run: ['run', 'view-transition:check'] },
-  { about: 'a retargeted slot scrubs, and a range lands where it was addressed', label: 'scroll-driven', run: ['run', 'scroll-driven:check'] },
-  { about: 'the Vite integration, dev and every build shape', label: 'vite', run: ['run', 'vite:check'] },
-  { about: 'the PostCSS integration, in every configuration', label: 'postcss', run: ['run', 'postcss:check'] },
-  { about: 'no carrier class in a shipped surface', label: 'legacy', run: ['run', 'legacy:check'] },
-  { about: 'every effect the Storybook names is one Jumi ships', label: 'stories', run: ['run', 'stories:check'] },
+  {
+    about: 'the vendored modules the site imports, with their declarations',
+    label: 'prepare',
+    run: ['run', 'docs:prepare'],
+  },
+  {
+    about: 'the public surface compiles',
+    label: 'types',
+    run: ['run', 'check-types'],
+  },
+  {
+    about: 'src, scripts and the site sources are clean',
+    label: 'lint',
+    run: [
+      'exec',
+      'eslint',
+      'src',
+      'scripts',
+      'docs/src',
+      'docs/astro.config.ts',
+    ],
+  },
+  {
+    about: 'the finalizer, the model and the CSS helper',
+    label: 'unit',
+    run: ['run', 'test:run'],
+  },
+  {
+    about: 'the theme maps still resolve',
+    label: 'theme',
+    run: ['run', 'theme:map'],
+  },
+  {
+    about: 'the byte snapshot, over two frozen corpora',
+    label: 'css',
+    run: ['run', 'css:check'],
+  },
+  {
+    about: 'a phrase takes the bypass, a scalar keeps the host type check',
+    label: 'phrase',
+    run: ['run', 'phrase:check'],
+  },
+  {
+    about: 'incremental builds stay correct and local',
+    label: 'incremental',
+    run: ['run', 'incremental:check'],
+  },
+  {
+    about: 'a real browser resolves a real carrier',
+    label: 'behaviour',
+    run: ['run', 'behaviour:check'],
+  },
+  {
+    about: 'the emitted view transition actually travels',
+    label: 'view-transition',
+    run: ['run', 'view-transition:check'],
+  },
+  {
+    about: 'a retargeted slot scrubs, and a range lands where it was addressed',
+    label: 'scroll-driven',
+    run: ['run', 'scroll-driven:check'],
+  },
+  {
+    about: 'the Vite integration, dev and every build shape',
+    label: 'vite',
+    run: ['run', 'vite:check'],
+  },
+  {
+    about: 'the PostCSS integration, in every configuration',
+    label: 'postcss',
+    run: ['run', 'postcss:check'],
+  },
+  {
+    about: 'no carrier class in a shipped surface',
+    label: 'legacy',
+    run: ['run', 'legacy:check'],
+  },
+  {
+    about: 'every effect the Storybook names is one Jumi ships',
+    label: 'stories',
+    run: ['run', 'stories:check'],
+  },
 ]
 
-const results = STAGES.map(stage => ({ ...stage, seconds: 0, status: 'not run' }))
+const results = STAGES.map(stage => ({
+  ...stage,
+  seconds: 0,
+  status: 'not run',
+}))
 let failures = 0
 
 for (const [index, result] of results.entries()) {
   const { label, run } = result
   const start = performance.now()
 
-  process.stdout.write(`\n${'─'.repeat(72)}\n· ${label} — ${result.about}\n${'─'.repeat(72)}\n`)
+  process.stdout.write(
+    `\n${'─'.repeat(72)}\n· ${label} — ${result.about}\n${'─'.repeat(72)}\n`,
+  )
 
   try {
     execFileSync('pnpm', run, { cwd: root, stdio: 'inherit' })
     result.status = 'passed'
-  }
-  catch (error) {
+  } catch (error) {
     // The stage prints its own reason; this only records that it stopped the gate. `error.status` is
     // the child's exit code, and a signal is reported as one rather than as a number.
     result.status = 'FAILED'
@@ -94,18 +170,25 @@ const width = Math.max(...results.map(result => result.label.length))
 console.log(`\n${'═'.repeat(72)}\n  the gate\n${'═'.repeat(72)}`)
 
 for (const result of results) {
-  const mark = result.status === 'passed' ? '✓' : result.status === 'FAILED' ? '✗' : '·'
+  const mark =
+    result.status === 'passed' ? '✓' : result.status === 'FAILED' ? '✗' : '·'
   const time = result.status === 'passed' ? `${result.seconds}s` : ''
 
-  console.log(`  ${mark} ${result.label.padEnd(width)}  ${result.status}${time ? `  ${time}` : ''}`)
+  console.log(
+    `  ${mark} ${result.label.padEnd(width)}  ${result.status}${time ? `  ${time}` : ''}`,
+  )
 }
 
 if (failures) {
   const skipped = results.filter(result => result.status === 'not run').length
 
-  console.log(`\n✗ ${results.find(result => result.status === 'FAILED').label} failed`
-    + `${skipped ? ` — the ${skipped} stage${skipped === 1 ? '' : 's'} below it did not run` : ''}.`)
-  console.log('  Nothing below the failure has been checked, whether or not it looks quiet.\n')
+  console.log(
+    `\n✗ ${results.find(result => result.status === 'FAILED').label} failed` +
+      `${skipped ? ` — the ${skipped} stage${skipped === 1 ? '' : 's'} below it did not run` : ''}.`,
+  )
+  console.log(
+    '  Nothing below the failure has been checked, whether or not it looks quiet.\n',
+  )
   process.exit(1)
 }
 

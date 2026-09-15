@@ -35,49 +35,228 @@ export const TIMELINE_PROPERTIES = [
 /** The Jumi arm: id → the classes that element carries. */
 export const ARMS = [
   // A — retarget. The same motion, a different driver.
-  { classes: 'animate-fade-in', group: 'A', id: 'aDtm', note: 'control: no timeline control at all' },
-  { classes: 'animate-fade-in animation-timeline-scroll', group: 'A', id: 'aScroll', note: 'scroll() from the nearest scroller' },
-  { classes: 'animate-fade-in animation-timeline-scroll animation-timeline-scroller-root', group: 'A', id: 'aScrollRoot', note: 'scroll(block root)' },
-  { classes: 'animate-fade-in animation-timeline-scroll animation-timeline-axis-x', group: 'A', id: 'aScrollAxisX', note: 'scroll(x nearest)' },
-  { classes: 'animate-fade-in animation-timeline-view', group: 'A', id: 'aView', note: 'view()' },
-  { classes: 'animate-fade-in animation-timeline-view animation-timeline-axis-x', group: 'A', id: 'aViewAxisX', note: 'view(x …)' },
-  { classes: 'animate-fade-in animation-timeline-none', group: 'A', id: 'aNone', note: 'animation-timeline: none' },
-  { classes: 'animate-fade-in animation-timeline-[scroll(block_root)]', group: 'A', id: 'aArbFn', note: 'arbitrary function value' },
-  { classes: 'animate-fade-in animation-timeline-scroll', group: 'A', id: 'aPaneScroll', note: 'nearest = #pane', where: 'pane' },
-  { classes: 'animate-fade-in animation-timeline-scroll animation-timeline-scroller-self', group: 'A', id: 'aSelfScroll', note: 'scroll(self)', where: 'self' },
+  {
+    classes: 'animate-fade-in',
+    group: 'A',
+    id: 'aDtm',
+    note: 'control: no timeline control at all',
+  },
+  {
+    classes: 'animate-fade-in animation-timeline-scroll',
+    group: 'A',
+    id: 'aScroll',
+    note: 'scroll() from the nearest scroller',
+  },
+  {
+    classes:
+      'animate-fade-in animation-timeline-scroll animation-timeline-scroller-root',
+    group: 'A',
+    id: 'aScrollRoot',
+    note: 'scroll(block root)',
+  },
+  {
+    classes:
+      'animate-fade-in animation-timeline-scroll animation-timeline-axis-x',
+    group: 'A',
+    id: 'aScrollAxisX',
+    note: 'scroll(x nearest)',
+  },
+  {
+    classes: 'animate-fade-in animation-timeline-view',
+    group: 'A',
+    id: 'aView',
+    note: 'view()',
+  },
+  {
+    classes:
+      'animate-fade-in animation-timeline-view animation-timeline-axis-x',
+    group: 'A',
+    id: 'aViewAxisX',
+    note: 'view(x …)',
+  },
+  {
+    classes: 'animate-fade-in animation-timeline-none',
+    group: 'A',
+    id: 'aNone',
+    note: 'animation-timeline: none',
+  },
+  {
+    classes: 'animate-fade-in animation-timeline-[scroll(block_root)]',
+    group: 'A',
+    id: 'aArbFn',
+    note: 'arbitrary function value',
+  },
+  {
+    classes: 'animate-fade-in animation-timeline-scroll',
+    group: 'A',
+    id: 'aPaneScroll',
+    note: 'nearest = #pane',
+    where: 'pane',
+  },
+  {
+    classes:
+      'animate-fade-in animation-timeline-scroll animation-timeline-scroller-self',
+    group: 'A',
+    id: 'aSelfScroll',
+    note: 'scroll(self)',
+    where: 'self',
+  },
 
   // B — the aggregate. One element, several slots, more than one timeline.
-  { classes: 'animate-fade-in animate-rotate-45 animation-timeline-scroll/rotate', group: 'B', id: 'bMixed', note: 'one slot retargeted, the other left alone' },
-  { classes: 'animate-fade-in animate-rotate-45 animation-timeline-scroll', group: 'B', id: 'bBoth', note: 'the global control on a two-slot element' },
-  { classes: 'animate-fade-in animate-rotate-45 animation-timeline-scroll/fade-in animation-timeline-view/rotate', group: 'B', id: 'bSplit', note: 'two slots, two different timelines' },
-  { classes: 'animate-fade-in animation-timeline-[--page]', group: 'B', id: 'bArbNamed', note: 'a named timeline, consumed through the arbitrary path', where: 'pane' },
-  { classes: 'animate-fade-in animate-rotate-45 animation-timeline-scroll animation-duration-600/fade-in', group: 'B', id: 'bDurations', note: 'two slots on one timeline, told different durations' },
+  {
+    classes:
+      'animate-fade-in animate-rotate-45 animation-timeline-scroll/rotate',
+    group: 'B',
+    id: 'bMixed',
+    note: 'one slot retargeted, the other left alone',
+  },
+  {
+    classes: 'animate-fade-in animate-rotate-45 animation-timeline-scroll',
+    group: 'B',
+    id: 'bBoth',
+    note: 'the global control on a two-slot element',
+  },
+  {
+    classes:
+      'animate-fade-in animate-rotate-45 animation-timeline-scroll/fade-in animation-timeline-view/rotate',
+    group: 'B',
+    id: 'bSplit',
+    note: 'two slots, two different timelines',
+  },
+  {
+    classes: 'animate-fade-in animation-timeline-[--page]',
+    group: 'B',
+    id: 'bArbNamed',
+    note: 'a named timeline, consumed through the arbitrary path',
+    where: 'pane',
+  },
+  {
+    classes:
+      'animate-fade-in animate-rotate-45 animation-timeline-scroll animation-duration-600/fade-in',
+    group: 'B',
+    id: 'bDurations',
+    note: 'two slots on one timeline, told different durations',
+  },
 
   // C — every control, on a document timeline and on a scroll timeline.
-  { classes: 'animate-fade-in animation-duration-600', group: 'C', id: 'cDuration' },
-  { classes: 'animate-fade-in animation-duration-600 animation-timeline-scroll', group: 'C', id: 'cDurationS' },
-  { classes: 'animate-fade-in animation-duration-[auto]', group: 'C', id: 'cDurationAuto' },
-  { classes: 'animate-fade-in animation-duration-[auto] animation-timeline-scroll', group: 'C', id: 'cDurationAutoS' },
-  { classes: 'animate-fade-in animation-duration-2000 animation-timeline-scroll', group: 'C', id: 'cDuration2sS' },
-  { classes: 'animate-fade-in animation-delay-600 animation-timeline-scroll', group: 'C', id: 'cDelay600S' },
+  {
+    classes: 'animate-fade-in animation-duration-600',
+    group: 'C',
+    id: 'cDuration',
+  },
+  {
+    classes: 'animate-fade-in animation-duration-600 animation-timeline-scroll',
+    group: 'C',
+    id: 'cDurationS',
+  },
+  {
+    classes: 'animate-fade-in animation-duration-[auto]',
+    group: 'C',
+    id: 'cDurationAuto',
+  },
+  {
+    classes:
+      'animate-fade-in animation-duration-[auto] animation-timeline-scroll',
+    group: 'C',
+    id: 'cDurationAutoS',
+  },
+  {
+    classes:
+      'animate-fade-in animation-duration-2000 animation-timeline-scroll',
+    group: 'C',
+    id: 'cDuration2sS',
+  },
+  {
+    classes: 'animate-fade-in animation-delay-600 animation-timeline-scroll',
+    group: 'C',
+    id: 'cDelay600S',
+  },
   { classes: 'animate-fade-in animation-delay-200', group: 'C', id: 'cDelay' },
-  { classes: 'animate-fade-in animation-delay-200 animation-timeline-scroll', group: 'C', id: 'cDelayS' },
-  { classes: 'animate-fade-in animation-timing-function-linear', group: 'C', id: 'cEasing' },
-  { classes: 'animate-fade-in animation-timing-function-linear animation-timeline-scroll', group: 'C', id: 'cEasingS' },
-  { classes: 'animate-fade-in animation-direction-reverse', group: 'C', id: 'cDirection' },
-  { classes: 'animate-fade-in animation-direction-reverse animation-timeline-scroll', group: 'C', id: 'cDirectionS' },
-  { classes: 'animate-fade-in animation-iteration-count-2', group: 'C', id: 'cIteration' },
-  { classes: 'animate-fade-in animation-iteration-count-2 animation-timeline-scroll', group: 'C', id: 'cIterationS' },
-  { classes: 'animate-fade-in animation-fill-mode-none', group: 'C', id: 'cFill' },
-  { classes: 'animate-fade-in animation-fill-mode-none animation-timeline-scroll', group: 'C', id: 'cFillS' },
-  { classes: 'animate-fade-in animation-play-state-paused', group: 'C', id: 'cPlayState' },
-  { classes: 'animate-fade-in animation-play-state-paused animation-timeline-scroll', group: 'C', id: 'cPlayStateS' },
-  { classes: 'animate-fade-in animation-composition-add', group: 'C', id: 'cComposition' },
-  { classes: 'animate-fade-in animation-composition-add animation-timeline-scroll', group: 'C', id: 'cCompositionS' },
+  {
+    classes: 'animate-fade-in animation-delay-200 animation-timeline-scroll',
+    group: 'C',
+    id: 'cDelayS',
+  },
+  {
+    classes: 'animate-fade-in animation-timing-function-linear',
+    group: 'C',
+    id: 'cEasing',
+  },
+  {
+    classes:
+      'animate-fade-in animation-timing-function-linear animation-timeline-scroll',
+    group: 'C',
+    id: 'cEasingS',
+  },
+  {
+    classes: 'animate-fade-in animation-direction-reverse',
+    group: 'C',
+    id: 'cDirection',
+  },
+  {
+    classes:
+      'animate-fade-in animation-direction-reverse animation-timeline-scroll',
+    group: 'C',
+    id: 'cDirectionS',
+  },
+  {
+    classes: 'animate-fade-in animation-iteration-count-2',
+    group: 'C',
+    id: 'cIteration',
+  },
+  {
+    classes:
+      'animate-fade-in animation-iteration-count-2 animation-timeline-scroll',
+    group: 'C',
+    id: 'cIterationS',
+  },
+  {
+    classes: 'animate-fade-in animation-fill-mode-none',
+    group: 'C',
+    id: 'cFill',
+  },
+  {
+    classes:
+      'animate-fade-in animation-fill-mode-none animation-timeline-scroll',
+    group: 'C',
+    id: 'cFillS',
+  },
+  {
+    classes: 'animate-fade-in animation-play-state-paused',
+    group: 'C',
+    id: 'cPlayState',
+  },
+  {
+    classes:
+      'animate-fade-in animation-play-state-paused animation-timeline-scroll',
+    group: 'C',
+    id: 'cPlayStateS',
+  },
+  {
+    classes: 'animate-fade-in animation-composition-add',
+    group: 'C',
+    id: 'cComposition',
+  },
+  {
+    classes:
+      'animate-fade-in animation-composition-add animation-timeline-scroll',
+    group: 'C',
+    id: 'cCompositionS',
+  },
 
   // D — what Jumi can write about a range, against what the platform does with a range.
-  { classes: 'animate-fade-in animation-timeline-view animation-range-start-entry animation-range-end-cover', group: 'D', id: 'dRangeJumi' },
-  { classes: 'animate-fade-in animation-timeline-view animation-range-[entry_0%_cover_50%]', group: 'D', id: 'dRangeJumiArb' },
+  {
+    classes:
+      'animate-fade-in animation-timeline-view animation-range-start-entry animation-range-end-cover',
+    group: 'D',
+    id: 'dRangeJumi',
+  },
+  {
+    classes:
+      'animate-fade-in animation-timeline-view animation-range-[entry_0%_cover_50%]',
+    group: 'D',
+    id: 'dRangeJumiArb',
+  },
   { classes: '', group: 'D', id: 'dPlainPct', where: 'plain' },
   { classes: '', group: 'D', id: 'dPlainNamed', where: 'plain' },
   { classes: '', group: 'D', id: 'dPlainMixed', where: 'plain' },
@@ -113,32 +292,76 @@ export const ARMS = [
 
   // X — the fallback. `xDropped` is what an unsupported browser holds: the same motion with the
   // timeline declaration gone (which is exactly what a browser that cannot parse it keeps).
-  { classes: 'animate-fade-in', group: 'X', id: 'xDropped', note: 'an unsupported browser: the timeline declaration does not exist' },
-  { classes: 'animate-fade-in animation-timeline-view', group: 'X', id: 'xViewScrub' },
-  { classes: 'animate-fade-in animation-timeline-[--nope]', group: 'X', id: 'xUnresolved', note: 'a timeline that cannot resolve, which is not the same as an unsupported one' },
+  {
+    classes: 'animate-fade-in',
+    group: 'X',
+    id: 'xDropped',
+    note: 'an unsupported browser: the timeline declaration does not exist',
+  },
+  {
+    classes: 'animate-fade-in animation-timeline-view',
+    group: 'X',
+    id: 'xViewScrub',
+  },
+  {
+    classes: 'animate-fade-in animation-timeline-[--nope]',
+    group: 'X',
+    id: 'xUnresolved',
+    note: 'a timeline that cannot resolve, which is not the same as an unsupported one',
+  },
 
   // F — reduced motion. The same arm is read again in a context that asks for nothing animated,
   // with and without the clamp an author would write.
-  { classes: 'animate-fade-in animation-timeline-scroll', group: 'F', id: 'fScroll' },
-  { classes: 'animate-fade-in animation-timeline-scroll motion-reduce:animation-timeline-none', group: 'F', id: 'fClamped' },
-  { classes: 'animate-fade-in motion-safe:animation-timeline-scroll', group: 'F', id: 'fMotionSafe' },
+  {
+    classes: 'animate-fade-in animation-timeline-scroll',
+    group: 'F',
+    id: 'fScroll',
+  },
+  {
+    classes:
+      'animate-fade-in animation-timeline-scroll motion-reduce:animation-timeline-none',
+    group: 'F',
+    id: 'fClamped',
+  },
+  {
+    classes: 'animate-fade-in motion-safe:animation-timeline-scroll',
+    group: 'F',
+    id: 'fMotionSafe',
+  },
 
   // G — the compositor. One scroll-driven slot on a compositable property, one on a property that
   // cannot be composited; the difference is what the main thread is asked to do during a scroll.
-  { classes: 'animate-fade-in animation-timeline-scroll', group: 'G', id: 'gOpacity' },
-  { classes: 'animate-width-50 animation-timeline-scroll', group: 'G', id: 'gWidth' },
-  { classes: 'animate-width-50', group: 'G', id: 'gWidthTime', note: 'the control for the compositor arm: same property, document timeline' },
+  {
+    classes: 'animate-fade-in animation-timeline-scroll',
+    group: 'G',
+    id: 'gOpacity',
+  },
+  {
+    classes: 'animate-width-50 animation-timeline-scroll',
+    group: 'G',
+    id: 'gWidth',
+  },
+  {
+    classes: 'animate-width-50',
+    group: 'G',
+    id: 'gWidthTime',
+    note: 'the control for the compositor arm: same property, document timeline',
+  },
 ]
 
 /** The Jumi arm's element ids, which is what the page mounts and the reader sweeps. */
-export const JUMI_IDS = ARMS.filter(arm => arm.where !== 'plain').map(arm => arm.id)
+export const JUMI_IDS = ARMS.filter(arm => arm.where !== 'plain').map(
+  arm => arm.id,
+)
 
 /** Every class token the compiler has to be given, variant prefix included. */
-export const CANDIDATES = [...new Set(
-  ARMS
-    .filter(arm => arm.where !== 'plain')
-    .flatMap(arm => arm.classes.split(/\s+/).filter(Boolean)),
-)]
+export const CANDIDATES = [
+  ...new Set(
+    ARMS.filter(arm => arm.where !== 'plain').flatMap(arm =>
+      arm.classes.split(/\s+/).filter(Boolean),
+    ),
+  ),
+]
 
 /**
  * The platform arm. Everything here is a fact Jumi cannot state today.

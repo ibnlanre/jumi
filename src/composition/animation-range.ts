@@ -10,7 +10,10 @@ import { join } from '@/helpers/join'
  * writes it: the offset control writes the offset variable, a named half writes the half itself,
  * and the arbitrary form writes the half with both in it.
  */
-export const animationRangeStart = css('var', '--jumi-animation-range-start-offset')
+export const animationRangeStart = css(
+  'var',
+  '--jumi-animation-range-start-offset',
+)
 
 export const animationRangeEnd = css('var', '--jumi-animation-range-end-offset')
 

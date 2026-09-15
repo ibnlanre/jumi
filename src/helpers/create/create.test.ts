@@ -47,7 +47,9 @@ describe('property curry', () => {
   it('writes a phrase into one variable per declared frame', () => {
     const { creator } = setup()
 
-    const result = creator.property('rotate')('0:16deg|58:0deg', { modifier: null })
+    const result = creator.property('rotate')('0:16deg|58:0deg', {
+      modifier: null,
+    })
     const id = shorthash2('0:16deg|58:0deg')
 
     expect(result).toEqual({
@@ -73,7 +75,9 @@ describe('property curry', () => {
   it('writes each string part to its own variable', () => {
     const { creator } = setup()
 
-    const result = creator.property('gap', ['row-gap', 'column-gap'])('8px', { modifier: null })
+    const result = creator.property('gap', ['row-gap', 'column-gap'])('8px', {
+      modifier: null,
+    })
 
     expect(result).toEqual({
       '--jumi-column-gap': '8px',
@@ -85,7 +89,9 @@ describe('property curry', () => {
   it('applies the transform of a tuple part', () => {
     const { creator } = setup()
 
-    const result = creator.property('filter', [['filter-blur', value => css('blur', value)]])('8px', { modifier: null })
+    const result = creator.property('filter', [
+      ['filter-blur', value => css('blur', value)],
+    ])('8px', { modifier: null })
 
     expect(result).toEqual({
       '--jumi-filter-animation-name': 'jumi-filter',
@@ -96,8 +102,12 @@ describe('property curry', () => {
   it('orders and dedupes frames, so one phrase is one declaration', () => {
     const { creator } = setup()
 
-    const ascending = creator.property('rotate')('0:16deg|58:0deg', { modifier: null })
-    const shuffled = creator.property('rotate')('58:0deg|0:16deg', { modifier: null })
+    const ascending = creator.property('rotate')('0:16deg|58:0deg', {
+      modifier: null,
+    })
+    const shuffled = creator.property('rotate')('58:0deg|0:16deg', {
+      modifier: null,
+    })
 
     expect(shuffled).toEqual(ascending)
   })
@@ -107,8 +117,12 @@ describe('property curry', () => {
 
     // Offsets that share a value are one frame, so the comma is free to be the offset separator —
     // and the shorthand has to be pure syntax, not a second spelling with its own keyframe.
-    const shared = creator.property('rotate')('0,100:45deg| 50:0deg', { modifier: null })
-    const written = creator.property('rotate')('0:45deg|50:0deg|100:45deg', { modifier: null })
+    const shared = creator.property('rotate')('0,100:45deg| 50:0deg', {
+      modifier: null,
+    })
+    const written = creator.property('rotate')('0:45deg|50:0deg|100:45deg', {
+      modifier: null,
+    })
     const id = shorthash2('0:45deg|50:0deg|100:45deg')
 
     expect(shared).toEqual(written)
@@ -125,7 +139,10 @@ describe('property curry', () => {
 
     // A comma inside a value is why the offset list gets its own separator rather than the frame:
     // `rgb(0,0,0)` is one value, not three offsets.
-    const result = creator.property('background-color')('0:rgb(0,0,0)|100:rgb(255,0,0)', { modifier: null })
+    const result = creator.property('background-color')(
+      '0:rgb(0,0,0)|100:rgb(255,0,0)',
+      { modifier: null },
+    )
     const id = shorthash2('0:rgb(0,0,0)|100:rgb(255,0,0)')
 
     expect(result).toEqual({
@@ -138,7 +155,9 @@ describe('property curry', () => {
   it('lets the last of two frames at one offset win', () => {
     const { creator } = setup()
 
-    const result = creator.property('rotate')('0:16deg|0:0deg', { modifier: null })
+    const result = creator.property('rotate')('0:16deg|0:0deg', {
+      modifier: null,
+    })
     const id = shorthash2('0:0deg')
 
     expect(result).toEqual({
@@ -150,7 +169,9 @@ describe('property curry', () => {
   it('distributes every frame across the parts of a composed property', () => {
     const { creator } = setup()
 
-    const result = creator.property('filter', [['filter-blur', value => css('blur', value)]])('0:0px|50:8px', { modifier: null })
+    const result = creator.property('filter', [
+      ['filter-blur', value => css('blur', value)],
+    ])('0:0px|50:8px', { modifier: null })
     const id = shorthash2('0:0px|50:8px')
 
     expect(result).toEqual({
@@ -174,13 +195,21 @@ describe('property curry', () => {
   it('records a phrase label in the rule it declares', () => {
     const { creator } = setup()
 
-    const labelled = creator.property('rotate')('0:0deg|58:0deg', { modifier: 'flick' })
-    const bare = creator.property('rotate')('0:0deg|100:90deg', { modifier: null })
+    const labelled = creator.property('rotate')('0:0deg|58:0deg', {
+      modifier: 'flick',
+    })
+    const bare = creator.property('rotate')('0:0deg|100:90deg', {
+      modifier: null,
+    })
 
     // The label is the address a person can write down, unlike the hash the
     // frame variables are keyed by, so the rule says what the slot is called.
-    expect(labelled).toMatchObject({ [`--jumi-rotate-${shorthash2('0:0deg|58:0deg')}-label`]: 'flick' })
-    expect(bare).not.toHaveProperty(`--jumi-rotate-${shorthash2('0:0deg|100:90deg')}-label`)
+    expect(labelled).toMatchObject({
+      [`--jumi-rotate-${shorthash2('0:0deg|58:0deg')}-label`]: 'flick',
+    })
+    expect(bare).not.toHaveProperty(
+      `--jumi-rotate-${shorthash2('0:0deg|100:90deg')}-label`,
+    )
   })
 })
 
@@ -215,8 +244,12 @@ describe('keyframe emission', () => {
     // Exactly the declared offsets — nobody else's — each reading its own frame
     // variable.
     expect(Object.keys(frames)).toEqual(['0%', '58%'])
-    expect(frames['0%'].opacity).toBe(`var(--jumi-opacity-${id}-0, var(--jumi-opacity))`)
-    expect(frames['58%'].opacity).toBe(`var(--jumi-opacity-${id}-58, var(--jumi-opacity))`)
+    expect(frames['0%'].opacity).toBe(
+      `var(--jumi-opacity-${id}-0, var(--jumi-opacity))`,
+    )
+    expect(frames['58%'].opacity).toBe(
+      `var(--jumi-opacity-${id}-58, var(--jumi-opacity))`,
+    )
   })
 
   it('gives different phrases of one property separate keyframes', () => {
@@ -233,14 +266,19 @@ describe('keyframe emission', () => {
     // Isolation is structural. Neither keyframe can hold the other's offsets,
     // because each is named after the phrase that declared it.
     expect(names).toContain(`@keyframes jumi-opacity-${shorthash2('0:0|58:1')}`)
-    expect(names).toContain(`@keyframes jumi-opacity-${shorthash2('0:0|100:1')}`)
+    expect(names).toContain(
+      `@keyframes jumi-opacity-${shorthash2('0:0|100:1')}`,
+    )
     expect(names).toHaveLength(2)
   })
 
   it('expands the composition per frame for a composed property', () => {
     const { addUtilities, creator } = setup()
 
-    creator.property('filter', [['filter-blur', value => css('blur', value)]])('0:0px|40:8px', { modifier: null })
+    creator.property('filter', [['filter-blur', value => css('blur', value)]])(
+      '0:0px|40:8px',
+      { modifier: null },
+    )
     creator.animations
 
     const id = shorthash2('0:0px|40:8px')
@@ -252,7 +290,9 @@ describe('keyframe emission', () => {
 
     const frame = keyframes[`@keyframes jumi-filter-${id}`]['40%'].filter
     expect(frame).toContain(`var(--jumi-filter-${id}-40,`)
-    expect(frame).toContain(`var(--jumi-filter-blur-${id}-40, var(--jumi-filter-blur))`)
+    expect(frame).toContain(
+      `var(--jumi-filter-blur-${id}-40, var(--jumi-filter-blur))`,
+    )
   })
 
   it('escapes a decimal offset in the keyframe', () => {
@@ -266,8 +306,9 @@ describe('keyframe emission', () => {
       .map(([u]) => u)
       .find(u => `@keyframes jumi-opacity-${id}` in u)
 
-    expect(keyframes[`@keyframes jumi-opacity-${id}`]['12.5%'].opacity)
-      .toBe(`var(--jumi-opacity-${id}-12\\.5, var(--jumi-opacity))`)
+    expect(keyframes[`@keyframes jumi-opacity-${id}`]['12.5%'].opacity).toBe(
+      `var(--jumi-opacity-${id}-12\\.5, var(--jumi-opacity))`,
+    )
   })
 
   it('wires a phrase slot with per-attribute timing overrides', () => {
@@ -294,7 +335,9 @@ describe('animations wiring', () => {
 
     // With no registered values, the getter falls back to the shared controls.
     expect(animations['animation-name']).toBe('var(--jumi-animation-name)')
-    expect(animations['animation-duration']).toBe('var(--jumi-animation-duration)')
+    expect(animations['animation-duration']).toBe(
+      'var(--jumi-animation-duration)',
+    )
     expect(animations).toMatchObject({
       '--jumi-animation': expect.stringContaining('var(--jumi-animation-name)'),
       '--jumi-animation-composition': 'replace',
@@ -346,7 +389,10 @@ describe('animations wiring', () => {
     const { creator } = setup()
 
     creator.property('opacity')('50', { modifier: null })
-    creator.property('filter', [['filter-blur', value => css('blur', value)]])('8px', { modifier: null })
+    creator.property('filter', [['filter-blur', value => css('blur', value)]])(
+      '8px',
+      { modifier: null },
+    )
     creator.property('opacity')('0:0|58:1', { modifier: null })
     creator.effect('bounce-in')
 
@@ -399,15 +445,23 @@ describe('animations wiring', () => {
     expect(animations['animation-composition']).toContain(
       `var(${flick}-animation-composition, var(--jumi-rotate-animation-composition, var(--jumi-animation-composition)))`,
     )
-    expect(animations['animation-timeline']).toContain(`var(${flick}-animation-timeline, `)
+    expect(animations['animation-timeline']).toContain(
+      `var(${flick}-animation-timeline, `,
+    )
 
     // Range is the third list of that shape, and it is a list *per animation*: position 0 may carry
     // a real range while position 1 falls through to the global default.
-    expect(animations['animation-range']).toContain(`var(${flick}-animation-range, `)
+    expect(animations['animation-range']).toContain(
+      `var(${flick}-animation-range, `,
+    )
     expect(animations['animation-range']).toContain(
       'var(--jumi-rotate-animation-range, var(--jumi-animation-range))',
     )
-    expect(String(animations['animation-range']).split('var(--jumi-rotate-animation-range').length - 1).toBe(2)
+    expect(
+      String(animations['animation-range']).split(
+        'var(--jumi-rotate-animation-range',
+      ).length - 1,
+    ).toBe(2)
 
     // **And the name is nowhere in it.** This is the invariant, not an absence of detail: the
     // aggregate is one declaration block shared by every element that matches the composition, so a
@@ -424,13 +478,19 @@ describe('animations wiring', () => {
 
 describe('animation-name registration', () => {
   const registered = (addBase: ReturnType<typeof setup>['addBase']) =>
-    addBase.mock.calls.reduce<CssInJs>((acc, [utilities]) => ({ ...acc, ...utilities }), {})
+    addBase.mock.calls.reduce<CssInJs>(
+      (acc, [utilities]) => ({ ...acc, ...utilities }),
+      {},
+    )
 
   it('registers per-value, composed, phrase and effect names as non-inheriting', () => {
     const { addBase, creator } = setup()
 
     creator.property('opacity')('50', { modifier: null })
-    creator.property('filter', [['filter-blur', value => css('blur', value)]])('8px', { modifier: null })
+    creator.property('filter', [['filter-blur', value => css('blur', value)]])(
+      '8px',
+      { modifier: null },
+    )
     creator.property('rotate')('0:16deg|58:0deg', { modifier: null })
     creator.effect('bounce-in')
     creator.animations
@@ -451,10 +511,15 @@ describe('animation-name registration', () => {
     // non-inheriting, because a descendant that inherits either one re-runs its ancestor's
     // animation. The second was missing when the aggregate became a hoist, and
     // `behaviour:check`'s non-inheritance arm is what found it.
-    const hoisted = expected.map(name => name.replace(/^--jumi-(.+)-animation-name$/, '--jumi-slot-$1'))
+    const hoisted = expected.map(name =>
+      name.replace(/^--jumi-(.+)-animation-name$/, '--jumi-slot-$1'),
+    )
 
-    expect(Object.keys(utilities).filter(name => name.startsWith('@property')).sort())
-      .toEqual([...expected, ...hoisted].sort().map(name => `@property ${name}`))
+    expect(
+      Object.keys(utilities)
+        .filter(name => name.startsWith('@property'))
+        .sort(),
+    ).toEqual([...expected, ...hoisted].sort().map(name => `@property ${name}`))
 
     expect(utilities[`@property --jumi-opacity-${id}-animation-name`]).toEqual({
       inherits: 'false',
@@ -475,7 +540,9 @@ describe('animation-name registration', () => {
 
     const id = shorthash2('0:16deg|58:0deg')
 
-    expect(registered(addBase)[`@property --jumi-rotate-${id}-animation-name`]).toEqual({
+    expect(
+      registered(addBase)[`@property --jumi-rotate-${id}-animation-name`],
+    ).toEqual({
       inherits: 'false',
       syntax: '"*"',
     })
@@ -488,8 +555,9 @@ describe('animation-name registration', () => {
     creator.animations
 
     const utilities = registered(addBase)
-    const parts = Object.keys(creator.animations)
-      .filter(part => part.startsWith('animation-') && part !== 'animation-name')
+    const parts = Object.keys(creator.animations).filter(
+      part => part.startsWith('animation-') && part !== 'animation-name',
+    )
 
     expect(parts.length).toBeGreaterThan(0)
 
@@ -511,8 +579,12 @@ describe('animation-name registration', () => {
 
     const utilities = registered(addBase)
 
-    expect(utilities['@property --jumi-rotate-animation-duration']).toBeUndefined()
-    expect(utilities['@property --jumi-rotate-animation-timing-function']).toBeUndefined()
+    expect(
+      utilities['@property --jumi-rotate-animation-duration'],
+    ).toBeUndefined()
+    expect(
+      utilities['@property --jumi-rotate-animation-timing-function'],
+    ).toBeUndefined()
   })
 
   it('registers a name once, however often the animations getter is read', () => {
@@ -527,13 +599,19 @@ describe('animation-name registration', () => {
     creator.animations
     creator.animations
 
-    const names = addBase.mock.calls.flatMap(([utilities]) => Object.keys(utilities))
+    const names = addBase.mock.calls.flatMap(([utilities]) =>
+      Object.keys(utilities),
+    )
     const id = shorthash2('50')
 
-    expect(names.filter(name => name === `@property --jumi-opacity-${id}-animation-name`))
-      .toHaveLength(1)
-    expect(names.filter(name => name === '@property --jumi-fade-in-animation-name'))
-      .toHaveLength(1)
+    expect(
+      names.filter(
+        name => name === `@property --jumi-opacity-${id}-animation-name`,
+      ),
+    ).toHaveLength(1)
+    expect(
+      names.filter(name => name === '@property --jumi-fade-in-animation-name'),
+    ).toHaveLength(1)
   })
 
   it('registers a slot created after the last read of the animations getter', () => {
@@ -550,7 +628,9 @@ describe('animation-name registration', () => {
 
     const id = shorthash2('amber-400')
 
-    expect(registered(addBase)[`@property --jumi-accent-color-${id}-animation-name`]).toEqual({
+    expect(
+      registered(addBase)[`@property --jumi-accent-color-${id}-animation-name`],
+    ).toEqual({
       inherits: 'false',
       syntax: '"*"',
     })
@@ -580,7 +660,10 @@ describe('color paints', () => {
   it('emits an SVG paint target as a hex literal', () => {
     const { creator } = setup()
 
-    const result = creator.color('fill', [], { paint: true })('oklch(62.7% 0.265 303.9)', { modifier: null })
+    const result = creator.color('fill', [], { paint: true })(
+      'oklch(62.7% 0.265 303.9)',
+      { modifier: null },
+    )
     const id = shorthash2('#ad46ff')
 
     expect(result).toEqual({
@@ -592,16 +675,23 @@ describe('color paints', () => {
   it('leaves non-paint colors untouched', () => {
     const { creator } = setup()
 
-    const result = creator.color('background-color')('oklch(62.7% 0.265 303.9)', { modifier: null })
+    const result = creator.color('background-color')(
+      'oklch(62.7% 0.265 303.9)',
+      { modifier: null },
+    )
     const id = shorthash2('oklch(62.7% 0.265 303.9)')
 
-    expect(result[`--jumi-background-color-${id}`]).toBe('oklch(62.7% 0.265 303.9)')
+    expect(result[`--jumi-background-color-${id}`]).toBe(
+      'oklch(62.7% 0.265 303.9)',
+    )
   })
 
   it('passes non-color paint values through unchanged', () => {
     const { creator } = setup()
 
-    const result = creator.color('fill', [], { paint: true })('url(#pattern)', { modifier: null })
+    const result = creator.color('fill', [], { paint: true })('url(#pattern)', {
+      modifier: null,
+    })
 
     expect(Object.values(result)).toContain('url(#pattern)')
   })
@@ -631,22 +721,38 @@ describe('the payload', () => {
       .filter((entry): entry is CssInJs => Boolean(entry))
 
   /** One kind's payload, later publications winning, with the staging prefix taken back off. */
-  const payload = (addBase: ReturnType<typeof setup>['addBase'], kind: string) => {
+  const payload = (
+    addBase: ReturnType<typeof setup>['addBase'],
+    kind: string,
+  ) => {
     const prefix = `${stagingMarker}${kind}-`
 
-    return Object.fromEntries(published(addBase)
-      .flatMap(entry => Object.entries(entry))
-      .filter(([name]) => name.startsWith(prefix))
-      .map(([name, value]) => [name.slice(prefix.length), value])) as Record<string, string>
+    return Object.fromEntries(
+      published(addBase)
+        .flatMap(entry => Object.entries(entry))
+        .filter(([name]) => name.startsWith(prefix))
+        .map(([name, value]) => [name.slice(prefix.length), value]),
+    ) as Record<string, string>
   }
 
   /** What that kind's composition declares: a name that is not itself a custom property. */
   const lists = (addBase: ReturnType<typeof setup>['addBase'], kind: string) =>
-    Object.fromEntries(Object.entries(payload(addBase, kind)).filter(([name]) => !name.startsWith('--')))
+    Object.fromEntries(
+      Object.entries(payload(addBase, kind)).filter(
+        ([name]) => !name.startsWith('--'),
+      ),
+    )
 
   /** What it resolves through: the names that are, written as the element reads them. */
-  const defaults = (addBase: ReturnType<typeof setup>['addBase'], kind: string) =>
-    Object.fromEntries(Object.entries(payload(addBase, kind)).filter(([name]) => name.startsWith('--')))
+  const defaults = (
+    addBase: ReturnType<typeof setup>['addBase'],
+    kind: string,
+  ) =>
+    Object.fromEntries(
+      Object.entries(payload(addBase, kind)).filter(([name]) =>
+        name.startsWith('--'),
+      ),
+    )
 
   it('publishes a payload per kind, before anything can read the model', () => {
     const { addBase } = setup()
@@ -657,8 +763,12 @@ describe('the payload', () => {
     // trace of the protocol for the checks to find.
     const names = published(addBase).flatMap(entry => Object.keys(entry))
 
-    expect(names.some(name => name.startsWith(`${stagingMarker}animations-`))).toBe(true)
-    expect(names.some(name => name.startsWith(`${stagingMarker}transitions-`))).toBe(true)
+    expect(
+      names.some(name => name.startsWith(`${stagingMarker}animations-`)),
+    ).toBe(true)
+    expect(
+      names.some(name => name.startsWith(`${stagingMarker}transitions-`)),
+    ).toBe(true)
     expect(published(addBase)).toHaveLength(4)
   })
 
@@ -673,8 +783,9 @@ describe('the payload', () => {
     // Each entry is the slot reference itself. `var(--jumi-<slot>-animation-name)` is declared *on
     // the element* by the `animate-*` utility, so the list only resolves there — which is precisely
     // why the data travels instead of being published where it is read.
-    expect(staged['animation-name'])
-      .toBe(`var(--jumi-opacity-${id}-animation-name, var(--jumi-animation-name))`)
+    expect(staged['animation-name']).toBe(
+      `var(--jumi-opacity-${id}-animation-name, var(--jumi-animation-name))`,
+    )
 
     // The payload is exactly the aggregate parts and nothing else. `interpolate-size` used to ride this
     // channel as a real property; it does not any more, because it is **inherited** — written on a carrier
@@ -696,7 +807,9 @@ describe('the payload', () => {
     // the slot utilities write there — and a custom property containing `var()` resolves where it is
     // *declared*. `--jumi-animation-delay` published on `:root` resolves once, to the stagger
     // fallback, and every element inherits that literal: measured, and it stops the stagger system.
-    expect(staged['--jumi-animation-delay']).toBe('var(--jumi-stagger-animation-delay, 0s)')
+    expect(staged['--jumi-animation-delay']).toBe(
+      'var(--jumi-stagger-animation-delay, 0s)',
+    )
     expect(staged['--jumi-animation-duration']).toBe('1s')
     expect(staged['--jumi-rotate']).toContain('var(--jumi-rotate-')
 
@@ -755,9 +868,13 @@ describe('the payload', () => {
     // The set of defaults only ever grows, so it travels as a delta: a full snapshot on every
     // publication would rewrite every earlier property's defaults each time, which is quadratic in
     // the number of properties for no gain. A default already published never appears again.
-    const repeated = published(addBase).slice(before)
+    const repeated = published(addBase)
+      .slice(before)
       .flatMap(entry => Object.entries(entry))
-      .filter(([name]) => name === `${stagingMarker}animations---jumi-animation-duration`)
+      .filter(
+        ([name]) =>
+          name === `${stagingMarker}animations---jumi-animation-duration`,
+      )
 
     expect(repeated).toEqual([])
   })
@@ -775,7 +892,8 @@ describe('the payload', () => {
     const compositionFor = (sequence: string[]) => {
       const scope = setup()
 
-      for (const value of sequence) scope.creator.property('opacity')(value, { modifier: null })
+      for (const value of sequence)
+        scope.creator.property('opacity')(value, { modifier: null })
 
       return lists(scope.addBase, 'animations')
     }
@@ -806,7 +924,9 @@ describe('the payload', () => {
 
     // With no slots at all the composition is the shared default for each longhand, which is what
     // lets an element carrying a control and no tween still resolve.
-    expect(lists(addBase, 'animations')['animation-name']).toBe('var(--jumi-animation-name)')
+    expect(lists(addBase, 'animations')['animation-name']).toBe(
+      'var(--jumi-animation-name)',
+    )
 
     // The getter is the oracle: every ordering assertion in this file is written against it, and
     // the payload is what actually ships. The two have to agree after every mutation, not merely at
@@ -815,25 +935,55 @@ describe('the payload', () => {
       const flat = creator.animations
 
       for (const part of parts) {
-        expect(lists(addBase, 'animations')[part], `${label} · ${part}`).toBe(flat[part])
+        expect(lists(addBase, 'animations')[part], `${label} · ${part}`).toBe(
+          flat[part],
+        )
       }
     }
 
     const mutations: Array<[string, () => void]> = [
-      ['a value on a first attribute', () => creator.property('opacity')('50', { modifier: null })],
-      ['a second attribute', () => creator.property('rotate')('45deg', { modifier: null })],
-      ['a third value on the first attribute', () => creator.property('opacity')('25', { modifier: null })],
-      ['a re-registered value, which moves within its group', () => creator.property('opacity')('50', { modifier: null })],
-      ['a phrase, which claims a slot of its own', () => creator.property('background-color')('0:red|100:blue', { modifier: null })],
+      [
+        'a value on a first attribute',
+        () => creator.property('opacity')('50', { modifier: null }),
+      ],
+      [
+        'a second attribute',
+        () => creator.property('rotate')('45deg', { modifier: null }),
+      ],
+      [
+        'a third value on the first attribute',
+        () => creator.property('opacity')('25', { modifier: null }),
+      ],
+      [
+        'a re-registered value, which moves within its group',
+        () => creator.property('opacity')('50', { modifier: null }),
+      ],
+      [
+        'a phrase, which claims a slot of its own',
+        () =>
+          creator.property('background-color')('0:red|100:blue', {
+            modifier: null,
+          }),
+      ],
       ['an effect', () => creator.effect('bounce-in')],
-      ['a fourth value on the first attribute', () => creator.property('opacity')('75', { modifier: null })],
+      [
+        'a fourth value on the first attribute',
+        () => creator.property('opacity')('75', { modifier: null }),
+      ],
       ['a re-registered effect', () => creator.effect('bounce-in')],
       // A long group, so the lists stop being short: twenty slots resolve in one
       // declaration each, with nothing accumulating per slot.
-      ...Array.from({ length: 12 }, (_, index) => [
-        `value ${index + 1} of a long group`,
-        () => creator.property('rotate')(`${10 + index}deg`, { modifier: null }),
-      ] as [string, () => void]),
+      ...Array.from(
+        { length: 12 },
+        (_, index) =>
+          [
+            `value ${index + 1} of a long group`,
+            () =>
+              creator.property('rotate')(`${10 + index}deg`, {
+                modifier: null,
+              }),
+          ] as [string, () => void],
+      ),
     ]
 
     for (const [label, mutate] of mutations) {
@@ -845,8 +995,9 @@ describe('the payload', () => {
     // re-registered effect, which changes nothing about *which* slots exist but does move one to
     // the end of the lists, and the lists are what is published. Reading the oracle publishes
     // nothing (see the test above); that is the gate that keeps this from being a publish-per-pass.
-    const compositions = published(addBase)
-      .filter(entry => `${stagingMarker}animations-animation-name` in entry)
+    const compositions = published(addBase).filter(
+      entry => `${stagingMarker}animations-animation-name` in entry,
+    )
 
     expect(compositions).toHaveLength(mutations.length + 1)
 
@@ -871,13 +1022,16 @@ describe('transitions wiring', () => {
   const payload = (addBase: ReturnType<typeof setup>['addBase']) => {
     const prefix = `${stagingMarker}transitions-`
 
-    return Object.fromEntries(published(addBase)
-      .flatMap(entry => Object.entries(entry))
-      .filter(([name]) => name.startsWith(prefix))
-      .map(([name, value]) => [name.slice(prefix.length), value])) as Record<string, string>
+    return Object.fromEntries(
+      published(addBase)
+        .flatMap(entry => Object.entries(entry))
+        .filter(([name]) => name.startsWith(prefix))
+        .map(([name, value]) => [name.slice(prefix.length), value]),
+    ) as Record<string, string>
   }
 
-  const list = (addBase: ReturnType<typeof setup>['addBase']) => payload(addBase)['transition']
+  const list = (addBase: ReturnType<typeof setup>['addBase']) =>
+    payload(addBase)['transition']
 
   it('stages the composed list rather than a per-motion variable', () => {
     const { addBase, creator } = setup()
@@ -887,8 +1041,12 @@ describe('transitions wiring', () => {
     // One chain per motion, inlined rather than assembled from a `--jumi-<motion>-transition`
     // variable: that variable would be dynamic too, and every dynamic declaration is another thing
     // the payload has to carry and the finalizer has to be told to write out.
-    expect(list(addBase)).toContain('var(--jumi-background-color-transition-property, background-color)')
-    expect(payload(addBase)['--jumi-background-color-transition']).toBeUndefined()
+    expect(list(addBase)).toContain(
+      'var(--jumi-background-color-transition-property, background-color)',
+    )
+    expect(
+      payload(addBase)['--jumi-background-color-transition'],
+    ).toBeUndefined()
   })
 
   it('falls back to the global shorthand when no motion has been declared', () => {
@@ -908,7 +1066,9 @@ describe('transitions wiring', () => {
     // Both are real properties, so both ride the channel bound to a declaration — which is what
     // makes the composition complete without the finalizer knowing anything about transitions.
     expect(payload(addBase)['transition']).toBe('var(--jumi-transition)')
-    expect(payload(addBase)['transition-behavior']).toBe('var(--jumi-transition-behavior)')
+    expect(payload(addBase)['transition-behavior']).toBe(
+      'var(--jumi-transition-behavior)',
+    )
   })
 
   it('republishes the composed list when a motion arrives after a publication', () => {
@@ -921,6 +1081,8 @@ describe('transitions wiring', () => {
     // stylesheet rather than from a utility Tailwind might revisit — so without this the new motion
     // never reaches the output. `incremental:check` pins the same thing end to end.
     expect(published(addBase).length).toBeGreaterThan(before)
-    expect(list(addBase)).toContain('var(--jumi-scale-transition-property, scale)')
+    expect(list(addBase)).toContain(
+      'var(--jumi-scale-transition-property, scale)',
+    )
   })
 })

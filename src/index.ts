@@ -17,4 +17,9 @@ export { default } from './helpers/create'
  * `@ibnlanre/jumi/postcss` and `@ibnlanre/jumi/vite` adapters call it at the two host integrations
  * Jumi supports.
  */
-export { finalize, finalizeCss, type Finalized, stagingMarker } from './helpers/carriers'
+export {
+  finalize,
+  finalizeCss,
+  type Finalized,
+  stagingMarker,
+} from './helpers/carriers'

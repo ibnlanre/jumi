@@ -28,12 +28,12 @@ import path from 'node:path'
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const changelog = path.join(root, 'CHANGELOG.md')
 
-const run = (command, args) => execFileSync(command, args, { cwd: root, encoding: 'utf8' })
+const run = (command, args) =>
+  execFileSync(command, args, { cwd: root, encoding: 'utf8' })
 const attempt = (command, args) => {
   try {
     return run(command, args).trim()
-  }
-  catch {
+  } catch {
     return ''
   }
 }
@@ -42,31 +42,51 @@ const tag = attempt('git', ['describe', '--tags', '--abbrev=0'])
 
 if (!tag) {
   console.error(
-    'no tag to start from, so there is nothing to stop the generator at the beginning of the repository.\n'
-    + '\n'
-    + 'Everything written in CHANGELOG.md so far is curated by hand, and it is the history for the releases it\n'
-    + 'describes. Tag the boundary first — the release the curated notes end at — and generation will begin after\n'
-    + 'it:\n'
-    + '\n'
-    + '  git tag v1.0.0-beta.1 <the commit that shipped it>\n',
+    'no tag to start from, so there is nothing to stop the generator at the beginning of the repository.\n' +
+      '\n' +
+      'Everything written in CHANGELOG.md so far is curated by hand, and it is the history for the releases it\n' +
+      'describes. Tag the boundary first — the release the curated notes end at — and generation will begin after\n' +
+      'it:\n' +
+      '\n' +
+      '  git tag v1.0.0-beta.1 <the commit that shipped it>\n',
   )
   process.exit(1)
 }
 
-const version = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8')).version
+const version = JSON.parse(
+  readFileSync(path.join(root, 'package.json'), 'utf8'),
+).version
 const before = readFileSync(changelog, 'utf8')
 
-run('pnpm', ['exec', 'conventional-changelog', '-p', 'conventionalcommits', '-i', changelog, '-o', changelog])
+run('pnpm', [
+  'exec',
+  'conventional-changelog',
+  '-p',
+  'conventionalcommits',
+  '-i',
+  changelog,
+  '-o',
+  changelog,
+])
 
 const after = readFileSync(changelog, 'utf8')
-const header = after.split('\n').find(line => line.startsWith('## ')) ?? '(no release header was written)'
+const header =
+  after.split('\n').find(line => line.startsWith('## ')) ??
+  '(no release header was written)'
 const added = after.split('\n').length - before.split('\n').length
 
 console.log(`boundary:   ${tag}`)
-console.log(`version:    ${version} — from package.json, so decide the bump before running this`)
+console.log(
+  `version:    ${version} — from package.json, so decide the bump before running this`,
+)
 console.log(`header:     ${header}`)
 console.log(`added:      ${added} line(s)`)
 
-if (!/^\s*##\s+\S/.test(after) || (after.split('\n')[0] === before.split('\n')[0] && added === 0)) {
-  console.warn('\nthe changelog did not change — there is nothing since the boundary, or the header already exists.')
+if (
+  !/^\s*##\s+\S/.test(after) ||
+  (after.split('\n')[0] === before.split('\n')[0] && added === 0)
+) {
+  console.warn(
+    '\nthe changelog did not change — there is nothing since the boundary, or the header already exists.',
+  )
 }

@@ -21,6 +21,8 @@ describe('css', () => {
   })
 
   it('should handle complex values', () => {
-    expect(css('linear-gradient', 'to right, #000, #fff')).toBe('linear-gradient(to right, #000, #fff)')
+    expect(css('linear-gradient', 'to right, #000, #fff')).toBe(
+      'linear-gradient(to right, #000, #fff)',
+    )
   })
 })

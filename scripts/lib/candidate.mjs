@@ -53,7 +53,7 @@ const declared = type => (Array.isArray(type) ? type : type ? [type] : ['any'])
  * semantics. Recognising what `hover:` *means*, and where the prefix has to be re-applied, stays
  * in the variant workstream.
  */
-const stripPrefix = (raw) => {
+const stripPrefix = raw => {
   let depth = 0
   let at = -1
 
@@ -73,7 +73,7 @@ const stripPrefix = (raw) => {
  * parsed here. The sign is *not* stripped for root selection: `-animate-bottom-4` matches
  * `animate-bottom`.
  */
-const split = (raw) => {
+const split = raw => {
   const bare = stripPrefix(raw).replace(/!$/, '')
   const negative = bare.startsWith('-')
 
@@ -84,12 +84,13 @@ const split = (raw) => {
 const decode = value => value.slice(1, -1).replace(/_/g, ' ')
 
 /** A bracketed modifier is unwrapped the same way a bracketed value is: `/[flick]` -> `flick`. */
-const wrapped = modifier => (modifier.startsWith('[') && modifier.endsWith(']')
-  ? decode(modifier)
-  : modifier)
+const wrapped = modifier =>
+  modifier.startsWith('[') && modifier.endsWith(']')
+    ? decode(modifier)
+    : modifier
 
 /** The last `/` that is not inside brackets or parentheses: the modifier separator. */
-const splitModifier = (remainder) => {
+const splitModifier = remainder => {
   let depth = 0
 
   for (let at = remainder.length - 1; at >= 0; at -= 1) {
@@ -98,7 +99,10 @@ const splitModifier = (remainder) => {
     if (character === ']' || character === ')') depth += 1
     else if (character === '[' || character === '(') depth -= 1
     else if (character === '/' && depth === 0) {
-      return { modifier: remainder.slice(at + 1), value: remainder.slice(0, at) }
+      return {
+        modifier: remainder.slice(at + 1),
+        value: remainder.slice(0, at),
+      }
     }
   }
 
@@ -106,7 +110,8 @@ const splitModifier = (remainder) => {
 }
 
 /** Root selection: longest registered name first, which is the order the host tries them in. */
-const roots = vocabulary => [...vocabulary].sort((a, b) => b.name.length - a.name.length)
+const roots = vocabulary =>
+  [...vocabulary].sort((a, b) => b.name.length - a.name.length)
 
 /**
  * Parse one candidate into what a matcher receives, or `null` when the host would reject it.
@@ -120,7 +125,7 @@ const roots = vocabulary => [...vocabulary].sort((a, b) => b.name.length - a.nam
  *   bare         a number the declared type can derive from (`360` -> `360deg`)
  *   otherwise    rejected, which is why `animate-width-abc` never reaches a matcher
  */
-export const parser = vocabulary => (raw) => {
+export const parser = vocabulary => raw => {
   const { candidate, negative } = split(raw)
   const found = []
 
@@ -128,7 +133,8 @@ export const parser = vocabulary => (raw) => {
     let remainder = null
 
     if (candidate === entry.name) remainder = ''
-    else if (candidate.startsWith(`${entry.name}-`)) remainder = candidate.slice(entry.name.length + 1)
+    else if (candidate.startsWith(`${entry.name}-`))
+      remainder = candidate.slice(entry.name.length + 1)
 
     if (remainder === null) continue
 

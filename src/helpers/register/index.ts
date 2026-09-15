@@ -42,8 +42,9 @@ export type Registered = {
 
 /** A Tailwind entry: `@import "tailwindcss"` (with any of its subpaths), or the v3-era directives. */
 const isEntry = (atRule: AtRule) =>
-  atRule.name === 'tailwind'
-  || (atRule.name === 'import' && /^["']?tailwindcss(\/[\w.-]+)*["']?(\s|$)/.test(atRule.params.trim()))
+  atRule.name === 'tailwind' ||
+  (atRule.name === 'import' &&
+    /^["']?tailwindcss(\/[\w.-]+)*["']?(\s|$)/.test(atRule.params.trim()))
 
 /** Jumi is registered if the specifier matches, or if a specifier names Jumi at all — which covers
  * `@plugin "@jumi/core"` and `@plugin "../../vendor/jumi.js"` without parsing paths. */
@@ -59,7 +60,10 @@ const isJumi = (params: string, specifier: string) => {
  * Only top-level at-rules are considered: `@import` is only valid there, and a `@plugin` nested in
  * something else is not a registration this pass should be guessing about.
  */
-export function register(root: Root, specifier: string = pluginSpecifier): Registered {
+export function register(
+  root: Root,
+  specifier: string = pluginSpecifier,
+): Registered {
   let entry = false
   let registered = false
   let lastImport: AtRule | undefined
@@ -72,7 +76,8 @@ export function register(root: Root, specifier: string = pluginSpecifier): Regis
       lastImport = node
     }
 
-    if (node.name === 'plugin' && isJumi(node.params, specifier)) registered = true
+    if (node.name === 'plugin' && isJumi(node.params, specifier))
+      registered = true
   }
 
   if (!entry || registered) return { entry, injected: false }

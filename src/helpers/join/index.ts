@@ -18,9 +18,9 @@ type Join<List extends string[], Separator extends Delimiter> = List extends []
       ? `${Head}${Separator}${Join<Rest, Separator>}`
       : string
 
-export function join<const List extends string[], Separator extends Delimiter = ' '>(
-  list: List,
-  separator: Separator = ' ' as Separator,
-) {
+export function join<
+  const List extends string[],
+  Separator extends Delimiter = ' ',
+>(list: List, separator: Separator = ' ' as Separator) {
   return list.filter(Boolean).join(separator) as Join<Filter<List>, Separator>
 }

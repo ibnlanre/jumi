@@ -17,7 +17,9 @@ import postcss from 'postcss'
 const here = path.dirname(fileURLToPath(import.meta.url))
 const root = path.join(here, '..', '..')
 
-const { build, compiler } = await import(path.join(root, 'scripts', 'lib', 'compile.mjs'))
+const { build, compiler } = await import(
+  path.join(root, 'scripts', 'lib', 'compile.mjs')
+)
 
 const CANDIDATES = process.argv.slice(2).length
   ? process.argv.slice(2)
@@ -57,17 +59,30 @@ const INTERESTING = [
 
 console.log(`candidates: ${CANDIDATES.join(' ')}\n`)
 
-sheet.walkRules((rule) => {
+sheet.walkRules(rule => {
   const own = (rule.nodes ?? []).filter(node => node.type === 'decl')
 
-  if (!own.some(node => INTERESTING.includes(node.prop) || node.prop.startsWith('--jumi'))) return
+  if (
+    !own.some(
+      node => INTERESTING.includes(node.prop) || node.prop.startsWith('--jumi'),
+    )
+  )
+    return
 
-  const parent = rule.parent?.type === 'atrule' ? `  (in @${rule.parent.name} ${rule.parent.params})` : ''
+  const parent =
+    rule.parent?.type === 'atrule'
+      ? `  (in @${rule.parent.name} ${rule.parent.params})`
+      : ''
 
   console.log(`${rule.selector}${parent} {`)
   for (const decl of own) console.log(`  ${decl.prop}: ${decl.value};`)
   console.log('}\n')
 })
 
-console.log(`keyframes: ${sheet.nodes.filter(node => node.type === 'atrule' && node.name === 'keyframes').map(node => node.params).join(' ')}`)
+console.log(
+  `keyframes: ${sheet.nodes
+    .filter(node => node.type === 'atrule' && node.name === 'keyframes')
+    .map(node => node.params)
+    .join(' ')}`,
+)
 console.log(`\n--- raw bytes: ${css.length}`)

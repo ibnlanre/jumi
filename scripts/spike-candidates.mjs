@@ -92,20 +92,30 @@ const trace = (html, extra = '') => {
   writeFileSync(path.join(dir, 'fixture.html'), html)
   writeFileSync(
     path.join(dir, 'entry.css'),
-    '@import "tailwindcss" source(none);\n@source "./fixture.html";\n'
-    + `@plugin ${JSON.stringify(wrapper)};\n${extra}`,
+    '@import "tailwindcss" source(none);\n@source "./fixture.html";\n' +
+      `@plugin ${JSON.stringify(wrapper)};\n${extra}`,
   )
 
   try {
     execFileSync(
       'pnpm',
-      ['exec', 'tailwindcss', '-i', path.join(dir, 'entry.css'), '-o', path.join(dir, 'out.css')],
-      { cwd: root, env: { ...process.env, JUMI_CANDIDATES: calls }, stdio: 'pipe' },
+      [
+        'exec',
+        'tailwindcss',
+        '-i',
+        path.join(dir, 'entry.css'),
+        '-o',
+        path.join(dir, 'out.css'),
+      ],
+      {
+        cwd: root,
+        env: { ...process.env, JUMI_CANDIDATES: calls },
+        stdio: 'pipe',
+      },
     )
 
     return JSON.parse(readFileSync(calls, 'utf8'))
-  }
-  finally {
+  } finally {
     rmSync(dir, { force: true, recursive: true })
   }
 }
@@ -120,24 +130,35 @@ for (const call of observed) {
   grouped.set(key, entry)
 }
 
-const name_width = Math.max(...[...grouped.values()].map(entry => entry.name.length), 4)
-const value_width = Math.max(...[...grouped.values()].map(entry => JSON.stringify(entry.value).length), 5)
+const name_width = Math.max(
+  ...[...grouped.values()].map(entry => entry.name.length),
+  4,
+)
+const value_width = Math.max(
+  ...[...grouped.values()].map(entry => JSON.stringify(entry.value).length),
+  5,
+)
 
 console.log('what Jumi\u2019s matchers receive, per candidate\n')
-console.log(`${'utility'.padEnd(name_width)}  ${'value'.padEnd(value_width)}  modifier  calls  context`)
+console.log(
+  `${'utility'.padEnd(name_width)}  ${'value'.padEnd(value_width)}  modifier  calls  context`,
+)
 
 for (const entry of grouped.values()) {
   console.log(
-    `${entry.name.padEnd(name_width)}  ${JSON.stringify(entry.value).padEnd(value_width)}  `
-    + `${String(entry.modifier ?? '—').padEnd(8)}  ${String(entry.count).padStart(5)}  `
-    + `${entry.context.join(', ')}`,
+    `${entry.name.padEnd(name_width)}  ${JSON.stringify(entry.value).padEnd(value_width)}  ` +
+      `${String(entry.modifier ?? '—').padEnd(8)}  ${String(entry.count).padStart(5)}  ` +
+      `${entry.context.join(', ')}`,
   )
 }
 
 const context = [...new Set(observed.flatMap(call => call.context))].sort()
-const sequence = calls => calls.map(call => `${call.name}-${call.value}`).join(' | ')
+const sequence = calls =>
+  calls.map(call => `${call.name}-${call.value}`).join(' | ')
 
-console.log(`\n${observed.length} calls, ${new Set(observed.map(call => `${call.name}-${call.value}`)).size} distinct utilities`)
+console.log(
+  `\n${observed.length} calls, ${new Set(observed.map(call => `${call.name}-${call.value}`)).size} distinct utilities`,
+)
 console.log(`context keys seen: ${context.join(', ') || '(none)'}`)
 
 /* ------------------------------------------------------------------------------------
@@ -156,7 +177,10 @@ console.log(`context keys seen: ${context.join(', ') || '(none)'}`)
 /** Candidate → what the matcher receives (from the trace above). Order comes from the sort. */
 const shape = {
   '*:animate-scale-110': ['animate-scale', '1.1'],
-  '-animate-bottom-4': ['animate-bottom', 'calc(calc(var(--spacing) * 4) * -1)'],
+  '-animate-bottom-4': [
+    'animate-bottom',
+    'calc(calc(var(--spacing) * 4) * -1)',
+  ],
   'animate-bounce-in': ['animate', 'bounce-in'],
   'animate-opacity-50': ['animate-opacity', '0.5'],
   'animate-rotate-45': ['animate-rotate', '45deg'],
@@ -172,7 +196,9 @@ const shape = {
   'transition-duration-600/rotate': ['transition-duration', '600ms'],
 }
 
-const predicted = Object.keys(shape).sort().map(candidate => `${shape[candidate][0]}-${shape[candidate][1]}`)
+const predicted = Object.keys(shape)
+  .sort()
+  .map(candidate => `${shape[candidate][0]}-${shape[candidate][1]}`)
 const received = observed.map(call => `${call.name}-${call.value}`)
 const lexical = predicted.join(' | ') === received.join(' | ')
 
@@ -182,8 +208,13 @@ const lexical = predicted.join(' | ') === received.join(' | ')
  * `apply.ts` splits the directive's own parameters, so those candidates arrive in the order the
  * author wrote them. Two sources with two orders is worth knowing before either is Jumi's.
  * ---------------------------------------------------------------------------------- */
-const applied = trace('<div class="applied"></div>', '.applied { @apply animate-opacity-50 animate-scale-110; }\n')
-const appliedOrder = applied.map(call => `${call.name}-${call.value}`).join(' | ')
+const applied = trace(
+  '<div class="applied"></div>',
+  '.applied { @apply animate-opacity-50 animate-scale-110; }\n',
+)
+const appliedOrder = applied
+  .map(call => `${call.name}-${call.value}`)
+  .join(' | ')
 
 const shuffled = fixture
   .split('\n')
@@ -194,10 +225,18 @@ const shuffled = fixture
 const reordered = trace(shuffled)
 
 console.log('\nordering\n')
-console.log(`  call order is the lexical sort of the raw candidates: ${lexical ? 'yes' : 'no'}`)
-console.log(`  reversed document order: ${sequence(observed) === sequence(reordered) ? 'identical sequence' : 'different sequence'}`)
-console.log(`  @apply animate-opacity-50 animate-scale-110 -> ${appliedOrder} (declared order, not sorted)`)
+console.log(
+  `  call order is the lexical sort of the raw candidates: ${lexical ? 'yes' : 'no'}`,
+)
+console.log(
+  `  reversed document order: ${sequence(observed) === sequence(reordered) ? 'identical sequence' : 'different sequence'}`,
+)
+console.log(
+  `  @apply animate-opacity-50 animate-scale-110 -> ${appliedOrder} (declared order, not sorted)`,
+)
 console.log(`  first three calls: ${received.slice(0, 3).join(', ')}`)
 
 console.log('\n  candidates that produced no call at all:\n')
-console.log('    animate-width-abc  (declared `type: \'length\'` — the host validates, Jumi never sees it)')
+console.log(
+  "    animate-width-abc  (declared `type: 'length'` — the host validates, Jumi never sees it)",
+)

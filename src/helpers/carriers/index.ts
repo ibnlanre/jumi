@@ -1,9 +1,6 @@
 import type { Container, Declaration, Root, Rule } from 'postcss'
 
-import type {
-  Product,
-  ViewTransitionStaging,
-} from './view-transition'
+import type { Product, ViewTransitionStaging } from './view-transition'
 import type { Collection } from '@/types'
 
 import { RANGE_GRAMMAR, rangeAccepted, rangeReadings } from './animation-range'
@@ -160,7 +157,8 @@ const stagedEntry = (prop: string) => {
  */
 const ACTIVATION: Record<CarrierKind, RegExp> = {
   animations: /^--jumi-.+-animation-name$/,
-  transitions: /^--jumi-.+-transition-(?:delay|duration|property|timing-function)$/,
+  transitions:
+    /^--jumi-.+-transition-(?:delay|duration|property|timing-function)$/,
 }
 
 /**
@@ -188,7 +186,11 @@ const SHORTHAND = [
  * Written after the shorthand rather than carried inside it — two because it resets them, one
  * because it cannot set it.
  */
-const AFTER_SHORTHAND = ['animation-composition', 'animation-range', 'animation-timeline']
+const AFTER_SHORTHAND = [
+  'animation-composition',
+  'animation-range',
+  'animation-timeline',
+]
 
 /**
  * What an unset position falls back to, per component.
@@ -318,8 +320,17 @@ const ownDeclarations = (rule: Rule) =>
 const layerFor = (root: Root, rule: Rule) => {
   let layer: Container = root
 
-  for (let node = rule.parent; node && node.type !== 'root'; node = node.parent) {
-    if (node.type === 'atrule' && node.name === 'layer' && node.params.trim() === 'utilities') layer = node
+  for (
+    let node = rule.parent;
+    node && node.type !== 'root';
+    node = node.parent
+  ) {
+    if (
+      node.type === 'atrule' &&
+      node.name === 'layer' &&
+      node.params.trim() === 'utilities'
+    )
+      layer = node
   }
 
   return layer
@@ -335,7 +346,12 @@ const layerFor = (root: Root, rule: Rule) => {
  */
 const defaultsLayerFor = (root: Root) => {
   for (const node of root.nodes ?? []) {
-    if (node.type !== 'atrule' || node.name !== 'layer' || node.params.trim() !== 'utilities') continue
+    if (
+      node.type !== 'atrule' ||
+      node.name !== 'layer' ||
+      node.params.trim() !== 'utilities'
+    )
+      continue
     if (node.nodes?.length) return node
   }
 
@@ -389,15 +405,27 @@ const defaultsLayerFor = (root: Root) => {
  * over 1,000 animating elements. `engineering/research/style-cost.md` has the whole account.
  */
 const hoist = (staged: Collection<string>, rules: Rule[]) => {
-  const entries = Object.fromEntries(SHORTHAND.map(part => [part, splitTopLevel(staged[part] ?? '')]))
+  const entries = Object.fromEntries(
+    SHORTHAND.map(part => [part, splitTopLevel(staged[part] ?? '')]),
+  )
   const positions = entries['animation-name'].map((entry, position) => {
     const slot = referencedSlot(entry)
 
     return slot
-      ? { position, slot, value: SHORTHAND.map(part => entries[part][position] || FALLBACK[part]).join(' ') }
+      ? {
+          position,
+          slot,
+          value: SHORTHAND.map(
+            part => entries[part][position] || FALLBACK[part],
+          ).join(' '),
+        }
       : null
   })
-  const known = new Map(positions.flatMap(entry => (entry ? [[entry.slot, entry.value] as const] : [])))
+  const known = new Map(
+    positions.flatMap(entry =>
+      entry ? [[entry.slot, entry.value] as const] : [],
+    ),
+  )
 
   for (const rule of rules) {
     const own = ownDeclarations(rule)
@@ -431,7 +459,9 @@ const hoist = (staged: Collection<string>, rules: Rule[]) => {
 
       if (!match) continue
 
-      const name = own.find(candidate => candidate.prop === cssEscape(`--jumi-${match[1]}-label`))?.value
+      const name = own.find(
+        candidate => candidate.prop === cssEscape(`--jumi-${match[1]}-label`),
+      )?.value
 
       if (!name) continue
 
@@ -441,27 +471,47 @@ const hoist = (staged: Collection<string>, rules: Rule[]) => {
         if (published.has(prop)) continue
 
         published.add(prop)
-        rule.append(postcss.decl({ prop, value: `var(${cssEscape(`--jumi-${name}-${part}`)})` }))
+        rule.append(
+          postcss.decl({
+            prop,
+            value: `var(${cssEscape(`--jumi-${name}-${part}`)})`,
+          }),
+        )
       }
     }
   }
 
   return positions
-    .map((entry, position) => (entry
-      ? `var(${hoistedName(entry.slot)}, none)`
-      : SHORTHAND.map(part => entries[part][position] || FALLBACK[part]).join(' ')))
+    .map((entry, position) =>
+      entry
+        ? `var(${hoistedName(entry.slot)}, none)`
+        : SHORTHAND.map(part => entries[part][position] || FALLBACK[part]).join(
+            ' ',
+          ),
+    )
     .join(', ')
 }
 
-export function finalize(root: Root, aggregate?: Collection<string>): Finalized {
+export function finalize(
+  root: Root,
+  aggregate?: Collection<string>,
+): Finalized {
   const payload: Collection<Collection<string>> = {}
-  const finalized: Finalized = { animations: 0, staging: 0, transitions: 0, viewTransitions: 0, warnings: [] }
+  const finalized: Finalized = {
+    animations: 0,
+    staging: 0,
+    transitions: 0,
+    viewTransitions: 0,
+    warnings: [],
+  }
 
   // Phase 1 — read the payload, and take the rules that carried it out of the document. Removal
   // during a walk is why this is an AST and not a string: the rule can go wherever it is nested.
-  root.walkRules((rule) => {
+  root.walkRules(rule => {
     const declarations = ownDeclarations(rule)
-    const staged = declarations.filter(declaration => declaration.prop.startsWith(stagingMarker))
+    const staged = declarations.filter(declaration =>
+      declaration.prop.startsWith(stagingMarker),
+    )
 
     if (!staged.length) return
 
@@ -493,7 +543,7 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
   //
   // It runs *before* the view-transition staging below, because that walk removes the rules it takes:
   // a range stacked onto a view transition would otherwise vanish without a word.
-  root.walkRules((rule) => {
+  root.walkRules(rule => {
     for (const reading of rangeReadings(rule)) {
       if (!rangeAccepted(reading.range)) {
         finalized.warnings.push(
@@ -521,7 +571,12 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
         continue
       }
 
-      rule.append(postcss.decl({ prop: `--jumi-${reading.slot}-animation-range`, value: reading.range }))
+      rule.append(
+        postcss.decl({
+          prop: `--jumi-${reading.slot}-animation-range`,
+          value: reading.range,
+        }),
+      )
     }
   })
 
@@ -544,16 +599,22 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
   // error, and warning about it would teach authors to stop naming things.
   const reported = new Set<string>()
 
-  root.walkRules((rule) => {
+  root.walkRules(rule => {
     for (const declaration of ownDeclarations(rule)) {
-      if (!REFUSED_NAME.test(declaration.prop) || reported.has(declaration.prop)) continue
+      if (
+        !REFUSED_NAME.test(declaration.prop) ||
+        reported.has(declaration.prop)
+      )
+        continue
 
       reported.add(declaration.prop)
 
       // Reconstructed, because the whitespace that made the name unusable is exactly what a CSS value
       // cannot keep: PostCSS moves a leading one into `raws.between`. Quoting the name as it arrived is
       // the difference between a message about the author's class and a message about a stray `x`.
-      const leading = ' '.repeat(Math.max(0, (declaration.raws.between ?? ': ').length - 2))
+      const leading = ' '.repeat(
+        Math.max(0, (declaration.raws.between ?? ': ').length - 2),
+      )
 
       finalized.warnings.push(
         `"${leading}${declaration.value}" is not a name a control can address: a name cannot contain whitespace. Write it bare — \`/reveal\` — because in the bracketed form Tailwind reads \`_\` as a space.`,
@@ -572,7 +633,7 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
   const stagedTransitions: ViewTransitionStaging[] = []
   let transitionLayer: Container = root
 
-  root.walkRules((rule) => {
+  root.walkRules(rule => {
     // One entry per staged **selector**, because a CSS optimizer merges rules that declare the same
     // thing: the docs build hands this pass one rule carrying six cards' staged selectors in a list,
     // where the CLI hands it six rules of one selector each. Measured — and it was the difference
@@ -584,9 +645,12 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
     // Read before the removal, because a detached rule has no ancestors to walk — and the at-rule
     // ancestry is what decides whether a wrapper transfers onto the pseudo tree at all.
     stagedTransitions.push(...staging)
-    if (stagedTransitions.length === staging.length) transitionLayer = layerFor(root, rule)
+    if (stagedTransitions.length === staging.length)
+      transitionLayer = layerFor(root, rule)
 
-    const remaining = rule.selectors.filter(selector => !isStagingSelector(selector))
+    const remaining = rule.selectors.filter(
+      selector => !isStagingSelector(selector),
+    )
 
     // A rule carrying staging *and* something else: the rest of it is not this pass's to delete. In
     // practice the variant produces all-staging rules, so this is the safe side of a case that should
@@ -606,7 +670,12 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
     // goes — but a layer is never removed, because `@layer utilities` means something even empty.
     let node = parent
 
-    while (node && node.type === 'atrule' && node.name !== 'layer' && !node.nodes?.length) {
+    while (
+      node &&
+      node.type === 'atrule' &&
+      node.name !== 'layer' &&
+      !node.nodes?.length
+    ) {
       const next = node.parent
 
       node.remove()
@@ -624,9 +693,10 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
   // order the selectors by name, which is not a fact about the page.
   const activators: Collection<Rule[]> = {}
 
-  root.walkRules((rule) => {
+  root.walkRules(rule => {
     for (const kind of Object.keys(ACTIVATION) as CarrierKind[]) {
-      if (activates(rule, ACTIVATION[kind])) (activators[kind] ??= []).push(rule)
+      if (activates(rule, ACTIVATION[kind]))
+        (activators[kind] ??= []).push(rule)
     }
   })
 
@@ -638,7 +708,10 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
   // `var()` fallbacks. So the data is built once, and whether the element composition exists is a
   // separate question from whether the data does: a page whose only motion is a view transition
   // activates no slot on any element and still needs both halves for the pseudo tree.
-  const data: Record<CarrierKind, { aggregate: Product[], substrate: Product[] }> = {
+  const data: Record<
+    CarrierKind,
+    { aggregate: Product[]; substrate: Product[] }
+  > = {
     animations: { aggregate: [], substrate: [] },
     transitions: { aggregate: [], substrate: [] },
   }
@@ -663,9 +736,13 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
     // publication the hoist appends (`--jumi-slot-<slot>`) is exactly what the emission has to
     // replay; without it the emitted composition applies and animates nothing, which is the failure
     // this pass already paid for once on the element side.
-    const hoisted = kind === 'animations'
-      ? hoist(staged, [...(rules ?? []), ...new Set(stagedTransitions.map(entry => entry.rule))])
-      : null
+    const hoisted =
+      kind === 'animations'
+        ? hoist(staged, [
+            ...(rules ?? []),
+            ...new Set(stagedTransitions.map(entry => entry.rule)),
+          ])
+        : null
     const { aggregate, substrate } = data[kind]
 
     for (const [name, value] of Object.entries(staged)) {
@@ -697,7 +774,12 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
       }
 
       for (const [name, value] of Object.entries(staged)) {
-        if (name.startsWith('--') || SHORTHAND.includes(name) || AFTER_SHORTHAND.includes(name)) continue
+        if (
+          name.startsWith('--') ||
+          SHORTHAND.includes(name) ||
+          AFTER_SHORTHAND.includes(name)
+        )
+          continue
 
         // Anything else the payload carries is not a position — `interpolate-size` is the one that
         // exists today — and is written verbatim, as it always was.
@@ -723,8 +805,10 @@ export function finalize(root: Root, aggregate?: Collection<string>): Finalized 
     // then made the whole declaration invalid at computed-value time on that pseudo-element.
     const defaults = postcss.rule({ selector: group })
 
-    for (const { prop, value } of aggregate) composition.append(postcss.decl({ prop, value }))
-    for (const { prop, value } of substrate) defaults.append(postcss.decl({ prop, value }))
+    for (const { prop, value } of aggregate)
+      composition.append(postcss.decl({ prop, value }))
+    for (const { prop, value } of substrate)
+      defaults.append(postcss.decl({ prop, value }))
 
     // A composition with no declarations is not one: a payload of nothing but defaults cannot
     // animate anything, and an empty rule would be noise in the output.

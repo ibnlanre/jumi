@@ -1,3 +1,24 @@
-@import 'tailwindcss';
+/* The Storybook's own entry, and the only sources it scans: nothing else in the repository should get
+   a say in what these stories compile.
+
+   It used to be a bare `@import 'tailwindcss'`, which scans the whole workspace — and that is what
+   took the Tailwind IntelliSense server down (crashed 5 times, ~3.4 GB heap, 2026-09-15). Measured on
+   this entry: 1.26 GB peak and 200 MB of CSS as a bare import, against 386 MB and 46 MB with the three
+   sources below. The scan surface is not what costs: every property utility Jumi emits lengthens the
+   `--jumi-<property>-animation-<part>` fallback chain that every other rule carries, so candidates
+   that exist only in prose (`CHANGELOG.md`, `engineering/**`, the studio sources) were charged to the
+   stories — one emitted rule reached 41 kB on its own.
+
+   `docs/src/data/effects.json` is load-bearing, not a convenience. The grid applies
+   `animate-${animation.class}`, and a computed class is not a candidate, so that file is the only
+   place the full `animate-<effect>` names appear. Measured: without this source the entry emits zero
+   `animate-*` utilities, and every card animates nothing — silently. With it: 228, the shipped count.
+ */
+@import 'tailwindcss' source(none);
+
+@source '../stories/**/*.{ts,tsx}';
+@source '../.storybook/**/*.{ts,tsx}';
+@source '../docs/src/data/effects.json';
+
 @config "../tailwind.config.ts";
 @plugin '../dist/index.js';

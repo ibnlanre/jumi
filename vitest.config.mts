@@ -1,6 +1,6 @@
-import tsconfigPaths from "vite-tsconfig-paths";
+import { defaultExclude, defineConfig } from 'vitest/config'
 
-import { defineConfig, defaultExclude } from "vitest/config";
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
   plugins: [tsconfigPaths()],
@@ -8,15 +8,15 @@ export default defineConfig({
     coverage: {
       clean: true,
       exclude: defaultExclude.concat([
-        "**/*.{test,json}.*",
-        "**/types/**",
-        "**/*.d.ts",
+        '**/*.{test,json}.*',
+        '**/types/**',
+        '**/*.d.ts',
       ]),
-      include: ["**/*.ts"],
+      include: ['**/*.ts'],
     },
-    environment: "happy-dom",
+    environment: 'happy-dom',
     globals: true,
     logHeapUsage: false,
-    reporters: ["default"],
+    reporters: ['default'],
   },
-});
+})

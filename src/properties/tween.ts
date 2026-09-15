@@ -1,4 +1,9 @@
-import type { AnimatableStandardPropertyType, GetMatchComponents, MatchComponents, MatchComponentsPropertyFunction } from '@/types'
+import type {
+  AnimatableStandardPropertyType,
+  GetMatchComponents,
+  MatchComponents,
+  MatchComponentsPropertyFunction,
+} from '@/types'
 
 import { css } from '@/helpers/css'
 import { join } from '@/helpers/join'
@@ -14,7 +19,10 @@ import { backfaceVisibility } from '@/theme/backface-visibility'
 import { backgroundAttachment } from '@/theme/background-attachment'
 import { backgroundClip } from '@/theme/background-clip'
 import { backgroundOrigin } from '@/theme/background-origin'
-import { backgroundRepeat, backgroundRepeatAxis } from '@/theme/background-repeat'
+import {
+  backgroundRepeat,
+  backgroundRepeatAxis,
+} from '@/theme/background-repeat'
 import { borderCollapse } from '@/theme/border-collapse'
 import { borderImageRepeat } from '@/theme/border-image-repeat'
 import { boxDecorationBreak } from '@/theme/box-decoration-break'
@@ -58,7 +66,10 @@ import { fontSynthesisStyle } from '@/theme/font-synthesis-style'
 import { fontSynthesisWeight } from '@/theme/font-synthesis-weight'
 import { fontVariantAlternates } from '@/theme/font-variant-alternates'
 import { fontVariantCaps } from '@/theme/font-variant-caps'
-import { fontVariantEastAsian, fontVariantEastAsianWidth } from '@/theme/font-variant-east-asian'
+import {
+  fontVariantEastAsian,
+  fontVariantEastAsianWidth,
+} from '@/theme/font-variant-east-asian'
 import { fontVariantLigatures } from '@/theme/font-variant-ligatures'
 import { fontVariantNumeric } from '@/theme/font-variant-numeric'
 import { fontVariantPosition } from '@/theme/font-variant-position'
@@ -112,7 +123,7 @@ import { textAlign } from '@/theme/text-align'
 import { transformStyle } from '@/theme/transform-style'
 import { visibility } from '@/theme/visibility'
 
-export const getMatchTween: GetMatchComponents = (creator) => {
+export const getMatchTween: GetMatchComponents = creator => {
   const { color, effect, name, property, theme } = creator
 
   /**
@@ -142,7 +153,8 @@ export const getMatchTween: GetMatchComponents = (creator) => {
    * (e.g. `skew(10deg, 20deg)`). Space-separated multi-arg transform
    * functions are invalid, so the value's whitespace is joined with commas.
    */
-  const args = (name: string) => (value: string) => css(name, value.split(/\s+/).join(', '))
+  const args = (name: string) => (value: string) =>
+    css(name, value.split(/\s+/).join(', '))
 
   const matchTween: Partial<MatchComponents> = {
     'animate': {
@@ -156,13 +168,13 @@ export const getMatchTween: GetMatchComponents = (creator) => {
         // ignored, which is what the host does with any utility it cannot resolve.
         if (!Object.hasOwn(cssEffects, value)) return {}
 
-        return ({
+        return {
           [`--jumi-${value}-animation-name`]: effect(value),
           // An effect is a motion, so it is named like one: `animate-fade-in/reveal` makes the slot
           // answer to `reveal`, and `animation-duration-500/reveal` addresses it. The declaration is
           // the model's, because the name's links and its addressability are the model's.
           ...(modifier ? name(value, modifier) : {}),
-        })
+        }
       },
       // Effects take a name, so Tailwind must let a bare one through.
       modifiers: 'any',
@@ -224,22 +236,30 @@ export const getMatchTween: GetMatchComponents = (creator) => {
       values: empty.none,
     },
     'animate-backdrop-filter-blur': {
-      fn: property('backdrop-filter', [['backdrop-filter-blur', value => css('blur', value)]]),
+      fn: property('backdrop-filter', [
+        ['backdrop-filter-blur', value => css('blur', value)],
+      ]),
       type: 'length',
       values: theme('backdropBlur'),
     },
     'animate-backdrop-filter-brightness': {
-      fn: property('backdrop-filter', [['backdrop-filter-brightness', value => css('brightness', value)]]),
+      fn: property('backdrop-filter', [
+        ['backdrop-filter-brightness', value => css('brightness', value)],
+      ]),
       type: ['number', 'percentage'],
       values: theme('backdropBrightness'),
     },
     'animate-backdrop-filter-contrast': {
-      fn: property('backdrop-filter', [['backdrop-filter-contrast', value => css('contrast', value)]]),
+      fn: property('backdrop-filter', [
+        ['backdrop-filter-contrast', value => css('contrast', value)],
+      ]),
       type: ['number', 'percentage'],
       values: theme('backdropContrast'),
     },
     'animate-backdrop-filter-drop-shadow': {
-      fn: property('backdrop-filter', [['backdrop-filter-drop-shadow', value => css('drop-shadow', value)]]),
+      fn: property('backdrop-filter', [
+        ['backdrop-filter-drop-shadow', value => css('drop-shadow', value)],
+      ]),
       type: ['length', 'shadow', 'any'],
       values: theme('dropShadow'),
     },
@@ -264,37 +284,51 @@ export const getMatchTween: GetMatchComponents = (creator) => {
       values: theme('outlineOffset'),
     },
     'animate-backdrop-filter-grayscale': {
-      fn: property('backdrop-filter', [['backdrop-filter-grayscale', value => css('grayscale', value)]]),
+      fn: property('backdrop-filter', [
+        ['backdrop-filter-grayscale', value => css('grayscale', value)],
+      ]),
       type: ['number', 'percentage'],
       values: theme('backdropGrayscale'),
     },
     'animate-backdrop-filter-hue-rotate': {
-      fn: property('backdrop-filter', [['backdrop-filter-hue-rotate', value => css('hue-rotate', value)]]),
+      fn: property('backdrop-filter', [
+        ['backdrop-filter-hue-rotate', value => css('hue-rotate', value)],
+      ]),
       type: 'angle',
       values: theme('backdropHueRotate'),
     },
     'animate-backdrop-filter-invert': {
-      fn: property('backdrop-filter', [['backdrop-filter-invert', value => css('invert', value)]]),
+      fn: property('backdrop-filter', [
+        ['backdrop-filter-invert', value => css('invert', value)],
+      ]),
       type: ['number', 'percentage'],
       values: theme('backdropInvert'),
     },
     'animate-backdrop-filter-opacity': {
-      fn: property('backdrop-filter', [['backdrop-filter-opacity', value => css('opacity', value)]]),
+      fn: property('backdrop-filter', [
+        ['backdrop-filter-opacity', value => css('opacity', value)],
+      ]),
       type: ['number', 'percentage'],
       values: theme('backdropOpacity'),
     },
     'animate-backdrop-filter-saturate': {
-      fn: property('backdrop-filter', [['backdrop-filter-saturate', value => css('saturate', value)]]),
+      fn: property('backdrop-filter', [
+        ['backdrop-filter-saturate', value => css('saturate', value)],
+      ]),
       type: ['number', 'percentage'],
       values: theme('backdropSaturate'),
     },
     'animate-backdrop-filter-sepia': {
-      fn: property('backdrop-filter', [['backdrop-filter-sepia', value => css('sepia', value)]]),
+      fn: property('backdrop-filter', [
+        ['backdrop-filter-sepia', value => css('sepia', value)],
+      ]),
       type: ['number', 'percentage'],
       values: theme('backdropSepia'),
     },
     'animate-backdrop-filter-url': {
-      fn: property('backdrop-filter', [['backdrop-filter-url', value => css('url', value)]]),
+      fn: property('backdrop-filter', [
+        ['backdrop-filter-url', value => css('url', value)],
+      ]),
       type: 'url',
       values: empty.string,
     },
@@ -428,7 +462,10 @@ export const getMatchTween: GetMatchComponents = (creator) => {
       values: theme('borderColor'),
     },
     'animate-border-block-end-radius': {
-      fn: property('border-radius', ['border-end-end-radius', 'border-end-start-radius']),
+      fn: property('border-radius', [
+        'border-end-end-radius',
+        'border-end-start-radius',
+      ]),
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
@@ -438,7 +475,10 @@ export const getMatchTween: GetMatchComponents = (creator) => {
       values: theme('borderWidth'),
     },
     'animate-border-block-start-radius': {
-      fn: property('border-radius', ['border-start-end-radius', 'border-start-start-radius']),
+      fn: property('border-radius', [
+        'border-start-end-radius',
+        'border-start-start-radius',
+      ]),
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
@@ -448,7 +488,10 @@ export const getMatchTween: GetMatchComponents = (creator) => {
       values: theme('borderWidth'),
     },
     'animate-border-block-width': {
-      fn: property('border-block-width', ['border-block-end-width', 'border-block-start-width']),
+      fn: property('border-block-width', [
+        'border-block-end-width',
+        'border-block-start-width',
+      ]),
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
@@ -458,7 +501,10 @@ export const getMatchTween: GetMatchComponents = (creator) => {
       values: theme('borderRadius'),
     },
     'animate-border-bottom-radius': {
-      fn: property('border-radius', ['border-bottom-left-radius', 'border-bottom-right-radius']),
+      fn: property('border-radius', [
+        'border-bottom-left-radius',
+        'border-bottom-right-radius',
+      ]),
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
@@ -523,12 +569,18 @@ export const getMatchTween: GetMatchComponents = (creator) => {
       values: empty.number,
     },
     'animate-border-image-outset-x': {
-      fn: property('border-image-outset', ['border-image-outset-left', 'border-image-outset-right']),
+      fn: property('border-image-outset', [
+        'border-image-outset-left',
+        'border-image-outset-right',
+      ]),
       type: ['number', 'length'],
       values: empty.number,
     },
     'animate-border-image-outset-y': {
-      fn: property('border-image-outset', ['border-image-outset-bottom', 'border-image-outset-top']),
+      fn: property('border-image-outset', [
+        'border-image-outset-bottom',
+        'border-image-outset-top',
+      ]),
       type: ['number', 'length'],
       values: empty.number,
     },
@@ -548,7 +600,10 @@ export const getMatchTween: GetMatchComponents = (creator) => {
       values: borderImageRepeat,
     },
     'animate-border-inline-end-radius': {
-      fn: property('border-radius', ['border-end-end-radius', 'border-start-end-radius']),
+      fn: property('border-radius', [
+        'border-end-end-radius',
+        'border-start-end-radius',
+      ]),
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
@@ -558,7 +613,10 @@ export const getMatchTween: GetMatchComponents = (creator) => {
       values: theme('borderWidth'),
     },
     'animate-border-inline-start-radius': {
-      fn: property('border-radius', ['border-end-start-radius', 'border-start-start-radius']),
+      fn: property('border-radius', [
+        'border-end-start-radius',
+        'border-start-start-radius',
+      ]),
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
@@ -568,12 +626,18 @@ export const getMatchTween: GetMatchComponents = (creator) => {
       values: theme('borderWidth'),
     },
     'animate-border-inline-width': {
-      fn: property('border-inline-width', ['border-inline-end-width', 'border-inline-start-width']),
+      fn: property('border-inline-width', [
+        'border-inline-end-width',
+        'border-inline-start-width',
+      ]),
       type: ['line-width', 'length'],
       values: theme('borderWidth'),
     },
     'animate-border-left-radius': {
-      fn: property('border-radius', ['border-bottom-left-radius', 'border-top-left-radius']),
+      fn: property('border-radius', [
+        'border-bottom-left-radius',
+        'border-top-left-radius',
+      ]),
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
@@ -588,7 +652,10 @@ export const getMatchTween: GetMatchComponents = (creator) => {
       values: theme('borderRadius'),
     },
     'animate-border-right-radius': {
-      fn: property('border-radius', ['border-bottom-right-radius', 'border-top-right-radius']),
+      fn: property('border-radius', [
+        'border-bottom-right-radius',
+        'border-top-right-radius',
+      ]),
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
@@ -613,7 +680,10 @@ export const getMatchTween: GetMatchComponents = (creator) => {
       values: theme('borderRadius'),
     },
     'animate-border-top-radius': {
-      fn: property('border-radius', ['border-top-left-radius', 'border-top-right-radius']),
+      fn: property('border-radius', [
+        'border-top-left-radius',
+        'border-top-right-radius',
+      ]),
       type: ['length', 'percentage'],
       values: theme('borderRadius'),
     },
@@ -916,17 +986,23 @@ export const getMatchTween: GetMatchComponents = (creator) => {
       values: theme('blur'),
     },
     'animate-filter-brightness': {
-      fn: property('filter', [['filter-brightness', value => css('brightness', value)]]),
+      fn: property('filter', [
+        ['filter-brightness', value => css('brightness', value)],
+      ]),
       type: ['number', 'percentage'],
       values: theme('brightness'),
     },
     'animate-filter-contrast': {
-      fn: property('filter', [['filter-contrast', value => css('contrast', value)]]),
+      fn: property('filter', [
+        ['filter-contrast', value => css('contrast', value)],
+      ]),
       type: ['number', 'percentage'],
       values: theme('contrast'),
     },
     'animate-filter-drop-shadow': {
-      fn: property('filter', [['filter-drop-shadow', value => css('drop-shadow', value)]]),
+      fn: property('filter', [
+        ['filter-drop-shadow', value => css('drop-shadow', value)],
+      ]),
       type: ['length', 'shadow', 'any'],
       values: theme('dropShadow'),
     },
@@ -951,27 +1027,37 @@ export const getMatchTween: GetMatchComponents = (creator) => {
       values: theme('outlineOffset'),
     },
     'animate-filter-grayscale': {
-      fn: property('filter', [['filter-grayscale', value => css('grayscale', value)]]),
+      fn: property('filter', [
+        ['filter-grayscale', value => css('grayscale', value)],
+      ]),
       type: ['number', 'percentage'],
       values: theme('grayscale'),
     },
     'animate-filter-hue-rotate': {
-      fn: property('filter', [['filter-hue-rotate', value => css('hue-rotate', value)]]),
+      fn: property('filter', [
+        ['filter-hue-rotate', value => css('hue-rotate', value)],
+      ]),
       type: 'angle',
       values: theme('hueRotate'),
     },
     'animate-filter-invert': {
-      fn: property('filter', [['filter-invert', value => css('invert', value)]]),
+      fn: property('filter', [
+        ['filter-invert', value => css('invert', value)],
+      ]),
       type: ['number', 'percentage'],
       values: theme('invert'),
     },
     'animate-filter-opacity': {
-      fn: property('filter', [['filter-opacity', value => css('opacity', value)]]),
+      fn: property('filter', [
+        ['filter-opacity', value => css('opacity', value)],
+      ]),
       type: ['number', 'percentage'],
       values: theme('opacity'),
     },
     'animate-filter-saturate': {
-      fn: property('filter', [['filter-saturate', value => css('saturate', value)]]),
+      fn: property('filter', [
+        ['filter-saturate', value => css('saturate', value)],
+      ]),
       type: ['number', 'percentage'],
       values: theme('saturate'),
     },
@@ -1235,17 +1321,23 @@ export const getMatchTween: GetMatchComponents = (creator) => {
       values: hyphenateLimitChars,
     },
     'animate-hyphenate-limit-chars-minimum-characters-after': {
-      fn: property('hyphenate-limit-chars', ['hyphenate-limit-chars-minimum-characters-after']),
+      fn: property('hyphenate-limit-chars', [
+        'hyphenate-limit-chars-minimum-characters-after',
+      ]),
       type: ['number', 'any'],
       values: hyphenateLimitChars,
     },
     'animate-hyphenate-limit-chars-minimum-characters-before': {
-      fn: property('hyphenate-limit-chars', ['hyphenate-limit-chars-minimum-characters-before']),
+      fn: property('hyphenate-limit-chars', [
+        'hyphenate-limit-chars-minimum-characters-before',
+      ]),
       type: ['number', 'any'],
       values: hyphenateLimitChars,
     },
     'animate-hyphenate-limit-chars-minimum-word-length': {
-      fn: property('hyphenate-limit-chars', ['hyphenate-limit-chars-minimum-word-length']),
+      fn: property('hyphenate-limit-chars', [
+        'hyphenate-limit-chars-minimum-word-length',
+      ]),
       type: ['number', 'any'],
       values: hyphenateLimitChars,
     },
@@ -1516,13 +1608,19 @@ export const getMatchTween: GetMatchComponents = (creator) => {
       values: theme('inset'),
     },
     'animate-mask-border-outset-x': {
-      fn: property('mask-border-outset', ['mask-border-outset-left', 'mask-border-outset-right']),
+      fn: property('mask-border-outset', [
+        'mask-border-outset-left',
+        'mask-border-outset-right',
+      ]),
       supportsNegativeValues: true,
       type: 'length',
       values: theme('inset'),
     },
     'animate-mask-border-outset-y': {
-      fn: property('mask-border-outset', ['mask-border-outset-bottom', 'mask-border-outset-top']),
+      fn: property('mask-border-outset', [
+        'mask-border-outset-bottom',
+        'mask-border-outset-top',
+      ]),
       supportsNegativeValues: true,
       type: 'length',
       values: theme('inset'),
@@ -1558,12 +1656,18 @@ export const getMatchTween: GetMatchComponents = (creator) => {
       values: theme('inset', maskBorderSlice),
     },
     'animate-mask-border-slice-x': {
-      fn: property('mask-border-slice', ['mask-border-slice-left', 'mask-border-slice-right']),
+      fn: property('mask-border-slice', [
+        'mask-border-slice-left',
+        'mask-border-slice-right',
+      ]),
       type: ['number', 'percentage', 'any'],
       values: theme('inset', maskBorderSlice),
     },
     'animate-mask-border-slice-y': {
-      fn: property('mask-border-slice', ['mask-border-slice-bottom', 'mask-border-slice-top']),
+      fn: property('mask-border-slice', [
+        'mask-border-slice-bottom',
+        'mask-border-slice-top',
+      ]),
       type: ['number', 'percentage', 'any'],
       values: theme('inset', maskBorderSlice),
     },
@@ -1630,7 +1734,9 @@ export const getMatchTween: GetMatchComponents = (creator) => {
       values: mathDepth,
     },
     'animate-math-depth-add': {
-      fn: property('math-depth', [['math-depth-add', value => css('add', value)]]),
+      fn: property('math-depth', [
+        ['math-depth-add', value => css('add', value)],
+      ]),
       supportsNegativeValues: true,
       type: 'integer',
       values: empty.number,

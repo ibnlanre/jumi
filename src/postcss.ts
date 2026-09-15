@@ -30,7 +30,10 @@ import postcss from 'postcss'
  * `jumi()` is the only thing that adds the directive, and the hand-written equivalent is
  * `@plugin "@ibnlanre/jumi"` in the stylesheet, which nothing needs a plugin for.
  */
-export default function jumi(options?: { plugin?: string, tailwind?: PluginOptions }): Processor {
+export default function jumi(options?: {
+  plugin?: string
+  tailwind?: PluginOptions
+}): Processor {
   return postcss([
     jumiRegister(options?.plugin),
     tailwindcss(options?.tailwind),

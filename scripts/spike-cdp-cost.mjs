@@ -43,16 +43,28 @@ import postcss from 'postcss'
 const here = path.dirname(fileURLToPath(import.meta.url))
 const root = path.join(here, '..')
 
-const args = process.argv.slice(2).filter(argument => !argument.startsWith('--'))
-const serveArg = process.argv.slice(2).find(argument => argument === '--serve' || argument.startsWith('--serve='))
+const args = process.argv
+  .slice(2)
+  .filter(argument => !argument.startsWith('--'))
+const serveArg = process.argv
+  .slice(2)
+  .find(argument => argument === '--serve' || argument.startsWith('--serve='))
 const serve = Boolean(serveArg)
 const serveVariant = serveArg?.includes('=') ? serveArg.split('=')[1] : 'jumi'
-const portArg = process.argv.slice(2).find(argument => argument.startsWith('--port='))
+const portArg = process.argv
+  .slice(2)
+  .find(argument => argument.startsWith('--port='))
 const servePort = portArg ? Number(portArg.split('=')[1]) : 8788
-const SLOTS = args[0] ? args[0].split(',').map(Number) : [10, 25, 50, 100, 150, 228]
+const SLOTS = args[0]
+  ? args[0].split(',').map(Number)
+  : [10, 25, 50, 100, 150, 228]
 const RUNS = 15
 
-const TARGET_CLASSES = ['animate-rotate-45', 'animate-scale-110', 'animate-opacity-50']
+const TARGET_CLASSES = [
+  'animate-rotate-45',
+  'animate-scale-110',
+  'animate-opacity-50',
+]
 
 console.log('· bundling')
 execFileSync('pnpm', ['run', 'bundle'], { cwd: root, stdio: 'pipe' })
@@ -68,10 +80,15 @@ const candidates = (n, extra = []) => [
   ...Array.from({ length: n }, (_, i) => `animate-rotate-[${i + 1}deg]`),
 ]
 
-const entry = (candidate, base) => `@plugin "${path.join(base, 'dist/index.js')}";`
+const entry = (candidate, base) =>
+  `@plugin "${path.join(base, 'dist/index.js')}";`
 
 const compile = async (n, extra = []) => {
-  const css = ['@import "tailwindcss" source(none);', `@plugin "${path.join(root, 'dist', 'index.js')}";`, ''].join('\n')
+  const css = [
+    '@import "tailwindcss" source(none);',
+    `@plugin "${path.join(root, 'dist', 'index.js')}";`,
+    '',
+  ].join('\n')
   const instance = await compiler(css, root)
 
   // `build()` returns the finalized result, not a string: `.css` is the finished stylesheet.
@@ -80,7 +97,8 @@ const compile = async (n, extra = []) => {
 
 /* ------------------------------------------------------------------ CSS surgery */
 
-const isAggregate = decl => PARTS.includes(decl.prop) && decl.value.includes('--jumi-')
+const isAggregate = decl =>
+  PARTS.includes(decl.prop) && decl.value.includes('--jumi-')
 
 const parse = css => postcss.parse(css)
 
@@ -92,11 +110,12 @@ const parse = css => postcss.parse(css)
  * Parsing rather than pattern-matching, for the reason `finalize` was moved onto an AST in the
  * first place: `[^{}]*` is only true of the constructs that happen to be in the corpus.
  */
-const compositionOf = (sheet) => {
+const compositionOf = sheet => {
   let best = null
 
-  sheet.walkRules((rule) => {
-    if (!rule.nodes?.some(node => node.type === 'decl' && isAggregate(node))) return
+  sheet.walkRules(rule => {
+    if (!rule.nodes?.some(node => node.type === 'decl' && isAggregate(node)))
+      return
 
     if (!best || rule.selector.length > best.selector.length) best = rule
   })
@@ -105,7 +124,9 @@ const compositionOf = (sheet) => {
 }
 
 const entriesOf = (rule, prop) => {
-  const decl = rule.nodes.find(node => node.type === 'decl' && node.prop === prop)
+  const decl = rule.nodes.find(
+    node => node.type === 'decl' && node.prop === prop,
+  )
 
   return decl ? splitTopLevel(decl.value) : []
 }
@@ -121,7 +142,10 @@ const entriesOf = (rule, prop) => {
  * classes stay here, because a representation that carried them would tie the number to one
  * harness's fixture.
  */
-const hoisted = mode => css => ({ classes: TARGET_CLASSES, css: shallowOf(css, mode) })
+const hoisted = mode => css => ({
+  classes: TARGET_CLASSES,
+  css: shallowOf(css, mode),
+})
 
 /**
  * Rewrite the giant list as a single complex selector.
@@ -134,7 +158,7 @@ const hoisted = mode => css => ({ classes: TARGET_CLASSES, css: shallowOf(css, m
 const wrapGiant = (sheet, fn) => {
   const giant = compositionOf(sheet).selector
 
-  sheet.walkRules((rule) => {
+  sheet.walkRules(rule => {
     if (rule.selector === giant) rule.selector = `:${fn}(${giant})`
   })
 
@@ -142,7 +166,10 @@ const wrapGiant = (sheet, fn) => {
 }
 
 const VARIANTS = {
-  'is-selectors': css => ({ classes: TARGET_CLASSES, css: wrapGiant(parse(css), 'is').toString() }),
+  'is-selectors': css => ({
+    classes: TARGET_CLASSES,
+    css: wrapGiant(parse(css), 'is').toString(),
+  }),
 
   /** The real emission. */
   'jumi': css => ({ classes: TARGET_CLASSES, css }),
@@ -153,11 +180,13 @@ const VARIANTS = {
    * The real stylesheet is appended afterwards so the page carries the same weight — the target
    * simply cannot match it, because it carries no classes.
    */
-  'native': (css) => {
+  'native': css => {
     const n = entriesOf(compositionOf(parse(css)), 'animation-name').length
 
-    const rule = i => `.nat-${i} { animation: nat-${i} 1s linear 0s 1 normal forwards running; }`
-    const frames = i => `@keyframes nat-${i} { from { opacity: 0 } to { opacity: 1 } }`
+    const rule = i =>
+      `.nat-${i} { animation: nat-${i} 1s linear 0s 1 normal forwards running; }`
+    const frames = i =>
+      `@keyframes nat-${i} { from { opacity: 0 } to { opacity: 1 } }`
 
     return {
       classes: [],
@@ -177,10 +206,10 @@ const VARIANTS = {
    * The composition rule's longhands deleted, everything else identical. Isolates the *declaration
    * payload* — the selector list DevTools still has to render is untouched.
    */
-  'no-declarations': (css) => {
+  'no-declarations': css => {
     const sheet = parse(css)
 
-    compositionOf(sheet).walkDecls((decl) => {
+    compositionOf(sheet).walkDecls(decl => {
       if (PARTS.includes(decl.prop)) decl.remove()
     })
 
@@ -221,16 +250,22 @@ const VARIANTS = {
    * new addresses. If the stall tracks the selector *count*, this changes nothing; if it tracks the
    * *text*, this alone should recover most of the bound.
    */
-  'short-addresses': (css) => {
+  'short-addresses': css => {
     const sheet = parse(css)
     const giant = compositionOf(sheet).selector
-    const addresses = Array.from({ length: giant.split(',').length }, (_, i) => `.j${i}`).join(', ')
+    const addresses = Array.from(
+      { length: giant.split(',').length },
+      (_, i) => `.j${i}`,
+    ).join(', ')
 
-    sheet.walkRules((rule) => {
+    sheet.walkRules(rule => {
       if (rule.selector === giant) rule.selector = addresses
     })
 
-    return { classes: [...TARGET_CLASSES, 'j0', 'j1', 'j2'], css: sheet.toString() }
+    return {
+      classes: [...TARGET_CLASSES, 'j0', 'j1', 'j2'],
+      css: sheet.toString(),
+    }
   },
 
   /**
@@ -239,7 +274,10 @@ const VARIANTS = {
    * than one rule. Collapsing only the composition rule understates it, because the substrate rule
    * lists the same utilities and its selector metadata stays in the response.
    */
-  'small-selectors': css => ({ classes: TARGET_CLASSES, css: collapseGiant(parse(css)).toString() }),
+  'small-selectors': css => ({
+    classes: TARGET_CLASSES,
+    css: collapseGiant(parse(css)).toString(),
+  }),
 
   /**
    * The two realizable selector reductions.
@@ -253,7 +291,10 @@ const VARIANTS = {
    * arguments. Both are therefore cascade-relevant, and the parity check is what decides whether
    * either is usable rather than merely smaller.
    */
-  'where-selectors': css => ({ classes: TARGET_CLASSES, css: wrapGiant(parse(css), 'where').toString() }),
+  'where-selectors': css => ({
+    classes: TARGET_CLASSES,
+    css: wrapGiant(parse(css), 'where').toString(),
+  }),
 }
 
 /* ------------------------------------------------------------------ serving */
@@ -291,10 +332,12 @@ const server = createServer((request, response) => {
   if (request.url === '/' || request.url === '/sheet.css') {
     const html = request.url === '/'
 
-    response.writeHead(200, {
-      'cache-control': 'no-store',
-      'content-type': html ? 'text/html' : 'text/css',
-    }).end(html ? current.html : current.css)
+    response
+      .writeHead(200, {
+        'cache-control': 'no-store',
+        'content-type': html ? 'text/html' : 'text/css',
+      })
+      .end(html ? current.html : current.css)
 
     return
   }
@@ -302,7 +345,9 @@ const server = createServer((request, response) => {
   response.writeHead(404).end('no fixture')
 })
 
-await new Promise(resolve => server.listen(serve ? servePort : 0, '127.0.0.1', resolve))
+await new Promise(resolve =>
+  server.listen(serve ? servePort : 0, '127.0.0.1', resolve),
+)
 
 const base = `http://127.0.0.1:${server.address().port}`
 
@@ -322,10 +367,14 @@ if (serve) {
 
   current = { css: variant.css, html: inspection(variant.classes, slots) }
 
-  console.log(`\nserving [${serveVariant}] — ${slots} slots, ${Buffer.byteLength(variant.css)} bytes of CSS`)
+  console.log(
+    `\nserving [${serveVariant}] — ${slots} slots, ${Buffer.byteLength(variant.css)} bytes of CSS`,
+  )
   console.log(`   page   ${base}/`)
   console.log(`   sheet  ${base}/sheet.css`)
-  console.log('Select #target in the Elements panel and watch what Inspector does.')
+  console.log(
+    'Select #target in the Elements panel and watch what Inspector does.',
+  )
   console.log('Ctrl-C to stop.\n')
 
   await new Promise(() => {})
@@ -334,7 +383,9 @@ if (serve) {
 /* ------------------------------------------------------------------ measuring */
 
 const browser = await chromium.launch()
-const context = await browser.newContext({ viewport: { height: 600, width: 900 } })
+const context = await browser.newContext({
+  viewport: { height: 600, width: 900 },
+})
 const page = await context.newPage()
 const session = await context.newCDPSession(page)
 
@@ -356,7 +407,11 @@ const timed = async (nodeId, method) => {
 
   samples.sort((a, b) => a - b)
 
-  return { bytes, median: samples[Math.floor(samples.length / 2)], result: first }
+  return {
+    bytes,
+    median: samples[Math.floor(samples.length / 2)],
+    result: first,
+  }
 }
 
 /**
@@ -367,7 +422,7 @@ const timed = async (nodeId, method) => {
  * nested `var()` lists are ten deep trees. `parsedValueBytes` measures that, and the gap between the
  * two is the difference between "what the rule says" and "what the protocol sends".
  */
-const decompose = (result) => {
+const decompose = result => {
   const out = {
     cssTextBytes: 0,
     customBytes: 0,
@@ -391,10 +446,16 @@ const decompose = (result) => {
     out.rules += 1
     out.selectorBytes += (entry.rule?.selectorList?.text ?? '').length
     out.ruleBytes += Buffer.byteLength(JSON.stringify(entry.rule))
-    out.entryBytes = (out.entryBytes ?? 0) + Buffer.byteLength(JSON.stringify(entry))
-    out.styleBytes = (out.styleBytes ?? 0) + Buffer.byteLength(JSON.stringify(entry.rule?.style ?? {}))
-    out.cssTextBytes = (out.cssTextBytes ?? 0) + (entry.rule?.style?.cssText?.length ?? 0)
-    out.selectorListBytes = (out.selectorListBytes ?? 0) + Buffer.byteLength(JSON.stringify(entry.rule?.selectorList ?? {}))
+    out.entryBytes =
+      (out.entryBytes ?? 0) + Buffer.byteLength(JSON.stringify(entry))
+    out.styleBytes =
+      (out.styleBytes ?? 0) +
+      Buffer.byteLength(JSON.stringify(entry.rule?.style ?? {}))
+    out.cssTextBytes =
+      (out.cssTextBytes ?? 0) + (entry.rule?.style?.cssText?.length ?? 0)
+    out.selectorListBytes =
+      (out.selectorListBytes ?? 0) +
+      Buffer.byteLength(JSON.stringify(entry.rule?.selectorList ?? {}))
 
     for (const property of entry.rule?.style?.cssProperties ?? []) {
       const size = property.name.length + (property.value ?? '').length
@@ -404,10 +465,16 @@ const decompose = (result) => {
 
       // `text` duplicates name + value, and `range` is four numbers per property. Both are paid for
       // on the wire for every one of the ten lists.
-      out.propertyOverheadBytes = (out.propertyOverheadBytes ?? 0) + Buffer.byteLength(JSON.stringify(property)) - size
+      out.propertyOverheadBytes =
+        (out.propertyOverheadBytes ?? 0) +
+        Buffer.byteLength(JSON.stringify(property)) -
+        size
 
       if (property.name.startsWith('--')) out.customBytes += size
-      if (property.parsedValue) out.parsedValueBytes += Buffer.byteLength(JSON.stringify(property.parsedValue))
+      if (property.parsedValue)
+        out.parsedValueBytes += Buffer.byteLength(
+          JSON.stringify(property.parsedValue),
+        )
     }
   }
 
@@ -416,31 +483,46 @@ const decompose = (result) => {
     out.keyframeBytes += Buffer.byteLength(JSON.stringify(keyframe))
   }
 
-  for (const entry of result.inherited ?? []) out.inheritedBytes += Buffer.byteLength(JSON.stringify(entry))
-  for (const entry of result.pseudoElements ?? []) out.pseudoBytes += Buffer.byteLength(JSON.stringify(entry))
+  for (const entry of result.inherited ?? [])
+    out.inheritedBytes += Buffer.byteLength(JSON.stringify(entry))
+  for (const entry of result.pseudoElements ?? [])
+    out.pseudoBytes += Buffer.byteLength(JSON.stringify(entry))
 
   return out
 }
 
 /** Bytes per top-level field of the response, so that nothing is left over as "the rest". */
-const fieldsOf = result => Object.fromEntries(
-  Object.entries(result).map(([key, value]) => [key, Buffer.byteLength(JSON.stringify(value))]),
-)
+const fieldsOf = result =>
+  Object.fromEntries(
+    Object.entries(result).map(([key, value]) => [
+      key,
+      Buffer.byteLength(JSON.stringify(value)),
+    ]),
+  )
 
-const computedAnimation = (result) => {
-  const values = Object.fromEntries(result.computedStyle.map(property => [property.name, property.value]))
+const computedAnimation = result => {
+  const values = Object.fromEntries(
+    result.computedStyle.map(property => [property.name, property.value]),
+  )
   const lengths = {}
 
   for (const part of PARTS) {
     if (values[part] !== undefined) lengths[part] = values[part].length
   }
 
-  return { animationLengths: lengths, bytes: Buffer.byteLength(JSON.stringify(result)), properties: result.computedStyle.length }
+  return {
+    animationLengths: lengths,
+    bytes: Buffer.byteLength(JSON.stringify(result)),
+    properties: result.computedStyle.length,
+  }
 }
 
-const measure = async (selector) => {
+const measure = async selector => {
   const { root: document } = await session.send('DOM.getDocument', { depth: 0 })
-  const { nodeId } = await session.send('DOM.querySelector', { nodeId: document.nodeId, selector })
+  const { nodeId } = await session.send('DOM.querySelector', {
+    nodeId: document.nodeId,
+    selector,
+  })
 
   // Warm-up: the first call in a fresh renderer pays for style recalculation, which is a different
   // cost from serialising the answer.
@@ -460,10 +542,15 @@ for (const slots of SLOTS) {
   const rule = compositionOf(parse(css))
   const entries = entriesOf(rule, 'animation-name')
 
-  if (entries.length < slots) throw new Error(`aggregate has ${entries.length} entries for ${slots} requested slots`)
+  if (entries.length < slots)
+    throw new Error(
+      `aggregate has ${entries.length} entries for ${slots} requested slots`,
+    )
 
-  console.log(`\n══ ${slots} requested — aggregate carries ${entries.length} entries across `
-    + `${rule.selector.split(',').length} selectors, ${rule.toString().length} rule bytes`)
+  console.log(
+    `\n══ ${slots} requested — aggregate carries ${entries.length} entries across ` +
+      `${rule.selector.split(',').length} selectors, ${rule.toString().length} rule bytes`,
+  )
 
   for (const [name, transform] of Object.entries(VARIANTS)) {
     const variant = transform(css)
@@ -482,12 +569,19 @@ for (const slots of SLOTS) {
     const behaviour = await page.evaluate(() => {
       const element = document.querySelector('#target')
       const style = getComputedStyle(element)
-      const list = property => style[property].split(',').map(part => part.trim())
+      const list = property =>
+        style[property].split(',').map(part => part.trim())
       const names = list('animationName')
       const durations = list('animationDuration')
       const timing = list('animationTimingFunction')
       const fills = list('animationFillMode')
-      const live = names.map((name, i) => ({ duration: durations[i], fill: fills[i], i, name, timing: timing[i] }))
+      const live = names.map((name, i) => ({
+        duration: durations[i],
+        fill: fills[i],
+        i,
+        name,
+        timing: timing[i],
+      }))
 
       return {
         // The known divergence between the two representations, measured rather than inherited: in
@@ -524,17 +618,21 @@ for (const slots of SLOTS) {
 
     report.push(row)
 
-    console.log(`   ${name.padEnd(17)} matched ${String(row.matchedBytes).padStart(9)} B ${String(row.matchedMs).padStart(7)} ms`
-      + `   computed ${String(row.computedBytes).padStart(7)} B ${String(row.computedMs).padStart(6)} ms`
-      + `   [sel ${row.selectorBytes} text ${row.declarationBytes} parsed ${row.parsedValueBytes}]`
-      + `   live ${row.behaviour.live.length}/${row.behaviour.entries} running ${row.behaviour.running}`)
+    console.log(
+      `   ${name.padEnd(17)} matched ${String(row.matchedBytes).padStart(9)} B ${String(row.matchedMs).padStart(7)} ms` +
+        `   computed ${String(row.computedBytes).padStart(7)} B ${String(row.computedMs).padStart(6)} ms` +
+        `   [sel ${row.selectorBytes} text ${row.declarationBytes} parsed ${row.parsedValueBytes}]` +
+        `   live ${row.behaviour.live.length}/${row.behaviour.entries} running ${row.behaviour.running}`,
+    )
   }
 
   const last = report[report.length - 1]
 
-  console.log(`   ${'inert'.padEnd(16)} matched ${String(last.inertMatchedBytes).padStart(9)} B `
-    + `${String(last.inertMatchedMs).padStart(7)} ms   computed ${String(last.inertComputedBytes).padStart(7)} B `
-    + `${String(last.inertComputedMs).padStart(6)} ms`)
+  console.log(
+    `   ${'inert'.padEnd(16)} matched ${String(last.inertMatchedBytes).padStart(9)} B ` +
+      `${String(last.inertMatchedMs).padStart(7)} ms   computed ${String(last.inertComputedBytes).padStart(7)} B ` +
+      `${String(last.inertComputedMs).padStart(6)} ms`,
+  )
 }
 
 /* ------------------------------------------------------------------ active-slot parity */
@@ -556,15 +654,28 @@ const LABEL_CLASSES = [
   'animation-delay-150/scale',
 ]
 
-const readLive = () => page.evaluate(({ parts }) => {
-  const style = getComputedStyle(document.querySelector('#target'))
-  const list = property => style.getPropertyValue(property).split(',').map(part => part.trim())
-  const lists = Object.fromEntries(parts.map(part => [part, list(part)]))
+const readLive = () =>
+  page.evaluate(
+    ({ parts }) => {
+      const style = getComputedStyle(document.querySelector('#target'))
+      const list = property =>
+        style
+          .getPropertyValue(property)
+          .split(',')
+          .map(part => part.trim())
+      const lists = Object.fromEntries(parts.map(part => [part, list(part)]))
 
-  return lists['animation-name']
-    .map((name, i) => ({ name, values: Object.fromEntries(parts.map(part => [part, lists[part][i] ?? null])) }))
-    .filter(entry => entry.name !== 'none')
-}, { parts: PARTS })
+      return lists['animation-name']
+        .map((name, i) => ({
+          name,
+          values: Object.fromEntries(
+            parts.map(part => [part, lists[part][i] ?? null]),
+          ),
+        }))
+        .filter(entry => entry.name !== 'none')
+    },
+    { parts: PARTS },
+  )
 
 const paritySlots = 25
 const parityCss = await compile(paritySlots, LABEL_CLASSES)
@@ -580,24 +691,39 @@ for (const name of ['jumi', 'shallow-shorthand']) {
   parity[name] = await readLive()
 }
 
-console.log(`\n── active-slot parity — label-scoped control, ${paritySlots} slots`)
-console.log(`   live positions: jumi ${parity.jumi.length}, shallow-shorthand ${parity['shallow-shorthand'].length}`)
+console.log(
+  `\n── active-slot parity — label-scoped control, ${paritySlots} slots`,
+)
+console.log(
+  `   live positions: jumi ${parity.jumi.length}, shallow-shorthand ${parity['shallow-shorthand'].length}`,
+)
 
 // Before blaming the representation, check that the fixture compiled at all: a control that never
 // emitted a variable would make the parity check pass for the wrong reason.
 const labelVars = [...new Set(parityCss.match(/--jumi-flick-[a-z-]+/g) ?? [])]
 // Slot hashes are mixed case, so a `[a-z0-9]+` character class silently finds nothing and would read
 // as "the label marker is missing" — the opposite of the truth.
-const markers = [...new Set(parityCss.match(/--jumi-[A-Za-z0-9-]+-label/g) ?? [])]
+const markers = [
+  ...new Set(parityCss.match(/--jumi-[A-Za-z0-9-]+-label/g) ?? []),
+]
 
-console.log(`   --jumi-flick-* variables emitted: ${labelVars.length ? labelVars.join(', ') : 'NONE'}`)
-console.log(`   slot label markers emitted: ${markers.length ? markers.join(', ') : 'NONE'}`)
+console.log(
+  `   --jumi-flick-* variables emitted: ${labelVars.length ? labelVars.join(', ') : 'NONE'}`,
+)
+console.log(
+  `   slot label markers emitted: ${markers.length ? markers.join(', ') : 'NONE'}`,
+)
 
-const toSeconds = value => (String(value).endsWith('ms') ? Number.parseFloat(value) / 1000 : Number.parseFloat(value))
+const toSeconds = value =>
+  String(value).endsWith('ms')
+    ? Number.parseFloat(value) / 1000
+    : Number.parseFloat(value)
 
 // `500ms` is serialised by `getComputedStyle` as `0.5s`, so comparing against the authored text
 // reports "the control never reached the slot" when it did. Normalise before asserting.
-const controlled = parity.jumi.find(entry => toSeconds(entry.values['animation-duration'] ?? '0s') === 0.5)
+const controlled = parity.jumi.find(
+  entry => toSeconds(entry.values['animation-duration'] ?? '0s') === 0.5,
+)
 
 // If the control variable is set on the element and the position still does not read it, the fault
 // is in the chain rather than the fixture — and those are very different findings.
@@ -615,7 +741,9 @@ const flick = await page.evaluate(() => {
   }
 })
 
-console.log(`   on the element: control=${flick.control} label=${flick.label} slot=${flick.slotName} global=${flick.global}`)
+console.log(
+  `   on the element: control=${flick.control} label=${flick.label} slot=${flick.slotName} global=${flick.global}`,
+)
 
 // The position is what matters, not the variable name: the duration chain for a labelled slot is
 // label → attribute → global, so it need not mention the slot hash at all. Read the entry at the
@@ -627,27 +755,45 @@ const slotIndex = nameEntries.findIndex(entry => entry.includes('Z2excak'))
 console.log(`   slot at index ${slotIndex}:`)
 console.log(`      name     ${nameEntries[slotIndex] ?? '—'}`)
 
-for (const part of ['animation-duration', 'animation-timing-function', 'animation-fill-mode']) {
-  console.log(`      ${part.slice(10).padEnd(8)} ${entriesOf(composed, part)[slotIndex] ?? '—'}`)
+for (const part of [
+  'animation-duration',
+  'animation-timing-function',
+  'animation-fill-mode',
+]) {
+  console.log(
+    `      ${part.slice(10).padEnd(8)} ${entriesOf(composed, part)[slotIndex] ?? '—'}`,
+  )
 }
 
-console.log(`   label-scoped control reached its slot: ${controlled ? `yes — ${controlled.name}` : 'NO — the fixture proves nothing'}`)
+console.log(
+  `   label-scoped control reached its slot: ${controlled ? `yes — ${controlled.name}` : 'NO — the fixture proves nothing'}`,
+)
 console.log(`   ten longhands at that position:`)
 
 for (const part of PARTS) {
   const mine = controlled?.values[part]
-  const theirs = parity['shallow-shorthand'].find(entry => entry.name === controlled?.name)?.values[part]
+  const theirs = parity['shallow-shorthand'].find(
+    entry => entry.name === controlled?.name,
+  )?.values[part]
 
-  console.log(`      ${part.padEnd(28)} ${String(mine ?? '—').padEnd(28)} ${mine === theirs ? 'identical' : `DIFFERS → ${theirs}`}`)
+  console.log(
+    `      ${part.padEnd(28)} ${String(mine ?? '—').padEnd(28)} ${mine === theirs ? 'identical' : `DIFFERS → ${theirs}`}`,
+  )
 }
 
 console.log(`   every live position, all ten longhands:`)
 
 for (const entry of parity.jumi) {
-  const other = parity['shallow-shorthand'].find(candidate => candidate.name === entry.name)
-  const differing = other ? PARTS.filter(part => entry.values[part] !== other.values[part]) : ['position absent']
+  const other = parity['shallow-shorthand'].find(
+    candidate => candidate.name === entry.name,
+  )
+  const differing = other
+    ? PARTS.filter(part => entry.values[part] !== other.values[part])
+    : ['position absent']
 
-  console.log(`      ${entry.name.padEnd(28)} ${differing.length === 0 ? 'identical' : `DIFFERS: ${differing.join(', ')}`}`)
+  console.log(
+    `      ${entry.name.padEnd(28)} ${differing.length === 0 ? 'identical' : `DIFFERS: ${differing.join(', ')}`}`,
+  )
 }
 
 await browser.close()
@@ -661,11 +807,15 @@ const names = Object.keys(VARIANTS)
 
 const table = (title, pick) => {
   console.log(`\n${title}`)
-  console.log(`${'slots'.padStart(6)} | ${names.map(name => name.padStart(15)).join(' | ')}`)
+  console.log(
+    `${'slots'.padStart(6)} | ${names.map(name => name.padStart(15)).join(' | ')}`,
+  )
 
   for (const slots of SLOTS) {
-    const cells = names.map((name) => {
-      const row = report.find(entry => entry.slots === slots && entry.variant === name)
+    const cells = names.map(name => {
+      const row = report.find(
+        entry => entry.slots === slots && entry.variant === name,
+      )
 
       return String(pick(row)).padStart(15)
     })
@@ -682,38 +832,64 @@ table('matched: declaration TEXT bytes', row => row.declarationBytes)
 table('matched: parsedValue TREE bytes', row => row.parsedValueBytes)
 table('matched: selector text bytes', row => row.selectorBytes)
 table('matched: keyframes bytes', row => row.keyframeBytes)
-table('computed animation-name length, chars', row => row.animationLengths['animation-name'] ?? 0)
+table(
+  'computed animation-name length, chars',
+  row => row.animationLengths['animation-name'] ?? 0,
+)
 table('matched: cssProperties returned', row => row.declarations)
 table('computed: properties returned', row => row.computedProperties)
-table('resolved positions on #target, live/total', row => `${row.behaviour.live.length}/${row.behaviour.entries}`)
+table(
+  'resolved positions on #target, live/total',
+  row => `${row.behaviour.live.length}/${row.behaviour.entries}`,
+)
 table('running animations on #target', row => row.behaviour.running)
 
-console.log(`\nparity of live positions against jumi, at ${SLOTS[SLOTS.length - 1]} slots`)
-const reference = report.find(entry => entry.slots === SLOTS[SLOTS.length - 1] && entry.variant === 'jumi').behaviour.live
+console.log(
+  `\nparity of live positions against jumi, at ${SLOTS[SLOTS.length - 1]} slots`,
+)
+const reference = report.find(
+  entry => entry.slots === SLOTS[SLOTS.length - 1] && entry.variant === 'jumi',
+).behaviour.live
 
 for (const name of names) {
-  const row = report.find(entry => entry.slots === SLOTS[SLOTS.length - 1] && entry.variant === name)
+  const row = report.find(
+    entry => entry.slots === SLOTS[SLOTS.length - 1] && entry.variant === name,
+  )
   const same = JSON.stringify(row.behaviour.live) === JSON.stringify(reference)
 
-  console.log(`   ${name.padEnd(17)} ${same ? 'identical to jumi' : 'DIFFERS'}`
-    + `${same ? '' : ` — ${JSON.stringify(row.behaviour.live)}`}`)
-  console.log(`   ${''.padEnd(17)} durations across all positions: ${JSON.stringify(row.behaviour.durationDistinct)}`)
+  console.log(
+    `   ${name.padEnd(17)} ${same ? 'identical to jumi' : 'DIFFERS'}` +
+      `${same ? '' : ` — ${JSON.stringify(row.behaviour.live)}`}`,
+  )
+  console.log(
+    `   ${''.padEnd(17)} durations across all positions: ${JSON.stringify(row.behaviour.durationDistinct)}`,
+  )
 }
 
 console.log(`\nresponse fields at ${SLOTS[SLOTS.length - 1]} slots`)
 for (const name of names) {
-  const row = report.find(entry => entry.slots === SLOTS[SLOTS.length - 1] && entry.variant === name)
+  const row = report.find(
+    entry => entry.slots === SLOTS[SLOTS.length - 1] && entry.variant === name,
+  )
 
   console.log(`   ${name.padEnd(17)} ${JSON.stringify(row.fields)}`)
 }
 
-console.log(`\nwhere matchedCSSRules goes, at ${SLOTS[SLOTS.length - 1]} slots (bytes)`)
-console.log(`${'variant'.padEnd(17)} ${'total'.padStart(9)} ${'rule.style'.padStart(11)} ${'cssText'.padStart(9)} ${'declText'.padStart(9)} ${'propOverhead'.padStart(13)} ${'selectorList'.padStart(13)} ${'selText'.padStart(8)}`)
+console.log(
+  `\nwhere matchedCSSRules goes, at ${SLOTS[SLOTS.length - 1]} slots (bytes)`,
+)
+console.log(
+  `${'variant'.padEnd(17)} ${'total'.padStart(9)} ${'rule.style'.padStart(11)} ${'cssText'.padStart(9)} ${'declText'.padStart(9)} ${'propOverhead'.padStart(13)} ${'selectorList'.padStart(13)} ${'selText'.padStart(8)}`,
+)
 
 for (const name of names) {
-  const row = report.find(entry => entry.slots === SLOTS[SLOTS.length - 1] && entry.variant === name)
+  const row = report.find(
+    entry => entry.slots === SLOTS[SLOTS.length - 1] && entry.variant === name,
+  )
 
-  console.log(`${name.padEnd(17)} ${String(row.matchedBytes).padStart(9)} ${String(row.styleBytes).padStart(11)} `
-    + `${String(row.cssTextBytes).padStart(9)} ${String(row.declarationBytes).padStart(9)} ${String(row.propertyOverheadBytes).padStart(13)} `
-    + `${String(row.selectorListBytes).padStart(13)} ${String(row.selectorBytes).padStart(8)}`)
+  console.log(
+    `${name.padEnd(17)} ${String(row.matchedBytes).padStart(9)} ${String(row.styleBytes).padStart(11)} ` +
+      `${String(row.cssTextBytes).padStart(9)} ${String(row.declarationBytes).padStart(9)} ${String(row.propertyOverheadBytes).padStart(13)} ` +
+      `${String(row.selectorListBytes).padStart(13)} ${String(row.selectorBytes).padStart(8)}`,
+  )
 }

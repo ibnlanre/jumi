@@ -36,11 +36,16 @@ const setMode = (next: 'jumi' | 'native') => {
     // Removed and re-added rather than toggled, because the candidates are what *name* the element
     // and one name per card is the whole mechanism: leaving both sets on would give every card two
     // names, and the browser refuses duplicates outright.
-    for (const token of [...card.classList]) if (token.startsWith('view-transition-')) card.classList.remove(token)
-    if (next === 'jumi') card.classList.add(...(card.dataset.jumi ?? '').split(' ').filter(Boolean))
+    for (const token of [...card.classList])
+      if (token.startsWith('view-transition-')) card.classList.remove(token)
+    if (next === 'jumi')
+      card.classList.add(
+        ...(card.dataset.jumi ?? '').split(' ').filter(Boolean),
+      )
   }
 
-  for (const button of modes) button.setAttribute('aria-pressed', String(button.dataset.mode === next))
+  for (const button of modes)
+    button.setAttribute('aria-pressed', String(button.dataset.mode === next))
   readout.textContent = 'waiting for a move'
 }
 
@@ -65,7 +70,7 @@ const apply = () => {
  * The blend the tree re-declares on each side starts on the same pseudo as the motion does, so it has
  * to be excluded by name or the readout could report it instead.
  */
-document.documentElement.addEventListener('animationstart', (event) => {
+document.documentElement.addEventListener('animationstart', event => {
   const identity = mode === 'jumi' ? active : `plain-${active}`
 
   if (event.pseudoElement !== `::view-transition-old(${identity})`) return
@@ -76,7 +81,7 @@ document.documentElement.addEventListener('animationstart', (event) => {
   // the two modes just ran without asking anyone to open a DevTools panel.
   readout.textContent = event.animationName.startsWith('jumi-')
     ? event.animationName
-    : 'the browser\'s own cross-fade'
+    : "the browser's own cross-fade"
 })
 
 /**
@@ -87,14 +92,14 @@ document.documentElement.addEventListener('animationstart', (event) => {
  * this cannot avoid JavaScript the way the cross-document case can. What the page no longer does is
  * keep track of the lifecycle: which transition is current, what a second call means, that an aborted
  * call's callback still runs, and that a click has to be held until the geometry settles are all
-     * `runViewTransition`'s, which is why this is three lines instead of forty.
-     *
-     * **And no options.** The default is this page's behaviour in both of its cases: a duplicate handler
-     * firing in the same task as the gesture it belongs to is coalesced — the update still applies, and no
-     * second transition aborts the one the reader is watching — while a real second click arrives in a later
-     * task and supersedes, which is exactly what a reader clicking another card mid-flight is asking for. It
-     * would take work to get the wrong answer here, which is the abstraction earning its place.
-     */
+ * `runViewTransition`'s, which is why this is three lines instead of forty.
+ *
+ * **And no options.** The default is this page's behaviour in both of its cases: a duplicate handler
+ * firing in the same task as the gesture it belongs to is coalesced — the update still applies, and no
+ * second transition aborts the one the reader is watching — while a real second click arrives in a later
+ * task and supersedes, which is exactly what a reader clicking another card mid-flight is asking for. It
+ * would take work to get the wrong answer here, which is the abstraction earning its place.
+ */
 const move = (id: string) => {
   if (!id || id === active) return
 
@@ -106,7 +111,8 @@ const move = (id: string) => {
   void runViewTransition(change)
 }
 
-for (const card of cards) card.addEventListener('click', () => move(card.dataset.id ?? ''))
+for (const card of cards)
+  card.addEventListener('click', () => move(card.dataset.id ?? ''))
 
 /**
  * A click during a transition, which no card can receive.
@@ -122,7 +128,7 @@ for (const card of cards) card.addEventListener('click', () => move(card.dataset
  * makes that safe for the boundary, so the gesture is answered where it lands rather than a quarter of
  * a second later.
  */
-document.addEventListener('click', (event) => {
+document.addEventListener('click', event => {
   /**
    * The overlay holding the hit is not a side effect to work around — it is the signal.
    *
@@ -146,7 +152,12 @@ document.addEventListener('click', (event) => {
   const contains = (element: HTMLElement) => {
     const { height, width, x, y } = element.getBoundingClientRect()
 
-    return clientX >= x && clientX <= x + width && clientY >= y && clientY <= y + height
+    return (
+      clientX >= x &&
+      clientX <= x + width &&
+      clientY >= y &&
+      clientY <= y + height
+    )
   }
 
   // The mode switch is answered *first*, and deliberately not gated on the projection the way the
@@ -181,7 +192,10 @@ document.addEventListener('click', (event) => {
   move(card.dataset.id ?? '')
 })
 
-for (const button of modes) button.addEventListener('click', () => setMode(button.dataset.mode as 'jumi' | 'native'))
+for (const button of modes)
+  button.addEventListener('click', () =>
+    setMode(button.dataset.mode as 'jumi' | 'native'),
+  )
 
 // Set once so the cards begin in the mode the page describes. `grid` is read only to keep the
 // selector honest — a demo that silently did nothing would otherwise look identical.

@@ -23,11 +23,15 @@ function setup() {
 }
 
 /** The `animate` entry — the utility an effect's name is a value of. */
-const animate = setup().animate as unknown as { fn: (value: string, extra: { modifier: null | string }) => unknown }
+const animate = setup().animate as unknown as {
+  fn: (value: string, extra: { modifier: null | string }) => unknown
+}
 
 describe('the effect utility', () => {
   it('writes the activation declaration for an effect Jumi has', () => {
-    expect(animate.fn('fade-in', { modifier: null })).toEqual({ '--jumi-fade-in-animation-name': 'jumi-fade-in' })
+    expect(animate.fn('fade-in', { modifier: null })).toEqual({
+      '--jumi-fade-in-animation-name': 'jumi-fade-in',
+    })
   })
 
   it('names the effect when the candidate gave it a name', () => {

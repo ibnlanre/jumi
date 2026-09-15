@@ -34,7 +34,14 @@ import type { Declaration, Rule } from 'postcss'
  */
 
 /** The names a variant value may be, and the whole range namespace the platform defines. */
-export const RANGE_NAMES = ['contain', 'cover', 'entry', 'entry-crossing', 'exit', 'exit-crossing'] as const
+export const RANGE_NAMES = [
+  'contain',
+  'cover',
+  'entry',
+  'entry-crossing',
+  'exit',
+  'exit-crossing',
+] as const
 
 /**
  * What an author may write, as a warning quotes it.
@@ -44,8 +51,7 @@ export const RANGE_NAMES = ['contain', 'cover', 'entry', 'entry-crossing', 'exit
  * the difference this pass makes — measured, an unparsable position falls back on its own and says
  * nothing, so without the check a typo is an animation that quietly uses the whole range.
  */
-export const RANGE_GRAMMAR
-  = `a range name (${RANGE_NAMES.join(', ')}), a length or percentage, two of either, or a name and offset`
+export const RANGE_GRAMMAR = `a range name (${RANGE_NAMES.join(', ')}), a length or percentage, two of either, or a name and offset`
 
 /** One ranged motion, as its own rule states it. */
 export type RangeReading = {
@@ -61,8 +67,8 @@ export type RangeReading = {
 
 const ACTIVATION = /^--jumi-(.+)-animation-name$/
 const RANGED = /^animation-range-(.+)$/
-const LENGTH_PERCENTAGE
-  = /^(?:[+-]?(?:\d+\.?\d*|\.\d+)(?:%|[a-z]{1,4})?|0|(?:calc|clamp|max|min|var)\(.*\))$/i
+const LENGTH_PERCENTAGE =
+  /^(?:[+-]?(?:\d+\.?\d*|\.\d+)(?:%|[a-z]{1,4})?|0|(?:calc|clamp|max|min|var)\(.*\))$/i
 
 const ownDeclarations = (rule: Rule) =>
   (rule.nodes ?? []).filter((node): node is Declaration => node.type === 'decl')
@@ -146,10 +152,13 @@ export const rangeFromSelector = (selector: string): null | string => {
 
   const value = innermost.match![1].replace(/_/g, ' ')
 
-  return value.startsWith('[') && value.endsWith(']') ? value.slice(1, -1) : value
+  return value.startsWith('[') && value.endsWith(']')
+    ? value.slice(1, -1)
+    : value
 }
 
-const isName = (token: string) => (RANGE_NAMES as readonly string[]).includes(token)
+const isName = (token: string) =>
+  (RANGE_NAMES as readonly string[]).includes(token)
 const isLength = (token: string) => LENGTH_PERCENTAGE.test(token)
 
 /**
@@ -163,11 +172,24 @@ export const rangeAccepted = (range: string) => {
   const tokens = range.trim().split(/\s+/).filter(Boolean)
 
   if (!tokens.length) return false
-  if (tokens.length === 1) return isName(tokens[0]) || tokens[0] === 'normal' || isLength(tokens[0])
+  if (tokens.length === 1)
+    return isName(tokens[0]) || tokens[0] === 'normal' || isLength(tokens[0])
   if (tokens.some(token => token === 'normal')) return false
-  if (tokens.length === 2) return (isLength(tokens[0]) && isLength(tokens[1])) || (isName(tokens[0]) && isLength(tokens[1])) || (isName(tokens[0]) && isName(tokens[1]))
-  if (tokens.length === 3) return isName(tokens[0]) && isLength(tokens[1]) && isName(tokens[2])
-  if (tokens.length === 4) return isName(tokens[0]) && isLength(tokens[1]) && isName(tokens[2]) && isLength(tokens[3])
+  if (tokens.length === 2)
+    return (
+      (isLength(tokens[0]) && isLength(tokens[1])) ||
+      (isName(tokens[0]) && isLength(tokens[1])) ||
+      (isName(tokens[0]) && isName(tokens[1]))
+    )
+  if (tokens.length === 3)
+    return isName(tokens[0]) && isLength(tokens[1]) && isName(tokens[2])
+  if (tokens.length === 4)
+    return (
+      isName(tokens[0]) &&
+      isLength(tokens[1]) &&
+      isName(tokens[2]) &&
+      isLength(tokens[3])
+    )
 
   return false
 }
@@ -184,8 +206,13 @@ export const rangeAccepted = (range: string) => {
  * because that is a refusal to report rather than a silence to keep.
  */
 export const rangeReadings = (rule: Rule): RangeReading[] => {
-  const activations = ownDeclarations(rule).filter(node => ACTIVATION.test(node.prop))
-  const slot = activations.length === 1 ? ACTIVATION.exec(activations[0].prop)?.[1] ?? null : null
+  const activations = ownDeclarations(rule).filter(node =>
+    ACTIVATION.test(node.prop),
+  )
+  const slot =
+    activations.length === 1
+      ? (ACTIVATION.exec(activations[0].prop)?.[1] ?? null)
+      : null
   const readings: RangeReading[] = []
 
   for (const selector of rule.selectors ?? []) {
@@ -193,7 +220,12 @@ export const rangeReadings = (rule: Rule): RangeReading[] => {
 
     if (range === null) continue
 
-    readings.push({ motions: activations.length, range, slot, source: classToken(selector).replace(/\\(.)/g, '$1') })
+    readings.push({
+      motions: activations.length,
+      range,
+      slot,
+      source: classToken(selector).replace(/\\(.)/g, '$1'),
+    })
   }
 
   return readings

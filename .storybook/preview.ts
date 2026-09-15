@@ -17,7 +17,7 @@ const preview: Preview = {
   tags: ['autodocs'],
 }
 
-export const decorators = [
+export const decorators: Preview['decorators'] = [
   withThemeByClassName({
     defaultTheme: 'light',
     themes: {

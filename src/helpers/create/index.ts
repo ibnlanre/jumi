@@ -12,7 +12,16 @@
  * `effects`, `labels`, `registered`) live exactly as long as that compiler
  * does. `@/core` documents what that implies.
  */
-import type { Api, Creator, GetMatchComponents, GetMatchUtilities, MatchComponentsOptions, MatchComponentsPropertyValue, MatchPropertyFunction, Modifiers } from '@/types'
+import type {
+  Api,
+  Creator,
+  GetMatchComponents,
+  GetMatchUtilities,
+  MatchComponentsOptions,
+  MatchComponentsPropertyValue,
+  MatchPropertyFunction,
+  Modifiers,
+} from '@/types'
 
 import { createJumiModel, isPhrase, nameable } from '@/core'
 import { stagingMarker } from '@/helpers/carriers'
@@ -54,10 +63,15 @@ export function getCreator(api: Api): Creator {
       // nothing consumes it, and `@/helpers/carriers` reads it off the emitted stylesheet and
       // builds the rules a browser actually needs. Its selector therefore does not matter;
       // `:root` is chosen to make that obvious.
-      payload: (kind, variables) => api.addBase({
-        ':root': Object.fromEntries(Object.entries(variables)
-          .map(([name, value]) => [`${stagingMarker}${kind}-${name}`, value])),
-      }),
+      payload: (kind, variables) =>
+        api.addBase({
+          ':root': Object.fromEntries(
+            Object.entries(variables).map(([name, value]) => [
+              `${stagingMarker}${kind}-${name}`,
+              value,
+            ]),
+          ),
+        }),
       // `syntax: "*"` is not a placeholder for a grammar Jumi has yet to write: it is the
       // permissive syntax that makes the registration *valid* without imposing a typed value
       // grammar on a token like `jumi-rotate-3zWYd`. With no `initial-value` it also leaves the
@@ -65,13 +79,16 @@ export function getCreator(api: Api): Creator {
       // of its own takes the composition's `var()` fallback rather than an ancestor's token. The two
       // declarations are one semantic unit — `inherits: false` cannot be written without a syntax,
       // and `syntax: "*"` alone would still inherit. See the `property` sink in `@/core`.
-      property: name => api.addBase({ [`@property ${name}`]: { inherits: 'false', syntax: '"*"' } }),
+      property: name =>
+        api.addBase({
+          [`@property ${name}`]: { inherits: 'false', syntax: '"*"' },
+        }),
     },
     theme: (key, values) => resolveTheme(api, key, values),
   })
 }
 
-const jumi = createPlugin((api) => {
+const jumi = createPlugin(api => {
   const { matchComponents, matchUtilities, matchVariant } = api
 
   const creator = getCreator(api)
@@ -87,9 +104,13 @@ const jumi = createPlugin((api) => {
    * animation at all. A bare modifier now reaches the fn, which names the slot; a matcher that reads
    * its modifier as something else — a value suffix, a metric, a count — still declares its own.
    */
-  const modifierSupport = (fn: MatchPropertyFunction): Modifiers => nameable in fn ? ('any') : ({})
+  const modifierSupport = (fn: MatchPropertyFunction): Modifiers =>
+    nameable in fn ? 'any' : {}
 
-  const registerPhrases = (name: string, options: Required<MatchComponentsPropertyValue>) => {
+  const registerPhrases = (
+    name: string,
+    options: Required<MatchComponentsPropertyValue>,
+  ) => {
     const { fn, modifiers, supportsNegativeValues, type, values } = options
     const typed = Array.isArray(type) ? type : [type]
 
@@ -133,13 +154,19 @@ const jumi = createPlugin((api) => {
    * stylesheet instead of remembering them here. There is nothing to remember, so there is nothing
    * to forget.
    */
-  matchVariant('view-transition', (side, { modifier }) => {
-    if (side !== 'old' && side !== 'new') return viewTransitionInvalidMarker('name')
-    if (!modifier) return viewTransitionInvalidMarker('missing')
-    if (!identityAccepted(modifier)) return viewTransitionInvalidMarker('name')
+  matchVariant(
+    'view-transition',
+    (side, { modifier }) => {
+      if (side !== 'old' && side !== 'new')
+        return viewTransitionInvalidMarker('name')
+      if (!modifier) return viewTransitionInvalidMarker('missing')
+      if (!identityAccepted(modifier))
+        return viewTransitionInvalidMarker('name')
 
-    return viewTransitionMarker(side, modifier)
-  }, { values: viewTransition })
+      return viewTransitionMarker(side, modifier)
+    },
+    { values: viewTransition },
+  )
 
   /**
    * Ranges, registered as a **variant**, and it is the opposite of the one above in the way that
@@ -165,9 +192,23 @@ const jumi = createPlugin((api) => {
   const registerComponents = (utilities: ReturnType<GetMatchComponents>) => {
     for (const name in utilities) {
       const { fn, ...options } = utilities[name]
-      const { modifiers = modifierSupport(fn), supportsNegativeValues = false, type = 'any', values } = options
-      matchComponents({ [name]: fn }, { modifiers, supportsNegativeValues, type, values })
-      registerPhrases(name, { fn, modifiers, supportsNegativeValues, type, values: {} })
+      const {
+        modifiers = modifierSupport(fn),
+        supportsNegativeValues = false,
+        type = 'any',
+        values,
+      } = options
+      matchComponents(
+        { [name]: fn },
+        { modifiers, supportsNegativeValues, type, values },
+      )
+      registerPhrases(name, {
+        fn,
+        modifiers,
+        supportsNegativeValues,
+        type,
+        values: {},
+      })
     }
   }
   registerComponents(getMatchTween(creator))
@@ -175,8 +216,16 @@ const jumi = createPlugin((api) => {
   const registerUtilities = (utilities: ReturnType<GetMatchUtilities>) => {
     for (const name in utilities) {
       const { fn, ...options } = utilities[name]
-      const { modifiers = modifierSupport(fn), supportsNegativeValues = false, type = 'any', values } = options
-      matchUtilities({ [name]: fn }, { modifiers, supportsNegativeValues, type, values })
+      const {
+        modifiers = modifierSupport(fn),
+        supportsNegativeValues = false,
+        type = 'any',
+        values,
+      } = options
+      matchUtilities(
+        { [name]: fn },
+        { modifiers, supportsNegativeValues, type, values },
+      )
     }
   }
   registerUtilities(getMatchControls(creator))

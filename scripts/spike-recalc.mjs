@@ -37,7 +37,9 @@ import path from 'node:path'
 const here = path.dirname(fileURLToPath(import.meta.url))
 const root = path.join(here, '..')
 
-const SLOTS = process.argv[2] ? process.argv[2].split(',').map(Number) : [10, 25, 50, 100, 150, 228]
+const SLOTS = process.argv[2]
+  ? process.argv[2].split(',').map(Number)
+  : [10, 25, 50, 100, 150, 228]
 const ELEMENTS = [1, 10, 100, 1000]
 const ITERATIONS = 3
 
@@ -50,7 +52,8 @@ execFileSync('pnpm', ['run', 'bundle'], { cwd: root, stdio: 'pipe' })
 // After bundling: the helper loads the finalizer out of `dist/`.
 const { build, compiler } = await import('./lib/compile.mjs')
 
-const pool = n => Array.from({ length: n }, (_, i) => `animate-rotate-[${i + 1}deg]`)
+const pool = n =>
+  Array.from({ length: n }, (_, i) => `animate-rotate-[${i + 1}deg]`)
 
 const candidates = n => [
   'animate-rotate-45',
@@ -60,8 +63,12 @@ const candidates = n => [
   ...pool(n),
 ]
 
-const compile = async (n) => {
-  const css = ['@import "tailwindcss" source(none);', `@plugin "${path.join(root, 'dist', 'index.js')}";`, ''].join('\n')
+const compile = async n => {
+  const css = [
+    '@import "tailwindcss" source(none);',
+    `@plugin "${path.join(root, 'dist', 'index.js')}";`,
+    '',
+  ].join('\n')
   const instance = await compiler(css, root)
 
   return `${build(instance, candidates(n)).css}\n${CONTROL}`
@@ -86,10 +93,12 @@ const server = createServer((request, response) => {
     return
   }
 
-  response.writeHead(200, {
-    'cache-control': 'no-store',
-    'content-type': html ? 'text/html' : 'text/css',
-  }).end(html ? current.html : current.css)
+  response
+    .writeHead(200, {
+      'cache-control': 'no-store',
+      'content-type': html ? 'text/html' : 'text/css',
+    })
+    .end(html ? current.html : current.css)
 })
 
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve))
@@ -99,7 +108,9 @@ const base = `http://127.0.0.1:${server.address().port}`
 /* ------------------------------------------------------------------ measuring */
 
 const browser = await chromium.launch()
-const context = await browser.newContext({ viewport: { height: 600, width: 900 } })
+const context = await browser.newContext({
+  viewport: { height: 600, width: 900 },
+})
 const page = await context.newPage()
 const session = await context.newCDPSession(page)
 
@@ -114,8 +125,12 @@ const counters = async () => {
 const available = await counters()
 
 if (!('RecalcStyleDuration' in available)) {
-  console.log(`! RecalcStyleDuration is unavailable in this build; got: ${Object.keys(available).sort().join(', ')}`)
-  console.log('! Falling back to wall clock only — the numbers below are then not comparable to the record.')
+  console.log(
+    `! RecalcStyleDuration is unavailable in this build; got: ${Object.keys(available).sort().join(', ')}`,
+  )
+  console.log(
+    '! Falling back to wall clock only — the numbers below are then not comparable to the record.',
+  )
 }
 
 /**
@@ -129,28 +144,40 @@ if (!('RecalcStyleDuration' in available)) {
 const measure = async () => {
   const before = await counters()
 
-  const samples = await page.evaluate(({ iterations }) => {
-    const out = []
+  const samples = await page.evaluate(
+    ({ iterations }) => {
+      const out = []
 
-    for (let i = 0; i < iterations; i++) {
-      const start = performance.now()
+      for (let i = 0; i < iterations; i++) {
+        const start = performance.now()
 
-      document.documentElement.classList.toggle('control')
-      void document.body.offsetHeight
-      out.push(performance.now() - start)
-    }
+        document.documentElement.classList.toggle('control')
+        void document.body.offsetHeight
+        out.push(performance.now() - start)
+      }
 
-    return out
-  }, { iterations: ITERATIONS })
+      return out
+    },
+    { iterations: ITERATIONS },
+  )
 
   const after = await counters()
 
   const round = value => Math.round(value * 1000) / 1000
 
   return {
-    elements: Math.round(((after.RecalcStyleCount ?? 0) - (before.RecalcStyleCount ?? 0)) / ITERATIONS),
-    styleMs: round(((after.RecalcStyleDuration ?? 0) - (before.RecalcStyleDuration ?? 0)) * 1000 / ITERATIONS),
-    wallMs: round(samples.reduce((total, sample) => total + sample, 0) / samples.length),
+    elements: Math.round(
+      ((after.RecalcStyleCount ?? 0) - (before.RecalcStyleCount ?? 0)) /
+        ITERATIONS,
+    ),
+    styleMs: round(
+      (((after.RecalcStyleDuration ?? 0) - (before.RecalcStyleDuration ?? 0)) *
+        1000) /
+        ITERATIONS,
+    ),
+    wallMs: round(
+      samples.reduce((total, sample) => total + sample, 0) / samples.length,
+    ),
   }
 }
 
@@ -179,32 +206,41 @@ for (const slots of SLOTS) {
     const row = { elements, slots }
 
     for (const variant of NAMES) {
-      current = { css: sheets[variant], html: markup(elements, variant === 'inert' ? [] : pool(slots)) }
+      current = {
+        css: sheets[variant],
+        html: markup(elements, variant === 'inert' ? [] : pool(slots)),
+      }
 
       await page.goto(`${base}/`)
 
       // Warm-up: the first toggle in a fresh renderer pays for first-recalc effects that every later
       // one does not.
-      await page.evaluate(({ iterations }) => {
-        document.documentElement.classList.toggle('control')
-        void document.body.offsetHeight
-
-        for (let i = 0; i < iterations; i++) {
+      await page.evaluate(
+        ({ iterations }) => {
           document.documentElement.classList.toggle('control')
           void document.body.offsetHeight
-        }
-      }, { iterations: 1 })
+
+          for (let i = 0; i < iterations; i++) {
+            document.documentElement.classList.toggle('control')
+            void document.body.offsetHeight
+          }
+        },
+        { iterations: 1 },
+      )
 
       row[variant] = await measure()
     }
 
     report.push(row)
 
-    const saved = row.jumi.styleMs - row.inert.styleMs > 0
-      ? `${Math.round((1 - (row.shallow.styleMs - row.inert.styleMs) / (row.jumi.styleMs - row.inert.styleMs)) * 100)}%`
-      : '—'
+    const saved =
+      row.jumi.styleMs - row.inert.styleMs > 0
+        ? `${Math.round((1 - (row.shallow.styleMs - row.inert.styleMs) / (row.jumi.styleMs - row.inert.styleMs)) * 100)}%`
+        : '—'
 
-    console.log(`   ${String(elements).padStart(5)} elements   ${NAMES.map(name => `${name} ${String(row[name].styleMs).padStart(8)}`).join('   ')}   saved ${saved}`)
+    console.log(
+      `   ${String(elements).padStart(5)} elements   ${NAMES.map(name => `${name} ${String(row[name].styleMs).padStart(8)}`).join('   ')}   saved ${saved}`,
+    )
   }
 }
 
@@ -214,24 +250,35 @@ server.close()
 /* ------------------------------------------------------------------ summary */
 
 console.log(`\n${'─'.repeat(104)}`)
-console.log('RecalcStyleDuration per control change, ms (or the wall-clock fallback)')
-console.log(`${'slots'.padStart(6)} ${'elements'.padStart(8)} ${NAMES.map(name => name.padStart(10)).join(' ')} ${'Δ jumi'.padStart(10)} ${'Δ shallow'.padStart(10)} ${'saved'.padStart(7)}`)
+console.log(
+  'RecalcStyleDuration per control change, ms (or the wall-clock fallback)',
+)
+console.log(
+  `${'slots'.padStart(6)} ${'elements'.padStart(8)} ${NAMES.map(name => name.padStart(10)).join(' ')} ${'Δ jumi'.padStart(10)} ${'Δ shallow'.padStart(10)} ${'saved'.padStart(7)}`,
+)
 
 for (const row of report) {
   const delta = value => Math.round((value - row.inert.styleMs) * 1000) / 1000
-  const saved = row.jumi.styleMs - row.inert.styleMs > 0
-    ? `${Math.round((1 - (row.shallow.styleMs - row.inert.styleMs) / (row.jumi.styleMs - row.inert.styleMs)) * 100)}%`
-    : '—'
+  const saved =
+    row.jumi.styleMs - row.inert.styleMs > 0
+      ? `${Math.round((1 - (row.shallow.styleMs - row.inert.styleMs) / (row.jumi.styleMs - row.inert.styleMs)) * 100)}%`
+      : '—'
 
-  console.log(`${String(row.slots).padStart(6)} ${String(row.elements).padStart(8)} `
-    + `${NAMES.map(name => String(row[name].styleMs).padStart(10)).join(' ')} `
-    + `${String(delta(row.jumi.styleMs)).padStart(10)} ${String(delta(row.shallow.styleMs)).padStart(10)} ${saved.padStart(7)}`)
+  console.log(
+    `${String(row.slots).padStart(6)} ${String(row.elements).padStart(8)} ` +
+      `${NAMES.map(name => String(row[name].styleMs).padStart(10)).join(' ')} ` +
+      `${String(delta(row.jumi.styleMs)).padStart(10)} ${String(delta(row.shallow.styleMs)).padStart(10)} ${saved.padStart(7)}`,
+  )
 }
 
 console.log(`\nwall clock per control change, ms (includes layout)`)
-console.log(`${'slots'.padStart(6)} ${'elements'.padStart(8)} ${NAMES.map(name => name.padStart(10)).join(' ')}`)
+console.log(
+  `${'slots'.padStart(6)} ${'elements'.padStart(8)} ${NAMES.map(name => name.padStart(10)).join(' ')}`,
+)
 
 for (const row of report) {
-  console.log(`${String(row.slots).padStart(6)} ${String(row.elements).padStart(8)} `
-    + `${NAMES.map(name => String(row[name].wallMs).padStart(10)).join(' ')}`)
+  console.log(
+    `${String(row.slots).padStart(6)} ${String(row.elements).padStart(8)} ` +
+      `${NAMES.map(name => String(row[name].wallMs).padStart(10)).join(' ')}`,
+  )
 }

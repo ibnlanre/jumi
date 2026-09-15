@@ -59,8 +59,8 @@ writeFileSync(
 const wrappers = (css, tag) => {
   const found = []
 
-  postcss.parse(css).walkAtRules((atRule) => {
-    atRule.walkRules((rule) => {
+  postcss.parse(css).walkAtRules(atRule => {
+    atRule.walkRules(rule => {
       if (rule.selector.includes(tag)) found.push(chain(rule))
     })
   })
@@ -68,7 +68,7 @@ const wrappers = (css, tag) => {
   return found
 }
 
-const chain = (rule) => {
+const chain = rule => {
   const parts = []
   let parent = rule.parent
 
@@ -88,7 +88,7 @@ const chain = (rule) => {
 const wrapperOf = (css, tag) => {
   let found = null
 
-  postcss.parse(css).walkRules((rule) => {
+  postcss.parse(css).walkRules(rule => {
     const at = rule.selector.indexOf(tag)
     if (found || at === -1) return
 
@@ -107,7 +107,12 @@ const wrapperOf = (css, tag) => {
     for (let index = at; index >= 0; index -= 1) {
       let slashes = 0
 
-      for (let before = index - 1; before >= 0 && rule.selector[before] === '\\'; before -= 1) slashes += 1
+      for (
+        let before = index - 1;
+        before >= 0 && rule.selector[before] === '\\';
+        before -= 1
+      )
+        slashes += 1
 
       if (rule.selector[index] === '.' && slashes % 2 === 0) {
         start = index
@@ -117,9 +122,10 @@ const wrapperOf = (css, tag) => {
 
     found = {
       media,
-      selector: start === -1
-        ? rule.selector
-        : `${rule.selector.slice(0, start)}&${rule.selector.slice(at + tag.length)}`,
+      selector:
+        start === -1
+          ? rule.selector
+          : `${rule.selector.slice(0, start)}&${rule.selector.slice(at + tag.length)}`,
     }
   })
 
@@ -127,12 +133,17 @@ const wrapperOf = (css, tag) => {
 }
 
 console.log('variant transformation, measured against a prototype model\n')
-console.log(`${'variant'.padEnd(16)}  ${'media'.padEnd(34)}  selector                        model`)
+console.log(
+  `${'variant'.padEnd(16)}  ${'media'.padEnd(34)}  selector                        model`,
+)
 
 let matched = 0
 
 for (const variant of variants) {
-  const instance = await compile(readFileSync(path.join(dir, 'entry.css'), 'utf8'), { base: dir, onDependency() {} })
+  const instance = await compile(
+    readFileSync(path.join(dir, 'entry.css'), 'utf8'),
+    { base: dir, onDependency() {} },
+  )
   const css = instance.build([`${variant}:animate-rotate-45`])
 
   const utility = wrapperOf(css, 'animate-rotate-45')
@@ -144,25 +155,33 @@ for (const variant of variants) {
   // userland `wrapperOf` returned null for it, which this comparison counted as a mismatch. The
   // spike then reported 0/12 and still exited 0, which is the failure mode `engineering/README.md`
   // warns about, so the count is now the exit code.
-  const same = Boolean(utility)
-    && JSON.stringify(utility) === JSON.stringify({ media: mine.media, selector: mine.selector })
+  const same =
+    Boolean(utility) &&
+    JSON.stringify(utility) ===
+      JSON.stringify({ media: mine.media, selector: mine.selector })
 
   if (same) matched += 1
 
   console.log(
-    `${variant.padEnd(16)}  ${(utility?.media.join(' ') ?? '(none)').slice(0, 32).padEnd(34)}  `
-    + `${(utility?.selector ?? '(none)').slice(0, 30).padEnd(32)}  ${same ? 'match' : 'DIFFERS'}`,
+    `${variant.padEnd(16)}  ${(utility?.media.join(' ') ?? '(none)').slice(0, 32).padEnd(34)}  ` +
+      `${(utility?.selector ?? '(none)').slice(0, 30).padEnd(32)}  ${same ? 'match' : 'DIFFERS'}`,
   )
 
   if (!same) {
     console.log(`                  host ${JSON.stringify(utility)}`)
-    console.log(`                  model ${JSON.stringify({ media: mine.media, selector: mine.selector })}`)
+    console.log(
+      `                  model ${JSON.stringify({ media: mine.media, selector: mine.selector })}`,
+    )
   }
 }
 
-console.log(`\n${matched}/${variants.length} transformations reproduced by the prototype`
-  + ` (${Object.keys(registry).length} registry entries + ${arbitrary.length} arbitrary rules)`)
-console.log('class escaping is not modelled: the comparison normalises the class token to `&`')
+console.log(
+  `\n${matched}/${variants.length} transformations reproduced by the prototype` +
+    ` (${Object.keys(registry).length} registry entries + ${arbitrary.length} arbitrary rules)`,
+)
+console.log(
+  'class escaping is not modelled: the comparison normalises the class token to `&`',
+)
 
 if (matched !== variants.length) process.exitCode = 1
 

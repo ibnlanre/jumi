@@ -20,14 +20,24 @@ const record = (kind, value, extra) => {
 export default plugin(({ matchUtilities }) => {
   // `type: 'any'` — no grammar imposed, so whatever arrives is what the shorthand produced.
   matchUtilities(
-    { probe: (value, extra) => { record('any', value, extra); return { '--probe-any': value } } },
+    {
+      probe: (value, extra) => {
+        record('any', value, extra)
+        return { '--probe-any': value }
+      },
+    },
     { values: {} },
   )
 
   // A typed matcher, because Jumi's matchers declare types and the phrase work already measured that
   // Tailwind validates an arbitrary value against the declared type *before* the callback runs.
   matchUtilities(
-    { probelen: (value, extra) => { record('length', value, extra); return { '--probe-length': value } } },
+    {
+      probelen: (value, extra) => {
+        record('length', value, extra)
+        return { '--probe-length': value }
+      },
+    },
     { type: ['length'], values: {} },
   )
 })

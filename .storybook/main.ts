@@ -11,8 +11,7 @@ const config: StorybookConfig = {
     '@storybook/addon-themes',
   ],
   framework: '@storybook/react-vite',
-  stories: ['../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)',
-  ],
+  stories: ['../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
   async viteFinal(config) {
     const { mergeConfig } = await import('vite')
 

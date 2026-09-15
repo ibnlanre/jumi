@@ -43,33 +43,35 @@ export const complete = css => ({ raw: css, ...finalizeCss(css) })
  * `@plugin` and `@source` resolve relative to `base`, which is what the CLI does; used where the
  * candidates are supplied by the harness rather than scanned from files.
  */
-export const compiler = (css, base) => compile(css, {
-  base,
-  loadModule: async (id, from) => {
-    const resolved = path.resolve(from, id)
-    const loaded = await import(resolved)
+export const compiler = (css, base) =>
+  compile(css, {
+    base,
+    loadModule: async (id, from) => {
+      const resolved = path.resolve(from, id)
+      const loaded = await import(resolved)
 
-    // tsup's CJS output puts the plugin object (`{ handler, config }`) on `default`.
-    return { base: from, module: loaded.default ?? loaded, path: resolved }
-  },
-  loadStylesheet: async (id, from) => {
-    if (id !== 'tailwindcss') throw new Error(`unexpected stylesheet: ${id}`)
+      // tsup's CJS output puts the plugin object (`{ handler, config }`) on `default`.
+      return { base: from, module: loaded.default ?? loaded, path: resolved }
+    },
+    loadStylesheet: async (id, from) => {
+      if (id !== 'tailwindcss') throw new Error(`unexpected stylesheet: ${id}`)
 
-    return {
-      base: path.dirname(tailwind),
-      content: readFileSync(tailwind, 'utf8'),
-      path: tailwind,
-    }
-  },
-  onDependency() {},
-})
+      return {
+        base: path.dirname(tailwind),
+        content: readFileSync(tailwind, 'utf8'),
+        path: tailwind,
+      }
+    },
+    onDependency() {},
+  })
 
 /**
  * A build on a compiler instance: Tailwind emits with these candidates, then the post-build step
  * completes the carriers. What comes back is a finished stylesheet — every carrier holds the
  * aggregate, and no staging remains.
  */
-export const build = (instance, candidates) => complete(instance.build(candidates))
+export const build = (instance, candidates) =>
+  complete(instance.build(candidates))
 
 /**
  * A corpus from `scripts/css-snapshot`, emitted by the CLI and then completed.
@@ -80,11 +82,17 @@ export const build = (instance, candidates) => complete(instance.build(candidate
  * and it measurably disagrees with Tailwind — 179,618 bytes emitted for `variant.css` against the
  * CLI's 177,793.
  */
-export const corpus = (name) => {
+export const corpus = name => {
   const entry = path.join(snapshot, name)
-  const out = path.join(mkdtempSync(path.join(tmpdir(), 'jumi-cli-')), path.basename(entry))
+  const out = path.join(
+    mkdtempSync(path.join(tmpdir(), 'jumi-cli-')),
+    path.basename(entry),
+  )
 
-  execFileSync('pnpm', ['exec', 'tailwindcss', '-i', entry, '-o', out], { cwd: root, stdio: 'pipe' })
+  execFileSync('pnpm', ['exec', 'tailwindcss', '-i', entry, '-o', out], {
+    cwd: root,
+    stdio: 'pipe',
+  })
 
   return complete(readFileSync(out, 'utf8'))
 }

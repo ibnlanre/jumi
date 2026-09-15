@@ -16,7 +16,8 @@ import postcss from 'postcss'
 
 export const parse = css => postcss.parse(css)
 
-export const isAggregate = decl => PARTS.includes(decl.prop) && decl.value.includes('--jumi-')
+export const isAggregate = decl =>
+  PARTS.includes(decl.prop) && decl.value.includes('--jumi-')
 
 /**
  * The composition rule: the one carrying the aggregate. Found by shape, because the transport is
@@ -26,11 +27,12 @@ export const isAggregate = decl => PARTS.includes(decl.prop) && decl.value.inclu
  * Parsing rather than pattern-matching, for the reason `finalize` was moved onto an AST in the first
  * place: `[^{}]*` is only true of the constructs that happen to be in the corpus.
  */
-export const compositionOf = (sheet) => {
+export const compositionOf = sheet => {
   let best = null
 
-  sheet.walkRules((rule) => {
-    if (!rule.nodes?.some(node => node.type === 'decl' && isAggregate(node))) return
+  sheet.walkRules(rule => {
+    if (!rule.nodes?.some(node => node.type === 'decl' && isAggregate(node)))
+      return
 
     if (!best || rule.selector.length > best.selector.length) best = rule
   })
@@ -39,7 +41,9 @@ export const compositionOf = (sheet) => {
 }
 
 export const entriesOf = (rule, prop) => {
-  const decl = rule.nodes.find(node => node.type === 'decl' && node.prop === prop)
+  const decl = rule.nodes.find(
+    node => node.type === 'decl' && node.prop === prop,
+  )
 
   return decl ? splitTopLevel(decl.value) : []
 }
@@ -49,10 +53,10 @@ export const entriesOf = (rule, prop) => {
  * emitted on more than one rule — the substrate and the aggregate — and collapsing only one
  * understates it.
  */
-export const collapseGiant = (sheet) => {
+export const collapseGiant = sheet => {
   const giant = compositionOf(sheet).selector
 
-  sheet.walkRules((rule) => {
+  sheet.walkRules(rule => {
     if (rule.selector === giant) rule.selector = '#target'
   })
 
@@ -116,11 +120,13 @@ export const FALLBACK = {
 export const shallowOf = (css, mode = 'shorthand') => {
   const sheet = parse(css)
   const composition = compositionOf(sheet)
-  const lists = Object.fromEntries(PARTS.map(part => [part, entriesOf(composition, part)]))
+  const lists = Object.fromEntries(
+    PARTS.map(part => [part, entriesOf(composition, part)]),
+  )
   const n = lists['animation-name'].length
   const shorthand = mode === 'shorthand'
 
-  const slots = lists['animation-name'].map((entry) => {
+  const slots = lists['animation-name'].map(entry => {
     const match = /var\((--jumi-(.+?)-animation-name)/.exec(entry)
 
     return match ? match[1] : null
@@ -129,9 +135,14 @@ export const shallowOf = (css, mode = 'shorthand') => {
   // The rule that activates a slot is the rule declaring its activation variable.
   const owners = new Map()
 
-  sheet.walkRules((rule) => {
+  sheet.walkRules(rule => {
     for (const node of rule.nodes ?? []) {
-      if (node.type === 'decl' && slots.includes(node.prop) && !owners.has(node.prop)) owners.set(node.prop, rule)
+      if (
+        node.type === 'decl' &&
+        slots.includes(node.prop) &&
+        !owners.has(node.prop)
+      )
+        owners.set(node.prop, rule)
     }
   })
 
@@ -141,26 +152,50 @@ export const shallowOf = (css, mode = 'shorthand') => {
     if (!owner) continue
 
     if (shorthand) {
-      owner.append({ prop: `--jumi-slot-${position}`, value: SHORTHAND.map(part => lists[part][position]).join(' ') })
+      owner.append({
+        prop: `--jumi-slot-${position}`,
+        value: SHORTHAND.map(part => lists[part][position]).join(' '),
+      })
 
       continue
     }
 
-    for (const part of PARTS) owner.append({ prop: `--jumi-slot-${part}-${position}`, value: lists[part][position] })
+    for (const part of PARTS)
+      owner.append({
+        prop: `--jumi-slot-${part}-${position}`,
+        value: lists[part][position],
+      })
   }
 
-  composition.walkDecls((decl) => {
+  composition.walkDecls(decl => {
     if (PARTS.includes(decl.prop)) decl.remove()
   })
 
   if (shorthand) {
-    composition.append({ prop: 'animation', value: Array.from({ length: n }, (_, p) => `var(--jumi-slot-${p}, none)`).join(', ') })
-    composition.append({ prop: 'animation-composition', value: lists['animation-composition'].join(', ') })
-    composition.append({ prop: 'animation-timeline', value: lists['animation-timeline'].join(', ') })
-  }
-  else {
+    composition.append({
+      prop: 'animation',
+      value: Array.from(
+        { length: n },
+        (_, p) => `var(--jumi-slot-${p}, none)`,
+      ).join(', '),
+    })
+    composition.append({
+      prop: 'animation-composition',
+      value: lists['animation-composition'].join(', '),
+    })
+    composition.append({
+      prop: 'animation-timeline',
+      value: lists['animation-timeline'].join(', '),
+    })
+  } else {
     for (const part of PARTS) {
-      composition.append({ prop: part, value: Array.from({ length: n }, (_, p) => `var(--jumi-slot-${part}-${p}, ${FALLBACK[part]})`).join(', ') })
+      composition.append({
+        prop: part,
+        value: Array.from(
+          { length: n },
+          (_, p) => `var(--jumi-slot-${part}-${p}, ${FALLBACK[part]})`,
+        ).join(', '),
+      })
     }
   }
 

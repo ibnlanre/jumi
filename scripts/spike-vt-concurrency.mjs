@@ -118,7 +118,9 @@ const server = createServer((_, response) => {
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve))
 
 const browser = await chromium.launch()
-const context = await browser.newContext({ viewport: { height: 500, width: 700 } })
+const context = await browser.newContext({
+  viewport: { height: 500, width: 700 },
+})
 const page = await context.newPage()
 
 await page.goto(`http://127.0.0.1:${server.address().port}/`)
@@ -127,44 +129,97 @@ const names = await page.evaluate(() => window.__names)
 const rows = []
 
 for (const name of names) {
-  rows.push(['oneTask', name, await page.evaluate(n => window.__spike.oneTask(n), name)])
-  rows.push(['microtaskAfter', name, await page.evaluate(n => window.__spike.microtaskAfter(n), name)])
-  rows.push(['timerAfter', name, await page.evaluate(n => window.__spike.timerAfter(n), name)])
-  rows.push(['timerBefore', name, await page.evaluate(n => window.__spike.timerBefore(n), name)])
+  rows.push([
+    'oneTask',
+    name,
+    await page.evaluate(n => window.__spike.oneTask(n), name),
+  ])
+  rows.push([
+    'microtaskAfter',
+    name,
+    await page.evaluate(n => window.__spike.microtaskAfter(n), name),
+  ])
+  rows.push([
+    'timerAfter',
+    name,
+    await page.evaluate(n => window.__spike.timerAfter(n), name),
+  ])
+  rows.push([
+    'timerBefore',
+    name,
+    await page.evaluate(n => window.__spike.timerBefore(n), name),
+  ])
 
   await page.evaluate(() => window.__spike.reset())
   await page.waitForTimeout(20)
   await page.click('#target')
   await page.click('#target')
-  rows.push(['clickPair', name, (await page.evaluate(() => window.__spike.input())).click?.[name] ?? '(no reading)'])
+  rows.push([
+    'clickPair',
+    name,
+    (await page.evaluate(() => window.__spike.input())).click?.[name] ??
+      '(no reading)',
+  ])
 
   await page.evaluate(() => window.__spike.reset())
   await page.waitForTimeout(20)
   await page.click('#target', { clickCount: 2, delay: 10 })
-  rows.push(['doubleClick', name, (await page.evaluate(() => window.__spike.input())).click?.[name] ?? '(no reading)'])
+  rows.push([
+    'doubleClick',
+    name,
+    (await page.evaluate(() => window.__spike.input())).click?.[name] ??
+      '(no reading)',
+  ])
 
   await page.evaluate(() => window.__spike.reset())
   await page.waitForTimeout(20)
 
   const session = await context.newCDPSession(page)
 
-  await session.send('Input.dispatchKeyEvent', { code: 'KeyA', key: 'a', type: 'keyDown', windowsVirtualKeyCode: 65 })
-  await session.send('Input.dispatchKeyEvent', { autoRepeat: true, code: 'KeyA', key: 'a', type: 'keyDown', windowsVirtualKeyCode: 65 })
-  await session.send('Input.dispatchKeyEvent', { autoRepeat: true, code: 'KeyA', key: 'a', type: 'keyDown', windowsVirtualKeyCode: 65 })
+  await session.send('Input.dispatchKeyEvent', {
+    code: 'KeyA',
+    key: 'a',
+    type: 'keyDown',
+    windowsVirtualKeyCode: 65,
+  })
+  await session.send('Input.dispatchKeyEvent', {
+    autoRepeat: true,
+    code: 'KeyA',
+    key: 'a',
+    type: 'keyDown',
+    windowsVirtualKeyCode: 65,
+  })
+  await session.send('Input.dispatchKeyEvent', {
+    autoRepeat: true,
+    code: 'KeyA',
+    key: 'a',
+    type: 'keyDown',
+    windowsVirtualKeyCode: 65,
+  })
 
-  rows.push(['keyRepeat', name, (await page.evaluate(() => window.__spike.input())).keydown?.[name] ?? '(no reading)'])
+  rows.push([
+    'keyRepeat',
+    name,
+    (await page.evaluate(() => window.__spike.input())).keydown?.[name] ??
+      '(no reading)',
+  ])
 
   await session.detach()
 }
 
 const width = Math.max(...rows.map(([shape]) => shape.length))
 
-console.log('\n  false = "a later interaction" (supersede)   true = "the same one" (coalesce)\n')
+console.log(
+  '\n  false = "a later interaction" (supersede)   true = "the same one" (coalesce)\n',
+)
 
 for (const [shape, name, value] of rows) {
-  const reading = typeof value === 'object' && value !== null
-    ? Object.entries(value).map(([key, entry]) => `${key}=${entry}`).join(' ')
-    : String(value)
+  const reading =
+    typeof value === 'object' && value !== null
+      ? Object.entries(value)
+          .map(([key, entry]) => `${key}=${entry}`)
+          .join(' ')
+      : String(value)
 
   console.log(`  ${shape.padEnd(width)}  ${name.padEnd(9)}  ${reading}`)
 }

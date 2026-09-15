@@ -34,7 +34,11 @@ import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { fileURLToPath } from 'node:url'
 
-import { aggregateSlots, expectedDeclarations, protocolState } from './lib/css.mjs'
+import {
+  aggregateSlots,
+  expectedDeclarations,
+  protocolState,
+} from './lib/css.mjs'
 
 import path from 'node:path'
 
@@ -50,20 +54,23 @@ const update = process.argv.includes('--update')
 const STAGING = /[^{}]+\{[^{}]*--jumi-staging-[^{}]*\}/g
 
 /** A CSS colour literal — what a theme value looks like before it is a token. */
-const COLOR_LITERAL = /^(?:#|(?:rgba?|hsla?|lab|lch|oklab|oklch|color|color-mix|light-dark)\()|^(?:currentColor|transparent|canvastext)$/i
+const COLOR_LITERAL =
+  /^(?:#|(?:rgba?|hsla?|lab|lch|oklab|oklch|color|color-mix|light-dark)\()|^(?:currentColor|transparent|canvastext)$/i
 
 /**
  * The values Jumi writes into its own utility rules — one per tween target or
  * phrase frame. Read from `.animate-*` rules so the counts describe theme
  * resolution rather than every custom property in the file.
  */
-const tweenValues = (css) => {
+const tweenValues = css => {
   const values = []
 
   for (const rule of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
     if (!rule[1].trim().startsWith('.animate-')) continue
 
-    for (const declaration of rule[2].matchAll(/(--jumi-[\w-]+):\s*([^;]+);/g)) {
+    for (const declaration of rule[2].matchAll(
+      /(--jumi-[\w-]+):\s*([^;]+);/g,
+    )) {
       values.push(declaration[2].trim())
     }
   }
@@ -77,7 +84,7 @@ const tweenValues = (css) => {
  * theme migration changes values without changing the utility set — a large
  * mechanical diff is exactly where a reviewer loses the signal.
  */
-const resolution = (css) => {
+const resolution = css => {
   const themeResolution = { formula: 0, literal: 0, token: 0 }
   const colorValues = { literal: 0, token: 0 }
 
@@ -109,7 +116,7 @@ function measure(built) {
   // declarations a browser reads.
   const shipped = {
     aggregateBytes: state.declarationBytes,
-    aggregateShare: Math.round(100 * state.declarationBytes / css.length),
+    aggregateShare: Math.round((100 * state.declarationBytes) / css.length),
     aggregateWrites: state.declarations,
     // Composition rules counted off the output, by kind: each is identified by the declaration
     // only that kind has — `animation-name`, or the composed `transition`.
@@ -153,12 +160,18 @@ function report(before, after, indent = 2) {
 
     if (value && typeof value === 'object') {
       console.log(`${pad}${key}`)
-      report(was && typeof was === 'object' ? was : undefined, value, indent + 2)
+      report(
+        was && typeof was === 'object' ? was : undefined,
+        value,
+        indent + 2,
+      )
       continue
     }
 
     const moved = was !== undefined && was !== value
-    console.log(`${pad}${key.padEnd(11)} ${String(value).padStart(8)}${moved ? `   (was ${was})` : ''}`)
+    console.log(
+      `${pad}${key.padEnd(11)} ${String(value).padStart(8)}${moved ? `   (was ${was})` : ''}`,
+    )
   }
 }
 
@@ -173,15 +186,20 @@ function report(before, after, indent = 2) {
  * record, so it is compared field by field now, and a mismatch is re-recorded deliberately with
  * `pnpm css:snapshot` rather than absorbed silently.
  */
-const drift = (before, after, path = []) => Object.entries(after).flatMap(([key, value]) => {
-  const was = before?.[key]
-  const where = [...path, key].join('.')
+const drift = (before, after, path = []) =>
+  Object.entries(after).flatMap(([key, value]) => {
+    const was = before?.[key]
+    const where = [...path, key].join('.')
 
-  if (value && typeof value === 'object') return drift(was && typeof was === 'object' ? was : {}, value, [...path, key])
-  if (was === undefined || was === value) return []
+    if (value && typeof value === 'object')
+      return drift(was && typeof was === 'object' ? was : {}, value, [
+        ...path,
+        key,
+      ])
+    if (was === undefined || was === value) return []
 
-  return [`${where} ${JSON.stringify(was)} → ${JSON.stringify(value)}`]
-})
+    return [`${where} ${JSON.stringify(was)} → ${JSON.stringify(value)}`]
+  })
 
 /**
  * Safety bounds, not desired performance. They exist so the cost cannot quietly get *worse*;
@@ -204,24 +222,32 @@ const drift = (before, after, path = []) => Object.entries(after).flatMap(([key,
  */
 const variantChecks = [
   {
-    detail: measured => `${measured.selectors} selectors`
-      + ` for ${measured.animations} animations + ${measured.transitions} transitions compositions`,
+    detail: measured =>
+      `${measured.selectors} selectors` +
+      ` for ${measured.animations} animations + ${measured.transitions} transitions compositions`,
     holds: measured => measured.selectors > 0 && measured.animations > 0,
     what: 'the composition is written for the rules that activate it',
   },
   {
-    detail: measured => `${measured.aggregateWrites} declarations, ${expectedDeclarations(measured)} expected`,
-    holds: measured => measured.aggregateWrites === expectedDeclarations(measured),
+    detail: measured =>
+      `${measured.aggregateWrites} declarations, ${expectedDeclarations(measured)} expected`,
+    holds: measured =>
+      measured.aggregateWrites === expectedDeclarations(measured),
     what: 'each kind holds the whole list for the parts it declares, and nothing else',
   },
   {
-    detail: measured => Object.entries(measured.protocol).map(([name, count]) => `${count} ${name}`).join(', '),
-    holds: measured => Object.values(measured.protocol).every(count => count === 0),
+    detail: measured =>
+      Object.entries(measured.protocol)
+        .map(([name, count]) => `${count} ${name}`)
+        .join(', '),
+    holds: measured =>
+      Object.values(measured.protocol).every(count => count === 0),
     what: 'no build-time name reaches the file',
   },
   {
-    detail: measured => `${measured.bytes} shipped from ${measured.rawBytes} emitted`
-      + (measured.stagingBytes ? `, ${measured.stagingBytes} of it staging` : ''),
+    detail: measured =>
+      `${measured.bytes} shipped from ${measured.rawBytes} emitted` +
+      (measured.stagingBytes ? `, ${measured.stagingBytes} of it staging` : ''),
     holds: measured => measured.bytes < measured.rawBytes,
     what: 'the build cost does not reach the file: what ships is smaller than what was emitted',
   },
@@ -236,11 +262,15 @@ execFileSync('pnpm', ['run', 'bundle'], { cwd: root, stdio: 'pipe' })
 const { corpus } = await import('./lib/compile.mjs')
 
 if (!existsSync(snapshot) && !update) {
-  console.error('✗ no snapshot to check against — run `pnpm css:snapshot` first')
+  console.error(
+    '✗ no snapshot to check against — run `pnpm css:snapshot` first',
+  )
   process.exit(1)
 }
 
-const previous = existsSync(structureFile) ? JSON.parse(readFileSync(structureFile, 'utf8')) : null
+const previous = existsSync(structureFile)
+  ? JSON.parse(readFileSync(structureFile, 'utf8'))
+  : null
 const failures = []
 let drifted = 0
 
@@ -248,7 +278,9 @@ let drifted = 0
 const canonicalBuild = await corpus('input.css')
 const canonicalCss = canonicalBuild.css
 const canonical = measure(canonicalBuild)
-const canonicalOut = update ? snapshot : path.join(mkdtempSync(path.join(tmpdir(), 'jumi-css-')), 'out.css')
+const canonicalOut = update
+  ? snapshot
+  : path.join(mkdtempSync(path.join(tmpdir(), 'jumi-css-')), 'out.css')
 
 // The CLI used to write this file as a side effect of compiling; the harness owns it now, and
 // the temp copy is what the `diff` below is run against.
@@ -261,8 +293,12 @@ if (previous?.canonical) {
   const moved = drift(previous.canonical, canonical)
 
   if (moved.length) {
-    console.error(`✗ the recorded structure does not describe this stylesheet: ${moved.join(', ')}`)
-    console.error('  Re-record it with `pnpm css:snapshot` if the measurement is intended.')
+    console.error(
+      `✗ the recorded structure does not describe this stylesheet: ${moved.join(', ')}`,
+    )
+    console.error(
+      '  Re-record it with `pnpm css:snapshot` if the measurement is intended.',
+    )
     drifted += moved.length
   }
 }
@@ -277,8 +313,12 @@ if (previous?.carrierVariant) {
   const moved = drift(previous.carrierVariant, variant)
 
   if (moved.length) {
-    console.error(`✗ the recorded structure does not describe this stylesheet: ${moved.join(', ')}`)
-    console.error('  Re-record it with `pnpm css:snapshot` if the measurement is intended.')
+    console.error(
+      `✗ the recorded structure does not describe this stylesheet: ${moved.join(', ')}`,
+    )
+    console.error(
+      '  Re-record it with `pnpm css:snapshot` if the measurement is intended.',
+    )
     drifted += moved.length
   }
 }
@@ -292,13 +332,22 @@ for (const check of variantChecks) {
 if (failures.length) {
   console.error('')
   for (const failure of failures) console.error(`✗ ${failure}`)
-  console.error('\n  These record a cost rather than a target: loosening one is a deliberate')
-  console.error('  edit to `variantChecks` in this script, and satisfying one is the workstream.')
+  console.error(
+    '\n  These record a cost rather than a target: loosening one is a deliberate',
+  )
+  console.error(
+    '  edit to `variantChecks` in this script, and satisfying one is the workstream.',
+  )
 }
 
 if (update) {
-  writeFileSync(structureFile, `${JSON.stringify({ canonical, carrierVariant: variant }, null, 2)}\n`)
-  console.log(`✓ recorded — ${path.relative(root, snapshot)} (${canonical.bytes} bytes) + structure.json`)
+  writeFileSync(
+    structureFile,
+    `${JSON.stringify({ canonical, carrierVariant: variant }, null, 2)}\n`,
+  )
+  console.log(
+    `✓ recorded — ${path.relative(root, snapshot)} (${canonical.bytes} bytes) + structure.json`,
+  )
 
   // Re-recording is what a drift asks for, so it clears one; a budget failure is not cleared here,
   // because satisfying one is the workstream rather than an edit to the record.
@@ -306,16 +355,21 @@ if (update) {
 }
 
 if (readFileSync(snapshot, 'utf8') === canonicalCss) {
-  console.log(`✓ css snapshot unchanged (${canonical.bytes} bytes shipped from ${canonical.rawBytes} emitted)`)
+  console.log(
+    `✓ css snapshot unchanged (${canonical.bytes} bytes shipped from ${canonical.rawBytes} emitted)`,
+  )
   process.exit(failures.length || drifted ? 1 : 0)
 }
 
-console.error('✗ css snapshot changed — the emitted CSS differs from the recorded one:\n')
+console.error(
+  '✗ css snapshot changed — the emitted CSS differs from the recorded one:\n',
+)
 try {
   execFileSync('diff', ['-u', snapshot, canonicalOut], { stdio: 'inherit' })
-}
-catch {
+} catch {
   // diff exits 1 when the files differ; that is the case we are reporting.
 }
-console.error('\nIf the change is intended, re-record it with `pnpm css:snapshot`.')
+console.error(
+  '\nIf the change is intended, re-record it with `pnpm css:snapshot`.',
+)
 process.exit(1)

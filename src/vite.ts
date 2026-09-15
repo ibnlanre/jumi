@@ -35,7 +35,10 @@ import tailwindcss from '@tailwindcss/vite'
  * is not exported: `jumi()` is the only thing that should be adding the directive, and the
  * hand-written equivalent is `@plugin "@ibnlanre/jumi"` in the stylesheet.
  */
-export default function jumi(options?: { plugin?: string, tailwind?: PluginOptions }): Plugin[] {
+export default function jumi(options?: {
+  plugin?: string
+  tailwind?: PluginOptions
+}): Plugin[] {
   return [
     jumiRegister(options?.plugin),
     ...tailwindcss(options?.tailwind),
@@ -68,7 +71,8 @@ export function jumiFinalizer(): Plugin {
       // but a guard that only looks for the payload marker would skip one silently if that ever stopped
       // being true, and the failure would be a feature that works everywhere except a build.
       if (!id.includes('.css')) return null
-      if (!code.includes(stagingMarker) && !code.includes('jumi-vt-')) return null
+      if (!code.includes(stagingMarker) && !code.includes('jumi-vt-'))
+        return null
 
       const { css, staging, warnings } = finalizeCss(code)
 

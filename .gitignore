@@ -1,5 +1,7 @@
 .DS_Store
-docs/.astro/
+# Astro's cache, at whatever depth it lands: `docs/.astro/` was the only spelling covered, so the
+# nested `docs/docs/.astro/` was committed instead of ignored.
+.astro/
 docs/vendor/
 .pnpm-store/
 storybook-static

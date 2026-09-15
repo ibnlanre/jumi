@@ -59,49 +59,110 @@ const MOTION_KINDS = [
 
 const ARMS = [
   // The feature.
-  { classes: 'animate-fade-in animate-rotate-45 animation-timeline-scroll animation-range-[25%_75%]/rotate', id: 'ranged' },
+  {
+    classes:
+      'animate-fade-in animate-rotate-45 animation-timeline-scroll animation-range-[25%_75%]/rotate',
+    id: 'ranged',
+  },
   // The control: same element, same slots, no range at all.
-  { classes: 'animate-fade-in animate-rotate-45 animation-timeline-scroll', id: 'unranged' },
+  {
+    classes: 'animate-fade-in animate-rotate-45 animation-timeline-scroll',
+    id: 'unranged',
+  },
   // One slot retargeted, the other left on the document timeline.
-  { classes: 'animate-fade-in animate-rotate-45 animation-timeline-scroll/rotate', id: 'mixed' },
+  {
+    classes:
+      'animate-fade-in animate-rotate-45 animation-timeline-scroll/rotate',
+    id: 'mixed',
+  },
   // Time values on a progress-based timeline: delay is a share of the scroll, not a wait.
-  { classes: 'animate-fade-in animation-timeline-scroll animation-delay-600', id: 'delayed' },
+  {
+    classes: 'animate-fade-in animation-timeline-scroll animation-delay-600',
+    id: 'delayed',
+  },
   // A range and a delay on one slot: the range places the window, the delay compresses within it.
-  { classes: 'animate-fade-in animation-timeline-scroll animation-range-[25%_75%]/fade-in animation-delay-600', id: 'delayedRange' },
+  {
+    classes:
+      'animate-fade-in animation-timeline-scroll animation-range-[25%_75%]/fade-in animation-delay-600',
+    id: 'delayedRange',
+  },
   // A view-driven entrance, for the fallback arm below.
   { classes: 'animate-fade-in animation-timeline-view', id: 'viewDriven' },
   // The view-timeline inset, which is a `<length-percentage>`: a percentage is the common case and
   // was refused silently by a `type: 'length'` on the control.
-  { classes: 'animate-fade-in animation-timeline-view animation-timeline-inset-start-[20%] animation-timeline-inset-end-[10%]', id: 'inset' },
+  {
+    classes:
+      'animate-fade-in animation-timeline-view animation-timeline-inset-start-[20%] animation-timeline-inset-end-[10%]',
+    id: 'inset',
+  },
   // A typo'd axis on a page with nothing to scroll horizontally.
-  { classes: 'animate-fade-in animation-timeline-scroll animation-timeline-axis-x', id: 'axisX' },
+  {
+    classes:
+      'animate-fade-in animation-timeline-scroll animation-timeline-axis-x',
+    id: 'axisX',
+  },
   // The two reduced-motion spellings: the clamp, and the bare arm the platform leaves alone.
-  { classes: 'animate-fade-in animation-timeline-scroll motion-reduce:animation-timeline-none', id: 'clamped' },
+  {
+    classes:
+      'animate-fade-in animation-timeline-scroll motion-reduce:animation-timeline-none',
+    id: 'clamped',
+  },
   { classes: 'animate-fade-in animation-timeline-scroll', id: 'bare' },
   // The author's strict path: motion *and* timeline behind one capability query, so a browser that
   // cannot do scroll-driven animation runs nothing at all rather than a time-driven stand-in. The
   // second arm uses a query that cannot match, which is the only way to measure the negative half in
   // a browser that does support timelines — see the note on that assertion.
-  { classes: 'supports-[animation-timeline:scroll()]:animate-fade-in supports-[animation-timeline:scroll()]:animation-timeline-scroll', id: 'guarded' },
-  { classes: 'supports-[animation-timeline:definitely-not-a-timeline]:animate-fade-in supports-[animation-timeline:definitely-not-a-timeline]:animation-timeline-scroll', id: 'guardedFalse' },
+  {
+    classes:
+      'supports-[animation-timeline:scroll()]:animate-fade-in supports-[animation-timeline:scroll()]:animation-timeline-scroll',
+    id: 'guarded',
+  },
+  {
+    classes:
+      'supports-[animation-timeline:definitely-not-a-timeline]:animate-fade-in supports-[animation-timeline:definitely-not-a-timeline]:animation-timeline-scroll',
+    id: 'guardedFalse',
+  },
   // The range as a composition variant: the same intent as `animation-range-*/slot`, written on the
   // candidate instead. This one is the claim that matters most — one element, two motions, one of them
   // ranged by the variant and one not, so a publication that ranged the wrong slot shows up as a
   // motion in the wrong place rather than as a missing declaration.
-  { classes: 'animate-fade-in animate-rotate-45 animation-timeline-scroll animation-range-[25%_75%]:animate-fade-in', id: 'variantScoped' },
+  {
+    classes:
+      'animate-fade-in animate-rotate-45 animation-timeline-scroll animation-range-[25%_75%]:animate-fade-in',
+    id: 'variantScoped',
+  },
   // Two ranged motions on one element, by name, through a view timeline: the two ranges must not swap.
-  { classes: 'animate-fade-in animate-fade-out animation-timeline-view animation-range-entry:animate-fade-in animation-range-exit:animate-fade-out', id: 'variantPair' },
+  {
+    classes:
+      'animate-fade-in animate-fade-out animation-timeline-view animation-range-entry:animate-fade-in animation-range-exit:animate-fade-out',
+    id: 'variantPair',
+  },
   // Ordinary Tailwind conditions stacked over a range variant. `motion-safe:` and `sm:` both hold in a
   // `no-preference` context at 1000px wide, so this arm is measured rather than merely compiled.
-  { classes: 'animate-fade-in animate-rotate-45 animation-timeline-scroll motion-safe:animation-range-[25%_75%]:animate-fade-in sm:animation-range-[25%_75%]:animate-fade-in hover:animation-range-[25%_75%]:animate-fade-in', id: 'variantStacked' },
+  {
+    classes:
+      'animate-fade-in animate-rotate-45 animation-timeline-scroll motion-safe:animation-range-[25%_75%]:animate-fade-in sm:animation-range-[25%_75%]:animate-fade-in hover:animation-range-[25%_75%]:animate-fade-in',
+    id: 'variantStacked',
+  },
   // A typo in the range: refused loudly, and the motion still runs at the default rather than not at all.
   // The bare spelling of a typo is *not* used here — a value outside the variant's `values` list is never
   // a candidate, so Tailwind drops it before Jumi can see it. The arbitrary spelling is the surface a
   // typo actually reaches, and so is a legal name joined to a malformed offset.
-  { classes: 'animate-fade-in animate-rotate-45 animation-timeline-scroll animation-range-[nonsense]:animate-fade-in', id: 'variantRefused' },
-  { classes: 'animate-fade-in animate-rotate-45 animation-timeline-scroll animation-range-[normal_0%]:animate-fade-in', id: 'variantLandmine' },
+  {
+    classes:
+      'animate-fade-in animate-rotate-45 animation-timeline-scroll animation-range-[nonsense]:animate-fade-in',
+    id: 'variantRefused',
+  },
+  {
+    classes:
+      'animate-fade-in animate-rotate-45 animation-timeline-scroll animation-range-[normal_0%]:animate-fade-in',
+    id: 'variantLandmine',
+  },
   // A range over a candidate that declares no motion: nothing to range, so nothing to write.
-  { classes: 'animate-fade-in animation-range-entry:animation-delay-[150ms]', id: 'variantNoMotion' },
+  {
+    classes: 'animate-fade-in animation-range-entry:animation-delay-[150ms]',
+    id: 'variantNoMotion',
+  },
   // The utility spelling of a value the variant also accepts, which is the shape that must stay quiet.
   { classes: 'animate-fade-in animation-range-entry', id: 'utilityBare' },
   // **Parity.** The variant qualifies one *slot*, so it publishes under that slot's key — and a
@@ -115,7 +176,9 @@ const ARMS = [
   })),
 ]
 
-const CANDIDATES = [...new Set(ARMS.flatMap(arm => arm.classes.split(/\s+/).filter(Boolean)))]
+const CANDIDATES = [
+  ...new Set(ARMS.flatMap(arm => arm.classes.split(/\s+/).filter(Boolean))),
+]
 
 const entry = `
 @import "tailwindcss";
@@ -148,7 +211,9 @@ const check = (label, condition, detail) => {
   asserted += 1
   if (!condition) failures.push(label)
 
-  console.log(`  ${condition ? '✓' : '✗'} ${label}${detail === undefined ? '' : ` — ${detail}`}`)
+  console.log(
+    `  ${condition ? '✓' : '✗'} ${label}${detail === undefined ? '' : ` — ${detail}`}`,
+  )
 }
 
 // ── 1 · the emission, read rather than assumed ──────────────────────────────────────────────────
@@ -165,11 +230,12 @@ const sheet = postcss.parse(emitted.css)
 const PUBLICATION = /^--jumi-.+-animation-range$/
 
 /** The first rule whose selector list holds `selector` exactly, or null. */
-const ruleHolding = (selector) => {
+const ruleHolding = selector => {
   let found = null
 
-  sheet.walkRules((rule) => {
-    if (found === null && (rule.selectors ?? []).includes(selector)) found = rule
+  sheet.walkRules(rule => {
+    if (found === null && (rule.selectors ?? []).includes(selector))
+      found = rule
   })
 
   return found
@@ -183,32 +249,43 @@ const ruleHolding = (selector) => {
  * one rule whose selector list holds several of them — the first match for any selector-based search,
  * and it holds none of the publications — and a condition can append to a class's selector (`:hover`).
  */
-const rulePublishing = (stem) => {
+const rulePublishing = stem => {
   let found = null
 
-  sheet.walkRules((rule) => {
-    const holds = (rule.nodes ?? []).some(node => node.type === 'decl' && PUBLICATION.test(node.prop))
+  sheet.walkRules(rule => {
+    const holds = (rule.nodes ?? []).some(
+      node => node.type === 'decl' && PUBLICATION.test(node.prop),
+    )
 
-    if (found === null && holds && (rule.selectors ?? []).some(selector => selector.startsWith(stem))) found = rule
+    if (
+      found === null &&
+      holds &&
+      (rule.selectors ?? []).some(selector => selector.startsWith(stem))
+    )
+      found = rule
   })
 
   return found
 }
 
 const declarationIn = (rule, prop) =>
-  (rule?.nodes ?? []).find(node => node.type === 'decl' && node.prop === prop)?.value
+  (rule?.nodes ?? []).find(node => node.type === 'decl' && node.prop === prop)
+    ?.value
 
 let composition = null
 
-sheet.walkRules((rule) => {
+sheet.walkRules(rule => {
   const own = (rule.nodes ?? []).filter(node => node.type === 'decl')
 
   if (!own.some(node => node.prop === 'animation')) return
 
-  if (!composition || rule.selector.length > composition.selector.length) composition = rule
+  if (!composition || rule.selector.length > composition.selector.length)
+    composition = rule
 })
 
-const declared = (composition?.nodes ?? []).filter(node => node.type === 'decl').map(node => node.prop)
+const declared = (composition?.nodes ?? [])
+  .filter(node => node.type === 'decl')
+  .map(node => node.prop)
 const shorthandAt = declared.indexOf('animation')
 
 check(
@@ -217,9 +294,13 @@ check(
   declared.join(' ').slice(0, 96),
 )
 
-const rangeValue = (composition?.nodes ?? []).find(node => node.prop === 'animation-range')?.value ?? ''
+const rangeValue =
+  (composition?.nodes ?? []).find(node => node.prop === 'animation-range')
+    ?.value ?? ''
 const rangeEntries = splitTopLevel(rangeValue)
-const shorthandValue = (composition?.nodes ?? []).find(node => node.prop === 'animation')?.value ?? ''
+const shorthandValue =
+  (composition?.nodes ?? []).find(node => node.prop === 'animation')?.value ??
+  ''
 const shorthandEntries = splitTopLevel(shorthandValue)
 
 // One entry per animation, and every entry ends at the element's default — through the slot's own
@@ -233,9 +314,13 @@ const shorthandEntries = splitTopLevel(shorthandValue)
 // added to this file changes how many slots an element has, and a hand-kept 2 would then fail for the
 // wrong reason — which is what happened the moment the range variant was added.
 check(
-  'the range list reads one entry per animation, each falling back to the element\'s own range',
-  rangeEntries.length === shorthandEntries.length
-  && rangeEntries.every(entry => /^var\(--jumi-[A-Za-z0-9-]+-animation-range, .*var\(--jumi-animation-range\)\)+$/.test(entry.trim())),
+  "the range list reads one entry per animation, each falling back to the element's own range",
+  rangeEntries.length === shorthandEntries.length &&
+    rangeEntries.every(entry =>
+      /^var\(--jumi-[A-Za-z0-9-]+-animation-range, .*var\(--jumi-animation-range\)\)+$/.test(
+        entry.trim(),
+      ),
+    ),
   `${rangeEntries.length} range entries for ${shorthandEntries.length} animations, first ${rangeEntries[0]?.slice(0, 48)}`,
 )
 
@@ -243,7 +328,7 @@ check(
 const substrate = (() => {
   let found = null
 
-  sheet.walkRules((rule) => {
+  sheet.walkRules(rule => {
     const props = new Set((rule.nodes ?? []).map(node => node.prop))
 
     if (props.has('--jumi-animation-range') && !found) found = rule
@@ -252,20 +337,22 @@ const substrate = (() => {
   return found
 })()
 
-const substrateValue = prop => (substrate?.nodes ?? []).find(node => node.prop === prop)?.value
+const substrateValue = prop =>
+  (substrate?.nodes ?? []).find(node => node.prop === prop)?.value
 
 check(
   'each half is one value fed by its offset, so nothing is joined from a name and an offset',
-  substrateValue('--jumi-animation-range-start') === 'var(--jumi-animation-range-start-offset)'
-  && substrateValue('--jumi-animation-range-start-offset') === '0%'
-  && substrateValue('--jumi-animation-range-end-offset') === '100%',
+  substrateValue('--jumi-animation-range-start') ===
+    'var(--jumi-animation-range-start-offset)' &&
+    substrateValue('--jumi-animation-range-start-offset') === '0%' &&
+    substrateValue('--jumi-animation-range-end-offset') === '100%',
   `${substrateValue('--jumi-animation-range-start')} = ${substrateValue('--jumi-animation-range-start-offset')}`,
 )
 
 check(
   'and the grammar-shaped name half is gone rather than left unused',
-  substrateValue('--jumi-animation-range-start-timeline') === undefined
-  && substrateValue('--jumi-animation-range-end-timeline') === undefined,
+  substrateValue('--jumi-animation-range-start-timeline') === undefined &&
+    substrateValue('--jumi-animation-range-end-timeline') === undefined,
   'no name-half variables in the substrate',
 )
 
@@ -278,7 +365,8 @@ const scoped = (() => {
 
 check(
   'a range control addresses one slot through the same /<slot> vocabulary the timing controls use',
-  scoped?.prop === '--jumi-rotate-animation-range' && scoped?.value === '25% 75%',
+  scoped?.prop === '--jumi-rotate-animation-range' &&
+    scoped?.value === '25% 75%',
   scoped ? `${scoped.prop}: ${scoped.value}` : '(no scoped rule)',
 )
 
@@ -287,8 +375,8 @@ check(
 // that refuses a value without saying so, which is the same failure shape as the range default.
 check(
   'a percentage view-timeline inset is expressible, not silently refused',
-  emitted.css.includes('--jumi-animation-timeline-inset-start: 20%')
-  && emitted.css.includes('--jumi-animation-timeline-inset-end: 10%'),
+  emitted.css.includes('--jumi-animation-timeline-inset-start: 20%') &&
+    emitted.css.includes('--jumi-animation-timeline-inset-end: 10%'),
   'inset-start 20%, inset-end 10% emitted',
 )
 
@@ -308,45 +396,107 @@ check(
 const VOCABULARY = [
   ['animation-timeline-auto', '--jumi-animation-timeline: auto'],
   ['animation-timeline-none', '--jumi-animation-timeline: none'],
-  ['animation-timeline-scroll', '--jumi-animation-timeline: var(--jumi-animation-timeline-scroll)'],
-  ['animation-timeline-view', '--jumi-animation-timeline: var(--jumi-animation-timeline-view)'],
-  ['animation-timeline-scroll/rotate', '--jumi-rotate-animation-timeline: var(--jumi-animation-timeline-scroll)'],
-  ...['block', 'inline', 'x', 'y'].map(value => [`animation-timeline-axis-${value}`, `--jumi-animation-timeline-axis: ${value}`]),
-  ...['nearest', 'root', 'self'].map(value => [`animation-timeline-scroller-${value}`, `--jumi-animation-timeline-scroller: ${value}`]),
-  ['animation-timeline-inset-start-auto', '--jumi-animation-timeline-inset-start: auto'],
-  ['animation-timeline-inset-end-auto', '--jumi-animation-timeline-inset-end: auto'],
-  ['animation-timeline-inset-start-[20%]', '--jumi-animation-timeline-inset-start: 20%'],
-  ['animation-timeline-inset-end-[10%]', '--jumi-animation-timeline-inset-end: 10%'],
+  [
+    'animation-timeline-scroll',
+    '--jumi-animation-timeline: var(--jumi-animation-timeline-scroll)',
+  ],
+  [
+    'animation-timeline-view',
+    '--jumi-animation-timeline: var(--jumi-animation-timeline-view)',
+  ],
+  [
+    'animation-timeline-scroll/rotate',
+    '--jumi-rotate-animation-timeline: var(--jumi-animation-timeline-scroll)',
+  ],
+  ...['block', 'inline', 'x', 'y'].map(value => [
+    `animation-timeline-axis-${value}`,
+    `--jumi-animation-timeline-axis: ${value}`,
+  ]),
+  ...['nearest', 'root', 'self'].map(value => [
+    `animation-timeline-scroller-${value}`,
+    `--jumi-animation-timeline-scroller: ${value}`,
+  ]),
+  [
+    'animation-timeline-inset-start-auto',
+    '--jumi-animation-timeline-inset-start: auto',
+  ],
+  [
+    'animation-timeline-inset-end-auto',
+    '--jumi-animation-timeline-inset-end: auto',
+  ],
+  [
+    'animation-timeline-inset-start-[20%]',
+    '--jumi-animation-timeline-inset-start: 20%',
+  ],
+  [
+    'animation-timeline-inset-end-[10%]',
+    '--jumi-animation-timeline-inset-end: 10%',
+  ],
   // The whole-range utility: the bare spelling is the keyword, and the names are the values.
   ['animation-range', '--jumi-animation-range: normal'],
-  ...['cover', 'contain', 'entry', 'exit', 'entry-crossing', 'exit-crossing'].map(value => [
+  ...[
+    'cover',
+    'contain',
+    'entry',
+    'exit',
+    'entry-crossing',
+    'exit-crossing',
+  ].map(value => [
     `animation-range-${value}`,
     `--jumi-animation-range: ${value}`,
   ]),
-  ...['cover', 'contain', 'entry', 'exit', 'entry-crossing', 'exit-crossing'].map(value => [
+  ...[
+    'cover',
+    'contain',
+    'entry',
+    'exit',
+    'entry-crossing',
+    'exit-crossing',
+  ].map(value => [
     `animation-range-start-${value}`,
     `--jumi-animation-range-start: ${value}`,
   ]),
-  ...['cover', 'contain', 'entry', 'exit', 'entry-crossing', 'exit-crossing'].map(value => [
+  ...[
+    'cover',
+    'contain',
+    'entry',
+    'exit',
+    'entry-crossing',
+    'exit-crossing',
+  ].map(value => [
     `animation-range-end-${value}`,
     `--jumi-animation-range-end: ${value}`,
   ]),
-  ['animation-range-[entry_0%_cover_50%]', '--jumi-animation-range: entry 0% cover 50%'],
-  ['animation-range-start-[entry_0%]', '--jumi-animation-range-start: entry 0%'],
+  [
+    'animation-range-[entry_0%_cover_50%]',
+    '--jumi-animation-range: entry 0% cover 50%',
+  ],
+  [
+    'animation-range-start-[entry_0%]',
+    '--jumi-animation-range-start: entry 0%',
+  ],
   ['animation-range-end-[exit_75%]', '--jumi-animation-range-end: exit 75%'],
-  ['animation-range-start-offset-25', '--jumi-animation-range-start-offset: 25%'],
+  [
+    'animation-range-start-offset-25',
+    '--jumi-animation-range-start-offset: 25%',
+  ],
   ['animation-range-end-offset-75', '--jumi-animation-range-end-offset: 75%'],
 ]
 
-const vocabulary = build(await compiler(entry, root), VOCABULARY.map(([candidate]) => candidate)).css
-const refused = VOCABULARY
-  .filter(([, declaration]) => !vocabulary.includes(declaration))
-  .map(([candidate]) => candidate)
+const vocabulary = build(
+  await compiler(entry, root),
+  VOCABULARY.map(([candidate]) => candidate),
+).css
+const refused = VOCABULARY.filter(
+  ([, declaration]) => !vocabulary.includes(declaration),
+).map(([candidate]) => candidate)
 
 check(
   'every value each scroll control declares resolves to the declaration it should write',
   refused.length === 0,
-  refused.length ? `refused: ${refused.join(', ')}` : `${VOCABULARY.length} spellings emit`,
+  refused.length
+    ? `refused: ${refused.join(', ')}`
+    : `${VOCABULARY.length} spellings emit`,
 )
 
 // And the spelling that must stay refused. `normal` is a legal *whole* range and an illegal *half*:
@@ -355,12 +505,16 @@ check(
 // and the reason `normal` is not in `animationRangeName`. If it is ever added back, this fails.
 const TRAPS = ['animation-range-start-normal', 'animation-range-end-normal']
 const traps = build(await compiler(entry, root), TRAPS).css
-const offered = ['start', 'end'].filter(half => traps.includes(`--jumi-animation-range-${half}: normal`))
+const offered = ['start', 'end'].filter(half =>
+  traps.includes(`--jumi-animation-range-${half}: normal`),
+)
 
 check(
   'the keyword is never offered as a half, where it is not a legal value',
   offered.length === 0,
-  offered.length ? `offered for ${offered.join(' and ')}` : 'animation-range-{start,end}-normal emit nothing',
+  offered.length
+    ? `offered for ${offered.join(' and ')}`
+    : 'animation-range-{start,end}-normal emit nothing',
 )
 
 // ── 2 · the page ────────────────────────────────────────────────────────────────────────────────
@@ -440,7 +594,11 @@ const htmlFor = css => `<!doctype html>
 
 const server = createServer((request, response) => {
   response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
-  response.end(request.url === '/without-timelines' ? htmlFor(withoutTimelines) : htmlFor(emitted.css))
+  response.end(
+    request.url === '/without-timelines'
+      ? htmlFor(withoutTimelines)
+      : htmlFor(emitted.css),
+  )
 }).listen(0)
 
 const origin = `http://127.0.0.1:${server.address().port}`
@@ -448,7 +606,10 @@ const browser = await chromium.launch()
 
 /** A context per motion preference: the media query is a context setting, not a page one. */
 const open = async (reducedMotion, url = '/') => {
-  const context = await browser.newContext({ reducedMotion, viewport: { height: 700, width: 1000 } })
+  const context = await browser.newContext({
+    reducedMotion,
+    viewport: { height: 700, width: 1000 },
+  })
   const page = await context.newPage()
 
   await page.goto(origin + url)
@@ -457,7 +618,13 @@ const open = async (reducedMotion, url = '/') => {
   return page
 }
 
-const settle = page => page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))
+const settle = page =>
+  page.evaluate(
+    () =>
+      new Promise(resolve =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      ),
+  )
 
 /** Read an arm at a scroll fraction, after the frame that applied it. */
 const at = async (page, fraction, id) => {
@@ -474,7 +641,10 @@ const series = async (page, id, prefix, fractions) => {
   for (const fraction of fractions) {
     const reading = await at(page, fraction, id)
 
-    out.push(reading.animations.find(animation => animation.name.startsWith(prefix))?.progress ?? null)
+    out.push(
+      reading.animations.find(animation => animation.name.startsWith(prefix))
+        ?.progress ?? null,
+    )
   }
 
   return out
@@ -493,32 +663,54 @@ const rangedList = ranged.range.split(/,(?![^(]*\))/).map(entry => entry.trim())
 
 check(
   'the range resolves at the position named by the modifier, and the other position keeps the default',
-  rangedList[0].includes('25%') && rangedList[0].includes('75%') && !rangedList[1].includes('25%'),
+  rangedList[0].includes('25%') &&
+    rangedList[0].includes('75%') &&
+    !rangedList[1].includes('25%'),
   ranged.range,
 )
 
-const rangedProgress = await series(page, 'ranged', 'jumi-rotate-', [0.25, 0.5, 0.75])
-const unrangedProgress = await series(page, 'unranged', 'jumi-rotate-', [0.25, 0.5, 0.75])
+const rangedProgress = await series(
+  page,
+  'ranged',
+  'jumi-rotate-',
+  [0.25, 0.5, 0.75],
+)
+const unrangedProgress = await series(
+  page,
+  'unranged',
+  'jumi-rotate-',
+  [0.25, 0.5, 0.75],
+)
 
 check(
   'and it moves the motion, not merely the declaration',
-  round(rangedProgress[0]) === 0 && Math.abs(rangedProgress[1] - 0.5) < 0.05 && Math.abs(rangedProgress[2] - 1) < 0.05,
+  round(rangedProgress[0]) === 0 &&
+    Math.abs(rangedProgress[1] - 0.5) < 0.05 &&
+    Math.abs(rangedProgress[2] - 1) < 0.05,
   `ranged at ¼ ½ ¾ → ${show(rangedProgress)}`,
 )
 
 check(
   'while an un-ranged slot of the same shape still fills the range',
-  Math.abs(unrangedProgress[0] - 0.25) < 0.05 && Math.abs(unrangedProgress[1] - 0.5) < 0.05,
+  Math.abs(unrangedProgress[0] - 0.25) < 0.05 &&
+    Math.abs(unrangedProgress[1] - 0.5) < 0.05,
   `unranged at ¼ ½ ¾ → ${show(unrangedProgress)}`,
 )
 
 // The regression that matters to every page that never asked for a range: the declaration the
 // composition now always writes must resolve to the *whole* range, not to a compressed one.
-const unrangedFade = await series(page, 'unranged', 'jumi-fade-', [0.25, 0.5, 0.75])
+const unrangedFade = await series(
+  page,
+  'unranged',
+  'jumi-fade-',
+  [0.25, 0.5, 0.75],
+)
 
 check(
   'a slot with no range control resolves to the whole range, which is what every existing page has',
-  Math.abs(unrangedFade[0] - 0.25) < 0.05 && Math.abs(unrangedFade[1] - 0.5) < 0.05 && Math.abs(unrangedFade[2] - 0.75) < 0.05,
+  Math.abs(unrangedFade[0] - 0.25) < 0.05 &&
+    Math.abs(unrangedFade[1] - 0.5) < 0.05 &&
+    Math.abs(unrangedFade[2] - 0.75) < 0.05,
   `un-ranged fade at ¼ ½ ¾ → ${show(unrangedFade)}`,
 )
 
@@ -535,7 +727,10 @@ console.log('\n· the range variant')
 // tells "the variant works" apart from "something else made it look as though it does".
 const STACKED = [
   ['a bare spelling', '.animation-range-\\[25\\%_75\\%\\]\\:animate-fade-in'],
-  ['motion-safe:', '.motion-safe\\:animation-range-\\[25\\%_75\\%\\]\\:animate-fade-in'],
+  [
+    'motion-safe:',
+    '.motion-safe\\:animation-range-\\[25\\%_75\\%\\]\\:animate-fade-in',
+  ],
   ['sm:', '.sm\\:animation-range-\\[25\\%_75\\%\\]\\:animate-fade-in'],
   ['hover:', '.hover\\:animation-range-\\[25\\%_75\\%\\]\\:animate-fade-in'],
 ]
@@ -545,9 +740,11 @@ for (const [condition, selector] of STACKED) {
 
   check(
     `stacked under ${condition}, the range publishes beside the activation it qualifies`,
-    declarationIn(rule, '--jumi-fade-in-animation-name') !== undefined
-    && declarationIn(rule, '--jumi-fade-in-animation-range') === '25% 75%',
-    rule ? `${selector} → ${declarationIn(rule, '--jumi-fade-in-animation-range')}` : `no rule publishing for ${selector}`,
+    declarationIn(rule, '--jumi-fade-in-animation-name') !== undefined &&
+      declarationIn(rule, '--jumi-fade-in-animation-range') === '25% 75%',
+    rule
+      ? `${selector} → ${declarationIn(rule, '--jumi-fade-in-animation-range')}`
+      : `no rule publishing for ${selector}`,
   )
 }
 
@@ -558,18 +755,24 @@ const exitRule = rulePublishing('.animation-range-exit\\:animate-fade-out')
 
 check(
   'each named range publishes to the slot its own candidate activates',
-  declarationIn(entryRule, '--jumi-fade-in-animation-range') === 'entry'
-  && declarationIn(entryRule, '--jumi-fade-out-animation-range') === undefined
-  && declarationIn(exitRule, '--jumi-fade-out-animation-range') === 'exit'
-  && declarationIn(exitRule, '--jumi-fade-in-animation-range') === undefined,
+  declarationIn(entryRule, '--jumi-fade-in-animation-range') === 'entry' &&
+    declarationIn(entryRule, '--jumi-fade-out-animation-range') === undefined &&
+    declarationIn(exitRule, '--jumi-fade-out-animation-range') === 'exit' &&
+    declarationIn(exitRule, '--jumi-fade-in-animation-range') === undefined,
   `entry → ${declarationIn(entryRule, '--jumi-fade-in-animation-range')}, exit → ${declarationIn(exitRule, '--jumi-fade-out-animation-range')}`,
 )
 
 // Refusals. A value outside the grammar is dropped position by position by the engine and says
 // nothing, so the warning is the only signal an author gets — and it has to name the class they wrote.
-const refusal = emitted.warnings.find(warning => warning.startsWith('animation-range-[nonsense]:animate-fade-in'))
-const landmine = emitted.warnings.find(warning => warning.startsWith('animation-range-[normal_0%]:animate-fade-in'))
-const noMotion = emitted.warnings.find(warning => warning.startsWith('animation-range-entry:animation-delay'))
+const refusal = emitted.warnings.find(warning =>
+  warning.startsWith('animation-range-[nonsense]:animate-fade-in'),
+)
+const landmine = emitted.warnings.find(warning =>
+  warning.startsWith('animation-range-[normal_0%]:animate-fade-in'),
+)
+const noMotion = emitted.warnings.find(warning =>
+  warning.startsWith('animation-range-entry:animation-delay'),
+)
 
 check(
   'a range Jumi cannot write is refused loudly, and the message names the class',
@@ -591,25 +794,49 @@ check(
 
 check(
   'and the utility spelling of the same value is not mistaken for the variant',
-  !emitted.warnings.some(warning => warning.startsWith('animation-range-entry: ')),
-  emitted.warnings.filter(warning => warning.startsWith('animation-range-entry: ')).join(' / ') || 'silent',
+  !emitted.warnings.some(warning =>
+    warning.startsWith('animation-range-entry: '),
+  ),
+  emitted.warnings
+    .filter(warning => warning.startsWith('animation-range-entry: '))
+    .join(' / ') || 'silent',
 )
 
-const scopedFade = await series(page, 'variantScoped', 'jumi-fade-', [0.25, 0.5, 0.75])
-const scopedRotate = await series(page, 'variantScoped', 'jumi-rotate-', [0.25, 0.5, 0.75])
+const scopedFade = await series(
+  page,
+  'variantScoped',
+  'jumi-fade-',
+  [0.25, 0.5, 0.75],
+)
+const scopedRotate = await series(
+  page,
+  'variantScoped',
+  'jumi-rotate-',
+  [0.25, 0.5, 0.75],
+)
 
 check(
   'the variant ranges its own slot, and the slot beside it keeps the whole range',
-  round(scopedFade[0]) === 0 && Math.abs(scopedFade[1] - 0.5) < 0.05 && Math.abs(scopedFade[2] - 1) < 0.05
-  && Math.abs(scopedRotate[0] - 0.25) < 0.05 && Math.abs(scopedRotate[1] - 0.5) < 0.05,
+  round(scopedFade[0]) === 0 &&
+    Math.abs(scopedFade[1] - 0.5) < 0.05 &&
+    Math.abs(scopedFade[2] - 1) < 0.05 &&
+    Math.abs(scopedRotate[0] - 0.25) < 0.05 &&
+    Math.abs(scopedRotate[1] - 0.5) < 0.05,
   `ranged fade at ¼ ½ ¾ → ${show(scopedFade)}, bare rotate → ${show(scopedRotate)}`,
 )
 
-const stackedFade = await series(page, 'variantStacked', 'jumi-fade-', [0.25, 0.5, 0.75])
+const stackedFade = await series(
+  page,
+  'variantStacked',
+  'jumi-fade-',
+  [0.25, 0.5, 0.75],
+)
 
 check(
   'and it survives ordinary Tailwind conditions stacked over it',
-  round(stackedFade[0]) === 0 && Math.abs(stackedFade[1] - 0.5) < 0.05 && Math.abs(stackedFade[2] - 1) < 0.05,
+  round(stackedFade[0]) === 0 &&
+    Math.abs(stackedFade[1] - 0.5) < 0.05 &&
+    Math.abs(stackedFade[2] - 1) < 0.05,
   `motion-safe: sm: hover: at ¼ ½ ¾ → ${show(stackedFade)}`,
 )
 
@@ -620,14 +847,22 @@ check(
 // concern, and it was the whole of the bug.
 for (const [at, [kind, motion]] of MOTION_KINDS.entries()) {
   const id = `motionKind${at}`
-  const ranged = await series(page, id, kind === 'an effect' ? 'jumi-fade-' : 'jumi-opacity-', [0.25, 0.5, 0.75])
+  const ranged = await series(
+    page,
+    id,
+    kind === 'an effect' ? 'jumi-fade-' : 'jumi-opacity-',
+    [0.25, 0.5, 0.75],
+  )
   const neighbour = await series(page, id, 'jumi-rotate-', [0.25, 0.5, 0.75])
 
   check(
     `the range reaches ${kind}, and leaves the motion beside it alone`,
-    round(ranged[0]) === 0 && Math.abs(ranged[1] - 0.5) < 0.05 && Math.abs(ranged[2] - 1) < 0.05
-    && Math.abs(neighbour[0] - 0.25) < 0.05 && Math.abs(neighbour[1] - 0.5) < 0.05
-    && Math.abs(neighbour[2] - 0.75) < 0.05,
+    round(ranged[0]) === 0 &&
+      Math.abs(ranged[1] - 0.5) < 0.05 &&
+      Math.abs(ranged[2] - 1) < 0.05 &&
+      Math.abs(neighbour[0] - 0.25) < 0.05 &&
+      Math.abs(neighbour[1] - 0.5) < 0.05 &&
+      Math.abs(neighbour[2] - 0.75) < 0.05,
     `${motion}: ranged at ¼ ½ ¾ → ${show(ranged)}, neighbour → ${show(neighbour)}`,
   )
 }
@@ -640,19 +875,27 @@ const fadeOutAt = pairPositions.indexOf('jumi-fade-out')
 
 check(
   'two ranged motions on one element resolve at their own positions, in order',
-  pairPositions.length === pairList.length
-  && fadeInAt !== -1 && fadeOutAt !== -1
-  && pairList[fadeInAt] === 'entry' && pairList[fadeOutAt] === 'exit',
+  pairPositions.length === pairList.length &&
+    fadeInAt !== -1 &&
+    fadeOutAt !== -1 &&
+    pairList[fadeInAt] === 'entry' &&
+    pairList[fadeOutAt] === 'exit',
   `${pairPositions.join(' ')} ↔ ${pairList.join(' | ')}`,
 )
 
 // The other half of a refusal: the motion is still there, on the default. Dropping the animation
 // because its range was a typo would be the worse failure of the two.
-const refusedFade = await series(page, 'variantRefused', 'jumi-fade-', [0.25, 0.5, 0.75])
+const refusedFade = await series(
+  page,
+  'variantRefused',
+  'jumi-fade-',
+  [0.25, 0.5, 0.75],
+)
 
 check(
   'a refused range leaves the motion running on the whole range',
-  Math.abs(refusedFade[0] - 0.25) < 0.05 && Math.abs(refusedFade[1] - 0.5) < 0.05,
+  Math.abs(refusedFade[0] - 0.25) < 0.05 &&
+    Math.abs(refusedFade[1] - 0.5) < 0.05,
   `refused at ¼ ½ ¾ → ${show(refusedFade)}`,
 )
 
@@ -660,12 +903,17 @@ check(
 console.log('\n· mixed drivers')
 
 const mixed = await at(page, 0.5, 'mixed')
-const mixedRotate = mixed.animations.find(animation => animation.name.startsWith('jumi-rotate-'))
-const mixedFade = mixed.animations.find(animation => animation.name.startsWith('jumi-fade-'))
+const mixedRotate = mixed.animations.find(animation =>
+  animation.name.startsWith('jumi-rotate-'),
+)
+const mixedFade = mixed.animations.find(animation =>
+  animation.name.startsWith('jumi-fade-'),
+)
 
 check(
   'one slot follows the scroll and its neighbour keeps the document timeline',
-  mixedRotate?.timeline === 'ScrollTimeline' && mixedFade?.timeline === 'DocumentTimeline',
+  mixedRotate?.timeline === 'ScrollTimeline' &&
+    mixedFade?.timeline === 'DocumentTimeline',
   `${mixedRotate?.name} → ${mixedRotate?.timeline}, ${mixedFade?.name} → ${mixedFade?.timeline}`,
 )
 
@@ -679,7 +927,8 @@ const inset = await at(page, 0.5, 'inset')
 
 check(
   'an inset view timeline still drives the motion it was given',
-  inset.animations[0]?.timeline === 'ViewTimeline' && round(inset.animations[0]?.progress) === 1,
+  inset.animations[0]?.timeline === 'ViewTimeline' &&
+    round(inset.animations[0]?.progress) === 1,
   `${inset.animations[0]?.timeline ?? 'none'} at ${round(inset.animations[0]?.progress)}`,
 )
 
@@ -708,11 +957,18 @@ check(
 // A range and a delay on the same slot. The range places the window and the delay takes its share
 // *within* it, so the compression is the same one the un-ranged arm showed — the two controls
 // compose rather than one winning.
-const delayedRange = await series(page, 'delayedRange', 'jumi-fade-', [0.25, 0.5, 0.75])
+const delayedRange = await series(
+  page,
+  'delayedRange',
+  'jumi-fade-',
+  [0.25, 0.5, 0.75],
+)
 
 check(
   'a delay and a range compose: the window is the range and the delay is a share of the window',
-  Math.abs(delayedRange[0]) < 0.05 && Math.abs(delayedRange[1] - 0.2) < 0.05 && Math.abs(delayedRange[2] - 1) < 0.05,
+  Math.abs(delayedRange[0]) < 0.05 &&
+    Math.abs(delayedRange[1] - 0.2) < 0.05 &&
+    Math.abs(delayedRange[2] - 1) < 0.05,
   `at ¼ ½ ¾ → ${show(delayedRange)}`,
 )
 
@@ -724,9 +980,9 @@ const axisAtEnd = await at(page, 1, 'axisX')
 
 check(
   'scroll(x) on a page with no horizontal overflow moves nothing, and says nothing',
-  axisAtStart.animations.every(animation => animation.progress == null)
-  && axisAtEnd.animations.every(animation => animation.progress == null)
-  && axisAtStart.opacity === axisAtEnd.opacity,
+  axisAtStart.animations.every(animation => animation.progress == null) &&
+    axisAtEnd.animations.every(animation => animation.progress == null) &&
+    axisAtStart.opacity === axisAtEnd.opacity,
   `${axisAtStart.animations.length} animation(s), progress ${axisAtStart.animations[0]?.progress ?? 'null'} at both ends, opacity ${axisAtStart.opacity} → ${axisAtEnd.opacity}`,
 )
 
@@ -744,7 +1000,7 @@ check(
 )
 
 check(
-  'an author\'s clamp does: motion-reduce: removes the timeline entirely',
+  "an author's clamp does: motion-reduce: removes the timeline entirely",
   quietClamped.animations[0]?.timeline == null,
   `timeline ${quietClamped.animations[0]?.timeline ?? 'none'}`,
 )
@@ -781,8 +1037,9 @@ const [modernFirst, modernSecond] = await readTwice(modern, 'viewDriven')
 
 check(
   'where the timeline is understood, standing still leaves the motion where it was',
-  modernFirst.animations[0]?.timeline === 'ViewTimeline'
-  && modernFirst.animations[0]?.progress === modernSecond.animations[0]?.progress,
+  modernFirst.animations[0]?.timeline === 'ViewTimeline' &&
+    modernFirst.animations[0]?.progress ===
+      modernSecond.animations[0]?.progress,
   `ViewTimeline, progress ${round(modernFirst.animations[0]?.progress)} held for 700ms`,
 )
 
@@ -791,8 +1048,9 @@ const [legacyFirst, legacySecond] = await readTwice(legacy, 'viewDriven')
 
 check(
   'where the declaration is dropped, the same motion runs on document time — the accepted fallback',
-  legacyFirst.animations[0]?.timeline === 'DocumentTimeline'
-  && (legacySecond.animations[0]?.progress ?? 0) > (legacyFirst.animations[0]?.progress ?? 0),
+  legacyFirst.animations[0]?.timeline === 'DocumentTimeline' &&
+    (legacySecond.animations[0]?.progress ?? 0) >
+      (legacyFirst.animations[0]?.progress ?? 0),
   `DocumentTimeline, progress ${round(legacyFirst.animations[0]?.progress)} → ${round(legacySecond.animations[0]?.progress)} while still`,
 )
 
@@ -810,7 +1068,8 @@ const guarded = await at(page, 0.5, 'guarded')
 
 check(
   'a capability query around the motion and its timeline gives a scroll-driven animation where it matches',
-  guarded.animations[0]?.timeline === 'ScrollTimeline' && guarded.animations[0]?.source === 'root',
+  guarded.animations[0]?.timeline === 'ScrollTimeline' &&
+    guarded.animations[0]?.source === 'root',
   `${guarded.animations[0]?.timeline ?? 'none'} ← ${guarded.animations[0]?.source ?? 'nothing'}`,
 )
 
@@ -828,8 +1087,12 @@ server.close()
 // The count is the checks that actually ran, not a constant kept beside them: a hand-kept total had
 // already drifted from the number of assertions in this file, which is the failure mode
 // `scripts/check.mjs` exists to prevent.
-console.log(`\n  ${asserted - failures.length}/${asserted} scroll-driven behaviours hold`)
-console.log(`  emission: ${emitted.css.length} bytes, ${CANDIDATES.length} candidates`)
+console.log(
+  `\n  ${asserted - failures.length}/${asserted} scroll-driven behaviours hold`,
+)
+console.log(
+  `  emission: ${emitted.css.length} bytes, ${CANDIDATES.length} candidates`,
+)
 
 if (failures.length) {
   console.error('\n✗ scroll-driven support does not behave in a browser:')
@@ -839,4 +1102,6 @@ if (failures.length) {
   process.exit(1)
 }
 
-console.log('\n✓ a range lands where it was addressed, a neighbour keeps its driver, and nothing fails silently that should not')
+console.log(
+  '\n✓ a range lands where it was addressed, a neighbour keeps its driver, and nothing fails silently that should not',
+)

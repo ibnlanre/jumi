@@ -29,7 +29,13 @@ import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright'
 import { build, createServer, preview } from 'vite'
 
-import { compositionRules, countedParts, expectedDeclarations, protocolState, transitionRules } from './lib/css.mjs'
+import {
+  compositionRules,
+  countedParts,
+  expectedDeclarations,
+  protocolState,
+  transitionRules,
+} from './lib/css.mjs'
 
 import path from 'node:path'
 
@@ -55,8 +61,13 @@ const { jumiFinalizer } = vite
 // would get a build with no Tailwind in it at all.
 const composed = jumi().map(plugin => plugin.name)
 
-if (!composed.includes('jumi') || !composed.some(name => name?.includes('tailwindcss'))) {
-  console.error(`✗ jumi() does not compose Tailwind's plugins: ${composed.join(', ')}`)
+if (
+  !composed.includes('jumi') ||
+  !composed.some(name => name?.includes('tailwindcss'))
+) {
+  console.error(
+    `✗ jumi() does not compose Tailwind's plugins: ${composed.join(', ')}`,
+  )
   process.exit(1)
 }
 
@@ -91,8 +102,17 @@ const CONTEXTS = `
 /** The same shape as `behaviour:check`: the contexts are the product promise. */
 const CHECKS = [
   { key: 'direct', selector: '#direct', utility: 'animate-rotate-45' },
-  { key: 'descendant', selector: '#descendant > i', utility: 'animate-rotate-45' },
-  { key: 'pseudo', pseudo: '::before', selector: '#pseudo', utility: 'animate-scale-110' },
+  {
+    key: 'descendant',
+    selector: '#descendant > i',
+    utility: 'animate-rotate-45',
+  },
+  {
+    key: 'pseudo',
+    pseudo: '::before',
+    selector: '#pseudo',
+    utility: 'animate-scale-110',
+  },
   { key: 'applied', selector: '#applied', utility: 'animate-rotate-45' },
 ]
 
@@ -120,8 +140,10 @@ const stylesheet = `@import "tailwindcss" source(none);
  * with the directive written by hand, and the two have to compile to the same CSS.
  */
 const registered = {
-  entry: '@import "tailwindcss" source(none);\n\n@source "./index.html";\n\n.applied-motion {\n  @apply animate-rotate-45;\n}\n',
-  explicit: '@import "tailwindcss" source(none);\n@plugin "jumi";\n\n@source "./index.html";\n\n.applied-motion {\n  @apply animate-rotate-45;\n}\n',
+  entry:
+    '@import "tailwindcss" source(none);\n\n@source "./index.html";\n\n.applied-motion {\n  @apply animate-rotate-45;\n}\n',
+  explicit:
+    '@import "tailwindcss" source(none);\n@plugin "jumi";\n\n@source "./index.html";\n\n.applied-motion {\n  @apply animate-rotate-45;\n}\n',
 }
 
 mkdirSync(dir, { recursive: true })
@@ -144,8 +166,14 @@ writeFileSync(path.join(dir, 'plain.css'), plain)
 const shim = path.join(dir, 'node_modules', 'jumi')
 
 mkdirSync(shim, { recursive: true })
-writeFileSync(path.join(shim, 'package.json'), JSON.stringify({ main: 'index.cjs', name: 'jumi', version: '0.0.0' }))
-writeFileSync(path.join(shim, 'index.cjs'), `module.exports = require(${JSON.stringify(path.join(root, 'dist', 'index.cjs'))})\n`)
+writeFileSync(
+  path.join(shim, 'package.json'),
+  JSON.stringify({ main: 'index.cjs', name: 'jumi', version: '0.0.0' }),
+)
+writeFileSync(
+  path.join(shim, 'index.cjs'),
+  `module.exports = require(${JSON.stringify(path.join(root, 'dist', 'index.cjs'))})\n`,
+)
 
 // The fixture for the arm that registers nothing: Jumi's directive, written by hand, as a project
 // that prefers the two-entry shape would write it.
@@ -154,7 +182,9 @@ const explicitDir = path.join(dir, 'explicit')
 mkdirSync(explicitDir, { recursive: true })
 writeFileSync(path.join(explicitDir, 'index.html'), html(CONTEXTS))
 writeFileSync(path.join(explicitDir, 'main.js'), 'import "./style.css"\n')
-writeFileSync(path.join(explicitDir, 'style.css'), `@import "tailwindcss" source(none);
+writeFileSync(
+  path.join(explicitDir, 'style.css'),
+  `@import "tailwindcss" source(none);
 
 @source "./index.html";
 @plugin "${path.join(root, 'dist', 'index.js')}";
@@ -162,14 +192,18 @@ writeFileSync(path.join(explicitDir, 'style.css'), `@import "tailwindcss" source
 .applied-motion {
   @apply animate-rotate-45;
 }
-`)
+`,
+)
 
 /* ------------------------------------------------------------------------------------
  * Reading the answer out of a browser
  * ---------------------------------------------------------------------------------- */
 
-const slotReader = css => (utility) => {
-  const escaped = utility.replace(/[[\]()/.:%'\\]/g, character => `\\${character}`)
+const slotReader = css => utility => {
+  const escaped = utility.replace(
+    /[[\]()/.:%'\\]/g,
+    character => `\\${character}`,
+  )
 
   for (const match of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
     if (!match[1].includes(escaped)) continue
@@ -182,16 +216,23 @@ const slotReader = css => (utility) => {
   return null
 }
 
-const measure = (page, check) => page.evaluate(
-  ({ pseudo, selector }) => {
-    const element = document.querySelector(selector)
+const measure = (page, check) =>
+  page.evaluate(
+    ({ pseudo, selector }) => {
+      const element = document.querySelector(selector)
 
-    return element ? getComputedStyle(element, pseudo).animationName : '(absent)'
-  },
-  { pseudo: check.pseudo ?? null, selector: check.selector },
-)
+      return element
+        ? getComputedStyle(element, pseudo).animationName
+        : '(absent)'
+    },
+    { pseudo: check.pseudo ?? null, selector: check.selector },
+  )
 
-const resolving = name => name.split(',').map(part => part.trim()).filter(part => part !== 'none')
+const resolving = name =>
+  name
+    .split(',')
+    .map(part => part.trim())
+    .filter(part => part !== 'none')
 
 /**
  * The transition a browser applies to the element.
@@ -200,14 +241,12 @@ const resolving = name => name.split(',').map(part => part.trim()).filter(part =
  * things at once: that the list reached this element, and which motions it lists. Nothing about the
  * AST is consulted, which is the point of asking a browser.
  */
-const transitioning = (page, selector = '#transitioning') => page.evaluate(
-  (selector) => {
+const transitioning = (page, selector = '#transitioning') =>
+  page.evaluate(selector => {
     const element = document.querySelector(selector)
 
     return element ? getComputedStyle(element).transitionProperty : '(absent)'
-  },
-  selector,
-)
+  }, selector)
 
 const browser = await chromium.launch()
 const failures = []
@@ -219,11 +258,16 @@ const matrix = async (label, url, slots) => {
   await page.goto(url, { waitUntil: 'load' })
 
   // The styles arrive with the JS module, so the first paint can precede them.
-  await page.waitForFunction(
-    selector => getComputedStyle(document.querySelector(selector)).animationName.includes('jumi-'),
-    '#direct',
-    { timeout: 15_000 },
-  ).catch(() => {})
+  await page
+    .waitForFunction(
+      selector =>
+        getComputedStyle(
+          document.querySelector(selector),
+        ).animationName.includes('jumi-'),
+      '#direct',
+      { timeout: 15_000 },
+    )
+    .catch(() => {})
 
   const rows = []
 
@@ -235,19 +279,26 @@ const matrix = async (label, url, slots) => {
     rows.push({ check, measured: resolving(measured), pass })
 
     if (!pass) {
-      failures.push(`${label} · ${check.key}: "${measured.slice(0, 40)}" does not include ${expected ?? '(no slot in the CSS)'}`)
+      failures.push(
+        `${label} · ${check.key}: "${measured.slice(0, 40)}" does not include ${expected ?? '(no slot in the CSS)'}`,
+      )
     }
   }
 
   const bare = await measure(page, { selector: '#bare' })
 
-  if (resolving(bare).length) failures.push(`${label} · bare carrier resolved "${bare.slice(0, 40)}"`)
+  if (resolving(bare).length)
+    failures.push(`${label} · bare carrier resolved "${bare.slice(0, 40)}"`)
 
   console.log(`\n  ${label}\n`)
   for (const { check, measured, pass } of rows) {
-    console.log(`    ${pass ? '✓' : '✗'} ${check.key.padEnd(12)}${measured.join(' + ') || 'none'}`)
+    console.log(
+      `    ${pass ? '✓' : '✗'} ${check.key.padEnd(12)}${measured.join(' + ') || 'none'}`,
+    )
   }
-  console.log(`    ${resolving(bare).length ? '✗' : '✓'} bare carrier    ${resolving(bare).join(' + ') || 'nones only'}`)
+  console.log(
+    `    ${resolving(bare).length ? '✗' : '✓'} bare carrier    ${resolving(bare).join(' + ') || 'nones only'}`,
+  )
 
   return page
 }
@@ -261,25 +312,38 @@ const structure = (label, css) => {
   const leaked = Object.entries(leaks).filter(([, count]) => count > 0)
   const expected = expectedDeclarations({ animations, transitions })
 
-  console.log(`\n    ${!leaked.length && animations ? '✓' : '✗'} ${label}: ${css.length.toLocaleString()} bytes,`
-    + ` ${animations} + ${transitions} compositions, ${declarations} declarations written,`
-    + ` ${leaked.length ? `${leaked.map(([name, count]) => `${count} ${name}`).join(', ')} left` : 'no protocol left'}`)
+  console.log(
+    `\n    ${!leaked.length && animations ? '✓' : '✗'} ${label}: ${css.length.toLocaleString()} bytes,` +
+      ` ${animations} + ${transitions} compositions, ${declarations} declarations written,` +
+      ` ${leaked.length ? `${leaked.map(([name, count]) => `${count} ${name}`).join(', ')} left` : 'no protocol left'}`,
+  )
 
-  if (leaked.length) failures.push(`${label}: the transport reached the output — ${leaked.map(([name, count]) => `${count} ${name}`).join(', ')}`)
+  if (leaked.length)
+    failures.push(
+      `${label}: the transport reached the output — ${leaked.map(([name, count]) => `${count} ${name}`).join(', ')}`,
+    )
   if (!animations) failures.push(`${label}: no composition reached the output`)
   if (declarations !== expected) {
     // Say which properties each composition declared, and which the counter saw. The totals alone cannot
     // distinguish "a longhand is missing" from "an extra rule was counted", and those need opposite fixes.
     const declared = [...compositionRules(css), ...transitionRules(css)]
-      .map(rule => (rule.nodes ?? [])
-        .filter(node => node.type === 'decl' && /^(animation|transition)/.test(node.prop))
-        .map(node => node.prop).join('+'))
+      .map(rule =>
+        (rule.nodes ?? [])
+          .filter(
+            node =>
+              node.type === 'decl' && /^(animation|transition)/.test(node.prop),
+          )
+          .map(node => node.prop)
+          .join('+'),
+      )
       .join(' | ')
     const counted = countedParts(css)
 
-    failures.push(`${label}: ${declarations} declarations for ${animations} + ${transitions} compositions, expected ${expected}`
-      + ` — declared: ${declared}`
-      + ` — counted: ${counted.join('+')}`)
+    failures.push(
+      `${label}: ${declarations} declarations for ${animations} + ${transitions} compositions, expected ${expected}` +
+        ` — declared: ${declared}` +
+        ` — counted: ${counted.join('+')}`,
+    )
   }
 
   /**
@@ -291,23 +355,34 @@ const structure = (label, css) => {
    * repository, and left the feature doing nothing in a browser. Through the bundler and not the CLI,
    * because the CLI does not merge.
    */
-  const named = VIEW_TRANSITIONS.filter(id => new RegExp(`view-transition-name:\\s*${id}\\b`).test(css))
-  const animated = VIEW_TRANSITIONS.filter(id => css.includes(`::view-transition-old(${id})`))
+  const named = VIEW_TRANSITIONS.filter(id =>
+    new RegExp(`view-transition-name:\\s*${id}\\b`).test(css),
+  )
+  const animated = VIEW_TRANSITIONS.filter(id =>
+    css.includes(`::view-transition-old(${id})`),
+  )
 
-  console.log(`    ${named.length === VIEW_TRANSITIONS.length && animated.length === VIEW_TRANSITIONS.length ? '✓' : '✗'}`
-    + ` ${label}: view transitions ${named.length}/${VIEW_TRANSITIONS.length} named,`
-    + ` ${animated.length}/${VIEW_TRANSITIONS.length} animated,`
-    + ` ${css.includes('jumi-vt-') ? 'staging LEFT' : 'no staging'}`)
+  console.log(
+    `    ${named.length === VIEW_TRANSITIONS.length && animated.length === VIEW_TRANSITIONS.length ? '✓' : '✗'}` +
+      ` ${label}: view transitions ${named.length}/${VIEW_TRANSITIONS.length} named,` +
+      ` ${animated.length}/${VIEW_TRANSITIONS.length} animated,` +
+      ` ${css.includes('jumi-vt-') ? 'staging LEFT' : 'no staging'}`,
+  )
 
   if (named.length !== VIEW_TRANSITIONS.length) {
-    failures.push(`${label}: ${named.length} of ${VIEW_TRANSITIONS.length} view-transition identities reached the output`)
+    failures.push(
+      `${label}: ${named.length} of ${VIEW_TRANSITIONS.length} view-transition identities reached the output`,
+    )
   }
 
   if (animated.length !== VIEW_TRANSITIONS.length) {
-    failures.push(`${label}: ${animated.length} of ${VIEW_TRANSITIONS.length} view-transition sides reached the output`)
+    failures.push(
+      `${label}: ${animated.length} of ${VIEW_TRANSITIONS.length} view-transition sides reached the output`,
+    )
   }
 
-  if (css.includes('jumi-vt-')) failures.push(`${label}: view-transition staging reached the output`)
+  if (css.includes('jumi-vt-'))
+    failures.push(`${label}: view-transition staging reached the output`)
 
   return css
 }
@@ -343,49 +418,74 @@ const page = await matrix('dev · matrix', devUrl, slots)
 // the element before anything changes.
 const transitionsBefore = await transitioning(page)
 
-console.log(`\n    ${transitionsBefore.includes('background-color') ? '✓' : '✗'} transitions: the composed shorthand reaches the element — ${transitionsBefore}`)
+console.log(
+  `\n    ${transitionsBefore.includes('background-color') ? '✓' : '✗'} transitions: the composed shorthand reaches the element — ${transitionsBefore}`,
+)
 
 if (!transitionsBefore.includes('background-color')) {
-  failures.push(`dev · transitions: "${transitionsBefore}" does not include background-color`)
+  failures.push(
+    `dev · transitions: "${transitionsBefore}" does not include background-color`,
+  )
 }
 
 // A candidate appears while the server is running: this is the path where Tailwind's cache and
 // Jumi's staging both have to produce a *new* aggregate, and the only proof is the computed value.
 // Both carriers grow at once, because a slot and a motion are the same class of state.
-const grownClasses = CONTEXTS
-  .replace('id="grown" class="animation-duration-500"', 'id="grown" class="animate-shake"')
-  .replace(
-    'transition-property/background-color transition-duration',
-    'transition-property/background-color transition-property/scale transition-duration',
-  )
+const grownClasses = CONTEXTS.replace(
+  'id="grown" class="animation-duration-500"',
+  'id="grown" class="animate-shake"',
+).replace(
+  'transition-property/background-color transition-duration',
+  'transition-property/background-color transition-property/scale transition-duration',
+)
 
 writeFileSync(path.join(dir, 'index.html'), html(grownClasses))
 
-const grown = await page.waitForFunction(
-  selector => getComputedStyle(document.querySelector(selector)).animationName.includes('jumi-shake'),
-  '#grown',
-  { polling: 500, timeout: 20_000 },
-).then(() => true).catch(() => false)
+const grown = await page
+  .waitForFunction(
+    selector =>
+      getComputedStyle(document.querySelector(selector)).animationName.includes(
+        'jumi-shake',
+      ),
+    '#grown',
+    { polling: 500, timeout: 20_000 },
+  )
+  .then(() => true)
+  .catch(() => false)
 
-console.log(`\n    ${grown ? '✓' : '✗'} incremental: a slot added while the server ran`)
+console.log(
+  `\n    ${grown ? '✓' : '✗'} incremental: a slot added while the server ran`,
+)
 
-if (!grown) failures.push('dev · incremental: animate-shake never reached the carrier after the source changed')
+if (!grown)
+  failures.push(
+    'dev · incremental: animate-shake never reached the carrier after the source changed',
+  )
 
 // The same acceptance for the second carrier. `scale` was not on the page when `transitions` was
 // first compiled, so this is the case where the carrier's own body would have been reused stale.
 const transitionsAfter = await transitioning(page)
-const both = ['background-color', 'scale'].every(property => transitionsAfter.includes(property))
+const both = ['background-color', 'scale'].every(property =>
+  transitionsAfter.includes(property),
+)
 
-console.log(`    ${both ? '✓' : '✗'} incremental: a motion added while the server ran — ${transitionsAfter}`)
+console.log(
+  `    ${both ? '✓' : '✗'} incremental: a motion added while the server ran — ${transitionsAfter}`,
+)
 
-if (!both) failures.push(`dev · transitions: "${transitionsAfter}" never gained scale after the source changed`)
+if (!both)
+  failures.push(
+    `dev · transitions: "${transitionsAfter}" never gained scale after the source changed`,
+  )
 
 const { code: grownCss } = await server.transformRequest('/style.css?direct')
 
 structure('dev · after the edit', grownCss)
 
 if (!grownCss.includes('--jumi-scale-transition-property')) {
-  failures.push('dev · transitions: the composed list still omits the new motion after the edit')
+  failures.push(
+    'dev · transitions: the composed list still omits the new motion after the edit',
+  )
 }
 
 await page.close()
@@ -412,14 +512,29 @@ const untouched = await devOf('/plain.css?direct')
 console.log('\n  registration\n')
 
 const registration = [
-  { actual: injected.includes('jumi-rotate-'), detail: 'the entrypoint compiled Jumi', label: 'entrypoint' },
-  { actual: second.includes('jumi-rotate-'), detail: 'a second entrypoint compiled Jumi on its own', label: 'second' },
-  { actual: untouched.includes('color: red'), detail: 'a stylesheet that is not an entrypoint is untouched', label: 'untouched' },
+  {
+    actual: injected.includes('jumi-rotate-'),
+    detail: 'the entrypoint compiled Jumi',
+    label: 'entrypoint',
+  },
+  {
+    actual: second.includes('jumi-rotate-'),
+    detail: 'a second entrypoint compiled Jumi on its own',
+    label: 'second',
+  },
+  {
+    actual: untouched.includes('color: red'),
+    detail: 'a stylesheet that is not an entrypoint is untouched',
+    label: 'untouched',
+  },
 ]
 
 for (const check of registration) {
-  console.log(`    ${check.actual ? '✓' : '✗'} ${check.label.padEnd(12)}${check.detail}`)
-  if (!check.actual) failures.push(`registration · ${check.label}: ${check.detail}`)
+  console.log(
+    `    ${check.actual ? '✓' : '✗'} ${check.label.padEnd(12)}${check.detail}`,
+  )
+  if (!check.actual)
+    failures.push(`registration · ${check.label}: ${check.detail}`)
 }
 
 // The second entrypoint is a whole compilation of its own: same invariant as the first, asserted
@@ -433,12 +548,27 @@ await server.close()
  * ---------------------------------------------------------------------------------- */
 
 const builds = [
-  { label: 'build · optimize', out: 'dist-optimized', plugins: () => jumi(), root: dir },
-  { label: 'build · optimize: false', out: 'dist-plain', plugins: () => jumi({ tailwind: { optimize: false } }), root: dir },
+  {
+    label: 'build · optimize',
+    out: 'dist-optimized',
+    plugins: () => jumi(),
+    root: dir,
+  },
+  {
+    label: 'build · optimize: false',
+    out: 'dist-plain',
+    plugins: () => jumi({ tailwind: { optimize: false } }),
+    root: dir,
+  },
   // The laboratory shape: Tailwind's entry plus the finalizer, with the directive written by hand.
   // It needs its own fixture, because this arm registers nothing — which is the distinction being
   // kept alive: `jumi()` owns registration, `jumiFinalizer()` assumes somebody else did it.
-  { label: 'build · two entries', out: 'dist', plugins: () => [tailwind(), jumiFinalizer()], root: explicitDir },
+  {
+    label: 'build · two entries',
+    out: 'dist',
+    plugins: () => [tailwind(), jumiFinalizer()],
+    root: explicitDir,
+  },
 ]
 
 // Both fixtures scan the same HTML, including the candidate the incremental step added, so the two
@@ -460,9 +590,18 @@ for (const step of builds) {
 
   const assets = path.join(outDir, 'assets')
   const cssFile = readdirSync(assets).find(file => file.endsWith('.css'))
-  const css = structure(step.label, readFileSync(path.join(assets, cssFile), 'utf8'))
+  const css = structure(
+    step.label,
+    readFileSync(path.join(assets, cssFile), 'utf8'),
+  )
 
-  const instance = await preview({ build: { outDir }, configFile: false, logLevel: 'silent', preview: { port: 0 }, root: step.root })
+  const instance = await preview({
+    build: { outDir },
+    configFile: false,
+    logLevel: 'silent',
+    preview: { port: 0 },
+    root: step.root,
+  })
 
   previews.push(instance)
 
@@ -482,14 +621,22 @@ const difference = (a, b) => {
 
   while (at < Math.min(a.length, b.length) && a[at] === b[at]) at += 1
 
-  return ` (${a.length} vs ${b.length} bytes; from byte ${at}: `
-    + `${JSON.stringify(a.slice(at, at + 60))} vs ${JSON.stringify(b.slice(at, at + 60))})`
+  return (
+    ` (${a.length} vs ${b.length} bytes; from byte ${at}: ` +
+    `${JSON.stringify(a.slice(at, at + 60))} vs ${JSON.stringify(b.slice(at, at + 60))})`
+  )
 }
 
-const assetOf = (outDir) => {
+const assetOf = outDir => {
   const assets = path.join(outDir, 'assets')
 
-  return readFileSync(path.join(assets, readdirSync(assets).find(file => file.endsWith('.css'))), 'utf8')
+  return readFileSync(
+    path.join(
+      assets,
+      readdirSync(assets).find(file => file.endsWith('.css')),
+    ),
+    'utf8',
+  )
 }
 
 /** Both built from the same fixture, fresh, with the directive added by Jumi in one and written by
@@ -500,10 +647,15 @@ const twoEntries = assetOf(path.join(explicitDir, 'dist'))
 const equivalent = oneStep === twoEntries
 
 console.log(`\n  equivalence\n`)
-console.log(`    ${equivalent ? '✓' : '✗'} the same CSS from injected and hand-written registration`
-  + (equivalent ? '' : difference(oneStep, twoEntries)))
+console.log(
+  `    ${equivalent ? '✓' : '✗'} the same CSS from injected and hand-written registration` +
+    (equivalent ? '' : difference(oneStep, twoEntries)),
+)
 
-if (!equivalent) failures.push(`equivalence: injected and hand-written registration disagree${difference(oneStep, twoEntries)}`)
+if (!equivalent)
+  failures.push(
+    `equivalence: injected and hand-written registration disagree${difference(oneStep, twoEntries)}`,
+  )
 
 await browser.close()
 
@@ -519,5 +671,7 @@ if (failures.length) {
   process.exit(1)
 }
 
-console.log('\n✓ the matrix holds in dev and in every build shape, staging never ships, and a slot')
+console.log(
+  '\n✓ the matrix holds in dev and in every build shape, staging never ships, and a slot',
+)
 console.log('  added while the dev server runs reaches the carrier.\n')

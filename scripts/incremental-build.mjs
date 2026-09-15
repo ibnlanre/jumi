@@ -28,7 +28,11 @@
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
-import { aggregateSlots, expectedDeclarations, protocolState } from './lib/css.mjs'
+import {
+  aggregateSlots,
+  expectedDeclarations,
+  protocolState,
+} from './lib/css.mjs'
 
 import path from 'node:path'
 
@@ -69,7 +73,13 @@ const cache = build(instance, [base, cacheTween, motion])
 
 // A tween and a motion are added to a long-lived session: the dev server's candidate Set only ever
 // grows, so both new classes land after everything the first build emitted.
-const order = build(instance, [base, cacheTween, motion, orderTween, lateMotion])
+const order = build(instance, [
+  base,
+  cacheTween,
+  motion,
+  orderTween,
+  lateMotion,
+])
 
 /**
  * The aggregate the browser applies, read out of the finalized stylesheet: with the lists flat
@@ -77,19 +87,25 @@ const order = build(instance, [base, cacheTween, motion, orderTween, lateMotion]
  */
 const slots = built => aggregateSlots(built.css)
 
-const keyframes = out => new Set([...out.matchAll(/@keyframes\s+([\w-]+)/g)].map(m => m[1]))
+const keyframes = out =>
+  new Set([...out.matchAll(/@keyframes\s+([\w-]+)/g)].map(m => m[1]))
 
 /**
  * Every rule in the output, as a selector and a body.
  */
-const rules = out => [...out.matchAll(/(\.[^{}\s][^{}]*)\{([^{}]*)\}/g)]
-  .map(match => ({ body: match[2].replace(/\s+/g, ' ').trim(), selector: match[1].trim() }))
+const rules = out =>
+  [...out.matchAll(/(\.[^{}\s][^{}]*)\{([^{}]*)\}/g)].map(match => ({
+    body: match[2].replace(/\s+/g, ' ').trim(),
+    selector: match[1].trim(),
+  }))
 
 /** Whether a body declares a property, as a declaration rather than as the tail of a longer name. */
-const has = (body, property) => new RegExp(`(?<![\\w-])${property}\\s*:`).test(body)
+const has = (body, property) =>
+  new RegExp(`(?<![\\w-])${property}\\s*:`).test(body)
 
 /** Every declaration name a body holds. */
-const names = body => [...body.matchAll(/(?<![-\w])(--[\w-]+|[\w-]+)\s*:/g)].map(match => match[1])
+const names = body =>
+  [...body.matchAll(/(?<![-\w])(--[\w-]+|[\w-]+)\s*:/g)].map(match => match[1])
 
 /**
  * What only this pass writes, identified by declaration set rather than by selector.
@@ -106,11 +122,19 @@ const names = body => [...body.matchAll(/(?<![-\w])(--[\w-]+|[\w-]+)\s*:/g)].map
  * selector list read as the cache moving. `compositionRules` in `lib/css.mjs` is the normative
  * definition of the same signature; this is it read from a rule body rather than from a rule.
  */
-const fingerprint = (body) => {
-  if (has(body, 'animation') && has(body, 'animation-composition') && has(body, 'animation-timeline')
-    && body.includes('var(--jumi-slot-')) return 'animations:composition'
+const fingerprint = body => {
+  if (
+    has(body, 'animation') &&
+    has(body, 'animation-composition') &&
+    has(body, 'animation-timeline') &&
+    body.includes('var(--jumi-slot-')
+  )
+    return 'animations:composition'
 
-  if (['transition', 'transition-behavior'].every(property => has(body, property))) return 'transitions:composition'
+  if (
+    ['transition', 'transition-behavior'].every(property => has(body, property))
+  )
+    return 'transitions:composition'
 
   // The defaults are all custom properties, and which kind they are for is which substrate they
   // carry — the animations one resolves the longhand chains, the transitions one the shorthand.
@@ -129,7 +153,7 @@ const fingerprint = (body) => {
  *   derived   what this pass derived. Expected to grow — that is the whole point — so it is
  *             compared for shape: the activator set, the aggregate, and the rule count.
  */
-const partition = (out) => {
+const partition = out => {
   const derived = new Map()
   const owned = new Map()
 
@@ -148,15 +172,20 @@ const selectors = rule => (rule ? rule.selector.split(/,\s*\n/) : [])
 
 const checks = []
 
-const fresh = [...keyframes(cache.raw)].filter(name => !keyframes(first.raw).has(name))
+const fresh = [...keyframes(cache.raw)].filter(
+  name => !keyframes(first.raw).has(name),
+)
 checks.push({
   detail: fresh.length ? `+ ${fresh.join(', ')}` : 'no new @keyframes',
   pass: fresh.length > 0,
   what: 'the added tween emits its keyframe',
 })
 
-const properties = out => new Set([...out.matchAll(/@property\s+(--jumi-[\w-]+)/g)].map(m => m[1]))
-const freshProperties = [...properties(cache.raw)].filter(name => !properties(first.raw).has(name))
+const properties = out =>
+  new Set([...out.matchAll(/@property\s+(--jumi-[\w-]+)/g)].map(m => m[1]))
+const freshProperties = [...properties(cache.raw)].filter(
+  name => !properties(first.raw).has(name),
+)
 checks.push({
   detail: `+ ${freshProperties.length} @property blocks`,
   pass: freshProperties.length > 0,
@@ -175,7 +204,11 @@ checks.push({
   what: 'the slot list grows (candidate set only grows)',
 })
 
-const outputs = { cache: partition(cache.css), first: partition(first.css), order: partition(order.css) }
+const outputs = {
+  cache: partition(cache.css),
+  first: partition(first.css),
+  order: partition(order.css),
+}
 
 /**
  * The motions the transitions composition applies, read off its `transition` shorthand.
@@ -183,20 +216,31 @@ const outputs = { cache: partition(cache.css), first: partition(first.css), orde
  * The shorthand names a motion as `var(--jumi-<motion>-transition-property, …)`, so the motion is
  * the word between `--jumi-` and `-transition`.
  */
-const transitionMotions = (derived) => {
+const transitionMotions = derived => {
   const rule = derived.get('transitions:composition')
   if (!rule) return []
 
-  const value = (rule.body.match(/(?<![\w-])transition:\s*([^;]+);/) ?? [, ''])[1]
+  const value = (rule.body.match(/(?<![\w-])transition:\s*([^;]+);/) ?? [
+    ,
+    '',
+  ])[1]
 
-  return [...new Set([...value.matchAll(/--jumi-([\w-]+)-transition/g)].map(match => match[1]))]
+  return [
+    ...new Set(
+      [...value.matchAll(/--jumi-([\w-]+)-transition/g)].map(match => match[1]),
+    ),
+  ]
 }
 
 checks.push({
-  detail: `motions ${transitionMotions(outputs.first.derived).join(' + ') || 'none'}`
-    + ` → ${transitionMotions(outputs.order.derived).join(' + ') || 'none'}`,
+  detail:
+    `motions ${transitionMotions(outputs.first.derived).join(' + ') || 'none'}` +
+    ` → ${transitionMotions(outputs.order.derived).join(' + ') || 'none'}`,
   pass: [motion, lateMotion].every(candidate =>
-    transitionMotions(outputs.order.derived).includes(candidate.replace('transition-property/', ''))),
+    transitionMotions(outputs.order.derived).includes(
+      candidate.replace('transition-property/', ''),
+    ),
+  ),
   what: 'a motion added after the first build still reaches the composition',
 })
 
@@ -205,13 +249,18 @@ checks.push({
 // would report the growth this harness exists to measure.
 const before = outputs.first.owned
 const after = outputs.order.owned
-const changed = [...before].filter(([selector, body]) => after.has(selector) && after.get(selector) !== body)
+const changed = [...before].filter(
+  ([selector, body]) => after.has(selector) && after.get(selector) !== body,
+)
 const missing = [...before.keys()].filter(selector => !after.has(selector))
 
 checks.push({
-  detail: `kept ${before.size - changed.length - missing.length}/${before.size}`
-    + (changed.length ? `, changed: ${changed.map(([selector]) => selector).join(', ')}` : '')
-    + (missing.length ? `, missing: ${missing.join(', ')}` : ''),
+  detail:
+    `kept ${before.size - changed.length - missing.length}/${before.size}` +
+    (changed.length
+      ? `, changed: ${changed.map(([selector]) => selector).join(', ')}`
+      : '') +
+    (missing.length ? `, missing: ${missing.join(', ')}` : ''),
   pass: changed.length === 0 && missing.length === 0,
   what: 'Tailwind-owned rules are unchanged, so the cache did not move',
 })
@@ -219,24 +268,37 @@ checks.push({
 // Jumi's half, the positive statement of the same thing: the derived rules are exactly the expected
 // set — one defaults rule and one composition per active kind — and a change in that number is a
 // change to the architecture rather than a change to the page.
-const expected = ['animations:composition', 'animations:defaults', 'transitions:composition', 'transitions:defaults']
+const expected = [
+  'animations:composition',
+  'animations:defaults',
+  'transitions:composition',
+  'transitions:defaults',
+]
 
 checks.push({
-  detail: Object.entries(outputs).map(([label, { derived }]) =>
-    `${label}: ${[...derived.keys()].sort().join(', ') || 'none'}`).join(' | '),
-  pass: Object.values(outputs).every(({ derived }) =>
-    [...derived.keys()].sort().join(', ') === expected.join(', ')),
+  detail: Object.entries(outputs)
+    .map(
+      ([label, { derived }]) =>
+        `${label}: ${[...derived.keys()].sort().join(', ') || 'none'}`,
+    )
+    .join(' | '),
+  pass: Object.values(outputs).every(
+    ({ derived }) =>
+      [...derived.keys()].sort().join(', ') === expected.join(', '),
+  ),
   what: 'exactly one defaults rule and one composition per active kind, in every build',
 })
 
 // And the growth itself, stated as the two things that are allowed to move: the selectors the
 // composition was written for, and the aggregate it holds.
 checks.push({
-  detail: `activators ${selectors(outputs.first.derived.get('animations:composition')).length}`
-    + ` → ${selectors(outputs.order.derived.get('animations:composition')).length}`
-    + `, slots ${slots(first)} → ${slots(order)}`,
-  pass: selectors(outputs.order.derived.get('animations:composition')).length
-    > selectors(outputs.first.derived.get('animations:composition')).length,
+  detail:
+    `activators ${selectors(outputs.first.derived.get('animations:composition')).length}` +
+    ` → ${selectors(outputs.order.derived.get('animations:composition')).length}` +
+    `, slots ${slots(first)} → ${slots(order)}`,
+  pass:
+    selectors(outputs.order.derived.get('animations:composition')).length >
+    selectors(outputs.first.derived.get('animations:composition')).length,
   what: 'the composition follows the activating selectors, and they grew',
 })
 
@@ -244,16 +306,24 @@ checks.push({
 // — the payload it reads, still in the file. There is no marker left to look for, so "did every
 // kind get its composition?" is answered by counting what was written, which is what
 // `protocolState` does, and the zero-occurrence check is what catches a pass that never ran.
-const finalization = [first, cache, order].map(built => protocolState(built.css))
+const finalization = [first, cache, order].map(built =>
+  protocolState(built.css),
+)
 
 checks.push({
   detail: finalization
-    .map(state => `${state.animations} + ${state.transitions} compositions, ${state.declarations} declarations`
-      + (state.leaks.staging ? `, ${state.leaks.staging} payloads left` : ''))
+    .map(
+      state =>
+        `${state.animations} + ${state.transitions} compositions, ${state.declarations} declarations` +
+        (state.leaks.staging ? `, ${state.leaks.staging} payloads left` : ''),
+    )
     .join('; '),
-  pass: finalization.every(state => Object.values(state.leaks).every(count => count === 0)
-    && state.animations > 0
-    && state.declarations === expectedDeclarations(state)),
+  pass: finalization.every(
+    state =>
+      Object.values(state.leaks).every(count => count === 0) &&
+      state.animations > 0 &&
+      state.declarations === expectedDeclarations(state),
+  ),
   what: 'each composition holds its own parts, and no build-time name survives',
 })
 
@@ -266,8 +336,12 @@ const failed = checks.filter(check => !check.pass).length
 
 if (failed) {
   console.log(`\n✗ ${failed} of ${checks.length} assertions failed`)
-  console.log('  a slot registered after `animations` was compiled has to reach the list, and')
-  console.log('  the rules Tailwind caches have to stay constant while it does.')
+  console.log(
+    '  a slot registered after `animations` was compiled has to reach the list, and',
+  )
+  console.log(
+    '  the rules Tailwind caches have to stay constant while it does.',
+  )
 }
 
 process.exit(failed ? 1 : 0)

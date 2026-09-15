@@ -54,7 +54,9 @@ const probes = [
   'probelen-(color:--feed)',
 ]
 
-console.log('\n1 · the parenthesised custom-property shorthand, through matchUtilities')
+console.log(
+  '\n1 · the parenthesised custom-property shorthand, through matchUtilities',
+)
 console.log('─'.repeat(100))
 
 const emitted = build(await compiler(jumiEntry, project), probes).css
@@ -66,11 +68,18 @@ for (const candidate of probes) {
   build(await compiler(jumiEntry, project), [candidate])
 
   const calls = seen.slice(before)
-  const declared = new RegExp(`\\.${candidate.replace(/[[\]()]/g, character => `\\\\${character}`)}[^{]*\\{([^}]*)\\}`).exec(emitted)
+  const declared = new RegExp(
+    `\\.${candidate.replace(/[[\]()]/g, character => `\\\\${character}`)}[^{]*\\{([^}]*)\\}`,
+  ).exec(emitted)
 
-  line(candidate, calls.length
-    ? `matcher called with ${calls.map(call => `${call.kind}:"${call.value}"`).join(', ')}`
-    : declared ? 'no matcher call — resolved without the plugin' : 'no matcher call and no rule')
+  line(
+    candidate,
+    calls.length
+      ? `matcher called with ${calls.map(call => `${call.kind}:"${call.value}"`).join(', ')}`
+      : declared
+        ? 'no matcher call — resolved without the plugin'
+        : 'no matcher call and no rule',
+  )
 }
 
 // ── 2 · the platform's declaration and scope model ────────────────────────────────────────────────────
@@ -172,17 +181,20 @@ const html = `<!doctype html>
 </script>
 </body></html>`
 
-const server = (await import('node:http')).createServer((request, response) => {
-  response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
-  response.end(html)
-}).listen(0)
+const server = (await import('node:http'))
+  .createServer((request, response) => {
+    response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' })
+    response.end(html)
+  })
+  .listen(0)
 
 const browser = await chromium.launch()
 const page = await browser.newPage()
 await page.goto(`http://127.0.0.1:${server.address().port}`)
 await page.waitForFunction(() => window.__ready === true)
 
-const show = ({ computedTimeline, count, progress, timeline, timelineKind }) => `${timeline} (${timelineKind}, ${count}) · computed ${computedTimeline} · progress ${progress}`
+const show = ({ computedTimeline, count, progress, timeline, timelineKind }) =>
+  `${timeline} (${timelineKind}, ${count}) · computed ${computedTimeline} · progress ${progress}`
 
 console.log('\n2 · where a named timeline exists, and who can reference it')
 console.log('─'.repeat(100))
@@ -190,7 +202,8 @@ console.log('─'.repeat(100))
 // The guard: a scope that is not implemented and a scope that does not work look identical in the rows
 // below, so the implementation is asked directly.
 const support = await page.evaluate(() => ({
-  scopeComputed: getComputedStyle(document.getElementById('scoped')).timelineScope,
+  scopeComputed: getComputedStyle(document.getElementById('scoped'))
+    .timelineScope,
   scrollTimelineName: CSS.supports('scroll-timeline-name', '--feed'),
   timelineScope: CSS.supports('timeline-scope', '--feed'),
   viewTimelineInset: CSS.supports('view-timeline-inset', '20%'),
@@ -201,21 +214,68 @@ for (const [name, value] of Object.entries(support)) {
   line(`supported: ${name}`, String(value))
 }
 
-line('a · a descendant of the scroller', show(await page.evaluate(() => window.__scroll('scroller', 0.5, 'inside'))))
-line('b · a sibling, with no scope anywhere', show(await page.evaluate(() => window.__read('outside'))))
-line('c · two siblings, common ancestor scopes', show(await page.evaluate(() => window.__scroll('scroller-two', 0.5, 'sibling-one'))))
-line('   …the second sibling, same scope', show(await page.evaluate(() => window.__read('sibling-two'))))
-line('d · scroll(), no scrollable ancestor', show(await page.evaluate(() => window.__scroll('scrollable', 0.5, 'anonymous'))))
-line('   …a sibling of a named scroller, no scope', show(await page.evaluate(() => window.__read('named'))))
-line('e · two names on one source', `${show(await page.evaluate(() => window.__scroll('two', 0.5, 'from-one')))} | ${show(await page.evaluate(() => window.__read('from-two')))}`)
-line('f1 · inner scroller, both named --dup', `inner: ${show(await page.evaluate(() => window.__scroll('nested-inner', 0.9, 'shadowed')))}`)
-line('   …then the outer one, same name', `outer: ${show(await page.evaluate(() => window.__scroll('nested-outer', 0.9, 'shadowed')))}`)
-line('f2 · two scrollers, one name, scoped', `near: ${show(await page.evaluate(() => window.__scroll('near', 0.9, 'shadowed')))}`)
-line('g · the view timeline, from a descendant', show(await page.evaluate(() => window.__read('subject-descendant'))))
-line('   …and from outside the subject', show(await page.evaluate(() => window.__read('subject-parent'))))
-line('h · does scroll-timeline-name inherit?', await page.evaluate(() => [
-  'scroller', 'scroller-child', 'outside',
-].map(id => `${id}: ${window.__inheritedName(id)}`).join(' · ')))
+line(
+  'a · a descendant of the scroller',
+  show(await page.evaluate(() => window.__scroll('scroller', 0.5, 'inside'))),
+)
+line(
+  'b · a sibling, with no scope anywhere',
+  show(await page.evaluate(() => window.__read('outside'))),
+)
+line(
+  'c · two siblings, common ancestor scopes',
+  show(
+    await page.evaluate(() =>
+      window.__scroll('scroller-two', 0.5, 'sibling-one'),
+    ),
+  ),
+)
+line(
+  '   …the second sibling, same scope',
+  show(await page.evaluate(() => window.__read('sibling-two'))),
+)
+line(
+  'd · scroll(), no scrollable ancestor',
+  show(
+    await page.evaluate(() => window.__scroll('scrollable', 0.5, 'anonymous')),
+  ),
+)
+line(
+  '   …a sibling of a named scroller, no scope',
+  show(await page.evaluate(() => window.__read('named'))),
+)
+line(
+  'e · two names on one source',
+  `${show(await page.evaluate(() => window.__scroll('two', 0.5, 'from-one')))} | ${show(await page.evaluate(() => window.__read('from-two')))}`,
+)
+line(
+  'f1 · inner scroller, both named --dup',
+  `inner: ${show(await page.evaluate(() => window.__scroll('nested-inner', 0.9, 'shadowed')))}`,
+)
+line(
+  '   …then the outer one, same name',
+  `outer: ${show(await page.evaluate(() => window.__scroll('nested-outer', 0.9, 'shadowed')))}`,
+)
+line(
+  'f2 · two scrollers, one name, scoped',
+  `near: ${show(await page.evaluate(() => window.__scroll('near', 0.9, 'shadowed')))}`,
+)
+line(
+  'g · the view timeline, from a descendant',
+  show(await page.evaluate(() => window.__read('subject-descendant'))),
+)
+line(
+  '   …and from outside the subject',
+  show(await page.evaluate(() => window.__read('subject-parent'))),
+)
+line(
+  'h · does scroll-timeline-name inherit?',
+  await page.evaluate(() =>
+    ['scroller', 'scroller-child', 'outside']
+      .map(id => `${id}: ${window.__inheritedName(id)}`)
+      .join(' · '),
+  ),
+)
 
 await browser.close()
 server.close()

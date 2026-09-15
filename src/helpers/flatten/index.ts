@@ -20,7 +20,9 @@
  * Owning the theme contract for real (`engineering/roadmap/migration.md`) is where that decision
  * belongs.
  */
-export function flattenPalette(values: Record<string, any> | undefined): Record<string, any> {
+export function flattenPalette(
+  values: Record<string, any> | undefined,
+): Record<string, any> {
   const flattened: Record<string, any> = {}
 
   for (const [key, value] of Object.entries(values ?? {})) {
@@ -35,8 +37,7 @@ export function flattenPalette(values: Record<string, any> | undefined): Record<
         // `DEFAULT` is the name of the scale itself: `blue` is `blue-DEFAULT`.
         flattened[`${key}${nested === 'DEFAULT' ? '' : `-${nested}`}`] = leaf
       }
-    }
-    else {
+    } else {
       flattened[key] = value
     }
   }

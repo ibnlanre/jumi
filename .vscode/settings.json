@@ -14,11 +14,17 @@
   "prettier.enable": false,
   "css.customData": [".vscode/tailwind.v4.json"],
   // The Tailwind IntelliSense extension builds one project per CSS file that imports "tailwindcss",
-  // and creating them all is what exhausted its heap. Only four files here are real entry points —
-  // docs/src/styles/{motion,catalog}.css, stories/globals.css and examples/input.css. The `scripts/`
-  // corpora are harness fixtures, and storybook-static/ and docs/.astro/ are build output; none of
-  // them should be built as a project. Overriding this setting replaces the extension's defaults
-  // (**/.git/**, **/node_modules/**, **/.hg/**, **/.svn/**), so they are repeated here.
+  // and creating them all is what exhausted its heap. Five files here are real entry points —
+  // docs/src/styles/{motion,catalog,demo}.css, stories/globals.css and examples/input.css. The
+  // `scripts/` corpora are harness fixtures, and storybook-static/ and docs/.astro/ are build output;
+  // none of them should be built as a project. Overriding this setting replaces the extension's
+  // defaults (**/.git/**, **/node_modules/**, **/.hg/**, **/.svn/**), so they are repeated here.
+  //
+  // Excluding paths only caps the number of *projects*. Their cost is what each entry scans, which is
+  // why every entry now declares its sources (`source(none)` plus `@source`): a bare
+  // `@import 'tailwindcss'` scans the whole workspace, and in stories/globals.css that was 1.2 GB and
+  // 200 MB of CSS — it could not finish in a 768 MB heap, and crashed the server five times on
+  // 2026-09-15. Scoped to its three sources, the same entry finishes in a 384 MB heap.
   "tailwindCSS.files.exclude": [
     "**/.git/**",
     "**/node_modules/**",

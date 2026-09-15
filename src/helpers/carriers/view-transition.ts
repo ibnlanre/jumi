@@ -96,7 +96,7 @@ import postcss from 'postcss'
  */
 
 /** A declaration as this pass replays it, in the order the emitted rule needs it. */
-export type Product = { prop: string, value: string }
+export type Product = { prop: string; value: string }
 
 /** The two sides of a transition, and the only values the variant accepts. */
 export type ViewTransitionSide = 'new' | 'old'
@@ -128,7 +128,8 @@ const invalidPrefix = 'jumi-vt-invalid-'
 /** Why a candidate was refused, from the marker the variant left behind. */
 export type ViewTransitionRefusal = 'missing' | 'name'
 
-const invalidMarker = (reason: ViewTransitionRefusal) => `${invalidPrefix}${reason}`
+const invalidMarker = (reason: ViewTransitionRefusal) =>
+  `${invalidPrefix}${reason}`
 
 /**
  * Whether a selector is view-transition staging.
@@ -140,7 +141,8 @@ const invalidMarker = (reason: ViewTransitionRefusal) => `${invalidPrefix}${reas
  * admits nothing an author would write by accident, and still admits a *malformed* marker, which is the
  * case that has to be collected so it can be reported rather than silently dropped.
  */
-export const isStagingSelector = (selector: string) => STAGING_SHAPE.test(selector)
+export const isStagingSelector = (selector: string) =>
+  STAGING_SHAPE.test(selector)
 
 /**
  * What the variant returns for a side and an identity.
@@ -148,8 +150,10 @@ export const isStagingSelector = (selector: string) => STAGING_SHAPE.test(select
  * `&:where(…)` and not `&`: the wrapper still matches the author's element, so the finalizer can
  * recover the selector, while the `:where()` half matches nothing, so the declarations never apply.
  */
-export const viewTransitionMarker = (side: ViewTransitionSide, identity: string) =>
-  `&:where(.${markerPrefix}${side}-${identity})`
+export const viewTransitionMarker = (
+  side: ViewTransitionSide,
+  identity: string,
+) => `&:where(.${markerPrefix}${side}-${identity})`
 
 /** The same selector, for a candidate this pass refuses. */
 export const viewTransitionInvalidMarker = (reason: ViewTransitionRefusal) =>
@@ -217,7 +221,8 @@ const MARKER = new RegExp(`:where\\(\\.${markerPrefix}(old|new)-([\\w-]+)\\)$`)
 const STAGING_SHAPE = new RegExp(`:where\\(\\.${markerPrefix}[^)]*\\)$`)
 
 /** A media query Jumi owns, so it never conditions participation. */
-const JUMI_OWNED_QUERY = /^\(\s*prefers-reduced-motion\s*:\s*no-preference\s*\)$/i
+const JUMI_OWNED_QUERY =
+  /^\(\s*prefers-reduced-motion\s*:\s*no-preference\s*\)$/i
 
 /**
  * The query that contradicts Jumi's own policy, and is refused rather than translated.
@@ -229,7 +234,7 @@ const JUMI_OWNED_QUERY = /^\(\s*prefers-reduced-motion\s*:\s*no-preference\s*\)$
 const REFUSED_QUERY = /^\(\s*prefers-reduced-motion\s*:\s*reduce\s*\)$/i
 
 /** A condition a staged rule sits inside. */
-export type Condition = { name: string, params: string }
+export type Condition = { name: string; params: string }
 
 /**
  * A staged rule and the conditions it sat inside, read **while the document still holds it**.
@@ -244,7 +249,11 @@ export type Condition = { name: string, params: string }
  * assumed one selector per rule took the whole list for a single candidate, found it was not one class,
  * and refused every card in the page while reporting each one politely. See `readStaged`.
  */
-export type ViewTransitionStaging = { conditions: Condition[], rule: Rule, selector: string }
+export type ViewTransitionStaging = {
+  conditions: Condition[]
+  rule: Rule
+  selector: string
+}
 
 /** A staged rule, read back out of the emitted stylesheet. */
 type Staged = {
@@ -277,10 +286,15 @@ export const viewTransitionStaging = (rule: Rule): ViewTransitionStaging[] => {
 
   const conditions: Condition[] = []
 
-  for (let node = rule.parent; node && node.type !== 'root'; node = node.parent) {
+  for (
+    let node = rule.parent;
+    node && node.type !== 'root';
+    node = node.parent
+  ) {
     const at = node as AtRule
 
-    if (at.type === 'atrule' && at.name !== 'layer') conditions.unshift({ name: at.name, params: at.params })
+    if (at.type === 'atrule' && at.name !== 'layer')
+      conditions.unshift({ name: at.name, params: at.params })
   }
 
   return staging.map(selector => ({ conditions, rule, selector }))
@@ -297,7 +311,9 @@ const readStaged = (
   isMotion: (rule: Rule) => boolean,
 ): null | Staged | ViewTransitionRefusal => {
   const { rule, selector } = staging
-  const refused = new RegExp(`:where\\(\\.${invalidPrefix}(missing|name)\\)$`).exec(selector)
+  const refused = new RegExp(
+    `:where\\(\\.${invalidPrefix}(missing|name)\\)$`,
+  ).exec(selector)
 
   if (refused) return refused[1] as ViewTransitionRefusal
 
@@ -307,7 +323,10 @@ const readStaged = (
 
   return {
     conditions: staging.conditions,
-    declarations: ownDeclarations(rule).map(({ prop, value }) => ({ prop, value })),
+    declarations: ownDeclarations(rule).map(({ prop, value }) => ({
+      prop,
+      value,
+    })),
     identity: marker[2],
     motion: isMotion(rule),
     side: marker[1] as ViewTransitionSide,
@@ -353,7 +372,11 @@ const authored = (selector: string) => {
 
 export type ViewTransitionProducts = {
   /** One `view-transition-name` per motion-bearing candidate, with the conditions it keeps. */
-  identities: Array<{ conditions: Condition[], identity: string, source: string }>
+  identities: Array<{
+    conditions: Condition[]
+    identity: string
+    source: string
+  }>
   /**
    * One per (identity, side, conditions) — the unit the owning rule and the side rule are both built
    * from, so that a transferable wrapper applies to a side's participation *and* to its motion.
@@ -378,7 +401,9 @@ export type ViewTransitionProducts = {
  * at-rule name or parameter contains, so `media` + `x` cannot collide with a parameter reading `x&media`.
  */
 const conditionKey = (conditions: Condition[]) =>
-  conditions.map(condition => `${condition.name} ${condition.params}`).join('\u0000')
+  conditions
+    .map(condition => `${condition.name} ${condition.params}`)
+    .join('\u0000')
 
 /**
  * The conditions a product keeps.
@@ -406,7 +431,11 @@ export const viewTransitionProducts = (
   staging: ViewTransitionStaging[],
   isMotion: (rule: Rule) => boolean,
 ) => {
-  const products: ViewTransitionProducts = { identities: [], units: [], warnings: [] }
+  const products: ViewTransitionProducts = {
+    identities: [],
+    units: [],
+    warnings: [],
+  }
   /** (side, identity) → condition key → the staged rules written under it. */
   const groups = new Map<string, Map<string, Staged[]>>()
   const named = new Set<string>()
@@ -420,9 +449,9 @@ export const viewTransitionProducts = (
     // whether or not it could read it. That is the one class of failure this pass is not allowed to have.
     if (staged === null) {
       products.warnings.push(
-        `Jumi could not read \`${entry.selector}\` as a view transition candidate, so nothing was`
-        + ' emitted for it. That is a bug in Jumi rather than in the class — please report it at'
-        + ' https://github.com/ibnlanre/jumi/issues',
+        `Jumi could not read \`${entry.selector}\` as a view transition candidate, so nothing was` +
+          ' emitted for it. That is a bug in Jumi rather than in the class — please report it at' +
+          ' https://github.com/ibnlanre/jumi/issues',
       )
 
       continue
@@ -430,10 +459,10 @@ export const viewTransitionProducts = (
 
     if (staged === 'missing') {
       products.warnings.push(
-        `Jumi left \`${authored(entry.selector)}\` out: it names no transition, so there is`
-        + ' nothing for the browser to pair. Write the name of the thing that moves between the `/`'
-        + ' and the `:` — `view-transition-old/hero:animate-fade-out` — and Jumi writes the'
-        + ' `view-transition-name` for you.',
+        `Jumi left \`${authored(entry.selector)}\` out: it names no transition, so there is` +
+          ' nothing for the browser to pair. Write the name of the thing that moves between the `/`' +
+          ' and the `:` — `view-transition-old/hero:animate-fade-out` — and Jumi writes the' +
+          ' `view-transition-name` for you.',
       )
 
       continue
@@ -444,23 +473,27 @@ export const viewTransitionProducts = (
         // Built by concatenation rather than as one template literal, because the prose names a `/` in
         // backticks and that is a backtick inside a template literal — which closes it. Measured: this
         // message read `NaN browser accepts as a transition name` for exactly that reason.
-        'Jumi left `' + authored(entry.selector) + '` out: the name after the `/` is not one the'
-        + ' browser accepts as a transition name. Use a plain name such as `hero` or `my-card-2` —'
-        + ' `none`, `auto`, and the CSS-wide keywords (`initial`, `inherit`, `unset`, `revert`,'
-        + ' `revert-layer`) are all reserved.',
+        'Jumi left `' +
+          authored(entry.selector) +
+          '` out: the name after the `/` is not one the' +
+          ' browser accepts as a transition name. Use a plain name such as `hero` or `my-card-2` —' +
+          ' `none`, `auto`, and the CSS-wide keywords (`initial`, `inherit`, `unset`, `revert`,' +
+          ' `revert-layer`) are all reserved.',
       )
 
       continue
     }
 
-    const refused = staged.conditions.find(condition => REFUSED_QUERY.test(condition.params))
+    const refused = staged.conditions.find(condition =>
+      REFUSED_QUERY.test(condition.params),
+    )
 
     if (refused) {
       products.warnings.push(
-        `Jumi left \`${authored(staged.source)}\` out: you asked for it under`
-        + ' `prefers-reduced-motion: reduce`, and Jumi\'s view transition motion never runs there — the'
-        + ' browser\'s own cross-fade is what remains instead. Write it without `motion-reduce:` and it'
-        + ' will run whenever motion is allowed.',
+        `Jumi left \`${authored(staged.source)}\` out: you asked for it under` +
+          " `prefers-reduced-motion: reduce`, and Jumi's view transition motion never runs there — the" +
+          " browser's own cross-fade is what remains instead. Write it without `motion-reduce:` and it" +
+          ' will run whenever motion is allowed.',
       )
 
       continue
@@ -468,10 +501,10 @@ export const viewTransitionProducts = (
 
     if (!SINGLE_CLASS.test(staged.source)) {
       products.warnings.push(
-        `Jumi left \`${authored(staged.source)}\` out: the motion has to run on the browser\'s snapshot`
-        + ' of your element, and this variant is about the element itself — there is no `:hover` or'
-        + ' `:checked` on the other side for it to be about. Variants that describe the environment do'
-        + ' transfer: `sm:`, `supports-[…]:`, `motion-safe:`.',
+        `Jumi left \`${authored(staged.source)}\` out: the motion has to run on the browser\'s snapshot` +
+          ' of your element, and this variant is about the element itself — there is no `:hover` or' +
+          ' `:checked` on the other side for it to be about. Variants that describe the environment do' +
+          ' transfer: `sm:`, `supports-[…]:`, `motion-safe:`.',
       )
 
       continue
@@ -512,7 +545,8 @@ export const viewTransitionProducts = (
     // anywhere in it is dropped silently, which is how an `animation-duration-500` with no `animate-*`
     // already behaves — inert, and not worth a warning, because writing the control on the way to
     // writing both is ordinary.
-    if (![...sets.values()].some(set => set.some(entry => entry.motion))) continue
+    if (![...sets.values()].some(set => set.some(entry => entry.motion)))
+      continue
 
     for (const set of sets.values()) {
       products.units.push({
@@ -536,7 +570,9 @@ const wrap = (node: Rule, conditions: Condition[]) => {
   let wrapped: Container = node
 
   for (const condition of [...conditions].reverse()) {
-    wrapped = postcss.atRule({ name: condition.name, params: condition.params }).append(wrapped)
+    wrapped = postcss
+      .atRule({ name: condition.name, params: condition.params })
+      .append(wrapped)
   }
 
   return wrapped
@@ -564,10 +600,13 @@ export function emitViewTransitions(
   root: Root,
   staging: ViewTransitionStaging[],
   isMotion: (rule: Rule) => boolean,
-  data: { aggregate: Product[], layer: Container, substrate: Product[] },
+  data: { aggregate: Product[]; layer: Container; substrate: Product[] },
 ): ViewTransitionEmission {
   const products = viewTransitionProducts(staging, isMotion)
-  const emission: ViewTransitionEmission = { emitted: 0, warnings: products.warnings }
+  const emission: ViewTransitionEmission = {
+    emitted: 0,
+    warnings: products.warnings,
+  }
 
   for (const { conditions, identity, source } of products.identities) {
     const rule = postcss.rule({ selector: source })
@@ -579,9 +618,17 @@ export function emitViewTransitions(
 
   if (!products.units.length) return emission
 
-  const preference = postcss.atRule({ name: 'media', params: '(prefers-reduced-motion: no-preference)' })
-  const pseudo = ({ identity, side }: { identity: string, side: ViewTransitionSide }) =>
-    `::view-transition-${side}(${identity})`
+  const preference = postcss.atRule({
+    name: 'media',
+    params: '(prefers-reduced-motion: no-preference)',
+  })
+  const pseudo = ({
+    identity,
+    side,
+  }: {
+    identity: string
+    side: ViewTransitionSide
+  }) => `::view-transition-${side}(${identity})`
 
   const supports = postcss.atRule({
     name: 'supports',
@@ -630,7 +677,8 @@ export function emitViewTransitions(
   for (const unit of products.units) {
     const rule = postcss.rule({ selector: pseudo(unit) })
 
-    for (const { prop, value } of unit.declarations) rule.append(postcss.decl({ prop, value }))
+    for (const { prop, value } of unit.declarations)
+      rule.append(postcss.decl({ prop, value }))
 
     // Re-declared rather than left to the browser's own animation, because the emitted `animation`
     // *replaces* that animation and takes its `-ua-mix-blend-mode-plus-lighter` with it. Measured with

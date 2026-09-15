@@ -38,8 +38,10 @@ const hostEntry = '@import "tailwindcss";\n'
 
 const jumiBaseline = build(await compiler(entry, project), []).css
 const hostBaseline = build(await compiler(hostEntry, project), []).css
-const jumi = async candidate => (await build(await compiler(entry, project), [candidate].flat())).css
-const host = async candidate => (await build(await compiler(hostEntry, project), [candidate])).css
+const jumi = async candidate =>
+  (await build(await compiler(entry, project), [candidate].flat())).css
+const host = async candidate =>
+  (await build(await compiler(hostEntry, project), [candidate])).css
 
 const line = (label, value) => console.log(`  ${label.padEnd(44)} ${value}`)
 
@@ -51,12 +53,14 @@ const line = (label, value) => console.log(`  ${label.padEnd(44)} ${value}`)
 const writes = (css, stem) => {
   const found = []
 
-  postcss.parse(css).walkRules((rule) => {
+  postcss.parse(css).walkRules(rule => {
     if (!rule.selector.includes(stem)) return
 
     for (const node of rule.nodes ?? []) {
       if (node.type === 'decl' && !node.prop.startsWith('--jumi-staging')) {
-        found.push(`${node.prop}: ${node.value.replace(/\s+/g, ' ').slice(0, 46)}`)
+        found.push(
+          `${node.prop}: ${node.value.replace(/\s+/g, ' ').slice(0, 46)}`,
+        )
       }
     }
   })
@@ -106,37 +110,99 @@ for (const candidate of SPELLINGS) {
   const wentToHost = await host(candidate)
 
   if (css === jumiBaseline) {
-    line(candidate, wentToHost === hostBaseline ? 'refused' : 'refused by Jumi — the host has this name')
+    line(
+      candidate,
+      wentToHost === hostBaseline
+        ? 'refused'
+        : 'refused by Jumi — the host has this name',
+    )
     continue
   }
 
   const declared = writes(css, candidate.split('[')[0])
 
-  line(candidate, declared.length ? declared.join('; ') : 'emitted a rule, wrote no declaration')
+  line(
+    candidate,
+    declared.length
+      ? declared.join('; ')
+      : 'emitted a rule, wrote no declaration',
+  )
 }
 
 // ── 1b · the split, checked as a contract rather than a name ─────────────────────────────────────────
-console.log('\n1b · the property and the transform function are different destinations')
+console.log(
+  '\n1b · the property and the transform function are different destinations',
+)
 console.log('─'.repeat(100))
 
 const property = await jumi('animate-perspective-[400px]')
 const part = await jumi('animate-transform-[perspective(400px)]')
-const both = await jumi(['animate-perspective-[400px]', 'animate-transform-[perspective(400px)]'])
-const slotsIn = css => [...new Set([...css.matchAll(/--jumi-perspective[a-z0-9-]*/g)].map(match => match[0]))].sort()
-const ownSlot = slots => slots.some(slot => !slot.startsWith('--jumi-perspective-origin') && slot !== '--jumi-perspective-3d')
+const both = await jumi([
+  'animate-perspective-[400px]',
+  'animate-transform-[perspective(400px)]',
+])
+const slotsIn = css =>
+  [
+    ...new Set(
+      [...css.matchAll(/--jumi-perspective[a-z0-9-]*/g)].map(match => match[0]),
+    ),
+  ].sort()
+const ownSlot = slots =>
+  slots.some(
+    slot =>
+      !slot.startsWith('--jumi-perspective-origin') &&
+      slot !== '--jumi-perspective-3d',
+  )
 
-line('animate-perspective-[400px]', `slots: ${slotsIn(property).join(', ') || 'none'}`)
-line('   ⋯ does it reach the composed transform?', slotsIn(property).includes('--jumi-perspective-3d') ? 'YES — the two destinations are entangled' : 'no — the property keeps its own slot')
-line('animate-transform-[perspective(400px)]', `slots: ${slotsIn(part).join(', ') || 'none'}`)
-line('   ⋯ does it reach the property slot?', ownSlot(slotsIn(part)) ? 'YES — the two destinations are entangled' : 'no — the function stays the part')
-line('both, composed in one build', `slots: ${slotsIn(both).join(', ') || 'none'}`)
+line(
+  'animate-perspective-[400px]',
+  `slots: ${slotsIn(property).join(', ') || 'none'}`,
+)
+line(
+  '   ⋯ does it reach the composed transform?',
+  slotsIn(property).includes('--jumi-perspective-3d')
+    ? 'YES — the two destinations are entangled'
+    : 'no — the property keeps its own slot',
+)
+line(
+  'animate-transform-[perspective(400px)]',
+  `slots: ${slotsIn(part).join(', ') || 'none'}`,
+)
+line(
+  '   ⋯ does it reach the property slot?',
+  ownSlot(slotsIn(part))
+    ? 'YES — the two destinations are entangled'
+    : 'no — the function stays the part',
+)
+line(
+  'both, composed in one build',
+  `slots: ${slotsIn(both).join(', ') || 'none'}`,
+)
 
 // ── 2 · does Jumi duplicate the host? ────────────────────────────────────────────────────────────────
-const controls = readFileSync(path.join(root, 'src', 'properties', 'controls.ts'), 'utf8')
-const names = [...controls.matchAll(/^\s{4}'([a-z-]+)':\s*\{/gm)].map(match => match[1])
-const SUFFIXES = ['0', '300', 'normal', 'auto', 'block', 'both', 'linear', 'allow-discrete', 'entry', 'infinite']
+const controls = readFileSync(
+  path.join(root, 'src', 'properties', 'controls.ts'),
+  'utf8',
+)
+const names = [...controls.matchAll(/^\s{4}'([a-z-]+)':\s*\{/gm)].map(
+  match => match[1],
+)
+const SUFFIXES = [
+  '0',
+  '300',
+  'normal',
+  'auto',
+  'block',
+  'both',
+  'linear',
+  'allow-discrete',
+  'entry',
+  'infinite',
+]
 
-console.log('\n2 · every non-tween utility Jumi registers: what it writes, and who else has the name')
+console.log(
+  '\n2 · every non-tween utility Jumi registers: what it writes, and who else has the name',
+)
 console.log('─'.repeat(100))
 
 const duplicates = []
@@ -149,7 +215,11 @@ for (const name of names) {
     const css = await jumi(candidate)
 
     if (css !== jumiBaseline) {
-      emitted = { candidate, css, hostHas: (await host(candidate)) !== hostBaseline }
+      emitted = {
+        candidate,
+        css,
+        hostHas: (await host(candidate)) !== hostBaseline,
+      }
       break
     }
   }
@@ -163,17 +233,25 @@ for (const name of names) {
   // Only a real property is evidence of overlap: everything else a Jumi utility writes is a `--jumi-*` slot
   // variable, including the carrier scaffolding every one of them emits, so the filter is what makes the
   // question askable at all.
-  const real = declared.filter(declaration => !declaration.startsWith('--jumi-'))
+  const real = declared.filter(
+    declaration => !declaration.startsWith('--jumi-'),
+  )
   const verdict = real.length
     ? `writes ${real.map(declaration => declaration.split(':')[0]).join(', ')}`
     : 'slot configuration only, no declaration of its own'
 
-  if (real.length && emitted.hostHas) duplicates.push({ candidate: emitted.candidate, declared: real, name })
+  if (real.length && emitted.hostHas)
+    duplicates.push({ candidate: emitted.candidate, declared: real, name })
 
-  line(name, `${emitted.candidate.padEnd(34)} ${verdict}${emitted.hostHas ? ' · the host also has this name' : ''}`)
+  line(
+    name,
+    `${emitted.candidate.padEnd(34)} ${verdict}${emitted.hostHas ? ' · the host also has this name' : ''}`,
+  )
 }
 
-console.log(`\nJumi utilities that write a declaration the host also provides: ${duplicates.length}`)
+console.log(
+  `\nJumi utilities that write a declaration the host also provides: ${duplicates.length}`,
+)
 for (const duplicate of duplicates) {
   console.log(`  ${duplicate.candidate}: ${duplicate.declared.join('; ')}`)
 }
@@ -182,11 +260,18 @@ for (const duplicate of duplicates) {
 console.log('\n3 · the overlap the inventory claimed, checked directly')
 console.log('─'.repeat(100))
 
-for (const candidate of ['will-change-[transform]', 'animate-will-change-[transform]', 'will-change-transform']) {
+for (const candidate of [
+  'will-change-[transform]',
+  'animate-will-change-[transform]',
+  'will-change-transform',
+]) {
   const inJumi = (await jumi(candidate)) !== jumiBaseline
   const inHost = (await host(candidate)) !== hostBaseline
 
-  line(candidate, `Jumi: ${inJumi ? 'emits' : 'nothing'} · host: ${inHost ? 'emits' : 'nothing'}`)
+  line(
+    candidate,
+    `Jumi: ${inJumi ? 'emits' : 'nothing'} · host: ${inHost ? 'emits' : 'nothing'}`,
+  )
 }
 
 console.log('')

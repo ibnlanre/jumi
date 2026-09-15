@@ -16,7 +16,7 @@ import { empty } from '@/theme/empty'
 import { percentage } from '@/theme/percentage'
 import { transitionBehavior } from '@/theme/transition-behavior'
 
-export const getMatchControls: GetMatchUtilities = (creator) => {
+export const getMatchControls: GetMatchUtilities = creator => {
   const { scope, stagger, theme, transition } = creator
 
   // Modifiers cannot be validated against a list: a control addresses a property
@@ -85,10 +85,10 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
       values: animationIterationCount,
     },
     'animation-name': {
-      fn: (value) => {
-        return ({
+      fn: value => {
+        return {
           '--jumi-animation-name': value,
-        })
+        }
       },
       values: empty.none,
     },
@@ -111,37 +111,37 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
     // What is deliberately absent from `values` is `normal`: measured, a half of `normal` joined to
     // the other half's offset is not a legal `animation-range`, and the whole declaration is dropped.
     'animation-range-end': {
-      fn: (value) => {
-        return ({
+      fn: value => {
+        return {
           '--jumi-animation-range-end': value,
-        })
+        }
       },
       type: ['length', 'percentage', 'any'],
       values: animationRangeName,
     },
     'animation-range-end-offset': {
-      fn: (value) => {
-        return ({
+      fn: value => {
+        return {
           '--jumi-animation-range-end-offset': value,
-        })
+        }
       },
       type: ['length', 'percentage'],
       values: percentage,
     },
     'animation-range-start': {
-      fn: (value) => {
-        return ({
+      fn: value => {
+        return {
           '--jumi-animation-range-start': value,
-        })
+        }
       },
       type: ['length', 'percentage', 'any'],
       values: animationRangeName,
     },
     'animation-range-start-offset': {
-      fn: (value) => {
-        return ({
+      fn: value => {
+        return {
           '--jumi-animation-range-start-offset': value,
-        })
+        }
       },
       type: ['length', 'percentage'],
       values: percentage,
@@ -152,18 +152,18 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
       values: animationTimeline,
     },
     'animation-timeline-axis': {
-      fn: (value) => {
-        return ({
+      fn: value => {
+        return {
           '--jumi-animation-timeline-axis': value,
-        })
+        }
       },
       values: animationTimelineAxis,
     },
     'animation-timeline-inset-end': {
-      fn: (value) => {
-        return ({
+      fn: value => {
+        return {
           '--jumi-animation-timeline-inset-end': value,
-        })
+        }
       },
       // A `<length-percentage>`, and the percentage is the common case — "start tracking when the
       // element is 20% into the viewport". `length` alone silently refused every percentage:
@@ -172,20 +172,20 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
       values: animationTimelineInset,
     },
     'animation-timeline-inset-start': {
-      fn: (value) => {
-        return ({
+      fn: value => {
+        return {
           '--jumi-animation-timeline-inset-start': value,
-        })
+        }
       },
       // See the end half: the value is a `<length-percentage>` and percentages were being refused.
       type: ['length', 'percentage'],
       values: animationTimelineInset,
     },
     'animation-timeline-scroller': {
-      fn: (value) => {
-        return ({
+      fn: value => {
+        return {
           '--jumi-animation-timeline-scroller': value,
-        })
+        }
       },
       type: 'length',
       values: animationTimelineScroller,
@@ -196,10 +196,10 @@ export const getMatchControls: GetMatchUtilities = (creator) => {
       values: animationTimingFunction,
     },
     'transition-behavior': {
-      fn: (value) => {
-        return ({
+      fn: value => {
+        return {
           '--jumi-transition-behavior': value,
-        })
+        }
       },
       values: transitionBehavior,
     },

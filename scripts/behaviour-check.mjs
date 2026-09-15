@@ -50,7 +50,8 @@ execFileSync('pnpm', ['run', 'bundle'], { cwd: root, stdio: 'pipe' })
 
 // Bundling comes first because the helper loads the finalizer out of `dist/`: the harness
 // exercises the artifact that ships, not the source it was built from.
-const { build, compiler, corpus, finalizeCss } = await import('./lib/compile.mjs')
+const { build, compiler, corpus, finalizeCss } =
+  await import('./lib/compile.mjs')
 
 /**
  * An entry for a build whose candidates are supplied here rather than scanned from a fixture —
@@ -63,11 +64,13 @@ const ENTRY = `
 `
 
 /** Compile a corpus, finalize it, and say what the finalizer did. */
-const compile = async (name) => {
+const compile = async name => {
   const built = await corpus(name)
 
-  console.log(`· ${name} — ${built.animations + built.transitions} selectors composed,`
-    + ` ${built.staging} payload rules consumed, ${built.css.length} bytes`)
+  console.log(
+    `· ${name} — ${built.animations + built.transitions} selectors composed,` +
+      ` ${built.staging} payload rules consumed, ${built.css.length} bytes`,
+  )
 
   return built
 }
@@ -83,9 +86,14 @@ const compile = async (name) => {
 const settled = (built, name) => {
   const again = finalizeCss(built.css)
 
-  if (again.staging !== 0) failures.push(`${name}: ${again.staging} payload rules survived finalization`)
-  if (again.animations !== 0 || again.transitions !== 0) failures.push(`${name}: a composition was derived twice`)
-  if (again.css !== built.css) failures.push(`${name}: finalizing the finalized CSS changed it`)
+  if (again.staging !== 0)
+    failures.push(
+      `${name}: ${again.staging} payload rules survived finalization`,
+    )
+  if (again.animations !== 0 || again.transitions !== 0)
+    failures.push(`${name}: a composition was derived twice`)
+  if (again.css !== built.css)
+    failures.push(`${name}: finalizing the finalized CSS changed it`)
 }
 
 /**
@@ -93,7 +101,7 @@ const settled = (built, name) => {
  * expectation follows the emission. Matches by selector *containing* the escaped class,
  * because a prefixed form wraps it (`… > *` for a descendant, `::before` for a pseudo).
  */
-const slotReader = css => (utility) => {
+const slotReader = css => utility => {
   // Escape the way the host escapes a class selector: every character that is not a word character
   // or a dash. A hand-rolled character class kept missing one (`>`, then `&`), and a miss reads as
   // "this utility is not in the sheet" rather than as a harness bug.
@@ -138,23 +146,29 @@ const load = async (css, body) => {
   return page
 }
 
-const entry = (page, selector, pseudo = null) => page.evaluate(
-  ({ parts, pseudo: pseudoElement, selector: query }) => {
-    const element = document.querySelector(query)
+const entry = (page, selector, pseudo = null) =>
+  page.evaluate(
+    ({ parts, pseudo: pseudoElement, selector: query }) => {
+      const element = document.querySelector(query)
 
-    if (!element) return null
+      if (!element) return null
 
-    const style = getComputedStyle(element, pseudoElement)
-    const lists = Object.fromEntries(parts.map(part => [part, style[part].split(',').map(value => value.trim())]))
+      const style = getComputedStyle(element, pseudoElement)
+      const lists = Object.fromEntries(
+        parts.map(part => [
+          part,
+          style[part].split(',').map(value => value.trim()),
+        ]),
+      )
 
-    return {
-      duration: style.animationDuration,
-      lengths: [...new Set(Object.values(lists).map(list => list.length))],
-      name: style.animationName,
-    }
-  },
-  { parts: longhands, pseudo, selector },
-)
+      return {
+        duration: style.animationDuration,
+        lengths: [...new Set(Object.values(lists).map(list => list.length))],
+        name: style.animationName,
+      }
+    },
+    { parts: longhands, pseudo, selector },
+  )
 
 const failures = []
 
@@ -173,16 +187,35 @@ if (variantBuild.animations === 0) {
 }
 
 const contexts = [
-  { detail: 'the utility itself', key: 'direct', selector: '#ctx-direct', utility: 'animate-rotate-45' },
-  { detail: '*:animate-* descendant', key: 'descendant', selector: '#ctx-descendant > i', utility: '*:animate-rotate-45' },
-  { detail: 'before:animate-* pseudo', key: 'pseudo', pseudo: '::before', selector: '#ctx-pseudo', utility: 'before:animate-scale-110' },
+  {
+    detail: 'the utility itself',
+    key: 'direct',
+    selector: '#ctx-direct',
+    utility: 'animate-rotate-45',
+  },
+  {
+    detail: '*:animate-* descendant',
+    key: 'descendant',
+    selector: '#ctx-descendant > i',
+    utility: '*:animate-rotate-45',
+  },
+  {
+    detail: 'before:animate-* pseudo',
+    key: 'pseudo',
+    pseudo: '::before',
+    selector: '#ctx-pseudo',
+    utility: 'before:animate-scale-110',
+  },
 ]
 
-const variantPage = await load(variantCss, `
+const variantPage = await load(
+  variantCss,
+  `
     <div id="ctx-direct" class="animate-rotate-45"></div>
     <div id="ctx-descendant" class="*:animate-rotate-45"><i></i></div>
     <div id="ctx-pseudo" class="before:content-[''] before:animate-scale-110"></div>
-`)
+`,
+)
 
 console.log('\n  activation contexts\n')
 
@@ -191,28 +224,35 @@ for (const context of contexts) {
   const expected = slots(context.utility)
 
   if (measured === null) {
-    failures.push(`${context.detail}: ${context.selector} not found in the page`)
+    failures.push(
+      `${context.detail}: ${context.selector} not found in the page`,
+    )
     console.log(`    ✗ ${context.detail}`)
     continue
   }
 
-  const resolving = measured.name.split(',').map(name => name.trim()).filter(name => name !== 'none')
+  const resolving = measured.name
+    .split(',')
+    .map(name => name.trim())
+    .filter(name => name !== 'none')
   const works = expected !== null && measured.name.includes(expected)
 
   console.log(
-    `    ${works ? '✓' : '✗'} ${context.detail.padEnd(28)}${context.utility.padEnd(26)}`
-    + `${resolving.length ? resolving.join(' + ') : 'none'}`,
+    `    ${works ? '✓' : '✗'} ${context.detail.padEnd(28)}${context.utility.padEnd(26)}` +
+      `${resolving.length ? resolving.join(' + ') : 'none'}`,
   )
 
   if (!works) {
     failures.push(
-      `${context.detail}: resolved "${measured.name.slice(0, 40)}" for ${context.utility},`
-      + ` expected to include ${expected ?? '(no slot in the CSS)'}`,
+      `${context.detail}: resolved "${measured.name.slice(0, 40)}" for ${context.utility},` +
+        ` expected to include ${expected ?? '(no slot in the CSS)'}`,
     )
   }
 
   if (measured.lengths.length !== 1) {
-    failures.push(`${context.detail}: longhand lists disagree on length (${measured.lengths.join(' vs ')})`)
+    failures.push(
+      `${context.detail}: longhand lists disagree on length (${measured.lengths.join(' vs ')})`,
+    )
   }
 }
 
@@ -233,17 +273,28 @@ console.log('\n  substrate\n')
 // bookkeeping rather than contract — `engineering/research/style-cost.md` records the ruling, and
 // asserting them here would pin the old representation on positions that never run.
 const pseudo = await variantPage.evaluate(() => {
-  const style = getComputedStyle(document.querySelector('#ctx-pseudo'), '::before')
+  const style = getComputedStyle(
+    document.querySelector('#ctx-pseudo'),
+    '::before',
+  )
   const names = style.animationName.split(',').map(part => part.trim())
   const durations = style.animationDuration.split(',').map(part => part.trim())
 
-  return names.map((name, index) => (name === 'none' ? null : durations[index])).filter(Boolean)
+  return names
+    .map((name, index) => (name === 'none' ? null : durations[index]))
+    .filter(Boolean)
 })
-const pseudoOk = pseudo.length > 0 && pseudo.every(duration => duration === '1s')
+const pseudoOk =
+  pseudo.length > 0 && pseudo.every(duration => duration === '1s')
 
-console.log(`    ${pseudoOk ? '✓' : '✗'} pseudo-element substrate  ${pseudo.join(', ') || '(nothing live)'}`)
+console.log(
+  `    ${pseudoOk ? '✓' : '✗'} pseudo-element substrate  ${pseudo.join(', ') || '(nothing live)'}`,
+)
 
-if (!pseudoOk) failures.push(`pseudo-element: the live position resolved "${pseudo.join(', ') || 'nothing'}", expected the 1s substrate`)
+if (!pseudoOk)
+  failures.push(
+    `pseudo-element: the live position resolved "${pseudo.join(', ') || 'nothing'}", expected the 1s substrate`,
+  )
 
 /* ------------------------------------------------------------------------------------
  * 3. The contexts that are not a variant, and the mechanisms a selector reaches
@@ -267,30 +318,46 @@ settled(canonicalBuild, 'input.css')
  * end to end: the composition's `animation-duration` is a `var()` chain over that variable, and a
  * browser that applied the wrong one shows it here.
  */
-const precedence = await load(canonicalCss, `
+const precedence = await load(
+  canonicalCss,
+  `
     <div id="precedence-default" class="animate-rotate-45"></div>
     <div id="precedence-controlled" class="animate-rotate-45 animation-duration-500"></div>
     <div id="precedence-arbitrary" class="animate-rotate-45 [--jumi-animation-duration:750ms]"></div>
-`)
+`,
+)
 
-for (const [id, expected] of [['precedence-default', '1s'], ['precedence-controlled', '0.5s'], ['precedence-arbitrary', '0.75s']]) {
+for (const [id, expected] of [
+  ['precedence-default', '1s'],
+  ['precedence-controlled', '0.5s'],
+  ['precedence-arbitrary', '0.75s'],
+]) {
   // The control has to reach the position that runs. Inactive positions carry no animation, and
   // under the ruling in `engineering/research/style-cost.md` their longhands are implementation
   // bookkeeping — reading them would be asserting the old representation's behaviour on values no
   // browser reads. Reading the live position tests the same cascade end to end and tests the thing
   // that actually matters.
-  const live = await precedence.evaluate((selector) => {
+  const live = await precedence.evaluate(selector => {
     const style = getComputedStyle(document.querySelector(selector))
     const names = style.animationName.split(',').map(part => part.trim())
-    const durations = style.animationDuration.split(',').map(part => part.trim())
+    const durations = style.animationDuration
+      .split(',')
+      .map(part => part.trim())
 
-    return names.map((name, index) => (name === 'none' ? null : durations[index])).filter(Boolean)
+    return names
+      .map((name, index) => (name === 'none' ? null : durations[index]))
+      .filter(Boolean)
   }, `#${id}`)
   const works = live.length > 0 && live.every(duration => duration === expected)
 
-  console.log(`    ${works ? '✓' : '✗'} ${id.padEnd(22)}${expected.padEnd(8)}${live.join(', ').slice(0, 44)}`)
+  console.log(
+    `    ${works ? '✓' : '✗'} ${id.padEnd(22)}${expected.padEnd(8)}${live.join(', ').slice(0, 44)}`,
+  )
 
-  if (!works) failures.push(`precedence: #${id} resolved "${live.join(', ') || 'nothing live'}", expected ${expected}`)
+  if (!works)
+    failures.push(
+      `precedence: #${id} resolved "${live.join(', ') || 'nothing live'}", expected ${expected}`,
+    )
 }
 
 const utilities = [
@@ -300,7 +367,9 @@ const utilities = [
   'animate-background-color-red-500',
 ]
 
-const directPage = await load(canonicalCss, `
+const directPage = await load(
+  canonicalCss,
+  `
     ${utilities.map((utility, index) => `<div id="c${index}" class="${utility}"></div>`).join('\n    ')}
     <div id="bare" class="animation-duration-500"></div>
     <div id="applied" class="applied-motion"></div>
@@ -309,7 +378,8 @@ const directPage = await load(canonicalCss, `
     <h1 id="sel-is" class="[&:is(h1)]:animate-fade-in"></h1>
     <div class="[&:is(h1)]:animate-fade-in"><h1 id="sel-is-descendant"></h1></div>
     <div id="sel-has" class="has-[>button]:animate-scale-110"><button></button></div>
-`)
+`,
+)
 
 const direct = []
 
@@ -325,11 +395,15 @@ for (const [index, utility] of utilities.entries()) {
   }
 
   if (!measured.name.includes(expected)) {
-    failures.push(`${utility}: resolved "${measured.name.slice(0, 60)}", expected to include ${expected}`)
+    failures.push(
+      `${utility}: resolved "${measured.name.slice(0, 60)}", expected to include ${expected}`,
+    )
   }
 
   if (measured.lengths.length !== 1) {
-    failures.push(`${utility}: longhand lists disagree on length (${measured.lengths.join(' vs ')})`)
+    failures.push(
+      `${utility}: longhand lists disagree on length (${measured.lengths.join(' vs ')})`,
+    )
   }
 }
 
@@ -340,7 +414,9 @@ const bare = await entry(directPage, '#bare')
 const bareNames = bare.name.split(',').map(name => name.trim())
 
 if (bareNames.some(name => name !== 'none')) {
-  failures.push(`a carrier with no slot resolved something other than nones: "${bare.name.slice(0, 60)}"`)
+  failures.push(
+    `a carrier with no slot resolved something other than nones: "${bare.name.slice(0, 60)}"`,
+  )
 }
 
 /* ------------------------------------------------------------------------------------
@@ -350,18 +426,27 @@ if (bareNames.some(name => name !== 'none')) {
 // The corpus overrides `--spacing` (0.3rem), so this is the batch's claim measured where it
 // matters: the emitted value is a *reference* the browser resolves against the page's theme. A
 // resolved literal — `1rem` — would compile, animate, and ignore the override entirely.
-const spacingProperty = /(--jumi-padding-[\w-]+):\s*calc\(var\(--spacing\) \* 4\)/.exec(canonicalCss)?.[1]
+const spacingProperty =
+  /(--jumi-padding-[\w-]+):\s*calc\(var\(--spacing\) \* 4\)/.exec(
+    canonicalCss,
+  )?.[1]
 const spacingValue = spacingProperty
   ? await directPage.evaluate(
-      property => getComputedStyle(document.querySelector('#spacing')).getPropertyValue(property),
+      property =>
+        getComputedStyle(document.querySelector('#spacing')).getPropertyValue(
+          property,
+        ),
       spacingProperty,
     )
   : '(no formula in the CSS)'
 
-const spacingResolved = typeof spacingValue === 'string' && spacingValue.includes('0.3rem')
+const spacingResolved =
+  typeof spacingValue === 'string' && spacingValue.includes('0.3rem')
 
 if (!spacingResolved) {
-  failures.push(`theme: the padding utility resolved to "${String(spacingValue).slice(0, 60)}", expected the corpus's 0.3rem`)
+  failures.push(
+    `theme: the padding utility resolved to "${String(spacingValue).slice(0, 60)}", expected the corpus's 0.3rem`,
+  )
 }
 
 /* ------------------------------------------------------------------------------------
@@ -372,18 +457,25 @@ if (!spacingResolved) {
 // `--radius-sm` (0.9rem), and the utility is emitted as `var(--radius-sm)` either way. Only the
 // browser shows whether the value is a reference or a literal baked in at build time — and a
 // literal is exactly what the table would produce if a namespace were only guessed at.
-const radiusProperty = /(--jumi-border-radius-[\w-]+):\s*var\(--radius-sm\)/.exec(canonicalCss)?.[1]
+const radiusProperty =
+  /(--jumi-border-radius-[\w-]+):\s*var\(--radius-sm\)/.exec(canonicalCss)?.[1]
 const radiusValue = radiusProperty
   ? await directPage.evaluate(
-      property => getComputedStyle(document.querySelector('#radius')).getPropertyValue(property),
+      property =>
+        getComputedStyle(document.querySelector('#radius')).getPropertyValue(
+          property,
+        ),
       radiusProperty,
     )
   : '(no token reference in the CSS)'
 
-const radiusResolved = typeof radiusValue === 'string' && radiusValue.includes('0.9rem')
+const radiusResolved =
+  typeof radiusValue === 'string' && radiusValue.includes('0.9rem')
 
 if (!radiusResolved) {
-  failures.push(`theme: the border-radius utility resolved to "${String(radiusValue).slice(0, 60)}", expected the corpus's 0.9rem`)
+  failures.push(
+    `theme: the border-radius utility resolved to "${String(radiusValue).slice(0, 60)}", expected the corpus's 0.9rem`,
+  )
 }
 
 // `@apply animations` inlines the carrier — longhands, slot references *and* the marker that
@@ -393,18 +485,23 @@ if (!radiusResolved) {
 // marker is what removed that limit, and this is the assertion that holds it.
 const applied = await entry(directPage, '#applied')
 const appliedSlot = canonicalSlots('animate-rotate-45')
-const appliedNames = applied.name.split(',').map(name => name.trim()).filter(name => name !== 'none')
+const appliedNames = applied.name
+  .split(',')
+  .map(name => name.trim())
+  .filter(name => name !== 'none')
 const appliedWorks = appliedSlot !== null && applied.name.includes(appliedSlot)
 
 if (!appliedWorks) {
   failures.push(
-    `@apply animations: resolved "${applied.name.slice(0, 60)}",`
-    + ` expected to include ${appliedSlot ?? '(no slot in the CSS)'}`,
+    `@apply animations: resolved "${applied.name.slice(0, 60)}",` +
+      ` expected to include ${appliedSlot ?? '(no slot in the CSS)'}`,
   )
 }
 
 if (applied.lengths.length !== 1) {
-  failures.push(`@apply animations: longhand lists disagree on length (${applied.lengths.join(' vs ')})`)
+  failures.push(
+    `@apply animations: longhand lists disagree on length (${applied.lengths.join(' vs ')})`,
+  )
 }
 
 /* ------------------------------------------------------------------------------------
@@ -423,19 +520,27 @@ const hasChild = await entry(directPage, '#sel-has')
 const isSlot = canonicalSlots('[&:is(h1)]:animate-fade-in')
 const hasSlot = canonicalSlots('has-[>button]:animate-scale-110')
 const isResolved = isSlot !== null && sameElement.name.includes(isSlot)
-const descendantResolved = descendant.name.split(',').some(name => name.trim() !== 'none')
+const descendantResolved = descendant.name
+  .split(',')
+  .some(name => name.trim() !== 'none')
 const hasResolved = hasSlot !== null && hasChild.name.includes(hasSlot)
 
 if (!isResolved) {
-  failures.push(`[&:is(h1)]: the element carrying the class resolved "${sameElement.name.slice(0, 40)}", expected ${isSlot ?? '(no slot)'}`)
+  failures.push(
+    `[&:is(h1)]: the element carrying the class resolved "${sameElement.name.slice(0, 40)}", expected ${isSlot ?? '(no slot)'}`,
+  )
 }
 
 if (descendantResolved) {
-  failures.push(`[&:is(h1)]: a descendant resolved "${descendant.name.slice(0, 40)}" — the variant is not same-element`)
+  failures.push(
+    `[&:is(h1)]: a descendant resolved "${descendant.name.slice(0, 40)}" — the variant is not same-element`,
+  )
 }
 
 if (!hasResolved) {
-  failures.push(`has-[>button]: the element with a direct child button resolved "${hasChild.name.slice(0, 40)}", expected ${hasSlot ?? '(no slot)'}`)
+  failures.push(
+    `has-[>button]: the element with a direct child button resolved "${hasChild.name.slice(0, 40)}", expected ${hasSlot ?? '(no slot)'}`,
+  )
 }
 
 /* ------------------------------------------------------------------------------------
@@ -454,16 +559,25 @@ if (!hasResolved) {
 // into nested petals, which then spun at the petal's duration instead of the orbit's. Deleting
 // `inherits: false` from the sink leaves every other harness here green, because none of them can
 // see inheritance at all.
-const nesting = await load(canonicalCss, `
+const nesting = await load(
+  canonicalCss,
+  `
     <div id="nest-outer" class="animate-rotate-45">
       <div id="nest-inner" class="animate-fade-in"></div>
     </div>
-`)
+`,
+)
 
 const outerSlot = canonicalSlots('animate-rotate-45')
 const innerSlot = canonicalSlots('animate-fade-in')
-const outerNames = (await entry(nesting, '#nest-outer'))?.name.split(',').map(name => name.trim()) ?? []
-const innerNames = (await entry(nesting, '#nest-inner'))?.name.split(',').map(name => name.trim()) ?? []
+const outerNames =
+  (await entry(nesting, '#nest-outer'))?.name
+    .split(',')
+    .map(name => name.trim()) ?? []
+const innerNames =
+  (await entry(nesting, '#nest-inner'))?.name
+    .split(',')
+    .map(name => name.trim()) ?? []
 
 const outerAnimates = outerSlot !== null && outerNames.includes(outerSlot)
 const innerAnimates = innerSlot !== null && innerNames.includes(innerSlot)
@@ -472,10 +586,10 @@ const nestingOk = outerAnimates && innerAnimates && !innerInherits
 
 if (!nestingOk) {
   failures.push(
-    'non-inheritance:'
-    + ` the outer ${outerAnimates ? 'animated' : `resolved no ${outerSlot}`},`
-    + ` the inner ${innerAnimates ? 'animated' : `resolved no ${innerSlot}`},`
-    + ` and the inner ${innerInherits ? `ran the ancestor's ${outerSlot}` : 'stayed clear of the ancestor'}`,
+    'non-inheritance:' +
+      ` the outer ${outerAnimates ? 'animated' : `resolved no ${outerSlot}`},` +
+      ` the inner ${innerAnimates ? 'animated' : `resolved no ${innerSlot}`},` +
+      ` and the inner ${innerInherits ? `ran the ancestor's ${outerSlot}` : 'stayed clear of the ancestor'}`,
   )
 }
 
@@ -492,34 +606,57 @@ if (!nestingOk) {
  * twice, in opposite candidate orders, and requires the same answer both times.
  * ---------------------------------------------------------------------------------- */
 const NAMED_ARMS = [
-  ['a', 'animate-fade-in/reveal animation-duration-300/reveal animation-duration-900/loop'],
+  [
+    'a',
+    'animate-fade-in/reveal animation-duration-300/reveal animation-duration-900/loop',
+  ],
   ['b', 'animate-fade-in/loop animation-duration-700/loop'],
-  ['c', 'animate-fade-in/reveal animate-scale-110/loop animation-duration-900/loop'],
+  [
+    'c',
+    'animate-fade-in/reveal animate-scale-110/loop animation-duration-900/loop',
+  ],
   // Names its own motion, and is named by nothing: every name in the sheet must miss it.
-  ['d', 'animate-fade-in animation-duration-900/loop animation-duration-500/elsewhere'],
+  [
+    'd',
+    'animate-fade-in animation-duration-900/loop animation-duration-500/elsewhere',
+  ],
   // A name shared by two *phrases* — the motion source whose slot key carries a hash, so this is where
   // a name and a slot key could part company — plus one phrase that took no name, which must stay out.
-  ['e', 'animate-opacity-[0:0|100:1]/enter animate-rotate-[0:0deg|100:90deg]/enter animation-duration-500/enter animate-scale-[0:1|100:2]'],
+  [
+    'e',
+    'animate-opacity-[0:0|100:1]/enter animate-rotate-[0:0deg|100:90deg]/enter animation-duration-500/enter animate-scale-[0:1|100:2]',
+  ],
 ]
 
-const NAMED_CANDIDATES = [...new Set(NAMED_ARMS.flatMap(([, classes]) => classes.split(/\s+/).filter(Boolean)))]
+const NAMED_CANDIDATES = [
+  ...new Set(
+    NAMED_ARMS.flatMap(([, classes]) => classes.split(/\s+/).filter(Boolean)),
+  ),
+]
 
 /** The duration each live animation resolves to, per element, by name position. */
-const namedDurations = async (candidates) => {
+const namedDurations = async candidates => {
   const built = build(await compiler(ENTRY, root), candidates)
-  const page = await load(built.css, NAMED_ARMS
-    .map(([id, classes]) => `<div id="named-${id}" class="${classes}"></div>`)
-    .join('\n'))
+  const page = await load(
+    built.css,
+    NAMED_ARMS.map(
+      ([id, classes]) => `<div id="named-${id}" class="${classes}"></div>`,
+    ).join('\n'),
+  )
 
   const readings = {}
 
   for (const [id] of NAMED_ARMS) {
-    const reading = await page.evaluate((selector) => {
+    const reading = await page.evaluate(selector => {
       const style = getComputedStyle(document.querySelector(selector))
       const names = style.animationName.split(',').map(name => name.trim())
-      const durations = style.animationDuration.split(',').map(value => value.trim())
+      const durations = style.animationDuration
+        .split(',')
+        .map(value => value.trim())
 
-      return Object.fromEntries(names.map((name, at) => [name, durations[at] ?? '?']))
+      return Object.fromEntries(
+        names.map((name, at) => [name, durations[at] ?? '?']),
+      )
     }, `#named-${id}`)
 
     readings[id] = reading
@@ -533,25 +670,49 @@ const namedDurations = async (candidates) => {
 const forward = await namedDurations(NAMED_CANDIDATES)
 const reversed = await namedDurations([...NAMED_CANDIDATES].reverse())
 const durationOf = (readings, id, prefix) =>
-  Object.entries(readings[id] ?? {}).find(([name]) => name.startsWith(prefix))?.[1]
+  Object.entries(readings[id] ?? {}).find(([name]) =>
+    name.startsWith(prefix),
+  )?.[1]
 
 /** Every reading that differs between the two builds, named, so a failure says what moved. */
 const orderDrift = Object.entries(forward).flatMap(([id, reading]) =>
   Object.entries(reading)
     .filter(([name, duration]) => reversed[id]?.[name] !== duration)
-    .map(([name, duration]) => `#${id} ${name}: ${duration} vs ${reversed[id]?.[name] ?? 'absent'}`))
+    .map(
+      ([name, duration]) =>
+        `#${id} ${name}: ${duration} vs ${reversed[id]?.[name] ?? 'absent'}`,
+    ),
+)
 
 const naming = [
-  ['the name it declared reaches its own motion', durationOf(forward, 'a', 'jumi-fade-in') === '0.3s'],
-  ['and a name declared on another element never does', durationOf(forward, 'b', 'jumi-fade-in') === '0.7s'],
-  ['a motion nothing named stays unreachable', durationOf(forward, 'd', 'jumi-fade-in') === '1s'],
-  ['one name reaches both motions that declared it, and only those',
-    durationOf(forward, 'c', 'jumi-scale-') === '0.9s' && durationOf(forward, 'c', 'jumi-fade-in') === '1s'],
-  ['and it does the same for two phrases, whose slots carry hashed keys',
-    durationOf(forward, 'e', 'jumi-opacity-') === '0.5s'
-    && durationOf(forward, 'e', 'jumi-rotate-') === '0.5s'
-    && durationOf(forward, 'e', 'jumi-scale-') === '1s'],
-  ['candidate order cannot decide which name wins', orderDrift.length === 0, orderDrift.join(' | ')],
+  [
+    'the name it declared reaches its own motion',
+    durationOf(forward, 'a', 'jumi-fade-in') === '0.3s',
+  ],
+  [
+    'and a name declared on another element never does',
+    durationOf(forward, 'b', 'jumi-fade-in') === '0.7s',
+  ],
+  [
+    'a motion nothing named stays unreachable',
+    durationOf(forward, 'd', 'jumi-fade-in') === '1s',
+  ],
+  [
+    'one name reaches both motions that declared it, and only those',
+    durationOf(forward, 'c', 'jumi-scale-') === '0.9s' &&
+      durationOf(forward, 'c', 'jumi-fade-in') === '1s',
+  ],
+  [
+    'and it does the same for two phrases, whose slots carry hashed keys',
+    durationOf(forward, 'e', 'jumi-opacity-') === '0.5s' &&
+      durationOf(forward, 'e', 'jumi-rotate-') === '0.5s' &&
+      durationOf(forward, 'e', 'jumi-scale-') === '1s',
+  ],
+  [
+    'candidate order cannot decide which name wins',
+    orderDrift.length === 0,
+    orderDrift.join(' | '),
+  ],
 ]
 
 for (const [claim, ok] of naming) if (!ok) failures.push(`naming: ${claim}`)
@@ -567,25 +728,48 @@ console.log('\n  direct carriers\n')
 for (const { measured, utility } of direct) {
   const broken = failures.some(failure => failure.startsWith(`${utility}:`))
 
-  console.log(`    ${broken ? '✗' : '✓'} ${utility.padEnd(32)} ${measured.name.slice(0, 52)}`)
+  console.log(
+    `    ${broken ? '✗' : '✓'} ${utility.padEnd(32)} ${measured.name.slice(0, 52)}`,
+  )
 }
 
-console.log(`    ✓ a carrier with no slot resolves to nones only (${bareNames.length} slots in the sheet)`)
-console.log(`    ${appliedWorks ? '✓' : '✗'} @apply animations -> ${appliedNames.join(' + ') || 'resolves nothing'}`)
-console.log(`    ${spacingResolved ? '✓' : '✗'} spacing follows --spacing -> ${String(spacingValue).slice(0, 40)}`)
-console.log(`    ${radiusResolved ? '✓' : '✗'} radius follows --radius-sm -> ${String(radiusValue).slice(0, 40)}`)
-console.log(`    ${isResolved ? '✓' : '✗'} [&:is(h1)] matches the element -> ${sameElement.name.slice(0, 34)}`)
-console.log(`    ${descendantResolved ? '✗' : '✓'} [&:is(h1)] does not match a descendant (${descendantResolved ? 'it did' : 'nones only'})`)
-console.log(`    ${hasResolved ? '✓' : '✗'} has-[>button] matches the element -> ${hasChild.name.slice(0, 34)}`)
-console.log(`    ${nestingOk ? '✓' : '✗'} a nested animation runs its own slot only`
-  + ` (outer ${outerNames.filter(name => name !== 'none').length},`
-  + ` inner ${innerNames.filter(name => name !== 'none').length} live)`)
-console.log(`    ✓ finalization settles: ${variantBuild.staging + canonicalBuild.staging} payload rules`
-  + ` consumed, a second pass a no-op`)
+console.log(
+  `    ✓ a carrier with no slot resolves to nones only (${bareNames.length} slots in the sheet)`,
+)
+console.log(
+  `    ${appliedWorks ? '✓' : '✗'} @apply animations -> ${appliedNames.join(' + ') || 'resolves nothing'}`,
+)
+console.log(
+  `    ${spacingResolved ? '✓' : '✗'} spacing follows --spacing -> ${String(spacingValue).slice(0, 40)}`,
+)
+console.log(
+  `    ${radiusResolved ? '✓' : '✗'} radius follows --radius-sm -> ${String(radiusValue).slice(0, 40)}`,
+)
+console.log(
+  `    ${isResolved ? '✓' : '✗'} [&:is(h1)] matches the element -> ${sameElement.name.slice(0, 34)}`,
+)
+console.log(
+  `    ${descendantResolved ? '✗' : '✓'} [&:is(h1)] does not match a descendant (${descendantResolved ? 'it did' : 'nones only'})`,
+)
+console.log(
+  `    ${hasResolved ? '✓' : '✗'} has-[>button] matches the element -> ${hasChild.name.slice(0, 34)}`,
+)
+console.log(
+  `    ${nestingOk ? '✓' : '✗'} a nested animation runs its own slot only` +
+    ` (outer ${outerNames.filter(name => name !== 'none').length},` +
+    ` inner ${innerNames.filter(name => name !== 'none').length} live)`,
+)
+console.log(
+  `    ✓ finalization settles: ${variantBuild.staging + canonicalBuild.staging} payload rules` +
+    ` consumed, a second pass a no-op`,
+)
 
 console.log('\n  naming')
 
-for (const [claim, ok, detail] of naming) console.log(`    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`)
+for (const [claim, ok, detail] of naming)
+  console.log(
+    `    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`,
+  )
 
 // Every assertion above that can fail, so the summary line is the count it claims to be: the three
 // activation contexts, the pseudo substrate, the direct carriers, bare, applied, spacing, radius,
@@ -600,8 +784,12 @@ if (failures.length) {
 
   for (const failure of failures) console.error(`  ${failure}`)
 
-  console.error('\n  Every other harness here reads text. This one is the only one that knows.')
+  console.error(
+    '\n  Every other harness here reads text. This one is the only one that knows.',
+  )
   process.exit(1)
 }
 
-console.log('\n✓ every carrier context resolves, on stock Tailwind, including the applied one')
+console.log(
+  '\n✓ every carrier context resolves, on stock Tailwind, including the applied one',
+)

@@ -34,35 +34,51 @@ import path from 'node:path'
 
 if (!process.env.DEMO_BASE) {
   console.log('· building the docs')
-  execFileSync('pnpm', ['run', 'docs:build'], { cwd: path.join(path.dirname(new URL(import.meta.url).pathname), '..'), stdio: 'pipe' })
+  execFileSync('pnpm', ['run', 'docs:build'], {
+    cwd: path.join(path.dirname(new URL(import.meta.url).pathname), '..'),
+    stdio: 'pipe',
+  })
 }
 
 const here = path.dirname(new URL(import.meta.url).pathname)
 const dist = path.join(here, '..', 'docs', 'dist')
 
-const types = { '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript', '.svg': 'image/svg+xml' }
+const types = {
+  '.css': 'text/css',
+  '.html': 'text/html',
+  '.js': 'text/javascript',
+  '.svg': 'image/svg+xml',
+}
 
 const server = createServer((request, response) => {
-  let name = decodeURIComponent(new URL(request.url, 'http://127.0.0.1').pathname)
+  let name = decodeURIComponent(
+    new URL(request.url, 'http://127.0.0.1').pathname,
+  )
   if (name.endsWith('/')) name += 'index.html'
 
   try {
     const body = readFileSync(path.join(dist, name))
-    response.writeHead(200, { 'content-type': types[path.extname(name)] ?? 'application/octet-stream' }).end(body)
-  }
-  catch {
+    response
+      .writeHead(200, {
+        'content-type': types[path.extname(name)] ?? 'application/octet-stream',
+      })
+      .end(body)
+  } catch {
     response.writeHead(404).end('no')
   }
 })
 
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve))
-const base = process.env.DEMO_BASE ?? `http://127.0.0.1:${server.address().port}`
+const base =
+  process.env.DEMO_BASE ?? `http://127.0.0.1:${server.address().port}`
 
 const checks = []
 const check = (label, pass, detail = '') => checks.push({ detail, label, pass })
 
 const browser = await chromium.launch()
-const context = await browser.newContext({ viewport: { height: 900, width: 1200 } })
+const context = await browser.newContext({
+  viewport: { height: 900, width: 1200 },
+})
 
 /**
  * One record per `startViewTransition` call, so the boundary can be asserted rather than assumed.
@@ -80,10 +96,11 @@ await context.addInitScript(() => {
   const install = () => {
     const original = document.startViewTransition.bind(document)
 
-    document.startViewTransition = (callback) => {
+    document.startViewTransition = callback => {
       const record = {
         activeAfter: null,
-        activeBefore: document.querySelector('.demo-card[data-active]')?.dataset.id ?? null,
+        activeBefore:
+          document.querySelector('.demo-card[data-active]')?.dataset.id ?? null,
         activeInCallback: null,
         groupAtReady: null,
         ready: 'pending',
@@ -92,26 +109,38 @@ await context.addInitScript(() => {
       window.__transitions.push(record)
 
       const transition = original(() => {
-        record.activeInCallback = document.querySelector('.demo-card[data-active]')?.dataset.id ?? null
+        record.activeInCallback =
+          document.querySelector('.demo-card[data-active]')?.dataset.id ?? null
 
         const result = callback()
 
-        record.activeAfter = document.querySelector('.demo-card[data-active]')?.dataset.id ?? null
+        record.activeAfter =
+          document.querySelector('.demo-card[data-active]')?.dataset.id ?? null
 
         return result
       })
 
-      transition.ready.then(() => {
-        record.ready = 'resolved'
-        record.groupAtReady = document.getAnimations().some(animation =>
-          animation.effect?.pseudoElement === `::view-transition-group(${record.activeBefore})`)
-      }).catch((error) => { record.ready = `rejected: ${error.name}` })
+      transition.ready
+        .then(() => {
+          record.ready = 'resolved'
+          record.groupAtReady = document
+            .getAnimations()
+            .some(
+              animation =>
+                animation.effect?.pseudoElement ===
+                `::view-transition-group(${record.activeBefore})`,
+            )
+        })
+        .catch(error => {
+          record.ready = `rejected: ${error.name}`
+        })
 
       return transition
     }
   }
 
-  if (document.readyState === 'loading') addEventListener('DOMContentLoaded', install)
+  if (document.readyState === 'loading')
+    addEventListener('DOMContentLoaded', install)
   else install()
 })
 
@@ -119,36 +148,53 @@ const page = await context.newPage()
 
 const errors = []
 page.on('pageerror', error => errors.push(String(error)))
-page.on('console', message => message.type() === 'error' && errors.push(message.text()))
+page.on(
+  'console',
+  message => message.type() === 'error' && errors.push(message.text()),
+)
 
 await page.goto(`${base}/demo/view-transitions/`)
 await page.waitForLoadState('load')
 
-const box = id => page.evaluate((card) => {
-  const { height, width, x, y } = document.querySelector(`.demo-card[data-id="${card}"]`).getBoundingClientRect()
+const box = id =>
+  page.evaluate(card => {
+    const { height, width, x, y } = document
+      .querySelector(`.demo-card[data-id="${card}"]`)
+      .getBoundingClientRect()
 
-  return { height: Math.round(height), width: Math.round(width), x: Math.round(x), y: Math.round(y) }
-}, id)
+    return {
+      height: Math.round(height),
+      width: Math.round(width),
+      x: Math.round(x),
+      y: Math.round(y),
+    }
+  }, id)
 
 /** The centre of a card, which is where a real mouse gesture has to be aimed. */
-const centre = async (id) => {
+const centre = async id => {
   const { height, width, x, y } = await box(id)
 
   return { x: x + width / 2, y: y + height / 2 }
 }
 
 /** What ran on the outgoing snapshot of a card, read while the transition is still live. */
-const ran = async (card) => {
+const ran = async card => {
   await page.waitForTimeout(160)
 
-  return page.evaluate((id) => {
+  return page.evaluate(id => {
     const animations = document.getAnimations()
-    const [outgoing] = animations.filter(animation =>
-      animation.effect?.pseudoElement === `::view-transition-old(${id})`)
-    const [travel] = animations.filter(animation =>
-      animation.effect?.pseudoElement === `::view-transition-group(${id})`)
-    const group = animations.some(animation =>
-      animation.effect?.pseudoElement === `::view-transition-group(${id})`)
+    const [outgoing] = animations.filter(
+      animation =>
+        animation.effect?.pseudoElement === `::view-transition-old(${id})`,
+    )
+    const [travel] = animations.filter(
+      animation =>
+        animation.effect?.pseudoElement === `::view-transition-group(${id})`,
+    )
+    const group = animations.some(
+      animation =>
+        animation.effect?.pseudoElement === `::view-transition-group(${id})`,
+    )
 
     return {
       group,
@@ -159,17 +205,28 @@ const ran = async (card) => {
   }, card)
 }
 
-const name = id => page.evaluate(card =>
-  getComputedStyle(document.querySelector(`.demo-card[data-id="${card}"]`)).viewTransitionName, id)
+const name = id =>
+  page.evaluate(
+    card =>
+      getComputedStyle(document.querySelector(`.demo-card[data-id="${card}"]`))
+        .viewTransitionName,
+    id,
+  )
 
 /* ------------------------------------------------------------------ Jumi mode (the default) */
 
 const alphaBefore = await box('alpha')
 const bravoBefore = await box('bravo')
 
-check('the page names every card in Jumi mode', await name('alpha') === 'alpha' && await name('bravo') === 'bravo')
-check('and starts with the first card expanded', alphaBefore.width > bravoBefore.width,
-  `alpha ${alphaBefore.width}×${alphaBefore.height}, bravo ${bravoBefore.width}×${bravoBefore.height}`)
+check(
+  'the page names every card in Jumi mode',
+  (await name('alpha')) === 'alpha' && (await name('bravo')) === 'bravo',
+)
+check(
+  'and starts with the first card expanded',
+  alphaBefore.width > bravoBefore.width,
+  `alpha ${alphaBefore.width}×${alphaBefore.height}, bravo ${bravoBefore.width}×${bravoBefore.height}`,
+)
 
 await page.click('.demo-card[data-id="bravo"]')
 const jumi = await ran('bravo')
@@ -177,32 +234,49 @@ const jumi = await ran('bravo')
 const bravoAfter = await box('bravo')
 const alphaAfter = await box('alpha')
 
-check('the browser projects the geometry, not just the style',
-  bravoAfter.width > bravoBefore.width && bravoAfter.x < bravoBefore.x && alphaAfter.x > alphaBefore.x,
-  `bravo ${bravoBefore.width}→${bravoAfter.width} wide and left ${bravoBefore.x}→${bravoAfter.x};`
-  + ` alpha left ${alphaBefore.x}→${alphaAfter.x}`)
+check(
+  'the browser projects the geometry, not just the style',
+  bravoAfter.width > bravoBefore.width &&
+    bravoAfter.x < bravoBefore.x &&
+    alphaAfter.x > alphaBefore.x,
+  `bravo ${bravoBefore.width}→${bravoAfter.width} wide and left ${bravoBefore.x}→${bravoAfter.x};` +
+    ` alpha left ${alphaBefore.x}→${alphaAfter.x}`,
+)
 
 check('the group is built for the card that moved', jumi.group)
-check('Jumi\'s motion runs on the outgoing snapshot', jumi.name.startsWith('jumi-'), jumi.name || 'none')
-check('and the page says so',
-  await page.textContent('#demo-motion') === jumi.name,
-  await page.textContent('#demo-motion') ?? '')
+check(
+  "Jumi's motion runs on the outgoing snapshot",
+  jumi.name.startsWith('jumi-'),
+  jumi.name || 'none',
+)
+check(
+  'and the page says so',
+  (await page.textContent('#demo-motion')) === jumi.name,
+  (await page.textContent('#demo-motion')) ?? '',
+)
 
 /* ------------------------------------------------- the boundary the swap happens inside --------------- */
 
 const [boundary] = await page.evaluate(() => window.__transitions)
 
-check('one click starts exactly one transition',
+check(
+  'one click starts exactly one transition',
   (await page.evaluate(() => window.__transitions.length)) === 1,
-  `${await page.evaluate(() => window.__transitions.length)} call(s) for the first swap`)
+  `${await page.evaluate(() => window.__transitions.length)} call(s) for the first swap`,
+)
 
-check('and its callback is where the page changes, so the boundary wraps the change',
-  boundary?.activeInCallback === boundary?.activeBefore && boundary?.activeAfter === 'bravo',
-  `active ${boundary?.activeBefore} → in callback ${boundary?.activeInCallback} → ${boundary?.activeAfter}`)
+check(
+  'and its callback is where the page changes, so the boundary wraps the change',
+  boundary?.activeInCallback === boundary?.activeBefore &&
+    boundary?.activeAfter === 'bravo',
+  `active ${boundary?.activeBefore} → in callback ${boundary?.activeInCallback} → ${boundary?.activeAfter}`,
+)
 
-check('with `ready` resolving rather than rejecting, and a group for the card that left',
+check(
+  'with `ready` resolving rather than rejecting, and a group for the card that left',
   boundary?.ready === 'resolved' && boundary?.groupAtReady === true,
-  `ready ${boundary?.ready}, group(${boundary?.activeBefore}) ${boundary?.groupAtReady}`)
+  `ready ${boundary?.ready}, group(${boundary?.activeBefore}) ${boundary?.groupAtReady}`,
+)
 
 /**
  * The dissolve outlives the projection on purpose, and that overhang is the effect the page is for.
@@ -213,9 +287,11 @@ check('with `ready` resolving rather than rejecting, and a group for the card th
  * stops looking like layout. So this asserts the inequality rather than the equality, in the direction
  * that looks like a bug if you only read the numbers.
  */
-check('the dissolve outlives the projection — the overhang is the glide',
+check(
+  'the dissolve outlives the projection — the overhang is the glide',
   jumi.pseudoDuration > jumi.groupDuration,
-  `motion ${jumi.pseudoDuration}ms, projection ${jumi.groupDuration}ms`)
+  `motion ${jumi.pseudoDuration}ms, projection ${jumi.groupDuration}ms`,
+)
 
 /* ------------------------------ the click the overlay swallows, and the handler that answers it */
 
@@ -224,14 +300,24 @@ const foxtrot = await centre('foxtrot')
 await page.click('.demo-card[data-id="echo"]')
 await page.waitForTimeout(110)
 
-const overlay = await page.evaluate(({ x, y }) => ({
-  elementFromPoint: document.elementFromPoint(x, y)?.tagName.toLowerCase() ?? '(nothing)',
-  elementsFromPoint: document.elementsFromPoint(x, y).map(element => element.tagName.toLowerCase()).join(' > '),
-}), foxtrot)
+const overlay = await page.evaluate(
+  ({ x, y }) => ({
+    elementFromPoint:
+      document.elementFromPoint(x, y)?.tagName.toLowerCase() ?? '(nothing)',
+    elementsFromPoint: document
+      .elementsFromPoint(x, y)
+      .map(element => element.tagName.toLowerCase())
+      .join(' > '),
+  }),
+  foxtrot,
+)
 
-check('while a transition runs the pseudo tree holds the hit outright',
-  overlay.elementFromPoint === 'html' && !overlay.elementsFromPoint.includes('button'),
-  `elementFromPoint → ${overlay.elementFromPoint}; elementsFromPoint → ${overlay.elementsFromPoint}`)
+check(
+  'while a transition runs the pseudo tree holds the hit outright',
+  overlay.elementFromPoint === 'html' &&
+    !overlay.elementsFromPoint.includes('button'),
+  `elementFromPoint → ${overlay.elementFromPoint}; elementsFromPoint → ${overlay.elementsFromPoint}`,
+)
 
 // A raw mouse click, not `page.click`: Playwright's actionability check waits for an element to be able
 // to receive a pointer event, so it would sit out the transition instead of measuring it.
@@ -240,7 +326,9 @@ const beforeGesture = await page.evaluate(() => window.__transitions.length)
 await page.mouse.click(foxtrot.x, foxtrot.y)
 await page.waitForTimeout(40)
 
-const midFlight = await page.evaluate(() => document.querySelector('.demo-card[data-active]')?.dataset.id)
+const midFlight = await page.evaluate(
+  () => document.querySelector('.demo-card[data-active]')?.dataset.id,
+)
 
 /**
  * Answered where it lands, by a *second* transition that supersedes the first.
@@ -253,23 +341,35 @@ const midFlight = await page.evaluate(() => document.querySelector('.demo-card[d
  * no transition at all, so the call itself is read out of the record: the *surviving* call's callback is
  * where the change happened, which is the failure the old hand-rolled version shipped.
  */
-check('a click inside the projection lands there and then',
+check(
+  'a click inside the projection lands there and then',
   midFlight === 'foxtrot',
-  `active became ${midFlight} within 40ms of the gesture`)
+  `active became ${midFlight} within 40ms of the gesture`,
+)
 
 const promoted = await page.evaluate(() => window.__transitions.at(-1))
 
-check('by superseding the transition in flight, with the change inside the new boundary',
-  (await page.evaluate(() => window.__transitions.length)) === beforeGesture + 1
-  && promoted?.activeInCallback === 'echo' && promoted?.activeAfter === 'foxtrot',
-  `${await page.evaluate(() => window.__transitions.length)} call(s) across the gesture; the call that`
-  + ` survived saw ${promoted?.activeInCallback} in its callback and ${promoted?.activeAfter} after it`)
+check(
+  'by superseding the transition in flight, with the change inside the new boundary',
+  (await page.evaluate(() => window.__transitions.length)) ===
+    beforeGesture + 1 &&
+    promoted?.activeInCallback === 'echo' &&
+    promoted?.activeAfter === 'foxtrot',
+  `${await page.evaluate(() => window.__transitions.length)} call(s) across the gesture; the call that` +
+    ` survived saw ${promoted?.activeInCallback} in its callback and ${promoted?.activeAfter} after it`,
+)
 
 await page.waitForTimeout(400)
 
-const landed = await page.evaluate(() => document.querySelector('.demo-card[data-active]')?.dataset.id)
+const landed = await page.evaluate(
+  () => document.querySelector('.demo-card[data-active]')?.dataset.id,
+)
 
-check('and it is still that card once the dissolve is over', landed === 'foxtrot', `active ${landed}`)
+check(
+  'and it is still that card once the dissolve is over',
+  landed === 'foxtrot',
+  `active ${landed}`,
+)
 
 await page.waitForTimeout(1200)
 
@@ -285,14 +385,23 @@ const delta = await centre('delta')
 await page.mouse.click(delta.x, delta.y)
 await page.waitForTimeout(30)
 
-const immediate = await page.evaluate(() => document.querySelector('.demo-card[data-active]')?.dataset.id)
+const immediate = await page.evaluate(
+  () => document.querySelector('.demo-card[data-active]')?.dataset.id,
+)
 
-check('and on the dissolve it lands straight away', immediate === 'delta',
-  `active became ${immediate} within a frame`)
+check(
+  'and on the dissolve it lands straight away',
+  immediate === 'delta',
+  `active became ${immediate} within a frame`,
+)
 
 const honoured = await ran('delta')
 
-check('by starting a transition of its own', honoured.name.startsWith('jumi-'), honoured.name || 'none')
+check(
+  'by starting a transition of its own',
+  honoured.name.startsWith('jumi-'),
+  honoured.name || 'none',
+)
 
 await page.waitForTimeout(1200)
 
@@ -304,25 +413,39 @@ await page.waitForTimeout(60)
 const nativeName = await name('bravo')
 const nativeBefore = await box('charlie')
 
-check('the hand-written names take over, and the cards still participate', nativeName === 'plain-bravo', nativeName)
+check(
+  'the hand-written names take over, and the cards still participate',
+  nativeName === 'plain-bravo',
+  nativeName,
+)
 
 await page.click('.demo-card[data-id="charlie"]')
 const native = await ran('plain-charlie')
 
 const nativeAfter = await box('charlie')
 
-check('the same layout shift still happens', nativeAfter.width > nativeBefore.width,
-  `charlie ${nativeBefore.width}→${nativeAfter.width} wide`)
-check('with the browser\'s own cross-fade instead of Jumi\'s',
+check(
+  'the same layout shift still happens',
+  nativeAfter.width > nativeBefore.width,
+  `charlie ${nativeBefore.width}→${nativeAfter.width} wide`,
+)
+check(
+  "with the browser's own cross-fade instead of Jumi's",
   native.group && !native.name.startsWith('jumi-') && native.name !== '',
-  native.name || 'none')
-check('and the page says that too',
-  await page.textContent('#demo-motion') === 'the browser\'s own cross-fade',
-  await page.textContent('#demo-motion') ?? '')
+  native.name || 'none',
+)
+check(
+  'and the page says that too',
+  (await page.textContent('#demo-motion')) === "the browser's own cross-fade",
+  (await page.textContent('#demo-motion')) ?? '',
+)
 
 /* ------------------------------------------------------------------ reduced motion */
 
-const reduced = await browser.newContext({ reducedMotion: 'reduce', viewport: { height: 900, width: 1200 } })
+const reduced = await browser.newContext({
+  reducedMotion: 'reduce',
+  viewport: { height: 900, width: 1200 },
+})
 const reducedPage = await reduced.newPage()
 
 await reducedPage.goto(`${base}/demo/view-transitions/`)
@@ -330,14 +453,30 @@ await reducedPage.waitForLoadState('load')
 await reducedPage.click('.demo-card[data-id="echo"]')
 await reducedPage.waitForTimeout(160)
 
-const quiet = await reducedPage.evaluate(() => document.getAnimations()
-  .filter(animation => (animation.effect?.pseudoElement ?? '').startsWith('::view-transition'))
-  .map(animation => `${animation.effect.pseudoElement} ${animation.animationName}`))
+const quiet = await reducedPage.evaluate(() =>
+  document
+    .getAnimations()
+    .filter(animation =>
+      (animation.effect?.pseudoElement ?? '').startsWith('::view-transition'),
+    )
+    .map(
+      animation =>
+        `${animation.effect.pseudoElement} ${animation.animationName}`,
+    ),
+)
 
-check('under reduced motion the element still participates', quiet.some(entry => entry.includes('group(echo)')),
-  quiet.filter(entry => entry.includes('(echo)')).join(' | ') || 'no echo pseudo animations')
-check('and no Jumi keyframe runs', quiet.every(entry => !entry.includes(' jumi-')),
-  quiet.filter(entry => entry.includes(' jumi-')).join(' | ') || 'no Jumi keyframes')
+check(
+  'under reduced motion the element still participates',
+  quiet.some(entry => entry.includes('group(echo)')),
+  quiet.filter(entry => entry.includes('(echo)')).join(' | ') ||
+    'no echo pseudo animations',
+)
+check(
+  'and no Jumi keyframe runs',
+  quiet.every(entry => !entry.includes(' jumi-')),
+  quiet.filter(entry => entry.includes(' jumi-')).join(' | ') ||
+    'no Jumi keyframes',
+)
 
 /* --------------- the control the overlay hides, and the window it must not be gated on --------------- */
 
@@ -349,7 +488,9 @@ await page.click('.demo-card[data-id="delta"]')
 await page.waitForTimeout(110)
 
 const jumiButton = await page.evaluate(() => {
-  const { height, width, x, y } = document.querySelector('.demo-mode[data-mode="jumi"]').getBoundingClientRect()
+  const { height, width, x, y } = document
+    .querySelector('.demo-mode[data-mode="jumi"]')
+    .getBoundingClientRect()
 
   return { x: x + width / 2, y: y + height / 2 }
 })
@@ -357,10 +498,15 @@ const jumiButton = await page.evaluate(() => {
 await page.mouse.click(jumiButton.x, jumiButton.y)
 await page.waitForTimeout(40)
 
-const switched = await page.evaluate(() => document.documentElement.dataset.demoMode)
+const switched = await page.evaluate(
+  () => document.documentElement.dataset.demoMode,
+)
 
-check('a mode switch inside the projection is answered, not dropped', switched === 'jumi',
-  `data-demo-mode = ${switched} after reaching for the switch 110ms into a native swap`)
+check(
+  'a mode switch inside the projection is answered, not dropped',
+  switched === 'jumi',
+  `data-demo-mode = ${switched} after reaching for the switch 110ms into a native swap`,
+)
 
 await page.waitForTimeout(1400)
 
@@ -368,17 +514,25 @@ await page.click('.demo-card[data-id="echo"]')
 
 const afterSwitch = await ran('echo')
 
-check('and the swap after it is Jumi\'s, not the mode the page just left',
-  afterSwitch.name.startsWith('jumi-'), afterSwitch.name || 'none')
+check(
+  "and the swap after it is Jumi's, not the mode the page just left",
+  afterSwitch.name.startsWith('jumi-'),
+  afterSwitch.name || 'none',
+)
 
 await page.waitForTimeout(1200)
 
-check('the page throws nothing', errors.length === 0, errors.slice(0, 3).join(' | ') || 'clean console')
+check(
+  'the page throws nothing',
+  errors.length === 0,
+  errors.slice(0, 3).join(' | ') || 'clean console',
+)
 
 await browser.close()
 server.close()
 
-for (const { detail, label, pass } of checks) console.log(`${pass ? '✓' : '✗'} ${label}${detail ? ` — ${detail}` : ''}`)
+for (const { detail, label, pass } of checks)
+  console.log(`${pass ? '✓' : '✗'} ${label}${detail ? ` — ${detail}` : ''}`)
 
 const failed = checks.filter(entry => !entry.pass).length
 
