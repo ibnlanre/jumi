@@ -51,7 +51,7 @@
     "docs:build": "pnpm run bundle && pnpm run docs:prepare && astro build --root docs",
     "docs:preview": "astro preview --root docs",
     "css:snapshot": "node scripts/css-snapshot.mjs --update",
-    "css:check": "node scripts/css-snapshot.mjs --check",
+    "css:check": "node scripts/css-snapshot.mjs --check && node scripts/dead-links.mjs --strict",
     "theme:map": "node scripts/theme-map.mjs",
     "incremental:check": "node scripts/incremental-build.mjs",
     "lint": "eslint --fix .",

@@ -556,6 +556,7 @@ export function createJumiModel({
     attribute: AnimatableStandardPropertyType,
     id: string,
     frames: Frame[],
+    writesOuterFrame: boolean,
   ): CssInJs => {
     const fallback = css('var', `--jumi-${attribute}`)
 
@@ -565,6 +566,7 @@ export function createJumiModel({
           attribute,
           `${id}-${offset}`,
           fallback,
+          writesOuterFrame,
         ),
       }
       return acc
@@ -582,24 +584,33 @@ export function createJumiModel({
     attribute: AnimatableStandardPropertyType,
     suffix: string,
     fallback: string,
+    writesOuterFrame: boolean,
   ): string {
     const variable = cssEscape(`--jumi-${attribute}-${suffix}`)
     const { dependencies = [], value = fallback } = propertyVariables[attribute]
 
-    // The fallback is the element's resting value: a phrase that does not pin a
-    // frame simply does not have one, and any frame variable left unset still
-    // lands on the property's resting value rather than its initial value.
-    if (!dependencies.length) return css('var', variable, fallback)
+    // A composed property's value names its own components, so a frame's value is that composition —
+    // `var(--jumi-scale-x) var(--jumi-scale-y) var(--jumi-scale-z)` — and each component reads the
+    // element's own value.
+    //
+    // Each component used to be wrapped in a frame-scoped copy as well:
+    // `var(--jumi-scale-x-<id>-<offset>, var(--jumi-scale-x))`. Its only possible writer would be a
+    // phrase addressing that component *and* pinning this frame, and no phrase does both — the suffix
+    // belongs to the phrase that owns the keyframe. `dead-links.mjs` reported those copies as the
+    // canonical sheet's only dead reads (112 of them, eight families), and
+    // `spike-keyframe-hooks.mjs` reads identically at five offsets with them removed.
+    const composed = dependencies.length ? value : fallback
 
-    const expanded = dependencies.reduce((result, dependency) => {
-      const part = propertyVariables[dependency].variable
-      return result.replaceAll(
-        `var(${part})`,
-        `var(${cssEscape(`${part}-${suffix}`)}, var(${part}))`,
-      )
-    }, value)
-
-    return css('var', variable, expanded)
+    // The outer read is emitted only when **this phrase wrote that key**. A constituent-authored
+    // phrase writes its parts' keys instead (`--jumi-scale-x-<id>-<offset>`), so its frame would
+    // otherwise read a variable nothing fills — the second dead shape measured
+    // (`--jumi-outline-<id>-<offset>`), where the value arrives through the composition above and
+    // the outer branch could never win.
+    //
+    // `fallback` is the element's resting value: a phrase that does not pin a frame simply does not
+    // have one, and any frame variable left unset still lands on the property's resting value rather
+    // than its initial value.
+    return writesOuterFrame ? css('var', variable, composed) : composed
   }
 
   function animationParts(
@@ -1003,7 +1014,7 @@ export function createJumiModel({
           registerName(`--jumi-${attribute}-${id}-animation-name`)
           emitKeyframe(
             `jumi-${attribute}-${id}`,
-            phraseKeyframe(attribute, id, frameList),
+            phraseKeyframe(attribute, id, frameList, !parts.length),
           )
           aggregateChanged()
 

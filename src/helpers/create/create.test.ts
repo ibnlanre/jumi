@@ -291,10 +291,63 @@ describe('keyframe emission', () => {
     expect(keyframes).toBeDefined()
 
     const frame = keyframes[`@keyframes jumi-filter-${id}`]['40%'].filter
-    expect(frame).toContain(`var(--jumi-filter-${id}-40,`)
-    expect(frame).toContain(
-      `var(--jumi-filter-blur-${id}-40, var(--jumi-filter-blur))`,
+
+    // The frame reads the composition itself, and nothing else.
+    //
+    // `filter` is authored as parts, so this phrase wrote the parts' keys — `--jumi-filter-blur-${id}-40`
+    // — and never `--jumi-filter-${id}-40`. A lookup for a key the phrase cannot write is what
+    // `propertyKeyframeValue` no longer emits, so the outer read is absent rather than dead: measured
+    // before the change as one of the sheet's writes-nothing reads.
+    //
+    // The frame-scoped copy of each component went with it (`var(--jumi-filter-blur-${id}-40,
+    // var(--jumi-filter-blur))`), for the same reason: its only possible writer would address that
+    // component *and* pin this frame, and the suffix belongs to the phrase that owns the keyframe.
+    expect(frame).not.toContain(`var(--jumi-filter-${id}-40`)
+    expect(frame).not.toContain(`var(--jumi-filter-blur-${id}-40`)
+    expect(frame).toBe(
+      'var(--jumi-filter-blur) var(--jumi-filter-brightness) ' +
+        'var(--jumi-filter-contrast) var(--jumi-filter-grayscale) ' +
+        'var(--jumi-filter-hue-rotate) var(--jumi-filter-invert) ' +
+        'var(--jumi-filter-saturate) var(--jumi-filter-sepia) ' +
+        'var(--jumi-filter-opacity) var(--jumi-filter-drop-shadow)',
     )
+  })
+
+  it('derives the definition id from the phrase value alone, not the attribute', () => {
+    const { creator } = setup()
+
+    const value = '0:2px|50:8px'
+
+    // The same value text under two different attributes gets **one** definition id, because the id is a
+    // hash of the value and nothing else. Nothing here validates that the value suits the attribute; that
+    // is the browser's business, and the hash is deliberately blind to it.
+    //
+    // Architectural rather than incidental, and worth pinning: `dead-links.mjs` briefly reported a writer
+    // for a phrase that never wrote a key, because a second candidate happened to share its value — and
+    // therefore its id. Anyone "fixing" that collision would be changing definition identity, with every
+    // dedup in the model resting on it.
+    creator.property('opacity')(value, { modifier: null })
+    creator.property('filter', [
+      ['filter-blur', (input: string) => css('blur', input)],
+    ])(value, { modifier: null })
+    creator.property('rotate')('0:16deg|58:0deg', { modifier: null })
+
+    const names = String(creator.animations['animation-name'])
+      .split(',')
+      .map(name => name.trim())
+
+    const idOf = (attribute: string) =>
+      names
+        .map(
+          name =>
+            new RegExp(`^var\\(--jumi-${attribute}-([\\w-]+?)-animation-name`)
+              .exec(name)?.[1],
+        )
+        .find(Boolean)
+
+    expect(idOf('opacity')).toBeDefined()
+    expect(idOf('opacity')).toBe(idOf('filter'))
+    expect(idOf('rotate')).not.toBe(idOf('opacity'))
   })
 
   it('escapes a decimal offset in the keyframe', () => {

@@ -2,23 +2,23 @@ import type { PropertyType, PropertyVariable } from '@/types'
 
 import { animation } from '@/composition/animation'
 import {
-  animationRange,
-  animationRangeEnd,
-  animationRangeStart,
+    animationRange,
+    animationRangeEnd,
+    animationRangeStart,
 } from '@/composition/animation-range'
 import {
-  animationTimelineInset,
-  animationTimelineScroll,
-  animationTimelineView,
+    animationTimelineInset,
+    animationTimelineScroll,
+    animationTimelineView,
 } from '@/composition/animation-timeline'
 import { aspectRatio } from '@/composition/aspect-ratio'
 import { backdropFilter } from '@/composition/backdrop-filter'
 import { backdropFilterDropShadow } from '@/composition/backdrop-filter-drop-shadow'
 import { background } from '@/composition/background'
 import {
-  backgroundPosition,
-  backgroundPositionX,
-  backgroundPositionY,
+    backgroundPosition,
+    backgroundPositionX,
+    backgroundPositionY,
 } from '@/composition/background-position'
 import { backgroundRepeat } from '@/composition/background-repeat'
 import { backgroundSize } from '@/composition/background-size'
@@ -30,9 +30,9 @@ import { borderBlockStart } from '@/composition/border-block-start'
 import { borderBottom } from '@/composition/border-bottom'
 import { borderImage } from '@/composition/border-image'
 import {
-  borderImageOutset,
-  borderImageOutsetX,
-  borderImageOutsetY,
+    borderImageOutset,
+    borderImageOutsetX,
+    borderImageOutsetY,
 } from '@/composition/border-image-outset'
 import { borderImageRepeat } from '@/composition/border-image-repeat'
 import { borderInline } from '@/composition/border-inline'
@@ -44,9 +44,9 @@ import { borderRadius } from '@/composition/border-radius'
 import { borderRight } from '@/composition/border-right'
 import { borderTop } from '@/composition/border-top'
 import {
-  boxShadow,
-  boxShadowInset,
-  boxShadowOutset,
+    boxShadow,
+    boxShadowInset,
+    boxShadowOutset,
 } from '@/composition/box-shadow'
 import { columnRule } from '@/composition/column-rule'
 import { columns } from '@/composition/columns'
@@ -72,32 +72,32 @@ import { marginBlock } from '@/composition/margin-block'
 import { marginInline } from '@/composition/margin-inline'
 import { marker } from '@/composition/marker'
 import {
-  maskBorderOutset,
-  maskBorderOutsetX,
-  maskBorderOutsetY,
+    maskBorderOutset,
+    maskBorderOutsetX,
+    maskBorderOutsetY,
 } from '@/composition/mask-border-outset'
 import { maskBorderRepeat } from '@/composition/mask-border-repeat'
 import {
-  maskBorderSlice,
-  maskBorderSliceX,
-  maskBorderSliceY,
+    maskBorderSlice,
+    maskBorderSliceX,
+    maskBorderSliceY,
 } from '@/composition/mask-border-slice'
 import { maskPosition } from '@/composition/mask-position'
 import { mathDepth } from '@/composition/math-depth'
 import {
-  objectPosition,
-  objectPositionX,
-  objectPositionY,
+    objectPosition,
+    objectPositionX,
+    objectPositionY,
 } from '@/composition/object-position'
 import {
-  offsetAnchor,
-  offsetAnchorX,
-  offsetAnchorY,
+    offsetAnchor,
+    offsetAnchorX,
+    offsetAnchorY,
 } from '@/composition/offset-anchor'
 import {
-  offsePosition,
-  offsetPositionX,
-  offsetPositionY,
+    offsePosition,
+    offsetPositionX,
+    offsetPositionY,
 } from '@/composition/offset-position'
 import { outline } from '@/composition/outline'
 import { overflow } from '@/composition/overflow'
@@ -112,14 +112,14 @@ import { scale } from '@/composition/scale'
 import { scrollTimeline } from '@/composition/scroll-timeline'
 import { textShadow } from '@/composition/text-shadow'
 import {
-  matrix,
-  matrix3d,
-  perspective3d,
-  rotate3d,
-  scale3d,
-  skew,
-  transform,
-  translate3d,
+    matrix,
+    matrix3d,
+    perspective3d,
+    rotate3d,
+    scale3d,
+    skew,
+    transform,
+    translate3d,
 } from '@/composition/transform'
 import { transition } from '@/composition/transition'
 import { translate } from '@/composition/translate'
@@ -883,6 +883,11 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-box-decoration-break',
   },
   'box-shadow': {
+    // `inset` and `outset` are internal template components, not phrase surfaces: no candidate
+    // addresses either, so no phrase can write a frame key for them and neither can reach the
+    // writer-aware branch in `propertyKeyframeValue`. Recorded because they look exactly like the
+    // constituents that *are* authorable — `scale-x`, `outline-width`, `backdrop-filter-blur` — and
+    // the difference is only visible in the candidate set, not in this table.
     dependencies: ['box-shadow-inset', 'box-shadow-outset'],
     value: boxShadow,
     variable: '--jumi-box-shadow',
