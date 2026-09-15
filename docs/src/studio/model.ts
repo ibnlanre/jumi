@@ -1,6 +1,10 @@
+import { flatten, parentOf } from './tree'
+export { flatten, parentOf } from './tree'
 import type { PropertyEntry } from './catalog'
 
 import { propertyVariables } from '@/variables/property'
+
+import { baseCss, sourceStyle, validBase } from './base'
 export type Controls = {
   composition: string
   delay: number
@@ -13,6 +17,7 @@ export type Controls = {
 export type Frame = { id: string; offset: number; value: string }
 export type SceneNode = {
   attributes: Record<string, string>
+  base?: Record<string, string>
   children: SceneNode[]
   id: string
   name: string
@@ -85,13 +90,6 @@ export function exportedTrackClasses(
 }
 export const uid = () =>
   `m${globalThis.crypto.randomUUID().replaceAll('-', '').slice(0, 10)}`
-export const flatten = (root: SceneNode): SceneNode[] => [
-  root,
-  ...root.children.flatMap(flatten),
-]
-export function parentOf(root: SceneNode, id: string): SceneNode | undefined {
-  return flatten(root).find(n => n.children.some(c => c.id === id))
-}
 export const escapeHtml = (s: string) =>
   s
     .replaceAll('&', '&amp;')
@@ -124,10 +122,10 @@ export function candidates(project: StudioProject): string[] {
   const identities = new Set<string>()
   const names = new Map<string, string>()
   for (const t of project.tracks) {
-    const key = `${t.nodeId}:${t.utility}:${phrase(t)}`
+    const key = `${t.nodeId}:${t.name}:${t.utility}:${phrase(t)}`
     if (identities.has(key))
       throw Error(
-        'Identical phrases on one property share a Jumi slot. Merge these tracks or change their phrase.',
+        'Identical phrases with the same motion name share an instance. Merge these tracks or choose a different name.',
       )
     identities.add(key)
     const address = `${t.nodeId}:${t.name}`,
@@ -169,13 +167,14 @@ export function documentHtml(
   editor = false,
 ): string {
   const safeStyle = (s: string) => s.replace(/<\/style/gi, '<\\/style')
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:;"><title>${escapeHtml(project.title)}</title><style id="jumi-output">${safeStyle(generated)}</style><style id="scene-base">${safeStyle(project.scene.css)}</style>${editor ? '<style id="studio-isolation"></style>' : ''}</head><body>${markup(project)}</body></html>`
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:;"><title>${escapeHtml(project.title)}</title><style id="jumi-output">${safeStyle(generated)}</style><style id="scene-base">${safeStyle(baseCss(project))}</style>${editor ? '<style id="studio-isolation"></style>' : ''}</head><body>${markup(project)}</body></html>`
 }
 export function markup(project: StudioProject): string {
   const render = (node: SceneNode, level: number): string => {
     const indent = '  '.repeat(level)
     const attrs = {
       ...node.attributes,
+      ...(node.attributes.style ? { style: sourceStyle(node) } : {}),
       class: [
         ...new Set([
           node.attributes.class || '',
@@ -266,7 +265,10 @@ export function trackClasses(track: Track, preserveDefaults = false): string[] {
       'easing',
       `animation-timing-function-[${cssValue(c.easing)}]/${track.name}`,
     ],
-    ['iterations', `animation-iteration-count-[${c.iterations}]/${track.name}`],
+    [
+      'iterations',
+      `animation-iteration-count-${c.iterations === 'infinite' ? 'infinite' : `[${c.iterations}]`}/${track.name}`,
+    ],
     ['direction', `animation-direction-${c.direction}/${track.name}`],
     ['fill', `animation-fill-mode-${c.fill}/${track.name}`],
     ['composition', `animation-composition-${c.composition}/${track.name}`],
@@ -463,6 +465,15 @@ export function validateSceneNode(
       'Scene must contain at most 250 safe HTML/SVG elements with unique simple IDs.',
     )
   ids.add(node.id)
+  if (
+    node.base &&
+    (typeof node.base !== 'object' ||
+      Array.isArray(node.base) ||
+      Object.entries(node.base).some(
+        ([key, value]) => !validBase(node, key, value),
+      ))
+  )
+    throw Error('Invalid base property declaration.')
   if (
     typeof node.name !== 'string' ||
     !node.name.trim() ||

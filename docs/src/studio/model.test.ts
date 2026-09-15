@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { sourceStyle } from './base'
 import { readCatalog } from './catalog'
 import {
   addFrame,
@@ -95,7 +96,7 @@ describe('Studio public output contract', () => {
     p.tracks.push({
       ...structuredClone(p.tracks[0]),
       id: 'different',
-      name: 'other',
+      name: p.tracks[0].name,
     })
     expect(() => candidates(p)).toThrow(/Identical phrases/)
     p.tracks.pop()
@@ -106,6 +107,53 @@ describe('Studio public output contract', () => {
       utility: 'animate-scale',
     })
     expect(() => candidates(p)).toThrow(/share controls/)
+  })
+  it('keeps differently named instances of identical frames independent', () => {
+    const p = makeScene('signal'),
+      t = structuredClone(p.tracks[0])
+    t.id = 'second'
+    t.name = 'glow'
+    t.controls.duration = 900
+    p.tracks.push(t)
+    expect(() => candidates(p)).not.toThrow()
+    expect(
+      candidates(p).filter(
+        c => c.startsWith('animate-opacity-[') && c.endsWith('/glow'),
+      ),
+    ).toHaveLength(1)
+  })
+  it('round-trips authored base declarations and omits unspecified starting keyframes', () => {
+    const p = makeScene('signal')
+    p.scene.root.base = { rotate: '20deg', width: '840px' }
+    const t = p.tracks[0]
+    t.frames = [{ id: 'end', offset: 100, value: '1' }]
+    expect(documentHtml(p, '')).toContain('rotate: 20deg;')
+    expect(trackClasses(t)[0]).toContain('[100:1]')
+    expect(
+      validateProject(JSON.parse(JSON.stringify(p)), properties).scene.root
+        .base,
+    ).toEqual(p.scene.root.base)
+    p.scene.root.base = { onclick: 'alert(1)' }
+    expect(() => validateProject(p, properties)).toThrow(/base/)
+  })
+  it('base overrides preserve and restore inline source declarations', () => {
+    const p = makeScene('signal'),
+      node = p.scene.root
+    node.attributes.style = 'rotate: 10deg; --label: "a;b"; color: red'
+    const source = node.attributes.style
+    node.base = { rotate: '20deg' }
+    expect(sourceStyle(node)).not.toContain('10deg')
+    expect(sourceStyle(node)).toContain('"a;b"')
+    expect(node.attributes.style).toBe(source)
+    delete node.base.rotate
+    expect(sourceStyle(node)).toBe(source)
+  })
+  it('serializes infinite iteration through the supported public keyword', () => {
+    const t = makeScene().tracks[0]
+    expect(trackClasses(t)).toContain(
+      `animation-iteration-count-infinite/${t.name}`,
+    )
+    expect(trackClasses(t).join(' ')).not.toContain('[infinite]')
   })
   it('uses delay-relative percentages and moves different tracks by the same time delta', () => {
     const p = makeScene('signal')

@@ -79,6 +79,54 @@ const control = async (name, value) => {
 try {
   await page.goto('http://127.0.0.1:' + server.address().port + '/studio/')
   await ready()
+  await page.locator('#studio-theme').selectOption('light')
+  check(
+    'light theme applies workspace tokens',
+    await page.evaluate(
+      () =>
+        document.documentElement.dataset.theme === 'light' &&
+        getComputedStyle(document.documentElement)
+          .getPropertyValue('--panel')
+          .trim() === '#f5f7f1',
+    ),
+  )
+  const themeProject = await page.evaluate(() =>
+    JSON.stringify(window.__jumiStudio.project),
+  )
+  await page.locator('#studio-theme').selectOption('dark')
+  await page.reload()
+  await ready()
+  check(
+    'theme preference persists independently of project',
+    await page.evaluate(
+      s =>
+        document.documentElement.dataset.theme === 'dark' &&
+        JSON.stringify(window.__jumiStudio.project) === s,
+      themeProject,
+    ),
+  )
+  await page.locator('[data-action=zoom-in]').click()
+  const manualZoom = await page.evaluate(
+    () => window.__jumiStudio.project.viewport.zoom,
+  )
+  await page.reload()
+  await ready()
+  check(
+    'manual zoom survives restoration without automatic fitting',
+    await page.evaluate(
+      z => window.__jumiStudio.project.viewport.zoom === z,
+      manualZoom,
+    ),
+  )
+  await page.locator('#studio-theme').selectOption('system')
+  await page.emulateMedia({ colorScheme: 'light' })
+  check(
+    'system theme follows OS appearance',
+    await page.evaluate(
+      () => document.documentElement.dataset.theme === 'light',
+    ),
+  )
+  await page.locator('#studio-theme').selectOption('dark')
   check(
     'workspace fills viewport',
     await page.evaluate(
@@ -165,6 +213,147 @@ try {
     'timeline groups named motion under its element',
     (await page.locator('.timeline-motion').count()) > 0,
   )
+  const railX = (await page.locator('#track-rail').boundingBox()).x
+  await page.locator('#timeline-zoom').selectOption('4')
+  const contentWidth = await page
+    .locator('#time-content')
+    .evaluate(el => el.clientWidth)
+  await page.locator('#timeline-x').evaluate(el => {
+    el.scrollLeft = 450
+    el.dispatchEvent(new Event('scroll'))
+  })
+  check(
+    'only the time viewport scrolls horizontally',
+    (await page.locator('#track-rail').boundingBox()).x === railX &&
+      (await page.locator('#time-viewport').evaluate(el => el.scrollLeft)) ===
+        450,
+  )
+  await page.locator('#rail-resize').focus()
+  await page.keyboard.press('ArrowRight')
+  check(
+    'rail resizing preserves time coordinates',
+    (await page.locator('#time-content').evaluate(el => el.clientWidth)) ===
+      contentWidth,
+  )
+  await page.locator('#all-tracks').check()
+  await page.locator('#timeline-scroll').evaluate(el => (el.scrollTop = 130))
+  check(
+    'rail and time rows share exact vertical positions',
+    await page.evaluate(() =>
+      [...document.querySelectorAll('[data-row-index]')].every(el => {
+        const other = document.querySelector(
+          '[data-time-row="' + el.dataset.rowIndex + '"]',
+        )
+        const a = el.getBoundingClientRect(),
+          b = other.getBoundingClientRect()
+        return Math.abs(a.top - b.top) < 0.1 && a.height === b.height
+      }),
+    ),
+  )
+  check(
+    'ruler remains above vertically scrolled tracks',
+    await page.locator('#timeline-header').isVisible(),
+  )
+  await page.locator('#all-tracks').uncheck()
+  await page.locator('#timeline-scroll').evaluate(el => (el.scrollTop = 0))
+  await page.locator('#timeline-x').evaluate(el => {
+    el.scrollLeft = 0
+    el.dispatchEvent(new Event('scroll'))
+  })
+  await page.locator('#timeline-zoom').selectOption('1')
+  await page.locator('#scene-tree [data-select="petal-4"]').click()
+  await page.locator('#breadcrumbs button').last().focus()
+  await page.keyboard.press('Alt+ArrowUp')
+  check(
+    'keyboard navigation moves upward through hierarchy',
+    await page.evaluate(
+      () => window.__jumiStudio.project.editor.selected[0] === 'position-4',
+    ),
+  )
+  await page.keyboard.press('Alt+ArrowDown')
+  check(
+    'keyboard navigation drills into children',
+    await page.evaluate(
+      () => window.__jumiStudio.project.editor.selected[0] === 'petal-4',
+    ),
+  )
+  const echoPhrase = await page.evaluate(() => {
+    const t = window.__jumiStudio.project.tracks.find(
+      t => t.nodeId === 'petal-4' && t.name === 'flick',
+    )
+    return (
+      t.utility +
+      '-[' +
+      t.frames.map(f => f.offset + ':' + f.value).join('|') +
+      ']/echo animation-duration-[1400ms]/echo'
+    )
+  })
+  await page.locator('[data-action=import-classes]').click()
+  await page.locator('#phrase-input').fill(echoPhrase)
+  await page.locator('#apply-phrases').click()
+  await ready()
+
+  check(
+    'identical frames with distinct names stay separate browser instances',
+    await page
+      .frameLocator('#scene-frame')
+      .locator('#petal-4')
+      .evaluate(el => el.getAnimations().length === 3),
+  )
+  await page.locator('[data-audition="motion:petal-4:echo"]').click()
+  check(
+    'audition addresses the named instance even with shared keyframe identity',
+    await page
+      .frameLocator('#scene-frame')
+      .locator('body')
+      .evaluate(
+        () =>
+          document.getAnimations().length === 1 &&
+          document.getAnimations()[0].effect.getTiming().duration === 1400,
+      ),
+  )
+  await page.locator('[data-action=reset-audition]').click()
+  const echoId = await page.evaluate(
+    () => window.__jumiStudio.project.tracks.find(t => t.name === 'echo').id,
+  )
+  await page.locator('[data-track-delete="' + echoId + '"]').click()
+  await ready()
+  const auditionExport = await page.evaluate(() => window.__jumiStudio.exported)
+  await page.locator('[data-audition="motion:petal-4:flick"]').click()
+  check(
+    'named motion preview runs only its instance',
+    await page
+      .frameLocator('#scene-frame')
+      .locator('body')
+      .evaluate(
+        () =>
+          document.getAnimations().length === 1 &&
+          document.getAnimations()[0].effect.target.id === 'petal-4',
+      ),
+  )
+  await page.locator('[data-audition="element:petal-4"]').click()
+  check(
+    'element preview includes all of its motion instances',
+    await page
+      .frameLocator('#scene-frame')
+      .locator('body')
+      .evaluate(() => document.getAnimations().length === 2),
+  )
+  await page.locator('[data-action=reset-audition]').click()
+  await page.locator('[data-solo="element:petal-4"]').click()
+  await page.locator('[data-mute="motion:petal-4:flick"]').click()
+  check(
+    'solo and mute compose without changing output',
+    (await page
+      .frameLocator('#scene-frame')
+      .locator('body')
+      .evaluate(() => document.getAnimations().length === 1)) &&
+      (await page.evaluate(
+        html => window.__jumiStudio.exported === html,
+        auditionExport,
+      )),
+  )
+  await page.locator('[data-action=reset-audition]').click()
   check(
     'registry-derived inspector includes motion paths and SVG',
     await page.evaluate(
@@ -234,8 +423,17 @@ try {
       window.__jumiStudio.project.tracks[0].controls.easing.includes('-0.55'),
     ),
   )
-  const handle = page.locator('[data-ease-handle="0"]'),
-    hb = await handle.boundingBox()
+  const handle = page.locator('[data-ease-handle="0"]')
+
+  // Scrolled into view first, and that is not a formality: the curve editor is the last section of the
+  // inspector, so with an overshoot preset — `ease-elastic` is `y₁ = -0.55` — the first handle sits
+  // below the panel's visible edge. `mouse.move` takes viewport coordinates and does not scroll, so the
+  // pointer landed on the tab row underneath instead of the handle, and the drag silently did nothing.
+  // `boundingBox()` reports the element's own box whether or not it is covered, which is what made the
+  // failure look like a dead interaction rather than a misplaced pointer.
+  await handle.scrollIntoViewIfNeeded()
+
+  const hb = await handle.boundingBox()
   await page.mouse.move(hb.x + hb.width / 2, hb.y + hb.height / 2)
   await page.mouse.down()
   await page.mouse.move(hb.x + 20, hb.y - 15, { steps: 4 })
@@ -250,6 +448,11 @@ try {
     ),
   )
   await page.locator('button[data-inspector=element]').click()
+  check(
+    'origin is quiet for element selection',
+    (await page.locator('[data-overlay-handle=origin]').count()) === 0,
+  )
+  await page.locator('.canvas-mode [data-action=edit-origin]').click()
   const origin = page.locator('[data-overlay-handle=origin]'),
     ob = await origin.boundingBox()
   await page.mouse.move(ob.x + ob.width / 2, ob.y + ob.height / 2)
@@ -265,9 +468,7 @@ try {
   check(
     'origin drag writes native reproducible CSS',
     await page.evaluate(() =>
-      window.__jumiStudio.project.scene.css.includes(
-        '/* Studio origin dot-a */',
-      ),
+      window.__jumiStudio.exported.includes('/* Studio base dot-a */'),
     ),
   )
   await page.frameLocator('#scene-frame').locator('#dot-a').click()
@@ -444,6 +645,120 @@ try {
   await page.locator('[data-ease-coordinate="1"]').fill('1.3')
   await page.locator('[data-ease-coordinate="1"]').dispatchEvent('change')
   await ready()
+  await page.locator('button[data-inspector=element]').click()
+  if (!(await page.locator('[data-base-section=Transform]').evaluate(el=>el.open))) await page.locator('[data-base-section=Transform] summary').click()
+  const baseField = async (property, value) => {
+    const field = page.locator('[data-base="' + property + '"]')
+    await field.fill(value)
+    await field.dispatchEvent('change')
+    await ready()
+  }
+  await baseField('rotate', '20deg')
+  await page.locator('#start-from-base').check()
+  await page.locator('#property-search').fill('rotate')
+  await page.locator('#property-select').selectOption('animate-rotate')
+  await page.locator('[data-action=add-track]').click()
+  await ready()
+  await seek(0)
+  check(
+    'end-only Jumi frames begin at authored base rotate',
+    Math.abs(
+      (await page
+        .frameLocator('#scene-frame')
+        .locator('#headline')
+        .evaluate(el => parseFloat(getComputedStyle(el).rotate))) - 20,
+    ) < 0.1,
+  )
+  await seek(1000)
+  check(
+    'browser interpolates from underlying base to motion endpoint',
+    Math.abs(
+      (await page
+        .frameLocator('#scene-frame')
+        .locator('#headline')
+        .evaluate(el => parseFloat(getComputedStyle(el).rotate))) - 55,
+    ) < 0.2,
+  )
+  await page.locator('button[data-inspector=element]').click()
+  await page.locator('[data-action=base-preview]').click()
+  await page.locator('[data-canvas-mode=move]').click()
+  const moveBox = await page
+    .locator('[data-manipulation=translate]')
+    .boundingBox()
+  const drag = async (box, dx, dy) => {
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(
+      box.x + box.width / 2 + dx,
+      box.y + box.height / 2 + dy,
+      { steps: 5 },
+    )
+    await page.mouse.up()
+  }
+  await drag(moveBox, 24, -12)
+  check(
+    'moving HTML authors visible base CSS',
+    await page.evaluate(() =>
+      /Studio base headline[^}]*translate:/s.test(window.__jumiStudio.exported),
+    ),
+  )
+  await page.locator('[data-output=native]').click()
+  check(
+    'direct manipulation appears immediately in Base CSS',
+    (await page.locator('#output-code').textContent()).includes('translate:'),
+  )
+  await page.locator('[data-action=undo]').click()
+  await ready()
+  check(
+    'one undo restores the whole move gesture',
+    await page.evaluate(
+      () =>
+        !window.__jumiStudio.exported.match(
+          /Studio base headline[^}]*translate:/s,
+        ),
+    ),
+  )
+  await drag(
+    await page.locator('[data-manipulation=translate]').boundingBox(),
+    24,
+    -12,
+  )
+  await page.locator('[data-canvas-mode=transform]').click()
+  await drag(
+    await page.locator('[data-manipulation=scale]').boundingBox(),
+    15,
+    10,
+  )
+  await drag(
+    await page.locator('[data-manipulation=rotate]').boundingBox(),
+    12,
+    8,
+  )
+  check(
+    'transform handles author scale and rotate, not wrappers',
+    await page.evaluate(() =>
+      /Studio base headline[^}]*scale:/s.test(window.__jumiStudio.exported),
+    ),
+  )
+  await page.locator('[data-canvas-mode=select]').click()
+  await page.locator('#scene-tree [data-select="dot-a"]').click()
+  check(
+    'SVG base geometry is shape-specific',
+    (await page.locator('[data-base=cx]').count()) === 1 &&
+      (await page.locator('[data-base=x]').count()) === 0,
+  )
+  await baseField('cx', '160px')
+  await baseField('fill', '#a0bc55')
+  check(
+    'SVG base geometry reaches the actual browser',
+    await page
+      .frameLocator('#scene-frame')
+      .locator('#dot-a')
+      .evaluate(el => getComputedStyle(el).cx === '160px'),
+  )
+  await page.locator('#scene-tree [data-select="headline"]').click()
+  await page.locator('[data-output=timeline]').click()
+  await page.locator('[data-action=reset-audition]').click()
   await page.evaluate(
     () =>
       (window.__studioNode = document
@@ -621,6 +936,17 @@ try {
     fullPage: true,
     path: path.join(folder, 'desktop.png'),
   })
+  await page.locator('#studio-theme').selectOption('light')
+  await page.screenshot({
+    fullPage: true,
+    path: path.join(folder, 'light.png'),
+  })
+  await page.locator('button[data-inspector=element]').click()
+  await page.screenshot({
+    fullPage: true,
+    path: path.join(folder, 'base-inspector.png'),
+  })
+  await page.locator('#studio-theme').selectOption('dark')
   await page.setViewportSize({ height: 844, width: 390 })
   await page.waitForTimeout(100)
   check(

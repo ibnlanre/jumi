@@ -1121,6 +1121,10 @@
   }
 }
 @layer base {
+  @property --jumi-slot-rotate-Z2excak-72Dbc {
+    inherits: false;
+    syntax: "*";
+  }
   @property --jumi-slot-rotate-Z2excak-72Dbc-animation-composition {
     inherits: false;
     syntax: "*";
@@ -1222,6 +1226,10 @@
   }
 }
 @layer base {
+  @property --jumi-slot-rotate-1CgNAd-Z16tCnr {
+    inherits: false;
+    syntax: "*";
+  }
   @property --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-composition {
     inherits: false;
     syntax: "*";

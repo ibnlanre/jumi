@@ -30,7 +30,7 @@ export function curveDrawing(p: number[]) {
     x2 = 30 + p[2] * 180,
     y1 = 150 - p[1] * 120,
     y2 = 150 - p[3] * 120
-  return `<path d="M30 150L${x1} ${y1}M210 30L${x2} ${y2}" stroke="#879c6e" fill="none"/><path d="M30 150C${x1} ${y1} ${x2} ${y2} 210 30" fill="none" stroke="#d7fc70" stroke-width="2"/>${[
+  return `<path d="M30 150L${x1} ${y1}M210 30L${x2} ${y2}" stroke="var(--curve-control)" fill="none"/><path d="M30 150C${x1} ${y1} ${x2} ${y2} 210 30" fill="none" stroke="var(--accent)" stroke-width="2"/>${[
     [x1, y1],
     [x2, y2],
   ]
@@ -57,5 +57,5 @@ export function easingMarkup(value: string) {
     )
     .join(
       '',
-    )}</div>${points ? `<svg id="ease-curve" viewBox="0 ${top} 240 ${bottom - top}" aria-label="Cubic Bézier easing"><path d="M30 30V150H210" fill="none" stroke="#4c5941"/><path d="M30 150L210 30" stroke="#34402b" stroke-dasharray="3 4"/><g id="ease-drawing">${curveDrawing(points)}</g></svg><div class="ease-coordinates">${points.map((v, i) => `<label>${['x₁', 'y₁', 'x₂', 'y₂'][i]}<input type="number" step=".01" ${i % 2 === 0 ? 'min="0" max="1"' : ''} data-ease-coordinate="${i}" value="${v}" /></label>`).join('')}</div>` : '<p class="muted">This easing is not a cubic curve. Edit its CSS value or choose a preset.</p>'}</div>`
+    )}</div>${points ? `<svg id="ease-curve" viewBox="0 ${top} 240 ${bottom - top}" aria-label="Cubic Bézier easing"><path d="M30 30V150H210" fill="none" stroke="var(--curve-axis)"/><path d="M30 150L210 30" stroke="var(--curve-guide)" stroke-dasharray="3 4"/><g id="ease-drawing">${curveDrawing(points)}</g></svg><div class="ease-coordinates">${points.map((v, i) => `<label>${['x₁', 'y₁', 'x₂', 'y₂'][i]}<input type="number" step=".01" ${i % 2 === 0 ? 'min="0" max="1"' : ''} data-ease-coordinate="${i}" value="${v}" /></label>`).join('')}</div>` : '<p class="muted">This easing is not a cubic curve. Edit its CSS value or choose a preset.</p>'}</div>`
 }

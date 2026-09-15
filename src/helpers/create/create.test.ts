@@ -581,6 +581,20 @@ describe('animation-name registration', () => {
     })
   })
 
+  it('registers each named instance hoist independently from its shared definition', () => {
+    const { addBase, creator } = setup()
+    for (const modifier of ['enter', 'exit'])
+      creator.property('opacity')('0:0|100:1', { modifier })
+    creator.animations
+    const rules = registered(addBase)
+    for (const name of ['enter', 'exit'])
+      expect(
+        rules[
+          `@property --jumi-slot-opacity-${shorthash2('0:0|100:1')}-${shorthash2(name)}`
+        ],
+      ).toEqual({ inherits: 'false', syntax: '"*"' })
+  })
+
   it('registers every link a labelled slot reads, so a label cannot inherit', () => {
     const { addBase, creator } = setup()
 
@@ -617,8 +631,8 @@ describe('animation-name registration', () => {
     const utilities = registered(addBase)
 
     expect(
-      Object.keys(utilities).filter(
-        name => name.startsWith('@property --jumi-reveal-'),
+      Object.keys(utilities).filter(name =>
+        name.startsWith('@property --jumi-reveal-'),
       ),
     ).toEqual([])
     expect(
@@ -642,9 +656,9 @@ describe('animation-name registration', () => {
     expect(shadowed).toMatchObject({
       [`--jumi-name-${shorthash2('scale')}-shadowed`]: 'scale',
     })
-    expect(
-      Object.keys(shadowed).some(key => key.endsWith('-label')),
-    ).toBe(false)
+    expect(Object.keys(shadowed).some(key => key.endsWith('-label'))).toBe(
+      false,
+    )
 
     // Naming a motion after the property it animates is not the same thing: one scope serves both
     // readings, so nothing is recorded and nothing is lost.

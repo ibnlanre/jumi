@@ -12,6 +12,7 @@ const prefs = {
   leftTab: 'layers',
   right: 280,
   rightOpen: true,
+  theme: 'system',
 }
 try {
   Object.assign(prefs, JSON.parse(localStorage.getItem(key) || '{}'))
@@ -23,6 +24,20 @@ const store = () => {
 }
 export function setupWorkspace() {
   const root = get('#studio-app')
+  get('.header-actions').insertAdjacentHTML(
+    'afterbegin',
+    '<label class="theme-preference">Theme<select id="studio-theme" aria-label="Studio theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>',
+  )
+  const theme = document.getElementById('studio-theme') as HTMLSelectElement
+  theme.value = ['dark', 'light', 'system'].includes(prefs.theme)
+    ? prefs.theme
+    : 'system'
+  theme.addEventListener('change', () => {
+    prefs.theme = theme.value
+    apply()
+    store()
+  })
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', apply)
   const bottom = document.createElement('section')
   bottom.id = 'bottom-dock'
   bottom.setAttribute('aria-label', 'Bottom dock')
@@ -176,6 +191,12 @@ export function workspaceTab() {
   return prefs.bottomTab
 }
 function apply() {
+  document.documentElement.dataset.theme =
+    prefs.theme === 'system'
+      ? matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light'
+      : prefs.theme
   const root = get('#studio-app')
   if (!get('#bottom-dock')) return
   for (const dock of ['left', 'right', 'bottom'] as Dock[]) {

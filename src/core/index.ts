@@ -374,6 +374,11 @@ export function createJumiModel({
     if (structuralAddress(name))
       return name === attribute ? {} : shadowedName(name)
 
+    // The finalizer publishes a named instance under its own hoisted key, not
+    // the shared definition key registered by the activation variable. Without
+    // this registration, nested animating elements inherit the parent's instance.
+    registerName(cssEscape(`--jumi-slot-${key}`))
+
     for (const part of slotParts) {
       // The slot's address is always registered: it is how a name reaches one motion, and a
       // descendant that animates the same property must not answer to a name declared above it.

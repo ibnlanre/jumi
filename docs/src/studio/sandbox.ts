@@ -1,17 +1,47 @@
 import type { StudioProject } from './model'
 
+import { baseCss, sourceStyle } from './base'
 import { documentHtml, exportedTrackClasses, flatten, parentOf } from './model'
 export class SceneSandbox {
   animations: Animation[] = []
+  audition: {
+    kind: 'base' | 'element' | 'motion' | 'scene'
+    name?: string
+    nodeId?: string
+  } = { kind: 'scene' }
   frame: HTMLIFrameElement
+  muted = new Set<string>()
   project: StudioProject
   ready = false
+  solo = new Set<string>()
   get doc() {
     return this.frame.contentDocument!
   }
   constructor(frame: HTMLIFrameElement, project: StudioProject) {
     this.frame = frame
     this.project = project
+  }
+  audible(nodeId: string, name: string) {
+    const element = `element:${nodeId}`,
+      motion = `motion:${nodeId}:${name}`,
+      scope = this.audition
+    return (
+      scope.kind !== 'base' &&
+      (scope.kind === 'scene' ||
+        (scope.nodeId === nodeId &&
+          (scope.kind === 'element' || scope.name === name))) &&
+      !this.muted.has(element) &&
+      !this.muted.has(motion) &&
+      (!this.solo.size || this.solo.has(element) || this.solo.has(motion))
+    )
+  }
+  baseValues(id: string, properties: string[]): Record<string, string> {
+    return this.withBase(() => {
+      const el = this.element(id)
+      if (!el) return {}
+      const s = this.frame.contentWindow!.getComputedStyle(el)
+      return Object.fromEntries(properties.map(p => [p, s.getPropertyValue(p)]))
+    })
   }
   bounds(id: string) {
     const el = this.element(id)
@@ -47,7 +77,6 @@ export class SceneSandbox {
       value: style.getPropertyValue(attribute),
     }
   }
-
   isolate() {
     if (!this.ready) return
     const p = this.project
@@ -104,7 +133,6 @@ export class SceneSandbox {
     }
     this.doc.getElementById('studio-isolation')!.textContent = rules.join('\n')
   }
-
   async load(project: StudioProject, css: string) {
     this.ready = false
     this.project = project
@@ -136,11 +164,127 @@ export class SceneSandbox {
     this.isolate()
   }
 
+  manipulationBasis(id: string) {
+    const el = this.element(id),
+      origin = this.origin(id)
+    if (!el || !origin) return null
+    const style = this.frame.contentWindow!.getComputedStyle(el)
+    const translate =
+      style.translate === 'none'
+        ? [0, 0]
+        : style.translate
+            .split(' ')
+            .map(v => (/^-?[\d.]+px$/.test(v) ? parseFloat(v) : NaN))
+    if (translate.length === 1) translate.push(0)
+    const rotate =
+      style.rotate === 'none'
+        ? 0
+        : /^-?[\d.]+deg$/.test(style.rotate)
+          ? parseFloat(style.rotate)
+          : NaN
+    const scale =
+      style.scale === 'none' ? [1, 1] : style.scale.split(' ').map(Number)
+    if (scale.length === 1) scale.push(scale[0])
+    if (
+      translate.length !== 2 ||
+      scale.length !== 2 ||
+      ![...translate, ...scale, rotate].every(Number.isFinite)
+    )
+      return null
+    const saved = el.style.cssText
+    const center = () => {
+      const b = el.getBoundingClientRect()
+      return { x: b.x + b.width / 2, y: b.y + b.height / 2 }
+    }
+    const start = center()
+    try {
+      el.style.setProperty(
+        'translate',
+        `${translate[0] + 1}px ${translate[1]}px`,
+        'important',
+      )
+      const x = center()
+      el.style.setProperty(
+        'translate',
+        `${translate[0]}px ${translate[1] + 1}px`,
+        'important',
+      )
+      const y = center()
+      const inverse = new DOMMatrix([
+        x.x - start.x,
+        x.y - start.y,
+        y.x - start.x,
+        y.y - start.y,
+        0,
+        0,
+      ]).inverse()
+      if (![inverse.a, inverse.b, inverse.c, inverse.d].every(Number.isFinite))
+        return null
+      return {
+        delta: (x: number, y: number) =>
+          new DOMPoint(x, y).matrixTransform(inverse),
+        origin,
+        rotate,
+        scale,
+        translate,
+      }
+    } finally {
+      el.style.cssText = saved
+    }
+  }
+
   onDrill: (id: string) => void = () => {}
+
   onHover: (id: null | string) => void = () => {}
   onSelect: (id: string, multi: boolean) => void = () => {}
   /** Map a local transform origin through the browser's 2D matrices. Do not guess for 3D/path transforms. */
   origin(id: string): null | { x: number; y: number } {
+    try {
+      return this.originPoint(id)
+    } catch {
+      return null
+    }
+  }
+  /** Measure the origin handle's local-to-scene basis once per drag. */
+  originHandle(id: string) {
+    const el = this.element(id)
+    const start = this.origin(id)
+    if (!el || !start) return null
+    const style = el.style,
+      priority = style.getPropertyPriority('transform-origin'),
+      saved = style.getPropertyValue('transform-origin')
+    const [x, y] = this.frame
+      .contentWindow!.getComputedStyle(el)
+      .transformOrigin.split(' ')
+      .map(parseFloat)
+    try {
+      style.setProperty('transform-origin', `${x + 1}px ${y}px`, 'important')
+      const dx = this.origin(id)
+      style.setProperty('transform-origin', `${x}px ${y + 1}px`, 'important')
+      const dy = this.origin(id)
+      if (!dx || !dy) return null
+      const matrix = new DOMMatrix([
+        dx.x - start.x,
+        dx.y - start.y,
+        dy.x - start.x,
+        dy.y - start.y,
+        start.x,
+        start.y,
+      ]).inverse()
+      if (![matrix.a, matrix.b, matrix.c, matrix.d].every(Number.isFinite))
+        return null
+      return {
+        value: (sx: number, sy: number) => {
+          const p = new DOMPoint(sx, sy).matrixTransform(matrix)
+          return `${Math.round((x + p.x) * 100) / 100}px ${Math.round((y + p.y) * 100) / 100}px`
+        },
+      }
+    } finally {
+      if (saved) style.setProperty('transform-origin', saved, priority)
+      else style.removeProperty('transform-origin')
+    }
+  }
+  originPoint(id: string): null | { x: number; y: number } {
     const el = this.element(id)
     if (!el) return null
     const win = this.frame.contentWindow!,
@@ -224,62 +368,25 @@ export class SceneSandbox {
     }
   }
 
-  /** Measure the origin handle's local-to-scene basis once per drag. */
-  originHandle(id: string) {
-    const el = this.element(id)
-    const start = this.origin(id)
-    if (!el || !start) return null
-    const style = el.style,
-      priority = style.getPropertyPriority('transform-origin'),
-      saved = style.getPropertyValue('transform-origin')
-    const [x, y] = this.frame
-      .contentWindow!.getComputedStyle(el)
-      .transformOrigin.split(' ')
-      .map(parseFloat)
-    try {
-      style.setProperty('transform-origin', `${x + 1}px ${y}px`, 'important')
-      const dx = this.origin(id)
-      style.setProperty('transform-origin', `${x}px ${y + 1}px`, 'important')
-      const dy = this.origin(id)
-      if (!dx || !dy) return null
-      const matrix = new DOMMatrix([
-        dx.x - start.x,
-        dx.y - start.y,
-        dy.x - start.x,
-        dy.y - start.y,
-        start.x,
-        start.y,
-      ]).inverse()
-      if (![matrix.a, matrix.b, matrix.c, matrix.d].every(Number.isFinite))
-        return null
-      return {
-        value: (sx: number, sy: number) => {
-          const p = new DOMPoint(sx, sy).matrixTransform(matrix)
-          return `${Math.round((x + p.x) * 100) / 100}px ${Math.round((y + p.y) * 100) / 100}px`
-        },
-      }
-    } finally {
-      if (saved) style.setProperty('transform-origin', saved, priority)
-      else style.removeProperty('transform-origin')
-    }
-  }
   patch(project: StudioProject, css: string) {
     this.project = project
     if (!this.ready) return
     this.doc.getElementById('jumi-output')!.textContent = css
-    this.doc.getElementById('scene-base')!.textContent = project.scene.css
+    this.doc.getElementById('scene-base')!.textContent = baseCss(project)
     for (const n of flatten(project.scene.root)) {
       const el = this.element(n.id)
-      if (el)
+      if (el) {
+        el.style.cssText = sourceStyle(n)
         el.setAttribute(
           'class',
           [
             n.attributes.class || '',
             ...project.tracks
-              .filter(t => t.nodeId === n.id)
+              .filter(t => t.nodeId === n.id && this.audible(t.nodeId, t.name))
               .flatMap(t => exportedTrackClasses(t, project)),
           ].join(' '),
         )
+      }
     }
     this.collect()
     this.isolate()
@@ -299,6 +406,7 @@ export class SceneSandbox {
     }
     return ids
   }
+
   play(ms: number) {
     const now = this.doc.timeline.currentTime
     for (const a of this.animations) {
@@ -306,6 +414,13 @@ export class SceneSandbox {
       a.play()
       if (typeof now === 'number') a.startTime = now - ms
     }
+  }
+  refreshAudition(ms: number) {
+    this.patch(
+      this.project,
+      this.doc.getElementById('jumi-output')!.textContent || '',
+    )
+    this.seek(ms)
   }
   seek(ms: number) {
     for (const a of this.animations) {
@@ -319,5 +434,19 @@ export class SceneSandbox {
       !this.project.editor.locked.includes(id) &&
       !this.project.editor.hidden.includes(id)
     )
+  }
+  withBase<T>(read: () => T): T {
+    // Keep CSSAnimation ownership intact. Replacing effect detaches it from CSS
+    // lifecycle and can leave stale motion alive after its class is removed.
+    const style = this.doc.createElement('style')
+    style.textContent =
+      '* { animation-delay: 1000000000s !important; animation-fill-mode: none !important; }'
+    this.doc.head.append(style)
+    try {
+      return read()
+    } finally {
+      style.remove()
+      this.doc.body.getBoundingClientRect()
+    }
   }
 }

@@ -1,6 +1,7 @@
 import type { ControlEntry, PropertyEntry } from './catalog'
 import type { Controls, StudioProject, Track } from './model'
 
+import { baseCss, baseProperties, sourceStyle, validBase } from './base'
 import { bezier, curveDrawing, curveValue, easingMarkup } from './easing'
 import {
   addFrame,
@@ -19,6 +20,7 @@ import {
 } from './model'
 import { SceneSandbox } from './sandbox'
 import { makeScene } from './scenes'
+import { renderTracks, setupTimeline } from './timeline'
 import { setupWorkspace, showInspector, workspaceTab } from './workspace'
 const $ = <T extends HTMLElement = HTMLElement>(id: string) =>
   document.getElementById(id) as T
@@ -26,6 +28,7 @@ const input = (id: string) => $<HTMLInputElement>(id)
 const select = (id: string) => $<HTMLSelectElement>(id)
 const copy = <T>(value: T): T => structuredClone(value)
 setupWorkspace()
+setupTimeline()
 const storageKey = 'jumi-studio-project-v1'
 let controls: ControlEntry[] = [],
   project = makeScene(),
@@ -44,6 +47,10 @@ let compileTimer: ReturnType<typeof setTimeout>,
   pending = true,
   revision = 0
 let timelineStart = 0
+let canvasMode = 'select',
+  originEnabled = false,
+  renderingBase = false
+const baseSections = new Set(['Appearance', 'Geometry'])
 let applying = false,
   hovered: null | string = null,
   outputTab = workspaceTab(),
@@ -180,6 +187,7 @@ worker.onmessage = async event => {
     try {
       const saved = localStorage.getItem(storageKey)
       if (saved) project = validateProject(JSON.parse(saved), properties)
+      else persist()
     } catch {
       message(
         'The saved project could not be restored. Your original data remains in local storage until your next edit.',
@@ -212,7 +220,7 @@ worker.onmessage = async event => {
     if (!sandbox.ready) {
       await sandbox.load(project, css)
       bindFrame()
-      fitScene()
+      viewport()
     } else sandbox.patch(project, css)
     if (thisRevision !== revision) return
     sandbox.seek(playhead)
@@ -284,8 +292,37 @@ function renderInfo() {
     .map(c => `<button data-select="${c.id}">${esc(c.name)}</button>`)
     .join('<span>/</span>')
   const b = info?.bounds
-  $('selection-info').innerHTML =
-    `<p class="selected-name">${esc(n.name)}</p><div class="geometry"><span>X <b>${b ? b.x.toFixed(1) : '—'}</b></span><span>Y <b>${b ? b.y.toFixed(1) : '—'}</b></span><span>W <b>${b ? b.width.toFixed(1) : '—'}</b></span><span>H <b>${b ? b.height.toFixed(1) : '—'}</b></span></div><p class="muted" style="margin-top:9px">${n.children.length} children · ${flatten(n).length - 1} descendants · ${Math.max(0, (parentOf(project.scene.root, n.id)?.children.length ?? 1) - 1)} siblings</p>${info?.svgBox ? `<p class="muted">SVG bbox ${info.svgBox.width.toFixed(1)} × ${info.svgBox.height.toFixed(1)}</p>` : ''}<div class="origin-editor"><label>Transform origin<input id="origin-value" value="${esc(info?.origin || '50% 50%')}" /></label><button data-action="origin">Set</button></div>${info ? `<p class="muted" style="margin-top:8px">Computed ${entry?.attribute ?? 'opacity'}: ${esc(info.value || '—')}</p>` : ''}`
+  if (renderingBase) return
+  renderingBase = true
+  try {
+    const basePosition = sandbox.ready
+      ? sandbox.baseValues(n.id, ['position']).position
+      : 'static'
+    const groups = baseProperties(n, basePosition !== 'static')
+    const base = sandbox.ready
+      ? sandbox.baseValues(n.id, Object.values(groups).flat())
+      : {}
+    $('selection-info').innerHTML =
+      `<p class="selected-name">${esc(n.name)}</p><div class="geometry"><span>W <b>${b ? b.width.toFixed(1) : '—'}</b></span><span>H <b>${b ? b.height.toFixed(1) : '—'}</b></span></div><p class="base-title">BASE STATE</p><p class="base-note">Underlying CSS, before motion. Empty fields restore source values.</p><button data-action="base-preview" class="base-preview">Preview base state</button>${Object.entries(
+        groups,
+      )
+        .filter(([, props]) => props.length)
+        .map(
+          ([group, props]) =>
+            `<details class="base-group" data-base-section="${group}" ${baseSections.has(group) ? 'open' : ''}><summary>${group}</summary><div class="base-fields">${props.map(prop => `<label>${prop}<input ${prop === 'transform-origin' ? 'id="origin-value"' : ''} data-base="${prop}" value="${esc(n.base?.[prop] ?? '')}" placeholder="${esc(base[prop] || 'source')}" aria-label="Base ${prop}" /></label>`).join('')}</div>${group === 'Transform' ? '<button data-action="edit-origin">Edit origin on canvas</button>' : ''}</details>`,
+        )
+        .join('')}`
+    $('selection-info')
+      .querySelectorAll<HTMLDetailsElement>('[data-base-section]')
+      .forEach(detail =>
+        detail.addEventListener('toggle', () => {
+          if (detail.open) baseSections.add(detail.dataset.baseSection!)
+          else baseSections.delete(detail.dataset.baseSection!)
+        }),
+      )
+  } finally {
+    renderingBase = false
+  }
 }
 function renderProperties() {
   const previous = select('property-select').value
@@ -352,10 +389,12 @@ function addTrack() {
               : value
       const t: Track = {
         controls: { ...defaults },
-        frames: [
-          { id: uid(), offset: 0, value },
-          { id: uid(), offset: 100, value: end },
-        ],
+        frames: input('start-from-base')?.checked
+          ? [{ id: uid(), offset: 100, value: end }]
+          : [
+              { id: uid(), offset: 0, value },
+              { id: uid(), offset: 100, value: end },
+            ],
         id: uid(),
         kind: 'animation',
         name,
@@ -365,13 +404,14 @@ function addTrack() {
       project.tracks.push(t)
       activeTrack = t.id
       showInspector('keyframe')
-      selectedFrames = [t.frames[1].id]
+      selectedFrames = [t.frames[t.frames.length - 1].id]
     }
   })
 }
 function bindFrame() {
   sandbox.doc.addEventListener('wheel', zoomWheel, { passive: false })
   sandbox.doc.addEventListener('pointerdown', startPan)
+  sandbox.doc.addEventListener('keydown', studioKeydown)
 }
 function deleteFrames() {
   if (!selectedFrames.length) return
@@ -416,11 +456,31 @@ function drawOverlays() {
     )
   }
   const originId = currentNode()?.id
-  const origin = originId ? sandbox.origin(originId) : null
+  const showOrigin =
+    originEnabled ||
+    canvasMode === 'transform' ||
+    (canvasMode === 'select' &&
+      document.querySelector('#studio-app')?.getAttribute('data-inspector') !==
+        'element' &&
+      /rotate|scale|translate|transform/.test(currentTrack()?.utility ?? ''))
+  const origin = originId && showOrigin ? sandbox.origin(originId) : null
   if (origin)
     boxes.push(
       `<button class="origin-dot" data-overlay-handle="origin" aria-label="Drag transform origin" title="Drag transform origin" style="left:${origin.x}px;top:${origin.y}px"></button>`,
     )
+  if (canvasMode !== 'select' && currentNode()) {
+    const id = currentNode()!.id,
+      b = sandbox.bounds(id)
+    if (b) {
+      boxes.push(
+        `<div class="manipulation-plane" data-manipulation="translate" title="Move · authors base translate" style="left:${b.x}px;top:${b.y}px;width:${b.width}px;height:${b.height}px"></div>`,
+      )
+      if (canvasMode === 'transform')
+        boxes.push(
+          `<button class="manipulation-handle scale" data-manipulation="scale" aria-label="Scale element" style="left:${b.x + b.width}px;top:${b.y + b.height}px"></button><button class="manipulation-handle rotate" data-manipulation="rotate" aria-label="Rotate element" style="left:${b.x + b.width / 2}px;top:${b.y - 24}px"></button>`,
+        )
+    }
+  }
   $('scene-overlays').innerHTML = boxes.join('')
 }
 function editorChange(fn: () => void) {
@@ -442,6 +502,7 @@ function fitScene() {
   )
   project.viewport.x = project.viewport.y = 0
   viewport()
+  persist()
 }
 function fitSelection() {
   const id = currentNode()?.id
@@ -486,19 +547,23 @@ function outputText() {
           .join('\n')
       : ''
   }
-  if (outputTab === 'native') return project.scene.css
+  if (outputTab === 'native') return baseCss(project)
   if (outputTab === 'compiled') return css
   return markup(project)
 }
-function play() {
+function play(scope: SceneSandbox['audition'] = { kind: 'scene' }) {
   if (pending || applying || !sandbox.ready) {
     message('Wait for the current motion update.')
     return
   }
-  if (playing) {
+  if (playing && JSON.stringify(sandbox.audition) === JSON.stringify(scope)) {
     stop()
     return
   }
+  stop()
+  sandbox.audition = scope
+  sandbox.refreshAudition(playhead)
+  auditionStatus()
   if (playhead >= project.duration) playhead = 0
   playing = true
   anchor = performance.now()
@@ -542,7 +607,15 @@ function renderInspector() {
       controls.find(c => c.utility === 'animation-timing-function')?.values ??
       []
     $('track-inspector').innerHTML =
-      `<div class="track-settings"><h3>${esc(t.utility.slice(8))} <span class="muted">/ ${esc(t.name)}</span></h3><label>Motion name<input data-control="name" value="${esc(t.name)}" /></label><div class="field-grid"><label>Duration · ms<input type="number" min="1" max="120000" data-control="duration" value="${c.duration}" /></label><label>Delay · ms<input type="number" min="-120000" max="120000" data-control="delay" value="${c.delay}" /></label></div><label>Easing<input data-control="easing" value="${esc(c.easing)}" list="easing-values" /></label><datalist id="easing-values">${easeValues
+      `<div class="track-settings"><h3>/ ${esc(t.name)}</h3><div class="motion-properties">${project.tracks
+        .filter(other => other.nodeId === t.nodeId && other.name === t.name)
+        .map(
+          other =>
+            `<button data-track-select="${other.id}" aria-pressed="${other.id === t.id}">${esc(other.utility.slice(8))}</button>`,
+        )
+        .join(
+          '',
+        )}</div><label>Motion name<input data-control="name" value="${esc(t.name)}" /></label><div class="field-grid"><label>Duration · ms<input type="number" min="1" max="120000" data-control="duration" value="${c.duration}" /></label><label>Delay · ms<input type="number" min="-120000" max="120000" data-control="delay" value="${c.delay}" /></label></div><label>Easing<input data-control="easing" value="${esc(c.easing)}" list="easing-values" /></label><datalist id="easing-values">${easeValues
         .filter(v =>
           [
             'ease',
@@ -603,65 +676,19 @@ function renderOutput() {
 }
 function renderTimeline() {
   const tracks = visibleTracks()
-    .slice()
-    .sort((a, b) => {
-      const nodes = flatten(project.scene.root).map(n => n.id)
-      return (
-        nodes.indexOf(a.nodeId) - nodes.indexOf(b.nodeId) ||
-        a.name.localeCompare(b.name)
-      )
-    })
-  let previousName = '',
-    previousNode = ''
   timelineStart = input('show-preroll')?.checked
     ? Math.min(0, ...tracks.map(t => t.controls.delay))
     : 0
-  const span = project.duration - timelineStart
-  const nodeMap = new Map(flatten(project.scene.root).map(n => [n.id, n.name]))
-  const ticks = Array.from(
-    { length: 11 },
-    (_, i) =>
-      `<span style="left:${i * 10}%">${((timelineStart + (span * i) / 10) / 1000).toFixed(1)}s</span>`,
-  ).join('')
-  $('timeline-body').style.width = `${timelineZoom * 100}%`
-  $('timeline-body').innerHTML =
-    `<div class="ruler-row"><div class="ruler-label">OBJECT / PROPERTY</div><div class="ruler">${ticks}<input type="range" id="playhead-scrub" min="${timelineStart}" max="${project.duration}" step="1" value="${playhead}" aria-label="Timeline playhead" /></div></div>${
-      tracks.length
-        ? tracks
-            .map(t => {
-              const end = Math.min(
-                  100,
-                  ((t.controls.delay + t.controls.duration - timelineStart) /
-                    span) *
-                    100,
-                ),
-                start = Math.max(
-                  0,
-                  ((t.controls.delay - timelineStart) / span) * 100,
-                )
-              const heading =
-                (previousNode !== t.nodeId
-                  ? `<div class="timeline-group"><button data-select="${t.nodeId}">${esc(nodeMap.get(t.nodeId) || t.nodeId)}</button></div>`
-                  : '') +
-                (previousNode !== t.nodeId || previousName !== t.name
-                  ? `<div class="timeline-group timeline-motion">/ ${esc(t.name)}${t.controls.delay < 0 ? ` · ${Math.abs(t.controls.delay)}ms advanced at scene zero` : ''}</div>`
-                  : '')
-              previousNode = t.nodeId
-              previousName = t.name
-              return (
-                heading +
-                `<div class="track-row ${t.id === activeTrack ? 'active' : ''}" data-track="${t.id}"><div class="track-label"><button data-track-select="${t.id}">${esc(t.utility.slice(8))}<small>${esc(nodeMap.get(t.nodeId) || t.nodeId)} / ${esc(t.name)}</small></button><button data-track-up="${t.id}" aria-label="Move ${esc(t.utility.slice(8))} track up">↑</button><button data-track-delete="${t.id}" aria-label="Delete ${esc(t.utility.slice(8))} track">×</button></div><div class="track-lane" data-lane="${t.id}"><span class="track-span" style="left:${start}%;width:${Math.max(0, end - start)}%"></span>${t.frames
-                  .map(f => {
-                    const time =
-                      t.controls.delay + (t.controls.duration * f.offset) / 100
-                    return `<button class="keyframe ${selectedFrames.includes(f.id) ? 'selected' : ''}" data-frame="${f.id}" data-frame-track="${t.id}" style="left:${((time - timelineStart) / span) * 100}%" aria-label="${esc(t.utility.slice(8))} keyframe ${f.offset}%" title="${f.offset}% · ${esc(f.value)} · ${Math.round(time)}ms"></button>`
-                  })
-                  .join('')}</div></div>`
-              )
-            })
-            .join('')
-        : '<div class="empty-timeline">Select a layer and add a property to begin.</div>'
-    }<div class="timeline-playhead" id="timeline-playhead"></div>`
+  renderTracks(
+    project,
+    tracks,
+    timelineStart,
+    timelineZoom,
+    activeTrack,
+    selectedFrames,
+    sandbox.muted,
+    sandbox.solo,
+  )
   $('track-count').textContent =
     `${tracks.length} / ${project.tracks.length} tracks`
   updateTime()
@@ -747,8 +774,7 @@ function updateTime() {
   if (slider) slider.value = String(playhead)
   const lane = document.querySelector<HTMLElement>('.ruler'),
     line = $('timeline-playhead')
-  if (line && lane)
-    line.style.left = `${lane.offsetLeft + lane.clientWidth * fraction}px`
+  if (line && lane) line.style.left = `${lane.clientWidth * fraction}px`
 }
 function viewport() {
   const p = project.viewport
@@ -758,7 +784,8 @@ function viewport() {
   shell.style.transform = `translate(-50%,-50%) translate(${p.x}px,${p.y}px) scale(${p.zoom})`
   $('zoom-label').textContent = `${Math.round(p.zoom * 100)}%`
   $('canvas-viewport').classList.toggle('no-grid', !p.grid)
-  $('canvas-viewport').style.backgroundColor = p.background
+  $('canvas-viewport').style.backgroundColor =
+    p.background === '#e1e4da' ? 'var(--canvas-surround)' : p.background
   drawOverlays()
 }
 function visibleTracks() {
@@ -766,6 +793,7 @@ function visibleTracks() {
     ? project.tracks
     : project.tracks.filter(t => project.editor.selected.includes(t.nodeId))
 }
+let viewportSave: ReturnType<typeof setTimeout>
 function zoomWheel(event: WheelEvent) {
   event.preventDefault()
   project.viewport.zoom = Math.max(
@@ -773,6 +801,8 @@ function zoomWheel(event: WheelEvent) {
     Math.min(4, project.viewport.zoom * Math.exp(-event.deltaY * 0.002)),
   )
   viewport()
+  clearTimeout(viewportSave)
+  viewportSave = setTimeout(persist, 150)
 }
 $('canvas-viewport').addEventListener('wheel', zoomWheel, { passive: false })
 $('canvas-viewport').addEventListener('pointerdown', startPan)
@@ -986,10 +1016,12 @@ document.addEventListener('click', async event => {
     case 'zoom-in':
       project.viewport.zoom = Math.min(4, project.viewport.zoom * 1.2)
       viewport()
+      persist()
       break
     case 'zoom-out':
       project.viewport.zoom = Math.max(0.1, project.viewport.zoom / 1.2)
       viewport()
+      persist()
       break
   }
 })
@@ -1017,10 +1049,15 @@ document.addEventListener('change', event => {
       return
     }
     change(() => {
-      if (name === 'name') t.name = value
-      else if (name === 'duration' || name === 'delay')
-        t.controls[name] = Number(value)
-      else (t.controls as unknown as Record<string, string>)[name] = value
+      const instance = project.tracks.filter(
+        other => other.nodeId === t.nodeId && other.name === t.name,
+      )
+      for (const other of instance) {
+        if (name === 'name') other.name = value
+        else if (name === 'duration' || name === 'delay')
+          other.controls[name] = Number(value)
+        else (other.controls as unknown as Record<string, string>)[name] = value
+      }
     })
     return
   }
@@ -1048,7 +1085,6 @@ document.addEventListener('change', event => {
       project.scene[dimension] = Number(target.value)
       project.scene.css += `\n#${project.scene.root.id} { ${dimension}: ${Number(target.value)}px; }`
     })
-    fitScene()
     return
   }
   if (target.id === 'isolation') {
@@ -1092,6 +1128,10 @@ select('scene-picker').addEventListener('change', () => {
   stop()
   remember()
   project = makeScene(select('scene-picker').value)
+  sandbox.audition = { kind: 'scene' }
+  sandbox.muted.clear()
+  sandbox.solo.clear()
+  auditionStatus()
   sandbox.ready = false
   playhead = 0
   activeTrack =
@@ -1210,7 +1250,7 @@ document.addEventListener('pointerdown', event => {
   window.addEventListener('pointermove', move)
   window.addEventListener('pointerup', end, { once: true })
 })
-document.addEventListener('keydown', event => {
+function studioKeydown(event: KeyboardEvent) {
   if (
     event.defaultPrevented ||
     (event.target as Element).closest(
@@ -1241,6 +1281,16 @@ document.addEventListener('keydown', event => {
     event.preventDefault()
     seek(project.duration)
   }
+  if (event.altKey && ['ArrowDown', 'ArrowUp'].includes(event.key)) {
+    event.preventDefault()
+    const n = currentNode(),
+      target =
+        event.key === 'ArrowUp'
+          ? parentOf(project.scene.root, n!.id)
+          : n?.children[0]
+    if (target) setSelection(target.id)
+    return
+  }
   if (event.key === 'Escape')
     editorChange(() => (project.editor.isolation = 'none'))
   if (event.key === 'Delete' || event.key === 'Backspace') {
@@ -1265,7 +1315,8 @@ document.addEventListener('keydown', event => {
       ),
     )
   }
-})
+}
+document.addEventListener('keydown', studioKeydown)
 window.addEventListener('beforeunload', () => worker.terminate())
 // Read-only diagnostics support the independent browser parity gate; no editing bypass.
 Object.defineProperty(window, '__jumiStudio', {
@@ -1418,6 +1469,16 @@ document.addEventListener('pointerdown', event => {
   svg.addEventListener('pointerup', end, { once: true })
   svg.addEventListener('pointercancel', end, { once: true })
 })
+function auditionStatus() {
+  const scope = sandbox.audition
+  $('audition-status').textContent =
+    scope.kind === 'scene'
+      ? `Scene${sandbox.solo.size ? ' · Solo active' : ''}${sandbox.muted.size ? ' · Muted motions' : ''}`
+      : scope.kind === 'base'
+        ? 'Base state · motion off'
+        : `${scope.kind} · ${scope.name || scope.nodeId}`
+}
+
 function originRule(base: string, id: string, value: string) {
   const marker = `/* Studio origin ${id} */`
   const start = base.indexOf(marker)
@@ -1427,43 +1488,236 @@ function originRule(base: string, id: string, value: string) {
   }
   return base.trimEnd() + `\n${marker}\n#${id} { transform-origin: ${value}; }`
 }
+function previewBase() {
+  stop()
+  sandbox.audition = { kind: 'base' }
+  sandbox.refreshAudition(playhead)
+  auditionStatus()
+  drawOverlays()
+}
+function setBase(property: string, value: string) {
+  const n = currentNode()
+  if (!n) return
+  if (
+    value &&
+    (!validBase(n, property, value) || !CSS.supports(property, value))
+  ) {
+    message(`Use a valid CSS ${property} value.`)
+    return
+  }
+  change(() => writeBase(n.id, property, value))
+}
+function writeBase(id: string, property: string, value: string) {
+  const n = flatten(project.scene.root).find(n => n.id === id)!
+  n.base ??= {}
+  if (value) n.base[property] = value
+  else delete n.base[property]
+  const el = sandbox.element(id)
+  if (el) el.style.cssText = sourceStyle(n)
+}
+document
+  .querySelector('.add-property')!
+  .insertAdjacentHTML(
+    'beforeend',
+    '<label class="check-label"><input id="start-from-base" type="checkbox" checked /> Start from underlying base value</label>',
+  )
+document
+  .querySelector('.canvas-tools')!
+  .insertAdjacentHTML(
+    'afterbegin',
+    '<div class="canvas-mode" aria-label="Canvas tool"><button data-canvas-mode="select" aria-pressed="true">Select</button><button data-canvas-mode="move" aria-pressed="false">Move</button><button data-canvas-mode="transform" aria-pressed="false">Transform</button><button data-action="edit-origin" title="Toggle origin editing">Origin</button></div>',
+  )
+$('canvas-viewport').insertAdjacentHTML(
+  'beforeend',
+  '<output class="manipulation-feedback" id="manipulation-feedback" hidden></output>',
+)
+document
+  .querySelector('.timeline-toolbar')!
+  .insertAdjacentHTML(
+    'beforeend',
+    '<span id="audition-status">Scene</span><button data-action="reset-audition">Reset audition</button>',
+  )
+// Group scene transport separately from timeline editing/choreography controls.
+const toolbar = document.querySelector('.timeline-toolbar')!
+for (const [label, selectors] of [
+  ['Scene', ['.transport', '#project-duration', '#loop']],
+  ['Edit', ['#snap', '#timeline-zoom', '#all-tracks', '#show-preroll']],
+  ['Choreography', ['[data-action=stagger]', '[data-action=sync]']],
+] as [string, string[]][]) {
+  const group = document.createElement('fieldset')
+  group.setAttribute('aria-label', label)
+  for (const selector of selectors) {
+    const el = toolbar.querySelector(selector)
+    if (el) group.append(el.closest('label') ?? el)
+  }
+  toolbar.append(group)
+}
+document.addEventListener('change', e => {
+  const target = e.target as HTMLInputElement
+  if (target.dataset.base && !renderingBase)
+    setBase(target.dataset.base, target.value.trim())
+})
+document.addEventListener('focusin', e => {
+  if ((e.target as HTMLElement).dataset.base === 'transform-origin') {
+    originEnabled = true
+    drawOverlays()
+  }
+})
+document.addEventListener('click', e => {
+  const b = (e.target as Element).closest<HTMLElement>('button')
+  if (!b) return
+  const d = b.dataset
+  if (d.inspector) {
+    drawOverlays()
+    return
+  }
+  if (d.canvasMode) {
+    canvasMode = d.canvasMode
+    originEnabled = false
+    document
+      .querySelectorAll('[data-canvas-mode]')
+      .forEach(el =>
+        el.setAttribute(
+          'aria-pressed',
+          String((el as HTMLElement).dataset.canvasMode === canvasMode),
+        ),
+      )
+    drawOverlays()
+  }
+  if (d.action === 'base-preview') previewBase()
+  if (d.action === 'edit-origin') {
+    originEnabled = !originEnabled
+    drawOverlays()
+  }
+  if (d.action === 'reset-audition') {
+    stop()
+    sandbox.audition = { kind: 'scene' }
+    sandbox.muted.clear()
+    sandbox.solo.clear()
+    sandbox.refreshAudition(playhead)
+    renderTimeline()
+    auditionStatus()
+    drawOverlays()
+  }
+  if (d.audition) {
+    const [kind, nodeId, name] = d.audition.split(':')
+    play({ kind: kind as 'element' | 'motion', name, nodeId })
+  }
+  if (d.mute || d.solo) {
+    stop()
+    const key = (d.mute || d.solo)!,
+      set = d.mute ? sandbox.muted : sandbox.solo
+    if (set.has(key)) set.delete(key)
+    else set.add(key)
+    sandbox.refreshAudition(playhead)
+    renderTimeline()
+    auditionStatus()
+    drawOverlays()
+  }
+})
 document.addEventListener('pointerdown', event => {
   const handle = (event.target as Element).closest<HTMLElement>(
-    '[data-overlay-handle="origin"]',
+    '[data-manipulation],[data-overlay-handle="origin"]',
   )
   if (!handle || event.button !== 0 || !currentNode()) return
   event.preventDefault()
   stop()
-  const id = currentNode()!.id,
-    geometry = sandbox.originHandle(id)
-  if (!geometry) {
-    message('Use exact origin values for this geometry.')
+  const before = JSON.stringify(project),
+    id = currentNode()!.id,
+    property = handle.dataset.manipulation || 'transform-origin',
+    scope = { ...sandbox.audition }
+  sandbox.audition = { kind: 'base' }
+  sandbox.refreshAudition(playhead)
+  showInspector('element', false)
+  baseSections.add('Transform')
+  renderInfo()
+  const basis = sandbox.manipulationBasis(id),
+    origin = property === 'transform-origin' ? sandbox.originHandle(id) : null
+  if (!basis || (property === 'transform-origin' && !origin)) {
+    sandbox.audition = scope
+    sandbox.refreshAudition(playhead)
+    message(
+      'Use exact base values for this transform. Direct manipulation requires invertible 2D numeric transforms.',
+    )
     return
   }
-  const base = project.scene.css,
-    before = JSON.stringify(project),
+  const overlay = $('scene-overlays'),
     shell = $('frame-shell').getBoundingClientRect(),
+    startX = event.clientX,
+    startY = event.clientY,
     zoom = project.viewport.zoom
-  const overlay = $('scene-overlays')
+  const initial = basis.delta(
+    (startX - shell.x) / zoom - basis.origin.x,
+    (startY - shell.y) / zoom - basis.origin.y,
+  )
+  const angle = Math.atan2(initial.y, initial.x),
+    radius = Math.hypot(initial.x, initial.y)
+  let moved = false
   overlay.setPointerCapture(event.pointerId)
+  const round = (n: number) => Math.round(n * 100) / 100
   const move = (e: PointerEvent) => {
-    const value = geometry.value(
-      (e.clientX - shell.x) / zoom,
-      (e.clientY - shell.y) / zoom,
+    if (
+      Math.abs(e.clientX - startX) + Math.abs(e.clientY - startY) < 2 &&
+      !moved
     )
-    project.scene.css = originRule(base, id, value)
-    sandbox.doc.getElementById('scene-base')!.textContent = project.scene.css
-    if (input('origin-value')) input('origin-value').value = value
+      return
+    moved = true
+    const delta = basis.delta(
+      (e.clientX - startX) / zoom,
+      (e.clientY - startY) / zoom,
+    )
+    const vector = basis.delta(
+      (e.clientX - shell.x) / zoom - basis.origin.x,
+      (e.clientY - shell.y) / zoom - basis.origin.y,
+    )
+    let value = ''
+    if (property === 'translate')
+      value = `${round(basis.translate[0] + delta.x)}px ${round(basis.translate[1] + delta.y)}px`
+    if (property === 'rotate')
+      value = `${round(basis.rotate + ((Math.atan2(vector.y, vector.x) - angle) * 180) / Math.PI)}deg`
+    if (property === 'scale') {
+      const ratio = Math.max(
+        0.01,
+        Math.hypot(vector.x, vector.y) / Math.max(1, radius),
+      )
+      value = `${round(basis.scale[0] * ratio)} ${round(basis.scale[1] * ratio)}`
+    }
+    if (property === 'transform-origin')
+      value = origin!.value(
+        (e.clientX - shell.x) / zoom,
+        (e.clientY - shell.y) / zoom,
+      )
+    writeBase(id, property, value)
+    sandbox.doc.getElementById('scene-base')!.textContent = baseCss(project)
+    const field = document.querySelector<HTMLInputElement>(
+      `[data-base="${property}"]`,
+    )
+    if (field) field.value = value
+    $('manipulation-feedback').hidden = false
+    $('manipulation-feedback').textContent =
+      `Base ${property}: ${value}${property === 'translate' ? ` · Δ ${round(delta.x)}, ${round(delta.y)}px` : ''}`
+    renderOutput()
     drawOverlays()
   }
-  const end = () => {
+  const end = (e: PointerEvent) => {
     overlay.removeEventListener('pointermove', move)
-    remember(before)
-    persist()
+    overlay.removeEventListener('pointerup', end)
+    overlay.removeEventListener('pointercancel', end)
+    if (e.type === 'pointercancel') project = JSON.parse(before)
+    else if (moved) {
+      remember(before)
+      persist()
+    }
+    sandbox.project = project
+    sandbox.audition = scope
+    sandbox.refreshAudition(playhead)
+    $('manipulation-feedback').hidden = true
     renderInfo()
     renderOutput()
+    drawOverlays()
+    auditionStatus()
   }
   overlay.addEventListener('pointermove', move)
-  overlay.addEventListener('pointerup', end, { once: true })
-  overlay.addEventListener('pointercancel', end, { once: true })
+  overlay.addEventListener('pointerup', end)
+  overlay.addEventListener('pointercancel', end)
 })
