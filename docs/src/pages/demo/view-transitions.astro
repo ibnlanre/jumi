@@ -1,6 +1,6 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import '../../styles/demo.css';
+import Layout from '../../layouts/Layout.astro'
+import '../../styles/demo.css'
 
 /**
  * The six cards, and their Jumi candidates written out one by one.
@@ -34,47 +34,112 @@ import '../../styles/demo.css';
  * handling right during a transition belongs where `types` can see it.
  */
 const CARDS = [
-  { candidates: 'view-transition-old/alpha:animate-fade-out view-transition-new/alpha:animate-fade-in', id: 'alpha', label: 'Alpha' },
-  { candidates: 'view-transition-old/bravo:animate-fade-out view-transition-new/bravo:animate-fade-in', id: 'bravo', label: 'Bravo' },
-  { candidates: 'view-transition-old/charlie:animate-fade-out view-transition-new/charlie:animate-fade-in', id: 'charlie', label: 'Charlie' },
-  { candidates: 'view-transition-old/delta:animate-fade-out view-transition-new/delta:animate-fade-in', id: 'delta', label: 'Delta' },
-  { candidates: 'view-transition-old/echo:animate-fade-out view-transition-new/echo:animate-fade-in', id: 'echo', label: 'Echo' },
-  { candidates: 'view-transition-old/foxtrot:animate-fade-out view-transition-new/foxtrot:animate-fade-in', id: 'foxtrot', label: 'Foxtrot' },
-];
+  {
+    candidates:
+      'view-transition-old/alpha:animate-fade-out view-transition-new/alpha:animate-fade-in',
+    id: 'alpha',
+    label: 'Alpha',
+  },
+  {
+    candidates:
+      'view-transition-old/bravo:animate-fade-out view-transition-new/bravo:animate-fade-in',
+    id: 'bravo',
+    label: 'Bravo',
+  },
+  {
+    candidates:
+      'view-transition-old/charlie:animate-fade-out view-transition-new/charlie:animate-fade-in',
+    id: 'charlie',
+    label: 'Charlie',
+  },
+  {
+    candidates:
+      'view-transition-old/delta:animate-fade-out view-transition-new/delta:animate-fade-in',
+    id: 'delta',
+    label: 'Delta',
+  },
+  {
+    candidates:
+      'view-transition-old/echo:animate-fade-out view-transition-new/echo:animate-fade-in',
+    id: 'echo',
+    label: 'Echo',
+  },
+  {
+    candidates:
+      'view-transition-old/foxtrot:animate-fade-out view-transition-new/foxtrot:animate-fade-in',
+    id: 'foxtrot',
+    label: 'Foxtrot',
+  },
+]
 ---
 
-<Layout title="Layout projection — Jumi" description="Six cards, a real layout shift, and a switch between the browser's own snapshot motion and Jumi's.">
-  <main id="main" class="demo">
-    <p class="eyebrow">SHOWCASE / LAYOUT PROJECTION</p>
-    <h1 class="demo-title">The browser moves it.<br /><em>Jumi dresses it.</em></h1>
-    <p class="demo-lede">
-      Pick a card. It takes the corner, its neighbours reflow, and the cards that move are followed
-      across the change rather than snapped into place. The movement is the browser's — the geometry of
-      the old and new layouts, projected. What each card <em>does</em> while that happens is Jumi's.
+<Layout
+  title='Layout projection — Jumi'
+  description="Six cards, a real layout shift, and a switch between the browser's own snapshot motion and Jumi's."
+>
+  <main
+    id='main'
+    class='demo'
+  >
+    <p class='eyebrow'>SHOWCASE / LAYOUT PROJECTION</p>
+    <h1 class='demo-title'>
+      The browser moves it.
+      <br />
+      <em>Jumi dresses it.</em>
+    </h1>
+    <p class='demo-lede'>
+      Pick a card. It takes the corner, its neighbours reflow, and the cards
+      that move are followed across the change rather than snapped into place.
+      The movement is the browser's — the geometry of the old and new layouts,
+      projected. What each card <em>does</em> while that happens is Jumi's.
       Switch to the browser's own behaviour to see the difference.
     </p>
 
-    <div class="demo-modes" role="group" aria-label="Snapshot motion">
-      <button type="button" class="demo-mode" data-mode="jumi" aria-pressed="true">Jumi</button>
-      <button type="button" class="demo-mode" data-mode="native" aria-pressed="false">Browser default</button>
+    <div
+      class='demo-modes'
+      role='group'
+      aria-label='Snapshot motion'
+    >
+      <button
+        type='button'
+        class='demo-mode'
+        data-mode='jumi'
+        aria-pressed='true'
+      >
+        Jumi
+      </button>
+      <button
+        type='button'
+        class='demo-mode'
+        data-mode='native'
+        aria-pressed='false'
+      >
+        Browser default
+      </button>
     </div>
 
-    <div class="demo-grid">
+    <div class='demo-grid'>
       {CARDS.map(card => (
         <button
-          type="button"
-          class="demo-card"
+          type='button'
+          class='demo-card'
           class:list={[card.candidates]}
           data-id={card.id}
           data-jumi={card.candidates}
           data-active={card.id === 'alpha' ? '' : undefined}
           aria-pressed={card.id === 'alpha'}
-        >{card.label}</button>
+        >
+          {card.label}
+        </button>
       ))}
     </div>
 
-    <p class="demo-readout" role="status" aria-live="polite">
-      Outgoing snapshot: <b id="demo-motion">waiting for a move</b>
+    <p
+      class='demo-readout'
+      role='status'
+      aria-live='polite'
+    >
+      Outgoing snapshot: <b id='demo-motion'>waiting for a move</b>
     </p>
   </main>
 
@@ -85,28 +150,100 @@ const CARDS = [
       than a resize: the card does not move in the document, it moves in the grid, and the browser
       follows it from where it was to where it now is.
     */
-    .demo { padding: 56px 4.5% 110px; }
-    .demo-title { font-family: 'Manrope', sans-serif; font-size: clamp(44px, 5.4vw, 76px); font-weight: 500; letter-spacing: -.06em; line-height: 1.06; margin: 20px 0 24px; }
-    .demo-title em { color: var(--lime); font-family: Georgia, serif; font-weight: 400; }
-    .demo-lede { color: #bbc0b3; font-size: 16px; line-height: 1.7; max-width: 620px; margin-bottom: 30px; }
-    .demo-lede em { color: var(--paper); font-style: italic; }
-
-    .demo-modes { display: inline-flex; border: 1px solid var(--line); border-radius: 30px; padding: 4px; margin-bottom: 26px; }
-    .demo-mode { background: none; border: 0; border-radius: 30px; color: var(--muted); font-size: 14px; padding: 9px 18px; }
-    .demo-mode[aria-pressed='true'] { background: var(--lime); color: var(--ink); }
-
-    .demo-grid { display: grid; gap: 14px; grid-auto-rows: 104px; grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 780px; }
-    .demo-card {
-      align-items: center; background: #1c2018; border: 1px solid var(--line); border-radius: 10px;
-      color: var(--muted); display: flex; font-family: 'Manrope', sans-serif; font-size: 19px;
-      justify-content: center; letter-spacing: -.03em; padding: 0;
+    .demo {
+      padding: 56px 4.5% 110px;
     }
-    .demo-card[data-active] { background: var(--lime); border-color: var(--lime); color: var(--ink); grid-column: span 2; grid-row: span 2; order: -1; }
-    .demo-card:hover { border-color: var(--muted); color: var(--paper); }
-    .demo-card[data-active]:hover { color: var(--ink); }
+    .demo-title {
+      font-family: 'Manrope', sans-serif;
+      font-size: clamp(44px, 5.4vw, 76px);
+      font-weight: 500;
+      letter-spacing: -0.06em;
+      line-height: 1.06;
+      margin: 20px 0 24px;
+    }
+    .demo-title em {
+      color: var(--lime);
+      font-family: Georgia, serif;
+      font-weight: 400;
+    }
+    .demo-lede {
+      color: #bbc0b3;
+      font-size: 16px;
+      line-height: 1.7;
+      max-width: 620px;
+      margin-bottom: 30px;
+    }
+    .demo-lede em {
+      color: var(--paper);
+      font-style: italic;
+    }
 
-    .demo-readout { color: var(--muted); font-size: 14px; margin-top: 24px; }
-    .demo-readout b { color: var(--lime); font-family: monospace; font-weight: 400; }
+    .demo-modes {
+      display: inline-flex;
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      padding: 4px;
+      margin-bottom: 26px;
+    }
+    .demo-mode {
+      background: none;
+      border: 0;
+      border-radius: 30px;
+      color: var(--muted);
+      font-size: 14px;
+      padding: 9px 18px;
+    }
+    .demo-mode[aria-pressed='true'] {
+      background: var(--lime);
+      color: var(--ink);
+    }
+
+    .demo-grid {
+      display: grid;
+      gap: 14px;
+      grid-auto-rows: 104px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      max-width: 780px;
+    }
+    .demo-card {
+      align-items: center;
+      background: #1c2018;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: var(--muted);
+      display: flex;
+      font-family: 'Manrope', sans-serif;
+      font-size: 19px;
+      justify-content: center;
+      letter-spacing: -0.03em;
+      padding: 0;
+    }
+    .demo-card[data-active] {
+      background: var(--lime);
+      border-color: var(--lime);
+      color: var(--ink);
+      grid-column: span 2;
+      grid-row: span 2;
+      order: -1;
+    }
+    .demo-card:hover {
+      border-color: var(--muted);
+      color: var(--paper);
+    }
+    .demo-card[data-active]:hover {
+      color: var(--ink);
+    }
+
+    .demo-readout {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 24px;
+    }
+    .demo-readout b {
+      color: var(--lime);
+      font-family: monospace;
+      font-weight: 400;
+    }
 
     /*
       What you would write by hand to get the geometry projection without Jumi: one
@@ -119,21 +256,39 @@ const CARDS = [
       modes would look identical. With a name of its own, the browser-default side really is only the
       browser's: it still projects the geometry, and it falls back to the cross-fade it ships with.
     */
-    [data-demo-mode='native'] .demo-card[data-id='alpha'] { view-transition-name: plain-alpha; }
-    [data-demo-mode='native'] .demo-card[data-id='bravo'] { view-transition-name: plain-bravo; }
-    [data-demo-mode='native'] .demo-card[data-id='charlie'] { view-transition-name: plain-charlie; }
-    [data-demo-mode='native'] .demo-card[data-id='delta'] { view-transition-name: plain-delta; }
-    [data-demo-mode='native'] .demo-card[data-id='echo'] { view-transition-name: plain-echo; }
-    [data-demo-mode='native'] .demo-card[data-id='foxtrot'] { view-transition-name: plain-foxtrot; }
+    [data-demo-mode='native'] .demo-card[data-id='alpha'] {
+      view-transition-name: plain-alpha;
+    }
+    [data-demo-mode='native'] .demo-card[data-id='bravo'] {
+      view-transition-name: plain-bravo;
+    }
+    [data-demo-mode='native'] .demo-card[data-id='charlie'] {
+      view-transition-name: plain-charlie;
+    }
+    [data-demo-mode='native'] .demo-card[data-id='delta'] {
+      view-transition-name: plain-delta;
+    }
+    [data-demo-mode='native'] .demo-card[data-id='echo'] {
+      view-transition-name: plain-echo;
+    }
+    [data-demo-mode='native'] .demo-card[data-id='foxtrot'] {
+      view-transition-name: plain-foxtrot;
+    }
 
     @media (max-width: 700px) {
-      .demo { padding-top: 30px; }
-      .demo-grid { grid-auto-rows: 76px; }
-      .demo-card { font-size: 15px; }
+      .demo {
+        padding-top: 30px;
+      }
+      .demo-grid {
+        grid-auto-rows: 76px;
+      }
+      .demo-card {
+        font-size: 15px;
+      }
     }
   </style>
 
   <script>
-    import '../../demo/view-transitions';
+    import '../../demo/view-transitions'
   </script>
 </Layout>

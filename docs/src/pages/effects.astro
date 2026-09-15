@@ -1,49 +1,138 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import '../styles/catalog.css';
-import effects from '../data/effects.json';
+import Layout from '../layouts/Layout.astro'
+import '../styles/catalog.css'
+import effects from '../data/effects.json'
 ---
-<Layout title="The motion collection — Jumi" description={`Explore ${effects.length} Jumi effects. Preview an animation and copy its Tailwind CSS classes.`}>
-  <main id="main" class="catalog section">
-    <p class="eyebrow">THE MOTION COLLECTION / {effects.length} EFFECTS</p>
-    <div class="section-heading"><h1>A feeling for<br /><em>every interface.</em></h1><p>Find your starting point.<br />Press play. Copy the classes. Make it yours.</p></div>
-    <div class="catalog-tools"><label><span>Find an effect</span><input id="effect-search" type="search" placeholder="Try bounce, spiral, reveal…" /></label><p id="effect-count" role="status" aria-live="polite">{effects.length} effects</p></div>
-    <div class="effect-grid">
-      {effects.map(({name, className}, index) => <article class="effect-card" data-name={name} data-demo>
-        <div class="effect-card-top"><span>{String(index+1).padStart(3,'0')}</span><button class="effect-play" aria-label={`Play ${name}`}>▷</button></div>
-        <div class:list={['effect-stage', ['green','apricot','lilac'][index % 3]]}><span class:list={['effect-glyph', className, 'animation-duration-[1200ms]']} aria-hidden="true">✳</span></div>
-        <h2>{name}</h2><div class="effect-class"><code>{className}</code><button data-copy={`<div class="motion-safe:${className} animation-duration-[1200ms]">Move me</div>`} aria-label={`Copy ${name} example`}>Copy</button></div>
-      </article>)}
+
+<Layout
+  title='The motion collection — Jumi'
+  description={`Explore ${effects.length} Jumi effects. Preview an animation and copy its Tailwind CSS classes.`}
+>
+  <main
+    id='main'
+    class='catalog section'
+  >
+    <p class='eyebrow'>THE MOTION COLLECTION / {effects.length} EFFECTS</p>
+    <div class='section-heading'>
+      <h1>
+        A feeling for
+        <br />
+        <em>every interface.</em>
+      </h1>
+      <p>
+        Find your starting point.
+        <br />
+        Press play. Copy the classes. Make it yours.
+      </p>
     </div>
-    <p id="empty-effects" hidden>No effects match. Try a shorter name or a different collection.</p>
+    <div class='catalog-tools'>
+      <label>
+        <span>Find an effect</span>
+        <input
+          id='effect-search'
+          type='search'
+          placeholder='Try bounce, spiral, reveal…'
+        />
+      </label>
+      <p
+        id='effect-count'
+        role='status'
+        aria-live='polite'
+      >
+        {effects.length} effects
+      </p>
+    </div>
+    <div class='effect-grid'>
+      {effects.map(({ name, className }, index) => (
+        <article
+          class='effect-card'
+          data-name={name}
+          data-demo
+        >
+          <div class='effect-card-top'>
+            <span>{String(index + 1).padStart(3, '0')}</span>
+            <button
+              class='effect-play'
+              aria-label={`Play ${name}`}
+            >
+              ▷
+            </button>
+          </div>
+          <div
+            class:list={[
+              'effect-stage',
+              ['green', 'apricot', 'lilac'][index % 3],
+            ]}
+          >
+            <span
+              class:list={[
+                'effect-glyph',
+                className,
+                'animation-duration-[1200ms]',
+              ]}
+              aria-hidden='true'
+            >
+              ✳
+            </span>
+          </div>
+          <h2>{name}</h2>
+          <div class='effect-class'>
+            <code>{className}</code>
+            <button
+              data-copy={`<div class="motion-safe:${className} animation-duration-[1200ms]">Move me</div>`}
+              aria-label={`Copy ${name} example`}
+            >
+              Copy
+            </button>
+          </div>
+        </article>
+      ))}
+    </div>
+    <p
+      id='empty-effects'
+      hidden
+    >
+      No effects match. Try a shorter name or a different collection.
+    </p>
   </main>
   <script>
-    const search = document.querySelector<HTMLInputElement>('#effect-search')!;
-    const cards = [...document.querySelectorAll<HTMLElement>('.effect-card')];
+    const search = document.querySelector<HTMLInputElement>('#effect-search')!
+    const cards = [...document.querySelectorAll<HTMLElement>('.effect-card')]
     const filter = () => {
-      let visible = 0;
+      let visible = 0
       for (const card of cards) {
-        card.hidden = !card.dataset.name?.includes(search.value.trim().toLowerCase());
-        if (!card.hidden) visible++;
+        card.hidden = !card.dataset.name?.includes(
+          search.value.trim().toLowerCase(),
+        )
+        if (!card.hidden) visible++
       }
-      document.querySelector('#effect-count')!.textContent = `${visible} effect${visible === 1 ? '' : 's'}`;
-      (document.querySelector('#empty-effects') as HTMLElement).hidden = visible !== 0;
-    };
-    search.addEventListener('input', filter);
+      document.querySelector('#effect-count')!.textContent =
+        `${visible} effect${visible === 1 ? '' : 's'}`
+      ;(document.querySelector('#empty-effects') as HTMLElement).hidden =
+        visible !== 0
+    }
+    search.addEventListener('input', filter)
     cards.forEach(card => {
-      const glyph = card.querySelector<HTMLElement>('.effect-glyph')!;
+      const glyph = card.querySelector<HTMLElement>('.effect-glyph')!
       // Attached once per glyph, not once per click. A second click cancels the animation in
       // flight, and a cancelled animation fires `animationcancel` rather than `animationend` — so a
       // per-click listener marked `{ once: true }` would never be removed, and clicking one card
       // repeatedly would stack handlers on it.
-      glyph.addEventListener('animationend', () => card.classList.remove('is-playing'));
-      card.querySelector('button.effect-play')?.addEventListener('click', () => {
-        glyph.style.animation = 'none';
-        card.classList.remove('is-playing');
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-          glyph.style.removeProperty('animation'); card.classList.add('is-playing');
-        }));
-      });
-    });
+      glyph.addEventListener('animationend', () =>
+        card.classList.remove('is-playing'),
+      )
+      card
+        .querySelector('button.effect-play')
+        ?.addEventListener('click', () => {
+          glyph.style.animation = 'none'
+          card.classList.remove('is-playing')
+          requestAnimationFrame(() =>
+            requestAnimationFrame(() => {
+              glyph.style.removeProperty('animation')
+              card.classList.add('is-playing')
+            }),
+          )
+        })
+    })
   </script>
 </Layout>

@@ -1,23 +1,451 @@
 ---
-import '../studio/studio.css';
+import '../studio/studio.css'
 ---
+
 <!doctype html>
-<html lang="en">
-<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /><meta name="description" content="Author real browser motion with Jumi. Explore layers, compose keyframes, and export production classes." /><title>Jumi Studio — Motion authoring</title><link rel="icon" href="/favicon.svg" /></head>
-<body class="studio-page">
-<a href="#canvas-area" class="studio-skip">Skip to canvas</a>
-<div id="studio-app">
-  <header class="studio-header"><a href="/" class="studio-brand">jumi<span>STUDIO</span></a><div class="header-rule"></div><span class="project-name" id="project-name">Petal study</span><span class="version-label">MOTION AUTHORING / 01</span><div class="header-actions"><button data-action="undo" title="Undo (⌘Z)" aria-label="Undo">↶</button><button data-action="redo" title="Redo (⇧⌘Z)" aria-label="Redo">↷</button><button data-action="save">Save project</button><button data-action="load">Open project</button><button class="accent" data-action="export" id="export-button">Export HTML ↗</button></div></header>
-  <div class="studio-workspace">
-    <aside class="layers-panel panel"><div class="panel-title"><h2>Scene</h2><span id="node-count"></span></div><label class="scene-picker">Study<select id="scene-picker"><option value="hero">01 — Hero petals</option><option value="signal">02 — HTML + SVG signal</option></select></label><div class="tree-heading"><span>LAYERS</span><button data-action="expand" title="Expand all layers">Expand all</button></div><div id="scene-tree" aria-label="Scene hierarchy"></div><div class="isolation-panel"><h3>Isolation</h3><label>Show<select id="isolation"><option value="none">Complete scene</option><option value="selection">Selected elements only</option><option value="children">Selection + direct children</option><option value="subtree">Selected subtrees</option></select></label><label class="check-label"><input id="ghosts" type="checkbox" checked /> Ghost siblings</label><label class="check-label"><input id="parent-context" type="checkbox" checked /> Show parent bounds</label><p>Paint changes. Structure stays intact.</p></div></aside>
-    <main id="canvas-area" class="canvas-panel"><div class="canvas-top"><nav id="breadcrumbs" aria-label="Selection ancestry"></nav><span class="scene-type">DOM / SVG</span></div><div class="canvas-tools"><div><button data-action="fit-scene">Fit scene</button><button data-action="fit-selection">Fit selection</button></div><div><button data-action="zoom-out" aria-label="Zoom out">−</button><span id="zoom-label">70%</span><button data-action="zoom-in" aria-label="Zoom in">+</button><label class="grid-label"><input type="checkbox" id="grid-toggle" checked /> Grid</label><input aria-label="Canvas background" type="color" id="canvas-background" value="#e1e4da" /></div></div><div id="canvas-viewport"><div id="frame-shell"><iframe id="scene-frame" title="Jumi working scene" sandbox="allow-same-origin"></iframe><div id="scene-overlays"></div></div><div class="canvas-hint">Scroll to zoom · Middle-drag to pan · Shift-click to select together · Alt-click to pick underneath</div></div><div class="context-tools"><span id="selection-caption">Select an element</span><button data-action="isolate">Isolate</button><button data-action="focus-property">+ Motion</button><button data-action="keyframe">◇ Keyframe</button><button data-action="preview">▷ Preview</button></div><div class="canvas-status"><span id="compile-status" role="status">Loading Jumi compiler…</span><div><label>W <input id="scene-width" type="number" min="100" max="3000" value="800" /></label><span>×</span><label>H <input id="scene-height" type="number" min="100" max="3000" value="540" /></label></div></div></main>
-    <aside class="inspector-panel panel"><div class="panel-title"><h2>Inspector</h2><span id="selection-tag">ELEMENT</span></div><div id="selection-info"></div><div class="add-property"><h3>Add a motion</h3><label>Find a property<input id="property-search" type="search" placeholder="Opacity, rotate, fill…" /></label><label>Jumi property<select id="property-select"></select></label><p id="property-meta"></p><button data-action="add-track" class="full-button">+ Add property track</button></div><div id="track-inspector"></div></aside>
-  </div>
-  <section class="timeline-panel" aria-label="Animation timeline"><div class="timeline-toolbar"><div class="transport"><button data-action="start" aria-label="Jump to start">|◁</button><button data-action="play" id="play-button" aria-label="Play" class="play-button">▷</button><button data-action="end" aria-label="Jump to end">▷|</button><output id="time-display">0.000 <small>/ 6.000 s</small></output></div><label>Duration <input id="project-duration" type="number" min="100" max="120000" step="100" value="6000" /> ms</label><label><input id="loop" type="checkbox" checked /> Loop</label><label><input id="snap" type="checkbox" checked /> Snap</label><label>Timeline <select id="timeline-zoom"><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option></select></label><button data-action="stagger">Stagger siblings</button><button data-action="sync">Share timing</button><label><input id="all-tracks" type="checkbox" /> All layers</label></div><div class="timeline-scroll" id="timeline-scroll"><div id="timeline-body"></div></div><div class="timeline-bottom"><span>◇ Drag frames · Shift-click for multiple · Delete to remove · ← → to nudge</span><span id="track-count"></span></div></section>
-  <section class="output-panel"><div class="output-toolbar"><div class="output-tabs" role="tablist" aria-label="Generated output"><button role="tab" aria-selected="true" data-output="html">HTML</button><button role="tab" aria-selected="false" data-output="classes">Jumi classes</button><button role="tab" aria-selected="false" data-output="native">Base CSS</button><button role="tab" aria-selected="false" data-output="compiled">Compiled CSS</button></div><span>PUBLIC JUMI VOCABULARY</span><button data-action="import-classes">Import phrases</button><button data-action="copy-output" id="copy-output">Copy code</button><button data-action="toggle-output" aria-label="Expand output">↕</button></div><pre id="output-code" role="tabpanel" tabindex="0"></pre></section>
-  <div id="studio-message" role="status" aria-live="polite"></div>
-</div>
-<input type="file" id="project-file" accept="application/json,.json" hidden />
-<dialog id="phrase-dialog"><form method="dialog"><h2>Bring your phrases.</h2><p>Paste named phrases and their scoped controls for the selected element. Unsupported syntax is reported, never guessed.</p><label>Jumi classes<textarea id="phrase-input" rows="7" placeholder="animate-opacity-[0:0|100:1]/enter animation-duration-[1200ms]/enter"></textarea></label><p id="phrase-error" role="alert"></p><div><button value="cancel">Cancel</button><button id="apply-phrases" type="button" class="accent">Add tracks</button></div></form></dialog>
-<script>import '../studio/app';</script>
-</body></html>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8' />
+    <meta
+      name='viewport'
+      content='width=device-width,initial-scale=1'
+    />
+    <meta
+      name='description'
+      content='Author real browser motion with Jumi. Explore layers, compose keyframes, and export production classes.'
+    />
+    <title>Jumi Studio — Motion authoring</title>
+    <link
+      rel='icon'
+      href='/favicon.svg'
+    />
+  </head>
+  <body class='studio-page'>
+    <a
+      href='#canvas-area'
+      class='studio-skip'
+    >
+      Skip to canvas
+    </a>
+    <div id='studio-app'>
+      <header class='studio-header'>
+        <a
+          href='/'
+          class='studio-brand'
+        >
+          jumi<span>STUDIO</span>
+        </a>
+        <div class='header-rule'></div>
+        <span
+          class='project-name'
+          id='project-name'
+        >
+          Petal study
+        </span>
+        <span class='version-label'>MOTION AUTHORING / 01</span>
+        <div class='header-actions'>
+          <button
+            data-action='undo'
+            title='Undo (⌘Z)'
+            aria-label='Undo'
+          >
+            ↶
+          </button>
+          <button
+            data-action='redo'
+            title='Redo (⇧⌘Z)'
+            aria-label='Redo'
+          >
+            ↷
+          </button>
+          <button data-action='save'>Save project</button>
+          <button data-action='load'>Open project</button>
+          <button
+            class='accent'
+            data-action='export'
+            id='export-button'
+          >
+            Export HTML ↗
+          </button>
+        </div>
+      </header>
+      <div class='studio-workspace'>
+        <aside class='layers-panel panel'>
+          <div class='panel-title'>
+            <h2>Scene</h2>
+            <span id='node-count'></span>
+          </div>
+          <label class='scene-picker'>
+            Study
+            <select id='scene-picker'>
+              <option value='hero'>01 — Hero petals</option>
+              <option value='signal'>02 — HTML + SVG signal</option>
+            </select>
+          </label>
+          <div class='tree-heading'>
+            <span>LAYERS</span>
+            <button
+              data-action='expand'
+              title='Expand all layers'
+            >
+              Expand all
+            </button>
+          </div>
+          <div
+            id='scene-tree'
+            aria-label='Scene hierarchy'
+          ></div>
+          <div class='isolation-panel'>
+            <h3>Isolation</h3>
+            <label>
+              Show
+              <select id='isolation'>
+                <option value='none'>Complete scene</option>
+                <option value='selection'>Selected elements only</option>
+                <option value='children'>Selection + direct children</option>
+                <option value='subtree'>Selected subtrees</option>
+              </select>
+            </label>
+            <label class='check-label'>
+              <input
+                id='ghosts'
+                type='checkbox'
+                checked
+              />{' '}
+              Ghost siblings
+            </label>
+            <label class='check-label'>
+              <input
+                id='parent-context'
+                type='checkbox'
+                checked
+              />{' '}
+              Show parent bounds
+            </label>
+            <p>Paint changes. Structure stays intact.</p>
+          </div>
+        </aside>
+        <main
+          id='canvas-area'
+          class='canvas-panel'
+        >
+          <div class='canvas-top'>
+            <nav
+              id='breadcrumbs'
+              aria-label='Selection ancestry'
+            ></nav>
+            <span class='scene-type'>DOM / SVG</span>
+          </div>
+          <div class='canvas-tools'>
+            <div>
+              <button data-action='fit-scene'>Fit scene</button>
+              <button data-action='fit-selection'>Fit selection</button>
+            </div>
+            <div>
+              <button
+                data-action='zoom-out'
+                aria-label='Zoom out'
+              >
+                −
+              </button>
+              <span id='zoom-label'>70%</span>
+              <button
+                data-action='zoom-in'
+                aria-label='Zoom in'
+              >
+                +
+              </button>
+              <label class='grid-label'>
+                <input
+                  type='checkbox'
+                  id='grid-toggle'
+                  checked
+                />{' '}
+                Grid
+              </label>
+              <input
+                aria-label='Canvas background'
+                type='color'
+                id='canvas-background'
+                value='#e1e4da'
+              />
+            </div>
+          </div>
+          <div id='canvas-viewport'>
+            <div id='frame-shell'>
+              <iframe
+                id='scene-frame'
+                title='Jumi working scene'
+                sandbox='allow-same-origin'
+              ></iframe>
+              <div id='scene-overlays'></div>
+            </div>
+            <div class='canvas-hint'>
+              Scroll to zoom · Middle-drag to pan · Shift-click to select
+              together · Alt-click to pick underneath
+            </div>
+          </div>
+          <div class='context-tools'>
+            <span id='selection-caption'>Select an element</span>
+            <button data-action='isolate'>Isolate</button>
+            <button data-action='focus-property'>+ Motion</button>
+            <button data-action='keyframe'>◇ Keyframe</button>
+            <button data-action='preview'>▷ Preview</button>
+          </div>
+          <div class='canvas-status'>
+            <span
+              id='compile-status'
+              role='status'
+            >
+              Loading Jumi compiler…
+            </span>
+            <div>
+              <label>
+                W{' '}
+                <input
+                  id='scene-width'
+                  type='number'
+                  min='100'
+                  max='3000'
+                  value='800'
+                />
+              </label>
+              <span>×</span>
+              <label>
+                H{' '}
+                <input
+                  id='scene-height'
+                  type='number'
+                  min='100'
+                  max='3000'
+                  value='540'
+                />
+              </label>
+            </div>
+          </div>
+        </main>
+        <aside class='inspector-panel panel'>
+          <div class='panel-title'>
+            <h2>Inspector</h2>
+            <span id='selection-tag'>ELEMENT</span>
+          </div>
+          <div id='selection-info'></div>
+          <div class='add-property'>
+            <h3>Add a motion</h3>
+            <label>
+              Find a property
+              <input
+                id='property-search'
+                type='search'
+                placeholder='Opacity, rotate, fill…'
+              />
+            </label>
+            <label>
+              Jumi property<select id='property-select'></select>
+            </label>
+            <p id='property-meta'></p>
+            <button
+              data-action='add-track'
+              class='full-button'
+            >
+              + Add property track
+            </button>
+          </div>
+          <div id='track-inspector'></div>
+        </aside>
+      </div>
+      <section
+        class='timeline-panel'
+        aria-label='Animation timeline'
+      >
+        <div class='timeline-toolbar'>
+          <div class='transport'>
+            <button
+              data-action='start'
+              aria-label='Jump to start'
+            >
+              |◁
+            </button>
+            <button
+              data-action='play'
+              id='play-button'
+              aria-label='Play'
+              class='play-button'
+            >
+              ▷
+            </button>
+            <button
+              data-action='end'
+              aria-label='Jump to end'
+            >
+              ▷|
+            </button>
+            <output id='time-display'>
+              0.000 <small>/ 6.000 s</small>
+            </output>
+          </div>
+          <label>
+            Duration{' '}
+            <input
+              id='project-duration'
+              type='number'
+              min='100'
+              max='120000'
+              step='100'
+              value='6000'
+            />{' '}
+            ms
+          </label>
+          <label>
+            <input
+              id='loop'
+              type='checkbox'
+              checked
+            />{' '}
+            Loop
+          </label>
+          <label>
+            <input
+              id='snap'
+              type='checkbox'
+              checked
+            />{' '}
+            Snap
+          </label>
+          <label>
+            Timeline{' '}
+            <select id='timeline-zoom'>
+              <option value='1'>1×</option>
+              <option value='2'>2×</option>
+              <option value='4'>4×</option>
+            </select>
+          </label>
+          <button data-action='stagger'>Stagger siblings</button>
+          <button data-action='sync'>Share timing</button>
+          <label>
+            <input
+              id='all-tracks'
+              type='checkbox'
+            />{' '}
+            All layers
+          </label>
+        </div>
+        <div
+          class='timeline-scroll'
+          id='timeline-scroll'
+        >
+          <div id='timeline-body'></div>
+        </div>
+        <div class='timeline-bottom'>
+          <span>
+            ◇ Drag frames · Shift-click for multiple · Delete to remove · ← → to
+            nudge
+          </span>
+          <span id='track-count'></span>
+        </div>
+      </section>
+      <section class='output-panel'>
+        <div class='output-toolbar'>
+          <div
+            class='output-tabs'
+            role='tablist'
+            aria-label='Generated output'
+          >
+            <button
+              role='tab'
+              aria-selected='true'
+              data-output='html'
+            >
+              HTML
+            </button>
+            <button
+              role='tab'
+              aria-selected='false'
+              data-output='classes'
+            >
+              Jumi classes
+            </button>
+            <button
+              role='tab'
+              aria-selected='false'
+              data-output='native'
+            >
+              Base CSS
+            </button>
+            <button
+              role='tab'
+              aria-selected='false'
+              data-output='compiled'
+            >
+              Compiled CSS
+            </button>
+          </div>
+          <span>PUBLIC JUMI VOCABULARY</span>
+          <button data-action='import-classes'>Import phrases</button>
+          <button
+            data-action='copy-output'
+            id='copy-output'
+          >
+            Copy code
+          </button>
+          <button
+            data-action='toggle-output'
+            aria-label='Expand output'
+          >
+            ↕
+          </button>
+        </div>
+        <pre
+          id='output-code'
+          role='tabpanel'
+          tabindex='0'
+        ></pre>
+      </section>
+      <div
+        id='studio-message'
+        role='status'
+        aria-live='polite'
+      ></div>
+    </div>
+    <input
+      type='file'
+      id='project-file'
+      accept='application/json,.json'
+      hidden
+    />
+    <dialog id='phrase-dialog'>
+      <form method='dialog'>
+        <h2>Bring your phrases.</h2>
+        <p>
+          Paste named phrases and their scoped controls for the selected
+          element. Unsupported syntax is reported, never guessed.
+        </p>
+        <label>
+          Jumi classes
+          <textarea
+            id='phrase-input'
+            rows='7'
+            placeholder='animate-opacity-[0:0|100:1]/enter animation-duration-[1200ms]/enter'
+          ></textarea>
+        </label>
+        <p
+          id='phrase-error'
+          role='alert'
+        ></p>
+        <div>
+          <button value='cancel'>Cancel</button>
+          <button
+            id='apply-phrases'
+            type='button'
+            class='accent'
+          >
+            Add tracks
+          </button>
+        </div>
+      </form>
+    </dialog>
+    <script>
+      import '../studio/app'
+    </script>
+  </body>
+</html>
