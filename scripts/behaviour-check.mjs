@@ -635,6 +635,15 @@ const NAMED_ARMS = [
     'f',
     'animate-rotate-45/scale animate-scale-110 animation-duration-1000/scale animation-duration-400/rotate',
   ],
+  // The three parts an `animation` shorthand cannot carry, all three addressed by the motion's own name.
+  // They are the parts that stay *assigned separately*, and the reason is structural: the composition
+  // declares them in one rule for every activating selector, so it cannot name a motion, and a name
+  // reaches them through a link the naming rule fills. An unfilled link falls back or drops — silently,
+  // because the motion still runs — so it is asserted rather than assumed.
+  [
+    'g',
+    'animate-rotate-45/spin animation-composition-add/spin animation-timeline-scroll/spin animation-range-[25%_75%]/spin',
+  ],
 ]
 
 const NAMED_CANDIDATES = [
@@ -693,6 +702,47 @@ const orderDrift = Object.entries(forward).flatMap(([id, reading]) =>
     ),
 )
 
+/**
+ * The three properties the `animation` shorthand cannot carry, read on the element that named them.
+ *
+ * These are the parts a name still reaches through a link: `animation-composition`, `animation-range`
+ * and `animation-timeline` have no shorthand section, so the composition declares them — and the
+ * composition is one rule for every activating selector, which is why it cannot name a motion itself.
+ * The naming rule fills the slot-keyed link the composition reads, and this is the only place that fill
+ * is asserted: if it went missing the three would fall back or drop, and the motion would still run.
+ *
+ * The live motion is found by position rather than by index 0: the element's `animation` list carries a
+ * position for every slot in the stylesheet, and only the one this element activated is named.
+ */
+const separateParts = async () => {
+  const built = build(await compiler(ENTRY, root), NAMED_CANDIDATES)
+  const classes = NAMED_ARMS.find(([id]) => id === 'g')[1]
+  const page = await load(
+    built.css,
+    `<div id="named-g" class="${classes}"></div>`,
+  )
+
+  const reading = await page.evaluate(() => {
+    const style = getComputedStyle(document.querySelector('#named-g'))
+    const names = style.animationName.split(',').map(value => value.trim())
+    const at = names.findIndex(name => name.startsWith('jumi-rotate-'))
+    const pick = value => value.split(',')[at]?.trim() ?? 'absent'
+
+    return {
+      composition: pick(style.animationComposition),
+      duration: pick(style.animationDuration),
+      range: pick(style.animationRange),
+      timeline: pick(style.animationTimeline),
+    }
+  })
+
+  await page.close()
+
+  return reading
+}
+
+const separate = await separateParts()
+
 const naming = [
   [
     'the name it declared reaches its own motion',
@@ -718,7 +768,7 @@ const naming = [
       durationOf(forward, 'e', 'jumi-scale-') === '1s',
   ],
   [
-    'a name a property already owns cannot take that property\'s control',
+    "a name a property already owns cannot take that property's control",
     durationOf(forward, 'f', 'jumi-scale-') === '1s' &&
       durationOf(forward, 'f', 'jumi-rotate-') === '0.4s',
   ],
@@ -726,6 +776,13 @@ const naming = [
     'candidate order cannot decide which name wins',
     orderDrift.length === 0,
     orderDrift.join(' | '),
+  ],
+  [
+    'a name reaches the parts the shorthand cannot carry',
+    separate.composition === 'add' &&
+      separate.timeline.includes('scroll') &&
+      separate.range !== 'normal',
+    JSON.stringify(separate),
   ],
 ]
 

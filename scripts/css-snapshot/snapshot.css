@@ -355,14 +355,7 @@
     --jumi-rotate-Z2excak-0: 0deg;
     --jumi-rotate-Z2excak-20: -8deg;
     --jumi-rotate-Z2excak-100: -8deg;
-    --jumi-slot-rotate-Z2excak-72Dbc: var(--jumi-rotate-Z2excak-animation-name, var(--jumi-animation-name)) var(--jumi-slot-rotate-Z2excak-72Dbc-animation-duration, var(--jumi-rotate-animation-duration, var(--jumi-animation-duration))) var(--jumi-slot-rotate-Z2excak-72Dbc-animation-timing-function, var(--jumi-rotate-animation-timing-function, var(--jumi-animation-timing-function))) var(--jumi-slot-rotate-Z2excak-72Dbc-animation-delay, var(--jumi-rotate-animation-delay, var(--jumi-animation-delay))) var(--jumi-slot-rotate-Z2excak-72Dbc-animation-iteration-count, var(--jumi-rotate-animation-iteration-count, var(--jumi-animation-iteration-count))) var(--jumi-slot-rotate-Z2excak-72Dbc-animation-direction, var(--jumi-rotate-animation-direction, var(--jumi-animation-direction))) var(--jumi-slot-rotate-Z2excak-72Dbc-animation-fill-mode, var(--jumi-rotate-animation-fill-mode, var(--jumi-animation-fill-mode))) var(--jumi-slot-rotate-Z2excak-72Dbc-animation-play-state, var(--jumi-rotate-animation-play-state, var(--jumi-animation-play-state)));
-    --jumi-slot-rotate-Z2excak-72Dbc-animation-duration: var(--jumi-label-flick-animation-duration);
-    --jumi-slot-rotate-Z2excak-72Dbc-animation-timing-function: var(--jumi-label-flick-animation-timing-function);
-    --jumi-slot-rotate-Z2excak-72Dbc-animation-delay: var(--jumi-label-flick-animation-delay);
-    --jumi-slot-rotate-Z2excak-72Dbc-animation-iteration-count: var(--jumi-label-flick-animation-iteration-count);
-    --jumi-slot-rotate-Z2excak-72Dbc-animation-direction: var(--jumi-label-flick-animation-direction);
-    --jumi-slot-rotate-Z2excak-72Dbc-animation-fill-mode: var(--jumi-label-flick-animation-fill-mode);
-    --jumi-slot-rotate-Z2excak-72Dbc-animation-play-state: var(--jumi-label-flick-animation-play-state);
+    --jumi-slot-rotate-Z2excak-72Dbc: var(--jumi-rotate-Z2excak-animation-name, var(--jumi-animation-name)) var(--jumi-label-flick-animation-duration, var(--jumi-rotate-animation-duration, var(--jumi-animation-duration))) var(--jumi-label-flick-animation-timing-function, var(--jumi-rotate-animation-timing-function, var(--jumi-animation-timing-function))) var(--jumi-label-flick-animation-delay, var(--jumi-rotate-animation-delay, var(--jumi-animation-delay))) var(--jumi-label-flick-animation-iteration-count, var(--jumi-rotate-animation-iteration-count, var(--jumi-animation-iteration-count))) var(--jumi-label-flick-animation-direction, var(--jumi-rotate-animation-direction, var(--jumi-animation-direction))) var(--jumi-label-flick-animation-fill-mode, var(--jumi-rotate-animation-fill-mode, var(--jumi-animation-fill-mode))) var(--jumi-label-flick-animation-play-state, var(--jumi-rotate-animation-play-state, var(--jumi-animation-play-state)));
     --jumi-slot-rotate-Z2excak-72Dbc-animation-composition: var(--jumi-label-flick-animation-composition);
     --jumi-slot-rotate-Z2excak-72Dbc-animation-range: var(--jumi-label-flick-animation-range);
     --jumi-slot-rotate-Z2excak-72Dbc-animation-timeline: var(--jumi-label-flick-animation-timeline);
@@ -373,14 +366,7 @@
     --jumi-rotate-1CgNAd-0: 0deg;
     --jumi-rotate-1CgNAd-20: 0deg;
     --jumi-rotate-1CgNAd-100: 8deg;
-    --jumi-slot-rotate-1CgNAd-Z16tCnr: var(--jumi-rotate-1CgNAd-animation-name, var(--jumi-animation-name)) var(--jumi-slot-rotate-1CgNAd-Z16tCnr-animation-duration, var(--jumi-rotate-animation-duration, var(--jumi-animation-duration))) var(--jumi-slot-rotate-1CgNAd-Z16tCnr-animation-timing-function, var(--jumi-rotate-animation-timing-function, var(--jumi-animation-timing-function))) var(--jumi-slot-rotate-1CgNAd-Z16tCnr-animation-delay, var(--jumi-rotate-animation-delay, var(--jumi-animation-delay))) var(--jumi-slot-rotate-1CgNAd-Z16tCnr-animation-iteration-count, var(--jumi-rotate-animation-iteration-count, var(--jumi-animation-iteration-count))) var(--jumi-slot-rotate-1CgNAd-Z16tCnr-animation-direction, var(--jumi-rotate-animation-direction, var(--jumi-animation-direction))) var(--jumi-slot-rotate-1CgNAd-Z16tCnr-animation-fill-mode, var(--jumi-rotate-animation-fill-mode, var(--jumi-animation-fill-mode))) var(--jumi-slot-rotate-1CgNAd-Z16tCnr-animation-play-state, var(--jumi-rotate-animation-play-state, var(--jumi-animation-play-state)));
-    --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-duration: var(--jumi-label-return-animation-duration);
-    --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-timing-function: var(--jumi-label-return-animation-timing-function);
-    --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-delay: var(--jumi-label-return-animation-delay);
-    --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-iteration-count: var(--jumi-label-return-animation-iteration-count);
-    --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-direction: var(--jumi-label-return-animation-direction);
-    --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-fill-mode: var(--jumi-label-return-animation-fill-mode);
-    --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-play-state: var(--jumi-label-return-animation-play-state);
+    --jumi-slot-rotate-1CgNAd-Z16tCnr: var(--jumi-rotate-1CgNAd-animation-name, var(--jumi-animation-name)) var(--jumi-label-return-animation-duration, var(--jumi-rotate-animation-duration, var(--jumi-animation-duration))) var(--jumi-label-return-animation-timing-function, var(--jumi-rotate-animation-timing-function, var(--jumi-animation-timing-function))) var(--jumi-label-return-animation-delay, var(--jumi-rotate-animation-delay, var(--jumi-animation-delay))) var(--jumi-label-return-animation-iteration-count, var(--jumi-rotate-animation-iteration-count, var(--jumi-animation-iteration-count))) var(--jumi-label-return-animation-direction, var(--jumi-rotate-animation-direction, var(--jumi-animation-direction))) var(--jumi-label-return-animation-fill-mode, var(--jumi-rotate-animation-fill-mode, var(--jumi-animation-fill-mode))) var(--jumi-label-return-animation-play-state, var(--jumi-rotate-animation-play-state, var(--jumi-animation-play-state)));
     --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-composition: var(--jumi-label-return-animation-composition);
     --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-range: var(--jumi-label-return-animation-range);
     --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-timeline: var(--jumi-label-return-animation-timeline);
@@ -1129,63 +1115,7 @@
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-label-flick-animation-composition {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-slot-rotate-Z2excak-72Dbc-animation-delay {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-label-flick-animation-delay {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-slot-rotate-Z2excak-72Dbc-animation-direction {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-label-flick-animation-direction {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-slot-rotate-Z2excak-72Dbc-animation-duration {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-label-flick-animation-duration {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-slot-rotate-Z2excak-72Dbc-animation-fill-mode {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-label-flick-animation-fill-mode {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-slot-rotate-Z2excak-72Dbc-animation-iteration-count {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-label-flick-animation-iteration-count {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-slot-rotate-Z2excak-72Dbc-animation-play-state {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-label-flick-animation-play-state {
-    inherits: false;
-    syntax: "*";
-  }
   @property --jumi-slot-rotate-Z2excak-72Dbc-animation-range {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-label-flick-animation-range {
     inherits: false;
     syntax: "*";
   }
@@ -1193,11 +1123,39 @@
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-label-flick-animation-timeline {
+  @property --jumi-label-flick-animation-composition {
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-slot-rotate-Z2excak-72Dbc-animation-timing-function {
+  @property --jumi-label-flick-animation-delay {
+    inherits: false;
+    syntax: "*";
+  }
+  @property --jumi-label-flick-animation-direction {
+    inherits: false;
+    syntax: "*";
+  }
+  @property --jumi-label-flick-animation-duration {
+    inherits: false;
+    syntax: "*";
+  }
+  @property --jumi-label-flick-animation-fill-mode {
+    inherits: false;
+    syntax: "*";
+  }
+  @property --jumi-label-flick-animation-iteration-count {
+    inherits: false;
+    syntax: "*";
+  }
+  @property --jumi-label-flick-animation-play-state {
+    inherits: false;
+    syntax: "*";
+  }
+  @property --jumi-label-flick-animation-range {
+    inherits: false;
+    syntax: "*";
+  }
+  @property --jumi-label-flick-animation-timeline {
     inherits: false;
     syntax: "*";
   }
@@ -1234,63 +1192,7 @@
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-label-return-animation-composition {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-delay {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-label-return-animation-delay {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-direction {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-label-return-animation-direction {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-duration {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-label-return-animation-duration {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-fill-mode {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-label-return-animation-fill-mode {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-iteration-count {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-label-return-animation-iteration-count {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-play-state {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-label-return-animation-play-state {
-    inherits: false;
-    syntax: "*";
-  }
   @property --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-range {
-    inherits: false;
-    syntax: "*";
-  }
-  @property --jumi-label-return-animation-range {
     inherits: false;
     syntax: "*";
   }
@@ -1298,11 +1200,39 @@
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-label-return-animation-timeline {
+  @property --jumi-label-return-animation-composition {
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-timing-function {
+  @property --jumi-label-return-animation-delay {
+    inherits: false;
+    syntax: "*";
+  }
+  @property --jumi-label-return-animation-direction {
+    inherits: false;
+    syntax: "*";
+  }
+  @property --jumi-label-return-animation-duration {
+    inherits: false;
+    syntax: "*";
+  }
+  @property --jumi-label-return-animation-fill-mode {
+    inherits: false;
+    syntax: "*";
+  }
+  @property --jumi-label-return-animation-iteration-count {
+    inherits: false;
+    syntax: "*";
+  }
+  @property --jumi-label-return-animation-play-state {
+    inherits: false;
+    syntax: "*";
+  }
+  @property --jumi-label-return-animation-range {
+    inherits: false;
+    syntax: "*";
+  }
+  @property --jumi-label-return-animation-timeline {
     inherits: false;
     syntax: "*";
   }

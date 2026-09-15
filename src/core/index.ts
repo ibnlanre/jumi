@@ -114,6 +114,24 @@ const slotParts = [
 ] as const
 
 /**
+ * The parts an `animation` shorthand cannot carry, and which therefore have to be assigned as their
+ * own declarations: `animation-composition`, `animation-range` and `animation-timeline` have no
+ * section in the shorthand.
+ *
+ * Exported because two modules have to agree about the split and the split is one fact. `nameSlot`
+ * registers these three as slot-keyed variables — the other seven travel inside the hoist, whose value
+ * is published on the rule that named the motion — and `@/helpers/carriers` fills exactly these three
+ * for a named instance. Two copies of this list is how the registration and the fill would come to
+ * disagree, and a variable registered with nothing to fill it is the exact shape of the bug this pass
+ * has already paid for once.
+ */
+export const separateParts = [
+  'animation-composition',
+  'animation-range',
+  'animation-timeline',
+] as const
+
+/**
  * Whether a name is one a control can address.
  *
  * Measured, and it is not a style rule: a name becomes a custom-property segment
@@ -347,12 +365,18 @@ export function createJumiModel({
    * Name a slot: install an address for the elements that wrote the name, and say so in the rule.
    *
    * Nothing here reaches the aggregate, and that is the point. A name is element-local —
-   * `animate-fade-in/reveal` names the motion for the elements matching *that* rule — so the address
-   * it installs is the slot-keyed variable the composition's chains already read
-   * (`--jumi-slot-<key>-<part>`), filled from the name's own variable in the **label namespace**
-   * (`--jumi-label-<name>-<part>`). Both are registered non-inheriting: a descendant that animates the
-   * same property must not answer to a name declared above it, which is the same rule the activation
-   * variables follow.
+   * `animate-fade-in/reveal` names the motion for the elements matching *that* rule — so the name is
+   * written where the value it configures is published. For the parts the `animation` shorthand
+   * carries, that is the hoist's own value on that rule: the name becomes the first link of each part's
+   * chain, and a control writes `--jumi-label-<name>-<part>`.
+   *
+   * The three parts the shorthand cannot carry are the exception, and the one exception is structural:
+   * `animation-composition`, `animation-range` and `animation-timeline` are declared by the composition,
+   * which is a single rule for every activating selector and therefore knows no names. The name reaches
+   * them the only way a shared rule can — through a slot-keyed variable (`--jumi-slot-<key>-<part>`) that
+   * the rule naming the motion fills from the label namespace (`--jumi-label-<name>-<part>`). Both are
+   * registered non-inheriting for the reason above: a descendant that animates the same property must not
+   * answer to a name declared above it, which is the same rule the activation variables follow.
    *
    * The label namespace is what makes a name unable to collide with a property. Structural addresses are
    * always `--jumi-<attribute>-<part>`, and `label-` is never an attribute, so `/scale` as a property and
@@ -379,11 +403,16 @@ export function createJumiModel({
     // this registration, nested animating elements inherit the parent's instance.
     registerName(cssEscape(`--jumi-slot-${key}`))
 
-    for (const part of slotParts) {
-      // The slot's address is always registered: it is how a name reaches one motion, and a
-      // descendant that animates the same property must not answer to a name declared above it.
+    for (const part of separateParts) {
+      // Only the three the shorthand cannot carry still travel through a slot-keyed variable, because
+      // the composition declares them itself: it is one rule for every activating selector, so it
+      // cannot name a motion, and the name has to reach it through a declaration on the rule that
+      // wrote the name. Registered for the reason it always was — a descendant that animates the same
+      // property must not answer to a name declared above it.
       registerName(cssEscape(`--jumi-slot-${key}-${part}`))
+    }
 
+    for (const part of slotParts) {
       // The name's own variable lives in the label namespace, so it cannot be the property scope's:
       // a scope is `--jumi-<attribute>-<part>`, and no attribute is `label-…`. This used to be
       // registered under the name itself, with an exemption for the identity case, because there the

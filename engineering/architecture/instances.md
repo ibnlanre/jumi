@@ -111,30 +111,40 @@ are sections of the `animation` value the hoist publishes. Three — `animation-
 `animation-range`, `animation-timeline` — have no shorthand section at all, so they are declared on their own
 beside it, and they are read, and therefore replaced, at those declarations rather than through the hoist.
 
-`scripts/spike-label-link.mjs` (`pnpm spike:label-link`) deletes the layer from the **compiled** stylesheet
-with PostCSS and measures both models in Chromium — the six naming arms from `behaviour:check`, each in both
-candidate orders, comparing live animations **in position order** (a sorted bag would miss the historical
-failure above, which kept the same set and swapped the order).
+**Measured, then implemented — for the seven the shorthand carries.** `scripts/spike-label-link.mjs`
+(`pnpm spike:label-link`) deletes the layer from the **compiled** stylesheet with PostCSS and measures both
+models in Chromium: the six naming arms from `behaviour:check`, each in both candidate orders, comparing live
+animations **in position order** (a sorted bag would miss the historical failure above, which kept the same
+set and swapped the order). No arm changes, in either order. On that fixture the layer is 50 declarations and
+40 registrations — 8,760 bytes of 34,417.
 
-| | today | layer removed |
+The generator now writes the name into the hoist's **value** for the seven parts the shorthand carries: the
+hoist is published on the rule that named the motion, so it is element-local, and a control's variable
+(`--jumi-label-<name>-<part>`) is the value's first link. The chain behind it is untouched, so an unset label
+still falls through to the definition and then to the shared default.
+
+**The three the shorthand cannot carry stay assigned separately, and that is structural rather than
+leftover.** `animation-composition`, `animation-range` and `animation-timeline` have no shorthand section, so
+the composition declares them — and the composition is synthesized as **one rule for every activating
+selector**, which includes candidates that named nothing. A name in that block would be a name every element
+matching it answers to, which is the failure measured above. So a name reaches those three the only way a
+shared rule can: through a slot-keyed variable the naming rule fills. Making them per-rule is what would
+remove the rest of the layer, and the view-transition emission reads the same aggregate, so it would move
+with it.
+
+| corpus | before | after |
 | --- | --- | --- |
-| arms whose reading changes | — | none, in either candidate order |
-| arm e under reversed candidate order | changes | changes — and identically so |
-| emitted bytes | 34,417 | 25,111 |
-| link declarations, registrations | 50 and 40 | — |
-| slot registrations | 49 | 9 |
+| canonical (`scripts/css-snapshot/snapshot.css`, 2 named motions) | 85,083 B | 81,850 B |
+| its slot registrations / fills | 55 / 20 | 41 / 6 |
+| probe fixture (6 arms, 4 named motions) | 34,417 B | 27,760 B |
+| carrier corpus (`examples/`, names nothing) | 140,006 B | 140,006 B |
 
-Removing the layer is 8,760 bytes of that stylesheet, and it changes nothing on these arms. The ten part
-registrations go with the fills, since nothing declares those parts afterwards; the hoist's own
-registration (`--jumi-slot-<slot>`, non-inheriting) is what keeps a nested animating element from
-inheriting an ancestor's instance, and it stays.
+The demo corpus is unchanged because it names no motion at all: the layer only exists for a named instance,
+so a corpus without names is not merely unaffected, it never had the cost.
 
-**Measured, not adopted.** The probe proves a *stylesheet shape* is equivalent; it cannot show that the
-generator emits that shape. Two limits. First, the rewrite is the change the generator would make, at the
-same places: the hoist's value, and the separate `animation-composition`, `animation-range` and
-`animation-timeline` declarations. Because those three are never sections of a long-form `animation` value,
-they are assigned — and so must be replaced — at their own use sites, which is exact rather than inferred;
-but the fixture exercises none of those utilities, so their equivalence here is argued from the shape and
-not measured. Second, the rewrite assumes the hoist is emitted once per named rule, which is the case it
-depends on. The guard for removing the layer is the permanent behaviour contexts and the CSS snapshot, not
-this probe.
+Held by: `index.test.ts` (the hoist names its instance; only the three are assigned; an unnamed motion is
+untouched), `create.test.ts` (only those three are registered as slot-keyed variables, and the aggregate
+still carries no name), and `behaviour:check`'s naming section, which now also asserts the three properties
+**resolve** on a named instance. That last one is falsified rather than assumed: with the assignment removed
+it reads `{"composition":"replace","duration":"1s","range":"0%","timeline":"auto"}` — all three controls
+gone while the motion still runs, which is exactly why text-level checks could not catch it.

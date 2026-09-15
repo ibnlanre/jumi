@@ -123,6 +123,87 @@ describe('the finalizer', () => {
     expect(out).not.toContain(':where(')
   })
 
+  it('writes a name into the hoist, and assigns separately only what the shorthand cannot carry', () => {
+    // An effect, because its slot key is the definition's own word — the shape where two names share one
+    // slot and the composition therefore cannot tell them apart on its own.
+    const named = payload(
+      'animations',
+      [
+        'animation-name: var(--jumi-fade-in-animation-name, var(--jumi-animation-name));',
+        'animation-duration: var(--jumi-slot-fade-in-animation-duration, var(--jumi-fade-in-animation-duration, var(--jumi-animation-duration)));',
+        'animation-composition: var(--jumi-slot-fade-in-animation-composition, var(--jumi-fade-in-animation-composition, var(--jumi-animation-composition)));',
+      ].join(' '),
+    )
+
+    const { css: out } = finalizeCss(
+      [
+        named,
+        '.animate-fade-in\\/reveal { --jumi-fade-in-animation-name: jumi-fade-in; --jumi-fade-in-label: reveal; }',
+      ].join('\n'),
+    )
+
+    // The parts the shorthand carries travel **inside the hoist's value**, where the rule that named the
+    // motion can name it: the control's variable is the value's first link, and no slot-keyed variable
+    // stands between them. That is the link layer the hoist used to be filled through.
+    expect(out).toContain(
+      '--jumi-slot-fade-in: var(--jumi-fade-in-animation-name, var(--jumi-animation-name))',
+    )
+    expect(out).toContain(
+      'var(--jumi-label-reveal-animation-duration, var(--jumi-fade-in-animation-duration, var(--jumi-animation-duration)))',
+    )
+
+    // The chain behind the name is untouched, so an unset label still falls through to the definition
+    // and then to the shared default — the property the whole arrangement depends on.
+    expect(out).toContain(
+      'var(--jumi-fade-in-animation-duration, var(--jumi-animation-duration))',
+    )
+
+    // None of the seven is assigned on the rule any more, which is what removes the layer.
+    for (const part of [
+      'animation-delay',
+      'animation-direction',
+      'animation-duration',
+      'animation-fill-mode',
+      'animation-iteration-count',
+      'animation-play-state',
+      'animation-timing-function',
+    ])
+      expect(out).not.toContain(`--jumi-slot-fade-in-${part}:`)
+
+    // The three the shorthand cannot carry still are, and that is structural rather than leftover: the
+    // composition declares them in **one** rule for every activating selector, so it knows no names, and
+    // a name reaches them the only way a shared rule can — through a variable the naming rule fills.
+    for (const part of [
+      'animation-composition',
+      'animation-range',
+      'animation-timeline',
+    ])
+      expect(out).toContain(
+        `--jumi-slot-fade-in-${part}: var(--jumi-label-reveal-${part});`,
+      )
+  })
+
+  it('leaves a motion nothing named reading its own slot', () => {
+    const named = payload(
+      'animations',
+      'animation-name: var(--jumi-fade-in-animation-name, var(--jumi-animation-name)); animation-duration: var(--jumi-slot-fade-in-animation-duration, var(--jumi-fade-in-animation-duration, var(--jumi-animation-duration)));',
+    )
+
+    const { css: out } = finalizeCss(
+      [
+        named,
+        '.animate-fade-in { --jumi-fade-in-animation-name: jumi-fade-in; }',
+      ].join('\n'),
+    )
+
+    // No label on the rule means no name to write: the value keeps the slot's own link, which nothing
+    // declares, so it resolves through the fallbacks exactly as it did before the layer was removed.
+    expect(out).toContain(
+      '--jumi-slot-fade-in: var(--jumi-fade-in-animation-name, var(--jumi-animation-name)) var(--jumi-slot-fade-in-animation-duration, var(--jumi-fade-in-animation-duration, var(--jumi-animation-duration)))',
+    )
+    expect(out).not.toContain('--jumi-label-')
+  })
+
   it('groups every activating selector once, in document order', () => {
     const css = [
       ANIMATIONS,

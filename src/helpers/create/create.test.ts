@@ -616,6 +616,49 @@ describe('animation-name registration', () => {
     }
   })
 
+  it('assigns a name separately only for the parts the shorthand cannot carry', () => {
+    const { addBase, creator } = setup()
+
+    creator.property('rotate')('0:16deg|58:0deg', { modifier: 'flick' })
+    const animations = creator.animations
+    const key = `rotate-${shorthash2('0:16deg|58:0deg')}-${shorthash2('flick')}`
+    const utilities = registered(addBase)
+
+    // These three are assigned on the rule that named the motion, because the composition declares them
+    // in one rule for every activating selector and so knows no names. Registered for the same reason as
+    // ever: a descendant that animates the same property must not answer to a name declared above it.
+    for (const part of [
+      'animation-composition',
+      'animation-range',
+      'animation-timeline',
+    ])
+      expect(utilities[`@property --jumi-slot-${key}-${part}`]).toEqual({
+        inherits: 'false',
+        syntax: '"*"',
+      })
+
+    // The other seven are not registered, because nothing declares them anywhere: they are sections of
+    // the `animation` shorthand, whose value the naming rule publishes with the name already in it. A
+    // registration with nothing to fill it is an address that reads as silence.
+    for (const part of [
+      'animation-delay',
+      'animation-direction',
+      'animation-duration',
+      'animation-fill-mode',
+      'animation-iteration-count',
+      'animation-play-state',
+      'animation-timing-function',
+    ])
+      expect(utilities[`@property --jumi-slot-${key}-${part}`]).toBeUndefined()
+
+    // The aggregate still addresses the slot for every part, which is what the composition reads — and
+    // where the name stays out, because that block is shared by every element that matches it.
+    for (const part of Object.keys(animations).filter(part =>
+      part.startsWith('animation-'),
+    ))
+      expect(String(animations[part])).not.toContain('flick')
+  })
+
   it('never registers a name outside the label namespace', () => {
     const { addBase, creator } = setup()
 

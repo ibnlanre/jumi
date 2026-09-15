@@ -1,7 +1,9 @@
-import type { Container, Root, Rule } from 'postcss'
+import type { Container, Declaration, Root, Rule } from 'postcss'
 
 import type { Product, ViewTransitionStaging } from './view-transition'
 import type { Collection } from '@/types'
+
+import { separateParts } from '@/core'
 
 import { RANGE_GRAMMAR, rangeAccepted, rangeReadings } from './animation-range'
 import { ACTIVATED_SLOT, instanceKeys, ownDeclarations } from './instance'
@@ -200,12 +202,13 @@ const SHORTHAND = [
 /**
  * Written after the shorthand rather than carried inside it — two because it resets them, one
  * because it cannot set it.
+ *
+ * Taken from the model rather than restated here: `nameSlot` registers exactly these three as
+ * slot-keyed variables and the fill below assigns exactly these three, so the list is one fact with two
+ * readers. Restated, the two drift — and a slot variable registered with nothing to fill it is an
+ * address that reads as silence.
  */
-const AFTER_SHORTHAND = [
-  'animation-composition',
-  'animation-range',
-  'animation-timeline',
-]
+const AFTER_SHORTHAND: string[] = [...separateParts]
 
 /**
  * What an unset position falls back to, per component.
@@ -227,13 +230,11 @@ const FALLBACK: Record<string, string> = {
 }
 
 /**
- * The parts a name installs on the rule that declared it: every slot part except `animation-name`,
- * which no control addresses — there is no `/<name>` spelling for an animation's name.
+ * The parts a name writes **into the hoist's value**: the shorthand's own, less `animation-name`,
+ * which no control addresses — there is no `/<name>` spelling for an animation's name, so the hoist reads
+ * that one from the definition's activation variable.
  */
-const namedParts = [
-  ...SHORTHAND.filter(part => part !== 'animation-name'),
-  ...AFTER_SHORTHAND,
-]
+const shorthandParts = SHORTHAND.filter(part => part !== 'animation-name')
 
 /**
  * The slot a hoisted value belongs to, read off the activation variable.
@@ -247,6 +248,37 @@ const namedParts = [
  * way, by `instanceKeys`.
  */
 const hoistedName = (slot: string) => `--jumi-slot-${slot}`
+
+/**
+ * The hoist's value with the author's name as the first link of every part the shorthand carries.
+ *
+ * The name goes into the **value**, not into a variable the value reads, because this value is published
+ * on the rule that named the motion and is therefore element-local. That locality is the whole reason the
+ * name can be written here at all: the composition is one rule for every activating selector, so a name
+ * written there became an address everywhere and which name won depended on candidate order — measured as
+ * `0.9s` forward and `0.3s` reversed on `animate-fade-in/reveal animation-duration-300/reveal
+ * animation-duration-900/loop`.
+ *
+ * It replaces the link the fill used to supply (`--jumi-slot-<key>-<part>`), and the chain behind it is
+ * untouched: a control writes `--jumi-label-<name>-<part>`, and the fallbacks still reach the definition
+ * and then the shared default. A rule that named nothing gets its value back unchanged.
+ */
+const namedHoist = (own: Declaration[], value: string, key: string) => {
+  const name = own.find(
+    candidate => candidate.prop === cssEscape(`--jumi-${key}-label`),
+  )?.value
+
+  if (!name) return value
+
+  return shorthandParts.reduce(
+    (text, part) =>
+      text.replaceAll(
+        `var(${hoistedName(key)}-${part}, `,
+        `var(${cssEscape(`--jumi-label-${name}-${part}`)}, `,
+      ),
+    value,
+  )
+}
 
 /** The slot a composition entry reads, or null when the entry is not a slot reference. */
 const referencedSlot = (entry: string) => {
@@ -478,17 +510,23 @@ const hoist = (staged: Collection<string>, rules: Rule[]) => {
         if (!value || published.has(prop)) continue
 
         published.add(prop)
-        rule.append(postcss.decl({ prop, value }))
+        rule.append(postcss.decl({ prop, value: namedHoist(own, value, key) }))
       }
     }
 
     // A named activation installs the name as this slot's address — **on this rule**, which is the
-    // whole of the locality rule. The composition's chains read `--jumi-slot-<slot>-<part>`, so filling
-    // it here means the name reaches the elements that wrote `.animate-fade-in/reveal` and no others.
+    // whole of the locality rule. The composition declares `animation-composition`, `animation-range`
+    // and `animation-timeline` itself, in one rule for every activating selector, so it cannot name a
+    // motion; the name reaches those three through the slot-keyed variable filled here, and the elements
+    // that wrote `.animate-fade-in/reveal` and no others.
     //
-    // The alternative — putting the name in the chain itself — cannot be made element-local: a chain is
-    // shared by every element matching the composition, so a name seen anywhere in the build became an
-    // address everywhere, and which name won depended on candidate order. Measured: `#a` with
+    // The other seven are sections of the shorthand, and the shorthand's value is the hoist published
+    // above — also on this rule. So the name goes straight into that value (`namedHoist`) and no variable
+    // stands between them: that is where the link layer's remaining declarations were.
+    //
+    // The alternative — putting the name in the composition's chains — cannot be made element-local: a
+    // chain is shared by every element matching the composition, so a name seen anywhere in the build
+    // became an address everywhere, and which name won depended on candidate order. Measured: `#a` with
     // `animate-fade-in/reveal animation-duration-300/reveal animation-duration-900/loop` computed
     // `0.9s` forward and `0.3s` reversed, and `loop` named on another element reached it either way.
     for (const declaration of own) {
@@ -503,7 +541,7 @@ const hoist = (staged: Collection<string>, rules: Rule[]) => {
 
         if (!name) continue
 
-        for (const part of namedParts) {
+        for (const part of AFTER_SHORTHAND) {
           const prop = cssEscape(`--jumi-slot-${key}-${part}`)
 
           if (published.has(prop)) continue
