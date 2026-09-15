@@ -1,4 +1,4 @@
-import type { Api } from '@/types'
+import type { Api, CssInJs } from '@/types'
 
 import { describe, expect, it, vi } from 'vitest'
 
@@ -92,30 +92,52 @@ describe('per-attribute timing controls', () => {
     })
   })
 
+  it('records an addressed phrase as intent, and never as a value', () => {
+    const { controls } = setup()
+
+    // The record is the whole model-side job of segment easing. It carries the address and the phrase — the
+    // address first, because an address is guaranteed whitespace-free and a phrase may contain anything else
+    // an easing function uses — and it resolves nothing: which instances an address reaches is a fact about
+    // the finished stylesheet, which a candidate compiled once can never know.
+    const recorded = controls['animation-timing-function'].fn('0:step-start', {
+      modifier: 'first',
+    }) as CssInJs
+    const [property] = Object.keys(recorded)
+
+    // The kind is in the property and the hash is what keeps two addresses on one rule from overwriting each
+    // other; the facts are in the value. Asserting the data rather than a literal hash keeps this test about
+    // the record and not about the hash function.
+    expect(property).toMatch(/^--jumi-segment-[\w-]+$/)
+    expect(recorded[property]).toBe('first 0:step-start')
+
+    // And the phrase is nowhere near the chain, at any address: written into it, the shorthand becomes
+    // invalid at computed-value time and the motion vanishes (measured — `animation-name: none`, zero
+    // animations).
+    expect(recorded).not.toHaveProperty(
+      '--jumi-label-first-animation-timing-function',
+    )
+    expect(recorded).not.toHaveProperty('--jumi-animation-timing-function')
+  })
+
   it('emits nothing for a phrase on a part the shorthand carries', () => {
     const { controls } = setup()
 
     // Measured: written into the chain, this left the element with `animation-name: none`, `0s` and *zero*
     // animations — the shorthand is one declaration, so one invalid component takes the motion with it.
     //
-    // An unsupported shape emits **nothing**, the way a candidate the framework does not recognize emits
-    // nothing: no control declaration, and no record either, because there is no address and so no intent to
-    // report on. A phrase belongs to segment easing, which is addressed — `/[0:ease-out]/reveal` — and the
-    // addressed forms are where the segment-easing path will attach.
+    // An unaddressed phrase emits **nothing**: with no address there is no intent to act on, and the shape is
+    // unsupported, which is the answer a framework gives a candidate it does not recognize. Nothing is
+    // recorded either, because a record exists to be acted on.
     expect(
       controls['animation-timing-function'].fn('0:ease-out', {
         modifier: null,
       }),
     ).toEqual({})
 
-    // Every address, because it is the shorthand that cannot hold a phrase and not one chain.
+    // Every other part of the shorthand, because it is the shorthand that cannot hold a phrase and not one
+    // chain — and only `animation-timing-function` has a segment form to record.
     expect(
       controls['animation-duration'].fn('0:1s', { modifier: 'flick' }),
-    ).toEqual({})
-    expect(
-      controls['animation-timing-function'].fn('0:ease-out', {
-        modifier: 'rotate',
-      }),
     ).toEqual({})
 
     // A scalar is untouched: this is a guard about phrases, and it must not read as one about controls.

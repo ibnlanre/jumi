@@ -1,12 +1,24 @@
-import type { Container, Declaration, Root, Rule } from 'postcss'
+import type {
+  AtRule,
+  ChildNode,
+  Container,
+  Declaration,
+  Root,
+  Rule,
+} from 'postcss'
 
 import type { Product, ViewTransitionStaging } from './view-transition'
 import type { Collection } from '@/types'
 
-import { separateParts } from '@/core'
+import { parsePhrase, separateParts, structuralAddress } from '@/core'
 
 import { RANGE_GRAMMAR, rangeAccepted, rangeReadings } from './animation-range'
-import { ACTIVATED_SLOT, instanceKeys, ownDeclarations } from './instance'
+import {
+  ACTIVATED_SLOT,
+  instanceKeys,
+  LABELLED_SLOT,
+  ownDeclarations,
+} from './instance'
 import {
   emitViewTransitions,
   isStagingSelector,
@@ -15,6 +27,7 @@ import {
 
 import cssEscape from 'css.escape'
 import postcss from 'postcss'
+import shorthash2 from 'shorthash2'
 
 /**
  * The carrier protocol, and the one engine that completes it.
@@ -263,12 +276,31 @@ const hoistedName = (slot: string) => `--jumi-slot-${slot}`
  * untouched: a control writes `--jumi-label-<name>-<part>`, and the fallbacks still reach the definition
  * and then the shared default. A rule that named nothing gets its value back unchanged.
  */
-const namedHoist = (own: Declaration[], value: string, key: string) => {
+const namedHoist = (
+  own: Declaration[],
+  value: string,
+  key: string,
+  selected: ReadonlyMap<string, string>,
+) => {
   const name = own.find(
     candidate => candidate.prop === cssEscape(`--jumi-${key}-label`),
   )?.value
 
   if (!name) return value
+
+  // The name position gains one link, and only where something actually selects one: a motion nothing eased
+  // keeps the value it had, so an instance pays for the link only when it uses it.
+  const definition = own.find(candidate =>
+    ACTIVATED_SLOT.test(candidate.prop),
+  )?.value
+
+  const selectedValue =
+    definition && selected.has(key)
+      ? value.replace(
+          `var(--${definition}-animation-name, var(--jumi-animation-name))`,
+          `var(${cssEscape(`--jumi-slot-${key}-animation-name`)}, var(--${definition}-animation-name, var(--jumi-animation-name)))`,
+        )
+      : value
 
   return shorthandParts.reduce(
     (text, part) =>
@@ -276,7 +308,7 @@ const namedHoist = (own: Declaration[], value: string, key: string) => {
         `var(${hoistedName(key)}-${part}, `,
         `var(${cssEscape(`--jumi-label-${name}-${part}`)}, `,
       ),
-    value,
+    selectedValue,
   )
 }
 
@@ -462,7 +494,277 @@ const defaultsLayerFor = (root: Root) => {
  * inspector's matched-style response fell from 965 KB to 413 KB, and recalc from 976 ms to 392 ms
  * over 1,000 animating elements. `engineering/research/style-cost.md` has the whole account.
  */
-const hoist = (staged: Collection<string>, rules: Rule[]) => {
+
+/**
+ * A timing phrase the model recorded for this pass: `--jumi-segment-<hash>: <address> <phrase>`.
+ *
+ * The model records **intent** and this pass acts on it, because every fact the action needs is a fact about
+ * the finished stylesheet: which instances an address reaches, and what the definition they select looks
+ * like. A handler in the model sees only the motions compiled before it — measured, and with the candidate
+ * list reversed it selected nothing at all.
+ */
+const SEGMENT_RECORD = /^--jumi-segment-[\w-]+$/
+
+/** A recorded timing phrase's segments: the offset, and the easing governing the segment after it. */
+type Segment = { offset: number; value: string }
+
+/** The keyframe rule a definition was emitted as, or null when nothing emitted it. */
+const keyframeOf = (root: Root, name: string): AtRule | null => {
+  let found: AtRule | null = null
+
+  root.walkAtRules('keyframes', atRule => {
+    if (atRule.params.trim() === name) found = atRule
+  })
+
+  return found
+}
+
+/**
+ * The numeric offsets a keyframe selector names, or null when it names something this has no business
+ * matching.
+ *
+ * **Structural, not textual**, because a keyframe selector is not a number: `from` and `to` are 0% and 100%,
+ * one rule can group several selectors (`10%, 30%, 50%`), and a range keyframe names offsets no segment
+ * phrase can mean. Normalizing here is what lets a phrase's offsets — always numbers — be compared against
+ * emitted CSS at all.
+ */
+const keyframeOffsets = (selector: string): null | number[] => {
+  const offsets = selector.split(',').map(part => {
+    const text = part.trim().toLowerCase()
+
+    if (text === 'from') return 0
+    if (text === 'to') return 100
+
+    const offset = Number.parseFloat(text)
+
+    return Number.isFinite(offset) ? offset : null
+  })
+
+  return offsets.every(offset => offset !== null) ? (offsets as number[]) : null
+}
+
+/**
+ * A definition, cloned with the phrase's easings written into the frames it names, or null when the phrase
+ * cannot be satisfied.
+ *
+ * Cloned from the **emitted** keyframe rather than from a frame list kept beside it, so specialization works
+ * against the thing that ships — every model transformation already applied — and nothing has to be held in
+ * step with it. That is what removed the model-side registries this feature was first planned around, and it
+ * is why an effect specializes for free: its frames are emitted with numeric offsets like any other.
+ *
+ * **Atomic.** Every offset the phrase names has to exist in the definition, or nothing is cloned at all. A
+ * phrase naming `0` and `100` that attached only one of them would look accepted while part of its intent
+ * silently vanished, and half a specialization is harder to notice than none. An offset that cannot be
+ * matched is unsupported rather than wrong, so it is silent for now — the same answer the model gives the
+ * unaddressed form.
+ *
+ * **Splitting is the sharp edge.** A keyframe rule may group selectors, and a timing function attaches to
+ * the whole rule, so targeting one offset inside a group means splitting that group into per-easing rules.
+ * This is why offsets are normalized before anything is compared.
+ *
+ * `null` is one operational answer — *do not select a clone* — for three causes the pass never needs to tell
+ * apart: an unsupported shape, an unmatched offset, and a specialization that would change nothing.
+ */
+const specialize = (root: Root, definition: string, segments: Segment[]) => {
+  const name = `${definition}-segment-${shorthash2(
+    segments.map(segment => `${segment.offset}:${segment.value}`).join('|'),
+  )}`
+
+  if (keyframeOf(root, name)) return name
+
+  const original = keyframeOf(root, definition)
+
+  if (!original) return null
+
+  const available = new Set(
+    (original.nodes ?? [])
+      .filter(node => node.type === 'rule')
+      .flatMap(frame => keyframeOffsets(frame.selector) ?? []),
+  )
+
+  if (!segments.every(segment => available.has(segment.offset))) return null
+
+  const clone = original.clone()
+  const rebuilt: ChildNode[] = []
+  let written = 0
+
+  for (const frame of clone.nodes ?? []) {
+    const rule = frame.type === 'rule' ? frame : null
+    const offsets = rule ? keyframeOffsets(rule.selector) : null
+
+    if (!rule || !offsets) {
+      rebuilt.push(frame)
+
+      continue
+    }
+
+    // One rule per easing, in the order the selectors were written. A frame nothing targets stays whole,
+    // which is the common case and keeps the clone identical to the definition it came from.
+    const groups = new Map<null | string, number[]>()
+
+    for (const offset of offsets) {
+      const easing =
+        segments.find(segment => segment.offset === offset)?.value ?? null
+
+      groups.set(easing, [...(groups.get(easing) ?? []), offset])
+    }
+
+    if (groups.size === 1 && groups.has(null)) {
+      rebuilt.push(frame)
+
+      continue
+    }
+
+    for (const [easing, group] of groups) {
+      const split = rule.clone()
+
+      split.selector = group.map(offset => `${offset}%`).join(', ')
+
+      if (easing) {
+        split.append({ prop: 'animation-timing-function', value: easing })
+        written += 1
+      }
+
+      rebuilt.push(split)
+    }
+  }
+
+  if (!written) return null
+
+  clone.removeAll()
+
+  for (const node of rebuilt) clone.append(node)
+
+  clone.params = name
+  original.parent?.append(clone)
+
+  return name
+}
+
+/**
+ * The instances an address reaches: a name, or a property scope.
+ *
+ * Both go through `instanceKeys`, the one derivation of what a rule means. That is what makes a property
+ * address wider than a name in exactly the right way: a rule that named its motion is both its named instance
+ * *and* one of the property's instances, so `/rotate` reaches it either way, while `/first` reaches only the
+ * rule whose label carries that word.
+ */
+const addressedInstances = (root: Root, address: string) => {
+  const found: Array<{ definition: string; key: string }> = []
+
+  root.walkRules(rule => {
+    const own = ownDeclarations(rule)
+    const activation = own.find(node => ACTIVATED_SLOT.test(node.prop))
+
+    if (!activation) return
+
+    const base = ACTIVATED_SLOT.exec(activation.prop)?.[1]
+    const definition = activation.value
+
+    if (!base) return
+
+    // A definition is `jumi-<attribute>` for an effect or a composed tween and `jumi-<attribute>-<id>` for a
+    // phrase — and the id is a hash, so it cannot be mistaken for another attribute's.
+    const structural =
+      structuralAddress(address) &&
+      (definition === `jumi-${address}` ||
+        definition.startsWith(`jumi-${address}-`))
+
+    const named = own.find(node => LABELLED_SLOT.test(node.prop))?.value
+
+    if (!structural && named !== address) return
+
+    for (const key of instanceKeys(rule, base)) found.push({ definition, key })
+  })
+
+  return found
+}
+
+/**
+ * Register a selection non-inheriting, where the element can see it.
+ *
+ * The model registers everything else, and this is the exception that shows why it normally does: a
+ * registration written by this pass arrives after the composition has been built, which is fatal for a
+ * variable the composition resolves *during* the pass. Nothing resolves a selection until the browser does,
+ * and a custom-property registration applies document-wide wherever it sits — so here it is safe, and here it
+ * has to be, because the instance a selection is keyed by is only known once the sheet is whole.
+ */
+const registerSelection = (root: Root, variable: string) => {
+  const layers: AtRule[] = []
+
+  root.walkAtRules('layer', atRule => {
+    if (atRule.params.trim() === 'base') layers.push(atRule)
+  })
+
+  const registration = postcss.atRule({ name: 'property', params: variable })
+
+  registration.append({ prop: 'inherits', value: 'false' })
+  registration.append({ prop: 'syntax', value: '"*"' })
+
+  const base = layers[0] ?? null
+
+  if (base) base.append(registration)
+  else
+    root.prepend(
+      postcss.atRule({
+        name: 'layer',
+        nodes: [registration],
+        params: 'base',
+      }),
+    )
+}
+
+/**
+ * Turn every recorded timing phrase into the selection it asks for, and answer with them by instance key.
+ *
+ * The return value is what the hoist reads: a motion's name position references its selection **only when
+ * something actually selected one**, so a motion nothing eased is untouched and no instance pays for a link
+ * it does not use.
+ */
+const segmentSelections = (root: Root) => {
+  const selected = new Map<string, string>()
+  const variables = new Set<string>()
+
+  root.walkRules(rule => {
+    for (const declaration of ownDeclarations(rule)) {
+      if (!SEGMENT_RECORD.test(declaration.prop)) continue
+
+      const [address, ...rest] = declaration.value.trim().split(' ')
+      const segments: Segment[] = parsePhrase(rest.join(' ')) ?? []
+
+      // Read, then gone: a record is intent, not output. Left in place it would ship a property nothing
+      // resolves, which is the obligation `--jumi-staging-*` is already under.
+      declaration.remove()
+
+      if (!address || !segments.length) continue
+
+      for (const { definition, key } of addressedInstances(root, address)) {
+        const specialized = specialize(root, definition, segments)
+
+        if (!specialized) continue
+
+        const variable = cssEscape(`--jumi-slot-${key}-animation-name`)
+
+        // Written back onto **this** rule — the one carrying the phrase — and never onto the motion's. That
+        // ownership is what keeps a selection element-local: declared on the motion's rule it would reach
+        // every element animating that motion, which is the leak the design exists to prevent.
+        rule.append({ prop: variable, value: specialized })
+        selected.set(key, specialized)
+        variables.add(variable)
+      }
+    }
+  })
+
+  for (const variable of variables) registerSelection(root, variable)
+
+  return selected
+}
+
+const hoist = (
+  staged: Collection<string>,
+  rules: Rule[],
+  selected: ReadonlyMap<string, string>,
+) => {
   const entries = Object.fromEntries(
     SHORTHAND.map(part => [part, splitTopLevel(staged[part] ?? '')]),
   )
@@ -510,7 +812,9 @@ const hoist = (staged: Collection<string>, rules: Rule[]) => {
         if (!value || published.has(prop)) continue
 
         published.add(prop)
-        rule.append(postcss.decl({ prop, value: namedHoist(own, value, key) }))
+        rule.append(
+          postcss.decl({ prop, value: namedHoist(own, value, key, selected) }),
+        )
       }
     }
 
@@ -828,12 +1132,18 @@ export function finalize(
     // publication the hoist appends (`--jumi-slot-<slot>`) is exactly what the emission has to
     // replay; without it the emitted composition applies and animates nothing, which is the failure
     // this pass already paid for once on the element side.
+    const selected = segmentSelections(root)
+
     const hoisted =
       kind === 'animations'
-        ? hoist(staged, [
-            ...(rules ?? []),
-            ...new Set(stagedTransitions.map(entry => entry.rule)),
-          ])
+        ? hoist(
+            staged,
+            [
+              ...(rules ?? []),
+              ...new Set(stagedTransitions.map(entry => entry.rule)),
+            ],
+            selected,
+          )
         : null
     const { aggregate, substrate } = data[kind]
 

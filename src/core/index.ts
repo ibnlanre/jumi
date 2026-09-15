@@ -183,7 +183,7 @@ export const addressableName = (name: string) =>
  * `nameSlot` records it and the pass reports it — because the alternative is a control that looks like
  * it works.
  */
-const structuralAddress = (token: string) =>
+export const structuralAddress = (token: string) =>
   Object.hasOwn(propertyVariables, token) ||
   Object.hasOwn(effectKeyframes, token)
 
@@ -375,6 +375,33 @@ export function createJumiModel({
    */
   const shadowedName = (name: string): CssInJs => ({
     [cssEscape(`--jumi-name-${shorthash2(name)}-shadowed`)]: name,
+  })
+
+  /**
+   * Record an addressed timing phrase, as intent for the pass to act on.
+   *
+   * The handler cannot resolve this itself, and that is the whole shape of the feature. A control's
+   * declarations are handed to the framework once, when that candidate is compiled, and a candidate is never
+   * revisited — so a handler that enumerates the motions an address reaches can only ever see the ones
+   * compiled *before* it. Measured on the differential: with the candidate list reversed, an addressed phrase
+   * selected nothing at all and both motions read their base definitions.
+   *
+   * So the model records **what the author asked for** — an address, and the segments — and nothing else. The
+   * pass turns that into a specialized definition and an instance selection, because it is the only place
+   * that sees the finished stylesheet.
+   *
+   * Property name and value are one fact each, in the shape the name records already use: the hash keeps two
+   * addresses on one rule from overwriting each other, and it is inert — nothing resolves it. `segmentIntent`
+   * in the pass is its only reader, and it drops the declaration once it has.
+   *
+   * The address and the phrase share the value, separated by the first space, because the address is
+   * guaranteed whitespace-free (`addressableName`) and the phrase may contain anything else — including `|`,
+   * `:` and commas, all of which an easing function uses. Nothing has to be escaped, and nothing has to be
+   * unescaped: a modifier carrying a dot would not survive being written into a property name.
+   */
+  const segmentRecord = (modifier: string, phrase: string): CssInJs => ({
+    [cssEscape(`--jumi-segment-${shorthash2(`${modifier}|${phrase}`)}`)]:
+      `${modifier} ${phrase}`,
   })
 
   /**
@@ -1008,18 +1035,29 @@ export function createJumiModel({
       return (value, { modifier }) => {
         // An unsupported shape emits nothing, the way a candidate the framework does not recognize emits
         // nothing — the same answer the motion matcher gives a non-phrase value
-        // (`isPhrase(value) ? fn(value, extra) : {}` in the host). A phrase here is *segment easing*, which
-        // is addressed to a motion (`/[0:ease-out]/reveal`) or to a property (`/[0:ease-out]/rotate`); with
-        // no address there is nothing to specialize, and writing the phrase into the chain is the one
-        // outcome that cannot be allowed: the shorthand is a single declaration, so it becomes invalid at
-        // computed-value time and the element reports `animation-name: none` — no motion at all, rather
-        // than a motion that misbehaves. When the segment-easing path lands, this is where an addressed
-        // phrase stops returning early.
+        // (`isPhrase(value) ? fn(value, extra) : {}` in the host).
+        //
+        // A timing phrase with an address is not unsupported: it is segment easing, recorded as **intent**
+        // for the pass to act on (`segmentRecord`). Anyone else, and every unaddressed phrase, still emits
+        // nothing: a phrase is not a `<time>` or an `<easing-function>`, and writing one into the chain makes
+        // the whole `animation` shorthand invalid at computed-value time — the element reports
+        // `animation-name: none` and the motion vanishes rather than misbehaving.
+        //
+        // The handler deliberately does **not** resolve the instances an address reaches. It cannot: a
+        // candidate is compiled once and never revisited, so it would only ever see the motions that happened
+        // to be compiled before it — measured, and it lost every selection when the candidate order was
+        // reversed.
         //
         // No warning, deliberately. There is nothing contradictory to report: Jumi has no address, so it has
         // no intent to act on, and explaining an unsupported shape is not diagnostics — it is a second
         // language for the same candidate. Warnings stay where acceptance proves the author wrong.
-        if (isPhrase(value) && carriedByShorthand(part)) return {}
+        if (isPhrase(value) && carriedByShorthand(part)) {
+          if (part !== 'animation-timing-function' || !modifier) return {}
+
+          if (!addressableName(modifier)) return refusedName(modifier)
+
+          return segmentRecord(modifier, value)
+        }
 
         if (!modifier) return { [`--jumi-${part}`]: value }
 
@@ -1149,7 +1187,7 @@ export function createJumiModel({
  */
 export const isPhrase = (value: string) => parsePhrase(value) !== null
 
-function parsePhrase(value: string): Frame[] | null {
+export function parsePhrase(value: string): Frame[] | null {
   if (!/^\s*\d+(?:\.\d+)?(?:\s*,\s*\d+(?:\.\d+)?)*\s*:/.test(value)) return null
 
   const frames = new Map<number, string>()

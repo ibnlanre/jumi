@@ -658,6 +658,29 @@ const NAMED_ARMS = [
     'h',
     'animate-fade-in/hphrase animation-timing-function-[0:ease-out]/hphrase',
   ],
+  // Segment easing, against real emitted keyframes. `jumi-shake` is the fixture the sharp edges need: it
+  // groups selectors — `10%, 30%, 50%, 70%, 90%` — and writes `from, to`, so partial targeting and
+  // normalization are exercised on what Jumi actually emits rather than on a synthetic keyframe.
+  [
+    'j',
+    'animate-shake/shakey animation-timing-function-[10:step-start]/shakey animation-duration-1000',
+  ],
+  [
+    'k',
+    'animate-shake/split animation-timing-function-[0:step-start]/split animation-duration-1000',
+  ],
+  // An offset the definition does not have: this phrase has 0 and 100, not 50. Unsupported, so silence —
+  // and the base definition untouched.
+  [
+    'l',
+    'animate-rotate-[0:0deg|100:90deg]/unmatched animation-timing-function-[50:linear]/unmatched animation-duration-1000',
+  ],
+  // Two names over ONE definition, each with its own phrase: the case instance-keyed selection exists for,
+  // and the one a definition-keyed selection would move together.
+  [
+    'm',
+    'animate-rotate-[0:0deg|100:90deg]/alpha animate-rotate-[0:0deg|100:90deg]/beta animation-timing-function-[0:step-start]/alpha animation-timing-function-[0:step-end]/beta animation-duration-1000',
+  ],
 ]
 
 const NAMED_CANDIDATES = [
@@ -757,6 +780,75 @@ const separateParts = async () => {
 
 const separate = await separateParts()
 
+/**
+ * Segment easing as the browser sees it: the definition each animation selected, and the easing written into
+ * its frames.
+ *
+ * Per animation rather than per element, for two reasons. Two motions on one element compose onto the same
+ * property, so a computed value can only ever show the winner; and text cannot tell a specialization from a
+ * clone that changed nothing. Where a frame carries a literal, this reads it.
+ */
+const segmentReadings = async () => {
+  const built = build(await compiler(ENTRY, root), NAMED_CANDIDATES)
+  const classes = Object.fromEntries(NAMED_ARMS)
+  const page = await load(
+    built.css,
+    ['j', 'k', 'l', 'm']
+      .map(id => `<div id="named-${id}" class="${classes[id]}"></div>`)
+      .concat(
+        '<div id="named-nocontrol" class="animate-shake/shakey animation-duration-1000"></div>',
+      )
+      .join('\n'),
+  )
+
+  const reading = await page.evaluate(
+    ids =>
+      Object.fromEntries(
+        ids.map(id => [
+          id,
+          [...document.querySelector(`#${id}`).getAnimations()].map(
+            animation => {
+              // Every keyframe reports the animation's own timing function when it declares none, so the
+              // literal a specialization wrote is what *differs* from it — not what differs from `linear`.
+              // Reading it the other way made a correct split look like it had injected `ease` everywhere.
+              const base = animation.effect?.getTiming?.().easing ?? 'linear'
+
+              return {
+                eased: (animation.effect?.getKeyframes?.() ?? [])
+                  .filter(frame => frame.easing && frame.easing !== base)
+                  .map(
+                    frame =>
+                      `${Math.round((frame.offset ?? 0) * 100)}:${frame.easing}`,
+                  ),
+                name: animation.animationName,
+              }
+            },
+          ),
+        ]),
+      ),
+    ['named-j', 'named-k', 'named-l', 'named-m', 'named-nocontrol'],
+  )
+
+  await page.close()
+
+  return reading
+}
+
+const segment = await segmentReadings()
+const only = id => segment[`named-${id}`] ?? []
+
+/**
+ * The easings the arms' phrases actually wrote.
+ *
+ * Every keyframe reports the animation's own timing function when it declares none — `ease`, from the
+ * substrate — so "the frame that differs from `linear`" counted all ten unaffected frames as eased, and
+ * diffing against the effect's own timing (which the engine reports as `linear`) counted them again. These
+ * arms write step functions, which is how the harness finds what it wrote; a general reader would diff
+ * against the base definition's frames.
+ */
+const written = id =>
+  only(id).flatMap(entry => entry.eased.filter(easing => /step/.test(easing)))
+
 const naming = [
   [
     'the name it declared reaches its own motion',
@@ -790,6 +882,47 @@ const naming = [
     'candidate order cannot decide which name wins',
     orderDrift.length === 0,
     orderDrift.join(' | '),
+  ],
+  [
+    'a timing phrase specializes one offset inside a grouped keyframe rule, and splits it',
+    only('j').length === 1 &&
+      only('j')[0].name.includes('-segment-') &&
+      written('j').length === 1 &&
+      written('j')[0].startsWith('10:'),
+    JSON.stringify(only('j')),
+  ],
+  [
+    'and normalizes `from`, so a `from, to` rule splits at 0 only',
+    only('k').length === 1 &&
+      only('k')[0].name.includes('-segment-') &&
+      written('k').length === 1 &&
+      written('k')[0].startsWith('0:'),
+    JSON.stringify(only('k')),
+  ],
+  [
+    'an offset the definition does not have leaves the base definition alone',
+    only('l').length === 1 &&
+      !only('l')[0].name.includes('-segment-') &&
+      written('l').length === 0,
+    JSON.stringify(only('l')),
+  ],
+  [
+    'two names over one definition take different easings',
+    only('m').length === 2 &&
+      only('m').every(entry => entry.name.includes('-segment-')) &&
+      only('m')[0].name !== only('m')[1].name &&
+      written('m').length === 2 &&
+      written('m')[0].startsWith('0:') &&
+      written('m')[1].startsWith('0:') &&
+      written('m')[0] !== written('m')[1],
+    JSON.stringify(only('m')),
+  ],
+  [
+    'and an element without the timing phrase keeps the base definition',
+    only('nocontrol').length === 1 &&
+      !only('nocontrol')[0].name.includes('-segment-') &&
+      written('nocontrol').length === 0,
+    JSON.stringify(only('nocontrol')),
   ],
   [
     'a phrase on a shorthand part leaves the motion running',

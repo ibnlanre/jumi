@@ -230,7 +230,7 @@ const keyframeOf = (root, name) => {
  * same name, which is what deduplication means here: a keyframe is shared exactly when the declaration is.
  */
 const specialize = (root, definition, segments) => {
-  const name = `${definition}-seg-${hash(
+  const name = `${definition}-segment-${hash(
     `${definition}|${segments.map(([at, easing]) => `${at}:${easing}`).join('|')}`,
   )}`
   const existing = keyframeOf(root, name)
@@ -1058,7 +1058,7 @@ await fanBrowser.close()
  * the instance** — `--jumi-slot-<instance>-animation-name` — read first in the hoist's *name* position:
  *
  *   --jumi-<definition>-animation-name → jumi-<definition>                     the base, unchanged
- *   --jumi-slot-<instance>-animation-name → jumi-<definition>-seg-<hash>       what the instance selects
+ *   --jumi-slot-<instance>-animation-name → jumi-<definition>-segment-<hash>       what the instance selects
  *
  * The name position gains one link and nothing else; the timing chain is not touched, which is the hard rule.
  *
@@ -1226,7 +1226,9 @@ if (!first) {
     console.log(`     hoist reads: ${applied.hoist}`)
 
     for (const [id, names] of Object.entries(readings)) {
-      const specialized = names.filter(name => name.includes('-seg-')).length
+      const specialized = names.filter(name =>
+        name.includes('-segment-'),
+      ).length
 
       console.log(
         `     #${id.padEnd(5)} ${names.join(', ') || '(nothing animates)'}   ${
