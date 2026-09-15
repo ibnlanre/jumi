@@ -646,7 +646,12 @@ try {
   await page.locator('[data-ease-coordinate="1"]').dispatchEvent('change')
   await ready()
   await page.locator('button[data-inspector=element]').click()
-  if (!(await page.locator('[data-base-section=Transform]').evaluate(el=>el.open))) await page.locator('[data-base-section=Transform] summary').click()
+  if (
+    !(await page
+      .locator('[data-base-section=Transform]')
+      .evaluate(el => el.open))
+  )
+    await page.locator('[data-base-section=Transform] summary').click()
   const baseField = async (property, value) => {
     const field = page.locator('[data-base="' + property + '"]')
     await field.fill(value)

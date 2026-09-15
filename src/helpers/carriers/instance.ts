@@ -1,6 +1,6 @@
-import type { Declaration, Rule } from 'postcss';
+import type { Declaration, Rule } from 'postcss'
 
-import cssEscape from 'css.escape';
+import cssEscape from 'css.escape'
 
 /**
  * The instance key, and its parser — the one place the format is written down.

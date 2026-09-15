@@ -2,18 +2,45 @@
 <html>
   <head>
     <style>
-      @keyframes a { from { width: 10px } to { width: 100px } }
-      @keyframes b { from { width: 10px } to { width: 300px } }
+      @keyframes a {
+        from {
+          width: 10px;
+        }
+        to {
+          width: 100px;
+        }
+      }
+      @keyframes b {
+        from {
+          width: 10px;
+        }
+        to {
+          width: 300px;
+        }
+      }
 
       /* Two animations on one property. `replace` is the default: whichever is
          listed last supplies the value. Nothing else in the declaration can
          outrank position. */
-      #b-last { animation: a 1ms forwards, b 1ms forwards; }
-      #a-last { animation: b 1ms forwards, a 1ms forwards; }
+      #b-last {
+        animation:
+          a 1ms forwards,
+          b 1ms forwards;
+      }
+      #a-last {
+        animation:
+          b 1ms forwards,
+          a 1ms forwards;
+      }
 
       /* Does metadata change it? `animation-composition: add` is the only other
          lever, and it changes the *operation*, not the winner. */
-      #add { animation: a 1ms forwards, b 1ms forwards; animation-composition: add; }
+      #add {
+        animation:
+          a 1ms forwards,
+          b 1ms forwards;
+        animation-composition: add;
+      }
     </style>
   </head>
   <body>

@@ -20,8 +20,14 @@
       html:active-view-transition-type(slide)::view-transition-new(root) { animation-name: vt-slide; }
       @keyframes vt-slide { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
     </style>
-    <link rel="stylesheet" href="/jumi.css" />
-    <link rel="stylesheet" href="{{SHEET}}" />
+    <link
+      rel="stylesheet"
+      href="/jumi.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{SHEET}}"
+    />
     <script>
       /**
        * The destination-side recorder. `pagereveal` fires before the first paint of the incoming
@@ -31,8 +37,12 @@
        */
       window.__vtTrace = []
 
-      window.addEventListener('pagereveal', (event) => {
-        window.__vtTrace.push({ at: 'pagereveal', hasTransition: Boolean(event.viewTransition), ...snapshot() })
+      window.addEventListener('pagereveal', event => {
+        window.__vtTrace.push({
+          at: 'pagereveal',
+          hasTransition: Boolean(event.viewTransition),
+          ...snapshot(),
+        })
 
         if (!event.viewTransition) return
 
@@ -64,19 +74,20 @@
         ]) {
           const cs = getComputedStyle(document.documentElement, pseudo)
 
-          pseudos[pseudo] = cs.length === 0
-            ? { resolved: false }
-            : {
-                markers: markers(cs),
-                mixBlendMode: cs.mixBlendMode,
-                name: cs.animationName,
-                opacity: cs.opacity,
-                resolved: true,
-                transform: cs.transform,
-              }
+          pseudos[pseudo] =
+            cs.length === 0
+              ? { resolved: false }
+              : {
+                  markers: markers(cs),
+                  mixBlendMode: cs.mixBlendMode,
+                  name: cs.animationName,
+                  opacity: cs.opacity,
+                  resolved: true,
+                  transform: cs.transform,
+                }
         }
 
-        const matches = (selector) => {
+        const matches = selector => {
           try {
             return document.documentElement.matches(selector)
           } catch {
@@ -91,12 +102,21 @@
           // Which document's stylesheet this page actually linked. A run where the pseudo markers
           // are all empty is ambiguous on its own; this says the sheet arrived.
           sheets: {
-            from: getComputedStyle(document.documentElement).getPropertyValue('--probe-from-loaded').trim(),
-            to: getComputedStyle(document.documentElement).getPropertyValue('--probe-to-loaded').trim(),
+            from: getComputedStyle(document.documentElement)
+              .getPropertyValue('--probe-from-loaded')
+              .trim(),
+            to: getComputedStyle(document.documentElement)
+              .getPropertyValue('--probe-to-loaded')
+              .trim(),
           },
-          animations: document.getAnimations()
-            .filter(a => (a.effect?.pseudoElement ?? '').startsWith('::view-transition'))
-            .map(a => `${a.effect.pseudoElement} ${a.animationName ?? ''}`.trim()),
+          animations: document
+            .getAnimations()
+            .filter(a =>
+              (a.effect?.pseudoElement ?? '').startsWith('::view-transition'),
+            )
+            .map(a =>
+              `${a.effect.pseudoElement} ${a.animationName ?? ''}`.trim(),
+            ),
         }
       }
 
@@ -110,8 +130,14 @@
         const found = {}
 
         for (const name of [
-          '--probe-from-old', '--probe-from-new', '--probe-from-pair', '--probe-from-group',
-          '--probe-to-old', '--probe-to-new', '--probe-to-pair', '--probe-to-group',
+          '--probe-from-old',
+          '--probe-from-new',
+          '--probe-from-pair',
+          '--probe-from-group',
+          '--probe-to-old',
+          '--probe-to-new',
+          '--probe-to-pair',
+          '--probe-to-group',
         ]) {
           const value = cs.getPropertyValue(name).trim()
 
@@ -127,7 +153,11 @@
       <div class="tile hero">hero</div>
       <div class="tile">to b</div>
       <div class="tile">z</div>
-      <a id="back" href="/cross-from.html">back to a</a>
+      <a
+        id="back"
+        href="/cross-from.html"
+        >back to a</a
+      >
     </main>
   </body>
 </html>

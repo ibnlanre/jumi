@@ -3,11 +3,11 @@ import { describe, expect, it } from 'vitest'
 import { finalizeCss } from '@/helpers/carriers'
 import { ACTIVATED_SLOT } from '@/helpers/carriers/instance'
 import {
-    identityAccepted,
-    viewTransitionInvalidMarker,
-    viewTransitionMarker,
-    viewTransitionProducts,
-    viewTransitionStaging,
+  identityAccepted,
+  viewTransitionInvalidMarker,
+  viewTransitionMarker,
+  viewTransitionProducts,
+  viewTransitionStaging,
 } from '@/helpers/carriers/view-transition'
 
 import postcss from 'postcss'
@@ -63,8 +63,7 @@ const CONTROL = '--jumi-animation-duration: 300ms'
 /** The classifier the finalizer passes in: a staged rule is motion-bearing if it activates a slot. */
 const isMotion = (rule: postcss.Rule) =>
   (rule.nodes ?? []).some(
-    node =>
-      node.type === 'decl' && ACTIVATED_SLOT.test(node.prop),
+    node => node.type === 'decl' && ACTIVATED_SLOT.test(node.prop),
   )
 
 /**

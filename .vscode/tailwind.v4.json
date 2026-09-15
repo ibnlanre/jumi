@@ -11,9 +11,7 @@
           "url": "https://tailwindcss.com/docs/functions-and-directives#import-directive"
         }
       ],
-      "descriptors": [
-        "@import <string> [source(<source-type>)]?"
-      ]
+      "descriptors": ["@import <string> [source(<source-type>)]?"]
     },
     {
       "name": "@theme",

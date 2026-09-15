@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
+import { addressableName } from '@/core'
 import { instanceKey, parseInstanceKey } from '@/helpers/carriers/instance'
 import { effectKeyframes } from '@/keyframes/effects'
 import { propertyVariables } from '@/variables/property'
 
-import { addressableName } from '@/core'
 import cssEscape from 'css.escape'
 
 /**
@@ -50,25 +50,25 @@ const OVERLAPS = VOCABULARY.flatMap(attribute =>
 /** Names to try: adversarial by construction, and the `foo-` spellings the overlaps make possible. */
 const NAMES = [
   ...new Set([
+    '2fast',
+    '5-flick',
+    '👍emoji',
     'a',
+    'café',
     'flick',
     'foo',
+    'foo,bar',
+    'foo--bar',
     'foo-animation-duration',
     'foo-bar-baz',
-    'loop',
-    '5-flick',
-    'foo--bar',
     'foo.bar',
-    'foo,bar',
-    '2fast',
-    'café',
+    'loop',
     '日本語',
-    '👍emoji',
-    ...VOCABULARY.slice(0, 20),
     ...OVERLAPS.slice(0, 30).flatMap(([attribute, suffix]) => [
       `foo-${attribute}`,
       `foo-${attribute.slice(0, -(suffix.length + 1))}`,
     ]),
+    ...VOCABULARY.slice(0, 20),
   ]),
 ].filter(addressableName)
 
@@ -146,9 +146,9 @@ describe('the instance key', () => {
     )
 
     // And the pair that killed the readable-but-undelimited one: a name whose tail is another instance's id.
-    expect(instanceKey('rotate-x', 'rotate', 'foo-backdrop-filter-hue-rotate')).not.toBe(
-      instanceKey('rotate', 'rotate', 'foo-backdrop-filter-hue'),
-    )
+    expect(
+      instanceKey('rotate-x', 'rotate', 'foo-backdrop-filter-hue-rotate'),
+    ).not.toBe(instanceKey('rotate', 'rotate', 'foo-backdrop-filter-hue'))
   })
 
   it('never mistakes a definition or an effect for a named instance', () => {
@@ -163,20 +163,41 @@ describe('the instance key', () => {
       'x-',
       '2a-b',
     ])
-      expect(parseInstanceKey(notAnInstance), notAnInstance).toBeNull()
+      // The value carries the input, so a failure says which one it was without a message argument.
+      expect({
+        input: notAnInstance,
+        parsed: parseInstanceKey(notAnInstance),
+      }).toEqual({
+        input: notAnInstance,
+        parsed: null,
+      })
   })
 
   it('takes no character away from a name that was legal before', () => {
     // The whole point of a length prefix over a delimiter: nothing is reserved. A name may hold the sequence
     // the rejected alternative needed (`--`), the characters CSS escapes, and anything outside ASCII.
-    for (const name of ['foo--bar', 'foo.bar', 'foo:bar', 'foo)bar', '日本語', '👍emoji']) {
+    for (const name of [
+      'foo--bar',
+      'foo.bar',
+      'foo:bar',
+      'foo)bar',
+      '日本語',
+      '👍emoji',
+    ]) {
       expect(addressableName(name)).toBe(true)
 
       const back = parseInstanceKey(
-        keyOf(variable('rotate', 'Z2excak', name, 'animation-delay'), 'animation-delay'),
+        keyOf(
+          variable('rotate', 'Z2excak', name, 'animation-delay'),
+          'animation-delay',
+        ),
       )
 
-      expect(back?.name, name).toBe(emitted(name))
+      // As above: the name is in the compared value, so the failure names the character that moved it.
+      expect({ emitted: emitted(name), parsed: back?.name }).toEqual({
+        emitted: emitted(name),
+        parsed: emitted(name),
+      })
     }
   })
 })

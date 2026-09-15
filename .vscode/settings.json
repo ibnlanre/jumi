@@ -23,7 +23,7 @@
   // `prettier-plugin-astro` — and a bundled copy resolves its own plugin set, which is the divergence the
   // project config exists to remove. `prettier.enable` is resource-scoped, so this override is enough.
   "[astro]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   // JSON is the case that shows why a named default is not enough on its own. The lint path applies Prettier
   // to `js`, `mjs`, `cjs` and `ts` and **not** to JSON — `EXT.JSON` is declared in `eslint.config.mts` and
@@ -32,11 +32,11 @@
   // `eslint --fix` leaves a messy JSON file untouched, `prettier --write` does not.
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "prettier.enable": true,
+    "prettier.enable": true
   },
   "[jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "prettier.enable": true,
+    "prettier.enable": true
   },
   "prettier.enable": false,
   "editor.codeActionsOnSave": {

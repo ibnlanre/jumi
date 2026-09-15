@@ -9,11 +9,19 @@
       extracts them from this file at runtime, so what is measured is the emitted model and not a
       paraphrase of it.
     -->
-    <link rel="stylesheet" href="/jumi.css" />
+    <link
+      rel="stylesheet"
+      href="/jumi.css"
+    />
     <!-- The harness's own view-transition CSS, written by lab.js: style(css). -->
     <style id="vt"></style>
     <style>
-      body { margin: 0; font: 600 14px/1.2 system-ui, sans-serif; }
+      body {
+        margin: 0;
+        font:
+          600 14px/1.2 system-ui,
+          sans-serif;
+      }
       #stage {
         align-items: flex-start;
         display: flex;
@@ -22,7 +30,9 @@
         transition: none;
       }
       /* move: a layout change the browser can only express as a move. */
-      #stage.moved { transform: translateX(160px); }
+      #stage.moved {
+        transform: translateX(160px);
+      }
       .tile {
         background: var(--tile-bg, #4f46e5);
         border-radius: 12px;
@@ -32,12 +42,19 @@
         place-items: center;
         width: 96px;
       }
-      .tile.alt { background: #059669; }
-      .tile.tall { height: 144px; }
+      .tile.alt {
+        background: #059669;
+      }
+      .tile.tall {
+        height: 144px;
+      }
     </style>
   </head>
   <body>
     <main id="stage"></main>
-    <script type="module" src="/lab.js"></script>
+    <script
+      type="module"
+      src="/lab.js"
+    ></script>
   </body>
 </html>

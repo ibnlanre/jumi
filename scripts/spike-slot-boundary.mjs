@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+import { build, compiler, root } from './lib/compile.mjs'
+
+import cssEscape from 'css.escape'
 /**
  * Probe: what makes a readable slot key **exact** rather than merely unlikely to collide?
  *
@@ -34,9 +37,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { build, compiler, root } from './lib/compile.mjs'
-import cssEscape from 'css.escape'
-
 /* ────────────────────────────────────────────────────────────────────────────────────────────────────
  * The corpus: the real attribute vocabulary, and names that attack the boundary
  * ────────────────────────────────────────────────────────────────────────────────────────────────── */
@@ -54,12 +54,12 @@ const read = relative => fs.readFileSync(path.join(root, relative), 'utf8')
 const VOCABULARY = [
   ...new Set([
     ...[
+      ...read('src/keyframes/effects.ts').matchAll(/^ {2}'([\w-]+)': \{$/gm),
+    ].map(match => match[1]),
+    ...[
       ...read('src/variables/property.ts').matchAll(
         /variable: '--jumi-([\w-]+)'/g,
       ),
-    ].map(match => match[1]),
-    ...[
-      ...read('src/keyframes/effects.ts').matchAll(/^ {2}'([\w-]+)': \{$/gm),
     ].map(match => match[1]),
   ]),
 ]
@@ -116,16 +116,19 @@ const MAX_OVERLAP_NAMES = 60
 const NAMES = [
   ...new Set([
     ...ADVERSARIAL,
-    ...OVERLAPS.slice(0, MAX_OVERLAP_NAMES / 2).flatMap(([attribute, suffix]) => [
-      `foo-${attribute}`,
-      `foo-${attribute.slice(0, -(suffix.length + 1))}`,
-    ]),
+    ...OVERLAPS.slice(0, MAX_OVERLAP_NAMES / 2).flatMap(
+      ([attribute, suffix]) => [
+        `foo-${attribute}`,
+        `foo-${attribute.slice(0, -(suffix.length + 1))}`,
+      ],
+    ),
     ...VOCABULARY.slice(0, MAX_OVERLAP_NAMES / 2),
   ]),
 ]
 
 /** `addressableName` refuses whitespace and control characters, so only those names are reachable. */
-const addressable = name => name.length > 0 && !/[\s\u0000-\u001f\u007f]/.test(name)
+const addressable = name =>
+  name.length > 0 && !/[\s\u0000-\u001f\u007f]/.test(name)
 
 const LEGAL = NAMES.filter(addressable)
 
@@ -164,12 +167,8 @@ const delimited = (
     take: (text, count) => text.slice(0, count),
   },
 ) => ({
-  about: 'length prefix, name, id, attribute — the prefix is the parse boundary',
-  encode: (attribute, id, name) => {
-    const text = emitted(name)
-
-    return `${unit.size(text)}-${text}-${id}-${attribute}`
-  },
+  about:
+    'length prefix, name, id, attribute — the prefix is the parse boundary',
   decode: key => {
     const cut = key.indexOf('-')
 
@@ -192,6 +191,11 @@ const delimited = (
 
     return { attribute: body.slice(end + 1), id: body.slice(0, end), name }
   },
+  encode: (attribute, id, name) => {
+    const text = emitted(name)
+
+    return `${unit.size(text)}-${text}-${id}-${attribute}`
+  },
 })
 
 const lengthUnits = delimited()
@@ -202,20 +206,24 @@ const codePoints = delimited({
 
 /** The same shape counting the name *before* escaping, which §3 shows is not the text that ships. */
 const rawLength = {
-  about: 'length prefix counting the raw name — broken where escaping changes the text',
-  encode: (attribute, id, name) => `${name.length}-${emitted(name)}-${id}-${attribute}`,
+  about:
+    'length prefix counting the raw name — broken where escaping changes the text',
   decode: lengthUnits.decode,
+  encode: (attribute, id, name) =>
+    `${name.length}-${emitted(name)}-${id}-${attribute}`,
 }
 
 /** A delimiter a name may not contain. */
 const doubled = {
   about: 'double delimiter — exact only if a name cannot contain `--`',
-  encode: (attribute, id, name) => `${emitted(name)}--${id}--${attribute}`,
   decode: key => {
     const [name, id, ...rest] = key.split('--')
 
-    return rest.length === 1 && name && id ? { attribute: rest[0], id, name } : null
+    return rest.length === 1 && name && id
+      ? { attribute: rest[0], id, name }
+      : null
   },
+  encode: (attribute, id, name) => `${emitted(name)}--${id}--${attribute}`,
 }
 
 const SHAPES = { codePoints, doubled, lengthUnits, rawLength, shipped }
@@ -232,9 +240,13 @@ console.log('══ what makes a readable slot key exact?\n')
 console.log(
   `   vocabulary: ${VOCABULARY.length} attributes, ${OVERLAPS.length} overlapping pairs`,
 )
-console.log(`   names: ${LEGAL.length} (adversarial + overlap spellings), ids: ${IDS.length}\n`)
+console.log(
+  `   names: ${LEGAL.length} (adversarial + overlap spellings), ids: ${IDS.length}\n`,
+)
 
-console.log('── 1 · the strict criterion: is `decode` a left inverse of `encode`?\n')
+console.log(
+  '── 1 · the strict criterion: is `decode` a left inverse of `encode`?\n',
+)
 
 for (const [label, shape] of Object.entries(SHAPES)) {
   if (!shape.decode) {
@@ -300,7 +312,9 @@ for (const [label, shape] of Object.entries(SHAPES)) {
 
         if (owner === undefined) claimed.set(key, triple)
         else if (owner !== triple && found.length < 2)
-          found.push(`${key}\n   ${''.padEnd(16)}${owner}\n   ${''.padEnd(16)}${triple}`)
+          found.push(
+            `${key}\n   ${''.padEnd(16)}${owner}\n   ${''.padEnd(16)}${triple}`,
+          )
       }
 
   console.log(
@@ -332,7 +346,9 @@ for (const name of differing.slice(0, 4))
     `      ${JSON.stringify(name)} → ${JSON.stringify(emitted(name))}   ${name.length} → ${emitted(name).length} chars`,
   )
 
-console.log(`   names where UTF-16 units and code points disagree: ${astral.length}`)
+console.log(
+  `   names where UTF-16 units and code points disagree: ${astral.length}`,
+)
 for (const name of astral.slice(0, 3))
   console.log(
     `      ${JSON.stringify(name)}   ${name.length} units, ${[...name].length} points`,
@@ -379,7 +395,9 @@ try {
  * fact about the vocabulary and the part list rather than about any name.
  * ────────────────────────────────────────────────────────────────────────────────────────────────── */
 
-console.log('\n── 4 · stripping the part, for a reader that is not handed one\n')
+console.log(
+  '\n── 4 · stripping the part, for a reader that is not handed one\n',
+)
 
 const PARTS = [
   'animation-composition',
@@ -469,6 +487,6 @@ for (const name of ['flick', 'flick-animation-duration', '日本語']) {
 }
 
 console.log(
-  '\n   the prefix is the only part that is not the author\'s own text: two characters for a name of nine or\n' +
+  "\n   the prefix is the only part that is not the author's own text: two characters for a name of nine or\n" +
     '   fewer, three under a hundred, and nothing at all for an unnamed slot, which keeps `attribute-id`.\n',
 )

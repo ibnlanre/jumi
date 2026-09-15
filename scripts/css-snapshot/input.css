@@ -1,4 +1,4 @@
-@import "tailwindcss" source(none);
+@import 'tailwindcss' source(none);
 
 /* The canonical corpus: an ordinary unprefixed carrier, so the aggregate is read
    once after every slot exists and the byte metric stays readable. The prefixed

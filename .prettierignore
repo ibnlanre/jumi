@@ -1,0 +1,12 @@
+# Generated output that is compared byte for byte, and therefore must never be formatted.
+#
+# `pnpm css:check` recompiles the two corpora and compares them against what is recorded here, so a
+# formatting pass that rewrites these files breaks the check for a reason that has nothing to do with the
+# stylesheet. Measured: a repo-wide `prettier --write` reformatted `snapshot.css`, and the `css` stage failed
+# on `@supports` wrapping and on `color: rgb(...)` becoming `color:rgb(...)`.
+#
+# These are output in the same sense `dist/` is — what the toolchain emits, not source. Most of the other
+# generated paths in this repository are already covered by `.gitignore`, which Prettier honours, so only the
+# tracked ones need to be named.
+scripts/css-snapshot/snapshot.css
+scripts/css-snapshot/structure.json

@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import { build, compiler, root } from './lib/compile.mjs'
+
 /**
  * Probe: can the slot key spell the instance instead of hashing it?
  *
@@ -34,8 +36,6 @@
  */
 import fs from 'node:fs'
 import path from 'node:path'
-
-import { build, compiler, root } from './lib/compile.mjs'
 import postcss from 'postcss'
 import shorthash2 from 'shorthash2'
 
@@ -77,9 +77,6 @@ const compiled = await build(
  */
 const VOCABULARY = [
   ...new Set([
-    ...[...compiled.css.matchAll(/--jumi-([a-z-]+)-animation-name:/g)].map(
-      match => match[1],
-    ),
     'accent-color',
     'background-color',
     'border-color',
@@ -92,6 +89,9 @@ const VOCABULARY = [
     'rotate',
     'scale',
     'stroke',
+    ...[...compiled.css.matchAll(/--jumi-([a-z-]+)-animation-name:/g)].map(
+      match => match[1],
+    ),
   ]),
 ].sort()
 
@@ -167,7 +167,9 @@ const collisions = shape => {
 }
 
 console.log('══ can the slot key spell the instance?\n')
-console.log(`   vocabulary: ${VOCABULARY.length} attributes, names: ${NAMES.length}`)
+console.log(
+  `   vocabulary: ${VOCABULARY.length} attributes, names: ${NAMES.length}`,
+)
 
 console.log('\n── 1 · namespace collision safety\n')
 
@@ -178,7 +180,7 @@ for (const [label, shape] of Object.entries(keys)) {
     `   ${label.padEnd(16)} ${found.length ? `${found.length} collisions` : 'no collisions'}`,
   )
 
-  for (const { variable, versus, source } of found.slice(0, 3))
+  for (const { source, variable, versus } of found.slice(0, 3))
     console.log(`      ${variable}\n        ${source}\n        ${versus}`)
 }
 
@@ -198,7 +200,9 @@ const named = []
 
 postcss.parse(snapshot).walkRules(rule => {
   const declarations = (rule.nodes ?? []).filter(node => node.type === 'decl')
-  const label = declarations.find(node => /^--jumi-[\w-]+-label$/.test(node.prop))
+  const label = declarations.find(node =>
+    /^--jumi-[\w-]+-label$/.test(node.prop),
+  )
 
   if (!label) return
 
@@ -232,7 +236,9 @@ for (const { before, delta, name, occurrences, shipped } of measured)
     `   /${name.padEnd(12)} ${occurrences} occurrences   ${before.length} → ${shipped.length} chars   ${delta >= 0 ? '+' : ''}${delta} bytes saved`,
   )
 
-console.log(`   canonical corpus total: ${corpus >= 0 ? '+' : ''}${corpus} bytes saved`)
+console.log(
+  `   canonical corpus total: ${corpus >= 0 ? '+' : ''}${corpus} bytes saved`,
+)
 
 // Long-name stress: one instance, at a length an author might reach, on the same sheet.
 const LONG_SHEET = [
@@ -249,11 +255,12 @@ const longCompiled = await build(
 const longId = shorthash2('0:0deg|100:90deg')
 const longKey = `${LONG}-${longId}-rotate`
 const longBefore = keys.hashed('rotate', longId, LONG)
-const longOccurrences = longCompiled.css.split(`--jumi-slot-${longKey}`).length - 1
+const longOccurrences =
+  longCompiled.css.split(`--jumi-slot-${longKey}`).length - 1
 const longDelta = longKey.length - longBefore.length
 
 console.log(
-    `   long name (${LONG.length} chars): ${longOccurrences} occurrences   ${longBefore.length} → ${longKey.length} chars   ${longDelta >= 0 ? '+' : ''}${longDelta} bytes per occurrence (× ${longOccurrences} sites)`,
+  `   long name (${LONG.length} chars): ${longOccurrences} occurrences   ${longBefore.length} → ${longKey.length} chars   ${longDelta >= 0 ? '+' : ''}${longDelta} bytes per occurrence (× ${longOccurrences} sites)`,
 )
 
 /* ────────────────────────────────────────────────────────────────────────────────────────────────────

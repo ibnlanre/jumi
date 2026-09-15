@@ -21,16 +21,14 @@
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noUncheckedIndexedAccess": false,
-    "noUncheckedSideEffectImports":false,
+    "noUncheckedSideEffectImports": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "paths": {
       "@/*": ["./src/*"],
       "~/*": ["./*"]
     },
-    "plugins": [
-      { "name": "@astrojs/ts-plugin" }
-    ],
+    "plugins": [{ "name": "@astrojs/ts-plugin" }],
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
@@ -48,5 +46,5 @@
     "vitest.setup.ts",
     "tsup.config.ts"
   ],
-  "extends": "astro/tsconfigs/base",
+  "extends": "astro/tsconfigs/base"
 }

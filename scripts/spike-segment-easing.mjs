@@ -30,7 +30,7 @@ const page = await browser.newPage()
  * `--vars` are written on the element, which is how a case asks whether a variable-driven easing is
  * honoured in a place a *literal* is.
  */
-const sample = async ({ property, keyframes, animation, time, vars = '' }) => {
+const sample = async ({ animation, keyframes, property, time, vars = '' }) => {
   await page.setContent(`<!doctype html>
 <html><head><style>
 @keyframes probe { ${keyframes} }
@@ -73,10 +73,10 @@ console.log('══ segment easing — what CSS permits\n')
  * `0` at 75% is the override — the 100% frame's value, held from 50% onward.
  */
 const override = {
-  property: 'opacity',
+  animation: 'animation-timing-function: linear;',
   keyframes:
     '0% { opacity: 0 } 50% { opacity: 1; animation-timing-function: step-start } 100% { opacity: 0 }',
-  animation: 'animation-timing-function: linear;',
+  property: 'opacity',
 }
 
 const firstHalf = await sample({ ...override, time: 250 })
@@ -101,13 +101,17 @@ console.log(
  */
 const variable = await sample({
   ...override,
+  animation: 'animation-timing-function: var(--slot-ease);',
   time: 750,
   vars: '--slot-ease: step-end;',
-  animation: 'animation-timing-function: var(--slot-ease);',
 })
 
-console.log('\n2 · a variable-driven slot easing keeps the segments a keyframe did not claim')
-console.log(`   animation-level: var(--slot-ease) = step-end, 50% frame: step-start`)
+console.log(
+  '\n2 · a variable-driven slot easing keeps the segments a keyframe did not claim',
+)
+console.log(
+  `   animation-level: var(--slot-ease) = step-end, 50% frame: step-start`,
+)
 console.log(
   `   at 75% → ${round(variable)}  (the frame's own step-start still applies there)`,
 )
@@ -121,14 +125,16 @@ console.log(
  */
 const dropped = await sample({
   ...override,
-  time: 750,
-  vars: '--segment-ease: step-start;',
   keyframes:
     '0% { opacity: 0 } 50% { opacity: 1; animation-timing-function: var(--segment-ease) } 100% { opacity: 0 }',
+  time: 750,
+  vars: '--segment-ease: step-start;',
 })
 
 console.log('\n3 · a variable in a keyframe easing is dropped — the constraint')
-console.log(`   50% frame: animation-timing-function: var(--segment-ease) = step-start`)
+console.log(
+  `   50% frame: animation-timing-function: var(--segment-ease) = step-start`,
+)
 console.log(
   `   at 75% → ${round(dropped)}  (linear again: the declaration did not survive)`,
 )
@@ -141,10 +147,10 @@ console.log(
  * measurable, because it is not clamped to a range the way `opacity` is.
  */
 const overshoot = {
-  property: 'translate',
+  animation: 'animation-timing-function: linear;',
   keyframes:
     '0% { translate: 0px; animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1) } 100% { translate: 100px }',
-  animation: 'animation-timing-function: linear;',
+  property: 'translate',
 }
 
 const mid = await sample({ ...overshoot, time: 750 })
@@ -172,7 +178,9 @@ console.log(
  */
 const CARRIERS = ['~', '@', '^', ':']
 
-console.log('\n5 · which separator survives the candidate, once it is in a phrase')
+console.log(
+  '\n5 · which separator survives the candidate, once it is in a phrase',
+)
 
 for (const separator of CARRIERS) {
   const candidate = `animate-rotate-[0:0deg${separator}ease-out-back|100:45deg]`
@@ -208,9 +216,9 @@ const timeline = async keyframes => {
   for (const time of at)
     readings.push(
       await sample({
-        property: 'translate',
-        keyframes,
         animation: 'animation-timing-function: linear;',
+        keyframes,
+        property: 'translate',
         time,
       }),
     )
@@ -235,7 +243,9 @@ console.log(
 console.log(`   times      ${at.join(', ')}`)
 console.log(`   without it ${shape(withoutLast)}`)
 console.log(`   with it    ${shape(withLast)}`)
-console.log(`   differs at: ${differs.length ? `${differs.join(', ')} ms` : 'no sample'}`)
+console.log(
+  `   differs at: ${differs.length ? `${differs.join(', ')} ms` : 'no sample'}`,
+)
 
 /* ── 7. Direction: an easing governs the segment after its frame, never before ─────────────────────
  *
@@ -243,9 +253,9 @@ console.log(`   differs at: ${differs.length ? `${differs.join(', ')} ms` : 'no 
  * the identical easing one frame earlier changes everything. Same pair of segments, one frame apart.
  */
 const middle = {
-  property: 'opacity',
-  keyframes: '0% { opacity: 0 } 50% { opacity: 1 } 100% { opacity: 0 }',
   animation: 'animation-timing-function: linear;',
+  keyframes: '0% { opacity: 0 } 50% { opacity: 1 } 100% { opacity: 0 }',
+  property: 'opacity',
 }
 const easedAtFifty = {
   ...middle,
@@ -265,7 +275,9 @@ const hundred = await sample({ ...easedAtHundred, time: 750 })
 console.log('\n7 · the easing belongs to the segment after its frame')
 console.log(`   at 75%, animation-level linear, 50→100 segment`)
 console.log(`   no easing anywhere → ${round(neither)}  (linear: half way)`)
-console.log(`   on the 50% frame   → ${round(fifty)}  (step-start: the segment end, 0)`)
+console.log(
+  `   on the 50% frame   → ${round(fifty)}  (step-start: the segment end, 0)`,
+)
 console.log(
   `   on the 100% frame  → ${round(hundred)}  (no segment after it: nothing changes)`,
 )

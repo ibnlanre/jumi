@@ -1002,7 +1002,7 @@ console.log(
   '     reads that definition-keyed activation. **Superseded by §9**, which measures the shape that does',
 )
 console.log(
-  '     work — a selection keyed by the instance and written onto the control\'s own rule.',
+  "     work — a selection keyed by the instance and written onto the control's own rule.",
 )
 
 for (const [label, reach] of [

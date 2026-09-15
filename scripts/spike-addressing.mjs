@@ -120,7 +120,8 @@ const CASES = [
     id: 'same-name-twice',
   },
   {
-    about: 'identical phrase, unnamed and named: a structural instance plus a named one',
+    about:
+      'identical phrase, unnamed and named: a structural instance plus a named one',
     classes: [
       'animate-opacity-[0:0|100:1]',
       'animate-opacity-[0:0|100:1]/enter',

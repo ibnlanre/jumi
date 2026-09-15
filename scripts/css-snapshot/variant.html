@@ -17,22 +17,35 @@
       published. The corpus stays because the *selectors* are still the awkward part, and
       `css-check` holds its bytes to a recorded budget.
     -->
-    <div class="animate-accent-color-amber-400 animate-background-color-red-500 animate-border-radius-lg animate-border-width-2 animate-bounce-in animate-fade-in animate-rotate-45 animate-rotate-[0:0deg|20:-8deg|100:-8deg]/[flick] animate-rotate-[0:0deg|20:0deg|100:8deg]/[return] animate-scale-110 animate-shake animate-slide-in-up animate-opacity-50 animate-box-shadow-sm animation-duration-[1200ms]"></div>
+    <div
+      class="animate-accent-color-amber-400 animate-background-color-red-500 animate-border-radius-lg animate-border-width-2 animate-bounce-in animate-fade-in animate-rotate-45 animate-rotate-[0:0deg|20:-8deg|100:-8deg]/[flick] animate-rotate-[0:0deg|20:0deg|100:8deg]/[return] animate-scale-110 animate-shake animate-slide-in-up animate-opacity-50 animate-box-shadow-sm animation-duration-[1200ms]"
+    ></div>
 
-    <div class="*:animate-letter-spacing-tight before:animate-fade-in-up hover:animate-zoom-in"></div>
+    <div
+      class="*:animate-letter-spacing-tight before:animate-fade-in-up hover:animate-zoom-in"
+    ></div>
 
     <!--
       The three contexts a composition has to reach. Each is an ordinary motion utility, so each
       is a selector the finalizer writes onto — including the two that do not name the element
       itself, which is what a carrier class used to be needed for.
     -->
-    <div id="ctx-direct" class="animate-rotate-45"></div>
+    <div
+      id="ctx-direct"
+      class="animate-rotate-45"
+    ></div>
 
-    <div id="ctx-descendant" class="*:animate-rotate-45">
+    <div
+      id="ctx-descendant"
+      class="*:animate-rotate-45"
+    >
       <i></i>
     </div>
 
-    <div id="ctx-pseudo" class="before:content-[''] before:animate-scale-110"></div>
+    <div
+      id="ctx-pseudo"
+      class="before:content-[''] before:animate-scale-110"
+    ></div>
 
     <div class="animate-stagger-forward-100/4">
       <i class="animate-scale-y-[0.2]"></i>
