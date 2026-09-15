@@ -96,6 +96,7 @@
     "spike:instances": "node scripts/spike-instance-models.mjs",
     "spike:segments": "node scripts/spike-segment-easing.mjs",
     "spike:timing-phrase": "node scripts/spike-timing-phrase.mjs",
+    "spike:label-link": "node scripts/spike-label-link.mjs",
     "spike:recalc": "node scripts/spike-recalc.mjs",
     "measure:real-page": "node scripts/measure-real-page.mjs",
     "spike:real-page": "node scripts/spike-real-page.mjs",

@@ -86,3 +86,55 @@ applies to a list.
 The scan is not defensive plumbing. There is no type that can express "this module and no other may know
 this", the failure mode is silent in the output, and the cost of the copy is two lines — which is exactly
 the shape of a rule that has to be enforced by something other than memory.
+
+## The link layer: measured, and not load-bearing
+
+A named instance currently reaches its controls through an extra hop:
+
+```css
+.animate-fade-in\/reveal {
+  --jumi-fade-in-label: reveal;
+  --jumi-slot-fade-in: … var(--jumi-slot-fade-in-animation-duration, …) …;
+  --jumi-slot-fade-in-animation-duration: var(--jumi-label-reveal-animation-duration);   ×10 fills
+}
+```
+
+The fills are the only place the author's word is bound to a part. The slot key names the definition
+(`--jumi-slot-fade-in`), or, for a property utility, the definition *with the name hash already in it*
+(`--jumi-slot-opacity-sluPU-6XRQG`) — so identity is in the slot, and the labels are where the controls
+write. That makes the fills look like plumbing: the hoist could read `var(--jumi-label-reveal-animation-duration, …)`
+itself. Once the word is in the emitted name, one element's hoist can name its own instance, and no shared
+position has to carry one word for the whole stylesheet.
+
+The ten fills split along the shorthand. Seven parts (`animation-duration` through `animation-play-state`)
+are sections of the `animation` value the hoist publishes. Three — `animation-composition`,
+`animation-range`, `animation-timeline` — have no shorthand section at all, so they are declared on their own
+beside it, and they are read, and therefore replaced, at those declarations rather than through the hoist.
+
+`scripts/spike-label-link.mjs` (`pnpm spike:label-link`) deletes the layer from the **compiled** stylesheet
+with PostCSS and measures both models in Chromium — the six naming arms from `behaviour:check`, each in both
+candidate orders, comparing live animations **in position order** (a sorted bag would miss the historical
+failure above, which kept the same set and swapped the order).
+
+| | today | layer removed |
+| --- | --- | --- |
+| arms whose reading changes | — | none, in either candidate order |
+| arm e under reversed candidate order | changes | changes — and identically so |
+| emitted bytes | 34,417 | 25,111 |
+| link declarations, registrations | 50 and 40 | — |
+| slot registrations | 49 | 9 |
+
+Removing the layer is 8,760 bytes of that stylesheet, and it changes nothing on these arms. The ten part
+registrations go with the fills, since nothing declares those parts afterwards; the hoist's own
+registration (`--jumi-slot-<slot>`, non-inheriting) is what keeps a nested animating element from
+inheriting an ancestor's instance, and it stays.
+
+**Measured, not adopted.** The probe proves a *stylesheet shape* is equivalent; it cannot show that the
+generator emits that shape. Two limits. First, the rewrite is the change the generator would make, at the
+same places: the hoist's value, and the separate `animation-composition`, `animation-range` and
+`animation-timeline` declarations. Because those three are never sections of a long-form `animation` value,
+they are assigned — and so must be replaced — at their own use sites, which is exact rather than inferred;
+but the fixture exercises none of those utilities, so their equivalence here is argued from the shape and
+not measured. Second, the rewrite assumes the hoist is emitted once per named rule, which is the case it
+depends on. The guard for removing the layer is the permanent behaviour contexts and the CSS snapshot, not
+this probe.
