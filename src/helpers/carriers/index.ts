@@ -18,6 +18,7 @@ import {
   instanceKeys,
   LABELLED_SLOT,
   ownDeclarations,
+  parseInstanceKey,
 } from './instance'
 import {
   emitViewTransitions,
@@ -866,19 +867,46 @@ const hoist = (
     // A named activation installs the name as this slot's address — **on this rule**, which is the
     // whole of the locality rule.
     //
-    // The three the shorthand cannot carry used to be filled here: `--jumi-slot-<key>-<part>`, written on
-    // this rule and reading the label a control wrote. They are read directly now — `animationParts` puts
-    // `var(--jumi-label-<name>-<part>)` in the composition's own chain for an addressed slot — so the layer
-    // is gone rather than shortened.
+    // The three the shorthand cannot carry are filled here for the slots that need it, and only those.
     //
-    // What that depends on, and what it does not: a name is still written only on the rule that declared
-    // it, and the label is registered `inherits: false`, so a descendant that named nothing has no value
-    // for it and falls through the chain. That registration is the whole of the locality — measured with a
-    // descendant and a bare sibling, in both candidate orders (`scripts/spike-label-link.mjs` §2).
+    // A slot whose key spells its name — a value or a phrase, `5-alpha-3zWYd-rotate` — reads the label
+    // directly in the composition's chain, so there is nothing to fill and this loop skips it. A slot whose
+    // key does not — an **effect**, which keys by the definition because every name of it shares one slot,
+    // and a composed tween — cannot be named in that chain at all: the composition is one rule for every
+    // activating selector, so a name written there would be whichever name was recorded last. For those,
+    // and only those, the name still travels through this variable, written on this rule, which is what
+    // makes it element-local.
     //
-    // The other seven are sections of the shorthand, and the shorthand's value is the hoist published above
-    // — also on this rule — so the name goes straight into that value (`namedHoist`) and no variable stands
-    // between them either.
+    // Measured before the scoping: with the fills gone unconditionally, a named effect's three parts read
+    // `--jumi-slot-fade-in-animation-composition` with nothing writing it while a named value's read the
+    // label, so the effect quietly fell back and the control was ignored.
+    for (const declaration of own) {
+      const match = ACTIVATED_SLOT.exec(declaration.prop)
+
+      if (!match) continue
+
+      for (const key of instanceKeys(rule, match[1])) {
+        const name = own.find(
+          candidate => candidate.prop === `--jumi-${key}-label`,
+        )?.value
+
+        if (!name || parseInstanceKey(key)?.name === name) continue
+
+        for (const part of AFTER_SHORTHAND) {
+          const prop = cssEscape(`--jumi-slot-${key}-${part}`)
+
+          if (published.has(prop)) continue
+
+          published.add(prop)
+          rule.append(
+            postcss.decl({
+              prop,
+              value: `var(${cssEscape(`--jumi-label-${name}-${part}`)})`,
+            }),
+          )
+        }
+      }
+    }
   }
 
   return positions

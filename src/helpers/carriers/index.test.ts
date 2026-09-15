@@ -123,7 +123,7 @@ describe('the finalizer', () => {
     expect(out).not.toContain(':where(')
   })
 
-  it('writes a name into the hoist, and fills nothing: the three separate parts read the label', () => {
+  it('writes a name into the hoist, and fills the three parts the shorthand cannot carry', () => {
     // An effect, because its slot key is the definition's own word — the shape where two names share one
     // slot and the composition therefore cannot tell them apart on its own.
     const named = payload(
@@ -131,7 +131,7 @@ describe('the finalizer', () => {
       [
         'animation-name: var(--jumi-fade-in-animation-name, var(--jumi-animation-name));',
         'animation-duration: var(--jumi-slot-fade-in-animation-duration, var(--jumi-fade-in-animation-duration, var(--jumi-animation-duration)));',
-        'animation-composition: var(--jumi-label-reveal-animation-composition, var(--jumi-fade-in-animation-composition, var(--jumi-animation-composition)));',
+        'animation-composition: var(--jumi-slot-fade-in-animation-composition, var(--jumi-fade-in-animation-composition, var(--jumi-animation-composition)));',
       ].join(' '),
     )
 
@@ -170,21 +170,21 @@ describe('the finalizer', () => {
     ])
       expect(out).not.toContain(`--jumi-slot-fade-in-${part}:`)
 
-    // The three the shorthand cannot carry used to be filled here, and are not any more: the chain reads
-    // the label itself, so there is no per-instance variable to fill and no registration to keep it
-    // element-local. The label's own `inherits: false` is the whole of that, and it is what a shared
-    // composition rule rests on — asserted as a pair in `create.test.ts`.
+    // The three the shorthand cannot carry are filled here, and for this shape they have to be. An effect
+    // keys its slot by the definition, because every name of that effect shares one slot — so the chain
+    // cannot read a label: the composition is one rule for every activating selector, and a name written
+    // there would be whichever name was recorded last. That is the nondeterminism the fills were built
+    // for. Measured after removing them unconditionally: a named effect's three parts read
+    // `--jumi-slot-fade-in-animation-composition` with nothing writing it — the control was ignored —
+    // while a named *value*, whose key spells its name, read the label and needed nothing here.
     for (const part of [
       'animation-composition',
       'animation-range',
       'animation-timeline',
     ])
-      expect(out).not.toContain(`--jumi-slot-fade-in-${part}:`)
-
-    // And the chain the payload carried is emitted as it stands, label and fallbacks together.
-    expect(out).toContain(
-      'animation-composition: var(--jumi-label-reveal-animation-composition, var(--jumi-fade-in-animation-composition, var(--jumi-animation-composition)));',
-    )
+      expect(out).toContain(
+        `--jumi-slot-fade-in-${part}: var(--jumi-label-reveal-${part});`,
+      )
   })
 
   it('leaves a motion nothing named reading its own slot', () => {

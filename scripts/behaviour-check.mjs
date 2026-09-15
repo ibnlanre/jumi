@@ -640,14 +640,24 @@ const NAMED_ARMS = [
   // declares them in one rule for every activating selector, so it cannot name a motion, and a name
   // reaches them through a link the naming rule fills. An unfilled link falls back or drops — silently,
   // because the motion still runs — so it is asserted rather than assumed.
-  // The three parts an `animation` shorthand cannot carry, all three addressed by the motion's own name.
-  // They are the parts that stay *assigned separately*, and the reason is structural: the composition
-  // declares them in one rule for every activating selector, so it cannot name a motion, and a name
-  // reaches them through a link the naming rule fills. An unfilled link falls back or drops — silently,
-  // because the motion still runs — so it is asserted rather than assumed.
+  //
+  // This arm names a **value**, whose slot key spells the name, so its chain reads the label directly.
   [
     'g',
     'animate-rotate-45/spin animation-composition-add/spin animation-timeline-scroll/spin animation-range-[25%_75%]/spin',
+  ],
+  // The same three parts on a **named effect** — the shape arm `g` cannot cover, and the one that was
+  // nearly lost. An effect keys its slot by the *definition* (`--jumi-slot-fade-in`), because every name of
+  // that effect shares one slot, so its chain cannot read a label at all: a name written into the shared
+  // composition would be whichever name was recorded last. It keeps the slot-keyed hop, and the fill that
+  // writes it, on the rule that named the motion.
+  //
+  // Measured on the commit that removed the fills unconditionally: this reads
+  // `{"composition":"replace","range":"0%","timeline":"auto"}` — every control gone while the motion
+  // still runs — and the whole gate stayed green, because arm `g` is value-shaped and was the only cover.
+  [
+    't',
+    'animate-fade-in/reveal animation-composition-add/reveal animation-timeline-scroll/reveal animation-range-[25%_75%]/reveal',
   ],
   // The destructive spelling, which must leave the motion **running**: a phrase written into a part the
   // `animation` shorthand carries makes the whole shorthand invalid at computed-value time, and the element
@@ -939,6 +949,46 @@ const scopeReadings = async candidates => {
   return reading
 }
 
+/**
+ * The three separate parts on a **named effect** — the shape whose slot key is the definition.
+ *
+ * `separateParts()` above names a *value*, and a value's key spells its name, so its chain reads the label
+ * directly and the link layer is gone from it. An effect cannot be named that way: one slot is shared by
+ * every name of that effect, so the composition could only ever hold whichever name was recorded last.
+ * Those three parts are still filled, on the rule that named the motion, and this is what says so in a
+ * browser rather than in text.
+ */
+const namedEffectParts = async () => {
+  const built = build(await compiler(ENTRY, root), NAMED_CANDIDATES)
+  const classes = NAMED_ARMS.find(([id]) => id === 't')[1]
+  const page = await load(
+    built.css,
+    `<div id="named-t" class="${classes}"></div>`,
+  )
+
+  const reading = await page.evaluate(() => {
+    const style = getComputedStyle(document.querySelector('#named-t'))
+    const names = style.animationName.split(',').map(value => value.trim())
+    // An effect's animation is `jumi-fade-in` — the whole name, with no value hash after it — so this
+    // prefix stops there. A `jumi-fade-in-` prefix matches nothing and reads as "no animation at all",
+    // which is the failure shape this arm is meant to report rather than the one it should have.
+    const at = names.findIndex(name => name.startsWith('jumi-fade-in'))
+    const pick = value => value.split(',')[at]?.trim() ?? 'absent'
+
+    return {
+      composition: pick(style.animationComposition),
+      range: pick(style.animationRange),
+      timeline: pick(style.animationTimeline),
+    }
+  })
+
+  await page.close()
+
+  return reading
+}
+
+const effectParts = await namedEffectParts()
+
 const scope = await scopeReadings(NAMED_CANDIDATES)
 const scopeReversed = await scopeReadings([...NAMED_CANDIDATES].reverse())
 
@@ -1107,6 +1157,13 @@ const naming = [
       separate.timeline.includes('scroll') &&
       separate.range !== 'normal',
     JSON.stringify(separate),
+  ],
+  [
+    'and reaches them on an effect too, whose slot key is the definition',
+    effectParts.composition === 'add' &&
+      effectParts.timeline.includes('scroll') &&
+      effectParts.range !== 'normal',
+    JSON.stringify(effectParts),
   ],
   [
     'a name that reads like a part still addresses its own motion',

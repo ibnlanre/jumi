@@ -467,7 +467,11 @@ describe('animations wiring', () => {
     creator.property('rotate')('0:0deg|100:90deg', { modifier: null })
     const animations = creator.animations
     const flick = `--jumi-slot-${instanceKey('rotate', shorthash2('0:0deg|58:0deg'), 'flick')}`
-    const flickKey = instanceKey('rotate', shorthash2('0:0deg|58:0deg'), 'flick')
+    const flickKey = instanceKey(
+      'rotate',
+      shorthash2('0:0deg|58:0deg'),
+      'flick',
+    )
 
     // Each position reads *its own* slot variable before the property's control, so one animation of
     // a property can be timed without the other — which is how two animations summed by
@@ -519,7 +523,9 @@ describe('animations wiring', () => {
 
     // The seven that ride the shorthand carry no label here: their name is written into the hoist's value
     // on the naming rule instead, so the aggregate stays name-free for them.
-    expect(String(animations['animation-duration'])).not.toContain('--jumi-label-')
+    expect(String(animations['animation-duration'])).not.toContain(
+      '--jumi-label-',
+    )
   })
 })
 

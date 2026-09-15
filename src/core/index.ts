@@ -464,17 +464,27 @@ export function createJumiModel({
     // this registration, nested animating elements inherit the parent's instance.
     registerName(cssEscape(`--jumi-slot-${key}`))
 
+    // A slot whose key does **not** spell its name still travels through a slot-keyed variable, filled on
+    // the rule that named the motion. That is an effect -- whose key is the definition's own word, because
+    // every name of that effect shares one slot -- and a composed tween, which has the same shape. The
+    // chain cannot name them: the composition is one rule for every activating selector, so a name written
+    // there would be whichever name was recorded last. Registered for the reason it always was, too — a
+    // descendant that animates the same property must not answer to a name declared above it.
+    if (parseInstanceKey(key)?.name !== name)
+      for (const part of separateParts)
+        registerName(cssEscape(`--jumi-slot-${key}-${part}`))
+
     for (const part of slotParts) {
       // The name's own variable lives in the label namespace, so it cannot be the property scope's:
       // a scope is `--jumi-<attribute>-<part>`, and no attribute is `label-…`. This used to be
       // registered under the name itself, with an exemption for the identity case, because there the
       // two roles really were one variable.
       //
-      // `inherits: false` is what the separate parts' chains rest on now that they read this label
-      // directly: the composition is one rule for every activating selector, so the label has to be
-      // present only where it was written or it becomes an address everywhere. The three slot-keyed
-      // variables that used to be registered beside these are gone — nothing fills them, because the
-      // chains read the label itself.
+      // `inherits: false` is what the separate parts' chains rest on: the composition is one rule for every
+      // activating selector, so a label has to be present only where it was written or it becomes an address
+      // everywhere. For a slot whose key spells its name the chain reads this variable directly, which is
+      // why the slot-keyed registration above is conditional rather than gone — the shape that cannot read a
+      // label still needs it, and a registration with nothing to fill it is an address that reads as silence.
       registerName(cssEscape(`--jumi-label-${name}-${part}`))
     }
 

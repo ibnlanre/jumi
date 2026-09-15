@@ -183,9 +183,9 @@ scope level too, collapsing three links to two — is measurably wrong: a declar
 wrapper's control would stop reaching descendants, and `0.5s` would become `1s`. Measured on the same fixture
 the arms use.
 
-## The link layer: measured, and not load-bearing
+## The link layer: measured, removed for named slots, kept where the slot cannot be named
 
-A named instance currently reaches its controls through an extra hop:
+A named instance used to reach its controls through an extra hop:
 
 ```css
 .animate-fade-in\/reveal {
@@ -220,34 +220,46 @@ hoist is published on the rule that named the motion, so it is element-local, an
 (`--jumi-label-<name>-<part>`) is the value's first link. The chain behind it is untouched, so an unset label
 still falls through to the definition and then to the shared default.
 
-**The three the shorthand cannot carry keep their link layer, and that is deliberate.**
-`animation-composition`, `animation-range` and `animation-timeline` have no shorthand section, so the
-composition declares them — and the composition's aggregate is **selector-grouped rather than rule-local**,
-which includes candidates that named nothing. A name in that block would be a name every element matching it
-answers to, which is the failure measured above. So those three are reached through a slot-keyed variable the
-naming rule fills, and the hop carries a real locality boundary rather than redundant indirection.
+**Measured, then implemented — for the three as well, where the slot can be named.** `animation-composition`,
+`animation-range` and `animation-timeline` have no shorthand section, so the composition declares them — and
+that aggregate is **selector-grouped rather than rule-local**. The question was whether a name written there
+becomes an address every element matching it answers to. It does not, and the reason is a registration rather
+than a position: `nameSlot` declares every label `inherits: false`, so an element that wrote no name has no
+value for it and falls through the chain. `scripts/spike-label-link.mjs` §2 measures five forms — two names
+over one definition, a descendant of a named element using the same definition, a bare sibling, a name that
+is a structural address, and both candidate orders — and every one reads identically with the label in the
+chain. So `animationParts` now reads `var(--jumi-label-<name>-<part>)` directly for those three.
 
-Removing the rest of the layer is therefore **not the same cleanup**: it would mean emitting those longhands
-rule-locally, which changes the emission topology — and the view-transition emission reads the same aggregate,
-so it moves with it. Deferred as its own research track, if CSS-size pressure ever makes it worth the blast
-radius: _can `separateParts` be emitted rule-locally without duplicating excessive CSS, breaking VT replay,
-changing selector grouping, or reintroducing element-crossing name leakage?_ That needs a probe, not a
-continuation of this refactor.
+**The rule is not "three parts" but "slots whose key spells its name".** A value or a phrase keys its slot
+by instance (`--jumi-slot-5-alpha-3zWYd-rotate`), so the name is _in the key_ and each position can read its
+own label — which is the shape the measurement above covers, and the shape the layer is now removed from.
+An **effect** keys its slot by the definition (`--jumi-slot-fade-in`), deliberately: every name of that
+effect shares one slot, so a name in the composition's chain would be whichever name was recorded last. That
+is precisely the nondeterminism the fills were built for, so for that shape — and a composed tween, which
+has the same shape — the slot-keyed variable and its fill **stay**. The removal is therefore scoped to the
+keys that spell a name, and the residual hop is a real boundary rather than redundant indirection.
+
+That distinction was nearly lost. Removing the fills unconditionally left a named effect reading
+`--jumi-slot-fade-in-animation-composition` with nothing writing it while a named _value_ read the label —
+the effect fell back and its control was silently ignored, and no arm covered it. Measured now, both ways:
+a named effect emits three reads and three matching fills; a named value emits neither.
 
 | corpus                                                           | before    | after     |
 | ---------------------------------------------------------------- | --------- | --------- |
-| canonical (`scripts/css-snapshot/snapshot.css`, 2 named motions) | 85,083 B  | 81,850 B  |
-| its slot registrations / fills                                   | 55 / 20   | 41 / 6    |
+| canonical (`scripts/css-snapshot/snapshot.css`, 2 named motions) | 85,083 B  | 80,518 B  |
+| its slot registrations / fills                                   | 55 / 20   | 35 / 0    |
 | probe fixture (6 arms, 4 named motions)                          | 34,417 B  | 27,760 B  |
 | carrier corpus (`examples/`, names nothing)                      | 140,006 B | 140,006 B |
 
 The demo corpus is unchanged because it names no motion at all: the layer only exists for a named instance,
 so a corpus without names is not merely unaffected, it never had the cost.
 
-Held by: `index.test.ts` (the hoist names its instance; only the three are assigned; an unnamed motion is
-untouched), `create.test.ts` (only those three are registered as slot-keyed variables, and the aggregate
-still carries no name), and `behaviour:check`'s naming section, which now also asserts the three properties
-**resolve** on a named instance. That last one is falsified rather than assumed: with the assignment removed
-it reads `{"composition":"replace","duration":"1s","range":"0%","timeline":"auto"}` — all three controls
-gone while the motion still runs, which is exactly why text-level checks could not catch it. The arm is worth
-more than the bytes: those three can vanish silently, because the animation itself keeps running.
+Held by: `index.test.ts` (the hoist names its instance; a slot whose key cannot spell its name is filled,
+and an unnamed motion is untouched), `create.test.ts` (an instance keyed by name reads the label, registers
+no per-instance part link, and every link in a `separateParts` chain matches a known writer class — label,
+range variant, scope or terminal — with none of them `--jumi-slot-*`), and `behaviour:check`'s naming
+section, which asserts the three properties **resolve** on a named instance. That last one is falsified
+rather than assumed: with the assignment removed it reads
+`{"composition":"replace","duration":"1s","range":"0%","timeline":"auto"}` — all three controls gone
+while the motion still runs, which is exactly why text-level checks could not catch it. The arm is worth more
+than the bytes: those three can vanish silently, because the animation itself keeps running.
