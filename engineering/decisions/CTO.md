@@ -274,3 +274,52 @@ hyphen-free names or a reserved separator, and both give back what this shape bo
 > corpus permanent — a corpus of generic samples reports no collisions in either shape, which is how a wrong
 > order looks safe. Do not add a collision warning to the model yet: the diagnostic exists in the assertion,
 > and instrumenting the writer for a case that needs a computed hash is not worth the bytes.**
+
+## 2026-09-15 — the readable key is readable, not exact: probe a real boundary
+
+The assertion did its job and disproved the property the shape was adopted for. `<name>-<id>-<attribute>` is
+readable but not injective: an id is hyphen-free but not fixed-length, so a name whose tail is another
+instance's id still absorbs its key. Adversarial and hard to stumble into, but the same class of defect the
+hash was there to remove, and I will not freeze that into 1.0 after finding it — nor make "nobody will
+compute another motion's hash" part of Jumi's correctness model.
+
+No permutation of hyphen-joined pieces fixes it. The name is unbounded and hyphenated, the attribute is
+hyphenated, the id is variable-length: joined only by `-`, the parse boundary is a function of the *contents*,
+so some pair of contents can move it. The representation needs a boundary that is a fact about the *shape*.
+
+Keep the `instanceKeys` and `linkedSlot` refactors and their regressions — they found real assumptions (a
+prefix relationship that no longer holds, and a part guessed from a suffix rather than supplied, which made a
+legal name silently stop the motion) and those stay fixed. Keep the behavioural gates and the topology counts
+exactly as they are.
+
+### Call
+
+> **Do not accept `<name>-<id>-<attribute>` as the final vocabulary. Probe a genuinely delimited readable
+> representation — preferably a length-delimited author name, which takes nothing away from authors — against
+> the same adversarial full-vocabulary corpus. The acceptance criterion is strict: zero collisions *by
+> construction*, which means a reader that is a left inverse of the writer, not merely zero ordinary
+> collisions. Probe the encoding details too: what "length" counts, and Unicode.**
+
+## 2026-09-15 — adopt the length-prefixed key: readable and exact at last
+
+The probe gives us the property we were actually after: readable, exact, round-trippable, and with no reserved
+author syntax. The result that decides it is not "no collisions in the corpus" but that
+`decode(encode(x)) = x` held across all 366,360 triples — that is the right standard, and it is the one the
+later shapes will have to meet too.
+
+So the named key is `--jumi-slot-<length>-<escaped-name>-<id>-<attribute>`; unnamed slots are unchanged; the
+length counts the **emitted** name in UTF-16 code units, which is what `.length` and `.slice` measure and what
+the `foo.bar → foo\.bar` measurement proves is the text a reader actually has.
+
+The extra recommendation is adopted as well, and it is the part that removes the last assumption rather than
+merely narrowing it: `instanceKeys` parses the canonical key instead of reconstructing identity from the
+activation base, so nothing depends any more on the shape of `attribute-id` or on an id's hyphens.
+`linkedSlot` stays explicit about the part, and the round-trip corpus becomes a permanent unit test.
+
+### Call
+
+> **Adopt `--jumi-slot-<length>-<escaped-name>-<id>-<attribute>` for named instances, counting the emitted
+> name in UTF-16 code units, with unnamed slots unchanged. Keep `instanceKeys` parsing the key rather than
+> inferring it, keep `linkedSlot` explicit about the part, and keep the round-trip corpus as a gate. The byte
+> cost is trivial beside the correctness win: this is the first version of the readable key I would call
+> structurally exact before 1.0.**

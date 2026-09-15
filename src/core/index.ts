@@ -10,6 +10,7 @@ import type {
 } from '@/types'
 
 import { assemble } from '@/helpers/assemble'
+import { instanceKey } from '@/helpers/carriers/instance'
 import { css } from '@/helpers/css'
 import { join } from '@/helpers/join'
 import { merge } from '@/helpers/merge'
@@ -204,41 +205,25 @@ export const structuralAddress = (token: string) =>
  * writes down is `--jumi-label-<name>-<part>`, in a namespace of its own — so a name and a property can
  * never end up being the same custom property.
  *
- * A named instance spells its name **first**, with the definition id between the name and the attribute:
+ * A named instance carries its own length, and the format belongs to `instanceKey` in
+ * `@/helpers/carriers/instance` — one statement of it, imported by the writer and the readers alike:
  *
- *   --jumi-slot-flick-Z2excak-rotate
- *   │    └ slot ┘└name┘└─ id ─┘└attr┘
+ *   --jumi-slot-5-flick-Z2excak-rotate
+ *   --jumi-slot-24-flick-animation-duration-Z2excak-rotate
  *
- * Readable on purpose, and the order is not cosmetic — the id is the delimiter. `shorthash2` is base62
- * (`scripts/spike-slot-key.mjs` enumerates its alphabet) and therefore holds no hyphen, so it is the one
- * segment that cannot absorb a neighbour. Put the attribute between the name and the id instead —
- * `flick-rotate-Z2excak` — and the keys stop being injective over Jumi's own vocabulary, which is measured
- * rather than feared:
- *
- *   --jumi-slot-foo-accent-color-k1aaa
- *     color         / name foo-accent
- *     accent-color  / name foo
- *
- * Both attributes are real (`src/variables/property.ts`: `color`, `accent-color`; and `width` under
- * `stroke-width`), and any name may hold a hyphen, so no amount of care in the name saves that order. The
- * probe finds 50 such collisions there and none here; the same enumeration is a gate
- * (`scripts/slot-key-check.mjs`).
- *
- * Cost, measured on the canonical corpus: a name the length of the hash it replaced is flat (`/return`,
- * −12 bytes over the corpus), and a 48-character name adds 42 bytes at each of the twelve sites an
- * instance appears. Unnamed slots keep `attribute-id`, because there is no name to spell.
+ * A length prefix is what makes the key *exact* rather than merely readable. Joined only by hyphens, the
+ * name, the attribute and the id cannot be told apart by their contents — any name may hold a hyphen, so
+ * `foo-accent` + `color` and `foo` + `accent-color` are one string, and even with the id between them a name
+ * whose tail is another instance's id absorbs its key (`scripts/spike-slot-boundary.mjs` measures both).
+ * The count puts the boundary in the shape instead: read the digits, take that many units, and the rest is
+ * the id and the attribute. Unnamed slots keep `attribute-id`, where there is no name to delimit.
  */
 const slotKey = (attribute: string, id?: string, name?: null | string) =>
-  id ? (name ? `${name}-${id}-${attribute}` : `${attribute}-${id}`) : attribute
-
-/**
- * The key, with the collision argument attached to it as a test rather than left as a comment.
- *
- * `slot-key.test.ts` enumerates this function over Jumi's whole attribute vocabulary, with instance names
- * taken from that vocabulary's own overlaps, so the shape cannot be reordered later without the test
- * saying what the reorder costs. Exported for that assertion — it is not part of the public surface.
- */
-export const instanceKey = slotKey
+  id
+    ? name
+      ? instanceKey(attribute, id, name)
+      : `${attribute}-${id}`
+    : attribute
 
 /**
  * A matcher that reads its modifier as a **name** — every motion candidate — carries this tag, so the

@@ -87,45 +87,57 @@ The scan is not defensive plumbing. There is no type that can express "this modu
 this", the failure mode is silent in the output, and the cost of the copy is two lines — which is exactly
 the shape of a rule that has to be enforced by something other than memory.
 
-## The slot key spells the name
+## The slot key spells the name, and states how much of it there is
 
-An instance's key is `<name>-<id>-<attribute>` when the author named the motion and `<attribute>-<id>` when
-they did not — `--jumi-slot-loop-sluPU-opacity`. The name is a word in the emitted stylesheet, which is what
-a person reads while debugging, and the id sits between the name and the attribute because `shorthash2` is
-base62 and therefore holds no hyphen.
-
-Order is a correctness property, not a preference. The attribute is the variable-length segment in both
-orders, and both the name and the attribute may hold hyphens, so a key that puts the attribute between the
-name and the id is not injective over Jumi's own vocabulary:
+A named instance's key is `<units>-<name>-<id>-<attribute>`, and an unnamed one keeps `<attribute>-<id>`:
 
 ```text
---jumi-slot-foo-accent-color-k1aaa
-  color         / name foo-accent       ← animate-color-…/foo-accent
-  accent-color  / name foo              ← animate-accent-color-…/foo
+--jumi-slot-5-flick-Z2excak-rotate
+--jumi-slot-24-flick-animation-duration-Z2excak-rotate
 ```
 
-`scripts/spike-slot-key.mjs` (`pnpm spike:slot-key`) enumerates the whole vocabulary with adversarial names
-and finds 50 such collisions in that order and none in this one.
+The name is a word in the emitted stylesheet, which is what a person reads while debugging, and the prefix is
+what makes it *exact*: the reader takes the name by the count it is given, so the parse boundary is a fact
+about the shape rather than about the contents. One format, stated once, in `instanceKey` in
+`src/helpers/carriers/instance.ts` — imported by the writer in `src/core` and by the readers, rather than
+spelled three times.
 
-**Measured, and permanent.** `src/core/slot-key.test.ts` keeps that corpus as a gate assertion, and its own
-first run corrected the ruling: the id is hyphen-free (measured — every character of 4,000 hashes is
-`[0-9A-Za-z]`) but **not fixed-length**, since ids run from two characters to seven (`shorthash2('50')` is
-`rI`). So the id delimits but cannot be unforged: a *crafted* name whose tail is another instance's id, on
-an attribute that overlaps that instance's attribute, still absorbs — `right`/`foo-backdrop-filter-hue-rotate`
-against `rotate-right`/`foo-backdrop-filter-hue`. That needs the author to compute another motion's hash and
-write it into theirs; closing it entirely would cost either hyphen-free names or a separator a name cannot
-hold.
+**Why not just a readable order.** Every shape that joined the three pieces with hyphens alone lost to the
+same defect, one version of it per ordering, and each looked fine until it was measured:
 
-**Both orders measured on the frozen corpus.** The rename moved bytes and nothing else: `aggregateBytes
-9212 → 9208`, `bytes 81850 → 81836`, `rawBytes 632549 → 632453` — and `properties` (registrations), `slots`,
-`publishEvents` (links) and `keyframes` all unchanged at 94 / 33 / 36 / 33. Diffed line by line, the snapshot
-is 22 lines out and 22 in, byte-identical once the two instance keys are renamed.
+```text
+--jumi-slot-flick-rotate-Z2excak        color + accent-color absorb; the attribute is between two
+                                        unbounded hyphenated segments
+--jumi-slot-flick-Z2excak-rotate        a name whose tail is another instance's id absorbs its key
+--jumi-slot-5-flick-Z2excak-rotate      the count is the boundary, and no name can move it
+```
 
-The cost is the name's length against the six-character hash it replaced: `/flick` is flat, `/return` saves
-twelve bytes over the corpus, and a 48-character name adds 42 bytes at each of the twelve sites an instance
-appears. `behaviour:check`'s arm `n` measures the shape this makes possible — a name that *reads* like a part
-of the shorthand (`/flick-animation-duration`), which a pass guessing the part instead of being told it reads
-as `flick`, publishes the hoist under a key nothing fills, and the motion silently never runs.
+The first is 50 collisions over the vocabulary (`scripts/spike-slot-key.mjs`, `pnpm spike:slot-key`, both
+halves of each one real attributes); the second was found by the permanent assertion below, with ids that are
+hyphen-free but not fixed-length (`shorthash2('50')` is `rI`); the third cannot be reached, because the
+reader is a left inverse of the writer. `scripts/spike-slot-boundary.mjs` (`pnpm spike:slot-boundary`) is the
+probe: 366,360 of 366,360 triples round-trip for the prefixed shape, against 17,040 failures for a prefix in
+raw-name characters (at the names CSS escapes) and 4,260 for a double delimiter (at the name holding `--`).
+
+**The count is of the emitted name, in UTF-16 code units.** Both details are load-bearing. The name a reader
+has is the escaped one — `/foo.bar` occupies eight characters as `foo\.bar` — and code units are what
+`.length` and `.slice` measure, so a reader slicing by the count cannot disagree with the writer that produced
+it. The repo keeps both honest: the probe checks the model's escaping against a real compile, and
+`behaviour-check.mjs` arm `o` runs a motion named `/[foo.bar]` in a browser in both candidate orders.
+
+**Both gates keep it.** `src/core/slot-key.test.ts` holds the round trip over the whole vocabulary with
+adversarial names, Unicode and characters CSS escapes, and `behaviour-check.mjs` holds two arms for the shapes
+the format makes possible: a name that *reads* like a part of the shorthand (`/flick-animation-duration`, where
+a pass that guessed the part read `flick`, published the hoist under a key nothing fills, and the motion
+silently never ran), and a name the stylesheet escapes. Both arms found real defects before they shipped — the
+second exposed a reader whose attribute scan was greedy enough to swallow a chain's fallback, and two label
+lookups that escaped an already-emitted key, which no text-level check had noticed.
+
+**Measured on the frozen corpus.** The rename moved bytes and nothing else: `bytes 81836 → 81892` (+56 over
+the corpus, the prefix at each of the 24 occurrences), `aggregateBytes 9208 → 9224`, `rawBytes 632453 →
+632881` — and `properties` (registrations), `slots`, `publishEvents` (links) and `keyframes` all unchanged at
+94 / 33 / 36 / 33. Diffed line by line, the snapshot is 22 lines out and 22 in, identical once the keyed
+variables (`--jumi-slot-…`, `--jumi-…-label`, `--jumi-…-animation-…`) are normalized.
 
 ## The link layer: measured, and not load-bearing
 

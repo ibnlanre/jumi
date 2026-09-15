@@ -3,6 +3,7 @@ import type { Api, CssInJs } from '@/types'
 import { describe, expect, it, vi } from 'vitest'
 
 import { stagingMarker } from '@/helpers/carriers'
+import { instanceKey } from '@/helpers/carriers/instance'
 import { getCreator } from '@/helpers/create'
 import { css } from '@/helpers/css'
 
@@ -205,7 +206,8 @@ describe('property curry', () => {
     // The label is the address a person can write down, unlike the hash the
     // frame variables are keyed by, so the rule says what the slot is called.
     expect(labelled).toMatchObject({
-      [`--jumi-flick-${shorthash2('0:0deg|58:0deg')}-rotate-label`]: 'flick',
+      [`--jumi-${instanceKey('rotate', shorthash2('0:0deg|58:0deg'), 'flick')}-label`]:
+        'flick',
     })
     expect(bare).not.toHaveProperty(
       `--jumi-rotate-${shorthash2('0:0deg|100:90deg')}-label`,
@@ -464,7 +466,7 @@ describe('animations wiring', () => {
     creator.property('rotate')('0:0deg|58:0deg', { modifier: 'flick' })
     creator.property('rotate')('0:0deg|100:90deg', { modifier: null })
     const animations = creator.animations
-    const flick = `--jumi-slot-flick-${shorthash2('0:0deg|58:0deg')}-rotate`
+    const flick = `--jumi-slot-${instanceKey('rotate', shorthash2('0:0deg|58:0deg'), 'flick')}`
 
     // Each position reads *its own* slot variable before the property's control, so one animation of
     // a property can be timed without the other — which is how two animations summed by
@@ -593,7 +595,7 @@ describe('animation-name registration', () => {
     for (const name of ['enter', 'exit'])
       expect(
         rules[
-          `@property --jumi-slot-${name}-${shorthash2('0:0|100:1')}-opacity`
+          `@property --jumi-slot-${instanceKey('opacity', shorthash2('0:0|100:1'), name)}`
         ],
       ).toEqual({ inherits: 'false', syntax: '"*"' })
   })
@@ -624,7 +626,7 @@ describe('animation-name registration', () => {
 
     creator.property('rotate')('0:16deg|58:0deg', { modifier: 'flick' })
     const animations = creator.animations
-    const key = `flick-${shorthash2('0:16deg|58:0deg')}-rotate`
+    const key = instanceKey('rotate', shorthash2('0:16deg|58:0deg'), 'flick')
     const utilities = registered(addBase)
 
     // These three are assigned on the rule that named the motion, because the composition declares them

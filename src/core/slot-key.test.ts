@@ -1,34 +1,37 @@
 import { describe, expect, it } from 'vitest'
 
-import { addressableName, instanceKey } from '@/core'
+import { instanceKey, parseInstanceKey } from '@/helpers/carriers/instance'
 import { effectKeyframes } from '@/keyframes/effects'
 import { propertyVariables } from '@/variables/property'
 
-import shorthash2 from 'shorthash2'
+import { addressableName } from '@/core'
+import cssEscape from 'css.escape'
 
 /**
- * The instance vocabulary's boundary, as an assertion rather than a comment.
+ * The instance vocabulary's **exactness**, as a permanent assertion.
  *
- * A slot key is `<name>-<id>-<attribute>` for a named instance and `<attribute>-<id>` for one that took no
- * name. The name is first because that is the readable end; the id sits between the name and the attribute
- * because `shorthash2` is base62 — `scripts/spike-slot-key.mjs` enumerates its alphabet — so the id is the
- * one segment of the key that can hold no hyphen.
+ * A named slot key is `<units>-<name>-<id>-<attribute>`:
  *
- * That gives two properties and not three, and the difference is worth stating because the ruling assumed
- * otherwise. **Hyphen-free** is true (measured: every character of 4000 hashes is `[0-9A-Za-z]`) and that is
- * what keeps a *name* from absorbing the attribute — put the attribute between the name and the id, and
- * `foo-accent` + `color` and `foo` + `accent-color` are one string, reachable by an author writing
- * `/foo-accent` on a `color` motion. **Fixed-length** is not true: ids run from two characters to seven
- * (`shorthash2('50')` is `rI`), so the id is a delimiter but not an unforgeable one, and a name whose tail
- * *is* another instance's id can still absorb. That residual is enumerated below rather than argued away,
- * because it is the difference between "safe against every name" and "safe against every name nobody
- * crafted".
+ *   --jumi-slot-5-flick-Z2excak-rotate
+ *   --jumi-slot-24-flick-animation-duration-Z2excak-rotate
  *
- * The corpus is built **from the vocabulary** for the reason the probe learned: a corpus of generic samples
- * reports no collisions in either shape, which is how a wrong order looks safe until someone writes the
- * name that breaks it. Every name here is a real attribute, `foo` plus an attribute, or `foo` plus the piece
- * of an attribute that another attribute already names (`color` under `accent-color`, `width` under
- * `stroke-width`).
+ * The prefix is what makes it exact rather than merely readable. Every shape that joined the three pieces
+ * with hyphens alone was a collision waiting for the right name, and the history is worth keeping because
+ * each step looked fine until it was measured:
+ *
+ *   flick-rotate-Z2excak        `foo-accent` on `color` and `foo` on `accent-color` are one string
+ *   flick-Z2excak-rotate        a name whose tail is another instance's id absorbs its key
+ *   <units>-flick-Z2excak-rotate   a boundary that is a fact about the shape
+ *
+ * The third is exact **by construction**: the reader is a left inverse of the writer. That is the criterion
+ * the CTO set, and it is a stronger claim than "no collisions in a corpus", so the round trip below is the
+ * assertion and the enumeration is its corroboration.
+ *
+ * The corpus is built **from the vocabulary**, because a corpus of generic samples reports no collisions in
+ * any of these shapes — which is exactly how a wrong one looks safe. Every name here is a real attribute,
+ * `foo` plus an attribute, `foo` plus the piece of an attribute another attribute already names (`color`
+ * under `accent-color`), or a name that attacks the *encoding*: Unicode, characters CSS escapes, and names
+ * that read like the prefix.
  */
 
 /** Every attribute Jumi can give a slot: the animatable properties, and the effects. */
@@ -37,14 +40,14 @@ const VOCABULARY = [
   ...Object.keys(effectKeyframes),
 ]
 
-/** The attributes that end in another attribute's name — the overlaps the corpus attacks through. */
+/** The attributes that end in another attribute's name — the overlaps a hyphen-joined key loses to. */
 const OVERLAPS = VOCABULARY.flatMap(attribute =>
   VOCABULARY.filter(
     suffix => attribute !== suffix && attribute.endsWith(`-${suffix}`),
   ).map(suffix => [attribute, suffix] as const),
 )
 
-/** Names to try: generic, every attribute, and every `foo-` spelling the overlaps make possible. */
+/** Names to try: adversarial by construction, and the `foo-` spellings the overlaps make possible. */
 const NAMES = [
   ...new Set([
     'a',
@@ -53,117 +56,127 @@ const NAMES = [
     'foo-animation-duration',
     'foo-bar-baz',
     'loop',
-    ...OVERLAPS.flatMap(([attribute, suffix]) => [
+    '5-flick',
+    'foo--bar',
+    'foo.bar',
+    'foo,bar',
+    '2fast',
+    'café',
+    '日本語',
+    '👍emoji',
+    ...VOCABULARY.slice(0, 20),
+    ...OVERLAPS.slice(0, 30).flatMap(([attribute, suffix]) => [
       `foo-${attribute}`,
       `foo-${attribute.slice(0, -(suffix.length + 1))}`,
     ]),
-    ...VOCABULARY,
-    ...VOCABULARY.map(attribute => `foo-${attribute}`),
   ]),
-]
+].filter(addressableName)
 
-/** Every name the model would accept, with the unnamed instance as its own case. */
-const LEGAL: Array<null | string> = [null, ...NAMES.filter(addressableName)]
-
-/**
- * Ids as the model produces them, over values a corpus would plausibly declare — three of them, because
- * the enumeration below runs the whole attribute vocabulary against every name and the gate instruments
- * this file. The id enters the key only as one of these tokens, so three are three ways to be wrong.
- */
-const IDS = [
-  ...new Set(['50', '0:0|100:1', 'scale'].map(value => shorthash2(value))),
-]
+/** Ids as the model produces them — base62, two to seven characters — plus one shaped like an attribute. */
+const IDS = ['k1aaa', 'Z2excak', 'rI', 'rotate']
 
 /**
- * The first key two different triples share, over the whole cross product.
- *
- * A `Set` of keys and a count, rather than a map of key to triple: the enumeration is hundreds of
- * thousands of entries, and injectivity is exactly `keys.size === count`. What the collision *was* is the
- * residual test's business, not this one's.
+ * The text a name occupies in the emitted variable — the test's own statement of the format, deliberately
+ * not imported from the implementation, because an assertion that reuses the code under test asserts only
+ * that the code is itself.
  */
-const shared = (ids: string[], names: Array<null | string>) => {
-  const keys = new Set<string>()
-  let count = 0
+const emitted = (name: string) => cssEscape(`x${name}`).slice(1)
 
-  for (const attribute of VOCABULARY)
-    for (const id of ids)
-      for (const name of names) {
-        keys.add(instanceKey(attribute, id, name ?? undefined))
-        count += 1
-      }
+/** The variable a named instance gets, which is what a reader actually parses. */
+const variable = (attribute: string, id: string, name: string, part: string) =>
+  cssEscape(`--jumi-slot-${instanceKey(attribute, id, name)}-${part}`)
 
-  return { count, keys }
-}
+/** The key back out of that variable, the way the pass does it: the part is known, the prefix says the rest. */
+const keyOf = (text: string, part: string) =>
+  text.slice('--jumi-slot-'.length, text.length - part.length - 1)
 
-describe('the slot key', () => {
-  it('spells the name first, the id between the name and the attribute', () => {
-    // The vocabulary itself, pinned, so a reorder is a failing test and not a diff nobody reads.
+describe('the instance key', () => {
+  it('states the name length first, and counts the text that ships', () => {
     expect(instanceKey('rotate', 'Z2excak', 'flick')).toBe(
-      'flick-Z2excak-rotate',
+      '5-flick-Z2excak-rotate',
     )
-    expect(instanceKey('background-color', '23M1JK', 'pulse')).toBe(
-      'pulse-23M1JK-background-color',
-    )
-
-    // No name, no id: the definition, for a composed tween or an effect.
-    expect(instanceKey('rotate', 'Z2excak')).toBe('rotate-Z2excak')
-    expect(instanceKey('filter')).toBe('filter')
-  })
-
-  it('builds its corpus from legal names and real overlaps', () => {
-    expect(LEGAL.length).toBeGreaterThan(300)
-
-    // The overlap is a fact about the vocabulary, not a hypothetical.
-    expect(OVERLAPS).toContainEqual(['accent-color', 'color'])
-    expect(OVERLAPS).toContainEqual(['stroke-width', 'width'])
-  })
-
-  it('is injective over the vocabulary, for the ids the model produces', () => {
-    const { count, keys } = shared(IDS, LEGAL)
-
-    // One key per triple, over several hundred attributes-and-effects × several ids × several
-    // hundred names. A shorter set is a collision, and the residual test below names the shape.
-    expect(keys.size).toBe(count)
-    expect(count).toBeGreaterThan(200_000)
-  })
-
-  it('records the residual: a name whose tail is another instance id', () => {
-    // Not a hypothetical, and not a name anyone writes by accident: this is what the readable key costs,
-    // and the assertion is here so the cost is visible rather than discovered.
-    expect(
-      instanceKey('right', 'rotate', 'foo-backdrop-filter-hue-rotate'),
-    ).toBe(instanceKey('rotate-right', 'rotate', 'foo-backdrop-filter-hue'))
-
-    // Reachability: an id is the hash of a value or a phrase (`shorthash2('50')` is `rI`), so a crafted name
-    // has to end in the exact id of a definition on an overlapping attribute — the author has to compute
-    // another motion's hash and write it into theirs. Ids are short enough that the word can collide by
-    // chance, which is why this is recorded.
-    expect(shorthash2('50')).toHaveLength(2)
-    expect(new Set(IDS.map(id => id.length)).size).toBeGreaterThan(1)
-
-    // The two ways out, for whoever rules on it: names restricted to a hyphen-free token, which makes the
-    // key provably injective, or a separator a name cannot hold. Both cost something this shape bought.
-  })
-
-  it('shows what the reordered key would cost, so nobody reorders it back', () => {
-    // The shape that was proposed first: `<name>-<attribute>-<id>`. Its collision needs no crafted hash at
-    // all — only a name that ends where another attribute's name begins.
-    const reordered = (attribute: string, id: string, name: string) =>
-      `${name}-${attribute}-${id}`
-
-    expect(reordered('color', 'k1aaa', 'foo-accent')).toBe(
-      reordered('accent-color', 'k1aaa', 'foo'),
-    )
-    expect(reordered('width', 'k1aaa', 'foo-stroke')).toBe(
-      reordered('stroke-width', 'k1aaa', 'foo'),
+    expect(instanceKey('rotate', 'Z2excak', 'flick-animation-duration')).toBe(
+      '24-flick-animation-duration-Z2excak-rotate',
     )
 
-    // …and the shipped shape keeps both pairs apart, which is the whole of the argument.
+    // The count is of the **emitted** name, and the key carries the name as written: `foo.bar` is seven
+    // characters the author typed and eight characters a stylesheet holds, and it is the eight a reader has
+    // to slice by. Measured against a real compile in `scripts/spike-slot-boundary.mjs`: the variable is
+    // `--jumi-slot-8-foo\.bar-d38-scale`.
+    expect(instanceKey('scale', 'd38', 'foo.bar')).toBe('8-foo.bar-d38-scale')
+    expect(variable('scale', 'd38', 'foo.bar', 'animation-duration')).toBe(
+      '--jumi-slot-8-foo\\.bar-d38-scale-animation-duration',
+    )
+  })
+
+  it('round-trips every triple: the reader is a left inverse of the writer', () => {
+    const wrong: string[] = []
+    let checked = 0
+
+    for (const attribute of VOCABULARY)
+      for (const id of IDS)
+        for (const name of NAMES) {
+          checked += 1
+
+          const text = variable(attribute, id, name, 'animation-duration')
+          const back = parseInstanceKey(keyOf(text, 'animation-duration'))
+
+          // The name comes back as the variable spells it, which is all a reader needs: keys are compared
+          // with each other in the emitted text, never with what the author typed.
+          if (
+            !back ||
+            back.attribute !== attribute ||
+            back.id !== id ||
+            back.name !== emitted(name)
+          )
+            wrong.push(
+              `${JSON.stringify(name)} on ${attribute} / ${id} → ${text.slice(0, 60)}`,
+            )
+        }
+
+    expect(wrong.slice(0, 3)).toEqual([])
+    expect(checked).toBeGreaterThan(50_000)
+  })
+
+  it('keeps two attributes that overlap apart, and two names over one definition', () => {
+    // The pair that killed the hyphen-joined order: `color` is a suffix of `accent-color`, so nothing about
+    // those two names distinguishes them once the attribute sits between the name and the id.
     expect(instanceKey('color', 'k1aaa', 'foo-accent')).not.toBe(
       instanceKey('accent-color', 'k1aaa', 'foo'),
     )
-    expect(instanceKey('width', 'k1aaa', 'foo-stroke')).not.toBe(
-      instanceKey('stroke-width', 'k1aaa', 'foo'),
+
+    // And the pair that killed the readable-but-undelimited one: a name whose tail is another instance's id.
+    expect(instanceKey('rotate-x', 'rotate', 'foo-backdrop-filter-hue-rotate')).not.toBe(
+      instanceKey('rotate', 'rotate', 'foo-backdrop-filter-hue'),
     )
+  })
+
+  it('never mistakes a definition or an effect for a named instance', () => {
+    // The reader's null is the answer for everything that is not a named instance, so a caller comparing a
+    // definition gets it right without asking a second question.
+    for (const notAnInstance of [
+      'rotate-Z2excak',
+      'filter',
+      'bounce-in',
+      '5-flick',
+      '',
+      'x-',
+      '2a-b',
+    ])
+      expect(parseInstanceKey(notAnInstance), notAnInstance).toBeNull()
+  })
+
+  it('takes no character away from a name that was legal before', () => {
+    // The whole point of a length prefix over a delimiter: nothing is reserved. A name may hold the sequence
+    // the rejected alternative needed (`--`), the characters CSS escapes, and anything outside ASCII.
+    for (const name of ['foo--bar', 'foo.bar', 'foo:bar', 'foo)bar', '日本語', '👍emoji']) {
+      expect(addressableName(name)).toBe(true)
+
+      const back = parseInstanceKey(
+        keyOf(variable('rotate', 'Z2excak', name, 'animation-delay'), 'animation-delay'),
+      )
+
+      expect(back?.name, name).toBe(emitted(name))
+    }
   })
 })

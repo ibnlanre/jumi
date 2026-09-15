@@ -691,6 +691,14 @@ const NAMED_ARMS = [
     'n',
     'animate-scale-110/flick-animation-duration animation-duration-600/flick-animation-duration',
   ],
+  // A name the stylesheet has to **escape**, which is where the length prefix earns its keep: the count is of
+  // the text that ships (`foo.bar` occupies eight characters as `foo\.bar`), so a reader that slices by it has
+  // to be reading the emitted text and not the author's word. A reader that counted what the author typed
+  // takes one character too many and lands inside the name.
+  [
+    'o',
+    'animate-scale-110/[foo.bar] animation-duration-600/[foo.bar]',
+  ],
 ]
 
 const NAMED_CANDIDATES = [
@@ -951,6 +959,12 @@ const naming = [
     durationOf(forward, 'n', 'jumi-scale-') === '0.6s',
     `read ${durationOf(forward, 'n', 'jumi-scale-') ?? 'no animation at all'} — the control is ` +
       '/flick-animation-duration, and an instance read as "flick" would fill no key at all',
+  ],
+  [
+    'a name CSS escapes is counted as the stylesheet spells it',
+    durationOf(forward, 'o', 'jumi-scale-') === '0.6s',
+    `read ${durationOf(forward, 'o', 'jumi-scale-') ?? 'no animation at all'} — the control is ` +
+      '/[foo.bar], and a count taken from the author\'s word is one character short',
   ],
 ]
 

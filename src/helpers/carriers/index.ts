@@ -282,8 +282,12 @@ const namedHoist = (
   key: string,
   selected: ReadonlyMap<string, string>,
 ) => {
+  // The key is already the text a variable name holds — it was parsed out of one — so the label declaration
+  // is built by concatenation. Escaping it again escapes the escapes: a name that needs one (`foo.bar` →
+  // `foo\.bar`) became `foo\\.bar`, the lookup missed, and the control that named the motion reached
+  // nothing.
   const name = own.find(
-    candidate => candidate.prop === cssEscape(`--jumi-${key}-label`),
+    candidate => candidate.prop === `--jumi-${key}-label`,
   )?.value
 
   if (!name) return value
@@ -329,17 +333,50 @@ const referencedSlot = (entry: string) => {
  * instances onto one — measured, `…/enter` with `200ms/enter` beside `…/exit` with `1800ms/exit`
  * resolved `1.8s, 1.8s`, both positions reading the single hoist the last position won.
  *
- * The part is **given**, and it has to be. An instance name may itself read like a part —
- * `flick-animation-duration` is legal, and `scripts/behaviour-check.mjs` measures it — so a scan for the
- * first part-shaped suffix inside the name reads `flick` out of
- * `--jumi-slot-flick-animation-duration-Z2excak-rotate-animation-duration` and publishes the hoist under a
- * key nothing activates. The lookahead is what keeps the scan inside the variable: a key cannot hold a
- * comma, a paren or whitespace, so the only match that satisfies it is the one that ends the name.
+ * The part is **given**, and the key is read by its own length prefix.
+ *
+ * Both halves of that are corrections to a reader that guessed. An instance name may read like a part —
+ * `flick-animation-duration` is legal, and `behaviour-check.mjs` arm `n` is exactly it — so scanning for the
+ * first part-shaped suffix inside the variable read `flick` out of it, published the hoist under a key nothing
+ * activates, and the motion silently never ran. Handing the part in removes the guess; the prefix removes the
+ * need for one, because the name's end is stated rather than searched for. What is left is arithmetic: the
+ * digits say how many units the name occupies, the id runs to the next hyphen, and the attribute is what
+ * remains before the part.
  */
-const linkedSlot = (entry: string, part: string) =>
-  new RegExp(`^var\\(--jumi-slot-([^,()\\s]+?)-${part}(?=[,)\\s])`).exec(
-    entry.trim(),
-  )?.[1] ?? null
+const linkedSlot = (entry: string, part: string) => {
+  const text = entry.trim()
+  const prefix = 'var(--jumi-slot-'
+
+  if (!text.startsWith(prefix)) return null
+
+  const body = text.slice(prefix.length)
+  const cut = body.indexOf('-')
+
+  if (cut < 1) return null
+
+  const count = Number(body.slice(0, cut))
+
+  if (!Number.isSafeInteger(count) || count < 1) return null
+
+  const rest = body.slice(cut + 1)
+  const name = rest.slice(0, count)
+
+  if (name.length !== count) return null
+
+  // The attribute is **lazy** and the part is anchored: the first occurrence of the part that ends a variable
+  // name is the variable's own, and the chain carries the same part again inside its fallback copy
+  // (`… -animation-duration, var(--jumi-rotate-animation-duration, …)`), where a greedy attribute would run
+  // past it and swallow the fallback — measured, arm `o` in `behaviour-check.mjs` read the whole chain as an
+  // attribute and published the hoist under a key that filled nothing. Nothing inside an attribute can look
+  // like the end of one either: a vocabulary attribute holds no comma, paren or whitespace of its own.
+  const match = new RegExp(
+    `^-(?<id>[^-]+)-(?<attribute>.+?)-${part}(?=[,)\\s])`,
+  ).exec(rest.slice(count))
+
+  return match?.groups
+    ? `${count}-${name}-${match.groups.id}-${match.groups.attribute}`
+    : null
+}
 
 /**
  * Split a comma-separated value on its top-level commas.
@@ -848,7 +885,7 @@ const hoist = (
 
       for (const key of instanceKeys(rule, match[1])) {
         const name = own.find(
-          candidate => candidate.prop === cssEscape(`--jumi-${key}-label`),
+          candidate => candidate.prop === `--jumi-${key}-label`,
         )?.value
 
         if (!name) continue
