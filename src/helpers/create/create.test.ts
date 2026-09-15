@@ -340,8 +340,9 @@ describe('keyframe emission', () => {
       names
         .map(
           name =>
-            new RegExp(`^var\\(--jumi-${attribute}-([\\w-]+?)-animation-name`)
-              .exec(name)?.[1],
+            new RegExp(
+              `^var\\(--jumi-${attribute}-([\\w-]+?)-animation-name`,
+            ).exec(name)?.[1],
         )
         .find(Boolean)
 
