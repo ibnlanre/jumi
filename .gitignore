@@ -13,6 +13,10 @@ examples/output.css
 # `mkdtempSync` directory with a leading dot. They are regenerated on every run, and the benchmark
 # corpora run to megabytes, so they are never worth committing whatever a run leaves behind.
 scripts/tmp-*
+# A dot-prefixed *file*, which the two patterns above missed: `scripts/tmp-*` wants a leading `t`, and
+# `scripts/.*-*/` wants a directory. `scripts/.tmp-timing-phrase.mjs` slipped between them and was committed,
+# so the artifact this section exists to keep out was in the repository.
+scripts/.*-*
 scripts/.*-*/
 
 # Logs

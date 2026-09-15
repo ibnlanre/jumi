@@ -1,17 +1,50 @@
 {
+  // **One formatter per language, and named.** Four things here can format: ESLint (the default below, which
+  // runs Prettier through `eslint-plugin-prettier`), the Prettier extension, the Astro extension, and the
+  // formatters built into VS Code. Naming a default is not enough on its own — when the default provider
+  // declines a file, VS Code silently falls back to the next one, which is how one file ends up with two
+  // different shapes depending on which extension happened to win.
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
   "editor.formatOnPaste": true,
   "editor.formatOnSave": true,
-  "editor.formatOnType": true,
-  "editor.detectIndentation": true,
+  // A third writer, firing while you type on a file the save action formats anyway, and the setting most
+  // likely to be experienced as "the formatter keeps fighting me".
+  "editor.formatOnType": false,
+  // `detectIndentation` beats `tabSize`: one file with four-space indentation makes VS Code use four for that
+  // file, Prettier then rewrites it to two, and the diff reads as a formatter that changed its mind.
+  "editor.detectIndentation": false,
   "editor.tabSize": 2,
+  // The built-in TypeScript/JavaScript/JSON formatters are the fallback that makes a collision invisible:
+  // ESLint declines nothing, but when it errors the built-in takes over and writes a *different* shape.
+  "js/ts.format.enabled": false,
+  "json.format.enable": false,
+  // ESLint cannot parse `.astro`, so it is named. It goes to Prettier itself rather than to the Astro
+  // extension's bundled copy, because the workspace's `prettier.config.mjs` declares
+  // `prettier-plugin-astro` — and a bundled copy resolves its own plugin set, which is the divergence the
+  // project config exists to remove. `prettier.enable` is resource-scoped, so this override is enough.
+  "[astro]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  // JSON is the case that shows why a named default is not enough on its own. The lint path applies Prettier
+  // to `js`, `mjs`, `cjs` and `ts` and **not** to JSON — `EXT.JSON` is declared in `eslint.config.mts` and
+  // never used in a `files:` list — so with the built-in formatter off, JSON had no formatter at all: ESLint
+  // declines it, the built-in is disabled, and the file is left silently as it was. Measured on a fixture:
+  // `eslint --fix` leaves a messy JSON file untouched, `prettier --write` does not.
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "prettier.enable": true,
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "prettier.enable": true,
+  },
+  "prettier.enable": false,
   "editor.codeActionsOnSave": {
     "source.addMissingImports.ts": "always",
     "source.fixAll.eslint": "always",
     "source.fixAll.ts": "always",
     "source.removeUnusedImports": "always"
   },
-  "prettier.enable": false,
   "css.customData": [".vscode/tailwind.v4.json"],
   // The Tailwind IntelliSense extension builds one project per CSS file that imports "tailwindcss",
   // and creating them all is what exhausted its heap. Five files here are real entry points —
