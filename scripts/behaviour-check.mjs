@@ -882,6 +882,66 @@ const propertyAddress = async () => {
 
 const property = await propertyAddress()
 
+/**
+ * The two directions of the inheritance rule, measured on **nested** elements.
+ *
+ * A property **scope** inherits: `animation-duration-500/rotate` on a wrapper is how an author times every
+ * rotate motion in a subtree, so the motion inside it must read `0.5s`. An instance **address** does not:
+ * `animation-duration-500/flick` on the same wrapper writes a label, the label is registered
+ * `inherits: false`, and a nested motion that named *itself* `flick` must therefore still read the substrate
+ * default rather than its ancestor's value. Naming the inner motion the same word is what makes the second
+ * arm sharp — an unnamed inner motion would read the same thing either way.
+ *
+ * Both are load-bearing and neither was asserted. Section 7 covers the other direction (an ancestor's
+ * *activation* must not reach a descendant), which left the scope's propagation — the whole reason
+ * `--jumi-rotate-animation-duration` is deliberately left unregistered — resting on a code comment and a
+ * one-off probe. Registering that variable is the cheapest way to watch this arm fail.
+ *
+ * Both runs are compared, for the reason every naming arm is: which link wins must not depend on the order
+ * the candidates were compiled in.
+ */
+const SCOPE_CANDIDATES = [
+  'animation-duration-500/rotate',
+  'animation-duration-500/flick',
+  'animate-rotate-45',
+  'animate-rotate-45/flick',
+]
+
+const scopeReadings = async candidates => {
+  const built = build(await compiler(ENTRY, root), [
+    ...new Set([...candidates, ...SCOPE_CANDIDATES]),
+  ])
+  const page = await load(
+    built.css,
+    '<div id="scope-rotate" class="animation-duration-500/rotate">' +
+      '<i id="scope-rotate-inner" class="animate-rotate-45"></i></div>' +
+      '<div id="scope-flick" class="animation-duration-500/flick">' +
+      '<i id="scope-flick-inner" class="animate-rotate-45/flick"></i></div>',
+  )
+
+  const reading = await page.evaluate(() => {
+    const duration = selector => {
+      const style = getComputedStyle(document.querySelector(selector))
+      const names = style.animationName.split(',').map(value => value.trim())
+      const at = names.findIndex(name => name.startsWith('jumi-rotate-'))
+
+      return style.animationDuration.split(',')[at]?.trim() ?? 'absent'
+    }
+
+    return {
+      instance: duration('#scope-flick-inner'),
+      scope: duration('#scope-rotate-inner'),
+    }
+  })
+
+  await page.close()
+
+  return reading
+}
+
+const scope = await scopeReadings(NAMED_CANDIDATES)
+const scopeReversed = await scopeReadings([...NAMED_CANDIDATES].reverse())
+
 const separate = await separateParts()
 
 /**
@@ -1083,6 +1143,22 @@ const naming = [
           entry.eased.some(easing => easing.startsWith('0:')),
       ),
     JSON.stringify(property),
+  ],
+  [
+    'a property scope reaches a nested motion',
+    scope.scope === '0.5s',
+    `read ${scope.scope} — a wrapper's /rotate control must time the motion inside it`,
+  ],
+  [
+    'and an instance address does not, even when the nested motion uses the same name',
+    scope.instance === '1s',
+    `read ${scope.instance} — the wrapper declares /flick and the inner motion named itself flick`,
+  ],
+  [
+    'candidate order cannot decide either direction',
+    scope.scope === scopeReversed.scope &&
+      scope.instance === scopeReversed.instance,
+    `${JSON.stringify(scope)} vs ${JSON.stringify(scopeReversed)}`,
   ],
 ]
 

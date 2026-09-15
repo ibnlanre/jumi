@@ -467,26 +467,33 @@ describe('animations wiring', () => {
     creator.property('rotate')('0:0deg|100:90deg', { modifier: null })
     const animations = creator.animations
     const flick = `--jumi-slot-${instanceKey('rotate', shorthash2('0:0deg|58:0deg'), 'flick')}`
+    const flickKey = instanceKey('rotate', shorthash2('0:0deg|58:0deg'), 'flick')
 
     // Each position reads *its own* slot variable before the property's control, so one animation of
     // a property can be timed without the other — which is how two animations summed by
-    // `animation-composition: add` are timed apart.
+    // `animation-composition: add` are timed apart. The seven the shorthand carries are staged this way
+    // and swapped for the label inside the hoist's value (`namedHoist`), which is element-local because it
+    // is published on the rule that named the motion.
     expect(animations['animation-duration']).toContain(
       `var(${flick}-animation-duration, var(--jumi-rotate-animation-duration, var(--jumi-animation-duration)))`,
     )
 
-    // Composition and timeline apply to one animation, so they are chained the same way.
+    // The three the shorthand cannot carry are read under the label itself. The slot link that used to
+    // stand here was filled by a declaration on the naming rule; the chain is per position, so every
+    // position can name its own label and nothing has to stand between them.
     expect(animations['animation-composition']).toContain(
-      `var(${flick}-animation-composition, var(--jumi-rotate-animation-composition, var(--jumi-animation-composition)))`,
+      'var(--jumi-label-flick-animation-composition, var(--jumi-rotate-animation-composition, var(--jumi-animation-composition)))',
     )
     expect(animations['animation-timeline']).toContain(
-      `var(${flick}-animation-timeline, `,
+      'var(--jumi-label-flick-animation-timeline, ',
     )
 
-    // Range is the third list of that shape, and it is a list *per animation*: position 0 may carry
-    // a real range while position 1 falls through to the global default.
+    // Range reads its label too, and keeps the range variant's publication between the label and the
+    // property's control. That link is **not** this layer: `rangeReadings` derives the instance, so
+    // `animation-range-entry:animate-fade-in` writes it, and a phrase whose chain did not read it emitted,
+    // validated and did nothing.
     expect(animations['animation-range']).toContain(
-      `var(${flick}-animation-range, `,
+      `var(--jumi-label-flick-animation-range, var(--jumi-${flickKey}-animation-range, `,
     )
     expect(animations['animation-range']).toContain(
       'var(--jumi-rotate-animation-range, var(--jumi-animation-range))',
@@ -497,20 +504,22 @@ describe('animations wiring', () => {
       ).length - 1,
     ).toBe(2)
 
-    // **And no name is anywhere in it.** Not as a value and not as a variable — a chain may carry the
-    // *slot*, which is inert on an element that never set it, but nothing may carry a label. The
-    // aggregate is one declaration block shared by every element that matches the composition, so a name
-    // written into a chain is a name every element answers to — including elements that called the motion
-    // something else, or nothing at all. Measured before the split: with two elements naming one effect
-    // `reveal` and `loop`, `animation-duration-900/loop` reached the `reveal` one, and which name won
-    // depended on the order the candidates were compiled in.
+    // **A name is in the aggregate now, and only for those three.** That is safe for one reason, and the
+    // reason is a registration rather than a style: `nameSlot` declares every label `inherits: false`, so
+    // an element that wrote no name has no value for it and falls through the chain. The test beside this
+    // one asserts the pair — the reference and the registration it depends on.
     //
-    // The word itself *is* in the key now, which is the readable vocabulary this shape bought, so the
-    // assertion is about the namespace rather than the spelling.
-    for (const part of Object.keys(animations).filter(part =>
-      part.startsWith('animation-'),
-    ))
-      expect(String(animations[part])).not.toContain('--jumi-label-')
+    // The alternative was measured, and it is why the label namespace exists at all: before it, the name
+    // *was* the variable (`--jumi-<name>-<part>`), nothing registered it, so it inherited — and two
+    // elements naming one effect (`reveal`, `loop`) reached each other, with the winner decided by the
+    // order the candidates were compiled in.
+    expect(String(animations['animation-composition'])).toContain(
+      'var(--jumi-label-flick-',
+    )
+
+    // The seven that ride the shorthand carry no label here: their name is written into the hoist's value
+    // on the naming rule instead, so the aggregate stays name-free for them.
+    expect(String(animations['animation-duration'])).not.toContain('--jumi-label-')
   })
 })
 
@@ -570,6 +579,80 @@ describe('animation-name registration', () => {
     })
   })
 
+  it('registers every label a separateParts chain reads, so a name in a shared chain cannot inherit', () => {
+    const { addBase, creator } = setup()
+
+    creator.property('rotate')('0:0deg|58:0deg', { modifier: 'flick' })
+    creator.property('rotate')('0:0deg|100:90deg', { modifier: null })
+    const animations = creator.animations
+    const rules = registered(addBase)
+
+    const labels = new Set(
+      Object.values(animations).flatMap(value =>
+        [...String(value).matchAll(/var\((--jumi-label-[^,)]+)/g)].map(
+          match => match[1],
+        ),
+      ),
+    )
+
+    // Exactly the three separate parts, and only for the slot that was named: an unnamed position reads
+    // the property's control, and the range variant's link is not a label.
+    expect([...labels].sort()).toEqual([
+      '--jumi-label-flick-animation-composition',
+      '--jumi-label-flick-animation-range',
+      '--jumi-label-flick-animation-timeline',
+    ])
+
+    for (const label of labels)
+      expect(rules[`@property ${label}`]).toEqual({
+        inherits: 'false',
+        syntax: '"*"',
+      })
+  })
+
+  it('gives every link in a separateParts chain a known writer', () => {
+    const { creator } = setup()
+
+    creator.property('rotate')('0:0deg|58:0deg', { modifier: 'flick' })
+    creator.property('rotate')('0:0deg|100:90deg', { modifier: null })
+    const animations = creator.animations
+
+    // The writer classes, enumerated from the model rather than taken from a fixture:
+    //
+    //   label     `--jumi-label-<name>-<part>`    a control that named a motion
+    //   variant   `--jumi-<instance-key>-<part>`  `rangeReadings`, so range only — and load-bearing
+    //   scope     `--jumi-<attribute>-<part>`     a control that named no motion
+    //   terminal  `--jumi-<part>`                 the substrate, documented as the last link
+    //
+    // A link matching none of them is a namespace nothing writes. That is the shape this assertion exists
+    // to stop: the per-instance slot links went on resolving harmlessly for as long as nothing asked who
+    // wrote them, and a chain that reads a variable no rule declares is a fossil by definition.
+    const writes = (part: string, link: string) =>
+      new RegExp(`^--jumi-label-[\\w-]+-${part}$`).test(link) ||
+      (part === 'animation-range' &&
+        new RegExp('^--jumi-[\\w-]+-[\\w-]+-animation-range$').test(link)) ||
+      new RegExp(`^--jumi-[\\w-]+-${part}$`).test(link) ||
+      link === `--jumi-${part}`
+
+    for (const part of [
+      'animation-composition',
+      'animation-range',
+      'animation-timeline',
+    ]) {
+      const links = [
+        ...String(animations[part]).matchAll(/var\((--jumi-[^,)]+)/g),
+      ].map(match => match[1])
+
+      expect(links.length).toBeGreaterThan(0)
+
+      for (const link of links) {
+        // The layer this change removed, asserted as gone rather than as never-written.
+        expect(link.startsWith('--jumi-slot-')).toBe(false)
+        expect(writes(part, link)).toBe(true)
+      }
+    }
+  })
+
   it('registers a phrase name against its own slot', () => {
     const { addBase, creator } = setup()
 
@@ -621,7 +704,7 @@ describe('animation-name registration', () => {
     }
   })
 
-  it('assigns a name separately only for the parts the shorthand cannot carry', () => {
+  it('assigns no per-instance part link, and names the three the shorthand cannot carry', () => {
     const { addBase, creator } = setup()
 
     creator.property('rotate')('0:16deg|58:0deg', { modifier: 'flick' })
@@ -629,22 +712,28 @@ describe('animation-name registration', () => {
     const key = instanceKey('rotate', shorthash2('0:16deg|58:0deg'), 'flick')
     const utilities = registered(addBase)
 
-    // These three are assigned on the rule that named the motion, because the composition declares them
-    // in one rule for every activating selector and so knows no names. Registered for the same reason as
-    // ever: a descendant that animates the same property must not answer to a name declared above it.
+    // Nothing is assigned on the rule that named the motion, for any of the ten. The three the shorthand
+    // cannot carry read the label inside the composition's own chain (`animationParts`); the other seven
+    // are sections of the shorthand, whose value this rule publishes with the name already in it.
+    for (const part of Object.keys(animations).filter(
+      part => part.startsWith('animation-') && part !== 'animation-name',
+    )) {
+      expect(utilities[`@property --jumi-slot-${key}-${part}`]).toBeUndefined()
+      expect(utilities[`@property --jumi-label-flick-${part}`]).toEqual({
+        inherits: 'false',
+        syntax: '"*"',
+      })
+    }
+
+    // So the assertion is about *which* parts a chain names, not whether a name appears at all: the label
+    // is registered for all ten and read by exactly the three that have no shorthand section to ride in.
     for (const part of [
       'animation-composition',
       'animation-range',
       'animation-timeline',
     ])
-      expect(utilities[`@property --jumi-slot-${key}-${part}`]).toEqual({
-        inherits: 'false',
-        syntax: '"*"',
-      })
+      expect(String(animations[part])).toContain('--jumi-label-flick-')
 
-    // The other seven are not registered, because nothing declares them anywhere: they are sections of
-    // the `animation` shorthand, whose value the naming rule publishes with the name already in it. A
-    // registration with nothing to fill it is an address that reads as silence.
     for (const part of [
       'animation-delay',
       'animation-direction',
@@ -654,15 +743,6 @@ describe('animation-name registration', () => {
       'animation-play-state',
       'animation-timing-function',
     ])
-      expect(utilities[`@property --jumi-slot-${key}-${part}`]).toBeUndefined()
-
-    // The aggregate still addresses the slot for every part, which is what the composition reads — and
-    // where no label is written, because that block is shared by every element that matches it. The key
-    // spells the instance (that is the readable vocabulary), so the assertion is about the namespace: a
-    // chain may carry a slot, and never a label.
-    for (const part of Object.keys(animations).filter(part =>
-      part.startsWith('animation-'),
-    ))
       expect(String(animations[part])).not.toContain('--jumi-label-')
   })
 

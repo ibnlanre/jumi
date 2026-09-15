@@ -322,6 +322,410 @@ for (const [label, css] of [
   )
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// §2  the three separate parts
+//
+// `animation-composition`, `animation-range` and `animation-timeline` have no shorthand section, so the
+// composition declares them itself. It is one rule for every activating selector, which is why it cannot
+// name a motion — and why a name reaches it through three fills on the rule that wrote the name:
+//
+//   .animate-rotate-45\/alpha {
+//     --jumi-<key>-label: alpha;                            ← the name, as written
+//     --jumi-slot-<key>-animation-composition: var(--jumi-label-alpha-animation-composition);
+//     --jumi-slot-<key>-animation-range:       var(--jumi-label-alpha-animation-range);
+//     --jumi-slot-<key>-animation-timeline:    var(--jumi-label-alpha-animation-timeline);
+//   }
+//
+// The composition then reads `var(--jumi-slot-<key>-animation-<part>, … --jumi-<attribute>-… )`.
+//
+// §1 removed the link for the parts the shorthand carries, by inlining the label into the hoist. This
+// section asks the same question for the three it does not carry: does the composition change if the
+// fills go and the chain names the label directly?
+//
+// Three models, never two — a deletion on its own is not a proposal, it is a control:
+//
+//   A  shipped:  fills present, composition reads the slot
+//   B  inlined:  fills absent, composition reads `var(--jumi-label-<name>-<part>`, fallback intact
+//   C  deleted:  fills absent, composition untouched — the negative control. If C also reads the same,
+//                the fills were never load-bearing and this section measures nothing.
+//
+// `--jumi-label-*` is registered `inherits: false` by `nameSlot`, which is what keeps B element-local:
+// the composition is shared, but a descendant that did not write the name has no value for the label and
+// falls through the chain. That is the arm that can tell the two apart.
+
+const SEPARATE = [
+  'animation-composition',
+  'animation-range',
+  'animation-timeline',
+]
+
+/**
+ * The arms for this section, and the four cases the model has to survive.
+ *
+ * `p` and `q` are two names over one definition — the case a chain that named a motion globally once lost
+ * order-dependently. `r` is a bare sibling on the same property with no control at all. `t` names itself
+ * after a structural address of a *different* property (`/scale` on a rotate motion): the model refuses to
+ * write a label for it, so there is nothing for the inline model to reference and it must not misroute.
+ */
+const PART_ARMS = [
+  [
+    'p',
+    'animate-rotate-45/alpha animation-composition-add/alpha animation-range-[25%_75%]/alpha animation-timeline-scroll/alpha',
+  ],
+  [
+    'q',
+    'animate-rotate-45/beta animation-composition-add/beta animation-range-[10%_90%]/beta animation-timeline-scroll/beta',
+  ],
+  ['r', 'animate-rotate-45'],
+  ['t', 'animate-rotate-45/scale animation-composition-add/scale'],
+]
+
+/** The descendant of `p`: same definition and the same property, but it never wrote a name. */
+const PART_DESCENDANT = ['desc', 'animate-rotate-45']
+
+const PART_MARKUP = `
+<div data-arm="p" class="${PART_ARMS[0][1]}">
+  <div data-arm="desc" class="${PART_DESCENDANT[1]}"></div>
+</div>
+${PART_ARMS.slice(1)
+  .map(([id, classes]) => `<div data-arm="${id}" class="${classes}"></div>`)
+  .join('\n')}`
+
+const PART_CANDIDATES = [
+  ...new Set([
+    ...CANDIDATES,
+    ...PART_ARMS.flatMap(([, classes]) => classes.split(' ')),
+    ...PART_DESCENDANT[1].split(' '),
+  ]),
+]
+
+/**
+ * Model B and model C.
+ *
+ * The name for a slot is read from `--jumi-<key>-label` — the declaration the naming rule already emits —
+ * rather than from the arm, because the point is to reproduce what the model *would* write, not what this
+ * script believes the arm means. A key with no label is left alone: that is the refused/shadowed case,
+ * and inventing a reference for it would hide the very thing the case is there to show.
+ */
+const withoutPartsLink = (css, { inline = true, register = true } = {}) => {
+  const document = postcss.parse(css)
+  const labels = new Map()
+  const fills = []
+  const inlined = []
+  const orphaned = []
+
+  document.walkDecls(node => {
+    const labelled = /^--jumi-(.+)-label$/.exec(node.prop)
+
+    if (labelled) labels.set(labelled[1], node.value)
+  })
+
+  document.walkDecls(node => {
+    const fill = new RegExp(`^--jumi-slot-(.+)-(${SEPARATE.join('|')})$`).exec(
+      node.prop,
+    )
+
+    if (!fill) return
+
+    fills.push({ prop: node.prop, bytes: node.toString().length + 1 })
+    node.remove()
+  })
+
+  if (inline)
+    document.walkDecls(node => {
+      for (const part of SEPARATE)
+        for (const [key, name] of labels) {
+          const from = `var(--jumi-slot-${key}-${part}`
+
+          if (!node.value.includes(from)) continue
+
+          node.value = node.value.replaceAll(
+            from,
+            `var(--jumi-label-${name}-${part}`,
+          )
+          inlined.push(`${name}→${part}`)
+        }
+    })
+
+  const registrations = []
+
+  // Kept for the negative control: deleting a fill and deleting the registration that gives its variable
+  // `inherits: false` are two different changes, and a control that makes both at once cannot say which
+  // one the reading moved under.
+  if (register)
+    for (const prop of new Set(fills.map(({ prop }) => prop)))
+      document.walkAtRules('property', atRule => {
+        if (atRule.params.trim() !== prop) return
+
+        registrations.push({ prop, bytes: atRule.toString().length + 1 })
+        atRule.remove()
+      })
+
+  // A read left pointing at a fill that no longer exists. The motion would still run — every chain ends
+  // in a fallback — so this cannot be caught by a live reading, only by looking at what was emitted.
+  if (inline)
+    postcss.parse(document.toString()).walkDecls(node => {
+      for (const part of SEPARATE)
+        for (const [, match] of node.value.matchAll(
+          new RegExp(`var\\(--jumi-slot-(.+?)-${part}`, 'g'),
+        ))
+          orphaned.push(`${match}-${part}`)
+    })
+
+  // Links that name an *instance* but that nothing declares — the honest count of "a chain points at a
+  // variable that is not there". Two kinds of link are excluded on purpose, because both are optional by
+  // design: the fallback levels (`--jumi-rotate-animation-range`, the attribute scope, emitted only when a
+  // control without a name writes it, and the `--jumi-animation-<part>` substrate), and the label
+  // (`--jumi-label-<name>-animation-<part>`, written only by the control that named it, so a chain naming
+  // a motion no control addressed is correct rather than broken). What is left is a link shaped like an
+  // instance key that no rule ever writes — pure weight, and invisible to every live reading.
+  const declared = new Set()
+  const dangling = []
+  const parsed = postcss.parse(document.toString())
+
+  parsed.walkDecls(node => {
+    if (node.prop.startsWith('--jumi-')) declared.add(node.prop)
+  })
+
+  parsed.walkDecls(node => {
+    for (const part of SEPARATE)
+      for (const [, link] of node.value.matchAll(
+        new RegExp(`var\\((--jumi-(?!label-)(?:[\\w-]+?-){2,}${part})\\b`, 'g'),
+      ))
+        if (!declared.has(link)) dangling.push(link)
+  })
+
+  return {
+    css: document.toString(),
+    dangling: [...new Set(dangling)],
+    // The text of those reads, not the variables they name: an undeclared link costs what it takes to
+    // write it, plus whatever the browser spends resolving a `var()` that can only ever be empty.
+    danglingBytes: dangling.reduce(
+      (total, link) => total + link.length + 'var(, )'.length,
+      0,
+    ),
+    fills,
+    inlined,
+    orphaned,
+    registrations,
+  }
+}
+
+const partPage = await browser.newPage()
+
+/**
+ * The three parts as the element's own animations resolve them.
+ *
+ * Position-matched like §1, and for the same reason: every element carries a position for every slot in the
+ * stylesheet, and the one this element activated is the one whose name starts with its property.
+ */
+const partReadings = async css => {
+  await partPage.setContent(
+    `<!doctype html><html><head><style>${css}</style></head><body>${PART_MARKUP}</body></html>`,
+  )
+
+  return partPage.evaluate(() =>
+    Object.fromEntries(
+      [...document.querySelectorAll('[data-arm]')].map(element => {
+        const style = getComputedStyle(element)
+        const names = style.animationName.split(',').map(value => value.trim())
+        const at = names.findIndex(name => name.startsWith('jumi-rotate-'))
+        const pick = value => value.split(',')[at]?.trim() ?? 'absent'
+
+        return [
+          element.dataset.arm,
+          {
+            activated: at < 0 ? 'none' : names[at],
+            composition: pick(style.animationComposition),
+            range: pick(style.animationRange),
+            timeline: pick(style.animationTimeline),
+          },
+        ]
+      }),
+    ),
+  )
+}
+
+const partsForward = build(await compiler(ENTRY, root), PART_CANDIDATES)
+const partsReversed = build(
+  await compiler(ENTRY, root),
+  [...PART_CANDIDATES].reverse(),
+)
+
+const models = {
+  A: partsForward.css,
+  B: withoutPartsLink(partsForward.css).css,
+  C: withoutPartsLink(partsForward.css, { inline: false, register: false }).css,
+}
+
+const parts = {}
+const partsBackwards = {}
+
+for (const [model, css] of Object.entries(models))
+  parts[model] = await partReadings(css)
+
+for (const model of ['A', 'B', 'C'])
+  partsBackwards[model] = await partReadings(
+    model === 'A'
+      ? partsReversed.css
+      : withoutPartsLink(partsReversed.css, {
+          inline: model === 'B',
+          register: model === 'B',
+        }).css,
+  )
+
+const stripped = withoutPartsLink(partsForward.css)
+
+const identical = (one, two) => JSON.stringify(one) === JSON.stringify(two)
+
+const describe = reading =>
+  `${reading.composition} / ${reading.range} / ${reading.timeline}`
+
+const PART_IDS = [...PART_ARMS.map(([id]) => id), PART_DESCENDANT[0]]
+
+console.log('\n══ §2  the three separate parts\n')
+
+console.log('── readings, per element (composition / range / timeline)\n')
+for (const id of PART_IDS) {
+  const today = parts.A[id]
+  const inlined = parts.B[id]
+  const removed = parts.C[id]
+  const verdict = identical(inlined, today) ? 'B identical' : 'B DIFFERS'
+
+  console.log(
+    `   ${id.padEnd(5)} ${today.activated.padEnd(24)} ${describe(today)}`,
+  )
+  console.log(
+    `         ${' '.repeat(24)} ${describe(inlined).padEnd(30)} ${verdict}` +
+      (identical(removed, today)
+        ? '   (C also identical — nothing load-bearing)'
+        : `   (C differs: ${describe(removed)})`),
+  )
+}
+
+console.log('\n── the four cases\n')
+
+const rangeOf = id => parts.A[id].range
+
+const cases = [
+  [
+    'two names over one definition',
+    rangeOf('p') !== rangeOf('q') &&
+      rangeOf('p').includes('25%') &&
+      rangeOf('q').includes('10%'),
+    `alpha ${rangeOf('p')}, beta ${rangeOf('q')}`,
+  ],
+  [
+    'and both survive inlining',
+    identical(parts.A.p, parts.B.p) && identical(parts.A.q, parts.B.q),
+    `${describe(parts.B.p)} | ${describe(parts.B.q)}`,
+  ],
+  [
+    'a refused/shadowed name writes no label',
+    !stripped.inlined.some(entry => entry.startsWith('scale→')) &&
+      parts.A.t.composition === 'replace',
+    `${stripped.inlined.length} references inlined, for ${[
+      ...new Set(stripped.inlined.map(entry => entry.split('→')[0])),
+    ].join(
+      ', ',
+    )}; /scale left at ${parts.A.t.composition} → ${parts.B.t.composition}`,
+  ],
+  [
+    'a descendant that wrote no name is untouched',
+    parts.A.desc.composition === 'replace' &&
+      identical(parts.A.desc, parts.A.r) &&
+      identical(parts.A.desc, parts.B.desc),
+    `${describe(parts.B.desc)} — same as the bare sibling, and unchanged by inlining`,
+  ],
+  [
+    'and so is a bare sibling',
+    parts.A.r.composition === 'replace' && identical(parts.A.r, parts.B.r),
+    describe(parts.B.r),
+  ],
+  [
+    'a later slot cannot move an earlier reading',
+    identical(parts.A.p, partsBackwards.A.p),
+    `reversed order: ${describe(partsBackwards.A.p)}`,
+  ],
+  [
+    'and neither model drifts with candidate order',
+    PART_IDS.every(
+      id =>
+        identical(parts.A[id], partsBackwards.A[id]) &&
+        identical(parts.B[id], partsBackwards.B[id]),
+    ),
+    PART_IDS.filter(id => !identical(parts.B[id], partsBackwards.B[id])).join(
+      ', ',
+    ) || 'no element changes',
+  ],
+  [
+    'no chain is left pointing at a deleted fill',
+    stripped.orphaned.length === 0,
+    `${stripped.orphaned.length} orphaned slot reads; ` +
+      `${stripped.dangling.length} undeclared links, ${stripped.danglingBytes} bytes — ` +
+      `in model A as well: ${stripped.dangling.join(', ') || 'none'}`,
+  ],
+]
+
+for (const [name, held, detail] of cases)
+  console.log(`   ${held ? '✓' : '✗'} ${name.padEnd(46)} ${detail}`)
+
+console.log(
+  '\n── re-emission: a slot that appears after a pass has published\n',
+)
+
+// The address link is only added to a slot's chain when the slot is named, and the model republishes when
+// that set grows. Both models have to be insensitive to *when* a later motion joins the build.
+const lateCompiler = await compiler(ENTRY, root)
+const EARLY_CANDIDATES = [
+  ...PART_CANDIDATES,
+  ...PART_ARMS.map(([, classes]) => classes),
+  PART_DESCENDANT[1],
+]
+const early = build(lateCompiler, EARLY_CANDIDATES)
+const late = build(lateCompiler, [
+  ...EARLY_CANDIDATES,
+  'animate-scale-110/extra',
+  'animate-scale-110/extra animation-composition-add/extra',
+])
+
+const earlyParts = {
+  A: await partReadings(early.css),
+  B: await partReadings(withoutPartsLink(early.css).css),
+}
+const lateParts = {
+  A: await partReadings(late.css),
+  B: await partReadings(withoutPartsLink(late.css).css),
+}
+
+console.log(
+  `   a second motion joined the build: ${early.css.length} → ${late.css.length} bytes`,
+)
+console.log(
+  `   ${identical(earlyParts.A.p, lateParts.A.p) ? '✓' : '✗'} the earlier element reads the same        A ${lateParts.A.p.activated} · ${describe(lateParts.A.p)}`,
+)
+console.log(
+  `   ${identical(earlyParts.B.p, lateParts.B.p) ? '✓' : '✗'} and the same under the inline model B  ${lateParts.B.p.activated} · ${describe(lateParts.B.p)}`,
+)
+
+console.log('\n── cost of the three fills\n')
+
+const bytesOf = entries =>
+  entries.reduce((total, entry) => total + entry.bytes, 0)
+
+console.log(
+  `   ${stripped.fills.length} fills over ${new Set(stripped.fills.map(({ prop }) => prop.replace(/-animation-.*$/, ''))).size} slots` +
+    ` — ${bytesOf(stripped.fills)} bytes; ${stripped.registrations.length} slot registrations — ${bytesOf(stripped.registrations)} bytes`,
+)
+console.log(
+  `   the inline model spends, instead, ${stripped.inlined.length} label references rewritten inside the composition — no declaration added`,
+)
+console.log(
+  `   negative control (C) on the same element: ${describe(parts.C.p)} vs shipped ${describe(parts.A.p)}`,
+)
+
+await partPage.close()
+
 await browser.close()
 
 // Show the work: the first rewritten hoist should name its own instance, with no fill left to do it.

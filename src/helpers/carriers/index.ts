@@ -864,47 +864,21 @@ const hoist = (
     }
 
     // A named activation installs the name as this slot's address — **on this rule**, which is the
-    // whole of the locality rule. The composition declares `animation-composition`, `animation-range`
-    // and `animation-timeline` itself, in one rule for every activating selector, so it cannot name a
-    // motion; the name reaches those three through the slot-keyed variable filled here, and the elements
-    // that wrote `.animate-fade-in/reveal` and no others.
+    // whole of the locality rule.
     //
-    // The other seven are sections of the shorthand, and the shorthand's value is the hoist published
-    // above — also on this rule. So the name goes straight into that value (`namedHoist`) and no variable
-    // stands between them: that is where the link layer's remaining declarations were.
+    // The three the shorthand cannot carry used to be filled here: `--jumi-slot-<key>-<part>`, written on
+    // this rule and reading the label a control wrote. They are read directly now — `animationParts` puts
+    // `var(--jumi-label-<name>-<part>)` in the composition's own chain for an addressed slot — so the layer
+    // is gone rather than shortened.
     //
-    // The alternative — putting the name in the composition's chains — cannot be made element-local: a
-    // chain is shared by every element matching the composition, so a name seen anywhere in the build
-    // became an address everywhere, and which name won depended on candidate order. Measured: `#a` with
-    // `animate-fade-in/reveal animation-duration-300/reveal animation-duration-900/loop` computed
-    // `0.9s` forward and `0.3s` reversed, and `loop` named on another element reached it either way.
-    for (const declaration of own) {
-      const match = ACTIVATED_SLOT.exec(declaration.prop)
-
-      if (!match) continue
-
-      for (const key of instanceKeys(rule, match[1])) {
-        const name = own.find(
-          candidate => candidate.prop === `--jumi-${key}-label`,
-        )?.value
-
-        if (!name) continue
-
-        for (const part of AFTER_SHORTHAND) {
-          const prop = cssEscape(`--jumi-slot-${key}-${part}`)
-
-          if (published.has(prop)) continue
-
-          published.add(prop)
-          rule.append(
-            postcss.decl({
-              prop,
-              value: `var(${cssEscape(`--jumi-label-${name}-${part}`)})`,
-            }),
-          )
-        }
-      }
-    }
+    // What that depends on, and what it does not: a name is still written only on the rule that declared
+    // it, and the label is registered `inherits: false`, so a descendant that named nothing has no value
+    // for it and falls through the chain. That registration is the whole of the locality — measured with a
+    // descendant and a bare sibling, in both candidate orders (`scripts/spike-label-link.mjs` §2).
+    //
+    // The other seven are sections of the shorthand, and the shorthand's value is the hoist published above
+    // — also on this rule — so the name goes straight into that value (`namedHoist`) and no variable stands
+    // between them either.
   }
 
   return positions

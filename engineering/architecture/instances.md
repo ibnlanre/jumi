@@ -139,6 +139,50 @@ the corpus, the prefix at each of the 24 occurrences), `aggregateBytes 9208 → 
 94 / 33 / 36 / 33. Diffed line by line, the snapshot is 22 lines out and 22 in, identical once the keyed
 variables (`--jumi-slot-…`, `--jumi-…-label`, `--jumi-…-animation-…`) are normalized.
 
+## Which variables inherit, and the chain that makes that safe
+
+Two mechanisms that are easy to confuse, because they both look like "where does this value come from".
+
+The **registration** decides whether a link is _present_ on a descendant. A variable registered
+`inherits: false` is absent there — it has no value at all unless the element declared one itself. The
+**fallback chain** decides what happens when a link is absent: `var()` resolves to its fallback, and if there
+is none the whole declaration is invalid at computed-value time — for the `animation` shorthand that means
+the element reports no animation at all, which reads as a page that never animated rather than one that is
+broken.
+
+So each part resolves through three levels of authority, and the middle one is why the outermost two work:
+
+```css
+--jumi-label-flick-animation-duration   the motion I named "flick"      instance — registered, inherits:false
+  → --jumi-rotate-animation-duration    every rotate motion, here down  scope    — left inheriting
+    → --jumi-animation-duration         the global default              substrate — declared per element
+```
+
+**Instance addresses are registered; property scopes are not.** `--jumi-label-<name>-<part>`, the activation
+variables and the hoisted slot all carry element-local identity, so a descendant that animates something else
+must not answer to a name written above it. `--jumi-<attribute>-animation-<part>` is the opposite: nothing
+declares it on the element, so it inherits on purpose, and `/rotate` on a wrapper is how an author times every
+rotate motion in a subtree. `--jumi-animation-*` needs no registration for a third reason — the derived
+defaults rule declares it on every animating element, and a declaration beats an inherited value.
+
+The middle link is what makes the outer one safe to be absent. A descendant's label link is _deliberately_ not
+inherited, and the fallback is what lets it fall through to the scope rather than failing:
+
+```text
+descendant:  label?  absent (non-inherited, and not declared here)
+             scope?  present — inherited from the wrapper that wrote /rotate
+```
+
+Both directions are asserted in a browser, in both candidate orders. `behaviour-check.mjs` §7 covers
+non-inheritance (an ancestor's activation must not reach an animating descendant), and the scope arms cover its
+counterpart: a wrapper's `animation-duration-500/rotate` makes a nested `animate-rotate-45` read `0.5s`, while
+`animation-duration-500/flick` leaves a nested motion that named itself `flick` at `1s`.
+
+**The chain cannot be shortened.** The tempting simplification — have the derived-defaults rule declare the
+scope level too, collapsing three links to two — is measurably wrong: a declaration beats inheritance, so the
+wrapper's control would stop reaching descendants, and `0.5s` would become `1s`. Measured on the same fixture
+the arms use.
+
 ## The link layer: measured, and not load-bearing
 
 A named instance currently reaches its controls through an extra hop:

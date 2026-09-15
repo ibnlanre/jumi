@@ -10,7 +10,7 @@ import type {
 } from '@/types'
 
 import { assemble } from '@/helpers/assemble'
-import { instanceKey } from '@/helpers/carriers/instance'
+import { instanceKey, parseInstanceKey } from '@/helpers/carriers/instance'
 import { css } from '@/helpers/css'
 import { join } from '@/helpers/join'
 import { merge } from '@/helpers/merge'
@@ -464,20 +464,17 @@ export function createJumiModel({
     // this registration, nested animating elements inherit the parent's instance.
     registerName(cssEscape(`--jumi-slot-${key}`))
 
-    for (const part of separateParts) {
-      // Only the three the shorthand cannot carry still travel through a slot-keyed variable, because
-      // the composition declares them itself: it is one rule for every activating selector, so it
-      // cannot name a motion, and the name has to reach it through a declaration on the rule that
-      // wrote the name. Registered for the reason it always was — a descendant that animates the same
-      // property must not answer to a name declared above it.
-      registerName(cssEscape(`--jumi-slot-${key}-${part}`))
-    }
-
     for (const part of slotParts) {
       // The name's own variable lives in the label namespace, so it cannot be the property scope's:
       // a scope is `--jumi-<attribute>-<part>`, and no attribute is `label-…`. This used to be
       // registered under the name itself, with an exemption for the identity case, because there the
       // two roles really were one variable.
+      //
+      // `inherits: false` is what the separate parts' chains rest on now that they read this label
+      // directly: the composition is one rule for every activating selector, so the label has to be
+      // present only where it was written or it becomes an address everywhere. The three slot-keyed
+      // variables that used to be registered beside these are gone — nothing fills them, because the
+      // chains read the label itself.
       registerName(cssEscape(`--jumi-label-${name}-${part}`))
     }
 
@@ -600,15 +597,36 @@ export function createJumiModel({
     nameVar?: string,
     key?: string,
   ): CssInJs {
-    // Three links, narrowest first: the address a *name* installed, then a per-slot publication,
-    // then the property's control, then the global default. Folded from the inside out, so the most
-    // specific link is outermost and each one falls through to the next.
+    // At most four links, narrowest first: the label a *name* wrote, the range variant's publication,
+    // the property's control, then the global default. Folded from the inside out, so the most specific
+    // link is outermost and each one falls through to the next.
     const timing = (part: string) => {
       const links: string[] = []
 
-      // What `/<name>` installed, on the rule that declared the name. Only a named slot has it.
-      if (addressed.has(key ?? attribute))
-        links.push(cssEscape(`--jumi-slot-${key}-${part}`))
+      // The three the shorthand cannot carry, and only for an addressed slot. The other seven are swapped
+      // for the label inside the hoist's **value** (`namedHoist`), and that value is published on the rule
+      // that named the motion, so it is element-local without a chain link. These three have no shorthand
+      // section to ride in — the composition declares them — so the name has to be read here.
+      //
+      // Locality is unaffected, and that is measured rather than hoped: `nameSlot` registers the label
+      // `inherits: false`, so an element that wrote no name has no value for it and falls through the
+      // chain. Checked with two names over one definition, a descendant, a bare sibling, a refused name
+      // and both candidate orders (`scripts/spike-label-link.mjs` §2 — identical readings in every one).
+      if (addressed.has(key ?? attribute)) {
+        // Read back out of the key, never escaped again: the key holds the emitted text already, and
+        // escaping it a second time is how `foo.bar` became `foo\\.bar` and stopped resolving.
+        const { name } = parseInstanceKey(key ?? '') ?? {}
+        const labelled =
+          name && separateParts.includes(part as never) ? name : null
+
+        links.push(
+          cssEscape(
+            labelled
+              ? `--jumi-label-${labelled}-${part}`
+              : `--jumi-slot-${key}-${part}`,
+          ),
+        )
+      }
 
       // The range composition variant, which publishes under the slot's **key** and not its
       // attribute: `attribute-id` for a phrase or a single value, where one attribute names a
