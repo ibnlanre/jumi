@@ -328,12 +328,18 @@ const referencedSlot = (entry: string) => {
  * keyframe and therefore one activation variable. Reading the slot from the name alone collapsed two
  * instances onto one — measured, `…/enter` with `200ms/enter` beside `…/exit` with `1800ms/exit`
  * resolved `1.8s, 1.8s`, both positions reading the single hoist the last position won.
+ *
+ * The part is **given**, and it has to be. An instance name may itself read like a part —
+ * `flick-animation-duration` is legal, and `scripts/behaviour-check.mjs` measures it — so a scan for the
+ * first part-shaped suffix inside the name reads `flick` out of
+ * `--jumi-slot-flick-animation-duration-Z2excak-rotate-animation-duration` and publishes the hoist under a
+ * key nothing activates. The lookahead is what keeps the scan inside the variable: a key cannot hold a
+ * comma, a paren or whitespace, so the only match that satisfies it is the one that ends the name.
  */
-const linkedSlot = (entry: string) => {
-  const match = /^var\(--jumi-slot-(.+?)-animation-\w/.exec(entry.trim())
-
-  return match ? match[1] : null
-}
+const linkedSlot = (entry: string, part: string) =>
+  new RegExp(`^var\\(--jumi-slot-([^,()\\s]+?)-${part}(?=[,)\\s])`).exec(
+    entry.trim(),
+  )?.[1] ?? null
 
 /**
  * Split a comma-separated value on its top-level commas.
@@ -772,8 +778,10 @@ const hoist = (
     // The instance first, the definition only as a fallback: a name is what distinguishes two
     // motions that share one keyframe, and only a named part carries it.
     const slot =
-      linkedSlot(entries['animation-duration']?.[position] ?? '') ??
-      referencedSlot(entry)
+      linkedSlot(
+        entries['animation-duration']?.[position] ?? '',
+        'animation-duration',
+      ) ?? referencedSlot(entry)
 
     return slot
       ? {

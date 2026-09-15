@@ -205,8 +205,7 @@ describe('property curry', () => {
     // The label is the address a person can write down, unlike the hash the
     // frame variables are keyed by, so the rule says what the slot is called.
     expect(labelled).toMatchObject({
-      [`--jumi-rotate-${shorthash2('0:0deg|58:0deg')}-${shorthash2('flick')}-label`]:
-        'flick',
+      [`--jumi-flick-${shorthash2('0:0deg|58:0deg')}-rotate-label`]: 'flick',
     })
     expect(bare).not.toHaveProperty(
       `--jumi-rotate-${shorthash2('0:0deg|100:90deg')}-label`,
@@ -465,7 +464,7 @@ describe('animations wiring', () => {
     creator.property('rotate')('0:0deg|58:0deg', { modifier: 'flick' })
     creator.property('rotate')('0:0deg|100:90deg', { modifier: null })
     const animations = creator.animations
-    const flick = `--jumi-slot-rotate-${shorthash2('0:0deg|58:0deg')}-${shorthash2('flick')}`
+    const flick = `--jumi-slot-flick-${shorthash2('0:0deg|58:0deg')}-rotate`
 
     // Each position reads *its own* slot variable before the property's control, so one animation of
     // a property can be timed without the other — which is how two animations summed by
@@ -496,16 +495,20 @@ describe('animations wiring', () => {
       ).length - 1,
     ).toBe(2)
 
-    // **And the name is nowhere in it.** This is the invariant, not an absence of detail: the
-    // aggregate is one declaration block shared by every element that matches the composition, so a
-    // name written into a chain is a name every element answers to — including elements that called
-    // the motion something else, or nothing at all. Measured before the split: with two elements
-    // naming one effect `reveal` and `loop`, `animation-duration-900/loop` reached the `reveal` one,
-    // and which name won depended on the order the candidates were compiled in.
-    expect(String(animations['animation-duration'])).not.toContain('flick')
-    expect(String(animations['animation-composition'])).not.toContain('flick')
-    expect(String(animations['animation-range'])).not.toContain('flick')
-    expect(String(animations['animation-timeline'])).not.toContain('flick')
+    // **And no name is anywhere in it.** Not as a value and not as a variable — a chain may carry the
+    // *slot*, which is inert on an element that never set it, but nothing may carry a label. The
+    // aggregate is one declaration block shared by every element that matches the composition, so a name
+    // written into a chain is a name every element answers to — including elements that called the motion
+    // something else, or nothing at all. Measured before the split: with two elements naming one effect
+    // `reveal` and `loop`, `animation-duration-900/loop` reached the `reveal` one, and which name won
+    // depended on the order the candidates were compiled in.
+    //
+    // The word itself *is* in the key now, which is the readable vocabulary this shape bought, so the
+    // assertion is about the namespace rather than the spelling.
+    for (const part of Object.keys(animations).filter(part =>
+      part.startsWith('animation-'),
+    ))
+      expect(String(animations[part])).not.toContain('--jumi-label-')
   })
 })
 
@@ -590,7 +593,7 @@ describe('animation-name registration', () => {
     for (const name of ['enter', 'exit'])
       expect(
         rules[
-          `@property --jumi-slot-opacity-${shorthash2('0:0|100:1')}-${shorthash2(name)}`
+          `@property --jumi-slot-${name}-${shorthash2('0:0|100:1')}-opacity`
         ],
       ).toEqual({ inherits: 'false', syntax: '"*"' })
   })
@@ -621,7 +624,7 @@ describe('animation-name registration', () => {
 
     creator.property('rotate')('0:16deg|58:0deg', { modifier: 'flick' })
     const animations = creator.animations
-    const key = `rotate-${shorthash2('0:16deg|58:0deg')}-${shorthash2('flick')}`
+    const key = `flick-${shorthash2('0:16deg|58:0deg')}-rotate`
     const utilities = registered(addBase)
 
     // These three are assigned on the rule that named the motion, because the composition declares them
@@ -652,11 +655,13 @@ describe('animation-name registration', () => {
       expect(utilities[`@property --jumi-slot-${key}-${part}`]).toBeUndefined()
 
     // The aggregate still addresses the slot for every part, which is what the composition reads — and
-    // where the name stays out, because that block is shared by every element that matches it.
+    // where no label is written, because that block is shared by every element that matches it. The key
+    // spells the instance (that is the readable vocabulary), so the assertion is about the namespace: a
+    // chain may carry a slot, and never a label.
     for (const part of Object.keys(animations).filter(part =>
       part.startsWith('animation-'),
     ))
-      expect(String(animations[part])).not.toContain('flick')
+      expect(String(animations[part])).not.toContain('--jumi-label-')
   })
 
   it('never registers a name outside the label namespace', () => {

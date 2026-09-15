@@ -32,11 +32,35 @@ export const ACTIVATED_SLOT = /^--jumi-(.+)-animation-name$/
 /**
  * A name, as the rule that declared it states it.
  *
- * The **key** is the instance's address inside the model (`attribute-id-hash`), and it is what the
- * definition-keyed activation cannot express: two names over identical frames share one activation
- * variable and are still two motions.
+ * The **key** is the instance's address inside the model, and it is what the definition-keyed activation
+ * cannot express: two names over identical frames share one activation variable and are still two motions.
+ * It spells the name first, then the definition id, then the attribute — `flick-Z2excak-rotate` — so the
+ * instance is readable in a stylesheet and the id, being base62, still delimits the two variable-length
+ * segments. See `slotKey` in `src/core` for why that order and not the other.
  */
 export const LABELLED_SLOT = /^--jumi-(.+)-label$/
+
+/**
+ * Whether a labelled slot is an **instance of the definition** a rule activated.
+ *
+ * The two keys are rotations of each other rather than one being a prefix of the other — the rule
+ * activated `rotate-Z2excak` and the slot is `flick-Z2excak-rotate` — so the test is not a prefix test and
+ * cannot be done by string search alone. The id is what makes it decidable: it is base62, so it holds no
+ * hyphen, and therefore the **last** hyphen in the base separates the attribute from the id even when the
+ * attribute has hyphens of its own (`background-color-23M1JK` → `background-color` + `23M1JK`). Every
+ * hyphen on the name's side is therefore free to be a hyphen.
+ *
+ * A base with no hyphen at all is a composed tween or an effect (`filter`, `bounce-in`), whose labelled
+ * slot is keyed by the base itself and matched by equality — `--jumi-filter-label`, not
+ * `--jumi-filter-…-label`.
+ */
+const instanceOf = (key: string, base: string) => {
+  const cut = base.lastIndexOf('-')
+
+  if (cut < 0) return false
+
+  return key.endsWith(`-${base.slice(cut + 1)}-${base.slice(0, cut)}`)
+}
 
 /**
  * Every slot key this rule can publish: the instance it named, or the definition's own when it named
@@ -57,9 +81,7 @@ export const LABELLED_SLOT = /^--jumi-(.+)-label$/
 export const instanceKeys = (rule: Rule, base: string): string[] => {
   const named = ownDeclarations(rule)
     .map(candidate => LABELLED_SLOT.exec(candidate.prop)?.[1])
-    .filter(
-      (key): key is string => key !== undefined && key.startsWith(`${base}-`),
-    )
+    .filter((key): key is string => key !== undefined && instanceOf(key, base))
 
   return named.length ? named : [base]
 }

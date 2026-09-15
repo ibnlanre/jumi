@@ -72,32 +72,65 @@ describe('which instance of a definition a rule means', () => {
     // one element run one keyframe twice — once at the scope's timing, once at the name's.
     const named = rule(
       '--jumi-scale-d38-animation-name: jumi-scale-d38;' +
-        '--jumi-scale-d38-4RGfw-label: loop;',
+        '--jumi-loop-d38-scale-label: loop;',
     )
 
-    expect(instanceKeys(named, 'scale-d38')).toEqual(['scale-d38-4RGfw'])
+    expect(instanceKeys(named, 'scale-d38')).toEqual(['loop-d38-scale'])
   })
 
   it('is every instance the rule named, when it named more than one', () => {
     const twice = rule(
       '--jumi-scale-d38-animation-name: jumi-scale-d38;' +
-        '--jumi-scale-d38-4RGfw-label: enter;' +
-        '--jumi-scale-d38-9Kd2q-label: exit;',
+        '--jumi-enter-d38-scale-label: enter;' +
+        '--jumi-exit-d38-scale-label: exit;',
     )
 
     expect(instanceKeys(twice, 'scale-d38')).toEqual([
-      'scale-d38-4RGfw',
-      'scale-d38-9Kd2q',
+      'enter-d38-scale',
+      'exit-d38-scale',
     ])
   })
 
   it('ignores a name that belongs to another definition', () => {
     const other = rule(
       '--jumi-scale-d38-animation-name: jumi-scale-d38;' +
-        '--jumi-opacity-sluPU-4RGfw-label: enter;',
+        '--jumi-enter-sluPU-opacity-label: enter;',
     )
 
     expect(instanceKeys(other, 'scale-d38')).toEqual(['scale-d38'])
+  })
+
+  it('separates two attributes that overlap, which is what the id is for', () => {
+    // `color` is a suffix of `accent-color`, and a name may hold hyphens, so `color` + `accent-color`
+    // and `accent-color` + `color` are one string in the order that puts the attribute between them.
+    // Spelling the name first and the id between the two is what keeps these two rules apart, and this
+    // is the assertion that says so: same id, same name, two attributes.
+    const absorbed = rule(
+      '--jumi-color-Z1ClR2s-animation-name: jumi-color-Z1ClR2s;' +
+        '--jumi-foo-accent-Z1ClR2s-color-label: foo-accent;' +
+        '--jumi-foo-Z1ClR2s-accent-color-label: foo;',
+    )
+
+    expect(instanceKeys(absorbed, 'color-Z1ClR2s')).toEqual([
+      'foo-accent-Z1ClR2s-color',
+    ])
+    expect(instanceKeys(absorbed, 'accent-color-Z1ClR2s')).toEqual([
+      'foo-Z1ClR2s-accent-color',
+    ])
+  })
+
+  it('reads a name that reads like a part, by the attribute rather than by the word', () => {
+    // An instance name may be `flick-animation-duration` — the probe measures that a slot variable named
+    // that way is one a reader would mistake for a part — so the instance is not matched by looking for a
+    // word: the last hyphen of the base is where the attribute ends, because the id holds none.
+    const partish = rule(
+      '--jumi-rotate-72Dbc-animation-name: jumi-rotate-72Dbc;' +
+        '--jumi-flick-animation-duration-72Dbc-rotate-label: flick-animation-duration;',
+    )
+
+    expect(instanceKeys(partish, 'rotate-72Dbc')).toEqual([
+      'flick-animation-duration-72Dbc-rotate',
+    ])
   })
 
   it('reads a composed tween as the definition, which is its one instance', () => {

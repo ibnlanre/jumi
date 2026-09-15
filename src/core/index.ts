@@ -198,14 +198,47 @@ export const structuralAddress = (token: string) =>
  * the same `@keyframes` twice; leaving it out of the key, which is what this used to do, made two
  * named motions collapse into one, with the second name simply replacing the first.
  *
- * The name enters **hashed**, so the key is a discriminator rather than the name itself. The
- * aggregate's chains are keyed by this string, and a name must not reach the composition: a name is
- * something an author writes on one element, and the composition is derived from the whole corpus.
- * The address a person writes down is `--jumi-label-<name>-<part>`, in a namespace of its own — so a name
- * and a property can never end up being the same custom property.
+ * The name enters the key, so the key is a discriminator rather than a label. The aggregate's chains
+ * are keyed by this string, and a name must not reach the composition: a name is something an author
+ * writes on one element, and the composition is derived from the whole corpus. The address a person
+ * writes down is `--jumi-label-<name>-<part>`, in a namespace of its own — so a name and a property can
+ * never end up being the same custom property.
+ *
+ * A named instance spells its name **first**, with the definition id between the name and the attribute:
+ *
+ *   --jumi-slot-flick-Z2excak-rotate
+ *   │    └ slot ┘└name┘└─ id ─┘└attr┘
+ *
+ * Readable on purpose, and the order is not cosmetic — the id is the delimiter. `shorthash2` is base62
+ * (`scripts/spike-slot-key.mjs` enumerates its alphabet) and therefore holds no hyphen, so it is the one
+ * segment that cannot absorb a neighbour. Put the attribute between the name and the id instead —
+ * `flick-rotate-Z2excak` — and the keys stop being injective over Jumi's own vocabulary, which is measured
+ * rather than feared:
+ *
+ *   --jumi-slot-foo-accent-color-k1aaa
+ *     color         / name foo-accent
+ *     accent-color  / name foo
+ *
+ * Both attributes are real (`src/variables/property.ts`: `color`, `accent-color`; and `width` under
+ * `stroke-width`), and any name may hold a hyphen, so no amount of care in the name saves that order. The
+ * probe finds 50 such collisions there and none here; the same enumeration is a gate
+ * (`scripts/slot-key-check.mjs`).
+ *
+ * Cost, measured on the canonical corpus: a name the length of the hash it replaced is flat (`/return`,
+ * −12 bytes over the corpus), and a 48-character name adds 42 bytes at each of the twelve sites an
+ * instance appears. Unnamed slots keep `attribute-id`, because there is no name to spell.
  */
 const slotKey = (attribute: string, id?: string, name?: null | string) =>
-  id ? `${attribute}-${id}${name ? `-${shorthash2(name)}` : ''}` : attribute
+  id ? (name ? `${name}-${id}-${attribute}` : `${attribute}-${id}`) : attribute
+
+/**
+ * The key, with the collision argument attached to it as a test rather than left as a comment.
+ *
+ * `slot-key.test.ts` enumerates this function over Jumi's whole attribute vocabulary, with instance names
+ * taken from that vocabulary's own overlaps, so the shape cannot be reordered later without the test
+ * saying what the reorder costs. Exported for that assertion — it is not part of the public surface.
+ */
+export const instanceKey = slotKey
 
 /**
  * A matcher that reads its modifier as a **name** — every motion candidate — carries this tag, so the

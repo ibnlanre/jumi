@@ -87,6 +87,46 @@ The scan is not defensive plumbing. There is no type that can express "this modu
 this", the failure mode is silent in the output, and the cost of the copy is two lines — which is exactly
 the shape of a rule that has to be enforced by something other than memory.
 
+## The slot key spells the name
+
+An instance's key is `<name>-<id>-<attribute>` when the author named the motion and `<attribute>-<id>` when
+they did not — `--jumi-slot-loop-sluPU-opacity`. The name is a word in the emitted stylesheet, which is what
+a person reads while debugging, and the id sits between the name and the attribute because `shorthash2` is
+base62 and therefore holds no hyphen.
+
+Order is a correctness property, not a preference. The attribute is the variable-length segment in both
+orders, and both the name and the attribute may hold hyphens, so a key that puts the attribute between the
+name and the id is not injective over Jumi's own vocabulary:
+
+```text
+--jumi-slot-foo-accent-color-k1aaa
+  color         / name foo-accent       ← animate-color-…/foo-accent
+  accent-color  / name foo              ← animate-accent-color-…/foo
+```
+
+`scripts/spike-slot-key.mjs` (`pnpm spike:slot-key`) enumerates the whole vocabulary with adversarial names
+and finds 50 such collisions in that order and none in this one.
+
+**Measured, and permanent.** `src/core/slot-key.test.ts` keeps that corpus as a gate assertion, and its own
+first run corrected the ruling: the id is hyphen-free (measured — every character of 4,000 hashes is
+`[0-9A-Za-z]`) but **not fixed-length**, since ids run from two characters to seven (`shorthash2('50')` is
+`rI`). So the id delimits but cannot be unforged: a *crafted* name whose tail is another instance's id, on
+an attribute that overlaps that instance's attribute, still absorbs — `right`/`foo-backdrop-filter-hue-rotate`
+against `rotate-right`/`foo-backdrop-filter-hue`. That needs the author to compute another motion's hash and
+write it into theirs; closing it entirely would cost either hyphen-free names or a separator a name cannot
+hold.
+
+**Both orders measured on the frozen corpus.** The rename moved bytes and nothing else: `aggregateBytes
+9212 → 9208`, `bytes 81850 → 81836`, `rawBytes 632549 → 632453` — and `properties` (registrations), `slots`,
+`publishEvents` (links) and `keyframes` all unchanged at 94 / 33 / 36 / 33. Diffed line by line, the snapshot
+is 22 lines out and 22 in, byte-identical once the two instance keys are renamed.
+
+The cost is the name's length against the six-character hash it replaced: `/flick` is flat, `/return` saves
+twelve bytes over the corpus, and a 48-character name adds 42 bytes at each of the twelve sites an instance
+appears. `behaviour:check`'s arm `n` measures the shape this makes possible — a name that *reads* like a part
+of the shorthand (`/flick-animation-duration`), which a pass guessing the part instead of being told it reads
+as `flick`, publishes the hoist under a key nothing fills, and the motion silently never runs.
+
 ## The link layer: measured, and not load-bearing
 
 A named instance currently reaches its controls through an extra hop:
@@ -100,8 +140,8 @@ A named instance currently reaches its controls through an extra hop:
 ```
 
 The fills are the only place the author's word is bound to a part. The slot key names the definition
-(`--jumi-slot-fade-in`), or, for a property utility, the definition _with the name hash already in it_
-(`--jumi-slot-opacity-sluPU-6XRQG`) — so identity is in the slot, and the labels are where the controls
+(`--jumi-slot-fade-in`), or, for a property utility, the definition _with the author's name spelled into it_
+(`--jumi-slot-loop-sluPU-opacity`) — so identity is in the slot, and the labels are where the controls
 write. That makes the fills look like plumbing: the hoist could read `var(--jumi-label-reveal-animation-duration, …)`
 itself. Once the word is in the emitted name, one element's hoist can name its own instance, and no shared
 position has to carry one word for the whole stylesheet.

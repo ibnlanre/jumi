@@ -245,3 +245,32 @@ eventually led to the better one. Preserving that history is useful.
 And yes, once that is landed, return to View Transitions. We've done enough foundational work on the
 animation core that we can explore them without carrying a known DevTools scalability defect
 underneath the experiments.
+
+## 2026-09-15 — the readable instance key, adopted with its boundary recorded
+
+I took the recommendation, and making it permanent turned the probe's argument into an assertion that then
+corrected it — which is what the assertion was for.
+
+The naive readable order is dead on measurement rather than on taste. `--jumi-slot-<name>-<attribute>-<id>`
+is not injective over Jumi's own vocabulary — `color` under `accent-color`, `width` under `stroke-width` — 50
+collisions in the probe's enumeration, and none of them needs a crafted input: any name that ends where
+another attribute's name begins produces one.
+
+The shipped order is `<name>-<id>-<attribute>`, for named instances only; unnamed slots keep
+`<attribute>-<id>`. It is readable, cheap and drift-free: canonical bytes 81,850 → 81,836 and
+`properties`/`slots`/`publishEvents`/`keyframes` unchanged at 94 / 33 / 36 / 33. Diffed line by line the
+snapshot is 22 lines out and 22 in, byte-identical once the two instance keys are renamed.
+
+What the permanent assertion corrected: the id is hyphen-free but **not fixed-length** (`shorthash2('50')` is
+`rI`), so it delimits without being unforgeable. A name crafted to end in another instance's id, on an
+overlapping attribute, still absorbs. That is not reachable by accident, and not reachable without computing
+another motion's hash first. I am recording it rather than paying for it: the two ways to close it cost
+hyphen-free names or a reserved separator, and both give back what this shape bought.
+
+### Call
+
+> **Adopt `--jumi-slot-<name>-<id>-<attribute>` for named instances, with the counts unchanged and the
+> residual documented in `instances.md` and asserted in `src/core/slot-key.test.ts`. Keep the adversarial
+> corpus permanent — a corpus of generic samples reports no collisions in either shape, which is how a wrong
+> order looks safe. Do not add a collision warning to the model yet: the diagnostic exists in the assertion,
+> and instrumenting the writer for a case that needs a computed hash is not worth the bytes.**

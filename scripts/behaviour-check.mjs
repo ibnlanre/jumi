@@ -681,6 +681,16 @@ const NAMED_ARMS = [
     'm',
     'animate-rotate-[0:0deg|100:90deg]/alpha animate-rotate-[0:0deg|100:90deg]/beta animation-timing-function-[0:step-start]/alpha animation-timing-function-[0:step-end]/beta animation-duration-1000',
   ],
+  // A name that reads like a section of the shorthand. The slot key spells the name first, so an instance
+  // may legitimately be called `flick-animation-duration` — and the pass reads the instance out of the
+  // staged chain, where the key is followed by `-animation-duration` of its own. A reader that takes the
+  // first part-shaped suffix inside the variable reads `flick`, publishes the hoist under a key nothing
+  // activates, and the motion still runs: only the control goes missing, silently. This is the arm that
+  // would catch it, and it is why `linkedSlot` is handed the part instead of guessing it.
+  [
+    'n',
+    'animate-scale-110/flick-animation-duration animation-duration-600/flick-animation-duration',
+  ],
 ]
 
 const NAMED_CANDIDATES = [
@@ -935,6 +945,12 @@ const naming = [
       separate.timeline.includes('scroll') &&
       separate.range !== 'normal',
     JSON.stringify(separate),
+  ],
+  [
+    'a name that reads like a part still addresses its own motion',
+    durationOf(forward, 'n', 'jumi-scale-') === '0.6s',
+    `read ${durationOf(forward, 'n', 'jumi-scale-') ?? 'no animation at all'} — the control is ` +
+      '/flick-animation-duration, and an instance read as "flick" would fill no key at all',
   ],
 ]
 
