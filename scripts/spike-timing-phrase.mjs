@@ -998,7 +998,12 @@ console.log(
 console.log(
   '     Instance-precise selection would need a name-keyed variable the model does not emit: the hoist',
 )
-console.log('     reads that definition-keyed activation.')
+console.log(
+  '     reads that definition-keyed activation. **Superseded by §9**, which measures the shape that does',
+)
+console.log(
+  '     work — a selection keyed by the instance and written onto the control\'s own rule.',
+)
 
 for (const [label, reach] of [
   ['A · property scope — every rotate motion in the sheet', () => true],

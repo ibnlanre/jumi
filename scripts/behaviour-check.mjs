@@ -695,9 +695,24 @@ const NAMED_ARMS = [
   // the text that ships (`foo.bar` occupies eight characters as `foo\.bar`), so a reader that slices by it has
   // to be reading the emitted text and not the author's word. A reader that counted what the author typed
   // takes one character too many and lands inside the name.
+  ['o', 'animate-scale-110/[foo.bar] animation-duration-600/[foo.bar]'],
+  // A timing phrase with **no address**: the shape is unsupported without a name to select it, so the model
+  // emits nothing at all and the motion must be indistinguishable from one that never wrote the phrase. The
+  // failure this prevents is a phrase that looks accepted while doing nothing — or worse, one that leaks to
+  // every element animating the definition.
   [
-    'o',
-    'animate-scale-110/[foo.bar] animation-duration-600/[foo.bar]',
+    'q',
+    'animate-rotate-[0:0deg|100:90deg]/first animation-timing-function-[0:step-start]',
+  ],
+  // A **scalar** easing under a name, which is the control that must keep working exactly as it did: the
+  // phrase path is the new one, and the value path it grew out of has to stay untouched beside it.
+  ['r', 'animate-scale-110/scalar animation-timing-function-[ease-in]/scalar'],
+  // The third spelling of an address, and the widest reach: `/rotate` is a **property** scope, so it reaches
+  // every instance of that property on the element rather than one name. Two instances over one definition
+  // are the case that tells the two apart — a name would specialize only one of them.
+  [
+    's',
+    'animate-rotate-[0:0deg|100:90deg]/alpha animate-rotate-[0:0deg|100:90deg]/beta animation-timing-function-[0:step-start]/rotate animation-duration-1000',
   ],
 ]
 
@@ -796,6 +811,78 @@ const separateParts = async () => {
   return reading
 }
 
+/**
+ * A **scalar** easing control, read on the element that named it.
+ *
+ * The phrase path is the new one; this is the value path it grew out of, and it has to keep working beside it.
+ * A `/scalar` easing writes `--jumi-label-scalar-animation-timing-function`, and the motion's hoist reads that
+ * link for its timing section exactly as it does for a duration — which is the whole of what "scalar easing is
+ * unchanged" means in a browser, rather than in a unit test.
+ */
+const scalarEasing = async () => {
+  const built = build(await compiler(ENTRY, root), NAMED_CANDIDATES)
+  const classes = NAMED_ARMS.find(([id]) => id === 'r')[1]
+  const page = await load(
+    built.css,
+    `<div id="named-r" class="${classes}"></div>`,
+  )
+
+  const easing = await page.evaluate(() => {
+    const style = getComputedStyle(document.querySelector('#named-r'))
+    const names = style.animationName.split(',').map(value => value.trim())
+    const at = names.findIndex(name => name.startsWith('jumi-scale-'))
+
+    return style.animationTimingFunction.split(',')[at]?.trim() ?? 'absent'
+  })
+
+  await page.close()
+
+  return { easing }
+}
+
+const scalar = await scalarEasing()
+
+/**
+ * A **property** address — `/rotate` — read on the element that wrote it.
+ *
+ * The third spelling, and the one with the widest reach: a name specializes one instance, and a property
+ * specializes every instance of that property on the element. Two instances over one definition are the case
+ * that tells them apart, so this reads both animations rather than one, and checks the literal the
+ * specialization wrote into their frames. Read on its own page for the reason the scalar reader is: the
+ * combined page is shared by eight arms whose motions all land on the same property, and a reading that
+ * wanders between arms is a harness bug that looks like a product one.
+ */
+const propertyAddress = async () => {
+  const built = build(await compiler(ENTRY, root), NAMED_CANDIDATES)
+  const classes = NAMED_ARMS.find(([id]) => id === 's')[1]
+  const page = await load(
+    built.css,
+    `<div id="named-s" class="${classes}"></div>`,
+  )
+
+  const reading = await page.evaluate(() =>
+    [...document.querySelector('#named-s').getAnimations()].map(animation => {
+      const base = animation.effect?.getTiming?.().easing ?? 'linear'
+
+      return {
+        eased: (animation.effect?.getKeyframes?.() ?? [])
+          .filter(frame => frame.easing && frame.easing !== base)
+          .map(
+            frame =>
+              `${Math.round((frame.offset ?? 0) * 100)}:${frame.easing}`,
+          ),
+        name: animation.animationName,
+      }
+    }),
+  )
+
+  await page.close()
+
+  return reading
+}
+
+const property = await propertyAddress()
+
 const separate = await separateParts()
 
 /**
@@ -811,7 +898,7 @@ const segmentReadings = async () => {
   const classes = Object.fromEntries(NAMED_ARMS)
   const page = await load(
     built.css,
-    ['j', 'k', 'l', 'm']
+    ['j', 'k', 'l', 'm', 'q', 'r']
       .map(id => `<div id="named-${id}" class="${classes[id]}"></div>`)
       .concat(
         '<div id="named-nocontrol" class="animate-shake/shakey animation-duration-1000"></div>',
@@ -844,7 +931,15 @@ const segmentReadings = async () => {
           ),
         ]),
       ),
-    ['named-j', 'named-k', 'named-l', 'named-m', 'named-nocontrol'],
+    [
+      'named-j',
+      'named-k',
+      'named-l',
+      'named-m',
+      'named-nocontrol',
+      'named-q',
+      'named-r',
+    ],
   )
 
   await page.close()
@@ -964,7 +1059,31 @@ const naming = [
     'a name CSS escapes is counted as the stylesheet spells it',
     durationOf(forward, 'o', 'jumi-scale-') === '0.6s',
     `read ${durationOf(forward, 'o', 'jumi-scale-') ?? 'no animation at all'} — the control is ` +
-      '/[foo.bar], and a count taken from the author\'s word is one character short',
+      "/[foo.bar], and a count taken from the author's word is one character short",
+  ],
+  [
+    'a timing phrase with no address specializes nothing',
+    only('q').length === 1 &&
+      !only('q')[0].name.includes('-segment-') &&
+      written('q').length === 0,
+    JSON.stringify(only('q')),
+  ],
+  [
+    'and a scalar easing under a name still reaches its motion',
+    scalar.easing.includes('ease-in'),
+    JSON.stringify(scalar),
+  ],
+  [
+    'a property address specializes every instance of that property, not one name',
+    property.length === 2 &&
+      property.every(entry => entry.name.includes('-segment-')) &&
+      new Set(property.map(entry => entry.name)).size === 1 &&
+      property.every(
+        entry =>
+          entry.eased.filter(easing => /step/.test(easing)).length === 1 &&
+          entry.eased.some(easing => easing.startsWith('0:')),
+      ),
+    JSON.stringify(property),
   ],
 ]
 
