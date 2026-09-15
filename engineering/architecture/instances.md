@@ -16,8 +16,8 @@ A rule states two facts, and only one of them is where the instance lives:
 
 ```css
 .animate-scale-110\/loop {
-  --jumi-scale-d38-animation-name: jumi-scale-d38;   /* the definition */
-  --jumi-scale-d38-4RGfw-label: loop;                /* the instance */
+  --jumi-scale-d38-animation-name: jumi-scale-d38; /* the definition */
+  --jumi-scale-d38-4RGfw-label: loop; /* the instance */
 }
 ```
 
@@ -28,9 +28,9 @@ thing that can.
 
 Two passes read the stylesheet and need that answer:
 
-| pass | what it publishes onto the activating rule |
-| --- | --- |
-| the finalizer's hoist (`index.ts`) | the slot's shallow value, `--jumi-slot-<instance>` |
+| pass                                  | what it publishes onto the activating rule                           |
+| ------------------------------------- | -------------------------------------------------------------------- |
+| the finalizer's hoist (`index.ts`)    | the slot's shallow value, `--jumi-slot-<instance>`                   |
 | the range pass (`animation-range.ts`) | the range the variant qualified, `--jumi-<instance>-animation-range` |
 
 Each derived it itself, and they drifted the way independent derivations do. Both failures are measured,
@@ -46,7 +46,7 @@ and neither was visible in the emitted text:
   carrying the range.
 
 One fix each, and the second is the argument for the rule rather than for the fix: the range pass did not
-have a bug in its own logic, it had a *second* spelling of a fact another module already owned. The
+have a bug in its own logic, it had a _second_ spelling of a fact another module already owned. The
 repository's standing warning — no second list can stay in step — applies to a derivation exactly as it
 applies to a list.
 
@@ -54,17 +54,17 @@ applies to a list.
 
 `instanceKeys(rule, base)` — the instances a rule means, in the order the rule stated them.
 
-| the rule declares | returns | why |
-| --- | --- | --- |
-| only the activation | `[base]` | nothing named it: the element means the definition's own instance |
-| activation + one label under that base | `[named]` | the unnamed instance belongs to a *different* candidate, which this element did not write |
-| activation + two labels under that base | both | `@apply` of two named candidates is one rule and two motions |
-| activation + a label belonging to another definition | `[base]` | a name is scoped to the definition it was declared on |
-| a composed tween's label (`--jumi-filter-label`) | `[base]` | the two coincide here: the label is keyed by the slot, so the base key *is* the named instance |
+| the rule declares                                    | returns   | why                                                                                            |
+| ---------------------------------------------------- | --------- | ---------------------------------------------------------------------------------------------- |
+| only the activation                                  | `[base]`  | nothing named it: the element means the definition's own instance                              |
+| activation + one label under that base               | `[named]` | the unnamed instance belongs to a _different_ candidate, which this element did not write      |
+| activation + two labels under that base              | both      | `@apply` of two named candidates is one rule and two motions                                   |
+| activation + a label belonging to another definition | `[base]`  | a name is scoped to the definition it was declared on                                          |
+| a composed tween's label (`--jumi-filter-label`)     | `[base]`  | the two coincide here: the label is keyed by the slot, so the base key _is_ the named instance |
 
 ## What is not a violation
 
-- **The model.** `src/core` *declares* both facts — it formats the activation variable and the label
+- **The model.** `src/core` _declares_ both facts — it formats the activation variable and the label
   declaration, so it cannot reconstruct them from themselves. It does read a name format in one place,
   `registerName`, to register `--jumi-slot-<slot>` non-inheriting in step with the finalizer's
   publication. That is a name-format dependency between two writers, not an instance read off a rule, and
@@ -100,16 +100,17 @@ A named instance currently reaches its controls through an extra hop:
 ```
 
 The fills are the only place the author's word is bound to a part. The slot key names the definition
-(`--jumi-slot-fade-in`), or, for a property utility, the definition *with the name hash already in it*
+(`--jumi-slot-fade-in`), or, for a property utility, the definition _with the name hash already in it_
 (`--jumi-slot-opacity-sluPU-6XRQG`) — so identity is in the slot, and the labels are where the controls
 write. That makes the fills look like plumbing: the hoist could read `var(--jumi-label-reveal-animation-duration, …)`
 itself. Once the word is in the emitted name, one element's hoist can name its own instance, and no shared
 position has to carry one word for the whole stylesheet.
 
 The ten fills split along the shorthand. Seven parts (`animation-duration` through `animation-play-state`)
-are sections of the `animation` value the hoist publishes. Three — `animation-composition`,
-`animation-range`, `animation-timeline` — have no shorthand section at all, so they are declared on their own
-beside it, and they are read, and therefore replaced, at those declarations rather than through the hoist.
+are sections of the `animation` value the hoist publishes, so they are written where that value is written.
+Three — `animation-composition`, `animation-range`, `animation-timeline` — have no shorthand section at all,
+so they are declared on their own beside it, and they are read at those declarations instead of through the
+hoist: a different site, with a different emission shape behind it.
 
 **Measured, then implemented — for the seven the shorthand carries.** `scripts/spike-label-link.mjs`
 (`pnpm spike:label-link`) deletes the layer from the **compiled** stylesheet with PostCSS and measures both
@@ -123,21 +124,26 @@ hoist is published on the rule that named the motion, so it is element-local, an
 (`--jumi-label-<name>-<part>`) is the value's first link. The chain behind it is untouched, so an unset label
 still falls through to the definition and then to the shared default.
 
-**The three the shorthand cannot carry stay assigned separately, and that is structural rather than
-leftover.** `animation-composition`, `animation-range` and `animation-timeline` have no shorthand section, so
-the composition declares them — and the composition is synthesized as **one rule for every activating
-selector**, which includes candidates that named nothing. A name in that block would be a name every element
-matching it answers to, which is the failure measured above. So a name reaches those three the only way a
-shared rule can: through a slot-keyed variable the naming rule fills. Making them per-rule is what would
-remove the rest of the layer, and the view-transition emission reads the same aggregate, so it would move
-with it.
+**The three the shorthand cannot carry keep their link layer, and that is deliberate.**
+`animation-composition`, `animation-range` and `animation-timeline` have no shorthand section, so the
+composition declares them — and the composition's aggregate is **selector-grouped rather than rule-local**,
+which includes candidates that named nothing. A name in that block would be a name every element matching it
+answers to, which is the failure measured above. So those three are reached through a slot-keyed variable the
+naming rule fills, and the hop carries a real locality boundary rather than redundant indirection.
 
-| corpus | before | after |
-| --- | --- | --- |
-| canonical (`scripts/css-snapshot/snapshot.css`, 2 named motions) | 85,083 B | 81,850 B |
-| its slot registrations / fills | 55 / 20 | 41 / 6 |
-| probe fixture (6 arms, 4 named motions) | 34,417 B | 27,760 B |
-| carrier corpus (`examples/`, names nothing) | 140,006 B | 140,006 B |
+Removing the rest of the layer is therefore **not the same cleanup**: it would mean emitting those longhands
+rule-locally, which changes the emission topology — and the view-transition emission reads the same aggregate,
+so it moves with it. Deferred as its own research track, if CSS-size pressure ever makes it worth the blast
+radius: _can `separateParts` be emitted rule-locally without duplicating excessive CSS, breaking VT replay,
+changing selector grouping, or reintroducing element-crossing name leakage?_ That needs a probe, not a
+continuation of this refactor.
+
+| corpus                                                           | before    | after     |
+| ---------------------------------------------------------------- | --------- | --------- |
+| canonical (`scripts/css-snapshot/snapshot.css`, 2 named motions) | 85,083 B  | 81,850 B  |
+| its slot registrations / fills                                   | 55 / 20   | 41 / 6    |
+| probe fixture (6 arms, 4 named motions)                          | 34,417 B  | 27,760 B  |
+| carrier corpus (`examples/`, names nothing)                      | 140,006 B | 140,006 B |
 
 The demo corpus is unchanged because it names no motion at all: the layer only exists for a named instance,
 so a corpus without names is not merely unaffected, it never had the cost.
@@ -147,4 +153,5 @@ untouched), `create.test.ts` (only those three are registered as slot-keyed vari
 still carries no name), and `behaviour:check`'s naming section, which now also asserts the three properties
 **resolve** on a named instance. That last one is falsified rather than assumed: with the assignment removed
 it reads `{"composition":"replace","duration":"1s","range":"0%","timeline":"auto"}` — all three controls
-gone while the motion still runs, which is exactly why text-level checks could not catch it.
+gone while the motion still runs, which is exactly why text-level checks could not catch it. The arm is worth
+more than the bytes: those three can vanish silently, because the animation itself keeps running.

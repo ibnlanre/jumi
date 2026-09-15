@@ -1,3 +1,31 @@
+## 2026-09-15 — the per-instance link layer: closed, with the residual recorded as intentional
+
+**Removing the link for the seven shorthand-carried parts — accepted.** A name reached those parts through a
+slot-keyed variable filled on the naming rule: ten declarations and ten registrations per named instance, to
+bind a word the rule publishing the value already knew. The hoist is published on that rule, so it is
+element-local, and the name can go in its value instead. Measured: 85,083 → 81,850 bytes on the recorded
+corpus (55 → 41 slot registrations, 20 → 6 fills), 34,417 → 27,760 on the probe fixture, and no behaviour
+change across the six naming arms in either candidate order. The demo corpus is unchanged because it names no
+motion — the cost only ever existed for a named instance. The `--jumi-slot-<slot>` registration stays, so
+descendant isolation is untouched.
+
+**The residual for `animation-composition`, `animation-range` and `animation-timeline` — kept.** Their
+aggregate emission is selector-grouped rather than rule-local, so their indirection carries a real locality
+boundary. Putting those declarations into each activating rule would change the emission topology rather than
+remove a hop, and it moves the view-transition emission with it. Two and a half kilobytes on the fixture is
+not worth that blast radius.
+
+**Falsification over text assertions — the pattern to keep.** The new naming arm is worth more than the byte
+saving: with the assignment removed, the three controls read `replace` / `0%` / `auto` while the animation
+still runs. A text snapshot cannot see that, and no other harness here would have caught it.
+
+### Call
+
+> **Close the refactor here.** Further rule-local emission is deferred to its own research item, not a
+> continuation of this work: _can `separateParts` be emitted rule-locally without duplicating excessive CSS,
+> breaking VT replay, changing selector grouping, or reintroducing element-crossing name leakage?_ That
+> deserves a probe.
+
 ## 2026-09-15 — addressing and motion instances: closed for 1.0
 
 The instance refactor has paid for itself twice over: it is what made the address collision fixable, and
@@ -32,8 +60,8 @@ legitimately latent control, not dead weight. Warnings stay where impossibility 
 finding 2 (`contradictory same-address controls`) turns out to be one case that **is not**: two
 unconditional control rules writing one variable with different values is also how two elements get
 different timings — `animation-duration-300` on cards and `animation-duration-900` on a hero is one
-stylesheet, one variable, two values, and no contradiction anywhere. It is provable only *within a single
-rule*, which is rare enough to be a typo rather than a pattern, so the contradiction stays where it is
+stylesheet, one variable, two values, and no contradiction anywhere. It is provable only _within a single
+rule_, which is rare enough to be a typo rather than a pattern, so the contradiction stays where it is
 visible: on the element, which is Studio's side of the fence and not the finalizer's. Finding 2's measured
 behaviour is unchanged (`1s`), and the reason it is not a rule is unchanged too: CSS guarantees nothing
 about authored class order.
