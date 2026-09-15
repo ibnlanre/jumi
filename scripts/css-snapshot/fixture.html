@@ -106,5 +106,17 @@
     <div
       class="animate-border-radius-sm animate-box-shadow-blur-sm animate-backdrop-filter-blur-sm animate-backdrop-filter-drop-shadow-sm animate-line-height-tight animate-line-height-6 animate-max-width-xs animate-max-width-4 animate-box-shadow-sm"
     ></div>
+
+    <!-- Dependency-bearing families, one phrase each. A property whose value template names its own
+         components — `--jumi-rotate` is `rotate-x` … `rotate-angle`, `--jumi-margin` is `margin-top` …
+         `margin-left` — reaches `propertyKeyframeValue` with those components expanded per frame, and the
+         expanded names have no writer. The corpus carried only `rotate` and `scale`, so the class looked
+         twice as small as it is: measured, all eight families produce it, 66 reads over 8 phrases.
+
+         This is the fixture `scripts/dead-links.mjs` audits, and the reason it is here rather than in the
+         demo page: the canonical corpus is what the writer/read invariant runs on. -->
+    <div
+      class="animate-rotate-[0:0deg|50:90deg] animate-scale-[0:1|50:1.5] animate-margin-[0:0px|50:8px] animate-padding-[0:0px|50:8px] animate-border-radius-[0:0px|50:8px] animate-box-shadow-[0:0px_0px_black|50:0px_0px_8px_black] animate-outline-color-[0:red|50:blue] animate-backdrop-filter-[0:blur(0px)|50:blur(8px)]"
+    ></div>
   </body>
 </html>
