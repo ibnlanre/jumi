@@ -31,7 +31,7 @@ Jumi needs two things: the plugin, which teaches Tailwind the utilities, and an 
 Your stylesheet does not mention Jumi:
 
 ```css
-@import "tailwindcss";
+@import 'tailwindcss';
 ```
 
 Import that stylesheet into your application. Tailwind needs to scan the files containing your animation classes.
@@ -41,7 +41,7 @@ Import that stylesheet into your application. Tailwind needs to scan the files c
 Register the plugin in CSS and finish the stylesheet with Jumi beside Tailwind's plugin:
 
 ```css
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin "@ibnlanre/jumi";
 ```
 
@@ -91,8 +91,10 @@ writeFileSync('dist/output.css', css)
 ## 03 — Make an entrance
 
 ```html
-<div class="motion-safe:animate-fade-in-up
-  animation-duration-[600ms]">
+<div
+  class="motion-safe:animate-fade-in-up
+  animation-duration-[600ms]"
+>
   Nice to see you.
 </div>
 ```
@@ -104,7 +106,7 @@ conditional.
 ## 04 — Add the runtime only where you need it
 
 Jumi is CSS and build-time right up to the point where your own state changes inside one document — a card
-taking the corner, a panel opening, a list reordering. That half needs someone to say *when* the change
+taking the corner, a panel opening, a list reordering. That half needs someone to say _when_ the change
 happens, and it lives behind its own subpath so the root package stays free of runtime code:
 
 ```ts
@@ -123,12 +125,12 @@ rule, what happens when it is called twice, and the outcomes it returns.
 Use Jumi's Vite integration in your Astro configuration:
 
 ```js
-import { defineConfig } from 'astro/config';
-import jumi from '@ibnlanre/jumi/vite';
+import { defineConfig } from 'astro/config'
+import jumi from '@ibnlanre/jumi/vite'
 
 export default defineConfig({
   vite: { plugins: [jumi()] },
-});
+})
 ```
 
 Then import your main stylesheet in an Astro layout. See the [official Astro styling guide](https://docs.astro.build/en/guides/styling/#tailwind) for Tailwind setup.

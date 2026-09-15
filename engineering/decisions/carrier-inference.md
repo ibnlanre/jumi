@@ -20,16 +20,16 @@ That is the whole mechanism. Everything else is surface.
 
 ## Why, produced by measurement rather than argument
 
-| question | result |
-| --- | --- |
-| does an implicit carrier behave the same? | yes — every case in the correctness matrix and every cascade context, including `@media` matching and not, `@supports`, another layer, a pseudo-element, hover with the pointer actually over the element, and `@apply` of a utility alone (which starts working) |
-| is a universal `*` carrier viable? | no — about 1 ms per 1,000 elements per style recalc, where the opt-in holds it at zero |
-| does grouping selectors across contexts change the cascade? | no — the *activation* is a variable the utility declares inside its own context, and the composition only reads it |
-| does it survive a growing sheet and two entrypoints? | yes — one rule rewritten in place; two compilers, two independent rules |
-| is a per-activating-rule aggregate affordable? | no — 68× the stylesheet at 100 slots |
-| is a grouped aggregate affordable? | yes — within 2% of today's bytes |
-| does `addBase` work as the shell's sink? | **no** — a `@layer components` declaration that loses to the utility-layer carrier beats a base-layer one; specificities match and the layer decides |
-| what happens with nothing to annotate? | the shell must be dropped — an empty selector list is not a rule, and a leftover marker trips the zero-occurrence invariant on a stylesheet that is not wrong |
+| question                                                    | result                                                                                                                                                                                                                                                            |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| does an implicit carrier behave the same?                   | yes — every case in the correctness matrix and every cascade context, including `@media` matching and not, `@supports`, another layer, a pseudo-element, hover with the pointer actually over the element, and `@apply` of a utility alone (which starts working) |
+| is a universal `*` carrier viable?                          | no — about 1 ms per 1,000 elements per style recalc, where the opt-in holds it at zero                                                                                                                                                                            |
+| does grouping selectors across contexts change the cascade? | no — the _activation_ is a variable the utility declares inside its own context, and the composition only reads it                                                                                                                                                |
+| does it survive a growing sheet and two entrypoints?        | yes — one rule rewritten in place; two compilers, two independent rules                                                                                                                                                                                           |
+| is a per-activating-rule aggregate affordable?              | no — 68× the stylesheet at 100 slots                                                                                                                                                                                                                              |
+| is a grouped aggregate affordable?                          | yes — within 2% of today's bytes                                                                                                                                                                                                                                  |
+| does `addBase` work as the shell's sink?                    | **no** — a `@layer components` declaration that loses to the utility-layer carrier beats a base-layer one; specificities match and the layer decides                                                                                                              |
+| what happens with nothing to annotate?                      | the shell must be dropped — an empty selector list is not a rule, and a leftover marker trips the zero-occurrence invariant on a stylesheet that is not wrong                                                                                                     |
 
 The carrier is located by an activation, not by a namespace: a rule declaring a generated
 `--jumi-<label>-animation-name`, or `--jumi-<motion>-transition-<part>`. Both patterns require a
@@ -46,7 +46,7 @@ and a control declares a different property again — so a control alone stays i
    a requirement, not an outcome of whatever a PostCSS walk happens to visit first.
 3. **Zero activators drops the shell.** No empty rule, no marker.
 4. **The substrate goes to `:root`**, where it is inherited and costs nothing per element — with
-   `interpolate-size` staying on the shell, because it is an inherited *real* property and moving it to
+   `interpolate-size` staying on the shell, because it is an inherited _real_ property and moving it to
    `:root` would turn it on for every element on the page.
 5. **The marker stays** as the rendezvous between the shell and the finalizer. It remains build-time
    only, and the zero-occurrence invariant still holds.
@@ -59,7 +59,7 @@ and a control declares a different property again — so a control alone stays i
 - `@apply`ing a Jumi utility without also applying the carrier starts working, which it does not today.
 - `animations` and `transitions` are removed from the utilities, the tests, the harnesses, the byte
   snapshot and the eight documentation pages that teach them.
-- A stylesheet with no Jumi motion gets *smaller*, not an inert internal rule.
+- A stylesheet with no Jumi motion gets _smaller_, not an inert internal rule.
 
 ## What this does not fix
 
@@ -67,7 +67,7 @@ The aggregate's evaluation cost. Each animated element still resolves every posi
 stylesheet-wide slot vector, and flattening or hoisting those chains moves the number by 11–19% while
 changing semantics for shared controls. See `architecture/aggregate-representation.md`. Reducing it
 means reducing the number of positions an element resolves, which is a change to what a slot universe
-*is*.
+_is_.
 
 ## Status of the evidence
 

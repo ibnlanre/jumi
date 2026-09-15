@@ -1,8 +1,8 @@
 # Style cost: what the aggregate costs the tooling
 
-*RESEARCH — measured, and concluded. The representation below is recommended for adoption and the
+_RESEARCH — measured, and concluded. The representation below is recommended for adoption and the
 release criteria change with it; the production change itself is a separate step and is not made
-here.*
+here._
 
 The page renders 228 effects at 60fps and Chrome DevTools freezes on the same page. Those are two
 different workloads against the same stylesheet, and the previous investigation
@@ -28,22 +28,22 @@ For one selected animated element at 228 slots, `CSS.getMatchedStylesForNode` re
 bytes**. The composition rule's own text is 177,882 bytes, so the protocol pays **4.9×** what the
 stylesheet says. Where those bytes go:
 
-| | bytes | share |
-| --- | --- | --- |
+|                                                            | bytes   | share |
+| ---------------------------------------------------------- | ------- | ----- |
 | `matchedCSSRules` → `rule.style` (the declaration payload) | 704,988 | 81.7% |
-| `matchedCSSRules` → `selectorList` metadata | 121,808 | 14.1% |
-| `pseudoElements` + `inherited` | 33,130 | 3.8% |
-| everything else | ~3,300 | 0.4% |
+| `matchedCSSRules` → `selectorList` metadata                | 121,808 | 14.1% |
+| `pseudoElements` + `inherited`                             | 33,130  | 3.8%  |
+| everything else                                            | ~3,300  | 0.4%  |
 
 and inside `rule.style`, the declaration body is paid for **three times** — as each property's
 `value`, again as each property's `text`, and a third time as the rule's `cssText`:
 
-| | bytes | share |
-| --- | --- | --- |
-| `cssProperties` name + value | 346,849 | 40.2% |
+|                                                    | bytes   | share |
+| -------------------------------------------------- | ------- | ----- |
+| `cssProperties` name + value                       | 346,849 | 40.2% |
 | per-property overhead (`text` duplicate + `range`) | 183,088 | 21.2% |
-| `cssText` (the whole body again) | 173,581 | 20.1% |
-| `style` metadata | ~1,500 | 0.2% |
+| `cssText` (the whole body again)                   | 173,581 | 20.1% |
+| `style` metadata                                   | ~1,500  | 0.2%  |
 
 The computed-style response is not a factor: **39,173 bytes, of which 16,830 over an inert element**
 (22,343 bytes), for 228 positions. Custom-property enumeration is not a factor: **3,322 bytes**, 0.4%.
@@ -65,7 +65,7 @@ Only the declaration payload changed, and the stall moved from 20 s to 2.5 s.
 
 **And the fix is the representation the earlier investigation rejected — for a reason that no longer
 applies.** Hoisting the per-position chains off the aggregate and onto the activator that owns the
-slot, so the aggregate carries one *shallow* reference per position instead of ten nested chains,
+slot, so the aggregate carries one _shallow_ reference per position instead of ten nested chains,
 takes the same 228-slot response from **863,189 → 339,774 bytes (−61%)** and **20.2 → 14.2 ms
 (−30%)**, with the three live positions resolving **identically to the current emission**. The
 earlier verdict measured runtime recalc (439 → 356 ms, −19%) and rejected it as not transformative.
@@ -75,7 +75,7 @@ The tooling payload is a 61% cut. Those are different numbers about the same cha
 plausibly assemble a list from independent utilities was checked in a browser: `@function` (present,
 verified), `if()` (present, verified), registered `<custom-ident>#` syntax (present, verified), style
 queries (present, verified). **All four select a whole value; none accumulates.** The obstacle is not
-concatenation — it is *counting*, and CSS has no primitive that counts anything but DOM siblings.
+concatenation — it is _counting_, and CSS has no primitive that counts anything but DOM siblings.
 
 ## Method, and what it does not measure
 
@@ -87,7 +87,7 @@ parses the response and builds a DOM out of it. This measures the first half.
   so it was measured by hand, in step four below, and the two agree.
 - **Latency is secondary**, and includes the Playwright-side JSON round trip. It is reported because
   it moves in the same direction as bytes, not as a rendering-time claim.
-- The renderer's *recalc* cost is a different workload and is measured separately, in step one — the
+- The renderer's _recalc_ cost is a different workload and is measured separately, in step one — the
   earlier verdict in `engineering/architecture/aggregate-representation.md` stands for the shape it
   measured, which is not the shape under consideration here.
 
@@ -98,17 +98,17 @@ instrument builds N distinct slots with `animate-rotate-[{i}deg]`.
 
 `CSS.getMatchedStylesForNode`, bytes and median ms:
 
-| slots | aggregate entries | jumi | shallow-shorthand | native | inert |
-| --- | --- | --- | --- | --- | --- |
-| 10 | 13 | 108,709 / 4.3 | 85,196 / 4.0 | 47,474 / 3.2 | 45,013 / 2.9 |
-| 25 | 28 | 160,758 / 5.4 | 102,682 / 4.8 | 47,501 / 3.5 | 45,013 / 3.4 |
-| 50 | 52 | 244,432 / 6.8 | 131,102 / 5.9 | 47,680 / 3.8 | 45,013 / 3.9 |
-| 100 | 102 | 417,757 / 10.0 | 189,274 / 8.2 | 47,680 / 5.1 | 45,013 / 4.9 |
-| 150 | 152 | 591,816 / 13.9 | 248,202 / 10.2 | 47,680 / 6.3 | 45,013 / 5.9 |
-| 228 | 230 | **863,189 / 20.2** | **339,774 / 14.2** | 47,680 / 8.1 | 45,013 / 7.9 |
+| slots | aggregate entries | jumi               | shallow-shorthand  | native       | inert        |
+| ----- | ----------------- | ------------------ | ------------------ | ------------ | ------------ |
+| 10    | 13                | 108,709 / 4.3      | 85,196 / 4.0       | 47,474 / 3.2 | 45,013 / 2.9 |
+| 25    | 28                | 160,758 / 5.4      | 102,682 / 4.8      | 47,501 / 3.5 | 45,013 / 3.4 |
+| 50    | 52                | 244,432 / 6.8      | 131,102 / 5.9      | 47,680 / 3.8 | 45,013 / 3.9 |
+| 100   | 102               | 417,757 / 10.0     | 189,274 / 8.2      | 47,680 / 5.1 | 45,013 / 4.9 |
+| 150   | 152               | 591,816 / 13.9     | 248,202 / 10.2     | 47,680 / 6.3 | 45,013 / 5.9 |
+| 228   | 230               | **863,189 / 20.2** | **339,774 / 14.2** | 47,680 / 8.1 | 45,013 / 7.9 |
 
 Growth is linear at roughly **3.7 KB per aggregate position** — and note the shape of it. The
-`inert` column is flat at 45 KB: that is the floor for selecting *any* element on a page with this
+`inert` column is flat at 45 KB: that is the floor for selecting _any_ element on a page with this
 stylesheet. The variable part is entirely the composition rule.
 
 The CTO's estimate — `7.6 KB × 228 / 9 ≈ 193 KB` for one composition declaration block — is close
@@ -119,13 +119,13 @@ serialization multiplier: **863 KB on the wire.**
 
 Each removes one part so the others can be attributed.
 
-| variant | what it removes | bytes | ms | declaration text | selector text | `selectorList` metadata |
-| --- | --- | --- | --- | --- | --- | --- |
-| jumi | — | 863,189 | 20.2 | 346,849 | 13,146 | 121,808 |
-| no-declarations | the ten aggregate longhands | 175,769 | 10.2 | 4,029 | 13,146 | 121,808 |
-| small-selectors | the giant selector lists | 749,331 | 17.0 | 346,849 | 490 | 7,962 |
-| native | the aggregate entirely | 47,680 | 8.1 | 1,142 | 428 | 7,031 |
-| inert | the selection's target | 45,013 | 7.9 | — | — | — |
+| variant         | what it removes             | bytes   | ms   | declaration text | selector text | `selectorList` metadata |
+| --------------- | --------------------------- | ------- | ---- | ---------------- | ------------- | ----------------------- |
+| jumi            | —                           | 863,189 | 20.2 | 346,849          | 13,146        | 121,808                 |
+| no-declarations | the ten aggregate longhands | 175,769 | 10.2 | 4,029            | 13,146        | 121,808                 |
+| small-selectors | the giant selector lists    | 749,331 | 17.0 | 346,849          | 490           | 7,962                   |
+| native          | the aggregate entirely      | 47,680  | 8.1  | 1,142            | 428           | 7,031                   |
+| inert           | the selection's target      | 45,013  | 7.9  | —                | —             | —                       |
 
 Reading them:
 
@@ -137,9 +137,10 @@ Reading them:
   aggregate. Collapsing only the composition rule measures 6% and understates the selector's share,
   which is what the first version of this control did.
 
-  Note the ratio that makes this worth a sentence: the selector *text* is 13 KB, but its
+  Note the ratio that makes this worth a sentence: the selector _text_ is 13 KB, but its
   `selectorList` metadata is **122 KB** — 9× the text, because each of the 462 selectors carries a
   `range` and a `specificity` alongside its text.
+
 - **C is not a factor.** The computed-style response is 39,173 bytes for 228 positions against an
   inert element's 22,343, and `animation-name` itself is 1,413 characters. Removing the aggregate
   drops it to 24,233 — a 15 KB swing against the matched response's 687 KB.
@@ -155,24 +156,26 @@ resolve to a fallback. Built by transforming the real emission, not hand-written
 
 ```css
 /* the activator that owns the slot */
-.animate-rotate-45 { --jumi-slot-44: var(--jumi-rotate-45-animation-name, …) var(…) …; }
+.animate-rotate-45 {
+  --jumi-slot-44: var(--jumi-rotate-45-animation-name, …) var(…) …;
+}
 
 /* the aggregate: one shallow reference per position, not ten nested chains */
 .activators… {
   animation: var(--jumi-slot-44, none), var(--jumi-slot-45, none), …;
-  animation-composition: …;   /* the shorthand resets these two and cannot set them */
+  animation-composition: …; /* the shorthand resets these two and cannot set them */
   animation-timeline: …;
 }
 ```
 
 At 228 slots:
 
-| variant | bytes | ms | declaration text | `rule.style` |
-| --- | --- | --- | --- | --- |
-| jumi | 863,189 | 20.2 | 346,849 | 704,988 |
-| **shallow-shorthand** | **339,774 (−61%)** | **14.2 (−30%)** | 82,313 | 181,573 |
-| shallow-longhand | 644,723 (−25%) | 28.2 (+40%) | 232,637 | 481,802 |
-| **shallow+small-selectors** | **230,584 (−73%)** | **11.3** | 82,313 | 181,567 |
+| variant                     | bytes              | ms              | declaration text | `rule.style` |
+| --------------------------- | ------------------ | --------------- | ---------------- | ------------ |
+| jumi                        | 863,189            | 20.2            | 346,849          | 704,988      |
+| **shallow-shorthand**       | **339,774 (−61%)** | **14.2 (−30%)** | 82,313           | 181,573      |
+| shallow-longhand            | 644,723 (−25%)     | 28.2 (+40%)     | 232,637          | 481,802      |
+| **shallow+small-selectors** | **230,584 (−73%)** | **11.3**        | 82,313           | 181,567      |
 
 **Behaviour is preserved where it is observable.** The parity check reads the resolved value of every
 position whose `animation-name` is not `none` and compares it against the current emission:
@@ -191,12 +194,12 @@ native            DIFFERS — its own three literal animations, as intended
 The earlier investigation rejected hoisting partly because a control shared across positions stops
 reaching the inactive ones. That is reproduced here, and it is a real computed-style difference:
 
-| variant | distinct `animation-duration` values across all 230 positions |
-| --- | --- |
-| jumi | `["1s"]` |
-| shallow-shorthand | `["auto", "1s"]` |
-| shallow-longhand | `["0s", "1s"]` |
-| small-selectors | `["1s"]` |
+| variant           | distinct `animation-duration` values across all 230 positions |
+| ----------------- | ------------------------------------------------------------- |
+| jumi              | `["1s"]`                                                      |
+| shallow-shorthand | `["auto", "1s"]`                                              |
+| shallow-longhand  | `["0s", "1s"]`                                                |
+| small-selectors   | `["1s"]`                                                      |
 
 In the current emission every position reads the shared attribute-scoped control, so all 230 carry
 the same duration. Hoisted, only the activated position does; the other 227 fall back to a literal
@@ -207,7 +210,7 @@ optimisation, exactly as recorded before, and it is the price of the 61%.
 ### The trap that cost a run
 
 The first `shallow-longhand` build used `none` as the fallback for all ten longhands. `none` is a
-keyword for `animation-name` and *invalid* for `animation-duration`, so the substitution made the
+keyword for `animation-name` and _invalid_ for `animation-duration`, so the substitution made the
 whole declaration invalid at computed-value time and **every** position lost its duration — including
 the live one. The parity check caught it as `DIFFERS` on all three live positions, with the names and
 fill-modes correct and the durations absent.
@@ -215,27 +218,27 @@ fill-modes correct and the durations absent.
 Any longhand-shaped hoist needs a per-part fallback (`0s`, `linear`, `1`, `running`, `auto`, …). The
 shorthand shape does not have this problem, because a missing item resolves to the whole shorthand
 value `none`, which is valid. That is one reason to prefer the shorthand; the other is that it is the
-shape that produces the 61% — the longhand hoist only reaches −25% and is *slower* than what it
+shape that produces the 61% — the longhand hoist only reaches −25% and is _slower_ than what it
 replaces (28.2 ms against 20.2 ms, despite being smaller).
 
 ## Step one: recalc, re-priced for the exact shape
 
 The earlier investigation rejected hoisting on the renderer's cost — 439 → 356 ms, −19%, "not
-transformative". That number was for a hoisted *longhand* shape. The shape under consideration is a
+transformative". That number was for a hoisted _longhand_ shape. The shape under consideration is a
 different one, so the grid was re-run with **both** hoists present, over six slot counts and four
 animated element counts (`pnpm spike:recalc`).
 
 `RecalcStyleDuration` per control change, 1,000 animated elements, against an inert page of the same
 DOM shape:
 
-| slots | jumi | hoisted longhand | shallow-shorthand | inert | shallow saves |
-| --- | --- | --- | --- | --- | --- |
-| 10 | 90.2 | 87.2 | 56.3 | 0.4 | 38% |
-| 25 | 146.8 | 136.4 | 84.7 | 0.4 | 42% |
-| 50 | 251.8 | 216.4 | 119.8 | 0.4 | 52% |
-| 100 | 454.2 | 391.0 | 200.7 | 0.4 | 56% |
-| 150 | 662.9 | 537.8 | 271.2 | 0.4 | 59% |
-| 228 | 975.8 | 825.8 | 392.2 | 0.4 | 60% |
+| slots | jumi  | hoisted longhand | shallow-shorthand | inert | shallow saves |
+| ----- | ----- | ---------------- | ----------------- | ----- | ------------- |
+| 10    | 90.2  | 87.2             | 56.3              | 0.4   | 38%           |
+| 25    | 146.8 | 136.4            | 84.7              | 0.4   | 42%           |
+| 50    | 251.8 | 216.4            | 119.8             | 0.4   | 52%           |
+| 100   | 454.2 | 391.0            | 200.7             | 0.4   | 56%           |
+| 150   | 662.9 | 537.8            | 271.2             | 0.4   | 59%           |
+| 228   | 975.8 | 825.8            | 392.2             | 0.4   | 60%           |
 
 Two things to read here.
 
@@ -244,7 +247,7 @@ recorded before. The prior verdict was correct about the prototype it measured; 
 generalisation that was wrong.
 
 **The shorthand shape is a different order of improvement — −60%, and better at every cell.** The
-reason is not depth, it is *count*. The longhand hoist keeps ten N-position lists and only makes each
+reason is not depth, it is _count_. The longhand hoist keeps ten N-position lists and only makes each
 position cheaper to resolve, which is worth ~15%. The shorthand collapses ten N-position lists into
 one plus the two the shorthand cannot carry, so an element resolves **3N positions instead of 10N**.
 That is precisely the lever the earlier document named — "reducing the number of positions an element
@@ -257,7 +260,7 @@ cell), so the counters are not measuring work the user would not feel.
 ## Step two: the label-scoped control, closed
 
 The one semantic unknown the earlier investigation left open was the collision between a hoisted
-chain and a *label-scoped* control. Such a control writes `--jumi-<label>-<part>`, which is the
+chain and a _label-scoped_ control. Such a control writes `--jumi-<label>-<part>`, which is the
 namespace a hoisted slot value has to coexist with, and the earlier fixture activated a slot whose
 control never reached it — so it settled nothing in either direction.
 
@@ -266,10 +269,8 @@ that stops reaching it fails loudly instead of passing quietly:
 
 ```html
 class="animate-rotate-[0:0deg|20:-8deg|100:-8deg]/[flick]
-       animation-duration-500/[flick]
-       animation-timing-function-linear/[flick]
-       animate-scale-110
-       animation-delay-150/scale"
+animation-duration-500/[flick] animation-timing-function-linear/[flick]
+animate-scale-110 animation-delay-150/scale"
 ```
 
 Measured on the element: the label marker `--jumi-rotate-Z2excak-label` and the control variable are both
@@ -290,7 +291,7 @@ animation-duration      0.5s                animation-timeline         auto
 animation-fill-mode     forwards            animation-timing-function  linear
 ```
 
-There is no collision, because the label link lives *inside* the hoisted slot value — exactly where
+There is no collision, because the label link lives _inside_ the hoisted slot value — exactly where
 it lived before. The unknown is closed, and it passes.
 
 ## Step three: both levers together
@@ -300,12 +301,12 @@ metadata is **36%** of what is left, so the two had to be priced together rather
 
 At 228 slots:
 
-| variant | bytes | ms | `rule.style` | `selectorList` |
-| --- | --- | --- | --- | --- |
-| jumi | 867,857 | 20.2 | 704,982 | 121,808 |
-| small-selectors | 749,291 (−14%) | 17.1 | 704,982 | 7,962 |
-| shallow-shorthand | 339,734 (−61%) | 14.0 | 181,567 | 121,808 |
-| **shallow+small-selectors** | **230,584 (−73%)** | **11.3** | 181,567 | 7,962 |
+| variant                     | bytes              | ms       | `rule.style` | `selectorList` |
+| --------------------------- | ------------------ | -------- | ------------ | -------------- |
+| jumi                        | 867,857            | 20.2     | 704,982      | 121,808        |
+| small-selectors             | 749,291 (−14%)     | 17.1     | 704,982      | 7,962          |
+| shallow-shorthand           | 339,734 (−61%)     | 14.0     | 181,567      | 121,808        |
+| **shallow+small-selectors** | **230,584 (−73%)** | **11.3** | 181,567      | 7,962          |
 
 Stacking the selector reduction on the hoist is worth a further **32%** of the remaining payload, and
 it stays parity-identical to the current emission on live positions. Selector metadata goes from 36%
@@ -357,11 +358,11 @@ hoisted       2.73 s     17×
 
 and through the protocol, on the same element:
 
-| | as built | hoisted |
-| --- | --- | --- |
-| matched response | 965,075 B | 412,671 B (−57%) |
-| CDP round trip | 21.5 ms | 15.7 ms (−27%) |
-| resolved animations | 228/228 | **228/228, identical names and durations** |
+|                     | as built  | hoisted                                    |
+| ------------------- | --------- | ------------------------------------------ |
+| matched response    | 965,075 B | 412,671 B (−57%)                           |
+| CDP round trip      | 21.5 ms   | 15.7 ms (−27%)                             |
+| resolved animations | 228/228   | **228/228, identical names and durations** |
 
 The parity line is the important one: the hoist is correct on the real stylesheet, not merely on the
 synthetic one, and the check is the same assertion `behaviour:check` makes.
@@ -371,11 +372,11 @@ synthetic one, and the check is the same assertion `behaviour:check` makes.
 The synthetic harness turned out to overstate one thing and understate another, and separating them
 is what answered the question. Hand timings, all with the aggregate hoisted:
 
-| selectors | selector text | Inspector |
-| --- | --- | --- |
-| 231 escaped utility names | 13,146 chars | 3.25 s |
-| **231 short addresses** | **3,486 chars** | **0.42 s** |
-| 1 selector | 7 chars | 0.23 s |
+| selectors                 | selector text   | Inspector  |
+| ------------------------- | --------------- | ---------- |
+| 231 escaped utility names | 13,146 chars    | 3.25 s     |
+| **231 short addresses**   | **3,486 chars** | **0.42 s** |
+| 1 selector                | 7 chars         | 0.23 s     |
 
 The first two rows hold the **same number of selectors** and differ by 3.8× in text and 7.7× in
 time. So the frontend's cost tracks the **characters** it has to render in the matched selector list,
@@ -412,16 +413,16 @@ the aggregate would be 1–3 positions instead of 228. The requirement, stated o
 Measured in a browser (`pnpm spike:local-list`). A mechanism works only if the three position counts
 are 1, 2 and 3:
 
-| mechanism | only | pair | all | positions |
-| --- | --- | --- | --- | --- |
-| three utilities set one property | `a` | `b` | `c` | 1/1/1 |
-| registered `syntax: "<custom-ident>#"` | `a` | `b` | `c` | 1/1/1 |
-| `if()` | `a` | `a` | `a` | 1/1/1 |
-| `@function` | `a` | `a` | `a` | 1/1/1 |
-| `@container style()` | `a` | `b` | `b` | 1/1/1 |
-| space toggle | `a, b, c` | `a, b, c` | `a, b, c` | 3/3/3 |
-| `sibling-count()` as a number source | — | — | — | 1/1/1 |
-| **control: one property holding a whole list** | `a` | `a, b` | `a, b, c` | **1/2/3** |
+| mechanism                                      | only      | pair      | all       | positions |
+| ---------------------------------------------- | --------- | --------- | --------- | --------- |
+| three utilities set one property               | `a`       | `b`       | `c`       | 1/1/1     |
+| registered `syntax: "<custom-ident>#"`         | `a`       | `b`       | `c`       | 1/1/1     |
+| `if()`                                         | `a`       | `a`       | `a`       | 1/1/1     |
+| `@function`                                    | `a`       | `a`       | `a`       | 1/1/1     |
+| `@container style()`                           | `a`       | `b`       | `b`       | 1/1/1     |
+| space toggle                                   | `a, b, c` | `a, b, c` | `a, b, c` | 3/3/3     |
+| `sibling-count()` as a number source           | —         | —         | —         | 1/1/1     |
+| **control: one property holding a whole list** | `a`       | `a, b`    | `a, b, c` | **1/2/3** |
 
 Four of the five mechanisms under test are present and verified by use, not by `CSS.supports`:
 `@function` returns `rgb(255, 0, 0)`, `if()` computes `10px`, the registered list syntax accepts
@@ -434,7 +435,7 @@ So the conclusion is not "CSS cannot concatenate". It is sharper and it closes t
 
 > **CSS cannot count.** Values are built from a fixed declaration text. Every primitive that could
 > contribute to a list — cascade, `var()` fallback, `if()`, `@function`, registered syntax, style
-> queries — resolves to *one value*, and none of them can make a value whose **length** depends on
+> queries — resolves to _one value_, and none of them can make a value whose **length** depends on
 > which other declarations happen to be present. The only numeric source in the language counts DOM
 > siblings, and a class list is not a sibling list.
 
@@ -469,7 +470,7 @@ label-scoped control delivered.
 Steps one to five priced the representation with a transform applied to an already-built stylesheet —
 `shallowOf` in `scripts/lib/aggregate.mjs`, which is deliberately independent of the finalizer so that
 the two can be compared. The change then went into the finalizer, and the question that closes it is
-whether the *real* build behaves like the transform.
+whether the _real_ build behaves like the transform.
 
 `scripts/measure-real-page.mjs` is the instrument. It serves a built site, opens the catalogue, reads
 every animating element's live positions across all ten longhands, and inspects one element through
@@ -480,14 +481,14 @@ The baseline is the pre-hoist build of `docs/dist`, kept at `/tmp/jumi-dist-deep
 
 **The real catalogue, production output, 228 effects:**
 
-| | deep (`docs/dist`, pre-hoist) | hoisted (rebuilt from `src`) | |
-| --- | --- | --- | --- |
-| matched-styles response | 965,683 B | **419,673 B** | −57% |
-| CDP round trip | 21.2 ms | 17.7 ms | −16% |
-| computed-style response | 39,442 B | 38,630 B | −2% |
-| stylesheet | 267,352 B | 293,060 B | +9.6% |
-| positions per element | 228 | 228 | — |
-| live positions | 228/228 | **228/228, 0 differences** | — |
+|                         | deep (`docs/dist`, pre-hoist) | hoisted (rebuilt from `src`) |       |
+| ----------------------- | ----------------------------- | ---------------------------- | ----- |
+| matched-styles response | 965,683 B                     | **419,673 B**                | −57%  |
+| CDP round trip          | 21.2 ms                       | 17.7 ms                      | −16%  |
+| computed-style response | 39,442 B                      | 38,630 B                     | −2%   |
+| stylesheet              | 267,352 B                     | 293,060 B                    | +9.6% |
+| positions per element   | 228                           | 228                          | —     |
+| live positions          | 228/228                       | **228/228, 0 differences**   | —     |
 
 **Step six passes.** The response is within 1.7% of the transform's 412,671 B on the same page, and
 the parity is exact rather than approximate: 228 live positions, all ten longhands each, and not one
@@ -516,7 +517,7 @@ answer:
   wrong timing. That is the gap `--compare` closes and the baseline-free assertion now closes without
   one.
 
-Only *live* positions are compared, which is the contract above rather than a convenience: the deep
+Only _live_ positions are compared, which is the contract above rather than a convenience: the deep
 and hoisted representations are known to give an inactive position different bookkeeping values, and
 comparing those would report the accepted divergence as a regression.
 
@@ -573,12 +574,12 @@ underneath it.
 
 **The selector reduction is not part of this change.** It does not survive contact with the real
 page: `small-selectors` was a bound (a single `#target` selector, unreachable), and the realizable
-`:is()` form buys 12% for a specificity change. The 2.73 s that remains is selector *text*, and
+`:is()` form buys 12% for a specificity change. The 2.73 s that remains is selector _text_, and
 dealing with it means changing the carrier's selector — a placement decision, not a representation
 one.
 
-The earlier rejection priced a *different shape* — the longhand hoist, which really is only −15% —
-on a *different workload*. Neither of those numbers transfers to this one.
+The earlier rejection priced a _different shape_ — the longhand hoist, which really is only −15% —
+on a _different workload_. Neither of those numbers transfers to this one.
 
 Three things to carry into the change:
 
@@ -595,8 +596,8 @@ opinion: the primitives all exist, and none of them counts.
 ## Release criteria
 
 The freeze was invisible to every harness Jumi had. It passed visual correctness, `behaviour:check`,
-the CSS byte snapshot and the recalc benchmark — because none of them look at what a *developer's
-tooling* pays to read the stylesheet. Three consequences, which now belong in the gate:
+the CSS byte snapshot and the recalc benchmark — because none of them look at what a _developer's
+tooling_ pays to read the stylesheet. Three consequences, which now belong in the gate:
 
 - **DevTools inspectability is a release criterion.** A developer-facing CSS library that stalls
   Inspector has a usability regression even when the page itself is perfectly smooth, and the people

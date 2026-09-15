@@ -9,21 +9,19 @@ description: Jumi is a motion vocabulary for Tailwind CSS. Start with an effect,
 Bring an element into view with a single named effect. Choose its motion and timing — the utilities compose automatically.
 
 ```html
-<div class="animate-bounce-in animation-duration-[800ms]">
-  Hello, movement.
-</div>
+<div class="animate-bounce-in animation-duration-[800ms]">Hello, movement.</div>
 ```
 
 Jumi generates CSS at build time. Your animations run in the browser's CSS engine, without a Jumi JavaScript runtime.
 
 ## Four pieces to play with
 
-| Piece | Syntax | Purpose |
-| --- | --- | --- |
-| Effects | `animate-bounce-in` | A complete, named keyframe animation |
-| Properties | `animate-rotate-45` | A target value for a CSS property |
-| Controls | `animation-duration-[800ms]` | Timing, repetition, direction, and playback |
-| Transitions | `transition-duration-[300ms]` | Motion between changes of state |
+| Piece       | Syntax                        | Purpose                                     |
+| ----------- | ----------------------------- | ------------------------------------------- |
+| Effects     | `animate-bounce-in`           | A complete, named keyframe animation        |
+| Properties  | `animate-rotate-45`           | A target value for a CSS property           |
+| Controls    | `animation-duration-[800ms]`  | Timing, repetition, direction, and playback |
+| Transitions | `transition-duration-[300ms]` | Motion between changes of state             |
 
 Animation and transition utilities compose automatically. Add the motion or transition properties you need; no setup class is required.
 
@@ -34,11 +32,13 @@ That assembly is the whole job, and it is Jumi's rather than yours. One element 
 Each property can have its own duration. This element rotates over 800 milliseconds while its scale changes over 1.2 seconds.
 
 ```html
-<div class="animate-rotate-45 animate-scale-110
+<div
+  class="animate-rotate-45 animate-scale-110
   animation-duration-[800ms]/rotate
   animation-duration-[1200ms]/scale
   animation-direction-alternate
-  animation-iteration-count-infinite">
+  animation-iteration-count-infinite"
+>
   Make your move.
 </div>
 ```

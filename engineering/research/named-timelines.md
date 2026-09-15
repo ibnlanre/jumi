@@ -21,19 +21,19 @@ proposal**: the point is to know the model and the grammar before choosing vocab
 A synthetic plugin (importing nothing from Jumi) registers one permissive matcher and one typed matcher, each
 recording the value it receives. One build per candidate, so a call is attributable.
 
-| candidate | what the matcher received |
-| --- | --- |
-| `probe-(--feed)` | `any:"var(--feed)"` |
-| `probe-[var(--feed)]` | `any:"var(--feed)"` — identical, so `(...)` is sugar for `[var(...)]` |
-| `probe-(length:--feed)` | `any:"var(--feed)"` — the hint is stripped before the callback |
-| `probe-(color:--feed)` | `any:"var(--feed)"` |
-| `probe-[12px]` | `any:"12px"` |
-| `probelen-[12px]` (type `length`) | `length:"12px"` |
-| **`probelen-(--feed)`** | **no matcher call, and no rule** |
-| **`probelen-(color:--feed)`** | **no matcher call, and no rule** |
+| candidate                         | what the matcher received                                             |
+| --------------------------------- | --------------------------------------------------------------------- |
+| `probe-(--feed)`                  | `any:"var(--feed)"`                                                   |
+| `probe-[var(--feed)]`             | `any:"var(--feed)"` — identical, so `(...)` is sugar for `[var(...)]` |
+| `probe-(length:--feed)`           | `any:"var(--feed)"` — the hint is stripped before the callback        |
+| `probe-(color:--feed)`            | `any:"var(--feed)"`                                                   |
+| `probe-[12px]`                    | `any:"12px"`                                                          |
+| `probelen-[12px]` (type `length`) | `length:"12px"`                                                       |
+| **`probelen-(--feed)`**           | **no matcher call, and no rule**                                      |
+| **`probelen-(color:--feed)`**     | **no matcher call, and no rule**                                      |
 
 So, answering the question exactly as asked: the shorthand reaches `matchUtilities` as **`var(--feed)`**, not
-`--feed`, and not as nothing — *provided the utility's declared type accepts it*. A `var()` cannot be
+`--feed`, and not as nothing — _provided the utility's declared type accepts it_. A `var()` cannot be
 validated as a length, so a `type: ['length']` matcher refuses `(--feed)` and its type hint must agree with
 the declared type (`(color:--feed)` against a length matcher is refused too).
 
@@ -52,21 +52,21 @@ grammar naturally".
 `animation-timeline: --feed`. `timeline` is the constructor of the animation's timeline, so `null` means the
 reference did not resolve.
 
-| case | reading |
-| --- | --- |
-| a **descendant** of the scroller | `ScrollTimeline` |
-| a **sibling** of the scroller, no scope anywhere | `null` |
-| a sibling of a *named* scroller, referenced directly | `null` |
-| a sibling twice removed, with `timeline-scope: --feed` on the common ancestor | **`null`** |
-| the same, two scrollers and one name in scope | **`null`** |
-| `animation-timeline: scroll()` with no scrollable ancestor | `ScrollTimeline` — falls back to the root scroller |
-| two names on one source (`--one, --two`) | both resolve, `ScrollTimeline` |
-| nested scrollers, both named `--dup`, target inside both | `ScrollTimeline` — **which source wins is unmeasured** (progress read `null` either way) |
-| a **view** timeline, from a descendant of the subject | `ViewTimeline`, progressing |
-| the same view timeline, from outside the subject | `null` |
-| computed `scroll-timeline-name` on the scroller vs its child | `--feed` vs **`none`** — the name does not cascade |
+| case                                                                          | reading                                                                                  |
+| ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| a **descendant** of the scroller                                              | `ScrollTimeline`                                                                         |
+| a **sibling** of the scroller, no scope anywhere                              | `null`                                                                                   |
+| a sibling of a _named_ scroller, referenced directly                          | `null`                                                                                   |
+| a sibling twice removed, with `timeline-scope: --feed` on the common ancestor | **`null`**                                                                               |
+| the same, two scrollers and one name in scope                                 | **`null`**                                                                               |
+| `animation-timeline: scroll()` with no scrollable ancestor                    | `ScrollTimeline` — falls back to the root scroller                                       |
+| two names on one source (`--one, --two`)                                      | both resolve, `ScrollTimeline`                                                           |
+| nested scrollers, both named `--dup`, target inside both                      | `ScrollTimeline` — **which source wins is unmeasured** (progress read `null` either way) |
+| a **view** timeline, from a descendant of the subject                         | `ViewTimeline`, progressing                                                              |
+| the same view timeline, from outside the subject                              | `null`                                                                                   |
+| computed `scroll-timeline-name` on the scroller vs its child                  | `--feed` vs **`none`** — the name does not cascade                                       |
 
-Supported *syntactically*, checked so an unimplemented property cannot read as a fixture bug:
+Supported _syntactically_, checked so an unimplemented property cannot read as a fixture bug:
 `scroll-timeline-name`, `view-timeline-name`, `view-timeline-inset` and `timeline-scope` all return `true`
 from `CSS.supports`, and `timeline-scope: --feed` **is** stored (the computing element reads it back). It
 still does not widen resolution. Two things are indistinguishable in the rows above — "the property parses
@@ -81,7 +81,7 @@ The answers to the questions that mattered:
   cross-subtree case is unavailable today. That is the whole of the "one scroller driving non-descendants"
   capability, and it is the reason not to build vocabulary for it yet: the platform cannot honour it.
 - **The name is a reference, not a custom property.** It has dashed-ident syntax and subtree visibility,
-  which makes it *look* inherited, but `scroll-timeline-name` computes to `none` on a child of the scroller
+  which makes it _look_ inherited, but `scroll-timeline-name` computes to `none` on a child of the scroller
   while `--feed` would inherit on any custom property. Nothing about `var()` semantics applies to it.
 - **Anonymous and named differ in reach, not in kind.** Anonymous `scroll()` resolves against the nearest
   scroll container and falls back to the root scroller, which is why an element with no scrollable ancestor
@@ -138,15 +138,15 @@ teach exactly the wrong mental model — custom-property access — for somethin
 
 ### The spellings a utility-based example would need, tried
 
-| candidate | result |
-| --- | --- |
-| `animation-timeline-[--feed]` | writes `--jumi-animation-timeline: --feed` |
-| `animation-timeline---feed` | **refused** — a bare dashed-ident never reaches the matcher |
-| `scroll-timeline-name-[--feed]`, `scroll-timeline-name---feed` | refused — no declaration utility exists |
-| `scroll-timeline-name/--feed` | refused |
-| `scroll-timeline-axis-block`, `view-timeline-name-[--view]`, `timeline-scope-[--feed]` | refused |
-| `animation-timeline-scroll` | writes `--jumi-animation-timeline: var(--jumi-animation-timeline-scroll)` |
-| `animation-timeline-scroll/--feed` | **writes nothing at the element level** |
+| candidate                                                                              | result                                                                    |
+| -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `animation-timeline-[--feed]`                                                          | writes `--jumi-animation-timeline: --feed`                                |
+| `animation-timeline---feed`                                                            | **refused** — a bare dashed-ident never reaches the matcher               |
+| `scroll-timeline-name-[--feed]`, `scroll-timeline-name---feed`                         | refused — no declaration utility exists                                   |
+| `scroll-timeline-name/--feed`                                                          | refused                                                                   |
+| `scroll-timeline-axis-block`, `view-timeline-name-[--view]`, `timeline-scope-[--feed]` | refused                                                                   |
+| `animation-timeline-scroll`                                                            | writes `--jumi-animation-timeline: var(--jumi-animation-timeline-scroll)` |
+| `animation-timeline-scroll/--feed`                                                     | **writes nothing at the element level**                                   |
 
 The last two rows are the important pair. A slash in Jumi addresses the **motion** with that name — that is the
 whole naming mechanism — so `scroll-timeline-name/--feed` would read as "the `scroll-timeline-name` control,
@@ -197,11 +197,11 @@ it that way deliberately — the real platform model rather than an alias that h
 Three readings were wrong before they were right, and the shape of the error is the same each time — **an
 under-specified fixture beating a claim the fixture could not support**:
 
-- **A target that was not a descendant.** The first pass nested the animated element as a *sibling* of the
+- **A target that was not a descendant.** The first pass nested the animated element as a _sibling_ of the
   scroller and reported that named timelines do not work; the sibling case is the one that must not work.
   Descendant and sibling are different rows, and the row that decides the question is the descendant.
-- **A view subject with no scroll container.** A view timeline describes the subject's visibility *inside a
-  scrollport*; with none, it is inactive and reads `null`, which looks exactly like "view timelines are not
+- **A view subject with no scroll container.** A view timeline describes the subject's visibility _inside a
+  scrollport_; with none, it is inactive and reads `null`, which looks exactly like "view timelines are not
   visible to descendants". Once the subject was placed in a scroller it read `ViewTimeline`, progressing.
 - **A property that parses and does nothing.** `timeline-scope` returns `true` from `CSS.supports` and stores
   its value, so "not implemented" and "my markup is wrong" produce identical output. `CSS.supports` plus a

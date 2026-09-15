@@ -19,24 +19,33 @@ A label whose name is another property's slot makes those collide:
 > **Superseded in part (2026-09-15).** This section describes the state the findings were measured in,
 > where one token was one custom property and therefore had N readers. Finding 1 has since been ruled on
 > and fixed: a token that is a property Jumi animates (or an effect) reads the property scope, and a name
-> reads `--jumi-label-<name>-<part>`. The diagram below is kept as the record of what the collision *was*;
+> reads `--jumi-label-<name>-<part>`. The diagram below is kept as the record of what the collision _was_;
 > the current rule is in the rulings section and in `addressing-instances.md`.
 
 The two readings were not two mechanisms. `/name` always wrote one thing:
 
 ```css
-.animation-duration-800\/spin { --jumi-spin-animation-duration: 800ms; }
-.animate-rotate-45\/spin      { --jumi-rotate-3zWYd-label: spin; }
+.animation-duration-800\/spin {
+  --jumi-spin-animation-duration: 800ms;
+}
+.animate-rotate-45\/spin {
+  --jumi-rotate-3zWYd-label: spin;
+}
 ```
 
 and a motion's slot link reads a **name** — the property when unlabelled, the label when labelled:
 
 ```css
 /* unlabelled: the scale slot reads the property's name */
---jumi-slot-scale-d38-animation-duration: var(--jumi-scale-animation-duration, …);
+--jumi-slot-scale-d38-animation-duration: var(
+  --jumi-scale-animation-duration,
+  …
+);
 
 /* labelled: the same chain, reading the label's name instead */
---jumi-slot-rotate-3zWYd-animation-duration: var(--jumi-spin-animation-duration);
+--jumi-slot-rotate-3zWYd-animation-duration: var(
+  --jumi-spin-animation-duration
+);
 ```
 
 So a control reached **every motion that read that name**: all unlabelled motions for that property, and
@@ -46,24 +55,24 @@ so `animation-duration-800/spin` writes `--jumi-label-spin-animation-duration`.
 
 ## The measured table
 
-| case | classes | slots derived | resolved name | duration |
-|---|---|---|---|---|
-| baseline | `animate-scale-110` `animation-duration-[1200ms]/scale` | 1 | `jumi-scale-d38` | **1.2s** |
-| label | `animate-rotate-45/spin` `animation-duration-800/spin` | 1 | `jumi-rotate-3zWYd` | **0.8s** |
-| compound | `animate-filter-blur-[4px]` `animate-filter-brightness-125` `animation-duration-900/filter` | 1 | `jumi-filter` | **0.9s** |
-| **collision** | `animate-scale-110` `animate-rotate-45/scale` `animation-duration-1000/scale` | 2 | `jumi-scale-d38, jumi-rotate-3zWYd` | **1s, 1s** |
-| collision, self-labelled | `animate-scale-110/scale` `animation-duration-1000/scale` | 1 | `jumi-scale-d38` | **1s** |
-| two controls, one address | `animate-scale-110` `animation-duration-1000/scale` `animation-duration-400/scale` | 1 | `jumi-scale-d38` | **1s** |
-| compound + foreign label | `animate-filter-blur-[4px]/foo` `animate-filter-brightness-125` `animation-duration-900/filter` `animation-duration-500/foo` | 1 | `jumi-filter` | **0.5s** |
-| identical phrases, two labels | `animate-opacity-[0:0\|100:1]/enter` `…/exit` | 2 | `jumi-opacity-sluPU` | **1s** |
-| identical phrases, per-label timing | …plus `animation-duration-200/enter` `animation-duration-1800/exit` | 2 | `jumi-opacity-sluPU` | **1.8s** |
-| orphan label | `animate-rotate-45` `animation-duration-700/nope` | 1 | `jumi-rotate-3zWYd` | **1s** |
-| orphan slot | `animate-rotate-45` `animation-duration-700/scale` | 1 | `jumi-rotate-3zWYd` | **1s** |
+| case                                | classes                                                                                                                      | slots derived | resolved name                       | duration   |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------- | ----------------------------------- | ---------- |
+| baseline                            | `animate-scale-110` `animation-duration-[1200ms]/scale`                                                                      | 1             | `jumi-scale-d38`                    | **1.2s**   |
+| label                               | `animate-rotate-45/spin` `animation-duration-800/spin`                                                                       | 1             | `jumi-rotate-3zWYd`                 | **0.8s**   |
+| compound                            | `animate-filter-blur-[4px]` `animate-filter-brightness-125` `animation-duration-900/filter`                                  | 1             | `jumi-filter`                       | **0.9s**   |
+| **collision**                       | `animate-scale-110` `animate-rotate-45/scale` `animation-duration-1000/scale`                                                | 2             | `jumi-scale-d38, jumi-rotate-3zWYd` | **1s, 1s** |
+| collision, self-labelled            | `animate-scale-110/scale` `animation-duration-1000/scale`                                                                    | 1             | `jumi-scale-d38`                    | **1s**     |
+| two controls, one address           | `animate-scale-110` `animation-duration-1000/scale` `animation-duration-400/scale`                                           | 1             | `jumi-scale-d38`                    | **1s**     |
+| compound + foreign label            | `animate-filter-blur-[4px]/foo` `animate-filter-brightness-125` `animation-duration-900/filter` `animation-duration-500/foo` | 1             | `jumi-filter`                       | **0.5s**   |
+| identical phrases, two labels       | `animate-opacity-[0:0\|100:1]/enter` `…/exit`                                                                                | 2             | `jumi-opacity-sluPU`                | **1s**     |
+| identical phrases, per-label timing | …plus `animation-duration-200/enter` `animation-duration-1800/exit`                                                          | 2             | `jumi-opacity-sluPU`                | **1.8s**   |
+| orphan label                        | `animate-rotate-45` `animation-duration-700/nope`                                                                            | 1             | `jumi-rotate-3zWYd`                 | **1s**     |
+| orphan slot                         | `animate-rotate-45` `animation-duration-700/scale`                                                                           | 1             | `jumi-rotate-3zWYd`                 | **1s**     |
 
 ## Four findings
 
 **1 · The collision reaches both, with no precedence, and says nothing.** `animation-duration-1000/scale`
-in the collision case sets the duration of the scale motion *and* of the rotate motion labelled
+in the collision case sets the duration of the scale motion _and_ of the rotate motion labelled
 `scale` — two slots, both 1s, from one class. It is not "the slot wins" or "the label wins": they are
 one name. Nothing warns, because nothing is ambiguous to the engine — the ambiguity exists in the
 vocabulary, and only the label declaration (`--jumi-rotate-3zWYd-label: scale`) records which reading
@@ -110,7 +119,7 @@ motion, at `0.5s`, and `/filter` addresses the same motion.
 ## What this means for a decision
 
 The overload is real but the engine is not nondeterministic: every case above has one answer. What is
-missing is a way for an author — or for Studio — to say *which* reading is meant when the two coincide,
+missing is a way for an author — or for Studio — to say _which_ reading is meant when the two coincide,
 and any signal when a control lands on more than one motion.
 
 The three candidate resolutions, none of them taken here:
@@ -132,7 +141,7 @@ Findings 2 and 3 are independent of the resolution: a "last class wins" expectat
 - **Finding 3 is fixed, and it was the real one.** Motion-instance identity is now separate from
   keyframe-definition identity: two identical phrases under two names are two slots over one
   `@keyframes`. Measured: `…/enter` with `200ms/enter` beside `…/exit` with `1800ms/exit` resolves
-  `0.2s, 1.8s` where it used to resolve `1.8s, 1.8s`, and the same phrase unnamed *and* named is two
+  `0.2s, 1.8s` where it used to resolve `1.8s, 1.8s`, and the same phrase unnamed _and_ named is two
   instances (`1s, 1.8s`). The same name twice stays one instance.
 - **Finding 1 is fixed as well, by separating the readings rather than the syntax.** A control's token is
   now classified before it is written: a property Jumi animates (or an effect) reads the property scope,

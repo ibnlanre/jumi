@@ -43,7 +43,7 @@ Register it by replacing `@tailwindcss/vite` with Jumi in your Vite config:
 and that is the whole setup. Your stylesheet does not mention Jumi:
 
 ```css
-@import "tailwindcss";
+@import 'tailwindcss';
 ```
 
 `jumi()` owns Jumi's lifecycle inside the build: it registers Jumi with Tailwind, lets Tailwind
@@ -53,7 +53,7 @@ known until every `animate-*` class on the page has been compiled.
 Prefer to be explicit? Both work, and they compile to the same CSS:
 
 ```css
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin "@ibnlanre/jumi";
 ```
 
@@ -103,7 +103,9 @@ state.
 Effects are a starting point. Property utilities let you author your own motion:
 
 ```html
-<div class="animate-rotate-45 animate-scale-110 animation-duration-800/rotate animation-duration-1200/scale animation-direction-alternate animation-iteration-count-infinite">
+<div
+  class="animate-rotate-45 animate-scale-110 animation-duration-800/rotate animation-duration-1200/scale animation-direction-alternate animation-iteration-count-infinite"
+>
   Two rhythms. One element.
 </div>
 ```
@@ -111,13 +113,13 @@ Effects are a starting point. Property utilities let you author your own motion:
 Here, rotation takes 800ms and scale takes 1200ms. The `/rotate` and `/scale`
 modifiers scope a control to that property's animation slot.
 
-| Piece | Example | What it does |
-| --- | --- | --- |
-| Effects | `animate-bounce-in` | Apply a named keyframe effect |
-| Properties | `animate-rotate-[0.25turn]` | Animate a property toward a target |
-| Controls | `animation-duration-[800ms]/rotate` | Give a property its own timing |
-| Stagger | `animate-stagger-forward-[100ms]/3` | Sequence direct children |
-| Transitions | `transition-property/scale` | Animate a change of state |
+| Piece       | Example                             | What it does                       |
+| ----------- | ----------------------------------- | ---------------------------------- |
+| Effects     | `animate-bounce-in`                 | Apply a named keyframe effect      |
+| Properties  | `animate-rotate-[0.25turn]`         | Animate a property toward a target |
+| Controls    | `animation-duration-[800ms]/rotate` | Give a property its own timing     |
+| Stagger     | `animate-stagger-forward-[100ms]/3` | Sequence direct children           |
+| Transitions | `transition-property/scale`         | Animate a change of state          |
 
 Theme values and arbitrary values work together. Compound properties such as
 filters and transforms are assembled from custom properties; their parts share
@@ -141,7 +143,9 @@ Omit the count when targeting browsers that support `sibling-index()` and
 ## Make state changes feel considered
 
 ```html
-<button class="transition-property/scale transition-duration-300 hover:scale-110 focus-visible:scale-110">
+<button
+  class="transition-property/scale transition-duration-300 hover:scale-110 focus-visible:scale-110"
+>
   Take a closer look.
 </button>
 ```

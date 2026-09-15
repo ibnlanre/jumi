@@ -284,8 +284,8 @@ hash was there to remove, and I will not freeze that into 1.0 after finding it �
 compute another motion's hash" part of Jumi's correctness model.
 
 No permutation of hyphen-joined pieces fixes it. The name is unbounded and hyphenated, the attribute is
-hyphenated, the id is variable-length: joined only by `-`, the parse boundary is a function of the *contents*,
-so some pair of contents can move it. The representation needs a boundary that is a fact about the *shape*.
+hyphenated, the id is variable-length: joined only by `-`, the parse boundary is a function of the _contents_,
+so some pair of contents can move it. The representation needs a boundary that is a fact about the _shape_.
 
 Keep the `instanceKeys` and `linkedSlot` refactors and their regressions — they found real assumptions (a
 prefix relationship that no longer holds, and a part guessed from a suffix rather than supplied, which made a
@@ -296,8 +296,8 @@ exactly as they are.
 
 > **Do not accept `<name>-<id>-<attribute>` as the final vocabulary. Probe a genuinely delimited readable
 > representation — preferably a length-delimited author name, which takes nothing away from authors — against
-> the same adversarial full-vocabulary corpus. The acceptance criterion is strict: zero collisions *by
-> construction*, which means a reader that is a left inverse of the writer, not merely zero ordinary
+> the same adversarial full-vocabulary corpus. The acceptance criterion is strict: zero collisions _by
+> construction_, which means a reader that is a left inverse of the writer, not merely zero ordinary
 > collisions. Probe the encoding details too: what "length" counts, and Unicode.**
 
 ## 2026-09-15 — adopt the length-prefixed key: readable and exact at last

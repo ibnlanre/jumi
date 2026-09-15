@@ -9,7 +9,7 @@ description: One wrapper around your state change, and the browser does the rest
 [View transitions](/docs/view-transitions/) are CSS until the moment the thing that moves is your own
 application state. A navigation is the browser's business — `@view-transition { navigation: auto }` and the
 two documents are captured for you — but swapping a card, opening a panel, or reordering a list happens
-*inside* one document, and the browser cannot see it happen. It needs a before and an after, which means
+_inside_ one document, and the browser cannot see it happen. It needs a before and an after, which means
 someone has to say when the change is.
 
 That is the whole job of `runViewTransition`:
@@ -30,7 +30,7 @@ build-time, and only the page that changes state imports this subpath.
 ## The callback must finish synchronously
 
 **Do not `await` inside it, do not return a Promise, and do not wait for a frame.** This is not a style
-preference. A promise handed to the browser is a *pending* callback, and `await requestAnimationFrame()`
+preference. A promise handed to the browser is a _pending_ callback, and `await requestAnimationFrame()`
 inside one wedges the transition permanently: no capture, no animation, no error, and the change never lands.
 The callback is called once, and it has to be finished when it returns. If your change depends on something
 asynchronous, do that first and then transition the result:
@@ -46,7 +46,7 @@ runViewTransition(() => {
 ## Two calls, and which one wins
 
 Calling it twice while a transition is running is the case worth knowing about, and the default — `auto` —
-decides by *when* the second call arrives. Which is the one thing an accidental duplicate cannot hide:
+decides by _when_ the second call arrives. Which is the one thing an accidental duplicate cannot hide:
 
 - **the same task.** A second call from the same event, or one that event deferred with a promise, is the
   same interaction twice: your update runs immediately, and no second transition starts. Nothing is dropped,
@@ -82,13 +82,13 @@ if (!result.transitioned) {
 }
 ```
 
-| `result` | meaning |
-| --- | --- |
-| `{ transitioned: true }` | the transition ran, with your change inside its boundary |
-| `{ transitioned: false, reason: 'in-flight' }` | a duplicate call in the same interaction |
-| `{ transitioned: false, reason: 'aborted' }` | replaced or skipped before it animated |
-| `{ transitioned: false, reason: 'hidden' }` | the document is in a background tab |
-| `{ transitioned: false, reason: 'unsupported' }` | this browser has no view transitions |
+| `result`                                         | meaning                                                  |
+| ------------------------------------------------ | -------------------------------------------------------- |
+| `{ transitioned: true }`                         | the transition ran, with your change inside its boundary |
+| `{ transitioned: false, reason: 'in-flight' }`   | a duplicate call in the same interaction                 |
+| `{ transitioned: false, reason: 'aborted' }`     | replaced or skipped before it animated                   |
+| `{ transitioned: false, reason: 'hidden' }`      | the document is in a background tab                      |
+| `{ transitioned: false, reason: 'unsupported' }` | this browser has no view transitions                     |
 
 Your update runs exactly once per call in every one of those cases. An outcome describes the animation, never
 whether your change happened — and the one thing the call refuses loudly rather than reporting is an

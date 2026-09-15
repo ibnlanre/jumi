@@ -5,7 +5,7 @@ changes, no syntax proposals. 51 candidates spanning the platform's motion surfa
 
 ## Summary
 
-**Nothing is missing as a category.** Every motion *category* the platform offers is already reachable
+**Nothing is missing as a category.** Every motion _category_ the platform offers is already reachable
 through Jumi; what the sweep found instead is one reachability cluster, two newer knobs, and a handful of
 properties that are not motion at all:
 
@@ -15,7 +15,7 @@ view-transition-group                                                  discrete,
 scroll-behavior, scroll-snap-type, will-change, transform-box           not motion
 ```
 
-The named-timeline cluster is not a missing subsystem either: it is two plain declarations on a *scroller* —
+The named-timeline cluster is not a missing subsystem either: it is two plain declarations on a _scroller_ —
 an element that is not the animated one — plus a reference through the `animation-timeline` control Jumi
 already has. So the honest reading is that **1.0 has nothing left to invent in the motion family**, and the
 remaining work is coverage and hardening rather than another subsystem.
@@ -25,7 +25,7 @@ remaining work is coverage and hardening rather than another subsystem.
 Three readings per candidate, each taken from the side that can actually answer it:
 
 1. **Animatability — from the browser.** A keyframe writes the property from one endpoint to the other, and
-   the paused animation is seeked to 0 / 50 / 100%. A midpoint value differing from *both* endpoints
+   the paused animation is seeked to 0 / 50 / 100%. A midpoint value differing from _both_ endpoints
    interpolated; a value equal to one of them did not. This is what separates a motion primitive from a knob
    that merely looks animatable.
 2. **Jumi motion — from Jumi's build, by differential.** `animate-<property>-[<value>]` emits a rule or emits
@@ -49,18 +49,18 @@ Two guards, both of which changed the answer:
 
 ### Covered as motion
 
-| property | browser | Jumi |
-| --- | --- | --- |
-| `transform`, `transform-origin`, `translate`, `rotate`, `scale` | interpolate | motion |
-| `offset-path`, `offset-distance`, `offset-rotate` | interpolate | motion |
-| `offset-anchor`, `offset-position` | discrete | motion |
-| `transform-style`, `backface-visibility` | discrete | motion |
-| `display`, `visibility`, `content-visibility` | discrete | motion |
-| `perspective` | interpolates | a transform composition part |
-| `perspective-origin` | interpolates | named in the keyframe/property map |
+| property                                                        | browser      | Jumi                               |
+| --------------------------------------------------------------- | ------------ | ---------------------------------- |
+| `transform`, `transform-origin`, `translate`, `rotate`, `scale` | interpolate  | motion                             |
+| `offset-path`, `offset-distance`, `offset-rotate`               | interpolate  | motion                             |
+| `offset-anchor`, `offset-position`                              | discrete     | motion                             |
+| `transform-style`, `backface-visibility`                        | discrete     | motion                             |
+| `display`, `visibility`, `content-visibility`                   | discrete     | motion                             |
+| `perspective`                                                   | interpolates | a transform composition part       |
+| `perspective-origin`                                            | interpolates | named in the keyframe/property map |
 
 Two corrections, from the follow-up surface audit (`surface-audit.md`): the two `perspective` rows name where
-the *string* appears, not that the property is reachable. `--jumi-perspective` is a part of the `transform`
+the _string_ appears, not that the property is reachable. `--jumi-perspective` is a part of the `transform`
 value — the `perspective()` **function** — and neither `animate-perspective-*` nor
 `animate-perspective-origin-*` emits anything, so the `perspective` **property** is not animatable through
 Jumi at all. And `will-change` is not credited to Jumi anywhere: `will-change-[transform]` emits
@@ -77,31 +77,31 @@ every row), which is exactly why they are controls and not motions.
 
 ### Covered elsewhere
 
-| property | browser | owned by |
-| --- | --- | --- |
+| property                                        | browser  | owned by                                                                  |
+| ----------------------------------------------- | -------- | ------------------------------------------------------------------------- |
 | `view-transition-name`, `view-transition-class` | discrete | the view-transition pass, which writes the name onto the author's element |
-| `interpolate-size` | discrete | the explicit utility, deliberately not the motion substrate |
-| `overlay` | discrete | the author, next to `@starting-style` (see `entry-exit.md`) |
+| `interpolate-size`                              | discrete | the explicit utility, deliberately not the motion substrate               |
+| `overlay`                                       | discrete | the author, next to `@starting-style` (see `entry-exit.md`)               |
 
 ## 3 · The gaps, each classified
 
 Nine rows came back with no Jumi motion, no control, and no named pass. Seven of them are one cluster:
 
-| property | browser | classification |
-| --- | --- | --- |
-| `scroll-timeline-name`, `scroll-timeline-axis`, `scroll-timeline` | discrete | **reachability, not a category** |
-| `view-timeline-name`, `view-timeline-axis`, `view-timeline` | discrete | **reachability, not a category** |
-| `timeline-scope` | discrete | **reachability, not a category** |
-| `view-transition-group` | discrete | a capture knob on a covered feature, newer than the feature itself |
-| `scroll-behavior` | does not interpolate | not motion — a scrolling mode |
-| `scroll-snap-type` | discrete | not motion — snapping positions |
-| `will-change` | does not interpolate | an optimisation hint, and Tailwind already provides it — Jumi registers nothing for it (measured in `surface-audit.md`) |
-| `transform-box` | discrete | a coordinate-space switch, not motion |
+| property                                                          | browser              | classification                                                                                                          |
+| ----------------------------------------------------------------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `scroll-timeline-name`, `scroll-timeline-axis`, `scroll-timeline` | discrete             | **reachability, not a category**                                                                                        |
+| `view-timeline-name`, `view-timeline-axis`, `view-timeline`       | discrete             | **reachability, not a category**                                                                                        |
+| `timeline-scope`                                                  | discrete             | **reachability, not a category**                                                                                        |
+| `view-transition-group`                                           | discrete             | a capture knob on a covered feature, newer than the feature itself                                                      |
+| `scroll-behavior`                                                 | does not interpolate | not motion — a scrolling mode                                                                                           |
+| `scroll-snap-type`                                                | discrete             | not motion — snapping positions                                                                                         |
+| `will-change`                                                     | does not interpolate | an optimisation hint, and Tailwind already provides it — Jumi registers nothing for it (measured in `surface-audit.md`) |
+| `transform-box`                                                   | discrete             | a coordinate-space switch, not motion                                                                                   |
 
-Why the timeline cluster is *reachability* rather than a category: Jumi covers the **consumer** side of
+Why the timeline cluster is _reachability_ rather than a category: Jumi covers the **consumer** side of
 scroll-driven animation (`animation-timeline`, `animation-range`, `view-timeline-inset`) and the platform's
 other half is the **declaration** side, which the author writes on the scroller — a different element from the
-one being animated. That is what makes a *named* timeline different from the anonymous `scroll()`/`view()`
+one being animated. That is what makes a _named_ timeline different from the anonymous `scroll()`/`view()`
 Jumi already writes: it lets one scroller drive elements that are not its descendants, and lets several
 elements share one timeline. It is two declarations plus a reference, not a new mechanism — and it is the one
 place where a Jumi spelling would be ergonomics rather than capability.
@@ -121,7 +121,7 @@ waiting on an invention. What remains is the shape of hardening rather than expa
 ## Instrument notes
 
 Five readings were wrong before they were right, and every one of them was wrong in the direction of a false
-*gap* — which is the worse direction, because it invites work:
+_gap_ — which is the worse direction, because it invites work:
 
 - **A gap from probing one spelling.** `view-transition-name` reported as uncovered because the probe tried
   `animate-view-transition-name-[card]`; the property is written by the view-transition pass, under a variant.
@@ -129,10 +129,10 @@ Five readings were wrong before they were right, and every one of them was wrong
 - **The host's utility credited to Jumi.** `will-change-[transform]` emits in a host-only build. Fixed by
   building every candidate twice, with and without the plugin.
 - **The property catalogue crediting everything.** `src/types/index.ts` lists every animatable property, so a
-  mention there is a statement that the property is *modelled*, never that it is exposed. Catalogue files are
+  mention there is a statement that the property is _modelled_, never that it is exposed. Catalogue files are
   now reported as `modelled only` instead of being counted as coverage.
 - **A value credited as a property owner.** `overlay` came back owned by `theme/mix-blend-mode` — the word
-  appears there as a blend-mode *value*. Ownership is now decided by the string form of the property name in a
+  appears there as a blend-mode _value_. Ownership is now decided by the string form of the property name in a
   non-catalogue file, and even then read as "named by", not "handled by".
 - **The composition parts detector reading an empty build.** Counting the parts from a stylesheet with no
   candidates found none, which is the correct answer to the wrong question. It was removed rather than fixed:

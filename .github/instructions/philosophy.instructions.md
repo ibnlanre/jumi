@@ -9,6 +9,7 @@ These instructions guide AI assistants working on the Jumi animation library cod
 ## Core Philosophy
 
 ### 1. CSS Property Fidelity
+
 **Always use the exact CSS property name from the specification.**
 
 ```typescript
@@ -28,6 +29,7 @@ These instructions guide AI assistants working on the Jumi animation library cod
 **Verification:** Always check MDN (https://developer.mozilla.org/en-US/docs/Web/CSS) for the canonical CSS property name before adding a new utility.
 
 ### 2. Minimal Abbreviations
+
 Only abbreviate when universally understood or part of CSS convention.
 
 ```typescript
@@ -42,6 +44,7 @@ Only abbreviate when universally understood or part of CSS convention.
 ```
 
 ### 3. Hierarchical Naming
+
 Maintain parent-child relationships in property names.
 
 ```typescript
@@ -59,6 +62,7 @@ Maintain parent-child relationships in property names.
 ```
 
 ### 4. Effect Animation Naming
+
 Use descriptive, hyphenated names for effect animations.
 
 ```typescript
@@ -204,6 +208,7 @@ Transforms should be composable via CSS custom properties:
 ```
 
 These compose naturally in HTML:
+
 ```html
 <div class="animate-translate-x-[20px] animate-rotate-45 animate-scale-110">
   <!-- All transforms apply simultaneously -->
@@ -218,24 +223,23 @@ When adding new properties, update the corresponding TypeScript types:
 
 ```typescript
 // types/attributes.ts or similar
-export type AnimatableProperty = 
+export type AnimatableProperty =
   | 'background-color'
   | 'border-radius'
   | 'opacity'
   | 'width'
   // Add new property here (alphabetically)
   | 'your-new-property'
-  ;
 
 export type Effect =
   | 'fade-in'
   | 'bounce-in'
   // Add new effect here (alphabetically within category)
   | 'your-new-effect'
-  ;
 ```
 
 **If you encounter a type error:**
+
 1. Verify the CSS property name is correct
 2. Add the property to the appropriate type definition
 3. Ensure the property is in the correct alphabetical position
@@ -352,7 +356,9 @@ It adapts to any list length — no count is needed:
   --jumi-stagger-animation-delay: calc((sibling-index() - 1) * 100ms);
 }
 .animate-stagger-backward-150 > * {
-  --jumi-stagger-animation-delay: calc((sibling-count() - sibling-index()) * 150ms);
+  --jumi-stagger-animation-delay: calc(
+    (sibling-count() - sibling-index()) * 150ms
+  );
 }
 ```
 
@@ -384,8 +390,10 @@ only when Firefox support is required.
 ```html
 ✅ CORRECT
 <h1 class="animate-fade-in [&:is(h1)]:animate-fade-in">
-<nav class="has-[>button]:animate-scale-110">
-<section class="[&:where(.active)]:animate-glow">
+  <nav class="has-[>button]:animate-scale-110">
+    <section class="[&:where(.active)]:animate-glow"></section>
+  </nav>
+</h1>
 ```
 
 **DON'T:** Register variants in Tailwind's namespace - no `is-*`, `where-*`, `has-*`, or other
@@ -397,8 +405,10 @@ the reason and the test to apply before adding anything to the plugin API.
 ```html
 ❌ AVOID
 <div class="child-h1:animate-fade-in">
-<nav class="contains-button:animate-scale-110">
-<section class="when-active:animate-glow">
+  <nav class="contains-button:animate-scale-110">
+    <section class="when-active:animate-glow"></section>
+  </nav>
+</div>
 ```
 
 ### Respect Motion Preferences
@@ -477,19 +487,19 @@ Always consider accessibility:
 ### Handling Type Errors
 
 **If a valid CSS property triggers an error:**
+
 - The property is missing from either the Attributes or Property type
 - Update the corresponding type definition
 - Add the property alphabetically
 
 ```typescript
 // Find the type file (e.g., types/index.ts)
-export type AnimatableProperty = 
+export type AnimatableProperty =
   | 'existing-property-1'
   | 'existing-property-2'
   // Add new property alphabetically here
   | 'your-new-property'
   | 'existing-property-3'
-  ;
 ```
 
 ## Quality Checklist

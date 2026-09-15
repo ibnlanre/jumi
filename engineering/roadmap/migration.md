@@ -32,7 +32,7 @@ base-layer bridge          repairs incremental publication
 ```
 
 State ownership inside that boundary is deliberate, and worth stating precisely —
-including where the data has to *resolve*:
+including where the data has to _resolve_:
 
 ```text
 .animations  owns the aggregate data on the element, and carries behaviour
@@ -41,7 +41,7 @@ including where the data has to *resolve*:
 The aggregate is carrier-local state, not sheet-wide state. Each entry is
 `var(--jumi-<slot>-animation-name, …)`, and those slot variables are declared by the
 `animate-*` utilities **on the element itself**. A `var()` chain inside a custom property
-resolves where it is *declared* — so the data has to sit on the carrier. Published on
+resolves where it is _declared_ — so the data has to sit on the carrier. Published on
 `:root` the slot variables do not exist, the declaration computes to the
 guaranteed-invalid value, that invalid value inherits, and every carrier resolves
 `animation-name: none`. That was shipped and measured in a browser; see the P0 note under
@@ -75,17 +75,17 @@ over, per candidate.
 Classifications: **keep** (worth keeping — the host is better at it), **own**
 (easy for Jumi to own), **retain** (hard dependency we intentionally keep).
 
-| Capability | How Jumi uses it | Evidence | Classification |
-| --- | --- | --- | --- |
-| Candidate scanning | Not at all — Jumi never walks source files | no scanner in `src/`; `@source` is the host's | **retain** (the largest piece a Jumi emitter would need) |
-| Candidate parsing / arbitrary values | `animate-rotate-[0:0deg|_,:]` — the phrase grammar is shaped by Tailwind's value parser | `engineering/architecture/phrases.md`: `_` arrives already converted to a space, `{`/`}` are rejected outright, and a `;` — the obvious frame separator, once the comma became the offset separator — is dropped silently, with no error | **retain**, and the deepest coupling: a Jumi parser must accept its own grammar, so the syntax is currently Tailwind's |
-| Variants | Built-ins only (`motion-safe:`, `hover:`, `sm:`, `*:`, `before:`, `has-*`), plus the host's arbitrary form `[&:is(h1)]` | `docs/src/pages/docs/*.md` | **removed** — Jumi no longer registers any variant: `is-*`/`where-*`/`has-*` are gone (principle 9 of `CONTRIBUTING.md`), because claiming host vocabulary is a bet the host can win at any time |
-| Candidate sorting / compile order | Load-bearing for *semantics*, not just output: slot registration order is what `perValue`'s move-to-end drives, and that order decides which animation wins under `animation-composition: replace` | `src/core/index.ts` `perValue`; the harness asserts "fresh-scan order" | **semantic precedence — its own workstream, below** |
-| Theme values | One function: `theme(key, values)` → `api.theme(key)`, flattened, called with 71 distinct Tailwind scale keys from 193 call sites | `src/helpers/create/index.ts`; `src/properties/*` | **own** — active workstream, below |
-| Utility registration | `matchComponents` / `matchUtilities` with `type`, `values`, `modifiers`, `supportsNegativeValues` | `src/properties/tween.ts`, `controls.ts` | **keep** — transport, and the option shape is already host vocabulary Jumi only passes through |
-| `@apply` | User CSS may apply Jumi utilities, and the carrier itself | `.applied-motion { @apply animations animate-rotate-45 }` resolves its slot in a browser — `pnpm behaviour:check`. `@apply` copies the carrier body, marker included, and `finalize` completes the copy | **keep** |
-| At-rule pass-through | `addBase({ '@property …' })` — at-rules are emitted unconditionally | `src/helpers/create/index.ts` sink | **retain** |
-| Layer order + same-selector append | The bridge relies on it: data in base, consumer in utilities, later declaration wins | `src/core/index.ts` `publishAggregate` | **retain** |
+| Capability                           | How Jumi uses it                                                                                                                                                                                   | Evidence                                                                                                                                                                                                | Classification                                                                                                                                                                                                                           |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Candidate scanning                   | Not at all — Jumi never walks source files                                                                                                                                                         | no scanner in `src/`; `@source` is the host's                                                                                                                                                           | **retain** (the largest piece a Jumi emitter would need)                                                                                                                                                                                 |
+| Candidate parsing / arbitrary values | `animate-rotate-[0:0deg                                                                                                                                                                            | _,:]` — the phrase grammar is shaped by Tailwind's value parser                                                                                                                                         | `engineering/architecture/phrases.md`: `_` arrives already converted to a space, `{`/`}` are rejected outright, and a `;` — the obvious frame separator, once the comma became the offset separator — is dropped silently, with no error | **retain**, and the deepest coupling: a Jumi parser must accept its own grammar, so the syntax is currently Tailwind's |
+| Variants                             | Built-ins only (`motion-safe:`, `hover:`, `sm:`, `*:`, `before:`, `has-*`), plus the host's arbitrary form `[&:is(h1)]`                                                                            | `docs/src/pages/docs/*.md`                                                                                                                                                                              | **removed** — Jumi no longer registers any variant: `is-*`/`where-*`/`has-*` are gone (principle 9 of `CONTRIBUTING.md`), because claiming host vocabulary is a bet the host can win at any time                                         |
+| Candidate sorting / compile order    | Load-bearing for _semantics_, not just output: slot registration order is what `perValue`'s move-to-end drives, and that order decides which animation wins under `animation-composition: replace` | `src/core/index.ts` `perValue`; the harness asserts "fresh-scan order"                                                                                                                                  | **semantic precedence — its own workstream, below**                                                                                                                                                                                      |
+| Theme values                         | One function: `theme(key, values)` → `api.theme(key)`, flattened, called with 71 distinct Tailwind scale keys from 193 call sites                                                                  | `src/helpers/create/index.ts`; `src/properties/*`                                                                                                                                                       | **own** — active workstream, below                                                                                                                                                                                                       |
+| Utility registration                 | `matchComponents` / `matchUtilities` with `type`, `values`, `modifiers`, `supportsNegativeValues`                                                                                                  | `src/properties/tween.ts`, `controls.ts`                                                                                                                                                                | **keep** — transport, and the option shape is already host vocabulary Jumi only passes through                                                                                                                                           |
+| `@apply`                             | User CSS may apply Jumi utilities, and the carrier itself                                                                                                                                          | `.applied-motion { @apply animations animate-rotate-45 }` resolves its slot in a browser — `pnpm behaviour:check`. `@apply` copies the carrier body, marker included, and `finalize` completes the copy | **keep**                                                                                                                                                                                                                                 |
+| At-rule pass-through                 | `addBase({ '@property …' })` — at-rules are emitted unconditionally                                                                                                                                | `src/helpers/create/index.ts` sink                                                                                                                                                                      | **retain**                                                                                                                                                                                                                               |
+| Layer order + same-selector append   | The bridge relies on it: data in base, consumer in utilities, later declaration wins                                                                                                               | `src/core/index.ts` `publishAggregate`                                                                                                                                                                  | **retain**                                                                                                                                                                                                                               |
 
 ## Already independent
 
@@ -93,7 +93,7 @@ Classifications: **keep** (worth keeping — the host is better at it), **own**
   theme lookup and two sinks, and it holds the decisions.
 - **Publication is host-independent.** `incremental:check` is green with the plain
   plugin, so the aggregate no longer depends on Tailwind's candidate cache or on
-  candidate order to be *complete*.
+  candidate order to be _complete_.
 - **The carriers are Jumi vocabulary, not adapter accidents.** They stay through
   the migration; if a future generator makes them implicit, that is an API change
   with an explicit new home for what they carry, not cleanup. See principle 6 in
@@ -106,7 +106,7 @@ Classifications: **keep** (worth keeping — the host is better at it), **own**
   internals change is the day nothing here changes. PostCSS is a **peer** dependency
   for the same reason `tailwindcss` and the host plugins are: they are the
   environment Jumi runs in, not versions Jumi chooses and has to keep current.
-  `@tailwindcss/vite`, `@tailwindcss/postcss` and `vite` are *optional* peers — only
+  `@tailwindcss/vite`, `@tailwindcss/postcss` and `vite` are _optional_ peers — only
   the integration you install pulls its own.
 
 ## What success means now
@@ -122,30 +122,30 @@ and the test that decides it:
 
 `engineering/architecture/dependency-gap.md` answers that against the measured surface. Two behaviours are named there — the
 scanner's candidate order, which the aggregate's precedence follows, and the collapsed-scale spread
-Jumi *guards against* rather than uses — and one of the two fails the gate here if it changes
+Jumi _guards against_ rather than uses — and one of the two fails the gate here if it changes
 upstream. Everything else Jumi consumes is documented API: `addBase`, `addUtilities`,
 `matchComponents`, `matchUtilities`, `theme`, `createPlugin`.
 
 Under that definition the migration is essentially done, and the remaining phases are the road to
-*standing entirely alone*: variants (prototype done — the shape is small, parity is a catalogue),
+_standing entirely alone_: variants (prototype done — the shape is small, parity is a catalogue),
 `@theme` parsing (surface scoped, not evaluated), and emission. Whether that road is worth walking
 is a product decision — becoming a Tailwind-compatible CSS compiler is a much larger commitment
 than extracting Jumi from Tailwind, and it is not required by the test above.
 
 ## Adoption: the step count, and its deletion path
 
-The finalizer has to run after Tailwind, so *something* has to invoke it. That is a
+The finalizer has to run after Tailwind, so _something_ has to invoke it. That is a
 real cost and it is a product regression unless it converges back to one step, which
 is why principle 7 of `CONTRIBUTING.md` states it as a constraint:
 
 > **Jumi must converge back toward one integration step. Any temporary second setup
 > requirement must have a deletion path.**
 
-| | what the author writes | what is temporary about it |
-| --- | --- | --- |
-| **Now** | `plugins: [jumi()]` (or `{'jumi/postcss': {}}`), and nothing in the CSS | `jumi()` composes Tailwind's plugin, so it *replaces* an entry rather than adding one — and it registers Jumi itself, so the CSS directive is gone too. Measured: a build with the directive injected is byte-identical to one where the author wrote `@plugin "jumi"`. |
-| **CLI** | the build, then `finalizeCss(css)` | The Tailwind CLI has no hook to finish in. Deletion path: the row below — a Jumi-owned emitter has nowhere it cannot finish. |
-| **End** | `plugins: [jumi()]`, with no Tailwind JS plugin composed | Jumi owns the emission (theme, scanning, arbitrary values, variants — the rest of this document's sequence), so composing `@tailwindcss/vite` is no longer needed and finalization becomes an internal phase rather than an external pass. |
+|         | what the author writes                                                  | what is temporary about it                                                                                                                                                                                                                                              |
+| ------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Now** | `plugins: [jumi()]` (or `{'jumi/postcss': {}}`), and nothing in the CSS | `jumi()` composes Tailwind's plugin, so it _replaces_ an entry rather than adding one — and it registers Jumi itself, so the CSS directive is gone too. Measured: a build with the directive injected is byte-identical to one where the author wrote `@plugin "jumi"`. |
+| **CLI** | the build, then `finalizeCss(css)`                                      | The Tailwind CLI has no hook to finish in. Deletion path: the row below — a Jumi-owned emitter has nowhere it cannot finish.                                                                                                                                            |
+| **End** | `plugins: [jumi()]`, with no Tailwind JS plugin composed                | Jumi owns the emission (theme, scanning, arbitrary values, variants — the rest of this document's sequence), so composing `@tailwindcss/vite` is no longer needed and finalization becomes an internal phase rather than an external pass.                              |
 
 The middle two rows are the whole remaining cost: one entry, and it composes somebody else's plugin.
 That is a big step down from where this started — the CSS directive is gone, and nothing asks an
@@ -157,15 +157,15 @@ list until it is.
 **P0 — the aggregate was published where it cannot resolve, and every harness stayed
 green.** The bridge first published the data on `:root`, on the reasoning that
 inheritance carries it to any element. It does not: a `var()` chain inside a custom
-property resolves where it is *declared*, so at `:root` the declaration computes to the
+property resolves where it is _declared_, so at `:root` the declaration computes to the
 guaranteed-invalid value, that invalid value inherits, and every carrier resolves
 `animation-name: none`. Measured in Chromium on the real compiled corpora:
 
-| build | `.animations animate-rotate-45` | `@apply animations animate-rotate-45` |
-| --- | --- | --- |
-| `:root` (was shipping) | `none` | `none` |
-| `.animations` (the first fix) | `none, none, jumi-rotate-3zWYd, …` | `none` |
-| completed into the carriers (now) | `none, none, jumi-rotate-3zWYd, …` | `jumi-rotate-3zWYd` |
+| build                             | `.animations animate-rotate-45`    | `@apply animations animate-rotate-45` |
+| --------------------------------- | ---------------------------------- | ------------------------------------- |
+| `:root` (was shipping)            | `none`                             | `none`                                |
+| `.animations` (the first fix)     | `none, none, jumi-rotate-3zWYd, …` | `none`                                |
+| completed into the carriers (now) | `none, none, jumi-rotate-3zWYd, …` | `jumi-rotate-3zWYd`                   |
 
 The byte snapshot, `incremental:check` and 123 unit tests were all green throughout,
 and the docs build emitted `:root{--jumi-aggregate-…}` — because **every harness read
@@ -176,12 +176,12 @@ emitted CSS. End-to-end, the built `examples/index.html` resolves `animate-wiggl
 all four of its slots.
 
 **`@apply animations` resolves — it was a publication-site bug, not a platform limit.**
-The carrier body is what Tailwind re-parents for a variant and *copies* for `@apply`, so a
+The carrier body is what Tailwind re-parents for a variant and _copies_ for `@apply`, so a
 rule that names a selector can reach neither the copy nor every prefixed form. The carrier
 now marks itself (`--jumi-carrier`), the model publishes the aggregate as staging
 (`--jumi-carrier-staging`, on a rule nothing reads), and `finalize` writes it into every
 marked rule and deletes the staging. The earlier conclusion — that `@apply` inlines
-utilities and never a base rule, so the data cannot arrive — was true of the *bridge*, not
+utilities and never a base rule, so the data cannot arrive — was true of the _bridge_, not
 of the platform: the data does not have to arrive through `@apply`, because it is written
 afterwards. Recorded in `engineering/architecture/carrier-locality.md`, asserted by
 `scripts/behaviour-check.mjs`, and stated for contributors in principle 6 of
@@ -199,7 +199,7 @@ byte-identical (the snapshot passed with no re-record). Measured while owning it
 `src/theme/` is flat too, so the helper is a merge plus two compatibility rules —
 nest joining and `DEFAULT` naming — that today's corpus does not exercise.
 
-One host behaviour is deliberately *not* replicated: the host helper re-applies
+One host behaviour is deliberately _not_ replicated: the host helper re-applies
 the raw value at any key whose `__CSS_VALUES__` flag lacks bit 4 ("resolved"),
 which is how `@theme inline` / `@theme reference` declare themselves. Measured
 288/288 colour keys carry the bit for the default `@theme` form, so the branch is
@@ -212,7 +212,7 @@ is owned for real.**
 Theme **ownership** and theme **representation** are two changes, and the mapping
 is proven before anything switches. `pnpm theme:map` prints the current table: it
 reads the vocabulary out of `src/`, the tokens out of the shipped `theme.css`, and
-counts a mapping only when the token exists *and* carries the same value — then
+counts a mapping only when the token exists _and_ carries the same value — then
 verifies every claim in `themeTokens` against the utilities Tailwind actually
 emits, because neither of those two is the contract on its own.
 
@@ -232,7 +232,7 @@ Jumi silently serves its own stale idea of the value. A missing token has to be
 visibly missing.
 
 One thing worth knowing before reading a batch diff: Jumi names a slot after a hash
-of its resolved value, so switching a value from a literal to a token *renames* that
+of its resolved value, so switching a value from a literal to a token _renames_ that
 slot's variables and keyframe. The utility and its candidate are unchanged; the
 generated names are not.
 
@@ -245,12 +245,12 @@ is what the host emits, so the requirement is that the choice is deliberate and 
 `src/helpers/create/theme.ts`, and what the emitted CSS does. It reports any key where the two
 disagree, and any key whose namespace candidate could not be measured at all.
 
-| Strategy | Keys | Count |
-| --- | --- | --- |
-| `token` — every name resolves to a namespace token | `accentColor`, `backgroundColor`, `boxShadowColor`, `caretColor`, `colors`, `letterSpacing`, `outlineColor` | 7 |
-| `mixed` — a namespace for some names, literals or arithmetic for the rest | `backdropBlur`, `blur`, `borderColor`, `borderRadius`, `dropShadow`, `lineHeight`, `maxWidth` | 7 |
-| `formula` — numeric names are `calc(var(--spacing) * n)` | `flexBasis`, `gap`, `height`, `inset`, `margin`, `maxHeight`, `minHeight`, `minWidth`, `padding`, `translate`, `width` | 11 |
-| `literal` — the host emits a literal and Jumi keeps it | `boxShadow`, plus the 45 keys below | 46 |
+| Strategy                                                                  | Keys                                                                                                                   | Count |
+| ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ----- |
+| `token` — every name resolves to a namespace token                        | `accentColor`, `backgroundColor`, `boxShadowColor`, `caretColor`, `colors`, `letterSpacing`, `outlineColor`            | 7     |
+| `mixed` — a namespace for some names, literals or arithmetic for the rest | `backdropBlur`, `blur`, `borderColor`, `borderRadius`, `dropShadow`, `lineHeight`, `maxWidth`                          | 7     |
+| `formula` — numeric names are `calc(var(--spacing) * n)`                  | `flexBasis`, `gap`, `height`, `inset`, `margin`, `maxHeight`, `minHeight`, `minWidth`, `padding`, `translate`, `width` | 11    |
+| `literal` — the host emits a literal and Jumi keeps it                    | `boxShadow`, plus the 45 keys below                                                                                    | 46    |
 
 `boxShadow` is the one literal key with a reason worth naming: `--shadow-*` exists and is spelled
 like `--drop-shadow-*`, but `shadow-sm` inlines its value while `drop-shadow-sm` references its
@@ -271,7 +271,7 @@ backlog. For the record: `borderWidth`, `outlineOffset`, `transitionDelay`, `bac
 Measured 2026-09-12: **71 keys — 11 formula, 7 mixed, 46 literal, 7 token — no drift, and no
 namespace candidate left unmeasured.** One candidate namespace was dropped earlier as a measured
 false positive — `--inset-shadow-*` matches three `inset` names by spelling, and is the inset
-*shadow* utility's namespace, not `inset`'s.
+_shadow_ utility's namespace, not `inset`'s.
 
 ### Batches
 
@@ -317,7 +317,7 @@ measured                 lineHeight and maxWidth carry spacing names; outlineOff
 ```
 
 **And it found an implementation limitation in the host's JS theme.** With `--spacing` overridden
-in `@theme`, the host's spacing scales are *unusable*: measured with `--spacing: 0.3rem`,
+in `@theme`, the host's spacing scales are _unusable_: measured with `--spacing: 0.3rem`,
 `api.theme('margin')` returns the characters of the base string — `1: '.'`, `2: '3'`, `4: 'e'` —
 because the scale is derived by indexing the base rather than multiplying it. Anything that trusted
 those values emitted `margin: 3`.
@@ -341,7 +341,7 @@ after    themeResolution: formula 2, literal 59, token 8
          --jumi-padding-…: calc(var(--spacing) * 4)
 ```
 
-`literal 59` went *up* by two: the two new utilities bring their own non-multiple names (`0`, the
+`literal 59` went _up_ by two: the two new utilities bring their own non-multiple names (`0`, the
 shorthand), which is the batch working as stated rather than a regression.
 
 The acceptance test is in the corpus: `input.css` overrides the theme
@@ -369,19 +369,19 @@ Two notes for whoever reviews a batch's diff:
 - naming is value-derived, so a batch renames variables and keyframes even though
   the utility set and slot order are untouched.
 
-**Batch 3 — landed: the partial namespaces, resolved per value.** Five scales are *partial*: some
+**Batch 3 — landed: the partial namespaces, resolved per value.** Five scales are _partial_: some
 names are token-backed, some are spacing arithmetic, and the rest keep what the host supplied. They
 now resolve per **name** rather than per key, so one scale can carry all three modes at once:
 
-| Key | Namespace | Token-backed | Stays literal | Spacing formula |
-| --- | --- | --- | --- | --- |
-| `borderRadius` | `--radius-*` | 8 (`xs sm md lg xl 2xl 3xl 4xl`) | `none`, `full`, `DEFAULT` | — |
-| `blur` | `--blur-*` | 7 | `none`, `DEFAULT` | — |
-| `dropShadow` | `--drop-shadow-*` | 6 | `none`, `DEFAULT` | — |
-| `lineHeight` | `--leading-*` | 5 (`tight snug normal relaxed loose`) | `none` | `3`–`10` (batch 2) |
-| `maxWidth` | `--container-*` | 13 | `none full min max fit prose px` | `0`–`96`, `0.5`… (batch 2) |
+| Key            | Namespace         | Token-backed                          | Stays literal                    | Spacing formula            |
+| -------------- | ----------------- | ------------------------------------- | -------------------------------- | -------------------------- |
+| `borderRadius` | `--radius-*`      | 8 (`xs sm md lg xl 2xl 3xl 4xl`)      | `none`, `full`, `DEFAULT`        | —                          |
+| `blur`         | `--blur-*`        | 7                                     | `none`, `DEFAULT`                | —                          |
+| `dropShadow`   | `--drop-shadow-*` | 6                                     | `none`, `DEFAULT`                | —                          |
+| `lineHeight`   | `--leading-*`     | 5 (`tight snug normal relaxed loose`) | `none`                           | `3`–`10` (batch 2)         |
+| `maxWidth`     | `--container-*`   | 13                                    | `none full min max fit prose px` | `0`–`96`, `0.5`… (batch 2) |
 
-`backdropBlur` came from the closing sweep rather than from this batch's list: a *separate* key with
+`backdropBlur` came from the closing sweep rather than from this batch's list: a _separate_ key with
 its own utility (`backdrop-blur-*`, beside `blur-*`), and it borrows the same `--blur-*` tokens —
 measured, not inferred from the name. It is the one thing the sweep found still unclassified, and
 adding it is what closed the classification: `backdropBlur` → `--blur-*`, literals `none` and
@@ -396,8 +396,12 @@ multiple or an entry the host itself cannot reach (`rounded-1` emits nothing).
 namespace exists, and it is spelled exactly like `--drop-shadow-*`:
 
 ```css
-.shadow-sm      { --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), …; }
-.drop-shadow-sm { --tw-drop-shadow: drop-shadow(var(--drop-shadow-sm)); }
+.shadow-sm {
+  --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), …;
+}
+.drop-shadow-sm {
+  --tw-drop-shadow: drop-shadow(var(--drop-shadow-sm));
+}
 ```
 
 `shadow-sm` inlines its value; `drop-shadow-sm` references its token. The namespace exists, the name
@@ -417,7 +421,7 @@ no drift: every claim matches the emitted CSS
 
 Three rules came out of this, and they are the batch discipline now:
 
-1. For a spacing-derived scale the key *name* is the semantic contract and `--spacing` is its
+1. For a spacing-derived scale the key _name_ is the semantic contract and `--spacing` is its
    representation; `api.theme()` is not trusted to materialise those values.
 2. A mapping is verified against emitted v4 CSS, never inferred from a similarly named scale.
 3. A partial scale may legitimately mix resolution modes, so resolution has to be per value.
@@ -437,7 +441,7 @@ after    themeResolution: formula 4, literal 71, token 12
 ```
 
 `literal 71` covers the new names that are not tokens, `animate-box-shadow-sm`'s inline shadow among
-them; it also counts a *composed* reference like `blur(var(--blur-sm))`, because the resolution
+them; it also counts a _composed_ reference like `blur(var(--blur-sm))`, because the resolution
 metric only classifies a value that starts with `var(--` as a token. `formula 4` is the pair of
 mixed names that proves the per-name resolution in emitted CSS.
 
@@ -474,29 +478,29 @@ registration. That is `O(n²)`, and it is the normal path rather than an edge ca
 
 ### The cost, measured
 
-| Build | Slots | Publications | Aggregate share |
-| --- | --- | --- | --- |
-| examples (`examples/output.css`) | 60 | 63 | 96% |
-| canonical corpus | 24 | 27 | 92% |
-| carrier-variant corpus | 18 | 19 | 91% |
+| Build                            | Slots | Publications | Aggregate share |
+| -------------------------------- | ----- | ------------ | --------------- |
+| examples (`examples/output.css`) | 60    | 63           | 96%             |
+| canonical corpus                 | 24    | 27           | 92%             |
+| carrier-variant corpus           | 18    | 19           | 91%             |
 
 An earlier reading of this was wrong and is corrected here: the trigger is **not**
-a prefixed carrier form. Publication count tracks *registrations that happen after
-the first read of `.animations`*, so any corpus whose tweens register after that
+a prefixed carrier form. Publication count tracks _registrations that happen after
+the first read of `.animations`_, so any corpus whose tweens register after that
 read pays it. Prefixed carriers (`*:animations`, `before:animations`) merely
 guarantee an early read; ordinary corpora also publish once per registration.
 
 **The open question is answered, and the answer is "no".** The effects catalogue
-published once because its corpus contains *none* of the three things that move the
+published once because its corpus contains _none_ of the three things that move the
 read earlier — it is 228 plain `animate-*` classes with no variants and no `@apply`,
 and its carrier sorts last (`animate-…` < `animations`). Each cause was isolated by
 experiment (the retired `spike-aggregate-read.mjs`):
 
-| Cause | Evidence |
-| --- | --- |
-| **`@apply` of the carrier** — compiled while the CSS is parsed, before any scanned candidate | removing one `@apply animations` rule from the canonical corpus: registrations-after-read **56 → 11**, publications **32 → 7** |
-| **A prefixed carrier** — `*:animations` sorts before `animate-…` (`*` < `a`), so the read happens on the first candidate | the carrier-variant corpus reads at **0 of 24** |
-| **Variant-prefixed utilities** — anything sorting after `animations` that registers a slot republishes | corpora differing only by `hover:` and `motion-safe:` classes: registrations-after-read **0 → 2** |
+| Cause                                                                                                                    | Evidence                                                                                                                       |
+| ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| **`@apply` of the carrier** — compiled while the CSS is parsed, before any scanned candidate                             | removing one `@apply animations` rule from the canonical corpus: registrations-after-read **56 → 11**, publications **32 → 7** |
+| **A prefixed carrier** — `*:animations` sorts before `animate-…` (`*` < `a`), so the read happens on the first candidate | the carrier-variant corpus reads at **0 of 24**                                                                                |
+| **Variant-prefixed utilities** — anything sorting after `animations` that registers a slot republishes                   | corpora differing only by `hover:` and `motion-safe:` classes: registrations-after-read **0 → 2**                              |
 
 ```
 entry                  registrations  publications  slots at first read
@@ -528,7 +532,7 @@ current order exactly while publishing O(1) per change.
    move-to-end needs. Emitted size would be linear.
 2. **But it cannot reproduce today's order.** A chain is append-only. Reading the
    examples build's own 63 publications: **0 of 58 registrations appended**; every
-   one inserted mid-list, because the slot order is a *grouped and sorted view*
+   one inserted mid-list, because the slot order is a _grouped and sorted view_
    (`values` by attribute, `composed` and `effects` alphabetically), not a
    registration log. `scripts/spike-aggregate-order.mjs` (retired) reproduced this.
 
@@ -538,7 +542,7 @@ current order exactly while publishing O(1) per change.
 
 So the quadratic cost is a consequence of the **order contract**, not of the
 bridge's bookkeeping. Making publication incremental requires deciding what order
-Jumi guarantees — which is why this workstream is named *order and representation*
+Jumi guarantees — which is why this workstream is named _order and representation_
 and why it comes before more theme batches.
 
 ### Acceptance criteria
@@ -563,8 +567,8 @@ to be **build cost that never reaches the file**, once the aggregate is complete
 carriers after the build. Measured on the frozen corpora: the canonical corpus emits
 287,289 bytes of which 259,331 is staging, and ships 66,772; the carrier variant emits
 179,618 and ships 90,173. `aggregateShare` no longer says what it used to say — the
-remaining copy is one per carrier, which is what a carrier *is* — so the bounded checks are
-now *a publication never survives into the output* and *staging is always consumed*.
+remaining copy is one per carrier, which is what a carrier _is_ — so the bounded checks are
+now _a publication never survives into the output_ and _staging is always consumed_.
 
 If a representation cannot hold these, the finding is that precedence itself needs
 redesign rather than optimisation.
@@ -584,7 +588,7 @@ trades serial depth for rewrite size:
   K=32              1.12×                 0.296×
 ```
 
-The chain is a *serial* dependency, so `K=1` walks 228 links where `K=8` walks 29; that is
+The chain is a _serial_ dependency, so `K=1` walks 228 links where `K=8` walks 29; that is
 the whole of the runtime story. Note that **a single publication does not get smaller**
 (209.5 KB against 187.1 KB at `K=8`, because a chain spends a reference per link as well
 as the entries) — the win is entirely the append unit, 14.0 KB per mutation against
@@ -630,7 +634,7 @@ canonical (fixture.html)   byte-snapshotted: any change at all is a change to de
 variant   (variant.html)   the prefixed carrier forms, held to a shape budget
 ```
 
-The canonical corpus was *intended* to be the one with a linear, readable byte
+The canonical corpus was _intended_ to be the one with a linear, readable byte
 metric. It is not: it publishes 27 times for 24 slots. The split is still worth
 keeping — one corpus is a byte contract, the other carries the prefixed-carrier
 coverage and the cost checks — but the readable-metric goal is unmet until the open
@@ -638,7 +642,7 @@ question above is answered.
 
 The variant corpus is checked for shape rather than size, so it tolerates
 legitimate corpus growth. These are **safety bounds, not desired performance**:
-they stop the cost getting *worse* while the representation workstream is open, and
+they stop the cost getting _worse_ while the representation workstream is open, and
 passing them is not evidence the architecture is acceptable — 91% aggregate
 duplication passes a 95% ceiling.
 
@@ -665,7 +669,7 @@ last, semantic ownership first.
    Jumi-owned resolver. Scope is measured rather than assumed: **193 call sites, 71
    distinct keys**. The contract stays `(key, values) => values map`, so no call
    site changes — the work was the 71-key vocabulary and what a resolved value
-   *is*. **Done means every one of the 71 keys has an explicit representation
+   _is_. **Done means every one of the 71 keys has an explicit representation
    strategy**, not that every value became a CSS variable: 7 `token`, 7 `mixed`,
    11 `formula`, 46 `literal`, with `pnpm theme:map` reporting no drift and no
    unmeasured namespace candidate. The classification and the batches are in
@@ -681,13 +685,14 @@ last, semantic ownership first.
    > If the same logical animation slot is registered multiple times, what
    > ordering rule does Jumi itself guarantee?
 
-   It guarantees the order of the ten flat lists, and nothing about *when* they are
+   It guarantees the order of the ten flat lists, and nothing about _when_ they are
    published: a re-registered slot moves to the end of its group, groups are ordered by
    attribute, and the aggregate is whatever the last publication said. Publication timing
    stopped being a semantic question once the data was completed into the carriers after
    the build.
-7. **`@apply`** (done). It did not merely have to keep working: it *materially changes when
-   the carrier is evaluated* — compiled while the CSS is parsed, before any scanned
+
+7. **`@apply`** (done). It did not merely have to keep working: it _materially changes when
+   the carrier is evaluated_ — compiled while the CSS is parsed, before any scanned
    candidate, and removing one `@apply animations` rule from the canonical corpus took
    publications from 32 to 7. That fact is what the finalizer was built for: `@apply`
    copies the carrier body, marker included, and the aggregate is written into the copy
@@ -700,9 +705,9 @@ last, semantic ownership first.
    - **3a candidate semantics** — prototype done: `scripts/lib/candidate.mjs` reproduces the
      payload a matcher receives for 121 of 123 Jumi-relevant candidates in the real corpora,
      against the host as the oracle (`pnpm candidate:diff`). The two exceptions are candidates
-     whose *variant* the host rejects, which is the variants workstream. The differential run also
+     whose _variant_ the host rejects, which is the variants workstream. The differential run also
      bounded the work: arbitrary values are accepted whatever their shape (Jumi's tween utilities
-     take phrases), so type validation only gates *bare* values, and `modifiers` does not filter
+     take phrases), so type validation only gates _bare_ values, and `modifiers` does not filter
      candidates at all. What remains for 3a is lifting the prototype into `@/core` — worth doing
      when 3c needs it, so Jumi ships no parser it does not yet use;
    - **3b ordering/precedence** — answered: a plain lexical sort of the raw candidates,
@@ -732,7 +737,7 @@ last, semantic ownership first.
 
 - Carrier classes are gone: `animations` and `transitions` left userland and the composition is
   inferred from the emitted activation declarations. `legacy:check` fails the gate if either name
-  reappears in an example, a fixture or the docs, because a resurrected carrier would be *inert*
+  reappears in an example, a fixture or the docs, because a resurrected carrier would be _inert_
   rather than broken — a page that still animates from its motion utilities would look fine.
 - Any new host capability we start relying on gets a row in the inventory above, with a
   classification, in the same change.
@@ -754,12 +759,12 @@ incidental consequence of removing them:
 ```html
 <!-- configures duration only; no transition by itself -->
 <div class="transition-duration-500">
-
-<!-- transitions all changing properties for 500ms -->
-<div class="transition-property/all transition-duration-500">
+  <!-- transitions all changing properties for 500ms -->
+  <div class="transition-property/all transition-duration-500"></div>
+</div>
 ```
 
 `animation-duration-500` has always meant the first of those. `transitions` was quietly doing two
-jobs — enabling composition *and* supplying an implicit `all` transition — and only the first was
+jobs — enabling composition _and_ supplying an implicit `all` transition — and only the first was
 removed by this migration. The second would have been hidden magic, so it is written out instead.
 That is an intentional part of the 1.0 API, and the transitions page teaches it as such.

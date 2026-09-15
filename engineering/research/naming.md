@@ -12,9 +12,9 @@ That much is delivery, and delivery is one line per matcher family:
 matchComponents({ [name]: fn }, { modifiers: 'any', … })
 ```
 
-Measured before it: Tailwind accepts `/[reveal]` on a *motion* (arbitrary) and refuses `/reveal`
+Measured before it: Tailwind accepts `/[reveal]` on a _motion_ (arbitrary) and refuses `/reveal`
 (bare), and refusing means dropping the **whole candidate** — no animation at all, which is the
-failure the bracket spelling hid. A Jumi *control* already declared `modifiers: 'any'`, so
+failure the bracket spelling hid. A Jumi _control_ already declared `modifiers: 'any'`, so
 `animation-duration-500/reveal` worked while every motion spelling did not.
 
 ## What a modifier flag cannot do
@@ -25,7 +25,7 @@ What the matcher then does with it is model state, and three quarters of the wor
 - `perValue` took the modifier and discarded it; `color()` hard-coded `{ modifier: null }`; the
   effect matcher ignored it. Delivery alone would have converted a loud refusal into a **silent
   no-op** for those families.
-- A name is only an address if the composition *reads* it, which means the slot's per-part chain and
+- A name is only an address if the composition _reads_ it, which means the slot's per-part chain and
   the non-inheriting registration of every link.
 - Which is where the architecture question was, and where the first implementation was wrong.
 
@@ -35,24 +35,35 @@ The first implementation recorded names against the slot — `names: Map<slotKey
 baked them into the aggregate's chains. The differential:
 
 ```html
-<div id="a" class="animate-fade-in/reveal animation-duration-300/reveal animation-duration-900/loop">
-<div id="b" class="animate-fade-in/loop animation-duration-700/loop">
-<div id="c" class="animate-fade-in/reveal animate-scale-110/loop animation-duration-900/loop">
+<div
+  id="a"
+  class="animate-fade-in/reveal animation-duration-300/reveal animation-duration-900/loop"
+>
+  <div
+    id="b"
+    class="animate-fade-in/loop animation-duration-700/loop"
+  >
+    <div
+      id="c"
+      class="animate-fade-in/reveal animate-scale-110/loop animation-duration-900/loop"
+    ></div>
+  </div>
+</div>
 ```
 
 Computed `animation-duration`, per motion:
 
-| | expected | first implementation, forward | reversed |
-| --- | --- | --- | --- |
-| `#a` fade-in | `0.3s` | `0.9s` ✗ | `0.3s` |
-| `#b` fade-in | `0.7s` | `0.7s` | `0.7s` |
-| `#c` fade-in | not `0.9s` | `0.9s` ✗ | `0.9s` ✗ |
-| `#c` scale | `0.9s` | `0.9s` | `0.9s` |
+|              | expected   | first implementation, forward | reversed |
+| ------------ | ---------- | ----------------------------- | -------- |
+| `#a` fade-in | `0.3s`     | `0.9s` ✗                      | `0.3s`   |
+| `#b` fade-in | `0.7s`     | `0.7s`                        | `0.7s`   |
+| `#c` fade-in | not `0.9s` | `0.9s` ✗                      | `0.9s` ✗ |
+| `#c` scale   | `0.9s`     | `0.9s`                        | `0.9s`   |
 
 Two failures, and the second is worse than the first. `#a` was reached by a name declared on a
-*different element* (`#b`'s `loop`), and it was reached **only in one candidate order** — so discovery
+_different element_ (`#b`'s `loop`), and it was reached **only in one candidate order** — so discovery
 order had become cascade semantics. The aggregate is one declaration block shared by every element
-that matches the composition: anything *value*-like in it is global by construction.
+that matches the composition: anything _value_-like in it is global by construction.
 
 ## The shape that is local
 
@@ -61,14 +72,18 @@ chain reads the slot's own address, and the rule that declared the name is what 
 
 ```css
 /* the aggregate — identical for every element, and carrying no name */
-animation-duration: var(--jumi-slot-fade-in-animation-duration,
-                        var(--jumi-fade-in-animation-duration, var(--jumi-animation-duration)));
+animation-duration: var(
+  --jumi-slot-fade-in-animation-duration,
+  var(--jumi-fade-in-animation-duration, var(--jumi-animation-duration))
+);
 
 /* the rule the author wrote — the only place the name appears */
 .animate-fade-in\/reveal {
   --jumi-fade-in-animation-name: jumi-fade-in;
   --jumi-fade-in-label: reveal;
-  --jumi-slot-fade-in-animation-duration: var(--jumi-label-reveal-animation-duration);
+  --jumi-slot-fade-in-animation-duration: var(
+    --jumi-label-reveal-animation-duration
+  );
   /* … one per part, filled by the finalizer */
 }
 ```
@@ -82,7 +97,7 @@ this reuses the phase rather than adding one.
 
 Verified: the differential above now gives `0.3s / 0.7s / (scale 0.9s, fade-in 1s)` in **both**
 candidate orders, and an element that names nothing is unreachable by any name in the sheet. The
-permanent form is `pnpm behaviour:check`'s *naming* section — five assertions, including the reversed
+permanent form is `pnpm behaviour:check`'s _naming_ section — five assertions, including the reversed
 build — and it is the same page that failed against the first implementation.
 
 Two consequences worth stating, because they are the contract rather than side effects:
@@ -94,7 +109,7 @@ Two consequences worth stating, because they are the contract rather than side e
   by a control written for `loop`. Before the split it could.
 
 One implementation detail is a compile-time decision, not a semantic one: the slot's address link is
-added to its chains only when the slot is named **somewhere** in the build. The link's *shape* being
+added to its chains only when the slot is named **somewhere** in the build. The link's _shape_ being
 global is harmless — its content is element-local and non-inheriting, and an unset link falls through
 — while adding it for every slot cost **51% more staged bytes** on the corpus. With the link only
 where a name exists, the composition grows by 1.8% (`aggregateBytes` 4281 → 4359 in
@@ -105,13 +120,13 @@ where a name exists, the composition grows by 1.8% (`aggregateBytes` 4281 → 43
 A name becomes part of a custom property's name, and that is the only thing that can be wrong with one.
 Two things are wrong with one now, and the second is newer than this section. Measured, name by name:
 
-| author writes | Jumi receives | outcome |
-| --- | --- | --- |
-| `/reveal` `/card` `/flick` `/return` `/hero-2` `/2x` `/_x` `/a_b` | same | addressable |
-| `/[a.b]` `/[a:b]` `/[a/b]` `/[a(b)]` `/[--x]` `/[A-Z]` | escaped | addressable |
-| `/[a b]` `/[a_b]` `/[_x]` `/[x_]` | `a b`, `a b`, ` x`, `x ` | **refused and reported** — cannot be written |
-| `/scale` `/opacity` `/filter` on a motion that animates something else | same | **refused and reported** — the property's address |
-| `/[]`, bare `/unicodé`, bare `animation-range-nonsense:` | never a candidate | Tailwind drops it |
+| author writes                                                          | Jumi receives            | outcome                                           |
+| ---------------------------------------------------------------------- | ------------------------ | ------------------------------------------------- |
+| `/reveal` `/card` `/flick` `/return` `/hero-2` `/2x` `/_x` `/a_b`      | same                     | addressable                                       |
+| `/[a.b]` `/[a:b]` `/[a/b]` `/[a(b)]` `/[--x]` `/[A-Z]`                 | escaped                  | addressable                                       |
+| `/[a b]` `/[a_b]` `/[_x]` `/[x_]`                                      | `a b`, `a b`, ` x`, `x ` | **refused and reported** — cannot be written      |
+| `/scale` `/opacity` `/filter` on a motion that animates something else | same                     | **refused and reported** — the property's address |
+| `/[]`, bare `/unicodé`, bare `animation-range-nonsense:`               | never a candidate        | Tailwind drops it                                 |
 
 Whitespace is unwritable: `css.escape('a b')` is `a\ b`, legal CSS that **ends PostCSS's
 identifier**, so the declaration fails to parse. Before this work that was not a silent no-op but a
@@ -127,7 +142,7 @@ into `raws.between` — so a value-based record went silent for exactly the name
 
 The second refusal, and the resolution of the collision this file's sibling `addressing.md` found. A
 control's token used to be read twice — as a property scope and as a label — because they were one
-variable, so `animation-duration-1000/scale` set the duration of the scale motion *and* of any motion
+variable, so `animation-duration-1000/scale` set the duration of the scale motion _and_ of any motion
 named `scale`, and an author's own `animation-duration-400/rotate` on that second motion lost. Measured,
 `1s, 1s`, against `1s, 0.4s` after the split.
 
@@ -139,7 +154,7 @@ already wrote.
 
 The name is recorded (`--jumi-name-<hash>-shadowed`) instead of linked, which does two things: the
 stylesheet carries no address that nothing fills, and the finalizer has something to report. Naming a
-motion after the property *it* animates is not this case — one scope serves both readings, and
+motion after the property _it_ animates is not this case — one scope serves both readings, and
 `animate-rotate-45/rotate` beside `animation-duration-400/rotate` is documented behaviour — so nothing is
 recorded. Measured on the distinguishing corpus: `structuralAddress` sends `/scale` to the property and
 `/rotate` to the motion, and the durations separate (`1s, 0.4s`) where they used to coincide (`1s, 1s`).
@@ -156,18 +171,18 @@ teach authors to stop naming things.
 
 ## Range composition parity — closed the same day
 
-The variant qualifies one *slot*, so it publishes under that slot's **key**: `attribute-id` for a
+The variant qualifies one _slot_, so it publishes under that slot's **key**: `attribute-id` for a
 phrase or a single value, the attribute for an effect or a composed tween. The chains read
 `--jumi-<attribute>-animation-range`, which is right for the last two and wrong for the first two —
 so a phrase's range emitted, validated, and did nothing. Measured, before the fix:
 
-| motion | publishes | chain read |
-| --- | --- | --- |
-| `animate-fade-in` (effect) | `--jumi-fade-in-animation-range` | `var(--jumi-fade-in-animation-range, …)` ✓ |
-| `animate-opacity-50` (single value) | `--jumi-opacity-cMr-animation-range` | `var(--jumi-opacity-animation-range, …)` ✗ |
-| `animate-opacity-[0:0\|100:1]` (phrase) | `--jumi-opacity-sluPU-animation-range` | `var(--jumi-opacity-animation-range, …)` ✗ |
-| `animate-scale-x-110` (composed) | `--jumi-scale-animation-range` | `var(--jumi-scale-animation-range, …)` ✓ |
-| a phrase named `/reveal` | both | `var(--jumi-slot-opacity-sluPU-…, var(--jumi-opacity-…` ✗ — the name link is not the publication |
+| motion                                  | publishes                              | chain read                                                                                       |
+| --------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `animate-fade-in` (effect)              | `--jumi-fade-in-animation-range`       | `var(--jumi-fade-in-animation-range, …)` ✓                                                       |
+| `animate-opacity-50` (single value)     | `--jumi-opacity-cMr-animation-range`   | `var(--jumi-opacity-animation-range, …)` ✗                                                       |
+| `animate-opacity-[0:0\|100:1]` (phrase) | `--jumi-opacity-sluPU-animation-range` | `var(--jumi-opacity-animation-range, …)` ✗                                                       |
+| `animate-scale-x-110` (composed)        | `--jumi-scale-animation-range`         | `var(--jumi-scale-animation-range, …)` ✓                                                         |
+| a phrase named `/reveal`                | both                                   | `var(--jumi-slot-opacity-sluPU-…, var(--jumi-opacity-…` ✗ — the name link is not the publication |
 
 The range part now takes one extra link, and only when the key is not the attribute:
 
@@ -176,7 +191,7 @@ name address (if named)  →  --jumi-<key>-animation-range  →  --jumi-<attribu
 ```
 
 Nothing else needs it, and that is a fact rather than a preference: the range variant is the only thing
-that publishes per slot *after* the composition is built. Adding the link for every part would have been
+that publishes per slot _after_ the composition is built. Adding the link for every part would have been
 uniform and would have cost a `var()` lookup per part per element.
 
 Held by four browser arms in `pnpm scroll-driven:check` — effect, single value, phrase, and named phrase
@@ -191,7 +206,7 @@ for the slots that can use it.
 
 - `_` means a space inside `[brackets]` and an underscore when bare. Nothing Jumi can do — it is
   Tailwind's value charset — so the docs teach the bare form and the warning says what happened.
-- Phrase slots are ordered in the composition by *insertion*, so the `animation-name` list can come out
+- Phrase slots are ordered in the composition by _insertion_, so the `animation-name` list can come out
   in a different order under a different candidate order. Harmless — each position carries its own
   chain, and a test that compares two builds must compare per name rather than per serialization, which
   is what `behaviour:check`'s naming section now does.

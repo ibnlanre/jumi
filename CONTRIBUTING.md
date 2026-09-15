@@ -14,14 +14,24 @@ Jumi follows clear principles that ensure consistency, clarity, and excellent de
 
 ```html
 ✅ Good
-<div class="animate-background-color-blue-500">     <!-- background-color -->
-<div class="animate-border-radius-full">            <!-- border-radius -->
-<div class="animate-backdrop-filter-blur-md">       <!-- backdrop-filter -->
+<div class="animate-background-color-blue-500">
+  <!-- background-color -->
+  <div class="animate-border-radius-full">
+    <!-- border-radius -->
+    <div class="animate-backdrop-filter-blur-md">
+      <!-- backdrop-filter -->
 
-❌ Avoid
-<div class="animate-bg-blue-500">                   <!-- abbreviated -->
-<div class="animate-radius-full">                   <!-- loses context -->
-<div class="animate-blur-md">                       <!-- ambiguous property -->
+      ❌ Avoid
+      <div class="animate-bg-blue-500">
+        <!-- abbreviated -->
+        <div class="animate-radius-full">
+          <!-- loses context -->
+          <div class="animate-blur-md"><!-- ambiguous property --></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 ```
 
 **Why?** Developers can immediately understand which CSS property is being animated without guessing or memorizing abbreviations.
@@ -33,10 +43,12 @@ Jumi follows clear principles that ensure consistency, clarity, and excellent de
 Only use abbreviations that are universally understood or part of CSS conventions.
 
 **Acceptable:**
+
 - `x`, `y`, `z` for spatial axes (`translate-x`, `rotate-z`)
 - Standard CSS shorthand (`margin`, `padding`)
 
 **Not acceptable:**
+
 - `bg` for `background-color`
 - `bd` for `border`
 - `pos` for `position`
@@ -50,15 +62,12 @@ Only use abbreviations that are universally understood or part of CSS convention
 Maintain property relationships in class names.
 
 ```html
-✅ Good
-animate-backdrop-filter-drop-shadow-blur-md
-animate-backdrop-filter-drop-shadow-color-blue-500
-animate-border-image-outset-4
-animate-mask-border-width-2
-
-❌ Avoid  
-animate-drop-shadow-blur-md                     <!-- loses parent context -->
-animate-border-outset-4                         <!-- ambiguous -->
+✅ Good animate-backdrop-filter-drop-shadow-blur-md
+animate-backdrop-filter-drop-shadow-color-blue-500 animate-border-image-outset-4
+animate-mask-border-width-2 ❌ Avoid animate-drop-shadow-blur-md
+<!-- loses parent context -->
+animate-border-outset-4
+<!-- ambiguous -->
 ```
 
 **Why?** Hierarchical naming preserves the relationship between parent and child properties, making the API predictable.
@@ -72,9 +81,9 @@ Prioritize clear, readable class names over shorter alternatives.
 ```html
 ✅ Preferred
 <div class="animate-backdrop-filter-drop-shadow-offset-x-4">
-
-❌ Avoid
-<div class="animate-bd-drop-x-4">
+  ❌ Avoid
+  <div class="animate-bd-drop-x-4"></div>
+</div>
 ```
 
 **Why?** Self-documenting code is maintainable code. A few extra characters are worth the clarity.
@@ -89,12 +98,15 @@ named one does not exist — instead of registering a variant of your own.
 ```html
 ✅ Good - Tailwind's variants
 <h1 class="animate-fade-in [&:is(h1)]:animate-fade-in">
-<nav class="has-[>button]:animate-scale-110">
-<section class="[&:where(.card)]:animate-slide-in-up">
-
-❌ Avoid - Custom natural language variants
-<div class="child-h1:animate-fade-in">
-<nav class="has-button:animate-scale-110">
+  <nav class="has-[>button]:animate-scale-110">
+    <section class="[&:where(.card)]:animate-slide-in-up">
+      ❌ Avoid - Custom natural language variants
+      <div class="child-h1:animate-fade-in">
+        <nav class="has-button:animate-scale-110"></nav>
+      </div>
+    </section>
+  </nav>
+</h1>
 ```
 
 **Why?** Tailwind owns the selector grammar and keeps evolving it. Jumi registering `is-*`,
@@ -111,12 +123,15 @@ rule of Jumi's is written by hand.
 ```html
 ✅ Good — the utilities are the whole interface
 <div class="animate-rotate-45 animate-scale-110">
-
-❌ Avoid — a hand-written list is a copy that goes stale
-<div class="animate-rotate-45" style="animation-name: rot, scale">
+  ❌ Avoid — a hand-written list is a copy that goes stale
+  <div
+    class="animate-rotate-45"
+    style="animation-name: rot, scale"
+  ></div>
+</div>
 ```
 
-**Why?** Every animation on an element competes for the same declarations, and those are *lists*
+**Why?** Every animation on an element competes for the same declarations, and those are _lists_
 (`animation-name`, `animation-duration`, and the rest) the browser resolves by position. A utility can
 own its own value; it cannot own the list, because Tailwind compiles each candidate without knowing
 what else the element carries — and caches that utility's output per candidate, so a list written
@@ -134,7 +149,7 @@ form, which is why nothing tries.
 Guardrails, each of which cost a shipped bug to learn:
 
 - **The defaults resolve on the element.** Their entries reference the slot variables the `animate-*`
-  utilities declare *on the element*, and a `var()` chain inside a custom property resolves where it
+  utilities declare _on the element_, and a `var()` chain inside a custom property resolves where it
   is declared. Published on `:root` instead, every animating element silently resolves
   `animation-name: none`, and the stagger system stops — `--jumi-animation-delay` reads a variable
   only the element sets.
@@ -170,7 +185,7 @@ any path whose name mentions Jumi — is left alone. Registering twice emits eve
 
 - **A token existing is not a contract.** `--shadow-*` exists and is spelled like `--drop-shadow-*`,
   but `shadow-sm` inlines its value while `drop-shadow-sm` references its token.
-- **A key *name* can be the contract.** For a spacing-derived scale the numeric name *is* the
+- **A key _name_ can be the contract.** For a spacing-derived scale the numeric name _is_ the
   multiple; `--spacing` is only its representation, and the host's JS scale cannot be trusted for it.
 - **A scale can mix modes, so resolution is per value.** `leading-6` is `calc(var(--spacing) * 6)`,
   `leading-tight` is `var(--leading-tight)`, `leading-none` is a literal — out of one key.
@@ -209,15 +224,15 @@ this cost are recorded in `engineering/roadmap/migration.md`.
 state what Jumi is and how to use it. Measurements, incidents, rejected options, dates and hashes are
 records, and records live in `engineering/`.
 
-| Location | Holds |
-| --- | --- |
-| `docs/` | the Astro site only — `src/pages`, layouts, styles, data, `public/` |
-| `engineering/architecture` | how the machine works, and why it is shaped this way |
-| `engineering/research` | investigations, measurements, and their conclusions |
-| `engineering/roadmap` | what is planned, in what order, and what was closed |
-| `README.md`, `CONTRIBUTING.md` | what Jumi is, and the rules for changing it |
+| Location                       | Holds                                                               |
+| ------------------------------ | ------------------------------------------------------------------- |
+| `docs/`                        | the Astro site only — `src/pages`, layouts, styles, data, `public/` |
+| `engineering/architecture`     | how the machine works, and why it is shaped this way                |
+| `engineering/research`         | investigations, measurements, and their conclusions                 |
+| `engineering/roadmap`          | what is planned, in what order, and what was closed                 |
+| `README.md`, `CONTRIBUTING.md` | what Jumi is, and the rules for changing it                         |
 
-None of it is private; the split is *intended audience*. See `engineering/README.md`.
+None of it is private; the split is _intended audience_. See `engineering/README.md`.
 
 ---
 
@@ -228,29 +243,43 @@ None of it is private; the split is *intended audience*. See `engineering/README
 Effect names use descriptive, hyphenated words following the pattern: `{type}-{direction}-{origin}`
 
 ```html
-✅ Good
-bounce-in, bounce-out                     <!-- Clear direction: -in vs -out -->
-slide-in-left, slide-out-right            <!-- Type + direction + axis -->
-fade-in, fade-out                         <!-- Simple directional -->
-arc-top-left, arc-bottom-right            <!-- Hierarchical origin points -->
-zoom-in, zoom-out                         <!-- Descriptive type -->
-skew-left, skew-right-up                  <!-- Compound directions -->
-wipe-in-center, wipe-out-left             <!-- Advanced: type-direction-origin -->
-iris-in-center, iris-out-top-right        <!-- Full pattern -->
-barn-door-in-center, curtain-out-left     <!-- Multi-word types (hyphenated) -->
+✅ Good bounce-in, bounce-out
+<!-- Clear direction: -in vs -out -->
+slide-in-left, slide-out-right
+<!-- Type + direction + axis -->
+fade-in, fade-out
+<!-- Simple directional -->
+arc-top-left, arc-bottom-right
+<!-- Hierarchical origin points -->
+zoom-in, zoom-out
+<!-- Descriptive type -->
+skew-left, skew-right-up
+<!-- Compound directions -->
+wipe-in-center, wipe-out-left
+<!-- Advanced: type-direction-origin -->
+iris-in-center, iris-out-top-right
+<!-- Full pattern -->
+barn-door-in-center, curtain-out-left
+<!-- Multi-word types (hyphenated) -->
 
-❌ Avoid
-bounceIn                                  <!-- camelCase -->
-slideLeft                                 <!-- missing -in/-out direction -->
-wipeC                                     <!-- abbreviated origin -->
-fade                                      <!-- missing direction -->
-arcTL                                     <!-- abbreviated -->
-bd-in-c                                   <!-- multiple abbreviations -->
+❌ Avoid bounceIn
+<!-- camelCase -->
+slideLeft
+<!-- missing -in/-out direction -->
+wipeC
+<!-- abbreviated origin -->
+fade
+<!-- missing direction -->
+arcTL
+<!-- abbreviated -->
+bd-in-c
+<!-- multiple abbreviations -->
 ```
 
 **Why this pattern?**
+
 - Descriptive names (wipe, iris, box, barn-door) convey intent immediately
-- Consistent direction indicators (-in/-out) make behavior predictable  
+- Consistent direction indicators (-in/-out) make behavior predictable
 - Hierarchical origins (-center, -top-left) provide precision when needed
 - No abbreviations ensures accessibility for all skill levels
 
@@ -259,9 +288,15 @@ bd-in-c                                   <!-- multiple abbreviations -->
 Follow the pattern: `animate-{css-property}-{value}`
 
 ```html
-<div class="animate-opacity-50">                    <!-- opacity: 0.5 -->
-<div class="animate-width-full">                    <!-- width: 100% -->
-<div class="animate-background-color-red-500">      <!-- background-color: red -->
+<div class="animate-opacity-50">
+  <!-- opacity: 0.5 -->
+  <div class="animate-width-full">
+    <!-- width: 100% -->
+    <div class="animate-background-color-red-500">
+      <!-- background-color: red -->
+    </div>
+  </div>
+</div>
 ```
 
 ---
@@ -327,7 +362,7 @@ scale the named values come from. `property()`, `token()` and `color()` are the 
     transform: 'scale(0.3) translateY(-100px)',
   },
   '50%': {
-    opacity: '1', 
+    opacity: '1',
     transform: 'scale(1.05) translateY(10px)',
   },
   '100%': {
@@ -389,13 +424,13 @@ reads emitted text, or the renderer, and the freeze was in neither. See "Tooling
 Quality Standards.
 
 **`behaviour:check` is not optional, and it is not a duplicate of the others.** Every
-harness above reads emitted *text*: the snapshot compares bytes, the structural metrics
+harness above reads emitted _text_: the snapshot compares bytes, the structural metrics
 count declarations, the incremental harness watches a list grow. A page can pass all of
 them while a browser does nothing — that has happened twice here. It happened most
 recently with the aggregate published on `:root`, where the CSS looked plausible, the
 snapshot was green, 123 unit tests passed, and every carrier resolved
 `animation-name: none`, because a `var()` chain inside a custom property resolves where
-it is *declared* and the slot variables are element-local. `behaviour:check` compiles
+it is _declared_ and the slot variables are element-local. `behaviour:check` compiles
 the canonical corpus, loads it in Chromium, and asserts the resolved `animation-name` of
 real carriers. If you change where data is declared, or how an element reads it, this is
 the check that knows.
@@ -431,28 +466,31 @@ pnpm publish
 Four things about that flow are load-bearing:
 
 - **The bump comes before the changelog.** The generator stamps the release header from `package.json`, so
-  running it first labels the release with the *previous* version.
+  running it first labels the release with the _previous_ version.
 - **`release:*` does not commit or tag.** It runs `pnpm version <bump> --no-git-tag-version`, which edits
   `package.json` and stops — so the release is one commit and one tag, not two of each.
 - **The boundary is a tag.** Everything written in `CHANGELOG.md` before the first tag is curated by hand and is
   left exactly as written; generation prepends above it. With no tag at all the generator would rewrite the
   entire history, so `pnpm run changelog` refuses to run until one exists.
 - **Never run the generator with `-r 0`.** That mode overwrites the file instead of prepending to it — it is how
-  the hand-written 1.0.0 notes were destroyed once. To *inspect* output, use the CLI directly with `--stdout`.
+  the hand-written 1.0.0 notes were destroyed once. To _inspect_ output, use the CLI directly with `--stdout`.
 
 ## Quality Standards
 
 ### Performance
+
 - Consider bundle size impact
 - Prefer GPU-accelerated transforms
 - Use CSS custom properties efficiently
 
-### Accessibility  
+### Accessibility
+
 - Respect `prefers-reduced-motion`
 - Test with screen readers when relevant
 - Provide reduced-motion alternatives for complex animations
 
 ### Browser Support
+
 - Target modern browsers (Chrome 88+, Firefox 89+, Safari 14+)
 - Test cross-browser before submitting
 
@@ -472,7 +510,7 @@ render scales with the number of slots — and that cost is invisible to every c
   (as each property's `value`, its `text`, and the rule's `cssText`). A 3% change in stylesheet
   bytes corresponded to a 61% change in response bytes, so sheet size is not a usable proxy.
 - **Price a representation change on both workloads.** A change to the composition is a recalc
-  question *and* a tooling question, and they do not move together unless the shape is right.
+  question _and_ a tooling question, and they do not move together unless the shape is right.
 
 ```bash
 pnpm spike:cdp-cost     # the protocol: bytes and latency per slot count, plus the A/B variants
@@ -484,6 +522,7 @@ These are measurements, not gates — they are too slow for `pnpm check`. The re
 numbers are in `engineering/research/style-cost.md`.
 
 ### Documentation
+
 - Clear examples for new features
 - Update README if adding major functionality
 - Explain the "why" in PR descriptions
@@ -504,6 +543,7 @@ numbers are in `engineering/research/style-cost.md`.
 ```
 
 **Why this is good:**
+
 - Exact CSS property name
 - Maintains hierarchical relationship with `backdrop-filter`
 - Supports arbitrary values: `animate-backdrop-filter-hue-rotate-[45deg]`
@@ -534,6 +574,7 @@ numbers are in `engineering/research/style-cost.md`.
 ```
 
 **Why this is good:**
+
 - Descriptive hyphenated name
 - Natural motion curve with overshoot
 - Includes opacity for entrance effect
@@ -551,11 +592,56 @@ numbers are in `engineering/research/style-cost.md`.
 ## Need Clarification?
 
 If you're unsure about:
+
 - Whether to abbreviate a name → Don't abbreviate
 - How to name a new property → Use the exact CSS property name
 - Whether to create a custom variant → Use Tailwind's `:is()`, `:has()`, `:where()`
 
 When in doubt, ask! We're here to help.
+
+---
+
+## Verifying a change
+
+Two habits, both learned by getting them wrong on 2026-09-15.
+
+**Never pipe the gate into a filter when its exit code decides what happens next.**
+
+```sh
+node scripts/check.mjs | tail -4 && git commit ...     # the commit runs on a red gate
+node scripts/check.mjs > /tmp/gate.log 2>&1; echo "exit: $?"; tail -4 /tmp/gate.log
+```
+
+`scripts/check.mjs` exits 1 when a stage fails, but a pipeline's status is the **last** command's — so
+`| tail` reports success whatever the gate did, and the last four lines still look green because a failing
+stage prints its detail above them. Measured: a formatting sweep was committed on top of a failing `css`
+stage while the summary read `✗ css failed` the whole time.
+
+**Generated files are not source, and formatting them breaks the checks that compare them byte for byte.**
+
+`scripts/css-snapshot/snapshot.css` is what the toolchain emits; `pnpm css:check` recompiles the corpora and
+compares against it. A repo-wide `prettier --write` reformatted it and the stage failed on `@supports`
+wrapping and on `color: rgb(...)` becoming `color:rgb(...)`. Both recorded artifacts are in
+`.prettierignore`; the rest of the generated output is already in `.gitignore`, which Prettier honours.
+
+## Formatting
+
+One formatter per language, and one configuration for all of them — `prettier.config.mjs`:
+
+| language                                                    | formatter                                                    |
+| ----------------------------------------------------------- | ------------------------------------------------------------ |
+| `ts`, `tsx`, `js`, `mjs`, `cjs`                             | ESLint, which runs Prettier through `eslint-plugin-prettier` |
+| `json`, `jsonc`, `css`, `html`, `markdown`, `yaml`, `astro` | Prettier — ESLint ignores these or cannot parse them         |
+
+The point is that a save in the editor and `pnpm lint` are the same operation. `pnpm lint` is `eslint --fix .`,
+and the editor routes the second row to Prettier directly, with the built-in formatters for those languages
+turned off — so a file the default formatter declines cannot silently fall through to a different one.
+
+```sh
+npx eslint src scripts docs/src docs/astro.config.ts   # 0 warnings
+npx prettier --check .                                 # clean
+node scripts/check.mjs                                 # 17/17
+```
 
 ---
 

@@ -49,7 +49,7 @@ chain whose links each reference their predecessor can only append. The correcti
 that links do **not** need ordered names: **the graph establishes order**.
 
 ```css
---jumi-<id>-part: var(--jumi-<predecessorId>-part), <entry>
+--jumi-<id>-part: var(--jumi-<predecessorId>-part), <entry>;
 ```
 
 Inserting `x` between `a` and `b` is two declarations, and nothing about `x` needs to
@@ -60,7 +60,7 @@ sort between them:
 --jumi-b-animation-name: var(--jumi-x-animation-name), <entry b>;
 ```
 
-So identities only have to be *stable*, which removes an entire class of future
+So identities only have to be _stable_, which removes an entire class of future
 problem — allocating gaps, exhausting them, rebalancing. Call it a **linked
 aggregate**, not a sparse-position one.
 
@@ -85,7 +85,7 @@ cached `.animations` rule still never needs revisiting because the consumer is c
 
 That placement is not a detail. The chain's entries reference the slot variables the
 `animate-*` utilities declare on the element, and a `var()` chain inside a custom
-property resolves where it is *declared* — so a chain published anywhere else inherits the
+property resolves where it is _declared_ — so a chain published anywhere else inherits the
 guaranteed-invalid value and resolves `none`. The first version of this design published
 the chain on `:root` with a pointer on the carrier; it measured fast and animated
 nothing. See the P0 note in `engineering/roadmap/migration.md`.
@@ -94,7 +94,7 @@ nothing. See the P0 note in `engineering/roadmap/migration.md`.
 
 `scripts/spike-linked-order.test.mjs` (retired), run against the real model. Four registration
 histories are fed to today's aggregation and to the linked one, and after **every**
-mutation all ten lists must be *identical*, not merely equal in slot count:
+mutation all ten lists must be _identical_, not merely equal in slot count:
 
 ```text
 a value, a phrase, an effect
@@ -114,7 +114,7 @@ Each step also asserts the invariant the precedence test made necessary:
 - local — reaching the new order takes at most 2 node operations.
 
 What this proves and what it does not: it shows the representation can express today's
-order exactly while mutating locally. It does not yet prove the *model* emits those
+order exactly while mutating locally. It does not yet prove the _model_ emits those
 operations — that is the implementation, and the gate for it is the snapshot corpus.
 
 ### Spike 2 — substitution depth: Chromium verified, other engines not
@@ -143,13 +143,13 @@ today (63 publications)   raw 1503KB   gzip 54KB   brotli 15KB
 linked proxy (1 list)     raw  110KB   gzip 12KB   brotli 10KB
 ```
 
-| | raw | gzip | brotli |
-| --- | --- | --- | --- |
+|     | raw       | gzip     | brotli   |
+| --- | --------- | -------- | -------- |
 | win | **13.7×** | **4.5×** | **1.5×** |
 
 The quadratic blowup is not what the raw number suggests. Repetition compresses
 unusually well — gzip's 32 KB window catches most of it and brotli's large window
-almost all of it — so the *delivery* win is 4.5× over gzip and only 1.5× over brotli.
+almost all of it — so the _delivery_ win is 4.5× over gzip and only 1.5× over brotli.
 The raw win is still the real one, and it is a build-time, memory and dev-server win
 rather than a network one. That does not excuse O(n²) — the output should not contain
 data the model knows is redundant — but it is the honest sizing of the prize.
@@ -211,9 +211,9 @@ Reading it:
 - **Initial resolution is flat.** Every arm resolves 228 carriers in ~6 ms, so it is not a
   differentiator. The bridge is **cost-neutral, not a runtime fix**: `carrier` matches
   `inline` at every cell. The earlier reading — "290 ms → 3.8 ms" — compared against the
-  `:root` arm, which was the *broken* placement.
+  `:root` arm, which was the _broken_ placement.
 - **`K` is the whole lever.** At 228 slots, `K=1` walks 228 links and costs 3.4×;
-  `K=8` walks 29 and costs 1.19×. A chain is a *serial* dependency, where a flat list is
+  `K=8` walks 29 and costs 1.19×. A chain is a _serial_ dependency, where a flat list is
   228 independent lookups.
 - **A single publication does not shrink.** Linked at `K=8` emits 209.5 KB against the
   flat 187.1 KB, because a chain spends a `var()` reference per link on top of the
@@ -257,7 +257,7 @@ With `K = 8`:
 ```
 
 The publication count is unchanged — 63 for the examples corpus, before and after —
-because the trigger is unchanged, and that is the point: each publication got *smaller*
+because the trigger is unchanged, and that is the point: each publication got _smaller_
 instead of rarer. Links touched per publication on the examples corpus: **one, two or
 three, never more than four**, against a chain of about twenty links. That bound is a
 constant, which is what makes the total linear: the work per publication no longer
@@ -293,7 +293,7 @@ comparable (8.6 vs 8.9 ms); the regression is on invalidation, where a 228-slot 
 5.5 ms to 10.0 ms.
 
 Raising `K` shortens the chain and buys the runtime back, but it enlarges the unit every
-*publication* rewrites — and on the multi-publication examples corpus that hands the output win
+_publication_ rewrites — and on the multi-publication examples corpus that hands the output win
 back: `K = 32` costs 1,131 KB where `K = 8` costs 444 KB. So this is a trade, not a fix: `K = 8`
 optimises output and misses the runtime bar by 21%; `K = 16` sits exactly on the bar with no
 margin; `K = 32` is comfortable on runtime and gives up most of the output win. Recorded for the
@@ -301,7 +301,7 @@ decision rather than resolved here.
 
 **A separate, pre-existing bug: `*:animations` never animates its descendants.** The adapter
 published the data on `.animations`, so for a `*:animations` carrier the aggregate landed on the
-parent while the slots were on the children — and the children resolved `none`. Measured in *both*
+parent while the slots were on the children — and the children resolved `none`. Measured in _both_
 representations, so it is not a chain result. It is the same class of mistake as the `:root`
 placement: the data has to sit where the slot variables are.
 
@@ -350,14 +350,14 @@ precedence in a new major version. The linked aggregate did not require it.
 `pnpm examples:build` (the whole examples corpus: 60 slots, one carrier per context) — the
 number that decides whether any of the linked work is still owed.
 
-|  | before the finalizer | now |
-| --- | --- | --- |
-| emitted by Tailwind | 1,130,863 bytes (the file itself) | 1,540,894 bytes |
-| …of which staging | — | 1,455,274 bytes, **94%** |
-| publications | 63 | 59 |
-| **shipped** | **1,130,863 bytes** | **271,812 bytes** |
-| aggregate in the shipped file | 96% | 186,192 bytes (69%), 4 copies × 60 entries × 10 lists |
-| keyframes | 60 | 60 |
+|                               | before the finalizer              | now                                                   |
+| ----------------------------- | --------------------------------- | ----------------------------------------------------- |
+| emitted by Tailwind           | 1,130,863 bytes (the file itself) | 1,540,894 bytes                                       |
+| …of which staging             | —                                 | 1,455,274 bytes, **94%**                              |
+| publications                  | 63                                | 59                                                    |
+| **shipped**                   | **1,130,863 bytes**               | **271,812 bytes**                                     |
+| aggregate in the shipped file | 96%                               | 186,192 bytes (69%), 4 copies × 60 entries × 10 lists |
+| keyframes                     | 60                                | 60                                                    |
 
 Read it as two claims.
 
@@ -366,11 +366,11 @@ browser downloads is one list per carrier. Republishing cannot reach the output 
 times the model publishes, because the only aggregate in the file is the one the finalizer
 wrote — `behaviour:check` and `css:check` both assert that no publication survives.
 
-**Build cost is not settled, and it is now purely build cost.** The emission is *larger* than
+**Build cost is not settled, and it is now purely build cost.** The emission is _larger_ than
 it was (1.13 MB → 1.54 MB) and 94% of it is staging that gets deleted: the flat lists re-say
 all sixty entries on every publication, where the chain would have re-said a link. So the
 quadratic publishing work still exists in CPU and memory during a build — and it is the only
-thing left that the linked representation would have improved, because the *shipped* bytes were
+thing left that the linked representation would have improved, because the _shipped_ bytes were
 never where the chain won: a carrier has to declare whatever it reads, so per-carrier cost is
 the same lists either way, and the chain's runtime cost (1.82× per-carrier restyle) is paid by
 every user forever.
@@ -386,7 +386,7 @@ flat        build emission 94% waste, shipped bytes same,  per-carrier restyle 1
 `examples/output.css` or a carrier is left without the aggregate.
 
 **Update — the transport no longer ships.** The table above measures flat lists as completed by the
-*first* finalizer, which kept the marker and wrote `--jumi-aggregate-*` declarations into each
+_first_ finalizer, which kept the marker and wrote `--jumi-aggregate-*` declarations into each
 carrier so that carrier's longhands could read them. That layer is gone: the finalizer now writes
 the lists into the carrier's own `animation-*` longhands and erases the marker, and
 `--jumi-carrier`, `--jumi-carrier-staging` and `--jumi-aggregate-*` are held to zero occurrences in
@@ -394,13 +394,13 @@ finished output by `css:check`, `vite:check`, `postcss:check` and `examples:buil
 
 On this corpus that moved shipped bytes 271,812 → **267,635**, with the same 59 publications, the
 same 4 carriers and the same 60 entries × 10 lists. The build-cost half of the table is unchanged,
-and that is the point: the transport was never what the *file* cost — it was what the build cost,
+and that is the point: the transport was never what the _file_ cost — it was what the build cost,
 and the build is still 95% staging. See `engineering/architecture/carrier-locality.md`.
 
 ## The evaluation cost, and why the representation is not where it lives
 
 > **Partly superseded, and superseded in the direction that matters.** Everything below stays true as
-> *measurement* — the cost scales with the number of aggregate positions resolved per animated
+> _measurement_ — the cost scales with the number of aggregate positions resolved per animated
 > element, and no rearrangement of the `var()` indirection removes it. What changed is the conclusion
 > drawn from it. The doc reads it as "therefore the representation is not the lever"; the hoist that
 > shipped took it as "then reduce the positions resolved", and 10N → 3N is where the −60% recalc and
@@ -410,19 +410,19 @@ and the build is still 95% staging. See `engineering/architecture/carrier-locali
 >
 > - **The parity divergence below is the accepted contract, not a defect to avoid.** Hoisting really
 >   does stop a shared control from reaching an inactive position — that was measured here first, and
->   the shorthand hoist ships it deliberately. The resolution was to state the boundary: *Jumi
+>   the shorthand hoist ships it deliberately. The resolution was to state the boundary: _Jumi
 >   guarantees the semantics of active animation positions; the computed longhand values of inactive
->   `animation-name: none` positions are not part of the semantic API.*
+>   `animation-name: none` positions are not part of the semantic API._
 > - **The two things recorded as unsettled are settled.** The label-scoped collision is tested in
 >   `spike-cdp-cost`'s active-slot parity section, against a control that is asserted to reach its
 >   slot, and the read is all ten longhands rather than `animation-duration` alone.
 >
 > The `hoisted` row below is the **longhand** hoist (−19%), not the shorthand one that shipped; the
 > two differ by how many positions an element resolves, which is precisely the quantity this section
-> identifies as the cost. The earlier rejection of `hoisted` was a rejection of a *different shape on
-> a different workload*, and does not transfer.
+> identifies as the cost. The earlier rejection of `hoisted` was a rejection of a _different shape on
+> a different workload_, and does not transfer.
 
-`scripts/spike-aggregate-cost.mjs` (retired) measured what an animated element pays to *resolve* the
+`scripts/spike-aggregate-cost.mjs` (retired) measured what an animated element pays to _resolve_ the
 aggregate, in Chromium, against hand-written controls with identical list lengths. The conclusion:
 
 > Flattening and hoisting reduce cost modestly, but do not remove the dominant expense. The cost
@@ -445,7 +445,7 @@ So the entries themselves cost almost nothing (`narrow` → `native` is +9 ms fo
 the ~1,000 lookups an element performs for positions it will never use.
 
 **Hoisting is not behaviour-preserving, and the divergence is inherent.** A parity matrix over the
-control scopes shows `hoisted` differing from `jumi` in exactly the cases where a control is *shared*
+control scopes shows `hoisted` differing from `jumi` in exactly the cases where a control is _shared_
 across positions:
 
 ```text
@@ -457,7 +457,7 @@ two slots, both controlled    0.5s ×101     2 distinct     DIFFERS
 global control set inline     0.75s ×101    2 distinct     DIFFERS
 ```
 
-In `jumi` every position reads the *shared* attribute-scoped variable, so a global control moves all
+In `jumi` every position reads the _shared_ attribute-scoped variable, so a global control moves all
 101 of them. Hoisted, only the active slot's chain is declared, so the other 100 fall back to a
 literal. A position cannot be cheap and identical at once — cheap means its fallback is a literal,
 identical means its fallback is the shared control. The divergence is harmless today only because an
@@ -469,7 +469,7 @@ semantic fork rather than a transparent optimisation, and not a trade to take ca
 
 **And it is not a bug in Jumi's output.** With the chain correctly hoisted and 909 declarations moved
 off the aggregate, the cost stays in the hundreds of milliseconds. Reducing it means reducing the
-number of positions an element resolves — a change to what a slot universe *is*, not to how one is
+number of positions an element resolves — a change to what a slot universe _is_, not to how one is
 written down.
 
 That sentence is the one the shipped hoist acts on, which is why this section is annotated rather than

@@ -15,12 +15,12 @@ Waited for Playwright code
 
 **It works — all four boxes are correct!**
 
-| Box | Stops | Measured | Behavior |
-|---|---|---|---|
-| **A** | 100% only | `40 → 40 → 40 → 41.6 → 43.2 … → 98.4` | ✅ holds 40 at the foreign 5% stop, then smooth 40→100 |
-| **B** | 5% only | `35 → 30 → 20 → 20.5 → 21 … → 39.5 → 40` | ✅ dips to 20 at 5%, then eases back to 40 |
-| **C** | both | `35 → 30 → 20 → 22.1 … → 97.9 → 100` | ✅ clean 40→20→100 |
-| **D** | neither | `40 → 40 → … → 40` | ✅ holds at rest the whole time |
+| Box   | Stops     | Measured                                 | Behavior                                               |
+| ----- | --------- | ---------------------------------------- | ------------------------------------------------------ |
+| **A** | 100% only | `40 → 40 → 40 → 41.6 → 43.2 … → 98.4`    | ✅ holds 40 at the foreign 5% stop, then smooth 40→100 |
+| **B** | 5% only   | `35 → 30 → 20 → 20.5 → 21 … → 39.5 → 40` | ✅ dips to 20 at 5%, then eases back to 40             |
+| **C** | both      | `35 → 30 → 20 → 22.1 … → 97.9 → 100`     | ✅ clean 40→20→100                                     |
+| **D** | neither   | `40 → 40 → … → 40`                       | ✅ holds at rest the whole time                        |
 
 The `calc-size(var(--jumi-width), size)` fallback gives foreign stops exactly the "none" semantic we wanted: **an unset stop holds at the element's resting width** instead of leaking `0` or ramping to intrinsic. That's your idea, and it's the fix.
 

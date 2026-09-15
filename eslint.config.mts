@@ -214,12 +214,18 @@ const storybookConfig = defineConfig({
   plugins: { storybookPlugin: storybookPlugin as any },
 })
 
-// Reads the options from `.prettierrc` rather than restating them here, so the file stays the
+// Reads the options from `prettier.config.mjs` rather than restating them here, so the file stays the
 // single source of truth. Kept last: it owns formatting, and nothing after it should re-enable
 // a rule that disagrees with Prettier.
+//
+// `EXT.TYPE_DEFINITION` used to be ignored here, and that is the one thing `src/types/index.ts`
+// needed to be "lint-clean but Prettier-dirty" — ESLint reported it quiet while `prettier --check`
+// disagreed, and it was the single largest file in the formatting sweep (2,959 lines) because
+// nothing had ever formatted it. Only `*.d.ts` and `*.tsbuildinfo` stay out now, which are
+// declarations and build output rather than source.
 const prettierConfig = defineConfig({
   files: [EXT.JS, EXT.MODULE, EXT.COMMONJS, EXT.TS],
-  ignores: [EXT.DEFINITION_FILES, EXT.TYPE_DEFINITION],
+  ignores: [EXT.DEFINITION_FILES],
   plugins: { prettier },
   rules: {
     'prettier/prettier': 'warn',

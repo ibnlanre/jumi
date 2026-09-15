@@ -37,7 +37,28 @@
   "[jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "prettier.enable": true
+  }, // CSS, HTML, Markdown and YAML are the same case as JSON: ESLint either ignores them (`**/*.css`
+  // is in its ignores, and nothing registers a parser for YAML) or cannot parse them (HTML, which it
+  // treats as JavaScript), so with the built-ins off they had no formatter at all. Every one of them
+  // is Prettier's to own, which is also what `prettier --check .` now asserts across the repository.
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "prettier.enable": true
   },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "prettier.enable": true
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "prettier.enable": true
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "prettier.enable": true
+  },
+  "css.format.enable": false,
+  "html.format.enable": false,
   "prettier.enable": false,
   "editor.codeActionsOnSave": {
     "source.addMissingImports.ts": "always",

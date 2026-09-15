@@ -17,23 +17,23 @@ engineering/
 
 ## What lives where
 
-| File | Why it is here |
-| --- | --- |
-| `architecture/aggregate-representation.md` | the carrier protocol, the linked representation that was rejected, and the evaluation cost that set the terms of the hoist — annotated where the two conflict |
-| `architecture/carrier-locality.md` | why the aggregate resolves on the carrier, with the browser measurement |
-| `architecture/dependency-gap.md` | what still stands between Jumi and independent emission, and why that is a product decision |
-| `architecture/effect-model.md` | what an effect is mechanically — one element, one keyframe timeline |
-| `architecture/instances.md` | the one derivation of a motion instance from a rule, the two conflation defects that made it a rule rather than a convention, and the test that holds it |
-| `architecture/phrases.md` | the shipped phrase grammar, and the host value-parser constraints it works within |
-| `decisions/hooks-proposal.md` | a lifecycle-hooks proposal that was never implemented |
-| `decisions/segment-easing.md` | segment easing as a phrase-valued `animation-timing-function-*` control: the probe (7 measurements) that fixes its semantics, the leak that decides where the specialization is written, the cost of addressed against unaddressed, and the finding that the phrase must never reach the control chain — proposal, not built |
-| `decisions/CTO.md` | the running record of architectural direction and its approvals |
-| `research/deployment.md` | the Vercel contract, and the 2026-09-12 diagnosis of a stale deploy |
-| `research/scanner-inventory.md` | candidate discovery: what the host hands a matcher, per candidate |
-| `research/upstream-limitation.md` | a parked investigation into a host limitation |
-| `research/view-transitions.md` | the View Transition API measured against the emitted model: the composition retargets onto the pseudo-elements and cannot be reached from the source element, the incoming document governs the tree cross-document, the group stays browser-owned, and the hoist means the slot publication must be re-materialized alongside the composition — then the shipped emitter, its eleven invariants, and the falsifications that hold them |
-| `research/style-cost.md` | what the aggregate costs DevTools: 863 KB of protocol response for one selected element at 228 slots, 82% of it the declaration payload, and the hoisted representation that removes 61% of it and 60% of the recalc — confirmed by hand at 47 s → 2.7 s in the Inspector, and by the shipped build at 965,683 → 419,673 bytes with 228/228 live animations unchanged |
-| `roadmap/migration.md` | the migration: its phases, what closed, and what was decided along the way |
+| File                                       | Why it is here                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `architecture/aggregate-representation.md` | the carrier protocol, the linked representation that was rejected, and the evaluation cost that set the terms of the hoist — annotated where the two conflict                                                                                                                                                                                                                                                                           |
+| `architecture/carrier-locality.md`         | why the aggregate resolves on the carrier, with the browser measurement                                                                                                                                                                                                                                                                                                                                                                 |
+| `architecture/dependency-gap.md`           | what still stands between Jumi and independent emission, and why that is a product decision                                                                                                                                                                                                                                                                                                                                             |
+| `architecture/effect-model.md`             | what an effect is mechanically — one element, one keyframe timeline                                                                                                                                                                                                                                                                                                                                                                     |
+| `architecture/instances.md`                | the one derivation of a motion instance from a rule, the two conflation defects that made it a rule rather than a convention, and the test that holds it                                                                                                                                                                                                                                                                                |
+| `architecture/phrases.md`                  | the shipped phrase grammar, and the host value-parser constraints it works within                                                                                                                                                                                                                                                                                                                                                       |
+| `decisions/hooks-proposal.md`              | a lifecycle-hooks proposal that was never implemented                                                                                                                                                                                                                                                                                                                                                                                   |
+| `decisions/segment-easing.md`              | segment easing as a phrase-valued `animation-timing-function-*` control: the probe (7 measurements) that fixes its semantics, the leak that decides where the specialization is written, the cost of addressed against unaddressed, and the finding that the phrase must never reach the control chain — proposal, not built                                                                                                            |
+| `decisions/CTO.md`                         | the running record of architectural direction and its approvals                                                                                                                                                                                                                                                                                                                                                                         |
+| `research/deployment.md`                   | the Vercel contract, and the 2026-09-12 diagnosis of a stale deploy                                                                                                                                                                                                                                                                                                                                                                     |
+| `research/scanner-inventory.md`            | candidate discovery: what the host hands a matcher, per candidate                                                                                                                                                                                                                                                                                                                                                                       |
+| `research/upstream-limitation.md`          | a parked investigation into a host limitation                                                                                                                                                                                                                                                                                                                                                                                           |
+| `research/view-transitions.md`             | the View Transition API measured against the emitted model: the composition retargets onto the pseudo-elements and cannot be reached from the source element, the incoming document governs the tree cross-document, the group stays browser-owned, and the hoist means the slot publication must be re-materialized alongside the composition — then the shipped emitter, its eleven invariants, and the falsifications that hold them |
+| `research/style-cost.md`                   | what the aggregate costs DevTools: 863 KB of protocol response for one selected element at 228 slots, 82% of it the declaration payload, and the hoisted representation that removes 61% of it and 60% of the recalc — confirmed by hand at 47 s → 2.7 s in the Inspector, and by the shipped build at 965,683 → 419,673 bytes with 228/228 live animations unchanged                                                                   |
+| `roadmap/migration.md`                     | the migration: its phases, what closed, and what was decided along the way                                                                                                                                                                                                                                                                                                                                                              |
 
 ## Rules of the split
 
@@ -70,7 +70,7 @@ Retired 2026-09-12, with the conclusions kept in `architecture/aggregate-represe
 
 `spike-shared-runtime` was retired under the same rule the day it was written. It answered its
 question — module identity across the `@plugin` boundary — and the answer removed the design it was
-probing, because a shared instance turned out to be one per *process* rather than one per
+probing, because a shared instance turned out to be one per _process_ rather than one per
 stylesheet. The conclusion is in `architecture/carrier-locality.md`.
 
 Kept, because they still reproduce current behaviour: `spike-candidates` (candidate parsing and
@@ -83,10 +83,10 @@ larger version of it: it probes the platform, not Jumi, and the platform facts i
 declared on the source element cannot reach them, that an author animation on
 `::view-transition-group(name)` replaces a shared element's travel — are not facts about a design
 Jumi might abandon. Its fixtures are templated by the harness's own server rather than duplicated
-per variant, and it is the *only* spike here that needs a served origin: a cross-document transition
+per variant, and it is the _only_ spike here that needs a served origin: a cross-document transition
 requires a same-origin navigation, and `file://` cannot provide one.
 
-`spike-vt-syntax` is the same workstream one layer down, and it probes the *host* rather than the
+`spike-vt-syntax` is the same workstream one layer down, and it probes the _host_ rather than the
 platform: given a spelling for "animate the old side of `hero` with this motion", does Tailwind resolve
 the candidate, what does it hand Jumi's matcher, and does a label written in one class resolve to the
 slots named in another. It compiles one candidate per build on purpose — a candidate the host drops
@@ -105,9 +105,9 @@ rebuilding it — shared, so the harnesses cannot disagree about what they are m
 exactly the failure mode the carrier-protocol spikes died of.
 
 `measure-real-page` is the fourth side, and it is the one that closes the question. The three above
-price a *fixture*: `spike-cdp-cost` compiles its own slots from the real plugin, so its activating
+price a _fixture_: `spike-cdp-cost` compiles its own slots from the real plugin, so its activating
 selectors are escaped arbitrary values averaging 57 characters against the shipped catalogue's 22 —
-a difference that decides the conclusion, because the frontend's cost tracks selector *text*. So the
+a difference that decides the conclusion, because the frontend's cost tracks selector _text_. So the
 real page gets its own instrument, which serves a built site, reads every animating element's live
 positions, and inspects one element through CDP. It has two modes and they depend on different things:
 by default it asserts what needs no baseline at all — every element resolves its own effect, and every

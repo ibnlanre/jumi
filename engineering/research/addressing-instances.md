@@ -13,7 +13,7 @@ The CTO's ruling, as implemented:
 ```
 
 Item 1 is in `src/` and measured below. Item 2 is unchanged and still a warning. Item 4's semantics are
-unchanged — but its *warning* has no subject, and the reason is a measurement error in this file's own
+unchanged — but its _warning_ has no subject, and the reason is a measurement error in this file's own
 first version, recorded under "Correction" below.
 
 ## Finding 1 — a token is a property or a name, and the build says which
@@ -23,9 +23,9 @@ The corpus is chosen so the two readings are distinguishable: `animate-scale-110
 last control is the tell — if the name `scale` also reaches the rotate motion, the author's own control
 for it loses.
 
-| | names | durations |
-|---|---|---|
-| before (one namespace) | `jumi-scale-d38, jumi-rotate-3zWYd` | **1s, 1s** |
+|                               | names                               | durations    |
+| ----------------------------- | ----------------------------------- | ------------ |
+| before (one namespace)        | `jumi-scale-d38, jumi-rotate-3zWYd` | **1s, 1s**   |
 | after (structural precedence) | `jumi-scale-d38, jumi-rotate-3zWYd` | **1s, 0.4s** |
 
 Before, `animation-duration-400/rotate` was ignored: the labelled slot's link to `--jumi-scale-…` sat
@@ -53,9 +53,9 @@ anything else                                              →  --jumi-label-fli
 - A name that is a structural address is recorded (`--jumi-name-<hash>-shadowed`) instead of linked, so
   the stylesheet carries no address nothing fills.
 
-**Rejected models.** *Explicit-label precedence* ("`/scale` reaches the labelled motion because a label
+**Rejected models.** _Explicit-label precedence_ ("`/scale` reaches the labelled motion because a label
 exists on this element") needs the element's class list, which the matcher never sees and the finalizer
-cannot reconstruct. *A disambiguation spelling* is new public syntax, which the ruling rules out. Writing
+cannot reconstruct. _A disambiguation spelling_ is new public syntax, which the ruling rules out. Writing
 **both** namespaces from one control is also wrong, and measurable: the label link would then be filled
 for the colliding token and the hijack would return unchanged — which is why the classification has to
 happen before the declaration is written.
@@ -81,10 +81,10 @@ twice one instance.
 **The plain-CSS question** (no Jumi involved): can two animations of one compound property both take
 effect? Sampled at 50% of a one-second animation, under Jumi's default composition and with `add`:
 
-| property | `animation-composition: replace` | `animation-composition: add` |
-|---|---|---|
-| `filter` | `brightness(1.8024)` — **blur gone** | `blur(8.81442px) brightness(1.8024)` |
-| `transform` | one matrix — the later animation wins | a combined matrix |
+| property    | `animation-composition: replace`      | `animation-composition: add`         |
+| ----------- | ------------------------------------- | ------------------------------------ |
+| `filter`    | `brightness(1.8024)` — **blur gone**  | `blur(8.81442px) brightness(1.8024)` |
+| `transform` | one matrix — the later animation wins | a combined matrix                    |
 
 So splitting a compound into independently timed members would make a label change rendering: under the
 default, half the value disappears. That is the ruling's "keep compounds atomic", and it is what the
@@ -118,11 +118,11 @@ Tailwind drops the whole candidate silently — no rule, no warning. Only `anima
 compiled, which made the page animate anyway and look correct. The measurements built on it were
 therefore about a member that was never emitted:
 
-| corpus | earlier reading | actual |
-|---|---|---|
-| `animate-filter-blur-4` alone | "compiles, one member" | **dropped — no rule** |
-| `animate-filter-blur-4/foo` | "the label is discarded" | the label never existed |
-| `animate-filter-blur-[4px]/foo` | — | label declared, compound answers to it, `0.5s` |
+| corpus                          | earlier reading          | actual                                         |
+| ------------------------------- | ------------------------ | ---------------------------------------------- |
+| `animate-filter-blur-4` alone   | "compiles, one member"   | **dropped — no rule**                          |
+| `animate-filter-blur-4/foo`     | "the label is discarded" | the label never existed                        |
+| `animate-filter-blur-[4px]/foo` | —                        | label declared, compound answers to it, `0.5s` |
 
 `engineering/research/addressing.md` finding 4 and its table row carried the same error and are corrected
 in place. The lesson is the one this repository keeps paying for: a probe that does not print what
@@ -136,15 +136,15 @@ Neither was in the ruling, and both were found by the permanent assertions rathe
 the change — the first because a new arm was added to `behaviour:check`, the second because that arm's fix
 broke a range check that had been passing for the wrong reason.
 
-**A named instance also ran the unnamed one.** `hoist` published the definition's base key *in addition to*
+**A named instance also ran the unnamed one.** `hoist` published the definition's base key _in addition to_
 every name a rule wrote down, on the reasoning that a rule activating a definition could mean either
-instance. It cannot: the unnamed instance is what a *different* candidate declared. Measured, with
+instance. It cannot: the unnamed instance is what a _different_ candidate declared. Measured, with
 `animate-scale-110` and `animate-scale-110/loop` in one sheet, an element carrying only the named candidate
 resolved `jumi-scale-d38, jumi-scale-d38` — the keyframe twice, at `0.9s` and `1s` — and which one the
 browser kept depended on the aggregate's position order: `0.9s, 1s` in one candidate order, `1s, 0.9s` in
 the other. Now a rule publishes the instances it named, or the definition's own when it named none
-(`instanceKeys`, `src/helpers/carriers/instance.ts`), and the new assertion holds: *candidate order cannot
-decide which name wins*.
+(`instanceKeys`, `src/helpers/carriers/instance.ts`), and the new assertion holds: _candidate order cannot
+decide which name wins_.
 
 **The range publication ranged the definition, not the instance.** `rangeReadings` read the slot off the
 activation alone, so `animation-range-entry:animate-opacity-[0:0|100:1]/reveal` published
@@ -173,6 +173,6 @@ not here: an unused name warning"): a control configures motion and does not cre
 `animation-duration-500/reveal` with no `reveal` is as inert as `animation-duration-500` — and a
 conditional motion beside an unconditional named control (`motion-safe:animate-fade-in/reveal`) is a real
 pattern, not an authoring mistake. The workable half of that signal is the one shipped here: the address
-that *cannot* work — a name a property already owns — is reported, because there is a specific remedy.
+that _cannot_ work — a name a property already owns — is reported, because there is a specific remedy.
 
 ---

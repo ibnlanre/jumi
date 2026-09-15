@@ -11,7 +11,9 @@ A view transition animates the browser's snapshot of an element rather than the 
 incoming one, and Jumi handles the generated view transition pseudo-elements for you.
 
 ```html
-<div class="view-transition-old/hero:animate-fade-out view-transition-new/hero:animate-fade-in">
+<div
+  class="view-transition-old/hero:animate-fade-out view-transition-new/hero:animate-fade-in"
+>
   hero
 </div>
 ```
@@ -22,7 +24,9 @@ else:
 
 ```html
 <!-- the card leaves by shrinking and arrives by growing -->
-<div class="view-transition-old/card:animate-scale-90 view-transition-new/card:animate-scale-110">
+<div
+  class="view-transition-old/card:animate-scale-90 view-transition-new/card:animate-scale-110"
+></div>
 ```
 
 Either side on its own is fine. With only `view-transition-new/…`, the outgoing side keeps the browser's
@@ -31,13 +35,15 @@ own cross-fade, which is usually what you want when the old state simply disappe
 ## The name is a claim on the document
 
 Choosing a name is not labelling the element, because the name is the only thing linking the two halves
-of this. The browser addresses a snapshot *only* by name — `::view-transition-old(hero)` is the one
+of this. The browser addresses a snapshot _only_ by name — `::view-transition-old(hero)` is the one
 selector there is for it — so a candidate attaches its motion to whatever carries that name in the
 document, including an element it has never seen:
 
 ```css
 /* elsewhere in the same document — this element animates with Jumi's motion as well */
-.card { view-transition-name: hero; }
+.card {
+  view-transition-name: hero;
+}
 ```
 
 Nothing about that is visible at the call site, in either direction, so the rule is worth stating plainly:
@@ -55,7 +61,9 @@ a switch between this and the browser's own behaviour.
 The two sides are independent, so each takes its own controls:
 
 ```html
-<div class="view-transition-old/hero:animate-fade-out view-transition-old/hero:animation-duration-300 view-transition-new/hero:animate-fade-in view-transition-new/hero:animation-duration-500">
+<div
+  class="view-transition-old/hero:animate-fade-out view-transition-old/hero:animation-duration-300 view-transition-new/hero:animate-fade-in view-transition-new/hero:animation-duration-500"
+></div>
 ```
 
 And as everywhere else in Jumi, a control on its own does nothing — it configures a duration for an
@@ -63,7 +71,7 @@ element that would need a motion to have one:
 
 ```html
 <!-- configures duration only; this element does not participate -->
-<div class="view-transition-old/hero:animation-duration-300">
+<div class="view-transition-old/hero:animation-duration-300"></div>
 ```
 
 ## When it applies
@@ -71,7 +79,9 @@ element that would need a motion to have one:
 Ordinary conditional variants work, and each one applies to the side it is written on:
 
 ```html
-<div class="sm:view-transition-old/hero:animate-fade-out view-transition-new/hero:animate-fade-in">
+<div
+  class="sm:view-transition-old/hero:animate-fade-out view-transition-new/hero:animate-fade-in"
+></div>
 ```
 
 Above the breakpoint both sides are yours. Below it the outgoing side keeps the browser's own
@@ -84,7 +94,9 @@ A `motion-safe:` motion runs for readers who have not asked for less motion, and
 in the transition either way:
 
 ```html
-<div class="motion-safe:view-transition-old/hero:animate-fade-out motion-safe:view-transition-new/hero:animate-fade-in">
+<div
+  class="motion-safe:view-transition-old/hero:animate-fade-out motion-safe:view-transition-new/hero:animate-fade-in"
+></div>
 ```
 
 `motion-reduce:` is not available here. Jumi has already decided that its own view transition motion
@@ -97,7 +109,9 @@ Everything above works within one page. For a navigation — one document to ano
 the way the platform requires, and nothing else changes:
 
 ```css
-@view-transition { navigation: auto; }
+@view-transition {
+  navigation: auto;
+}
 ```
 
 ## When Jumi cannot honour a candidate

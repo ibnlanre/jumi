@@ -2,8 +2,8 @@
 
 Found while measuring motion paths (`engineering/research/motion-paths.md`): a phrase is not a CSS value
 of any type, Tailwind validates an arbitrary value against the matcher's declared `type` **before** the
-matcher runs, so a typed matcher never receives one. The claim Jumi makes — *a phrase is how one property
-gets its own frames* — was therefore false for part of the table, and silently so.
+matcher runs, so a typed matcher never receives one. The claim Jumi makes — _a phrase is how one property
+gets its own frames_ — was therefore false for part of the table, and silently so.
 
 Chromium/Node. The instrument is now the gate itself — `pnpm phrase:check`, stage 8 of 16
 (`scripts/phrase-check.mjs` + `scripts/phrase-check/probe.mjs`). The spike this grew out of was removed
@@ -15,12 +15,12 @@ A **synthetic** plugin (no Jumi import, so a result cannot be a Jumi behaviour i
 handlers under one prefix. Each brands what it emits, so a compiled rule says which handler accepted the
 value:
 
-| registered | `[4rem]` | `[50%]` | `[abc]` | `[0:0%\|100:100%]` |
-| --- | --- | --- | --- | --- |
-| `type: 'length'` only | emits (typed) | refused | refused | **refused** |
-| `'length'` then `'any'` + phrase check | emits (typed) | refused | refused | **emits (phrase)** |
-| the same two, **reversed** | identical | identical | identical | identical |
-| `type: 'any'` only | emits | emits | **emits** ✗ | emits |
+| registered                             | `[4rem]`      | `[50%]`   | `[abc]`     | `[0:0%\|100:100%]` |
+| -------------------------------------- | ------------- | --------- | ----------- | ------------------ |
+| `type: 'length'` only                  | emits (typed) | refused   | refused     | **refused**        |
+| `'length'` then `'any'` + phrase check | emits (typed) | refused   | refused     | **emits (phrase)** |
+| the same two, **reversed**             | identical     | identical | identical   | identical          |
+| `type: 'any'` only                     | emits         | emits     | **emits** ✗ | emits              |
 
 Two conclusions, both load-bearing:
 
@@ -61,15 +61,15 @@ decline it.
 The two claims, asked of **every** matcher in `src/properties/tween.ts` whose type lacks `'any'` (the list
 is read out of the source, not kept here — a hand-kept list would stop checking the thing it exists for):
 
-| claim | 161 typed matchers |
-| --- | --- |
-| a valid phrase emits | **0 refused** (was: every `['length', 'percentage']` and `'color'` matcher) |
-| an invalid scalar is still refused | **1 exception, and it is Tailwind's**: `animate-font-family-[!]` emits `--jumi-font-family-x: !` from the *typed* handler, because Tailwind's `family-name` grammar accepts it |
+| claim                              | 161 typed matchers                                                                                                                                                             |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| a valid phrase emits               | **0 refused** (was: every `['length', 'percentage']` and `'color'` matcher)                                                                                                    |
+| an invalid scalar is still refused | **1 exception, and it is Tailwind's**: `animate-font-family-[!]` emits `--jumi-font-family-x: !` from the _typed_ handler, because Tailwind's `family-name` grammar accepts it |
 
 Four other facts from the same run, worth keeping:
 
 - **Validation was never uniform.** `animate-padding-[abc]`, `animate-rotate-[abc]`, `animate-opacity-[abc]`
-  and `animate-width-[abc]` all *emit* today, because those matchers' type lists contain `'any'` — so the
+  and `animate-width-[abc]` all _emit_ today, because those matchers' type lists contain `'any'` — so the
   inconsistency the fix removes was two-sided: some families refused phrases, others refused nothing.
   Tightening the loose ones is a separate decision, not part of this change, and no page can be relying on
   a phrase that never emitted.
@@ -77,7 +77,7 @@ Four other facts from the same run, worth keeping:
   grammar and emits. The value is left to the browser, exactly as an arbitrary value is. That boundary is
   deliberate and now documented.
 - **An empty rule is a refusal.** Tailwind writes the selector and leaves the body empty when a handler
-  declines, so a sweep that counts *rules* reports refused candidates as emitted — which is how
+  declines, so a sweep that counts _rules_ reports refused candidates as emitted — which is how
   `animate-font-family` first looked like a leak.
 - **A `]` inside a character class closes it.** The class-token reader started as
   `/^\.((?:\\.|[^\s.:#[]>+~])+)/`, whose character class ended at the `]` — matching nothing, and reading
@@ -89,14 +89,14 @@ Four other facts from the same run, worth keeping:
 `pnpm phrase:check` is **stage 8 of 16**. The spike it grew out of is gone: one instrument in the gate
 beats two that can drift, and the research narrative lives here. It holds:
 
-| | |
-| --- | --- |
-| two handlers, one prefix | a synthetic plugin, importing nothing from Jumi, so a result cannot be a Jumi behaviour in disguise |
-| registration order is irrelevant | the same pair registered in the other order, asserted equal — the architecture rests on this |
-| a scalar keeps the host's check | `[4rem]` → typed handler, `[abc]` → **no rule** |
-| a phrase takes the bypass | phrase → phrase handler |
-| a named value stays typed | the phrase handler declares no `values`, so it cannot claim one |
-| every typed tween matcher | **derived from `src/properties/tween.ts` on each run** — matcher 162 is covered the day it is written, not the day someone updates a count |
+|                                  |                                                                                                                                            |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| two handlers, one prefix         | a synthetic plugin, importing nothing from Jumi, so a result cannot be a Jumi behaviour in disguise                                        |
+| registration order is irrelevant | the same pair registered in the other order, asserted equal — the architecture rests on this                                               |
+| a scalar keeps the host's check  | `[4rem]` → typed handler, `[abc]` → **no rule**                                                                                            |
+| a phrase takes the bypass        | phrase → phrase handler                                                                                                                    |
+| a named value stays typed        | the phrase handler declares no `values`, so it cannot claim one                                                                            |
+| every typed tween matcher        | **derived from `src/properties/tween.ts` on each run** — matcher 162 is covered the day it is written, not the day someone updates a count |
 
 Falsified by disabling the phrase route: 161 of 161 refused, 9/11 assertions failed. The failure message
 was 200 lines of matcher names, which is a stage nobody reads — it now reports the count and five names.
@@ -107,7 +107,7 @@ was 200 lines of matcher names, which is a stage nobody reads — it now reports
 adversarial corpus: scalars (`#123456`, `23deg`, `calc(1px:2px)`), values with colons that are not phrases
 (`url(data:image/png;base64,…)`, `color-mix(in srgb, red 50%, blue)`, `50%:0`, `a:b`), partial and
 malformed syntax (`:` , `0:`, `|`, `0:50%|`, `0:50%||100:1`), a value with a leading number and no colon,
-and — from the other direction — a phrase *inside* a value (`url(0:0%|100:100%)`), which must not make the
+and — from the other direction — a phrase _inside_ a value (`url(0:0%|100:100%)`), which must not make the
 value a phrase. Plus the end-to-end version on the real table in the gate: a data URL, a colour function
 and a colon-bearing `calc()` all keep the scalar route.
 

@@ -97,7 +97,7 @@ A named instance's key is `<units>-<name>-<id>-<attribute>`, and an unnamed one 
 ```
 
 The name is a word in the emitted stylesheet, which is what a person reads while debugging, and the prefix is
-what makes it *exact*: the reader takes the name by the count it is given, so the parse boundary is a fact
+what makes it _exact_: the reader takes the name by the count it is given, so the parse boundary is a fact
 about the shape rather than about the contents. One format, stated once, in `instanceKey` in
 `src/helpers/carriers/instance.ts` — imported by the writer in `src/core` and by the readers, rather than
 spelled three times.
@@ -127,7 +127,7 @@ it. The repo keeps both honest: the probe checks the model's escaping against a 
 
 **Both gates keep it.** `src/core/slot-key.test.ts` holds the round trip over the whole vocabulary with
 adversarial names, Unicode and characters CSS escapes, and `behaviour-check.mjs` holds two arms for the shapes
-the format makes possible: a name that *reads* like a part of the shorthand (`/flick-animation-duration`, where
+the format makes possible: a name that _reads_ like a part of the shorthand (`/flick-animation-duration`, where
 a pass that guessed the part read `flick`, published the hoist under a key nothing fills, and the motion
 silently never ran), and a name the stylesheet escapes. Both arms found real defects before they shipped — the
 second exposed a reader whose attribute scan was greedy enough to swallow a chain's fallback, and two label

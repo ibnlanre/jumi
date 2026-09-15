@@ -23,7 +23,9 @@ Simple property animations generate a `to` keyframe. The starting point comes fr
 `auto`, `min-content`, `max-content` and `fit-content` interpolate only with `interpolate-size: allow-keywords`. Jumi does not set it for you, because the declaration is **inherited**: setting it on an element opts in everything beneath it, and that should be your decision rather than a side effect of animating something.
 
 ```html
-<div class="interpolate-size-allow-keywords animate-width-auto w-[200px]">Keyword target</div>
+<div class="interpolate-size-allow-keywords animate-width-auto w-[200px]">
+  Keyword target
+</div>
 ```
 
 Without it the keyword still applies, but as a discrete change — the property holds its starting value and flips at the midpoint. `interpolate-size-numeric-only` stops a subtree inheriting the switch.
@@ -31,18 +33,22 @@ Without it the keyword still applies, but as a discrete change — the property 
 A value that carries its own intrinsic size needs no switch at all:
 
 ```html
-<div class="animate-width-[calc-size(auto,size+2rem)]">Arbitrary intrinsic value</div>
+<div class="animate-width-[calc-size(auto,size+2rem)]">
+  Arbitrary intrinsic value
+</div>
 ```
 
 ## Separate properties, separate rhythms
 
 ```html
-<div class="animate-rotate-[180deg]
+<div
+  class="animate-rotate-[180deg]
   animate-scale-[0.75]
   animation-duration-[3s]/rotate
   animation-duration-[1s]/scale
   animation-direction-alternate
-  animation-iteration-count-infinite">
+  animation-iteration-count-infinite"
+>
   Two rhythms. One element.
 </div>
 ```
@@ -54,9 +60,11 @@ The `/rotate` and `/scale` modifiers target those property slots. A global contr
 Jumi assembles parts of compound CSS values through custom properties. For example, blur and brightness contribute to the same filter:
 
 ```html
-<div class="animate-filter-blur-[4px]
+<div
+  class="animate-filter-blur-[4px]
   animate-filter-brightness-[1.2]
-  animation-duration-[900ms]/filter">
+  animation-duration-[900ms]/filter"
+>
   A softer glow.
 </div>
 ```
@@ -69,10 +77,14 @@ An effect can animate several properties. Combining two effects that both write 
 
 ```html
 <div class="animate-fade-in">
-  <div class="animate-spinning
+  <div
+    class="animate-spinning
     animation-duration-[8s]
     animation-timing-function-linear
-    animation-iteration-count-infinite">✳</div>
+    animation-iteration-count-infinite"
+  >
+    ✳
+  </div>
 </div>
 ```
 
@@ -81,9 +93,11 @@ An effect can animate several properties. Combining two effects that both write 
 A motion path is a property you declare and a property you animate, and keeping those two apart is the whole of it. The path is where the motion happens; the distance is how far along it the element has got. Declare the path, animate the distance:
 
 ```html
-<div class="[offset-path:path('M0,0_L200,0_L200,200')]
+<div
+  class="[offset-path:path('M0,0_L200,0_L200,200')]
   animate-offset-distance-100
-  animation-duration-2000">
+  animation-duration-2000"
+></div>
 ```
 
 The geometry is arbitrary, so anything the platform accepts is available: `path()`, `ray()`, `circle()`, `ellipse()`, `inset()`, `polygon()`, and the box keywords `border-box`, `padding-box`, `content-box`. `offset-path:border-box` needs no geometry at all — the element travels its own border box.
@@ -91,22 +105,26 @@ The geometry is arbitrary, so anything the platform accepts is available: `path(
 Three properties describe the geometry, and they are written once rather than animated: `offset-path`, `offset-rotate` — `auto` turns the element to follow the tangent — and `offset-anchor`, which decides which point of the element rides the path. All of them are ordinary utilities with an arbitrary value, so nothing new has to be learned:
 
 ```html
-<div class="[offset-path:circle(60px)] [offset-position:50%_50%]
+<div
+  class="[offset-path:circle(60px)] [offset-position:50%_50%]
   [offset-rotate:auto]
   animate-offset-distance-100
   animation-duration-[4s]
-  animation-iteration-count-infinite">
+  animation-iteration-count-infinite"
+></div>
 ```
 
 Because the driver is an ordinary animation, everything else composes with it. Scroll works unchanged:
 
 ```html
-<div class="[offset-path:path('M0,0_L200,0_L200,200')]
+<div
+  class="[offset-path:path('M0,0_L200,0_L200,200')]
   animation-timeline-scroll
-  animation-range-[25%_75%]:animate-offset-distance-100">
+  animation-range-[25%_75%]:animate-offset-distance-100"
+></div>
 ```
 
-**A note for the adventurous.** `offset-path` is itself animatable *between two compatible paths* — the same command list, different coordinates — so a path can morph as it is travelled. Animating it from `none`, though, is a discrete step: the element does not ease onto the path, it appears on it halfway through. Declare the path.
+**A note for the adventurous.** `offset-path` is itself animatable _between two compatible paths_ — the same command list, different coordinates — so a path can morph as it is travelled. Animating it from `none`, though, is a discrete step: the element does not ease onto the path, it appears on it halfway through. Declare the path.
 
 ## CSS still sets the boundaries
 

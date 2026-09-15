@@ -1,10 +1,10 @@
 # View transition orchestration — what is the smallest wrapper worth shipping?
 
-The question: *what is the smallest framework-agnostic orchestration API Jumi can provide around
-`document.startViewTransition()` that eliminates browser lifecycle footguns without owning application state?*
+The question: _what is the smallest framework-agnostic orchestration API Jumi can provide around
+`document.startViewTransition()` that eliminates browser lifecycle footguns without owning application state?_
 
 The framing is accepted: class-only motion is the strongest part of this feature, and the imperative boundary
-is not removable — the browser's contract is *capture old → run the application's mutation → capture new*, and
+is not removable — the browser's contract is _capture old → run the application's mutation → capture new_, and
 no class can say what state to change. What follows is what the boundary costs today, measured, and the
 smallest thing that removes the parts of that cost which are not the author's problem.
 
@@ -13,15 +13,15 @@ Everything below was measured in Chromium 153 this session; the raw numbers live
 
 ## The footguns, each with what it actually does
 
-| # | behaviour | measured | what it looks like to an author |
-| --- | --- | --- | --- |
-| 1 | the update callback is **deferred** to a later rendering update | 52ms after the call on a cold document, 16ms warm | guards keyed on the value the callback sets do not catch a second call in the same task |
-| 2 | a second `startViewTransition` **aborts** the first, and the aborted call's callback **still runs** | `#1`'s `ready` rejects `AbortError`; `#1`'s callback mutates the DOM at 2505ms; `#2` animates | one gesture produces two transitions, and the surviving one animates a boundary the aborted one filled in |
-| 3 | therefore the boundary can be **empty** — the layout changes and nothing animates | reproduced on demand: two `supersede` calls → `old/new(bravo)` **absent**, no animation, `finished` still resolves | "the first click changes layout but doesn't animate" |
-| 4 | `ready` **rejects** in normal operation | `AbortError` when aborted; `InvalidStateError` when the document is hidden | an unhandled rejection in a console that is otherwise asserted clean |
-| 5 | a **hidden document** skips the transition entirely; the callback still runs | `ready` rejects, `finished` resolves | works in a test, not in a background tab |
-| 6 | the pseudo tree **replaces hit-testing** — the click's target becomes `<html>` | `elementsFromPoint` returns a bare `html` for the whole transition | clicks during a transition resolve to nothing unless the app handles them itself |
-| 7 | the tree's lifetime **is** the slowest animation on it | 1s motion ⇒ the page is click-blocked for 1s | motion duration is a UX decision, not a detail |
+| #   | behaviour                                                                                           | measured                                                                                                           | what it looks like to an author                                                                           |
+| --- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| 1   | the update callback is **deferred** to a later rendering update                                     | 52ms after the call on a cold document, 16ms warm                                                                  | guards keyed on the value the callback sets do not catch a second call in the same task                   |
+| 2   | a second `startViewTransition` **aborts** the first, and the aborted call's callback **still runs** | `#1`'s `ready` rejects `AbortError`; `#1`'s callback mutates the DOM at 2505ms; `#2` animates                      | one gesture produces two transitions, and the surviving one animates a boundary the aborted one filled in |
+| 3   | therefore the boundary can be **empty** — the layout changes and nothing animates                   | reproduced on demand: two `supersede` calls → `old/new(bravo)` **absent**, no animation, `finished` still resolves | "the first click changes layout but doesn't animate"                                                      |
+| 4   | `ready` **rejects** in normal operation                                                             | `AbortError` when aborted; `InvalidStateError` when the document is hidden                                         | an unhandled rejection in a console that is otherwise asserted clean                                      |
+| 5   | a **hidden document** skips the transition entirely; the callback still runs                        | `ready` rejects, `finished` resolves                                                                               | works in a test, not in a background tab                                                                  |
+| 6   | the pseudo tree **replaces hit-testing** — the click's target becomes `<html>`                      | `elementsFromPoint` returns a bare `html` for the whole transition                                                 | clicks during a transition resolve to nothing unless the app handles them itself                          |
+| 7   | the tree's lifetime **is** the slowest animation on it                                              | 1s motion ⇒ the page is click-blocked for 1s                                                                       | motion duration is a UX decision, not a detail                                                            |
 
 7 is the one already settled and it belongs to the emission. 6 is a demo-level concern. **1–5 are the
 orchestration surface**, and none of them is discoverable from the API's shape.
@@ -33,7 +33,10 @@ The surface as decided, with one question still open at the end of this note:
 ```ts
 type ViewTransitionOutcome =
   | { transitioned: true }
-  | { transitioned: false, reason: 'unsupported' | 'hidden' | 'in-flight' | 'aborted' }
+  | {
+      transitioned: false
+      reason: 'unsupported' | 'hidden' | 'in-flight' | 'aborted'
+    }
 
 type ViewTransitionOptions = { concurrency?: 'coalesce' | 'supersede' }
 
@@ -48,7 +51,7 @@ Its whole body is the ~25 lines prototyped this session, and the guarantees it c
 - **the update always runs, exactly once per call** — the wrapper never drops the caller's mutation, because
   dropping it desynchronises the DOM from the application's intent. This is what keeps it out of the state
   business.
-- **at most one transition in flight, and the second call decides by *when* it arrives.** Two calls in one task
+- **at most one transition in flight, and the second call decides by _when_ it arrives.** Two calls in one task
   are an echo and are coalesced into the one running; a call from a later task is a gesture and supersedes. This
   is `auto`, the default, and the section below is the measurement it rests on.
 - **the update is inside the boundary the caller gets animated**, because the wrapper passes its own callback.
@@ -70,7 +73,7 @@ Two deliberate silences, argued rather than overlooked:
 ### Why the default is `auto`, and what "the same interaction" means
 
 The first default was `coalesce` for every in-flight call, on the argument that starting a second transition is
-the dangerous operation. Two measurements narrowed that. The danger is real but *specific*: the empty boundary
+the dangerous operation. Two measurements narrowed that. The danger is real but _specific_: the empty boundary
 needs the mutation to live in the **aborted** call's callback, and a supersede that lands once the first
 transition is already running fills its boundary correctly (probed with a same-task pair and a 200ms gap). And
 coalescing an in-flight call does **not** necessarily cost the reader the animation, which is what the argument
@@ -80,21 +83,21 @@ What survives is a shape the wrapper can detect: two calls in one task cannot be
 is an echo and should not be allowed to abort anything. A call from a later task can be a gesture, and should
 win. `pnpm spike:vt-concurrency` measures three candidate markers against seven dispatch shapes:
 
-| shape | microtask | timeout | message |
-| --- | --- | --- | --- |
-| duplicate writer, one task | same | same | same |
-| call from `queueMicrotask` | **later ✗** | same | same |
-| call from `setTimeout(…, 0)` | later | later | later |
-| caller's timer queued *before* the call | later | **same ✗** | **same ✗** |
-| second real click | later | later | later |
-| `dblclick` | later | later | later |
-| keyboard auto-repeat | later | later | later |
+| shape                                   | microtask   | timeout    | message    |
+| --------------------------------------- | ----------- | ---------- | ---------- |
+| duplicate writer, one task              | same        | same       | same       |
+| call from `queueMicrotask`              | **later ✗** | same       | same       |
+| call from `setTimeout(…, 0)`            | later       | later      | later      |
+| caller's timer queued _before_ the call | later       | **same ✗** | **same ✗** |
+| second real click                       | later       | later      | later      |
+| `dblclick`                              | later       | later      | later      |
+| keyboard auto-repeat                    | later       | later      | later      |
 
-Clearing in a microtask is wrong: a promise-deferred echo is still an echo. Clearing in a later *task* gets all
+Clearing in a microtask is wrong: a promise-deferred echo is still an echo. Clearing in a later _task_ gets all
 five of the cases that matter right, and `setTimeout(…, 0)` scores identically on every shape — but a timer is a
 duration and this is a boundary, so the clear is a `MessageChannel` post, which is a task and nothing else.
 
-The one shape no marker can win is a caller's own macrotask queued *before* the call: that write reads as the
+The one shape no marker can win is a caller's own macrotask queued _before_ the call: that write reads as the
 same interaction and is coalesced. It fails in the safe direction — the update still runs, nothing is aborted,
 and only the animation is missed.
 
@@ -110,7 +113,7 @@ marker.
 ### Supersede is safe once the first transition is running (measured)
 
 The empty-boundary row above describes **one** shape: two calls in the same task where the change lives in the
-*aborted* call's callback, which runs after the surviving call has already captured — so the surviving boundary
+_aborted_ call's callback, which runs after the surviving call has already captured — so the surviving boundary
 animates a change it never photographed. A supersede that lands while the first transition is already running
 is a different shape, and it is the demo's: the reader clicks a second card mid-flight.
 
@@ -124,11 +127,11 @@ same task   dos boundary: present   ::view-transition-{group,new,old}(uno) and (
 
 Both survive. The reason is the ordering above: when the first transition has materialised, its mutation is
 long since done, so the second call's capture contains the real before-state — and because that state is the
-first transition's *painted* one, the new move continues from mid-flight instead of restarting from a settled
+first transition's _painted_ one, the new move continues from mid-flight instead of restarting from a settled
 layout. So the danger is not "supersede" but "supersede inside one task, with the mutation in the aborted
 callback", which is exactly the double-trigger the demo hit and fixed.
 
-What this does **not** say is that the same-task probe above reproduces *absence*: it does not, because both
+What this does **not** say is that the same-task probe above reproduces _absence_: it does not, because both
 its calls mutate a different element. The absence measurement stands on its own shape (one element, the
 mutation in the aborted callback) and is not generalised here.
 
@@ -188,7 +191,7 @@ looks at the two promises it has a reason to look at leaks the third into the ho
 what this one did. The caller still receives the error once, through the returned promise.
 
 Neither bug was reachable from the fake, which is the point: it modelled `finished` resolving and aborting as
-the real platform does *as far as the fake's author believed*, and the belief was wrong in the two places the
+the real platform does _as far as the fake's author believed_, and the belief was wrong in the two places the
 wrapper's honesty depends on. The type contract that survives in `src/view-transition.test.ts` is the part a
 unit test can actually enforce — that an async update is refused at the type level and at runtime.
 
@@ -198,14 +201,14 @@ Widening the signature to `() => void | Promise<void>` was conditional on this b
 fresh context per scenario, because the first attempt ran them in a single page and an un-settled transition
 poisoned every scenario after it.
 
-| update | result |
-| --- | --- |
-| `await setTimeout(0)`, then mutate | **works** — the boundary spans the await, `ready` resolves after it, the animation runs and the mutation is inside the boundary |
-| `await Promise.resolve()`, then mutate | **works** — same, the promise merely defers within the task |
-| `await requestAnimationFrame(...)`, then mutate | **wedges the transition permanently** — no `ready`, no `finished`, no mutation, ever |
-| rejects after mutating | `ready` rejects, `finished` rejects with the update's error, **and the callback's own promise is unobserved: unhandled rejection *and* page error**. The DOM is left mutated |
-| rejects before mutating | same rejections; the DOM is left unmutated |
-| two async calls, the second settling later | both mutations apply — the superseded call's promise still settles, so its mutation lands **during the later transition's window**, the same foreign-boundary shape as the synchronous double-trigger |
+| update                                          | result                                                                                                                                                                                                |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `await setTimeout(0)`, then mutate              | **works** — the boundary spans the await, `ready` resolves after it, the animation runs and the mutation is inside the boundary                                                                       |
+| `await Promise.resolve()`, then mutate          | **works** — same, the promise merely defers within the task                                                                                                                                           |
+| `await requestAnimationFrame(...)`, then mutate | **wedges the transition permanently** — no `ready`, no `finished`, no mutation, ever                                                                                                                  |
+| rejects after mutating                          | `ready` rejects, `finished` rejects with the update's error, **and the callback's own promise is unobserved: unhandled rejection _and_ page error**. The DOM is left mutated                          |
+| rejects before mutating                         | same rejections; the DOM is left unmutated                                                                                                                                                            |
+| two async calls, the second settling later      | both mutations apply — the superseded call's promise still settles, so its mutation lands **during the later transition's window**, the same foreign-boundary shape as the synchronous double-trigger |
 
 The rendering-frame row is the one that decides it. `await new Promise(resolve => requestAnimationFrame(resolve))` is the most idiomatic thing an author writes to let the DOM settle, and inside the update callback it is fatal: the transition waits for the promise, the promise waits for a rendering update that the pending transition is holding, and neither ever happens. Nothing is reported to the caller because nothing fails — the page simply stays as it was, with a transition pending.
 
@@ -221,7 +224,7 @@ The recommendation is therefore to keep `update: () => void` for 1.0. **Open que
 the `@ts-expect-error` cases in `src/view-transition.test.ts` fail the `types` stage if that ever stops
 holding), and the runtime refuses the value — a returned thenable is never handed to the platform, which is the
 only way the wedge is reachable at all. Both are asserted against the real platform: the refusal arm checks the
-error that reaches the caller *and* that the call after it still reports `transitioned: true`, because an
+error that reaches the caller _and_ that the call after it still reports `transitioned: true`, because an
 enforcement that leaves the document unwedgeable but a transition abandoned forever would pass the first check
 and fail the second. Measured: two transitions started across three calls, and the document is not wedged.
 
@@ -266,13 +269,13 @@ runtime at all, and it should stay the headline.
 ## Appendix — the case study this session produced
 
 The strongest argument for owning the wrapper is that two people and one instrument failed to avoid these
-footguns in a *demo*:
+footguns in a _demo_:
 
 - the document-level click handler double-fired with a card's own listener → two transitions per click
   (footgun 2), which survived review and instrumentation until the timeline above caught it;
 - the demo's readout chained `ready.then(...)` with no `catch`, and `ready` rejects whenever a transition is
   superseded — an unhandled rejection waiting for the first interrupted swap (footgun 4);
-- the fix for the double-fire was not a flag but the *event target*, because while a transition runs the
+- the fix for the double-fire was not a flag but the _event target_, because while a transition runs the
   pseudo tree takes the hit (footgun 6) — an argument that would have to be rediscovered by every Jumi user.
 
 If the ambition is "assign classes, change state, get motion", then the state change is the only platform

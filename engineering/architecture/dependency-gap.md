@@ -13,49 +13,49 @@ repository yet.
 
 ## Capability by capability
 
-| Capability | Status | Evidence |
-| --- | --- | --- |
-| Jumi's own semantics — slots, phrases, effects, labels, composition, aggregate, keyframes | **Jumi's** | `@/core`; the aggregate is Jumi's own protocol |
-| Theme vocabulary → representation (token / formula / literal) | **Jumi's** | Phase 2, 71 keys classified, enforced by `pnpm theme:map` |
-| Reading the user's `@theme` and resolving it | **host's** | `resolveTheme` asks `api.theme(key)` and never sees a `@theme` block. Owning emission means parsing `@theme` itself: multiple blocks, cascade, and the `inline` / `static` / `reference` / `prefix` modes |
-| Candidate discovery | ownable, parked | 3c. Substring-level, low value alone |
-| Candidate semantics | **proven, in `scripts/`** | 3a: 123 Jumi-relevant candidates, 0 real deltas |
-| Candidate ordering | **solved** | 3b: byte order of raw candidates; `@apply` is a second, authored-order source |
-| Data-type inference (bare values only) | ownable, small | `360` → `360deg`; `animate-width-abc` calls nothing. Arbitrary values are never type-checked |
-| **Variant transformation** | **host's — the largest gap** | measured below |
-| Rule placement and layer structure | **host's** | every Jumi rule lands in `@layer utilities`; `@property` and the staging rule are placed by the host too |
-| Theme variable emission and tree-shaking | **host's** | measured in Phase 2: only the *referenced* `--color-*` tokens are emitted, which is why pointing at tokens does not pull in the namespace |
-| `@apply` expansion | **host's** | and it is a shipped Jumi feature (principle 6 of `CONTRIBUTING.md`), so it stays load-bearing |
-| Global `important` and `prefix` | **host's** | Jumi passes neither, but a user can set them, and the emitted CSS has to respect them |
-| Sources: `@source`, `source(none)`, ignores, incremental invalidation | **host's** | 3c's other half, and the one with real ongoing cost |
-| Pipeline integration (CLI / Vite / PostCSS) | **Jumi's, composed** | `jumi/vite` and `jumi/postcss` exist, but they compose Tailwind's plugins rather than replacing the compiler |
+| Capability                                                                                | Status                       | Evidence                                                                                                                                                                                                  |
+| ----------------------------------------------------------------------------------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Jumi's own semantics — slots, phrases, effects, labels, composition, aggregate, keyframes | **Jumi's**                   | `@/core`; the aggregate is Jumi's own protocol                                                                                                                                                            |
+| Theme vocabulary → representation (token / formula / literal)                             | **Jumi's**                   | Phase 2, 71 keys classified, enforced by `pnpm theme:map`                                                                                                                                                 |
+| Reading the user's `@theme` and resolving it                                              | **host's**                   | `resolveTheme` asks `api.theme(key)` and never sees a `@theme` block. Owning emission means parsing `@theme` itself: multiple blocks, cascade, and the `inline` / `static` / `reference` / `prefix` modes |
+| Candidate discovery                                                                       | ownable, parked              | 3c. Substring-level, low value alone                                                                                                                                                                      |
+| Candidate semantics                                                                       | **proven, in `scripts/`**    | 3a: 123 Jumi-relevant candidates, 0 real deltas                                                                                                                                                           |
+| Candidate ordering                                                                        | **solved**                   | 3b: byte order of raw candidates; `@apply` is a second, authored-order source                                                                                                                             |
+| Data-type inference (bare values only)                                                    | ownable, small               | `360` → `360deg`; `animate-width-abc` calls nothing. Arbitrary values are never type-checked                                                                                                              |
+| **Variant transformation**                                                                | **host's — the largest gap** | measured below                                                                                                                                                                                            |
+| Rule placement and layer structure                                                        | **host's**                   | every Jumi rule lands in `@layer utilities`; `@property` and the staging rule are placed by the host too                                                                                                  |
+| Theme variable emission and tree-shaking                                                  | **host's**                   | measured in Phase 2: only the _referenced_ `--color-*` tokens are emitted, which is why pointing at tokens does not pull in the namespace                                                                 |
+| `@apply` expansion                                                                        | **host's**                   | and it is a shipped Jumi feature (principle 6 of `CONTRIBUTING.md`), so it stays load-bearing                                                                                                             |
+| Global `important` and `prefix`                                                           | **host's**                   | Jumi passes neither, but a user can set them, and the emitted CSS has to respect them                                                                                                                     |
+| Sources: `@source`, `source(none)`, ignores, incremental invalidation                     | **host's**                   | 3c's other half, and the one with real ongoing cost                                                                                                                                                       |
+| Pipeline integration (CLI / Vite / PostCSS)                                               | **Jumi's, composed**         | `jumi/vite` and `jumi/postcss` exist, but they compose Tailwind's plugins rather than replacing the compiler                                                                                              |
 
 ## The variant surface, measured
 
 `node scripts/spike-variants.mjs` compiles one carrier and one tween utility under every variant
 Jumi's own corpora actually use, and prints the wrapper the host produces:
 
-| Variant | Transformation |
-| --- | --- |
-| `hover` | `@media (hover: hover)` + `:hover` |
-| `before` | `::before` |
-| `hover:before` | composed: media **and** pseudo-element |
-| `*` | re-parents: `:is(.… > *)` — the carrier included |
-| `*:odd` | `:is(.… > *):nth-child(odd)` |
-| `sm` | `@media (width >= 40rem)` |
-| `not-sm` | `@media not (width >= 40rem)` — negation, not a second breakpoint |
-| `motion-safe` | `@media (prefers-reduced-motion: no-preference)` |
-| `motion-reduce` | `@media (prefers-reduced-motion: reduce)` |
-| `[&:is(h1)]` | `&:is(h1)` — the host's arbitrary variant, which replaced Jumi's `is-*` |
-| `has-[>button]` | `&:has( > button)` — the host's built-in, which Jumi no longer shadows |
+| Variant         | Transformation                                                          |
+| --------------- | ----------------------------------------------------------------------- |
+| `hover`         | `@media (hover: hover)` + `:hover`                                      |
+| `before`        | `::before`                                                              |
+| `hover:before`  | composed: media **and** pseudo-element                                  |
+| `*`             | re-parents: `:is(.… > *)` — the carrier included                        |
+| `*:odd`         | `:is(.… > *):nth-child(odd)`                                            |
+| `sm`            | `@media (width >= 40rem)`                                               |
+| `not-sm`        | `@media not (width >= 40rem)` — negation, not a second breakpoint       |
+| `motion-safe`   | `@media (prefers-reduced-motion: no-preference)`                        |
+| `motion-reduce` | `@media (prefers-reduced-motion: reduce)`                               |
+| `[&:is(h1)]`    | `&:is(h1)` — the host's arbitrary variant, which replaced Jumi's `is-*` |
+| `has-[>button]` | `&:has( > button)` — the host's built-in, which Jumi no longer shadows  |
 
 Every one of them sits inside `@layer utilities`, and every one applies to the **carrier** as well
 as to the utility — which is the case `engineering/architecture/carrier-locality.md` describes from the other side: `*`
 re-parents the carrier body, and that re-parenting is why the aggregate cannot be published at a
 literal selector.
 
-Two of these are worth naming as the shape of the work: `not-sm` is a *negated* media query, and `*`
-is a *re-parenting* selector, not a class wrapper. A Jumi emitter needs a variant registry
+Two of these are worth naming as the shape of the work: `not-sm` is a _negated_ media query, and `*`
+is a _re-parenting_ selector, not a class wrapper. A Jumi emitter needs a variant registry
 (name → media/selector transform), composition of several, and the ability to move a carrier — and
 that is a larger subsystem than the scanner it would replace.
 
@@ -106,8 +106,12 @@ different wrapping, and that bet is exactly the one `has-*` lost. Nothing was lo
 host's arbitrary form is the same semantics with more characters:
 
 ```html
-<h1 class="animate-fade-in [&:is(h1)]:animate-fade-in">      <!-- replaces is-[h1]:  -->
-<section class="[&:where(.card)]:animate-slide-in-up">        <!-- replaces where-[.card]: -->
+<h1 class="animate-fade-in [&:is(h1)]:animate-fade-in">
+  <!-- replaces is-[h1]:  -->
+  <section class="[&:where(.card)]:animate-slide-in-up">
+    <!-- replaces where-[.card]: -->
+  </section>
+</h1>
 ```
 
 Measured, the arbitrary form emits the same transformation: `&:is(h1)`, same element. Jumi's own
@@ -126,27 +130,27 @@ nothing in the host's namespace.
 
 ### Does the shape extrapolate?
 
-| Capability | Expressible in the shape? |
-| --- | --- |
-| `group-*` / `peer-*` | yes — measured: `group-hover:` is `&:is(:where(.group):hover *)`, a selector step |
-| arbitrary variants `[&>*]` | yes — a verbatim selector step containing `&` |
-| `not-*` | yes — a selector step (`&:not(:is(h2))`) |
-| `@supports`, `@container` | yes — another at-rule step beside media |
-| prefix | no, and it is not a variant — it rewrites class names |
-| specificity, `:where()` placement | a per-variant detail, not a new kind |
-| the catalogue: ~40 built-ins plus `@custom-variant` | the actual cost, and it is a catalogue plus an ordering rule, not a new shape |
+| Capability                                          | Expressible in the shape?                                                         |
+| --------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `group-*` / `peer-*`                                | yes — measured: `group-hover:` is `&:is(:where(.group):hover *)`, a selector step |
+| arbitrary variants `[&>*]`                          | yes — a verbatim selector step containing `&`                                     |
+| `not-*`                                             | yes — a selector step (`&:not(:is(h2))`)                                          |
+| `@supports`, `@container`                           | yes — another at-rule step beside media                                           |
+| prefix                                              | no, and it is not a variant — it rewrites class names                             |
+| specificity, `:where()` placement                   | a per-variant detail, not a new kind                                              |
+| the catalogue: ~40 built-ins plus `@custom-variant` | the actual cost, and it is a catalogue plus an ordering rule, not a new shape     |
 
 ### Who owns variants now
 
-| Kind | Owner |
-| --- | --- |
-| everything Jumi's corpora actually use — `hover`, `sm`, `not-sm`, `motion-*`, `before`, `*`, `*:odd`, `has-*`, and the arbitrary form `[&:is(h1)]` | **host** |
-| Jumi's own | **nothing** — the variant surface is empty after the removal below |
-| the catalogue at large — parity beyond what Jumi uses | **not a 1.0 goal** |
+| Kind                                                                                                                                               | Owner                                                              |
+| -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| everything Jumi's corpora actually use — `hover`, `sm`, `not-sm`, `motion-*`, `before`, `*`, `*:odd`, `has-*`, and the arbitrary form `[&:is(h1)]` | **host**                                                           |
+| Jumi's own                                                                                                                                         | **nothing** — the variant surface is empty after the removal below |
+| the catalogue at large — parity beyond what Jumi uses                                                                                              | **not a 1.0 goal**                                                 |
 
 That is the ownership boundary, and it is now a written principle: **do not claim host vocabulary
 because the host does not implement it yet** (principle 9 of `CONTRIBUTING.md`, with the test to
-apply). The shape stays small; owning *parity* means owning the catalogue. That is what the exercise
+apply). The shape stays small; owning _parity_ means owning the catalogue. That is what the exercise
 was for.
 
 ## B. Stylesheet / theme semantics — the surface, scoped
@@ -154,7 +158,7 @@ was for.
 Not evaluated yet. The surface is read out of the host rather than recalled: `@theme` carries five
 modes (`reference`, `inline`, `default`, `static`, `prefix(…)`), prefix key rewriting, a
 namespace-to-token mapping, the cascade across multiple blocks, and tree-shaking of unused variables
-(measured in Phase 2: only *referenced* `--color-*` tokens are emitted). Beside it sit `@source`
+(measured in Phase 2: only _referenced_ `--color-*` tokens are emitted). Beside it sit `@source`
 parsing, `@apply` expansion and layer placement.
 
 The Phase 2 boundary may already be the right long-term answer: **Jumi owns what theme values mean
@@ -175,7 +179,7 @@ worth naming:
   bump is a release blocker** rather than something to re-tune. It would not fail in a user's project
   on a Tailwind minor, which is exactly why the assumption lives in one place instead of everywhere.
 - **the collapsed-scale spread.** `api.theme('radius')` returning character keys is undocumented
-  behaviour Jumi *guards against* (measured: those names are unreachable, `rounded-1` emits nothing)
+  behaviour Jumi _guards against_ (measured: those names are unreachable, `rounded-1` emits nothing)
   rather than depends on.
 
 Neither is a blocker, and both are named so they cannot be discovered later. With them on the table,

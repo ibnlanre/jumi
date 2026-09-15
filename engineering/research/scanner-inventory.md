@@ -12,41 +12,41 @@ object.
 
 ## What this inventory concluded: discovery is parked, and why
 
-The first measurement says discovery is *easy*. The rest say it is not *worth* owning on its own,
+The first measurement says discovery is _easy_. The rest say it is not _worth_ owning on its own,
 because the host hands Jumi far more than presence:
 
-| Concern | Cost | Value, if owned alone |
-| --- | --- | --- |
-| Discovery (raw candidate strings) | easy — a substring problem | **low** — it removes no dependency, since every candidate would go straight back to the host to be parsed |
-| Candidate parsing, type validation | meaningful | high — this is most of what the host does for Jumi |
-| Ordering / precedence | semantic | high — the aggregate's order *is* precedence |
-| Arbitrary values, modifiers, negation | meaningful | high — same reason as parsing |
-| Variants | — | orthogonal: they are gone before a matcher runs |
+| Concern                               | Cost                       | Value, if owned alone                                                                                     |
+| ------------------------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Discovery (raw candidate strings)     | easy — a substring problem | **low** — it removes no dependency, since every candidate would go straight back to the host to be parsed |
+| Candidate parsing, type validation    | meaningful                 | high — this is most of what the host does for Jumi                                                        |
+| Ordering / precedence                 | semantic                   | high — the aggregate's order _is_ precedence                                                              |
+| Arbitrary values, modifiers, negation | meaningful                 | high — same reason as parsing                                                                             |
+| Variants                              | —                          | orthogonal: they are gone before a matcher runs                                                           |
 
 So a Jumi-owned substring scanner that still hands strings to Tailwind for parsing would add a
 subsystem without removing a dependency, and would leave Jumi owning discovery while depending on
-the host's parser *and* its ordering. That is the half-migration shape to avoid.
+the host's parser _and_ its ordering. That is the half-migration shape to avoid.
 
 ## What a Jumi matcher actually receives
 
-| Candidate in the source | What Jumi is handed | What a raw string would *not* give it |
-| --- | --- | --- |
-| `animate-rotate-45` | `animate-rotate` ← `"45deg"` | the name → value lookup: `45` resolves through Jumi's own `values` map, which today the host performs |
-| `animate-rotate-[23deg]` | `"23deg"` | bracket parsing |
-| `animate-rotate-[0.25turn]` | `"0.25turn"` | bracket parsing |
-| `animate-rotate-[calc(1deg_+_2deg)]` | `"calc(1deg + 2deg)"` | bracket parsing **and** `_` → space |
-| `animate-rotate-[var(--spin)]` | `"var(--spin)"` | bracket parsing |
-| `animate-width-[3rem]` | `"3rem"` | bracket parsing |
-| `animate-width-abc` | **nothing at all** | type validation — Jumi declares `type: 'length'` and never sees a value that fails it |
-| `hover:animate-scale-110` | `animate-scale` ← `"1.1"` | nothing: the variant is invisible *both* ways. Measured identical to the bare candidate |
-| `*:animate-scale-110` | same | same |
-| `motion-reduce:animate-scale-110` | same | same |
-| `transition-duration-600/rotate` | `"600ms"`, `modifier: "rotate"` | `/` splitting, plus the same values lookup |
-| `-animate-bottom-4` | `"calc(calc(var(--spacing) * 4) * -1)"` | negation, **composed onto Jumi's already-resolved value** |
-| `animate-opacity-50`, twice | **one** call | nothing — the host dedupes before matching |
-| `animate-bounce-in`, twice | one call (`animate` ← `"bounce-in"`) | nothing — effects are a matcher too, not static CSS |
-| `animate-` alone — what `animate-${name}` in a template literal scans as | one call (`animate` ← `""`) | nothing. The empty name arrives as an ordinary value, and a matcher that then looks up a keyframe it does not have for that name takes down the **whole build** — from inside `addUtilities`, with no frame pointing back at the matcher. Guarded in `src/properties/tween.ts`, pinned by `src/properties/tween.test.ts` |
-| `animations` | one call (`animations` ← `""`) | nothing |
+| Candidate in the source                                                  | What Jumi is handed                     | What a raw string would _not_ give it                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------------------------------------ | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `animate-rotate-45`                                                      | `animate-rotate` ← `"45deg"`            | the name → value lookup: `45` resolves through Jumi's own `values` map, which today the host performs                                                                                                                                                                                                                    |
+| `animate-rotate-[23deg]`                                                 | `"23deg"`                               | bracket parsing                                                                                                                                                                                                                                                                                                          |
+| `animate-rotate-[0.25turn]`                                              | `"0.25turn"`                            | bracket parsing                                                                                                                                                                                                                                                                                                          |
+| `animate-rotate-[calc(1deg_+_2deg)]`                                     | `"calc(1deg + 2deg)"`                   | bracket parsing **and** `_` → space                                                                                                                                                                                                                                                                                      |
+| `animate-rotate-[var(--spin)]`                                           | `"var(--spin)"`                         | bracket parsing                                                                                                                                                                                                                                                                                                          |
+| `animate-width-[3rem]`                                                   | `"3rem"`                                | bracket parsing                                                                                                                                                                                                                                                                                                          |
+| `animate-width-abc`                                                      | **nothing at all**                      | type validation — Jumi declares `type: 'length'` and never sees a value that fails it                                                                                                                                                                                                                                    |
+| `hover:animate-scale-110`                                                | `animate-scale` ← `"1.1"`               | nothing: the variant is invisible _both_ ways. Measured identical to the bare candidate                                                                                                                                                                                                                                  |
+| `*:animate-scale-110`                                                    | same                                    | same                                                                                                                                                                                                                                                                                                                     |
+| `motion-reduce:animate-scale-110`                                        | same                                    | same                                                                                                                                                                                                                                                                                                                     |
+| `transition-duration-600/rotate`                                         | `"600ms"`, `modifier: "rotate"`         | `/` splitting, plus the same values lookup                                                                                                                                                                                                                                                                               |
+| `-animate-bottom-4`                                                      | `"calc(calc(var(--spacing) * 4) * -1)"` | negation, **composed onto Jumi's already-resolved value**                                                                                                                                                                                                                                                                |
+| `animate-opacity-50`, twice                                              | **one** call                            | nothing — the host dedupes before matching                                                                                                                                                                                                                                                                               |
+| `animate-bounce-in`, twice                                               | one call (`animate` ← `"bounce-in"`)    | nothing — effects are a matcher too, not static CSS                                                                                                                                                                                                                                                                      |
+| `animate-` alone — what `animate-${name}` in a template literal scans as | one call (`animate` ← `""`)             | nothing. The empty name arrives as an ordinary value, and a matcher that then looks up a keyframe it does not have for that name takes down the **whole build** — from inside `addUtilities`, with no frame pointing back at the matcher. Guarded in `src/properties/tween.ts`, pinned by `src/properties/tween.test.ts` |
+| `animations`                                                             | one call (`animations` ← `""`)          | nothing                                                                                                                                                                                                                                                                                                                  |
 
 The context object carries exactly one key — `{ modifier }`. There is no variant, no source
 location, and no original string. 15 calls arrive for 12 distinct utilities.
@@ -55,7 +55,7 @@ Two conclusions fall straight out of the table:
 
 1. **Discovery does not need the variant grammar.** `hover:animate-scale-110` contains
    `animate-scale-110` as a substring, and the matcher cannot tell the two apart anyway, so a
-   substring scan finds everything a variant-aware one would. What it *cannot* do without more work
+   substring scan finds everything a variant-aware one would. What it _cannot_ do without more work
    is the parsing on the right-hand column — but that is the arbitrary-value workstream, not
    discovery.
 2. **`type` is doing real filtering today.** `animate-width-abc` produces no call, no warning and no
@@ -64,18 +64,18 @@ Two conclusions fall straight out of the table:
 
 ## Who owns what today
 
-| Concern | Today | If Jumi discovers candidates |
-| --- | --- | --- |
-| which files are scanned | host — `@source`, `source(none)`, globs, ignores | Jumi |
-| candidate extraction | host scanner | Jumi |
-| deduplication | host (measured above) plus Jumi's own registries | unchanged |
-| ordering | host — measured: **identical call sequence under reversed document order** | Jumi must reproduce it |
-| variants on a candidate | host, stripped before Jumi sees anything | **not required** for discovery |
-| arbitrary syntax | host (`[23deg]` → `23deg`, `_` → space) | Jumi, as its own workstream |
-| type validation | host | Jumi |
-| name → value | host looks up the map Jumi supplied | Jumi — it owns the vocabulary now |
-| negation | host composes onto Jumi's resolved value | Jumi |
-| incremental | host re-scans and re-presents the whole candidate set | Jumi |
+| Concern                 | Today                                                                      | If Jumi discovers candidates      |
+| ----------------------- | -------------------------------------------------------------------------- | --------------------------------- |
+| which files are scanned | host — `@source`, `source(none)`, globs, ignores                           | Jumi                              |
+| candidate extraction    | host scanner                                                               | Jumi                              |
+| deduplication           | host (measured above) plus Jumi's own registries                           | unchanged                         |
+| ordering                | host — measured: **identical call sequence under reversed document order** | Jumi must reproduce it            |
+| variants on a candidate | host, stripped before Jumi sees anything                                   | **not required** for discovery    |
+| arbitrary syntax        | host (`[23deg]` → `23deg`, `_` → space)                                    | Jumi, as its own workstream       |
+| type validation         | host                                                                       | Jumi                              |
+| name → value            | host looks up the map Jumi supplied                                        | Jumi — it owns the vocabulary now |
+| negation                | host composes onto Jumi's resolved value                                   | Jumi                              |
+| incremental             | host re-scans and re-presents the whole candidate set                      | Jumi                              |
 
 Ordering is the one row that is not merely plumbing. The aggregate's ten flat lists are built in
 registration order, and their order **is** precedence: a later slot's longhand wins where two
@@ -147,6 +147,7 @@ Nothing. `src/` never touches the filesystem — no glob, no `readdir`, no `read
 plugin is handed candidates by the host. Worth recording while it is in view: **`glob@^11` is
 declared as a runtime dependency and is used only by `scripts/analyze.js`**, so it belongs in
 `devDependencies` whether or not Phase 3 happens.
+
 ### 3a — result: the prototype matches the host
 
 `scripts/lib/candidate.mjs` parses a raw candidate into `{ root, value, modifier, negative }`, and
@@ -181,13 +182,13 @@ the model.
 
 What the differential test corrected, compared to the plan:
 
-| Assumption | Measured |
-| --- | --- |
-| the payload is `{root, value, modifier, negative}` | the observable payload is the **triple**. Negation is *in* the value (`calc(<value> * -1)`), so the test still covers it |
-| type validation is a meaningful dependency | it is much smaller than it looked: **arbitrary values are accepted whatever their shape.** Jumi's tween utilities take *phrases* — `animate-rotate-[0:0deg|20:-8deg|100:-8deg]` — which the host never type-checks. Only *bare* values are gated, and only by inference: a bare number is derived by type (`360` → `360deg`), a bare word is rejected (`animate-width-abc` calls nothing) |
-| `modifiers` filters candidates | it does not. Measured with all three option shapes — the empty object Jumi passes by default, a property map, and `'any'` — the host accepts the modifier and hands it straight to the matcher |
-| a bracketed modifier stays bracketed | `/[flick]` arrives as `flick`, unwrapped like any arbitrary value |
-| variants are a prefix to strip | stripping is enough to reproduce the *payload*, but not to reproduce *validity* — an unknown variant rejects the whole candidate before any matcher runs |
+| Assumption                                         | Measured                                                                                                                                                                                       |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| the payload is `{root, value, modifier, negative}` | the observable payload is the **triple**. Negation is _in_ the value (`calc(<value> * -1)`), so the test still covers it                                                                       |
+| type validation is a meaningful dependency         | it is much smaller than it looked: **arbitrary values are accepted whatever their shape.** Jumi's tween utilities take _phrases_ — `animate-rotate-[0:0deg                                     | 20:-8deg | 100:-8deg]` — which the host never type-checks. Only *bare* values are gated, and only by inference: a bare number is derived by type (`360`→`360deg`), a bare word is rejected (`animate-width-abc` calls nothing) |
+| `modifiers` filters candidates                     | it does not. Measured with all three option shapes — the empty object Jumi passes by default, a property map, and `'any'` — the host accepts the modifier and hands it straight to the matcher |
+| a bracketed modifier stays bracketed               | `/[flick]` arrives as `flick`, unwrapped like any arbitrary value                                                                                                                              |
+| variants are a prefix to strip                     | stripping is enough to reproduce the _payload_, but not to reproduce _validity_ — an unknown variant rejects the whole candidate before any matcher runs                                       |
 
 One more thing the tables above already said, and this run confirms: **arbitrary values are passed
 through unresolved**. `[0:var(--angle)|100:calc(var(--angle)_-_360deg)]` arrives with the `_` decoded
@@ -202,6 +203,7 @@ to a space and nothing else touched. Phrase validation is the model's business (
   whether a candidate is valid at all are separate concerns, and 3a owns only the first.
 - **Phrase semantics stay with Jumi**, which is where they belong: the host passes a phrase through
   untouched, and the model decides whether it is a sequence of frames.
+
 ## The sequence, revised
 
 Discovery comes **after** we know what we intend to do with the discovered strings:
@@ -223,8 +225,8 @@ That input is the shape below, and "the same" is checkable rather than a judgeme
 
 ```ts
 type JumiCandidate = {
-  root: string          // `animate-rotate`
-  value: string         // `45deg` — after the name-to-value lookup
+  root: string // `animate-rotate`
+  value: string // `45deg` — after the name-to-value lookup
   modifier: string | null
   negative: boolean
 }

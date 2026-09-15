@@ -13,12 +13,12 @@ Decisive result — and it splits cleanly by what the base var holds:
 
 **With `--jumi-width` = `auto` (the plugin's actual default) — this test:**
 
-| Box | `interpolate-size` | Measured | Result |
-|---|---|---|---|
-| G1-A (100% only) | no | `80 → 260 (snap) → 100` | ❌ foreign stop snaps to `auto`=260 |
-| G2-A (100% only) | yes | `125 → 257 → … → 105 → 80` | ❌ ramps from `auto`=257 |
-| G2-B (5% only) | yes | `65 → 40 → 24 → … → 251` | ❌ ramps up to `auto`=251 |
-| G2-D (neither) | yes | `125 → 200 → 260` | ❌ holds at `auto`=260 |
+| Box              | `interpolate-size` | Measured                   | Result                              |
+| ---------------- | ------------------ | -------------------------- | ----------------------------------- |
+| G1-A (100% only) | no                 | `80 → 260 (snap) → 100`    | ❌ foreign stop snaps to `auto`=260 |
+| G2-A (100% only) | yes                | `125 → 257 → … → 105 → 80` | ❌ ramps from `auto`=257            |
+| G2-B (5% only)   | yes                | `65 → 40 → 24 → … → 251`   | ❌ ramps up to `auto`=251           |
+| G2-D (neither)   | yes                | `125 → 200 → 260`          | ❌ holds at `auto`=260              |
 
 ## Why it breaks with `auto`
 
@@ -30,7 +30,7 @@ Your mechanism is right — it's the first thing that gives proper "unset stop =
 
 That's a genuine design fork:
 
-1. **Make `--jumi-width` (and friends) hold a real resting width.** But the plugin can't know an element's resting width — it comes from *other* classes (`w-8`) or the layout. There's no input for it.
+1. **Make `--jumi-width` (and friends) hold a real resting width.** But the plugin can't know an element's resting width — it comes from _other_ classes (`w-8`) or the layout. There's no input for it.
 
 2. **Require/derive a "rest" value per element** — e.g., the stops' fallback points at a per-element rest variable the user sets alongside (`animate-width` base), or the plugin defaults rest to a sensible length. That's a new concept in the API.
 

@@ -1,6 +1,6 @@
 # Upstream limitation: a plugin utility whose output depends on the candidate set
 
-*PARKED — research evidence, not a workstream. Not filed.*
+_PARKED — research evidence, not a workstream. Not filed._
 
 Keeping this here rather than filing it, because the limitation stopped blocking
 us: the base-layer bridge made the plain plugin path incrementally correct, and
@@ -15,7 +15,7 @@ host-level integration would start from exactly this evidence.
 
 ## Summary
 
-A plugin utility whose output depends on which *other* candidates have been
+A plugin utility whose output depends on which _other_ candidates have been
 compiled cannot stay correct across incremental builds. Tailwind caches one AST
 per candidate, so when `build(candidates)` is called again with more candidates,
 that utility's rule is reused even though its content should have changed. There
@@ -50,11 +50,16 @@ const out = compiler.build([
 The plugin's `animations` utility lists one entry per slot it has seen:
 
 ```js
-matchUtilities({
-  animations: () => ({
-    'animation-name': slots.map(slot => `var(${slot.nameVar}, var(--jumi-animation-name))`).join(', '),
-  }),
-}, { values: { default: 'x' } })
+matchUtilities(
+  {
+    animations: () => ({
+      'animation-name': slots
+        .map(slot => `var(${slot.nameVar}, var(--jumi-animation-name))`)
+        .join(', '),
+    }),
+  },
+  { values: { default: 'x' } },
+)
 ```
 
 The second `build()` reuses the cached `animations` rule, so the newly registered
@@ -76,13 +81,13 @@ This is reproducible outside Tailwind's own test suite with the harness in
   tween does not grow the list.
 - **The Vite plugin is this path**: it holds one compiler and calls
   `build([...this.candidates])` per update, and its candidate set is created once
-  per session and never cleared — so candidates added later are appended *after*
+  per session and never cleared — so candidates added later are appended _after_
   the aggregate, and a restart is the only reliable fix.
 - **Eager materialisation**: a getter on `addBase` and on a utility value returned
   its first value across three consecutive builds, so deferring computation is not
   available to plugins.
 - **At-rules are unconditional, class rules are not**: `addBase` and
-  `@keyframes`-shaped `addUtilities` calls made *during* a new candidate's
+  `@keyframes`-shaped `addUtilities` calls made _during_ a new candidate's
   compilation do appear in that build's output; a class-selector utility only
   appears when its candidate exists, and re-registering a rule for an
   already-generated candidate is ignored on later builds.
@@ -90,16 +95,24 @@ This is reproducible outside Tailwind's own test suite with the harness in
 ## What we did instead, and what it costs
 
 Because `addBase` output is unconditional, the plugin now publishes the mutable
-part of the utility as *data* — custom properties in a base-layer rule of the same
+part of the utility as _data_ — custom properties in a base-layer rule of the same
 selector — and keeps the cached utility rule constant:
 
 ```css
-@layer base { .animations { --jumi-aggregate-animation-name: …; } }
-@layer utilities { .animations { animation-name: var(--jumi-aggregate-animation-name, …); } }
+@layer base {
+  .animations {
+    --jumi-aggregate-animation-name: …;
+  }
+}
+@layer utilities {
+  .animations {
+    animation-name: var(--jumi-aggregate-animation-name, …);
+  }
+}
 ```
 
 That is correct across incremental builds, and it made the ordinary case
-*cheaper*, because one constant rule replaces a full list per candidate form (a
+_cheaper_, because one constant rule replaces a full list per candidate form (a
 docs page of ours went from 433 KB to 261 KB). Its cost is the sharper argument
 for recomputing after compilation rather than just bypassing the cache:
 

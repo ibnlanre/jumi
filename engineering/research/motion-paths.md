@@ -8,7 +8,9 @@ changes: the point was to find out whether Jumi already has the pieces, and it d
 Motion paths need **no new subsystem, and no new syntax**. The whole feature is:
 
 ```html
-<div class="[offset-path:path('M0,0_L200,0_L200,200')] animate-offset-distance-100 animate-timeline-scroll">
+<div
+  class="[offset-path:path('M0,0_L200,0_L200,200')] animate-offset-distance-100 animate-timeline-scroll"
+></div>
 ```
 
 A path **declared** on the element, a distance **driven** by an existing Jumi tween, and the driver
@@ -27,13 +29,13 @@ All five properties parse, and 26 of 27 value forms are accepted. The one that i
 `ray(45deg 100px)` is **invalid grammar** — a ray's size is a keyword (`closest-side`,
 `farthest-corner`, …), not a length. `ray(45deg)` and `ray(45deg closest-side)` are both fine.
 
-| property | role | measured |
-| --- | --- | --- |
-| `offset-path` | where the motion happens | `path()`, `ray()`, `circle()`, `ellipse()`, `inset()`, `polygon()`, `border-box`, `content-box`, `view-box`, `none` all parse |
-| `offset-distance` | **how far along it** — the driver | drives continuously, 0→100% |
-| `offset-rotate` | the tangent | `auto` turns the element: a 40×8 box on a 45° path measures 33.9 wide (40·cos45 + 8·sin45) |
-| `offset-anchor` | which point of the element rides the path | `top left` sits 20px right of `center` on the same path, half the box's 40px width |
-| `offset-position` | the origin a `ray()` starts from | `ray(45deg)` + `offset-position: 50% 50%` travels up-and-right, per the CSS convention that a ray's 0° is **up** and positive is clockwise |
+| property          | role                                      | measured                                                                                                                                   |
+| ----------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `offset-path`     | where the motion happens                  | `path()`, `ray()`, `circle()`, `ellipse()`, `inset()`, `polygon()`, `border-box`, `content-box`, `view-box`, `none` all parse              |
+| `offset-distance` | **how far along it** — the driver         | drives continuously, 0→100%                                                                                                                |
+| `offset-rotate`   | the tangent                               | `auto` turns the element: a 40×8 box on a 45° path measures 33.9 wide (40·cos45 + 8·sin45)                                                 |
+| `offset-anchor`   | which point of the element rides the path | `top left` sits 20px right of `center` on the same path, half the box's 40px width                                                         |
+| `offset-position` | the origin a `ray()` starts from          | `ray(45deg)` + `offset-position: 50% 50%` travels up-and-right, per the CSS convention that a ray's 0° is **up** and positive is clockwise |
 
 Two forms worth naming because they replace authored geometry entirely: `offset-path: border-box` walks
 the element's own border box (`0,0 → 420,185 → 0,292 → 0,59 → 0,0` around a 420×320 container), and
@@ -55,7 +57,7 @@ This is the classification the spike was for, and it is measured rather than ass
 
 So the model is: **set the geometry, drive the distance.** `offset-rotate`, `offset-anchor` and
 `offset-position` are in the same class as the path — they describe the geometry and are written once,
-not interpolated. `offset-path` is the interesting one: it is a declaration *and*, between two
+not interpolated. `offset-path` is the interesting one: it is a declaration _and_, between two
 compatible shapes, a driver. Both are true, and neither needs a subsystem: `animate-offset-path-[…]`
 already animates it, and a plain declaration already sets it.
 

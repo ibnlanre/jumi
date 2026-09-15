@@ -22,17 +22,17 @@ The contract lives in the root `vercel.json`, not in dashboard settings:
 because that is its root. Verified: exit 0, 9 pages, `docs/dist` (728K), and `docs/dist` is ignored
 by git through the generic `dist` rule.
 
-**The dashboard overrides `vercel.json`**, so Build Command and Output Directory must be *empty*
+**The dashboard overrides `vercel.json`**, so Build Command and Output Directory must be _empty_
 there for the file to win.
 
-| Setting | Value |
-| --- | --- |
-| Root Directory | the repository root — **not** `docs` |
+| Setting          | Value                                                                  |
+| ---------------- | ---------------------------------------------------------------------- |
+| Root Directory   | the repository root — **not** `docs`                                   |
 | Framework Preset | Astro (its default output goes unused, because `vercel.json` sets one) |
-| Build Command | empty |
-| Output Directory | empty |
-| Install Command | default |
-| Node.js Version | default (20.3+ or 22) |
+| Build Command    | empty                                                                  |
+| Output Directory | empty                                                                  |
+| Install Command  | default                                                                |
+| Node.js Version  | default (20.3+ or 22)                                                  |
 
 ## The diagnosis
 
@@ -47,8 +47,8 @@ GET /postcss.js     404   (it is in dist/, which is the point)
 GET /docs/…         404
 ```
 
-The served bundle's hash differed from the current `dist/index.js`, so it was a *stale successful
-build*, not a broken one. Two causes, both in project settings:
+The served bundle's hash differed from the current `dist/index.js`, so it was a _stale successful
+build_, not a broken one. Two causes, both in project settings:
 
 1. **`engines.node` said `>=16.0.0`.** Astro requires `18.20.8 || ^20.3.0 || >=22` and Tailwind v4
    needs Node 20+, so Vercel was free to install a Node the documentation build cannot run on.

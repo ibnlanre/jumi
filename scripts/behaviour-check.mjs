@@ -868,8 +868,7 @@ const propertyAddress = async () => {
         eased: (animation.effect?.getKeyframes?.() ?? [])
           .filter(frame => frame.easing && frame.easing !== base)
           .map(
-            frame =>
-              `${Math.round((frame.offset ?? 0) * 100)}:${frame.easing}`,
+            frame => `${Math.round((frame.offset ?? 0) * 100)}:${frame.easing}`,
           ),
         name: animation.animationName,
       }

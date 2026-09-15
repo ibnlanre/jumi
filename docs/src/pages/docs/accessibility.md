@@ -19,7 +19,9 @@ Keep the base element visible. Avoid an unconditional `opacity-0` or off-screen 
 When the movement is continuous rather than an entrance, the inverse variant is the one to reach for. It strips the repetition, and only for the visitors who ask for it:
 
 ```html
-<div class="animate-pulsing animation-iteration-count-infinite motion-reduce:animation-iteration-count-1">
+<div
+  class="animate-pulsing animation-iteration-count-infinite motion-reduce:animation-iteration-count-1"
+>
   Pulses until you say otherwise.
 </div>
 ```
@@ -31,7 +33,9 @@ has to reach every element:
 
 ```css
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation: none !important;
     transition: none !important;
   }
@@ -45,7 +49,9 @@ This is the approach used for the animated specimens in this documentation site.
 Provide an accessible pause control for persistent decorative movement. Use a real button, label its action, and communicate whether it is pressed with `aria-pressed`.
 
 ```css
-.motion-paused *, .motion-paused *::before, .motion-paused *::after {
+.motion-paused *,
+.motion-paused *::before,
+.motion-paused *::after {
   animation-play-state: paused !important;
 }
 ```

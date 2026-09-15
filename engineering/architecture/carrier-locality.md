@@ -9,9 +9,14 @@ Jumi's aggregate is published with `api.addBase({ '.animations': … })`. That s
 literal, while the carrier utility it serves is not: a variant moves it somewhere else.
 
 ```html
-<div class="animations animate-…">          <!-- consumer on the element -->
-<div class="*:animations"><i class="animate-…"></i></div>   <!-- consumer on the child -->
-<div class="before:animations before:animate-…">            <!-- consumer on ::before -->
+<div class="animations animate-…">
+  <!-- consumer on the element -->
+  <div class="*:animations"><i class="animate-…"></i></div>
+  <!-- consumer on the child -->
+  <div class="before:animations before:animate-…">
+    <!-- consumer on ::before -->
+  </div>
+</div>
 ```
 
 Measured in a browser, only the first animates. The other two resolve `animation-name:
@@ -25,16 +30,16 @@ contexts, when our publication loses locality?** Read from the source rather tha
 ## What the pipeline actually does
 
 `compileAstNodes` builds the utility **body** first, then wraps it in a rule, then applies
-variants to *that rule*:
+variants to _that rule_:
 
 ```ts
 // packages/tailwindcss/src/compile.ts:222
-let asts = compileBaseUtility(candidate, designSystem)     // the body
+let asts = compileBaseUtility(candidate, designSystem) // the body
 let selector = `.${escape(candidate.raw)}`
 for (let nodes of asts) {
-  let node: StyleRule = { kind: 'rule', selector, nodes }  // wrapped, still the body
+  let node: StyleRule = { kind: 'rule', selector, nodes } // wrapped, still the body
   for (let variant of candidate.variants) {
-    let result = applyVariant(node, variant, designSystem.variants)  // transforms the rule
+    let result = applyVariant(node, variant, designSystem.variants) // transforms the rule
   }
 }
 ```
@@ -44,16 +49,20 @@ And a variant does not copy the body — it **re-parents** it:
 ```ts
 // packages/tailwindcss/src/variants.ts:359
 function staticVariant(name, selectors, { compounds } = {}) {
-  variants.static(name, (r) => {
-    r.nodes = selectors.map((selector) => rule(selector, r.nodes))
-  }, { compounds })
+  variants.static(
+    name,
+    r => {
+      r.nodes = selectors.map(selector => rule(selector, r.nodes))
+    },
+    { compounds },
+  )
 }
 
 staticVariant('*', [':is(& > *)'], { compounds: Compounds.Never })
 ```
 
 `*:animations` therefore emits `:is(.animations > *) { …the body… }` and `before:animations`
-emits `.animations::before { …the body… }` — with the declarations *inside*, wherever the
+emits `.animations::before { …the body… }` — with the declarations _inside_, wherever the
 selector ended up.
 
 **That is the whole answer to why the old carrier worked everywhere and our bridge does
@@ -99,7 +108,9 @@ variants introduced:
 ```ts
 // packages/tailwindcss/src/compile.ts:141
 function drill(node: StyleRule, callback: (node: StyleRule) => void) {
-  let children = node.nodes.filter((child): child is StyleRule => child.kind === 'rule')
+  let children = node.nodes.filter(
+    (child): child is StyleRule => child.kind === 'rule',
+  )
   if (children.length === node.nodes.length) {
     for (let child of children) drill(child, callback)
     return
@@ -109,7 +120,9 @@ function drill(node: StyleRule, callback: (node: StyleRule) => void) {
 
 // compile.ts:158 — find-or-replace a declaration in the innermost rule
 function setDeclarations(node: StyleRule) {
-  return (css: CssInJs) => { /* existing.value = …, else innermost.nodes.push(…) */ }
+  return (css: CssInJs) => {
+    /* existing.value = …, else innermost.nodes.push(…) */
+  }
 }
 ```
 
@@ -120,7 +133,7 @@ three contexts, with no literal selector anywhere.
 ### Why this does not reintroduce the stale-cache problem
 
 The bridge exists because a utility that changes as slots appear is reused stale. The hook
-is not that: it fires *after* every candidate has been compiled and *before* sorting and
+is not that: it fires _after_ every candidate has been compiled and _before_ sorting and
 return, on every pass that compiles anything:
 
 ```ts
@@ -141,7 +154,7 @@ build(newRawCandidates: string[]) {
 
 The values written by `set` are current as of that pass, because the model's slot registry
 is as current as that pass. When nothing changed there is nothing to refresh, and the
-short-circuit returns the previous AST. That is a *refresh per build*, not a cache of
+short-circuit returns the previous AST. That is a _refresh per build_, not a cache of
 plugin output — the opposite of what `addUtilities` would give us.
 
 ### `@apply` becomes reachable, in principle
@@ -154,7 +167,7 @@ let compiled = compileCandidates(candidates, designSystem, { respectImportant: f
 ```
 
 If the aggregate lives in the carrier's body, `@apply animations` inlines it along with
-everything else — so the path recorded as *deliberately unsupported* would become
+everything else — so the path recorded as _deliberately unsupported_ would become
 supportable. It is not free: `@apply` runs while the CSS is parsed, before template
 candidates are scanned, so any data inlined there is whatever existed at parse time. The
 behaviour matrix pins that case in the failing direction, so if it ever changes the matrix
@@ -172,11 +185,11 @@ node_modules/tailwindcss/dist/lib.js: 0
 Stock Tailwind's plugin API offers `addBase`, `addUtilities` and `matchUtilities`, and none
 of them expose a compiled, post-variant rule that can be mutated with current state:
 
-| API | What it can reach | Why it fails here |
-| --- | --- | --- |
-| `addBase` | an at-rule pass, no candidate, no variants | literal selector only — this is the bridge's limit |
-| `addUtilities` | a class rule per candidate | cached per candidate; dynamic values go stale |
-| `matchUtilities` | same, and re-registration is ignored | the same staleness, measured earlier |
+| API              | What it can reach                          | Why it fails here                                  |
+| ---------------- | ------------------------------------------ | -------------------------------------------------- |
+| `addBase`        | an at-rule pass, no candidate, no variants | literal selector only — this is the bridge's limit |
+| `addUtilities`   | a class rule per candidate                 | cached per candidate; dynamic values go stale      |
+| `matchUtilities` | same, and re-registration is ignored       | the same staleness, measured earlier               |
 
 So the choice is upstreaming the seam, adopting the fork, or accepting that prefixed
 carriers cannot be correct — which would be the first genuine Tailwind blocker in this
@@ -196,7 +209,7 @@ workstream rather than an inconvenience.
 ## The experiment
 
 `scripts/spike-carrier-seam.mjs` (retired) builds the same carrier twice with the fork's compiler,
-differing only in *where* the aggregate is published, and asks a browser which carrier
+differing only in _where_ the aggregate is published, and asks a browser which carrier
 contexts resolve. Both arms use one carrier body and one aggregate; the slot utilities are
 identical. It loads the compiler from `tailwindcss-core` by path and is deliberately not
 wired into Jumi.
@@ -239,7 +252,7 @@ internals. `tailwindcss-core` is a laboratory for now, not a platform.
 
 `@apply animations` resolves in the hook arm, but the aggregate there was a **constant**. In
 the real design `@apply` runs while the CSS is parsed, before template candidates are
-scanned, so the copy it inlines is a *snapshot* — and because it is a copy, the hook cannot
+scanned, so the copy it inlines is a _snapshot_ — and because it is a copy, the hook cannot
 refresh it later. So the expected production behaviour is still `none`, which is what the
 matrix pins. It is worth confirming on the real model before the matrix is changed either
 way.
@@ -276,7 +289,7 @@ data.
 
 That is the one result the fork could not have produced. `@apply` copies the carrier body while
 the CSS is parsed, and the aggregate does not exist yet — a node-level hook can only mutate the
-*compiled* carrier rule, not the copy inlined into the author's rule. A finalizer runs over the
+_compiled_ carrier rule, not the copy inlined into the author's rule. A finalizer runs over the
 emitted stylesheet, where that copy **is** a rule with the marker, so it receives current data
 like every other carrier.
 
@@ -345,7 +358,10 @@ carrier, so a carrier read its own data through a pointer it also declared:
 ```css
 .animations {
   --jumi-carrier: animations;
-  animation-duration: var(--jumi-aggregate-animation-duration, var(--jumi-animation-duration));
+  animation-duration: var(
+    --jumi-aggregate-animation-duration,
+    var(--jumi-animation-duration)
+  );
   --jumi-aggregate-animation-duration: var(…), var(…);
 }
 ```
@@ -374,9 +390,9 @@ declarations across the same 4 carriers — only where it is written.
 
 Two requirements pull in opposite directions:
 
-- **locality** wants the list *inside* the utility body, because that is what travels with a
+- **locality** wants the list _inside_ the utility body, because that is what travels with a
   re-parented or `@apply`-copied body
-- **freshness** wants it *outside*, because Tailwind caches one AST per candidate and will not
+- **freshness** wants it _outside_, because Tailwind caches one AST per candidate and will not
   revisit the carrier when a later class changes what the list should say
 
 The finalizer is neither. The body is **constant** and names the parts it applies; the list is
@@ -385,7 +401,9 @@ whole of the contract — a staged part is written only where the carrier alread
 property:
 
 ```ts
-const existing = ownDeclarations(rule).find(declaration => declaration.prop === longhand)
+const existing = ownDeclarations(rule).find(
+  declaration => declaration.prop === longhand,
+)
 
 if (!existing || existing.value === value) continue
 ```
@@ -394,7 +412,7 @@ Nothing is appended. A property a carrier does not declare is not one it wants, 
 needs **no knowledge of carrier types**: `animations` declares the ten animation longhands and
 `transitions` declares `transition`, each is handed only its own, and both travel one flat staging
 channel. A carrier says what it is by what it declares — which is also why erasing the marker costs
-nothing: the declarations left behind *are* the distinction.
+nothing: the declarations left behind _are_ the distinction.
 
 That is a better trade than a per-carrier protocol branch. A third carrier needs no change in the
 finalizer, only a body that declares what it applies.
@@ -407,7 +425,8 @@ shorthand **inside** the utility body, from the live set of motions:
 ```css
 /* was */
 .transitions {
-  transition: var(--jumi-background-color-transition), var(--jumi-scale-transition);
+  transition:
+    var(--jumi-background-color-transition), var(--jumi-scale-transition);
   --jumi-background-color-transition: var(…) var(…) var(…) var(…);
 }
 ```
@@ -433,7 +452,7 @@ finalizer writes.
 
 ### Three levels, because the bug has three shapes
 
-*Fresh build correct, incremental compiler stale, only the browser shows it* is the shape this
+_Fresh build correct, incremental compiler stale, only the browser shows it_ is the shape this
 class of bug takes, and it has now appeared twice. The property is pinned at three levels, each
 catching a different failure:
 
@@ -455,23 +474,23 @@ Tailwind loads and the finalizer cannot share one model, so the data has to trav
 stylesheet. `scripts/spike-shared-runtime.mjs` (retired) measured it, and the claim is **wrong as
 stated** — identity is available, with no globals and no Tailwind internals.
 
-Tailwind's own loader branches on the *form* of the plugin id, and `@tailwindcss/node` ships an
+Tailwind's own loader branches on the _form_ of the plugin id, and `@tailwindcss/node` ships an
 `esm-cache.loader` that propagates a parent's `?id` to whatever that parent imports:
 
 ```js
-if (id[0] !== '.') return import(resolve(id))        // bare or absolute
-return import(resolve(id) + '?id=' + Date.now())     // relative
+if (id[0] !== '.') return import(resolve(id)) // bare or absolute
+return import(resolve(id) + '?id=' + Date.now()) // relative
 ```
 
 So a relative `@plugin` path is cache-busted on every load and gets a **private instance**, while a
 bare or absolute one falls through to Node's ESM registry, which is per-process — and therefore
 shared, whichever side imports first:
 
-| `@plugin` form | vite dev | dev, 2nd entry | two entrypoints | recompile | vite build | postcss |
-| --- | --- | --- | --- | --- | --- | --- |
-| `"./runtime.mjs"` | PRIVATE | PRIVATE | ISOLATED | REPLACED | PRIVATE | PRIVATE |
-| absolute path | SHARED | SHARED | **SHARED** | STABLE | SHARED | SHARED |
-| `"@jumi/probe"` | SHARED | SHARED | **SHARED** | STABLE | SHARED | SHARED |
+| `@plugin` form    | vite dev | dev, 2nd entry | two entrypoints | recompile | vite build | postcss |
+| ----------------- | -------- | -------------- | --------------- | --------- | ---------- | ------- |
+| `"./runtime.mjs"` | PRIVATE  | PRIVATE        | ISOLATED        | REPLACED  | PRIVATE    | PRIVATE |
+| absolute path     | SHARED   | SHARED         | **SHARED**      | STABLE    | SHARED     | SHARED  |
+| `"@jumi/probe"`   | SHARED   | SHARED         | **SHARED**      | STABLE    | SHARED     | SHARED  |
 
 The middle column is why the design was not taken. Sharing is exactly the problem: **one instance
 serves both entrypoints.** A shared runtime knows everything that happened in the process and
@@ -501,7 +520,7 @@ compensating for a missing hook — it is the only place the **per-stylesheet bo
 
 ### Why the marker stays
 
-That leaves the narrower question, which is about *locating* the carrier rather than about carrying
+That leaves the narrower question, which is about _locating_ the carrier rather than about carrying
 the data: the aggregate travels in CSS, but `--jumi-carrier` is a synthetic name a browser never
 reads, and both carriers already declare something better. `transitions` declares
 `transition: var(--jumi-transition)`; `animations` could declare
@@ -513,12 +532,12 @@ real plugin over the real corpora, transformed mechanically into the marker-free
 finalized both ways. **The outputs must be identical** — the marker is only doing work if they are
 not.
 
-| corpus | carrier rules | verdict |
-| --- | --- | --- |
-| `input.css` | 3 | IDENTICAL |
-| `variant.css` | 4 | IDENTICAL |
-| carrier matrix | 7 | IDENTICAL |
-| no slots or motions | 2 | IDENTICAL but for 1 marker the shipping pass leaked |
+| corpus              | carrier rules | verdict                                             |
+| ------------------- | ------------- | --------------------------------------------------- |
+| `input.css`         | 3             | IDENTICAL                                           |
+| `variant.css`       | 4             | IDENTICAL                                           |
+| carrier matrix      | 7             | IDENTICAL                                           |
+| no slots or motions | 2             | IDENTICAL but for 1 marker the shipping pass leaked |
 
 Covered contexts, all written: `animations`, `transitions`, `*:animations`, `before:animations`,
 `motion-safe:animations`, `hover:animations`, `@apply animations`, `@apply transitions`. So the
@@ -526,12 +545,12 @@ marker is **not needed to find a carrier**, on Jumi's own output, under either l
 
 It fails on the rest:
 
-- **It is ambiguous, and not in a contrived way.** The fallback is a *public* read —
+- **It is ambiguous, and not in a contrived way.** The fallback is a _public_ read —
   `--jumi-animation-name` and `--jumi-transition` are documented controls with defaults. A page
   that writes `transition: var(--jumi-transition)` writes the same declaration the carrier does.
   Measured: **2 of 2 such rules rewritten** by the proposal, against **0** for the shipping pass. A
   locator that cannot tell a carrier from a page reading a control is not a locator.
-- **It is value-sensitive where the marker is not.** The marker identifies a rule by *property*, so
+- **It is value-sensitive where the marker is not.** The marker identifies a rule by _property_, so
   a declaration whose value has drifted is still written. Matching on the value misses it: with one
   value changed, the shipping pass left **0** declarations behind, per-declaration matching left
   **1**, silently. Per-rule matching also leaves 0 — but only by widening the ambiguity above, since
@@ -556,13 +575,13 @@ no slots or motions · emitted by the CLI, as examples:build runs it
 
 A page with `class="transitions"` and no `transition-*` utility shipped
 `--jumi-carrier: transitions` and tripped the zero-occurrence invariant on a legitimate build.
-`animations` escaped only because its body reads *through* the transport, so replacing that read is
+`animations` escaped only because its body reads _through_ the transport, so replacing that read is
 a change even when the value is unchanged. It stayed latent because no corpus had a motionless
 carrier; `postcss:check` has one now, and it reproduced the leak in all five of its configurations
 before the fix.
 
-The mistake was conflating two questions — *did this carrier need a new value?* and *did this
-carrier complete the protocol?* — and reporting only the first. They are separate fields now,
+The mistake was conflating two questions — _did this carrier need a new value?_ and _did this
+carrier complete the protocol?_ — and reporting only the first. They are separate fields now,
 `carriersChanged` and `carriersFound`, and the erasure follows participation rather than change.
 
 One thing did **not** become unconditional, and the distinction is why. Erasing whenever a marker is
@@ -575,13 +594,13 @@ motionless carrier finish.
 What each carrier can be caught by differs, which is what makes the gate pass-level rather than
 per-rule: an unfinalized `animations` carrier still reads through the transport, so the leftover
 `--jumi-aggregate-*` name is a second signal, while an unfinalized `transitions` carrier declares
-only the fallback — the marker is the *only* thing that says it was never completed.
+only the fallback — the marker is the _only_ thing that says it was never completed.
 
 ---
 
 # The carrier leaves userland
 
-Everything above describes the protocol as it stood when the question was *where the carrier ends up*.
+Everything above describes the protocol as it stood when the question was _where the carrier ends up_.
 This section supersedes it: the carrier stopped being a class, and with it `--jumi-carrier`, the
 public `animations` / `transitions` utilities, and the whole marker mechanism. The earlier sections
 are kept because the reasoning is still the reasoning — the transport, the per-stylesheet boundary,
@@ -667,7 +686,7 @@ The duplicated selector list is the measurable cost, and it is small: **1,376 ch
 start at the aggregate's per-element evaluation cost instead, which is a far larger number and is
 recorded below.
 
-What *would* genuinely collapse the two rules, and what it would cost:
+What _would_ genuinely collapse the two rules, and what it would cost:
 
 ```css
 /* today */   var(--jumi-rotate-animation-duration, var(--jumi-animation-duration))
@@ -686,10 +705,10 @@ cleanup.
 The registration policy is deliberately asymmetric, and the asymmetry is the difference between
 **state** and **configuration**:
 
-| property | shipped as | why |
-| --- | --- | --- |
-| `--jumi-<slot>-animation-name`, `--jumi-<label>-animation-<part>` | registered, `inherits: false` | **Activation state.** It says *this* element runs *this* animation. Inherited into a descendant that also animates — which is exactly what puts the descendant in the composition set — it says the descendant runs it too, at the descendant's own timing. |
-| the shared `--jumi-animation-*` and `--jumi-transition-*` controls | ordinary custom properties | **Configuration.** `--jumi-animation-duration: 500ms` on a wrapper is a useful thing to write, and it stays useful *because* it is inherited: a declaration beats inheritance, so the wrapper reaches exactly the elements that never declared their own. |
+| property                                                           | shipped as                    | why                                                                                                                                                                                                                                                         |
+| ------------------------------------------------------------------ | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--jumi-<slot>-animation-name`, `--jumi-<label>-animation-<part>`  | registered, `inherits: false` | **Activation state.** It says _this_ element runs _this_ animation. Inherited into a descendant that also animates — which is exactly what puts the descendant in the composition set — it says the descendant runs it too, at the descendant's own timing. |
+| the shared `--jumi-animation-*` and `--jumi-transition-*` controls | ordinary custom properties    | **Configuration.** `--jumi-animation-duration: 500ms` on a wrapper is a useful thing to write, and it stays useful _because_ it is inherited: a declaration beats inheritance, so the wrapper reaches exactly the elements that never declared their own.   |
 
 Measured in Chromium on the canonical corpus — an `animate-rotate-45` wrapper around an
 `animate-fade-in` child:
@@ -726,20 +745,20 @@ participating elements is the dimension already established as the expensive one
 Each of these looks simpler on paper. They are recorded because every one of them was proposed,
 built, and measured, and the reasons are specific rather than stylistic.
 
-| approach | what it was for | why it failed |
-| --- | --- | --- |
-| `addBase` | hosting the carrier unconditionally | **Wrong layer.** A `@layer components` declaration that loses to a utility-layer carrier *beats* a base-layer one: specificities match and the layer decides. Measured across five competing contexts; `base` differed in exactly one. |
-| `addUtilities` | hosting the carrier in the utility layer | **Candidate-gated, and sorted too late.** A static utility added by a plugin is emitted only when its class is a candidate — a probe class was absent from the output until it was put in `@source inline` — and when present it sorts *after* the controls, so the defaults beat the very rules they exist to lose to (`1s` where today is `500ms`). It also rejects anything but a single class name. |
-| `:root` substrate | publishing the defaults once instead of per element | **`var()` resolves where it is declared.** `--jumi-animation-delay` is `var(--jumi-stagger-animation-delay, 0s)`; on `:root` it resolves once, to the default, and every element inherits that literal — the stagger value never arrives (`0s` where the element gives `150ms`). The same applies to `--jumi-animation`, `--jumi-margin` and the rest. This is what forces the defaults onto the animating element. |
-| `:where(group)` | letting the controls win regardless of position | **A pseudo-element cannot appear inside it.** `before:` and `after:` are ordinary usage, so the defaults rule was dropped as invalid; the substrate never arrived; `var(--jumi-animation-name)` inside the composition list then made the whole declaration invalid at computed-value time, and the name computed to `none`. |
-| a universal carrier (`*, ::before, ::after`) | dropping the opt-in entirely, by making every element carry the composition | **Correct, and it scales with the page rather than with the animations.** See below. |
-| **finalizer synthesis** | — | Works: right layer, supports pseudos, keeps the defaults element-local, and needs no carrier marker at all. |
+| approach                                     | what it was for                                                             | why it failed                                                                                                                                                                                                                                                                                                                                                                                                       |
+| -------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `addBase`                                    | hosting the carrier unconditionally                                         | **Wrong layer.** A `@layer components` declaration that loses to a utility-layer carrier _beats_ a base-layer one: specificities match and the layer decides. Measured across five competing contexts; `base` differed in exactly one.                                                                                                                                                                              |
+| `addUtilities`                               | hosting the carrier in the utility layer                                    | **Candidate-gated, and sorted too late.** A static utility added by a plugin is emitted only when its class is a candidate — a probe class was absent from the output until it was put in `@source inline` — and when present it sorts _after_ the controls, so the defaults beat the very rules they exist to lose to (`1s` where today is `500ms`). It also rejects anything but a single class name.             |
+| `:root` substrate                            | publishing the defaults once instead of per element                         | **`var()` resolves where it is declared.** `--jumi-animation-delay` is `var(--jumi-stagger-animation-delay, 0s)`; on `:root` it resolves once, to the default, and every element inherits that literal — the stagger value never arrives (`0s` where the element gives `150ms`). The same applies to `--jumi-animation`, `--jumi-margin` and the rest. This is what forces the defaults onto the animating element. |
+| `:where(group)`                              | letting the controls win regardless of position                             | **A pseudo-element cannot appear inside it.** `before:` and `after:` are ordinary usage, so the defaults rule was dropped as invalid; the substrate never arrived; `var(--jumi-animation-name)` inside the composition list then made the whole declaration invalid at computed-value time, and the name computed to `none`.                                                                                        |
+| a universal carrier (`*, ::before, ::after`) | dropping the opt-in entirely, by making every element carry the composition | **Correct, and it scales with the page rather than with the animations.** See below.                                                                                                                                                                                                                                                                                                                                |
+| **finalizer synthesis**                      | —                                                                           | Works: right layer, supports pseudos, keeps the defaults element-local, and needs no carrier marker at all.                                                                                                                                                                                                                                                                                                         |
 
 ### The universal carrier, and why "every element" is the wrong unit
 
 `scripts/spike-global-carrier.mjs` asked whether the composition could simply live on `*`. It is the
 most attractive-looking option on paper — no opt-in, no inference, nothing to derive — and it is
-*correctness-equivalent*: every case behaved identically to the opt-in, across elements,
+_correctness-equivalent_: every case behaved identically to the opt-in, across elements,
 `::before`, `*:` descendants, nesting, transitions, a native `animation:` shorthand (which wins, a
 universal rule being zero specificity), and a control class with no tween. The one difference ran
 the other way — `@apply`ing a Jumi utility without a carrier produced nothing under the opt-in and
@@ -808,11 +827,11 @@ condition.
 
 Every number measured on this repository after the migration.
 
-| corpus | before | after |
-| --- | --- | --- |
-| examples app | ~267 KB | 120,762 bytes |
-| canonical snapshot | 89,796 bytes | 65,124 bytes |
-| variant corpus | 85,659 bytes | 35,165 bytes |
+| corpus             | before       | after         |
+| ------------------ | ------------ | ------------- |
+| examples app       | ~267 KB      | 120,762 bytes |
+| canonical snapshot | 89,796 bytes | 65,124 bytes  |
+| variant corpus     | 85,659 bytes | 35,165 bytes  |
 
 The variant corpus is the interesting one: it existed to bound a quadratic path, where a prefixed
 carrier sorted before every `animate-*` candidate so the data was read while almost no slots existed
@@ -829,7 +848,7 @@ The aggregate's evaluation cost. An animated element resolves every position in 
 stylesheet-wide slot vector, and flattening or hoisting those chains moves the number by 11–19%
 while changing semantics for shared controls. Placement does not move it by more than a few percent.
 Reducing it means reducing the number of positions an element resolves, which is a change to what a
-slot universe *is* — and it is the one number a user would feel first. Recorded, deliberately not
+slot universe _is_ — and it is the one number a user would feel first. Recorded, deliberately not
 attempted for 1.0.
 
 ## The evidence, and where it lives
@@ -842,4 +861,3 @@ path now reproduces every invariant they established: `behaviour:check` asserts 
 the precedence triangle and non-inheritance in a browser, `incremental:check` asserts that exactly
 two rules are derived per kind and that Tailwind's cached rules do not move, and `css:check` holds
 the bytes.
-

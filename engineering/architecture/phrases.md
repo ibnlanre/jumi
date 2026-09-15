@@ -17,15 +17,16 @@ value       := any CSS value, may contain ":" "," "(" ")" and spaces
 ```
 
 ```html
-animate-rotate-[0:0deg|50:0deg|100:45deg]
-animate-rotate-[0,100:45deg|50:0deg]         <!-- one value, two offsets -->
-animate-scale-[0:0.42_0.30|50:1.03_1.03]     <!-- `_` stands in for a space -->
+animate-rotate-[0:0deg|50:0deg|100:45deg] animate-rotate-[0,100:45deg|50:0deg]
+<!-- one value, two offsets -->
+animate-scale-[0:0.42_0.30|50:1.03_1.03]
+<!-- `_` stands in for a space -->
 ```
 
 **The separator is a pipe because the comma became the offset separator, and the obvious replacement
 — a semicolon — does not survive the host.** Tailwind drops any candidate containing a `;` inside its
 arbitrary value. Measured against `@`, `%`, `|`, `!`, `~` and `^`, a semicolon is the only one of the
-seven that emits nothing at all — and it emits nothing *quietly*: with every phrase in the canonical
+seven that emits nothing at all — and it emits nothing _quietly_: with every phrase in the canonical
 corpus written with semicolons, the keyframe count fell from 33 to 27 and no harness said a word. `%`
 and `!` are carried but unusable here, since both are legal in a CSS value (`50%`, `!important`) —
 which is the same reason the comma could not stay the frame separator. A pipe is carried, appears in
@@ -77,7 +78,7 @@ the dot form went away.
 **There is a second namespace, and one collision is what forced it.** Labels and property names are the
 same kind of word — one control's modifier is either — and the chain is the same shape either way: a
 labelled slot reads `--jumi-label-{label}-{part}`, then `--jumi-{attr}-{part}`, then `--jumi-{part}`. What
-changed is *where a control writes*: a word that is a property Jumi animates goes to
+changed is _where a control writes_: a word that is a property Jumi animates goes to
 `--jumi-{word}-{part}`, the property scope every motion animating it reads, and anything else goes to the
 label namespace.
 
@@ -179,7 +180,7 @@ Tailwind type-checks arbitrary values before the plugin runs, and a phrase is no
 a number or a length. An entry accepts phrases only if `'any'` is in its `type`
 list — 221 of 395 already had it. Widened so far: `animate-scale`,
 `animate-scale-x/y/z`, `animate-opacity`. The wider change loosens validation for
-that property's *bare* arbitrary values, which is why it is done per property
+that property's _bare_ arbitrary values, which is why it is done per property
 rather than wholesale; theme-defined phrases are resolved from the values map and
 skip the gate entirely.
 
@@ -202,12 +203,12 @@ halves were measured against `@tailwindcss/node`'s `compile()` +
   first), and every `animate-…` / `animation-…` sorts before `animations` because
   `-` < `s`. So every slot is registered before the list is built. Hand the same
   candidates in another order and the list is short or empty: `['animations',
-  tween]` → no slot, `[tween, 'animations']` → one slot.
+tween]` → no slot, `[tween, 'animations']` → one slot.
 - **An incremental pass can be stale.** Calling `build()` again with one more
   tween reuses the cached `.animations` AST, and the list does not grow. The Vite
   plugin holds one compiler and calls `build([...this.candidates])` per update,
   and its candidate Set is created once per session and never cleared — so
-  candidates added later are appended *after* `animations`, which makes the
+  candidates added later are appended _after_ `animations`, which makes the
   alphabetical guarantee a first-scan guarantee. That is why the workaround is a
   dev-server restart, not a CSS edit: recreating the compiler does not reorder the
   Set. Symptom: a newly added tween class does not animate, because the element's
@@ -220,6 +221,6 @@ builds. Making the rule constant is the one structural alternative: a
 fixed-length list of `var(--jumi-slot-<n>-…)` positions, each tween writing its
 own slot's variables, so the rule depends on nothing. It costs two things: the
 list length becomes a fixed maximum shipped on every page, and a slot's
-*position* moves into the tween's own cached rule — and position is exactly how
+_position_ moves into the tween's own cached rule — and position is exactly how
 `perValue`'s move-to-end makes a re-registered value win under
 `animation-composition: replace`.

@@ -8,10 +8,10 @@ description: Jumi is a plugin plus an integration, because the animation lists a
 
 Jumi ships a plugin and an integration, and they are not interchangeable:
 
-| | What it is | What it does |
-| --- | --- | --- |
-| The plugin | `@plugin "@ibnlanre/jumi"` | Teaches Tailwind Jumi's utilities, so `animate-fade-in` and `animation-duration-[600ms]` compile to real CSS |
-| The integration | `jumi()` from `@ibnlanre/jumi/vite`, or `@ibnlanre/jumi/postcss` | Assembles the animation lists once every `animate-*` class has been compiled |
+|                 | What it is                                                       | What it does                                                                                                 |
+| --------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| The plugin      | `@plugin "@ibnlanre/jumi"`                                       | Teaches Tailwind Jumi's utilities, so `animate-fade-in` and `animation-duration-[600ms]` compile to real CSS |
+| The integration | `jumi()` from `@ibnlanre/jumi/vite`, or `@ibnlanre/jumi/postcss` | Assembles the animation lists once every `animate-*` class has been compiled                                 |
 
 Wire up only the plugin and your utilities compile, your page has no animations, and nothing warns you. That is why the installation guide starts with the integration: it is the half that has to be there.
 
@@ -26,9 +26,11 @@ declares a slot's activation variable is one of the selectors the composition is
 ```
 
 ```css
-.animate-rotate-45, .animate-fade-in {
-  animation-name: var(--jumi-rotate-…-animation-name, var(--jumi-animation-name)),
-                  var(--jumi-fade-in-…-animation-name, var(--jumi-animation-name));
+.animate-rotate-45,
+.animate-fade-in {
+  animation-name:
+    var(--jumi-rotate-…-animation-name, var(--jumi-animation-name)),
+    var(--jumi-fade-in-…-animation-name, var(--jumi-animation-name));
   animation-duration: …;
   /* one entry per animated slot, for each longhand */
 }
@@ -48,11 +50,11 @@ Everything below applies to both.
 
 There are only three, and each one gives up something:
 
-| Written… | Locality | Freshness |
-| --- | --- | --- |
-| **In the utility body** | ✓ the body travels with the class — `*:animate-*`, `before:animate-*` and `@apply animate-*` all carry it | ✗ Tailwind caches a utility's output per candidate, so a list that depends on other classes is reused stale |
-| **In a separate rule at a literal selector** | ✗ the rule that needs it has moved — a variant re-parents the class body, so a rule written for the utility is not where `*:animate-*` ended up | ✓ it is rewritten whenever the lists change |
-| **After Tailwind emits** | ✓ written for every selector the finished stylesheet proves animates, wherever that is | ✓ computed once every class has been compiled |
+| Written…                                     | Locality                                                                                                                                        | Freshness                                                                                                   |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| **In the utility body**                      | ✓ the body travels with the class — `*:animate-*`, `before:animate-*` and `@apply animate-*` all carry it                                       | ✗ Tailwind caches a utility's output per candidate, so a list that depends on other classes is reused stale |
+| **In a separate rule at a literal selector** | ✗ the rule that needs it has moved — a variant re-parents the class body, so a rule written for the utility is not where `*:animate-*` ended up | ✓ it is rewritten whenever the lists change                                                                 |
+| **After Tailwind emits**                     | ✓ written for every selector the finished stylesheet proves animates, wherever that is                                                          | ✓ computed once every class has been compiled                                                               |
 
 The first two are complements rather than alternatives: locality wants the list inside the class, freshness wants it outside. That is the entire reason the step exists, and it is why no `@plugin` configuration can stand in for it.
 

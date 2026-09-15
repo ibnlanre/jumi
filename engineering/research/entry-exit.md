@@ -23,14 +23,14 @@ finding that makes it cheap on Jumi's side (§6).
 Same element, five samples from 0% to 100% of a 300ms transition. `display/opacity` plus whether the browser
 considers it visible — `checkVisibility()` with the opacity and visibility checks on.
 
-| case | entering | leaving |
-| --- | --- | --- |
+| case                                       | entering                                                                    | leaving                                                 |
+| ------------------------------------------ | --------------------------------------------------------------------------- | ------------------------------------------------------- |
 | `display: none → block` + `allow-discrete` | `block/0.00 → block/0.41 → … → block/1.00` **visible from the first frame** | `block/1.00 → … → none/0.00` **visible until the last** |
-| the same, `allow-discrete` as a longhand | identical | identical |
-| the same, **no** `allow-discrete` | no transition at all | no transition at all |
-| `content-visibility: hidden → visible` | same shape as `display` | same shape |
-| `visibility: hidden → visible` | `visibility` interpolates, visible from ~25% | hides early on the way out |
-| an ordinary `opacity` change | baseline | baseline |
+| the same, `allow-discrete` as a longhand   | identical                                                                   | identical                                               |
+| the same, **no** `allow-discrete`          | no transition at all                                                        | no transition at all                                    |
+| `content-visibility: hidden → visible`     | same shape as `display`                                                     | same shape                                              |
+| `visibility: hidden → visible`             | `visibility` interpolates, visible from ~25%                                | hides early on the way out                              |
+| an ordinary `opacity` change               | baseline                                                                    | baseline                                                |
 
 The asymmetry is the feature: **entry flips at the start and exit flips at the end**, so the element is
 present for the whole of its entrance and for the whole of its exit. That is not a coincidence of these
@@ -39,7 +39,7 @@ why "fade something in and out of existence" works with nothing but a transition
 
 ## 2 · What `allow-discrete` actually changes
 
-Not *whether* a discrete property flips — **when**. Without it, `display` cannot change at all inside a
+Not _whether_ a discrete property flips — **when**. Without it, `display` cannot change at all inside a
 transition (row three: nothing runs, in either direction). With it, the flip is placed at the end of the
 transition on the way out and at the start on the way in, which is exactly what keeps content on screen
 while it animates.
@@ -52,12 +52,12 @@ shorthand-versus-longhand question in §6.
 
 The four ways an element becomes present, measured:
 
-| how it becomes present | without `@starting-style` | with it |
-| --- | --- | --- |
-| newly inserted into the DOM | **no transition** (it just appears at its final style) | transitions from the starting style |
-| from `display: none` (a class toggle) | nothing ran — the "before" state is not rendered, so there is nothing to travel from | transitions, and §1 shows the flip placement |
+| how it becomes present                              | without `@starting-style`                                                                                | with it                                                                                             |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| newly inserted into the DOM                         | **no transition** (it just appears at its final style)                                                   | transitions from the starting style                                                                 |
+| from `display: none` (a class toggle)               | nothing ran — the "before" state is not rendered, so there is nothing to travel from                     | transitions, and §1 shows the flip placement                                                        |
 | entering the top layer (`showModal`, `showPopover`) | `opacity` still transitions, because the UA's own `display`/`overlay` change is what the transition sees | transitions from the starting style; `overlay: auto` is in the property list when its value changes |
-| an ordinary style change, already present | transitions | not needed — there is a before-style already |
+| an ordinary style change, already present           | transitions                                                                                              | not needed — there is a before-style already                                                        |
 
 So `@starting-style` is precisely "the before-style that a first render has no previous value to supply".
 It is a **conditional at-rule**, which is the one structural fact that matters for Jumi (§6).
@@ -83,16 +83,16 @@ That question is now answered — §8 — and the reason it did not materialise 
 `pnpm spike:discrete-keyframes` (`scripts/spike-discrete-keyframes.mjs`), same browser, every probe element
 rendered from the start so that an `Animation` has a chance to exist at all.
 
-| case | result |
-| --- | --- |
-| `display: block → none`, `fill: both` | the Animation exists; samples at 0 / 25 / 50 / 75% all read `block`, and only the final sample reads `none` |
-| the same for `content-visibility` and `visibility` | identical shape |
-| the same with **both** keyframes written, sampled at 40 / 50 / 60% | still `block` — so this is not a case of the `from` frame being implicit |
-| `fill: none`, read at the end and after it | `block` — the keyframe's value is reverted |
-| `iteration-count: 3`, six samples across the run | `block` throughout — no flip per iteration |
-| `animation-timeline: scroll()` | the same end-only shape: `none` at 100% |
-| `overlay` in a keyframe, on a modal dialog in the top layer | inert — the computed value stays `auto` |
-| `display: none → block` (inwards) | **no Animation object at all**, and `display` stays `none` |
+| case                                                               | result                                                                                                      |
+| ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `display: block → none`, `fill: both`                              | the Animation exists; samples at 0 / 25 / 50 / 75% all read `block`, and only the final sample reads `none` |
+| the same for `content-visibility` and `visibility`                 | identical shape                                                                                             |
+| the same with **both** keyframes written, sampled at 40 / 50 / 60% | still `block` — so this is not a case of the `from` frame being implicit                                    |
+| `fill: none`, read at the end and after it                         | `block` — the keyframe's value is reverted                                                                  |
+| `iteration-count: 3`, six samples across the run                   | `block` throughout — no flip per iteration                                                                  |
+| `animation-timeline: scroll()`                                     | the same end-only shape: `none` at 100%                                                                     |
+| `overlay` in a keyframe, on a modal dialog in the top layer        | inert — the computed value stays `auto`                                                                     |
+| `display: none → block` (inwards)                                  | **no Animation object at all**, and `display` stays `none`                                                  |
 
 Two facts, and the second is the load-bearing one:
 
@@ -101,7 +101,7 @@ Two facts, and the second is the load-bearing one:
 - **A discrete change is the animation's end value, not an interpolation.** The property holds its base
   value for the whole active interval and takes the keyframe's value only where a fill applies it; with
   `fill: none` it never changes. So there is no keyframe analogue of `allow-discrete`, no flip placement to
-  reason about, and no midpoint rule to exploit — the discrete machinery lives on the *transition* path,
+  reason about, and no midpoint rule to exploit — the discrete machinery lives on the _transition_ path,
   and the two mechanisms differ rather than overlap.
 
 Read against the spec, `visibility`'s end flip is its own rule (it flips at 0% on the way to `visible` and
@@ -111,8 +111,8 @@ than as a spec reading, and it is Chromium 153 only.
 
 The answer is therefore **no — and that is the useful answer.** Jumi needs no animation-side support for
 discrete state, §6's division of labour stands unchanged, and §7's boundary is now backed by a platform
-fact instead of an intuition: an entrance *effect* is a motion; becoming present is a transition, because
-for content that does not yet exist there is nothing else it *could* be.
+fact instead of an intuition: an entrance _effect_ is a motion; becoming present is a transition, because
+for content that does not yet exist there is nothing else it _could_ be.
 
 ## 6 · Jumi, read rather than assumed
 
@@ -122,7 +122,7 @@ variable chains.
 
 The specific question was whether `transition-behavior` suffers the placement problem that
 `animation-range` and `animation-timeline` did — the `animation` shorthand resets both, so they have to be
-declared *after* it. Measured on the emitted rule: `transition:` at offset 110, `transition-behavior` at
+declared _after_ it. Measured on the emitted rule: `transition:` at offset 110, `transition-behavior` at
 680 — **already after the shorthand**, and in the same rule. So the shorthand does not eat it, and a
 transition-based entry/exit feature needs no placement fix.
 
@@ -146,7 +146,7 @@ animate-fade-in            an animation that runs because the author asked for o
 
 One is explicit keyframe motion with a duration, a timeline, iteration and every control Jumi has; the
 other is state interpolation that happens once, when presence changes, and cannot be replayed. Keeping them
-conceptually distinct is the recommendation: an entrance *effect* is a motion, and "appear on entry" is a
+conceptually distinct is the recommendation: an entrance _effect_ is a motion, and "appear on entry" is a
 transition. They compose (both may run) but neither replaces the other.
 
 ## Instrument notes
@@ -163,6 +163,6 @@ cannot reveal `offset-rotate`**, and **`getComputedTiming().duration` is a numbe
 and a `CSSUnitValue` for progress-driven ones**.
 
 And one that is not a fixture bug at all but a parse error: a browser fixture is a single template literal,
-so a backtick *anywhere* inside it — including in a comment, including around one word — ends the template
+so a backtick _anywhere_ inside it — including in a comment, including around one word — ends the template
 and the file does not load. The fix that stops it recurring is structural rather than attentive: prose with
 code spans lives above the template, and the fixture carries only plain markers.
