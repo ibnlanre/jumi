@@ -205,7 +205,8 @@ describe('property curry', () => {
     // The label is the address a person can write down, unlike the hash the
     // frame variables are keyed by, so the rule says what the slot is called.
     expect(labelled).toMatchObject({
-      [`--jumi-rotate-${shorthash2('0:0deg|58:0deg')}-label`]: 'flick',
+      [`--jumi-rotate-${shorthash2('0:0deg|58:0deg')}-${shorthash2('flick')}-label`]:
+        'flick',
     })
     expect(bare).not.toHaveProperty(
       `--jumi-rotate-${shorthash2('0:0deg|100:90deg')}-label`,
@@ -426,13 +427,45 @@ describe('animations wiring', () => {
       ].join(', '),
     )
   })
+
+  it('gives two names on one phrase two slots over one keyframe', () => {
+    const { creator } = setup()
+
+    creator.property('opacity')('0:0|100:1', { modifier: 'enter' })
+    creator.property('opacity')('0:0|100:1', { modifier: 'exit' })
+    const animations = creator.animations
+    const id = shorthash2('0:0|100:1')
+
+    // Instance identity, not definition identity. Both entries name the *same* keyframe — the frames
+    // are declared once — and the two names are two slots, so either can be timed without the other.
+    // Leaving the name out of the key made the second name replace the first instead.
+    expect(animations['animation-name']).toBe(
+      [
+        `var(--jumi-opacity-${id}-animation-name, var(--jumi-animation-name))`,
+        `var(--jumi-opacity-${id}-animation-name, var(--jumi-animation-name))`,
+      ].join(', '),
+    )
+  })
+
+  it('collapses a repeated name to one instance', () => {
+    const { creator } = setup()
+
+    creator.property('opacity')('0:0|100:1', { modifier: 'enter' })
+    creator.property('opacity')('0:0|100:1', { modifier: 'enter' })
+    const animations = creator.animations
+
+    // The same definition under the same name is one motion, however often a variant re-declares it.
+    expect(animations['animation-name']).toBe(
+      `var(--jumi-opacity-${shorthash2('0:0|100:1')}-animation-name, var(--jumi-animation-name))`,
+    )
+  })
   it('gives every slot its own address, and never carries a name in the aggregate', () => {
     const { creator } = setup()
 
     creator.property('rotate')('0:0deg|58:0deg', { modifier: 'flick' })
     creator.property('rotate')('0:0deg|100:90deg', { modifier: null })
     const animations = creator.animations
-    const flick = `--jumi-slot-rotate-${shorthash2('0:0deg|58:0deg')}`
+    const flick = `--jumi-slot-rotate-${shorthash2('0:0deg|58:0deg')}-${shorthash2('flick')}`
 
     // Each position reads *its own* slot variable before the property's control, so one animation of
     // a property can be timed without the other — which is how two animations summed by

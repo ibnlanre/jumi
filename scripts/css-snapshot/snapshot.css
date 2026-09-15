@@ -351,39 +351,39 @@
   }
   .animate-rotate-\[0\:0deg\|20\:-8deg\|100\:-8deg\]\/\[flick\] {
     --jumi-rotate-Z2excak-animation-name: jumi-rotate-Z2excak;
-    --jumi-rotate-Z2excak-label: flick;
+    --jumi-rotate-Z2excak-72Dbc-label: flick;
     --jumi-rotate-Z2excak-0: 0deg;
     --jumi-rotate-Z2excak-20: -8deg;
     --jumi-rotate-Z2excak-100: -8deg;
-    --jumi-slot-rotate-Z2excak: var(--jumi-rotate-Z2excak-animation-name, var(--jumi-animation-name)) var(--jumi-slot-rotate-Z2excak-animation-duration, var(--jumi-rotate-animation-duration, var(--jumi-animation-duration))) var(--jumi-slot-rotate-Z2excak-animation-timing-function, var(--jumi-rotate-animation-timing-function, var(--jumi-animation-timing-function))) var(--jumi-slot-rotate-Z2excak-animation-delay, var(--jumi-rotate-animation-delay, var(--jumi-animation-delay))) var(--jumi-slot-rotate-Z2excak-animation-iteration-count, var(--jumi-rotate-animation-iteration-count, var(--jumi-animation-iteration-count))) var(--jumi-slot-rotate-Z2excak-animation-direction, var(--jumi-rotate-animation-direction, var(--jumi-animation-direction))) var(--jumi-slot-rotate-Z2excak-animation-fill-mode, var(--jumi-rotate-animation-fill-mode, var(--jumi-animation-fill-mode))) var(--jumi-slot-rotate-Z2excak-animation-play-state, var(--jumi-rotate-animation-play-state, var(--jumi-animation-play-state)));
-    --jumi-slot-rotate-Z2excak-animation-duration: var(--jumi-flick-animation-duration);
-    --jumi-slot-rotate-Z2excak-animation-timing-function: var(--jumi-flick-animation-timing-function);
-    --jumi-slot-rotate-Z2excak-animation-delay: var(--jumi-flick-animation-delay);
-    --jumi-slot-rotate-Z2excak-animation-iteration-count: var(--jumi-flick-animation-iteration-count);
-    --jumi-slot-rotate-Z2excak-animation-direction: var(--jumi-flick-animation-direction);
-    --jumi-slot-rotate-Z2excak-animation-fill-mode: var(--jumi-flick-animation-fill-mode);
-    --jumi-slot-rotate-Z2excak-animation-play-state: var(--jumi-flick-animation-play-state);
-    --jumi-slot-rotate-Z2excak-animation-composition: var(--jumi-flick-animation-composition);
-    --jumi-slot-rotate-Z2excak-animation-range: var(--jumi-flick-animation-range);
-    --jumi-slot-rotate-Z2excak-animation-timeline: var(--jumi-flick-animation-timeline);
+    --jumi-slot-rotate-Z2excak-72Dbc: var(--jumi-rotate-Z2excak-animation-name, var(--jumi-animation-name)) var(--jumi-slot-rotate-Z2excak-72Dbc-animation-duration, var(--jumi-rotate-animation-duration, var(--jumi-animation-duration))) var(--jumi-slot-rotate-Z2excak-72Dbc-animation-timing-function, var(--jumi-rotate-animation-timing-function, var(--jumi-animation-timing-function))) var(--jumi-slot-rotate-Z2excak-72Dbc-animation-delay, var(--jumi-rotate-animation-delay, var(--jumi-animation-delay))) var(--jumi-slot-rotate-Z2excak-72Dbc-animation-iteration-count, var(--jumi-rotate-animation-iteration-count, var(--jumi-animation-iteration-count))) var(--jumi-slot-rotate-Z2excak-72Dbc-animation-direction, var(--jumi-rotate-animation-direction, var(--jumi-animation-direction))) var(--jumi-slot-rotate-Z2excak-72Dbc-animation-fill-mode, var(--jumi-rotate-animation-fill-mode, var(--jumi-animation-fill-mode))) var(--jumi-slot-rotate-Z2excak-72Dbc-animation-play-state, var(--jumi-rotate-animation-play-state, var(--jumi-animation-play-state)));
+    --jumi-slot-rotate-Z2excak-72Dbc-animation-duration: var(--jumi-flick-animation-duration);
+    --jumi-slot-rotate-Z2excak-72Dbc-animation-timing-function: var(--jumi-flick-animation-timing-function);
+    --jumi-slot-rotate-Z2excak-72Dbc-animation-delay: var(--jumi-flick-animation-delay);
+    --jumi-slot-rotate-Z2excak-72Dbc-animation-iteration-count: var(--jumi-flick-animation-iteration-count);
+    --jumi-slot-rotate-Z2excak-72Dbc-animation-direction: var(--jumi-flick-animation-direction);
+    --jumi-slot-rotate-Z2excak-72Dbc-animation-fill-mode: var(--jumi-flick-animation-fill-mode);
+    --jumi-slot-rotate-Z2excak-72Dbc-animation-play-state: var(--jumi-flick-animation-play-state);
+    --jumi-slot-rotate-Z2excak-72Dbc-animation-composition: var(--jumi-flick-animation-composition);
+    --jumi-slot-rotate-Z2excak-72Dbc-animation-range: var(--jumi-flick-animation-range);
+    --jumi-slot-rotate-Z2excak-72Dbc-animation-timeline: var(--jumi-flick-animation-timeline);
   }
   .animate-rotate-\[0\:0deg\|20\:0deg\|100\:8deg\]\/\[return\] {
     --jumi-rotate-1CgNAd-animation-name: jumi-rotate-1CgNAd;
-    --jumi-rotate-1CgNAd-label: return;
+    --jumi-rotate-1CgNAd-Z16tCnr-label: return;
     --jumi-rotate-1CgNAd-0: 0deg;
     --jumi-rotate-1CgNAd-20: 0deg;
     --jumi-rotate-1CgNAd-100: 8deg;
-    --jumi-slot-rotate-1CgNAd: var(--jumi-rotate-1CgNAd-animation-name, var(--jumi-animation-name)) var(--jumi-slot-rotate-1CgNAd-animation-duration, var(--jumi-rotate-animation-duration, var(--jumi-animation-duration))) var(--jumi-slot-rotate-1CgNAd-animation-timing-function, var(--jumi-rotate-animation-timing-function, var(--jumi-animation-timing-function))) var(--jumi-slot-rotate-1CgNAd-animation-delay, var(--jumi-rotate-animation-delay, var(--jumi-animation-delay))) var(--jumi-slot-rotate-1CgNAd-animation-iteration-count, var(--jumi-rotate-animation-iteration-count, var(--jumi-animation-iteration-count))) var(--jumi-slot-rotate-1CgNAd-animation-direction, var(--jumi-rotate-animation-direction, var(--jumi-animation-direction))) var(--jumi-slot-rotate-1CgNAd-animation-fill-mode, var(--jumi-rotate-animation-fill-mode, var(--jumi-animation-fill-mode))) var(--jumi-slot-rotate-1CgNAd-animation-play-state, var(--jumi-rotate-animation-play-state, var(--jumi-animation-play-state)));
-    --jumi-slot-rotate-1CgNAd-animation-duration: var(--jumi-return-animation-duration);
-    --jumi-slot-rotate-1CgNAd-animation-timing-function: var(--jumi-return-animation-timing-function);
-    --jumi-slot-rotate-1CgNAd-animation-delay: var(--jumi-return-animation-delay);
-    --jumi-slot-rotate-1CgNAd-animation-iteration-count: var(--jumi-return-animation-iteration-count);
-    --jumi-slot-rotate-1CgNAd-animation-direction: var(--jumi-return-animation-direction);
-    --jumi-slot-rotate-1CgNAd-animation-fill-mode: var(--jumi-return-animation-fill-mode);
-    --jumi-slot-rotate-1CgNAd-animation-play-state: var(--jumi-return-animation-play-state);
-    --jumi-slot-rotate-1CgNAd-animation-composition: var(--jumi-return-animation-composition);
-    --jumi-slot-rotate-1CgNAd-animation-range: var(--jumi-return-animation-range);
-    --jumi-slot-rotate-1CgNAd-animation-timeline: var(--jumi-return-animation-timeline);
+    --jumi-slot-rotate-1CgNAd-Z16tCnr: var(--jumi-rotate-1CgNAd-animation-name, var(--jumi-animation-name)) var(--jumi-slot-rotate-1CgNAd-Z16tCnr-animation-duration, var(--jumi-rotate-animation-duration, var(--jumi-animation-duration))) var(--jumi-slot-rotate-1CgNAd-Z16tCnr-animation-timing-function, var(--jumi-rotate-animation-timing-function, var(--jumi-animation-timing-function))) var(--jumi-slot-rotate-1CgNAd-Z16tCnr-animation-delay, var(--jumi-rotate-animation-delay, var(--jumi-animation-delay))) var(--jumi-slot-rotate-1CgNAd-Z16tCnr-animation-iteration-count, var(--jumi-rotate-animation-iteration-count, var(--jumi-animation-iteration-count))) var(--jumi-slot-rotate-1CgNAd-Z16tCnr-animation-direction, var(--jumi-rotate-animation-direction, var(--jumi-animation-direction))) var(--jumi-slot-rotate-1CgNAd-Z16tCnr-animation-fill-mode, var(--jumi-rotate-animation-fill-mode, var(--jumi-animation-fill-mode))) var(--jumi-slot-rotate-1CgNAd-Z16tCnr-animation-play-state, var(--jumi-rotate-animation-play-state, var(--jumi-animation-play-state)));
+    --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-duration: var(--jumi-return-animation-duration);
+    --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-timing-function: var(--jumi-return-animation-timing-function);
+    --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-delay: var(--jumi-return-animation-delay);
+    --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-iteration-count: var(--jumi-return-animation-iteration-count);
+    --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-direction: var(--jumi-return-animation-direction);
+    --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-fill-mode: var(--jumi-return-animation-fill-mode);
+    --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-play-state: var(--jumi-return-animation-play-state);
+    --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-composition: var(--jumi-return-animation-composition);
+    --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-range: var(--jumi-return-animation-range);
+    --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-timeline: var(--jumi-return-animation-timeline);
   }
   .animate-opacity-\[0\:1\|50\:0\.5\|100\:1\] {
     --jumi-opacity-Z2p4Ykg-animation-name: jumi-opacity-Z2p4Ykg;
@@ -706,10 +706,10 @@
 .sm\:animate-rotate-45,
 .\[\&\:is\(h1\)\]\:animate-fade-in:is(h1),
 .applied-motion{
-    animation: var(--jumi-slot-rotate-1Ma5hg, none), var(--jumi-slot-rotate-1I9WLW, none), var(--jumi-slot-rotate-3zWYd, none), var(--jumi-slot-accent-color-1YjYzf, none), var(--jumi-slot-background-color-23M1JK, none), var(--jumi-slot-background-color-Z2wlvkD, none), var(--jumi-slot-border-color-1Jl9fj, none), var(--jumi-slot-border-radius-2dRcKj, none), var(--jumi-slot-box-shadow-24PYa, none), var(--jumi-slot-caret-color-abeHu, none), var(--jumi-slot-fill-1gixqf, none), var(--jumi-slot-fill-eUhJ, none), var(--jumi-slot-letter-spacing-1U51M9, none), var(--jumi-slot-line-height-Z1kfb3b, none), var(--jumi-slot-line-height-Z2kCBW2, none), var(--jumi-slot-margin-Z1kfb5d, none), var(--jumi-slot-max-width-Z1kfb4c, none), var(--jumi-slot-max-width-22L7Hs, none), var(--jumi-slot-padding-Z1kfb4c, none), var(--jumi-slot-scale-d38, none), var(--jumi-slot-backdrop-filter, none), var(--jumi-slot-box-shadow, none), var(--jumi-slot-outline, none), var(--jumi-slot-scale, none), var(--jumi-slot-opacity-Z2p4Ykg, none), var(--jumi-slot-rotate-Z2excak, none), var(--jumi-slot-rotate-1CgNAd, none), var(--jumi-slot-rotate-JgEqx, none), var(--jumi-slot-rotate-5fjp3, none), var(--jumi-slot-scale-ZhUH2y, none), var(--jumi-slot-bounce-in, none), var(--jumi-slot-fade-in, none), var(--jumi-slot-shake, none);
-    animation-composition: var(--jumi-rotate-animation-composition, var(--jumi-animation-composition)), var(--jumi-rotate-animation-composition, var(--jumi-animation-composition)), var(--jumi-rotate-animation-composition, var(--jumi-animation-composition)), var(--jumi-accent-color-animation-composition, var(--jumi-animation-composition)), var(--jumi-background-color-animation-composition, var(--jumi-animation-composition)), var(--jumi-background-color-animation-composition, var(--jumi-animation-composition)), var(--jumi-border-color-animation-composition, var(--jumi-animation-composition)), var(--jumi-border-radius-animation-composition, var(--jumi-animation-composition)), var(--jumi-box-shadow-animation-composition, var(--jumi-animation-composition)), var(--jumi-caret-color-animation-composition, var(--jumi-animation-composition)), var(--jumi-fill-animation-composition, var(--jumi-animation-composition)), var(--jumi-fill-animation-composition, var(--jumi-animation-composition)), var(--jumi-letter-spacing-animation-composition, var(--jumi-animation-composition)), var(--jumi-line-height-animation-composition, var(--jumi-animation-composition)), var(--jumi-line-height-animation-composition, var(--jumi-animation-composition)), var(--jumi-margin-animation-composition, var(--jumi-animation-composition)), var(--jumi-max-width-animation-composition, var(--jumi-animation-composition)), var(--jumi-max-width-animation-composition, var(--jumi-animation-composition)), var(--jumi-padding-animation-composition, var(--jumi-animation-composition)), var(--jumi-scale-animation-composition, var(--jumi-animation-composition)), var(--jumi-backdrop-filter-animation-composition, var(--jumi-animation-composition)), var(--jumi-box-shadow-animation-composition, var(--jumi-animation-composition)), var(--jumi-outline-animation-composition, var(--jumi-animation-composition)), var(--jumi-scale-animation-composition, var(--jumi-animation-composition)), var(--jumi-opacity-animation-composition, var(--jumi-animation-composition)), var(--jumi-slot-rotate-Z2excak-animation-composition, var(--jumi-rotate-animation-composition, var(--jumi-animation-composition))), var(--jumi-slot-rotate-1CgNAd-animation-composition, var(--jumi-rotate-animation-composition, var(--jumi-animation-composition))), var(--jumi-rotate-animation-composition, var(--jumi-animation-composition)), var(--jumi-rotate-animation-composition, var(--jumi-animation-composition)), var(--jumi-scale-animation-composition, var(--jumi-animation-composition)), var(--jumi-bounce-in-animation-composition, var(--jumi-animation-composition)), var(--jumi-fade-in-animation-composition, var(--jumi-animation-composition)), var(--jumi-shake-animation-composition, var(--jumi-animation-composition));
-    animation-range: var(--jumi-rotate-1Ma5hg-animation-range, var(--jumi-rotate-animation-range, var(--jumi-animation-range))), var(--jumi-rotate-1I9WLW-animation-range, var(--jumi-rotate-animation-range, var(--jumi-animation-range))), var(--jumi-rotate-3zWYd-animation-range, var(--jumi-rotate-animation-range, var(--jumi-animation-range))), var(--jumi-accent-color-1YjYzf-animation-range, var(--jumi-accent-color-animation-range, var(--jumi-animation-range))), var(--jumi-background-color-23M1JK-animation-range, var(--jumi-background-color-animation-range, var(--jumi-animation-range))), var(--jumi-background-color-Z2wlvkD-animation-range, var(--jumi-background-color-animation-range, var(--jumi-animation-range))), var(--jumi-border-color-1Jl9fj-animation-range, var(--jumi-border-color-animation-range, var(--jumi-animation-range))), var(--jumi-border-radius-2dRcKj-animation-range, var(--jumi-border-radius-animation-range, var(--jumi-animation-range))), var(--jumi-box-shadow-24PYa-animation-range, var(--jumi-box-shadow-animation-range, var(--jumi-animation-range))), var(--jumi-caret-color-abeHu-animation-range, var(--jumi-caret-color-animation-range, var(--jumi-animation-range))), var(--jumi-fill-1gixqf-animation-range, var(--jumi-fill-animation-range, var(--jumi-animation-range))), var(--jumi-fill-eUhJ-animation-range, var(--jumi-fill-animation-range, var(--jumi-animation-range))), var(--jumi-letter-spacing-1U51M9-animation-range, var(--jumi-letter-spacing-animation-range, var(--jumi-animation-range))), var(--jumi-line-height-Z1kfb3b-animation-range, var(--jumi-line-height-animation-range, var(--jumi-animation-range))), var(--jumi-line-height-Z2kCBW2-animation-range, var(--jumi-line-height-animation-range, var(--jumi-animation-range))), var(--jumi-margin-Z1kfb5d-animation-range, var(--jumi-margin-animation-range, var(--jumi-animation-range))), var(--jumi-max-width-Z1kfb4c-animation-range, var(--jumi-max-width-animation-range, var(--jumi-animation-range))), var(--jumi-max-width-22L7Hs-animation-range, var(--jumi-max-width-animation-range, var(--jumi-animation-range))), var(--jumi-padding-Z1kfb4c-animation-range, var(--jumi-padding-animation-range, var(--jumi-animation-range))), var(--jumi-scale-d38-animation-range, var(--jumi-scale-animation-range, var(--jumi-animation-range))), var(--jumi-backdrop-filter-animation-range, var(--jumi-animation-range)), var(--jumi-box-shadow-animation-range, var(--jumi-animation-range)), var(--jumi-outline-animation-range, var(--jumi-animation-range)), var(--jumi-scale-animation-range, var(--jumi-animation-range)), var(--jumi-opacity-Z2p4Ykg-animation-range, var(--jumi-opacity-animation-range, var(--jumi-animation-range))), var(--jumi-slot-rotate-Z2excak-animation-range, var(--jumi-rotate-Z2excak-animation-range, var(--jumi-rotate-animation-range, var(--jumi-animation-range)))), var(--jumi-slot-rotate-1CgNAd-animation-range, var(--jumi-rotate-1CgNAd-animation-range, var(--jumi-rotate-animation-range, var(--jumi-animation-range)))), var(--jumi-rotate-JgEqx-animation-range, var(--jumi-rotate-animation-range, var(--jumi-animation-range))), var(--jumi-rotate-5fjp3-animation-range, var(--jumi-rotate-animation-range, var(--jumi-animation-range))), var(--jumi-scale-ZhUH2y-animation-range, var(--jumi-scale-animation-range, var(--jumi-animation-range))), var(--jumi-bounce-in-animation-range, var(--jumi-animation-range)), var(--jumi-fade-in-animation-range, var(--jumi-animation-range)), var(--jumi-shake-animation-range, var(--jumi-animation-range));
-    animation-timeline: var(--jumi-rotate-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-rotate-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-rotate-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-accent-color-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-background-color-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-background-color-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-border-color-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-border-radius-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-box-shadow-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-caret-color-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-fill-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-fill-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-letter-spacing-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-line-height-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-line-height-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-margin-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-max-width-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-max-width-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-padding-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-scale-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-backdrop-filter-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-box-shadow-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-outline-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-scale-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-opacity-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-slot-rotate-Z2excak-animation-timeline, var(--jumi-rotate-animation-timeline, var(--jumi-animation-timeline))), var(--jumi-slot-rotate-1CgNAd-animation-timeline, var(--jumi-rotate-animation-timeline, var(--jumi-animation-timeline))), var(--jumi-rotate-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-rotate-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-scale-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-bounce-in-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-fade-in-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-shake-animation-timeline, var(--jumi-animation-timeline));
+    animation: var(--jumi-slot-rotate-1Ma5hg, none), var(--jumi-slot-rotate-1I9WLW, none), var(--jumi-slot-rotate-3zWYd, none), var(--jumi-slot-accent-color-1YjYzf, none), var(--jumi-slot-background-color-23M1JK, none), var(--jumi-slot-background-color-Z2wlvkD, none), var(--jumi-slot-border-color-1Jl9fj, none), var(--jumi-slot-border-radius-2dRcKj, none), var(--jumi-slot-box-shadow-24PYa, none), var(--jumi-slot-caret-color-abeHu, none), var(--jumi-slot-fill-1gixqf, none), var(--jumi-slot-fill-eUhJ, none), var(--jumi-slot-letter-spacing-1U51M9, none), var(--jumi-slot-line-height-Z1kfb3b, none), var(--jumi-slot-line-height-Z2kCBW2, none), var(--jumi-slot-margin-Z1kfb5d, none), var(--jumi-slot-max-width-Z1kfb4c, none), var(--jumi-slot-max-width-22L7Hs, none), var(--jumi-slot-padding-Z1kfb4c, none), var(--jumi-slot-scale-d38, none), var(--jumi-slot-backdrop-filter, none), var(--jumi-slot-box-shadow, none), var(--jumi-slot-outline, none), var(--jumi-slot-scale, none), var(--jumi-slot-opacity-Z2p4Ykg, none), var(--jumi-slot-rotate-Z2excak-72Dbc, none), var(--jumi-slot-rotate-1CgNAd-Z16tCnr, none), var(--jumi-slot-rotate-JgEqx, none), var(--jumi-slot-rotate-5fjp3, none), var(--jumi-slot-scale-ZhUH2y, none), var(--jumi-slot-bounce-in, none), var(--jumi-slot-fade-in, none), var(--jumi-slot-shake, none);
+    animation-composition: var(--jumi-rotate-animation-composition, var(--jumi-animation-composition)), var(--jumi-rotate-animation-composition, var(--jumi-animation-composition)), var(--jumi-rotate-animation-composition, var(--jumi-animation-composition)), var(--jumi-accent-color-animation-composition, var(--jumi-animation-composition)), var(--jumi-background-color-animation-composition, var(--jumi-animation-composition)), var(--jumi-background-color-animation-composition, var(--jumi-animation-composition)), var(--jumi-border-color-animation-composition, var(--jumi-animation-composition)), var(--jumi-border-radius-animation-composition, var(--jumi-animation-composition)), var(--jumi-box-shadow-animation-composition, var(--jumi-animation-composition)), var(--jumi-caret-color-animation-composition, var(--jumi-animation-composition)), var(--jumi-fill-animation-composition, var(--jumi-animation-composition)), var(--jumi-fill-animation-composition, var(--jumi-animation-composition)), var(--jumi-letter-spacing-animation-composition, var(--jumi-animation-composition)), var(--jumi-line-height-animation-composition, var(--jumi-animation-composition)), var(--jumi-line-height-animation-composition, var(--jumi-animation-composition)), var(--jumi-margin-animation-composition, var(--jumi-animation-composition)), var(--jumi-max-width-animation-composition, var(--jumi-animation-composition)), var(--jumi-max-width-animation-composition, var(--jumi-animation-composition)), var(--jumi-padding-animation-composition, var(--jumi-animation-composition)), var(--jumi-scale-animation-composition, var(--jumi-animation-composition)), var(--jumi-backdrop-filter-animation-composition, var(--jumi-animation-composition)), var(--jumi-box-shadow-animation-composition, var(--jumi-animation-composition)), var(--jumi-outline-animation-composition, var(--jumi-animation-composition)), var(--jumi-scale-animation-composition, var(--jumi-animation-composition)), var(--jumi-opacity-animation-composition, var(--jumi-animation-composition)), var(--jumi-slot-rotate-Z2excak-72Dbc-animation-composition, var(--jumi-rotate-animation-composition, var(--jumi-animation-composition))), var(--jumi-slot-rotate-1CgNAd-Z16tCnr-animation-composition, var(--jumi-rotate-animation-composition, var(--jumi-animation-composition))), var(--jumi-rotate-animation-composition, var(--jumi-animation-composition)), var(--jumi-rotate-animation-composition, var(--jumi-animation-composition)), var(--jumi-scale-animation-composition, var(--jumi-animation-composition)), var(--jumi-bounce-in-animation-composition, var(--jumi-animation-composition)), var(--jumi-fade-in-animation-composition, var(--jumi-animation-composition)), var(--jumi-shake-animation-composition, var(--jumi-animation-composition));
+    animation-range: var(--jumi-rotate-1Ma5hg-animation-range, var(--jumi-rotate-animation-range, var(--jumi-animation-range))), var(--jumi-rotate-1I9WLW-animation-range, var(--jumi-rotate-animation-range, var(--jumi-animation-range))), var(--jumi-rotate-3zWYd-animation-range, var(--jumi-rotate-animation-range, var(--jumi-animation-range))), var(--jumi-accent-color-1YjYzf-animation-range, var(--jumi-accent-color-animation-range, var(--jumi-animation-range))), var(--jumi-background-color-23M1JK-animation-range, var(--jumi-background-color-animation-range, var(--jumi-animation-range))), var(--jumi-background-color-Z2wlvkD-animation-range, var(--jumi-background-color-animation-range, var(--jumi-animation-range))), var(--jumi-border-color-1Jl9fj-animation-range, var(--jumi-border-color-animation-range, var(--jumi-animation-range))), var(--jumi-border-radius-2dRcKj-animation-range, var(--jumi-border-radius-animation-range, var(--jumi-animation-range))), var(--jumi-box-shadow-24PYa-animation-range, var(--jumi-box-shadow-animation-range, var(--jumi-animation-range))), var(--jumi-caret-color-abeHu-animation-range, var(--jumi-caret-color-animation-range, var(--jumi-animation-range))), var(--jumi-fill-1gixqf-animation-range, var(--jumi-fill-animation-range, var(--jumi-animation-range))), var(--jumi-fill-eUhJ-animation-range, var(--jumi-fill-animation-range, var(--jumi-animation-range))), var(--jumi-letter-spacing-1U51M9-animation-range, var(--jumi-letter-spacing-animation-range, var(--jumi-animation-range))), var(--jumi-line-height-Z1kfb3b-animation-range, var(--jumi-line-height-animation-range, var(--jumi-animation-range))), var(--jumi-line-height-Z2kCBW2-animation-range, var(--jumi-line-height-animation-range, var(--jumi-animation-range))), var(--jumi-margin-Z1kfb5d-animation-range, var(--jumi-margin-animation-range, var(--jumi-animation-range))), var(--jumi-max-width-Z1kfb4c-animation-range, var(--jumi-max-width-animation-range, var(--jumi-animation-range))), var(--jumi-max-width-22L7Hs-animation-range, var(--jumi-max-width-animation-range, var(--jumi-animation-range))), var(--jumi-padding-Z1kfb4c-animation-range, var(--jumi-padding-animation-range, var(--jumi-animation-range))), var(--jumi-scale-d38-animation-range, var(--jumi-scale-animation-range, var(--jumi-animation-range))), var(--jumi-backdrop-filter-animation-range, var(--jumi-animation-range)), var(--jumi-box-shadow-animation-range, var(--jumi-animation-range)), var(--jumi-outline-animation-range, var(--jumi-animation-range)), var(--jumi-scale-animation-range, var(--jumi-animation-range)), var(--jumi-opacity-Z2p4Ykg-animation-range, var(--jumi-opacity-animation-range, var(--jumi-animation-range))), var(--jumi-slot-rotate-Z2excak-72Dbc-animation-range, var(--jumi-rotate-Z2excak-72Dbc-animation-range, var(--jumi-rotate-animation-range, var(--jumi-animation-range)))), var(--jumi-slot-rotate-1CgNAd-Z16tCnr-animation-range, var(--jumi-rotate-1CgNAd-Z16tCnr-animation-range, var(--jumi-rotate-animation-range, var(--jumi-animation-range)))), var(--jumi-rotate-JgEqx-animation-range, var(--jumi-rotate-animation-range, var(--jumi-animation-range))), var(--jumi-rotate-5fjp3-animation-range, var(--jumi-rotate-animation-range, var(--jumi-animation-range))), var(--jumi-scale-ZhUH2y-animation-range, var(--jumi-scale-animation-range, var(--jumi-animation-range))), var(--jumi-bounce-in-animation-range, var(--jumi-animation-range)), var(--jumi-fade-in-animation-range, var(--jumi-animation-range)), var(--jumi-shake-animation-range, var(--jumi-animation-range));
+    animation-timeline: var(--jumi-rotate-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-rotate-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-rotate-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-accent-color-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-background-color-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-background-color-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-border-color-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-border-radius-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-box-shadow-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-caret-color-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-fill-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-fill-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-letter-spacing-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-line-height-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-line-height-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-margin-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-max-width-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-max-width-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-padding-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-scale-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-backdrop-filter-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-box-shadow-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-outline-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-scale-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-opacity-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-slot-rotate-Z2excak-72Dbc-animation-timeline, var(--jumi-rotate-animation-timeline, var(--jumi-animation-timeline))), var(--jumi-slot-rotate-1CgNAd-Z16tCnr-animation-timeline, var(--jumi-rotate-animation-timeline, var(--jumi-animation-timeline))), var(--jumi-rotate-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-rotate-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-scale-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-bounce-in-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-fade-in-animation-timeline, var(--jumi-animation-timeline)), var(--jumi-shake-animation-timeline, var(--jumi-animation-timeline));
   }
   .transition-duration-500\/background-color{
     transition: var(--jumi-background-color-transition-property, background-color) var(--jumi-background-color-transition-duration, var(--jumi-transition-duration)) var(--jumi-background-color-transition-timing-function, var(--jumi-transition-timing-function)) var(--jumi-background-color-transition-delay, var(--jumi-transition-delay));
@@ -1121,7 +1121,7 @@
   }
 }
 @layer base {
-  @property --jumi-slot-rotate-Z2excak-animation-composition {
+  @property --jumi-slot-rotate-Z2excak-72Dbc-animation-composition {
     inherits: false;
     syntax: "*";
   }
@@ -1129,7 +1129,7 @@
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-slot-rotate-Z2excak-animation-delay {
+  @property --jumi-slot-rotate-Z2excak-72Dbc-animation-delay {
     inherits: false;
     syntax: "*";
   }
@@ -1137,7 +1137,7 @@
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-slot-rotate-Z2excak-animation-direction {
+  @property --jumi-slot-rotate-Z2excak-72Dbc-animation-direction {
     inherits: false;
     syntax: "*";
   }
@@ -1145,7 +1145,7 @@
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-slot-rotate-Z2excak-animation-duration {
+  @property --jumi-slot-rotate-Z2excak-72Dbc-animation-duration {
     inherits: false;
     syntax: "*";
   }
@@ -1153,7 +1153,7 @@
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-slot-rotate-Z2excak-animation-fill-mode {
+  @property --jumi-slot-rotate-Z2excak-72Dbc-animation-fill-mode {
     inherits: false;
     syntax: "*";
   }
@@ -1161,7 +1161,7 @@
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-slot-rotate-Z2excak-animation-iteration-count {
+  @property --jumi-slot-rotate-Z2excak-72Dbc-animation-iteration-count {
     inherits: false;
     syntax: "*";
   }
@@ -1169,7 +1169,7 @@
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-slot-rotate-Z2excak-animation-play-state {
+  @property --jumi-slot-rotate-Z2excak-72Dbc-animation-play-state {
     inherits: false;
     syntax: "*";
   }
@@ -1177,7 +1177,7 @@
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-slot-rotate-Z2excak-animation-range {
+  @property --jumi-slot-rotate-Z2excak-72Dbc-animation-range {
     inherits: false;
     syntax: "*";
   }
@@ -1185,7 +1185,7 @@
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-slot-rotate-Z2excak-animation-timeline {
+  @property --jumi-slot-rotate-Z2excak-72Dbc-animation-timeline {
     inherits: false;
     syntax: "*";
   }
@@ -1193,7 +1193,7 @@
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-slot-rotate-Z2excak-animation-timing-function {
+  @property --jumi-slot-rotate-Z2excak-72Dbc-animation-timing-function {
     inherits: false;
     syntax: "*";
   }
@@ -1222,7 +1222,7 @@
   }
 }
 @layer base {
-  @property --jumi-slot-rotate-1CgNAd-animation-composition {
+  @property --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-composition {
     inherits: false;
     syntax: "*";
   }
@@ -1230,7 +1230,7 @@
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-slot-rotate-1CgNAd-animation-delay {
+  @property --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-delay {
     inherits: false;
     syntax: "*";
   }
@@ -1238,7 +1238,7 @@
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-slot-rotate-1CgNAd-animation-direction {
+  @property --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-direction {
     inherits: false;
     syntax: "*";
   }
@@ -1246,7 +1246,7 @@
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-slot-rotate-1CgNAd-animation-duration {
+  @property --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-duration {
     inherits: false;
     syntax: "*";
   }
@@ -1254,7 +1254,7 @@
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-slot-rotate-1CgNAd-animation-fill-mode {
+  @property --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-fill-mode {
     inherits: false;
     syntax: "*";
   }
@@ -1262,7 +1262,7 @@
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-slot-rotate-1CgNAd-animation-iteration-count {
+  @property --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-iteration-count {
     inherits: false;
     syntax: "*";
   }
@@ -1270,7 +1270,7 @@
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-slot-rotate-1CgNAd-animation-play-state {
+  @property --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-play-state {
     inherits: false;
     syntax: "*";
   }
@@ -1278,7 +1278,7 @@
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-slot-rotate-1CgNAd-animation-range {
+  @property --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-range {
     inherits: false;
     syntax: "*";
   }
@@ -1286,7 +1286,7 @@
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-slot-rotate-1CgNAd-animation-timeline {
+  @property --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-timeline {
     inherits: false;
     syntax: "*";
   }
@@ -1294,7 +1294,7 @@
     inherits: false;
     syntax: "*";
   }
-  @property --jumi-slot-rotate-1CgNAd-animation-timing-function {
+  @property --jumi-slot-rotate-1CgNAd-Z16tCnr-animation-timing-function {
     inherits: false;
     syntax: "*";
   }

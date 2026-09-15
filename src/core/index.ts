@@ -130,9 +130,20 @@ export const addressableName = (name: string) =>
  * A slot's key: the name a slot is addressed by throughout the model, and the middle of its
  * variable names. `attribute-id` for a phrase or a single value (identity is the value), the
  * attribute for a composed tween or an effect (identity is the property or the effect).
+ *
+ * A name the author gave the motion is part of the key, and that is the whole of motion-instance
+ * identity: two motions may share one generated keyframe — same frames, same `id` — and still be two
+ * slots, addressed and timed independently. Folding the name into the keyframe instead would emit
+ * the same `@keyframes` twice; leaving it out of the key, which is what this used to do, made two
+ * named motions collapse into one, with the second name simply replacing the first.
+ *
+ * The name enters **hashed**, so the key is a discriminator rather than the name itself. The
+ * aggregate's chains are keyed by this string, and a name must not reach the composition: a name is
+ * something an author writes on one element, and the composition is derived from the whole corpus.
+ * The address a person writes down is `--jumi-<name>-<part>`, which is unchanged.
  */
-const slotKey = (attribute: string, id?: string) =>
-  id ? `${attribute}-${id}` : attribute
+const slotKey = (attribute: string, id?: string, name?: null | string) =>
+  id ? `${attribute}-${id}${name ? `-${shorthash2(name)}` : ''}` : attribute
 
 /**
  * A matcher that reads its modifier as a **name** — every motion candidate — carries this tag, so the
@@ -179,15 +190,19 @@ export function createJumiModel({
   const seen = new Set<string>()
 
   // A phrase — `0:16deg|58:0deg` — declares the frames of its own animation, so
-  // it owns a keyframe no other declaration can name. Identity IS the phrase:
-  // two elements share a keyframe only when they declared the identical thing,
-  // which is what makes the frames safe to trust. A keyframe shared per
-  // attribute cannot work — every element animating that property would run the
-  // union of everyone's offsets, and CSS has no way to skip a frame.
-  const phrases = new Map<
-    AnimatableStandardPropertyType,
-    Map<string, Frame[]>
-  >()
+  // it owns a keyframe no other declaration can name. Identity of the
+  // *definition* IS the phrase: two elements share a keyframe only when they
+  // declared the identical thing, which is what makes the frames safe to trust.
+  // A keyframe shared per attribute cannot work — every element animating that
+  // property would run the union of everyone's offsets, and CSS has no way to
+  // skip a frame.
+  //
+  // Keyed by the **instance** (the slot key, which carries a name when the
+  // author gave one) and valued by the definition it rides on. One definition,
+  // many instances: `…/enter` and `…/exit` over identical frames are two slots
+  // over one keyframe, which is the difference between naming a motion and
+  // cloning it.
+  const phrases = new Map<AnimatableStandardPropertyType, Map<string, string>>()
   // Names already registered as non-inheriting.
   const registered = new Set<string>()
 
@@ -239,7 +254,9 @@ export function createJumiModel({
       sink.property(hoisted)
     }
   }
-  const values = new Map<AnimatableStandardPropertyType, Set<string>>()
+  // Keyed by instance for the same reason the phrases are: the value is the
+  // definition (a hash of the value), the key is what the author addressed.
+  const values = new Map<AnimatableStandardPropertyType, Map<string, string>>()
 
   const composed = new Set<AnimatableStandardPropertyType>()
 
@@ -324,18 +341,21 @@ export function createJumiModel({
     name?: string,
   ): CssInJs => {
     const id = shorthash2(value)
-    let ids = values.get(attribute)
+    const key = slotKey(attribute, id, name)
+    let instances = values.get(attribute)
 
-    if (!ids) {
-      ids = new Set()
-      values.set(attribute, ids)
+    if (!instances) {
+      instances = new Map()
+      values.set(attribute, instances)
     }
 
     // Move-to-end: a re-registered (variant/hover) value must land LAST in the
     // slot list so it wins under `animation-composition: replace`. Deleting and
-    // re-adding it forces it to the back of the Set's insertion order.
-    ids.delete(id)
-    ids.add(id)
+    // re-adding it forces it to the back of the insertion order — and because the
+    // key names the instance, two differently named instances of one value keep
+    // an order of their own instead of overwriting each other.
+    instances.delete(key)
+    instances.set(key, id)
 
     registerName(`--jumi-${attribute}-${id}-animation-name`)
     emitKeyframe(`jumi-${attribute}-${id}`, {
@@ -346,7 +366,7 @@ export function createJumiModel({
     return {
       [`--jumi-${attribute}-${id}-animation-name`]: `jumi-${attribute}-${id}`,
       [`--jumi-${attribute}-${id}`]: value,
-      ...(name ? nameSlot(slotKey(attribute, id), attribute, name) : {}),
+      ...(name ? nameSlot(key, attribute, name) : {}),
     }
   }
   /**
@@ -479,11 +499,13 @@ export function createJumiModel({
     const slots: Slot[] = []
     const shared = new Set<AnimatableStandardPropertyType>()
 
-    for (const [attribute, ids] of values) {
-      for (const id of ids) {
+    for (const [attribute, instances] of values) {
+      // The key is the instance; the activation variable belongs to the definition, so two instances
+      // of one value resolve one keyframe.
+      for (const [key, id] of instances) {
         slots.push({
           attribute,
-          key: slotKey(attribute, id),
+          key,
           nameVar: `--jumi-${attribute}-${id}-animation-name`,
         })
       }
@@ -497,11 +519,11 @@ export function createJumiModel({
     for (const attribute of sorted(shared))
       slots.push({ attribute, key: slotKey(attribute) })
 
-    for (const [attribute, byId] of phrases) {
-      for (const id of byId.keys()) {
+    for (const [attribute, instances] of phrases) {
+      for (const [key, id] of instances) {
         slots.push({
           attribute,
-          key: slotKey(attribute, id),
+          key,
           nameVar: `--jumi-${attribute}-${id}-animation-name`,
         })
       }
@@ -783,15 +805,16 @@ export function createJumiModel({
           register(attribute)
 
           const id = shorthash2(phraseKey(frameList))
+          const key = slotKey(attribute, id, modifier)
 
-          let byId = phrases.get(attribute)
+          let instances = phrases.get(attribute)
 
-          if (!byId) {
-            byId = new Map()
-            phrases.set(attribute, byId)
+          if (!instances) {
+            instances = new Map()
+            phrases.set(attribute, instances)
           }
 
-          byId.set(id, frameList)
+          instances.set(key, id)
           registerName(`--jumi-${attribute}-${id}-animation-name`)
           emitKeyframe(
             `jumi-${attribute}-${id}`,
@@ -802,9 +825,7 @@ export function createJumiModel({
           // `animate-opacity-[0:0|100:1]/reveal` names this slot, so a control — or your own CSS —
           // can address it on its own. Skipped when the name is the attribute itself, because that
           // name is the property scope's, and a scope cascades into subtrees on purpose.
-          const named = modifier
-            ? nameSlot(slotKey(attribute, id), attribute, modifier)
-            : {}
+          const named = modifier ? nameSlot(key, attribute, modifier) : {}
 
           const variables = frameList.reduce(
             (acc, { offset, value: frame }) => {

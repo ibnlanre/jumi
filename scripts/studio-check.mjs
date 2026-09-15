@@ -504,31 +504,51 @@ try {
       )
     }, stored),
   )
-  const snapshot = await page.evaluate(() => ({
-    classes: [
-      ...new DOMParser()
-        .parseFromString(window.__jumiStudio.exported, 'text/html')
-        .querySelectorAll('[class]'),
-    ].flatMap(el => [...el.classList]),
-    html: window.__jumiStudio.exported,
-    project: window.__jumiStudio.project,
-  }))
+  // The download comes first, and everything below runs on its bytes rather than on the string the
+  // editor is holding. Those two could drift and this gate would still pass, which is the one seam the
+  // loop left open: what a reader saves is what has to replay.
+  await ready()
+  const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    page.locator('[data-action="export"]').click(),
+  ])
+  check(
+    'standalone HTML can be downloaded',
+    download.suggestedFilename() === 'jumi-motion.html',
+  )
+  const exported = await readFile(await download.path(), 'utf8')
+  const inMemory = await page.evaluate(() => window.__jumiStudio.exported)
+  check(
+    'the downloaded artifact is the export the editor holds',
+    exported.trim() === inMemory.trim(),
+  )
+  const classes = await page.evaluate(
+    html =>
+      [
+        ...new DOMParser()
+          .parseFromString(html, 'text/html')
+          .querySelectorAll('[class]'),
+      ].flatMap(el => [...el.classList]),
+    exported,
+  )
   check(
     'output uses named Jumi phrases and has no editor isolation',
-    snapshot.html.includes('animate-opacity-[') &&
-      snapshot.html.includes('/pulse') &&
-      !snapshot.html.includes('studio-isolation'),
+    exported.includes('animate-opacity-[') &&
+      exported.includes('/pulse') &&
+      !exported.includes('studio-isolation'),
   )
   const fresh = build(
     await compiler(
       '@import "tailwindcss"; @plugin "' + root + '/dist/index.js";',
       root,
     ),
-    snapshot.classes,
+    classes,
   ).css
   const independent = await context.newPage()
+  const replayErrors = []
+  independent.on('pageerror', e => replayErrors.push(e.message))
   await independent.setContent(
-    snapshot.html.replace(
+    exported.replace(
       /(<style id="jumi-output">)[\s\S]*?(<\/style>)/,
       (_m, a, b) => a + fresh + b,
     ),
@@ -583,13 +603,13 @@ try {
     'fresh external Jumi build matches Studio HTML/SVG at eight times',
     true,
   )
-  await independent.close()
-  const download = page.waitForEvent('download')
-  await page.locator('[data-action="export"]').click()
+  // The replay is a real page loading real bytes: a throw there (a missing custom property, a bad
+  // `@keyframes`) would leave the comparison reading whatever the browser fell back to.
   check(
-    'standalone HTML can be downloaded',
-    (await download).suggestedFilename() === 'jumi-motion.html',
+    'the replayed artifact raises no page errors',
+    replayErrors.length === 0,
   )
+  await independent.close()
   const folder = path.join(root, 'artifacts/studio')
   await mkdir(folder, { recursive: true })
   await page.locator('button[data-left-tab=layers]').click()

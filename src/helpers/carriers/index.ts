@@ -231,12 +231,29 @@ const namedParts = [
  * the matching value on itself.
  */
 const ACTIVATED_SLOT = /^--jumi-(.+)-animation-name$/
+const LABELLED_SLOT = /^--jumi-(.+)-label$/
 
 const hoistedName = (slot: string) => `--jumi-slot-${slot}`
 
 /** The slot a composition entry reads, or null when the entry is not a slot reference. */
 const referencedSlot = (entry: string) => {
   const match = /^var\(--jumi-(.+?)-animation-name\b/.exec(entry.trim())
+
+  return match ? match[1] : null
+}
+
+/**
+ * The **instance** a chain entry addresses, when the author named one.
+ *
+ * Every part of a named motion carries `--jumi-slot-<instance>-<part>` as its outermost link, and
+ * that is the only place the instance appears in the aggregate. `animation-name` is deliberately not
+ * that place: it is keyed by the definition, because two names over identical frames share one
+ * keyframe and therefore one activation variable. Reading the slot from the name alone collapsed two
+ * instances onto one — measured, `…/enter` with `200ms/enter` beside `…/exit` with `1800ms/exit`
+ * resolved `1.8s, 1.8s`, both positions reading the single hoist the last position won.
+ */
+const linkedSlot = (entry: string) => {
+  const match = /^var\(--jumi-slot-(.+?)-animation-\w/.exec(entry.trim())
 
   return match ? match[1] : null
 }
@@ -409,7 +426,11 @@ const hoist = (staged: Collection<string>, rules: Rule[]) => {
     SHORTHAND.map(part => [part, splitTopLevel(staged[part] ?? '')]),
   )
   const positions = entries['animation-name'].map((entry, position) => {
-    const slot = referencedSlot(entry)
+    // The instance first, the definition only as a fallback: a name is what distinguishes two
+    // motions that share one keyframe, and only a named part carries it.
+    const slot =
+      linkedSlot(entries['animation-duration']?.[position] ?? '') ??
+      referencedSlot(entry)
 
     return slot
       ? {
@@ -431,18 +452,39 @@ const hoist = (staged: Collection<string>, rules: Rule[]) => {
     const own = ownDeclarations(rule)
     const published = new Set(own.map(declaration => declaration.prop))
 
+    /**
+     * Every slot key this rule can publish: the activation variable's own — the unnamed instance of
+     * the definition it activates — plus one per name the rule wrote down.
+     *
+     * A name lives in the label declaration and not in the activation variable, and it has to: two
+     * names over identical frames share one keyframe and therefore one activation variable. That is
+     * the whole of motion-instance identity at this end — the definition is what the variable names,
+     * the instance is what the label names.
+     */
+    const instances = (base: string) => [
+      base,
+      ...own
+        .map(candidate => LABELLED_SLOT.exec(candidate.prop)?.[1])
+        .filter(
+          (key): key is string =>
+            key !== undefined && key.startsWith(`${base}-`),
+        ),
+    ]
+
     for (const declaration of own) {
       const match = ACTIVATED_SLOT.exec(declaration.prop)
 
       if (!match) continue
 
-      const value = known.get(match[1])
-      const prop = hoistedName(match[1])
+      for (const key of instances(match[1])) {
+        const value = known.get(key)
+        const prop = hoistedName(key)
 
-      if (!value || published.has(prop)) continue
+        if (!value || published.has(prop)) continue
 
-      published.add(prop)
-      rule.append(postcss.decl({ prop, value }))
+        published.add(prop)
+        rule.append(postcss.decl({ prop, value }))
+      }
     }
 
     // A named activation installs the name as this slot's address — **on this rule**, which is the
@@ -459,24 +501,26 @@ const hoist = (staged: Collection<string>, rules: Rule[]) => {
 
       if (!match) continue
 
-      const name = own.find(
-        candidate => candidate.prop === cssEscape(`--jumi-${match[1]}-label`),
-      )?.value
+      for (const key of instances(match[1])) {
+        const name = own.find(
+          candidate => candidate.prop === cssEscape(`--jumi-${key}-label`),
+        )?.value
 
-      if (!name) continue
+        if (!name) continue
 
-      for (const part of namedParts) {
-        const prop = cssEscape(`--jumi-slot-${match[1]}-${part}`)
+        for (const part of namedParts) {
+          const prop = cssEscape(`--jumi-slot-${key}-${part}`)
 
-        if (published.has(prop)) continue
+          if (published.has(prop)) continue
 
-        published.add(prop)
-        rule.append(
-          postcss.decl({
-            prop,
-            value: `var(${cssEscape(`--jumi-${name}-${part}`)})`,
-          }),
-        )
+          published.add(prop)
+          rule.append(
+            postcss.decl({
+              prop,
+              value: `var(${cssEscape(`--jumi-${name}-${part}`)})`,
+            }),
+          )
+        }
       }
     }
   }

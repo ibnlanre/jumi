@@ -92,6 +92,7 @@
     "spike:intrinsic-layout": "node scripts/spike-intrinsic-layout.mjs",
     "spike:cdp-cost": "node scripts/spike-cdp-cost.mjs",
     "spike:local-list": "node scripts/spike-local-list.mjs",
+    "spike:addressing": "node scripts/spike-addressing.mjs",
     "spike:recalc": "node scripts/spike-recalc.mjs",
     "measure:real-page": "node scripts/measure-real-page.mjs",
     "spike:real-page": "node scripts/spike-real-page.mjs",

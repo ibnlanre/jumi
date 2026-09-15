@@ -132,6 +132,23 @@ const STAGES = [
     label: 'stories',
     run: ['run', 'stories:check'],
   },
+  // Last, and the only stage that needs the *site* rather than the library: `studio:check` is
+  // `docs:build && node scripts/studio-check.mjs`, so it bundles, prepares and runs `astro build`
+  // before it starts. Measured 2026-09-15: 18 s end to end, the site build 2.75 s of it.
+  //
+  // It is the only stage that carries the whole loop rather than one link of it: Studio authors a
+  // scene in a real browser, the export is recompiled by a **separate** Tailwind instance in Node
+  // against the shipped bundle, replayed in a second page with Studio's own stylesheet replaced, and
+  // sampled at eight times against the editor's own frames. Every other stage here checks the library
+  // against fixtures Jumi's authors wrote; this one checks it against what an editor derived from it,
+  // so a failure means either Studio's model or Jumi's serialization has drifted — which no other
+  // stage would notice, because nothing else exports and reads back.
+  {
+    about:
+      'an authored scene survives export, an independent compile and a replay',
+    label: 'studio',
+    run: ['run', 'studio:check'],
+  },
 ]
 
 const results = STAGES.map(stage => ({
