@@ -49,8 +49,11 @@ about authored class order.
 Next: revisit **segment easing**, which had to wait for a motion-instance model that would not contaminate
 it. `../architecture/phrases.md` holds the constraint that shaped it: a keyframe's own
 `animation-timing-function` cannot be driven by a variable, so per-segment easing is a property of the
-keyframe itself. Measured and written up as a proposal in `segment-easing.md` — seven measurements, three
-syntax candidates rejected with the property that breaks each, and the suffix form recommended.
+keyframe itself. Now probed as a **phrase-valued `animation-timing-function-*` control** (ruled 2026-09-15
+in favour of the suffix form, for public API coherence) — seven measurements in `segment-easing.md`,
+including the two that decide the shape: the phrase must never reach the control chain (it kills the
+animation outright), and the specialization must be selected in the control's own rule (written in the
+motion's rule it leaks to every element animating that motion). Awaiting a ruling on the unaddressed form.
 
 ## 2026-09-13 — the hoisted shallow-shorthand representation: closed for 1.0
 

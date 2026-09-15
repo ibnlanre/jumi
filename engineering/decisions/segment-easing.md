@@ -1,134 +1,138 @@
-# Segment easing: a proposal, measured and not built
+# Segment easing: a phrase-valued timing control
 
-**Status:** proposal — awaiting a ruling. Nothing in `src/` changes for this document; the measurements
-are reproducible with `pnpm spike:segments` (`scripts/spike-segment-easing.mjs`).
+**Status:** probe complete, design recommended, **not implemented**. The measurements are reproducible with
+`pnpm spike:timing-phrase` (the mechanism, simulated by rewriting compiled CSS) and `pnpm spike:segments`
+(what CSS itself permits). Nothing in `src/` changes for this document.
 
-## The distinction
+## The shape
 
-The CTO's model, which the measurements below support:
-
-```text
-slot easing      →  variable-driven, addressable, one easing for the whole animation
-segment easing   →  keyframe-local, literal, part of the motion definition
+```html
+animate-rotate-[0:0deg|100:45deg]/test              what the property does at each offset
+animation-timing-function-[0:ease-out-back]/test    how the motion leaves particular offsets
 ```
 
-Slot easing is shipped and addressable: `animation-timing-function-ease-out`,
-`…-ease-out/rotate` (a property scope) and `…-ease-out/flick` (a name) all resolve to
-`--jumi-<token>-animation-timing-function`, which the composition reads per position.
+Two orthogonal statements, one grammar: the motion phrase stays strictly `offset:value`, and all easing
+stays under `animation-timing-function-*` — scalar for the whole motion, a phrase for the offsets. A
+segment phrase maps `offset:easing`, and the easing applies to the segment **after** that offset (measured
+in `spike:segments`: the easing belongs to the segment after its frame, never before).
 
-Segment easing is the missing half: one easing per segment, which is how a motion eases "out" into a
-rest and "in" to a turn without becoming two animations. Today the docs teach the workaround — two
-animations summed by `animation-composition: add`, each with one moving segment
-(`docs/src/pages/docs/controls.md`) — which is correct and expensive.
+The suffix form `0:0deg~ease-out-back` was proposed first and rejected: it works, but it makes the motion
+phrase carry two kinds of information, and it invents a delimiter for a concept that already has a home.
 
-## Why it can only be keyframe-local
+## The finding that sets the implementation shape
 
-Not a stylistic choice. Measured (`spike:segments` case 3), a `var()` inside a keyframe's
-`animation-timing-function` is **dropped**: the segment falls back to the animation-level easing.
+**The phrase must not reach the control chain.** Not a preference — measured: with
+`animation-timing-function-[0:cubic-bezier(0.34,1.56,0.64,1)]/back` on an element, the motion dies
+completely.
 
 ```text
-50% { animation-timing-function: var(--segment-ease) }   with --segment-ease: step-start
-  at 75% → 0.5 (linear, the animation-level easing) — not 0, which step-start would give
+animation-name: none        animation-duration: 0s        document.getAnimations().length: 0
 ```
 
-So segment easing cannot be variable-driven and cannot be addressed by a control: it is part of the
-motion's definition, in the same sense its frames are. That has three consequences the model already
-knows how to handle:
+A phrase is not an `<easing-function>`, so the control's variable resolves to an invalid token sequence and
+the composition's whole `animation` shorthand becomes invalid at computed-value time — the same
+invalid-at-computed-value-time hazard the carrier's `FALLBACK` table exists to avoid, one declaration
+higher up. So a timing phrase cannot be "the same matcher with a different value shape", which is what its
+syntax invites. It needs:
 
-1. It belongs in the **phrase**, which is the syntax for a value that declares its own keyframe.
-2. It is part of the phrase's **identity** — `phraseKey(frames)` is the frames' text — so two phrases
-   differing only in easing are two keyframes, correctly and for free.
-3. Nothing in the aggregate changes, no new control, and no new entry in `slotParts`: a control keeps
-   meaning the whole animation, and the phrase keeps meaning the definition.
+1. a **phrase-aware handler** on the timing controls — the same split the motion matchers already use, where
+   a phrase is routed to a second handler because Tailwind validates the value type before the first one
+   runs — which records the segments in an **inert declaration** (the shape `--jumi-<key>-label` uses) and
+   writes nothing into a control variable;
+2. finalizer work: read the records, **specialize** each addressed definition, and **select** the
+   specialization per element.
 
-## What is measured
+`~` never had this problem: it lives inside the motion phrase, which has no variable path to break. That is
+the one real advantage it had, and it is not worth the public API.
 
-| # | question | measurement | what it decides |
-| --- | --- | --- | --- |
-| 1 | does a frame's easing govern its segment only? | `linear` animation-level, `step-start` on the 50% frame → 25% is `0.5`, 75% is `0` | per-segment easing is expressible, and does not rewrite the whole motion |
-| 2 | does it compose with a **variable-driven** slot easing? | animation-level `var(--slot-ease)` = `step-end`, frame `step-start` → 75% is `0` | slot easing stays the default for unclaimed segments; the two do not compete |
-| 3 | can it be a variable? | the case above, written as a variable → 75% is `0.5` | **no** — the declaration is dropped; keyframe-local is forced |
-| 4 | can a segment overshoot? | `ease-out-back` on the 0→100 segment → 75% is `105.965px` against a `100px` target | the thing one-easing-per-animation cannot do: eased rest, overshoot, settle |
-| 5 | does a separator survive a candidate? | `~`, `@`, `^` and `:` in `animate-rotate-[0:0deg<sep>ease-out-back\|100:45deg]` — all four emitted | carriage does not choose the syntax; ambiguity does |
-| 6 | what does the **last declared** frame's easing govern? | frames at 0% and 80%, easing on the 80% frame → value held at `0` from 800 ms (see below) | the phrase's implicit final segment is a segment, and can be eased |
-| 7 | does it ever apply *backwards*? | the same easing on the 50% frame vs the 100% frame → `0` vs `0.5` | the easing belongs to the segment **after** its frame |
+## The mechanism, and where it must be written
 
-Case 6's shape is worth stating, because it is also an independent confirmation of a documented promise:
-with frames at `0%` and `80%` and no `100%` frame, the value runs `12.5 … 100` by 800 ms and then
-**returns** to the resting value (`75, 50, 25, 5`) as the implicit final keyframe takes over — exactly what
-`controls.md` means by "a phrase holds still until its first frame and closes itself at the end". The last
-*declared* frame is therefore not the last *keyframe*: an easing written there governs that closing
-segment, and only an explicitly written `100%` frame has no segment after it (case 7).
+The specialization is two halves, and the second is the architectural one:
 
-## The syntax candidates
+| half | what it is | where it lives |
+| --- | --- | --- |
+| **content** | the addressed definition cloned with `animation-timing-function: <literal>` added to the named frames, named by `hash(definition + segment map)` | global — a keyframe is shared exactly when the declaration is |
+| **selection** | a write of the clone's name into the activation variable the composition resolves | the **timing candidate's own rule** |
 
-The frame grammar is `offset:value`, frames joined by `|`, offsets in a frame split by `,`. So the easing
-needs a separator that cannot be confused with any of those, and that survives a candidate.
+Measured on a structural address (`animation-timing-function-[0:step-start]/rotate`), both placements:
 
-| candidate | example | reading | verdict |
-| --- | --- | --- | --- |
-| suffix `~` | `0:0deg~ease-out-back\|100:45deg` | the segment from this frame eases like this | **recommended** |
-| suffix `@` / `^` | `0:0deg@ease-out-back` | same, no resonance | usable, worse to read |
-| second `:` | `0:0deg:ease-out-back` | reads well, and collides | **rejected** |
-| leading token | `0:ease-out-back 0deg` | mirrors a keyframe block | **rejected** |
-| brackets | `0:[ease-out-back]0deg` | Tailwind's own delimiter | **rejected, unverified** |
+```text
+written in the control's rule   element with the control → 90      element without → 86.441  (unaffected)
+written in the motion's rule    element with the control → 90      element without → 90      ← LEAKED
+```
 
-- **`:` is rejected by a real value.** Values carry colons, and the frame grammar already says
-  "everything after the first colon is the value" — measured, `animate-background-image-[0:url(a:b)|100:url(c:d)]`
-  compiles today and its frames' values are `url(a:b)` and `url(c:d)`. A second colon makes every such frame
-  ambiguous between a value and a value-plus-easing, so the parser would have to guess inside the value.
-- **A leading token is rejected because it makes the parse value-dependent.** It reads well
-  (`0:ease-out-back 0deg`), but it has to consult the vocabulary to find where the value *begins*, and a
-  frame whose value merely starts with an easing word changes meaning without changing text: measured,
-  `animate-filter-[0:linear|100:blur(4px)]` compiles today. That particular value is not valid CSS — no
-  valid value of a property Jumi animates begins with an easing keyword, so this costs less than it first
-  looks — but a delimiter should not need to look inside the value to know where it ends.
-- **Brackets are rejected as unverified.** They are the arbitrary-value delimiters Tailwind has already
-  stripped by the time Jumi sees the value, `_` means a space inside them, and nothing has measured how a
-  nested pair survives. The syntax should not rest on an unmeasured parse.
-- **`~` is recommended** because it is absent from CSS values in practice (it lives in selectors),
-  needs no lookup to disambiguate, and reads in the right direction: it annotates the frame whose segment
-  *follows* it. Collision risk is a value that literally contains a top-level `~`, which no CSS value
-  does — and the parse stays total either way: a phrase with two top-level `~` is not a phrase rather
-  than a guess.
+A definition is shared text, so writing the selection where the *motion* is declared gives the
+specialization to every element that animates that motion. Writing it where the *control* is declared is
+what keeps it element-local — and it is what lets two instances of one definition hold different segment
+easings, since each writes the same variable from its own rule and an element matches only one of them.
 
-Vocabulary: an easing word should resolve through the map the controls already use
-(`@/theme/animation-timing-function`), so `ease-out-back` means the same `cubic-bezier` in a phrase as in
-a control, and an arbitrary `cubic-bezier(…)`, `steps(…)` or `linear(…)` passes through unresolved.
+## The probes the CTO asked for
+
+| # | probe | measurement |
+| --- | --- | --- |
+| 1 | two identical motions, different segment easings | `/enter` (0:step-start) → `1` throughout; `/exit` (0:linear) → `0.25, 0.75`; a third instance with no timing phrase → `0.409, 0.96` (the substrate's own easing, untouched). Two specialized definitions, not one: `…-seg-1uqle` and `…-seg-lcrog` |
+| 2 | identical segment easings — deduplicate? | same name on both (`…-seg-1uqle`), **one** clone emitted, sheet holds base + one clone. Deduplication is not a special case: identity is the declaration's text |
+| 3 | named and structural addresses | both work; the named form addresses its own instance, `/rotate` addresses every rotate motion on the element the control reaches. The leak table above is this probe |
+| 4 | the scalar slot easing as fallback | frames `0:0\|50:1\|100:0`, phrase claims `0%` only, scalar `/mixed` is `linear` → `250ms → 1` (the phrase's step-start), `750ms → 0.5` (the scalar's linear). The scalar control keeps everything the phrase did not claim |
+| 5 | arbitrary `cubic-bezier()`, `steps()`, `linear()` | `cubic-bezier(0.34,1.56,0.64,1)` → `48.82, 81.629, **105.965**` — overshoot past a `100deg` target; `steps(4,end)` → `0, 25, 75` — plateaus. Both survive the phrase grammar and land as literals in the keyframe |
+| 6 | unaddressed — implementable without element-local knowledge? | **Yes, contrary to the suspicion.** The control's own rule rewrites every definition's activation, so the specialization reaches exactly the elements that wrote the control, and only those. Cost is the sheet's definition count, not the element's |
+| 7 | size and keyframe count | 36 candidates / 19 definitions / 46,086 bytes: **addressed** `/reveal` → +257 bytes, 1 clone, 1 declaration. **Unaddressed** → +4,844 bytes (+10.5%), 19 clones, 19 declarations in one rule |
+
+Probe 6's alternative — refusing the unaddressed form — also has a reason, and it is arithmetic rather than
+correctness: the unaddressed cost is **multiplicative**. Each distinct unaddressed phrase needs its own
+clone of every definition (`19 × 2 = 38` clones for two of them), while the addressed form is linear in the
+definitions actually named. Unaddressed is therefore *allowed but expensive*, and its recommendation is a
+question rather than a blocker.
+
+## Separate bug this probe found
+
+Writing a phrase into a timing control **kills the motion silently** today — no rule is invalid, nothing
+warns, the page simply stops animating. That is provable from the value's shape alone (a phrase is never a
+valid easing function), so it fits the standing warning policy: impossibility that can be shown without
+element context. Worth a warning whether or not the feature ships, because the destructive spelling is
+exactly what the proposed syntax will teach people to type.
+
+## `~` against this, on public API coherence
+
+| | suffix `~` | phrase-valued control |
+| --- | --- | --- |
+| motion phrase means | `offset:value` **plus** a second kind of fact | `offset:value`, unchanged |
+| where easing lives | a new delimiter, nowhere else used | `animation-timing-function-*`, where all easing already lives |
+| discovery | a reader must learn a delimiter introduced for this | a reader who knows `animation-timing-function-ease-out/test` guesses `[0:…]/test` correctly |
+| unaddressed form | `0:0deg~ease-out-back` is inherently per-motion | `animation-timing-function-[0:…]` is a question with a cost, not a syntax error |
+| implementation | parser + keyframe emission, nothing else | a handler, a record, specialization, per-element selection, plus a cascade placement decision |
+| failure mode if the phrase reaches the control chain | cannot happen | kills the animation (measured) — needs the handler, not discipline |
+
+`~` is smaller to build. The control form is the better language, at the cost of a real mechanism.
 
 ## What implementing it would take
 
-Three small edits and no new concept:
-
-1. `parsePhrase` — a frame's content splits on its first top-level `~`; the left side is the value, the
-   right the easing (resolved through the easing map, or passed through if it is a function).
-2. `phraseKey` — include the easing, so identity follows the definition. Nothing else changes: frames are
-   already the identity.
-3. `phraseKeyframe` — emit `animation-timing-function` as a **literal** on that frame's step, beside the
-   property. A `var()` there would be dropped (case 3), so it must be resolved at emission.
-
-Plus documentation of the two rules the measurements establish: the easing governs the segment **after**
-its frame, and the last declared frame's easing governs the phrase's closing segment.
-
-Cost: one declaration per eased frame. Resolved literals are the price of keyframe-local easing — a theme
-name is ~14 characters and its `cubic-bezier` is ~40 — and it is paid only on frames that ask for one.
-Nothing appears in the aggregate.
-
-## What this does not propose
-
-- **No control, and no address.** Impossible rather than undesirable (case 3), and it would put a
-  definition-level fact into the address space the instance work just settled.
-- **No second API.** `stops` and `aliases` were removed for sharing keyframes the phrase grammar now owns
-  privately; segment easing is the same kind of decision and belongs in the same grammar.
-- **No change to slot easing.** It stays variable-driven and addressable, and case 2 measures that the two
-  compose rather than compete: a frame claims its segment, the slot's control governs the rest.
+1. **A phrase-aware handler** on `animation-timing-function-*`, routed the way motion phrases already are,
+   recording the segment map in an inert declaration keyed by the address. The phrase never becomes a
+   control value.
+2. **A warning** for the destructive spelling above, and (per the policy) for an unaddressed segment phrase
+   if that form is refused.
+3. **Finalizer specialization** — clone the addressed definition with the resolved literals, name it by
+   content, and select it in the control's own rule. The selection must beat the motion utility's own
+   activation declaration deterministically: the composition's placement (last in the utilities layer) is
+   the obvious home, and it needs its own measurement before it is settled.
+4. **Documented limitation.** Two instances of *one definition* addressed by two different segment phrases
+   on *one element* write the same activation variable, so the cascade picks one. That is find2's shape
+   (contradictory controls for one address) — not statically provable at stylesheet level, so it belongs to
+   Studio, not to a build warning.
 
 ## Recommendation
 
-Adopt the suffix form in the phrase, with the easing vocabulary the controls already use, and resolve it
-to a literal at emission. The three measurements that make it safe are: a frame's easing governs only the
-segment after it (1, 7), it leaves the variable-driven slot easing in charge everywhere else (2), and the
-closing segment of a phrase that stops short of `100%` is a real segment an easing can govern (6) — with
-the one constraint that no part of it can be a variable (3).
+Adopt the phrase-valued `animation-timing-function-*` control, with `offset:easing` where the easing
+governs the segment after its frame, resolving easing words through the vocabulary the controls already
+use and passing arbitrary easing functions through as literals. The probes say the design holds on every
+axis the CTO asked about: instances stay independent, identical declarations deduplicate, the scalar
+control remains the fallback, structural and named addresses both work, arbitrary functions survive, and the
+specialization stays element-local provided it is written in the control's rule.
 
-Not implemented, pending the ruling.
+Two things to rule on rather than implement by default:
+
+- **the unaddressed form** — allowed at ~10% sheet growth and 19 clones on a 19-definition sheet, with a
+  cost that multiplies per distinct unaddressed phrase, or refused in favour of `/name` or `/{property}`;
+- **the cascade placement** of the selection declaration, which is the one piece of this design that still
+  needs a measurement of its own.
