@@ -53,11 +53,50 @@ before the handler is written:
   definition cannot be eased apart;
 - instance granularity — a name-keyed selection variable, so `/<name>` means exactly one instance.
 
+**Ruled: instance granularity.** Accepting definition granularity would reintroduce the old limitation
+through a side door — same keyframes, shared activation, shared segment easing — so
+`animate-rotate-[0:0deg|100:45deg]/enter` beside `…/exit` could not carry two easing profiles even though the
+instance model says they are two motions, and that is exactly the distinction the identity work exists to
+make. The split that follows:
+
+```text
+definition identity → shared keyframes
+instance identity   → which specialized definition this motion selects
+```
+
+So the base activation stays definition-keyed
+(`--jumi-rotate-Z1WIhuk-animation-name` → `jumi-rotate-Z1WIhuk`) and segment easing adds an
+**instance-keyed selection override** — the shape `--jumi-slot-<instance>-animation-name` or whatever the
+carrier model prefers. The fan-out rule becomes:
+
+| address       | reach                                                                                                         |
+| ------------- | ------------------------------------------------------------------------------------------------------------- |
+| `/<name>`     | one instance — even when another instance shares its definition                                               |
+| `/<property>` | every instance of that property on the element, named or unnamed; may produce several specialized definitions |
+| unaddressed   | refused for 1.0                                                                                               |
+
+Property scope is allowed to cost more, and that is not the same kind of cost as the refused form: it is
+proportional to what the author explicitly asked for, where the unaddressed phrase silently cloned every
+definition in the stylesheet.
+
 ### Call
 
-> **Accept the syntax; implementation waits on the granularity ruling.** Unaddressed refused for 1.0,
-> addressed allowed, the destructive spelling warns and is structurally blocked, scalar easing unchanged, and
-> placement measured before it lands.
+> **Accept the syntax with instance-precise specialization.** Preserve the definition-keyed base activation
+> and add an instance-keyed selection path; keep property scope fanning out across instances; keep
+> unaddressed refused for 1.0; ship the destructive-spelling warning independently, now; then measure cascade
+> placement against `base motion activation < instance specialization selection < aggregate consumption` and
+> verify: two names over one definition take different easings, one instance is specialized while its sibling
+> is untouched, property scope reaches every same-property instance, scalar easing still supplies the
+> fallback, nothing leaks to elements without the phrase, and Studio export/replay parity stays exact.
+
+**Shipped: the destructive-spelling warning** (independent of the feature, and before it). A phrase that
+reaches a part the `animation` shorthand carries is now refused at the model — `carriedByShorthand` derives
+the parts from `separateParts`, so the guard cannot drift from the split it depends on — recorded inertly as
+`--jumi-phrase-<hash>-unroutable`, and reported by the pass with the remedy in the message. The motion keeps
+its scalar easing instead of vanishing. Asserted three ways and falsified: `controls.test.ts` (refused at
+every address, scalar untouched, the three separate parts deliberately out of scope), `index.test.ts` (the
+message), and `behaviour:check`'s arm `h`, which fails — "no animation at all" — the moment the refusal is
+removed.
 
 ## 2026-09-15 — the per-instance link layer: closed, with the residual recorded as intentional
 
