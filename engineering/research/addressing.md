@@ -16,7 +16,13 @@ A label whose name is another property's slot makes those collide:
 
 ## What the engine actually does
 
-The two readings are not two mechanisms. `/name` always writes one thing:
+> **Superseded in part (2026-09-15).** This section describes the state the findings were measured in,
+> where one token was one custom property and therefore had N readers. Finding 1 has since been ruled on
+> and fixed: a token that is a property Jumi animates (or an effect) reads the property scope, and a name
+> reads `--jumi-label-<name>-<part>`. The diagram below is kept as the record of what the collision *was*;
+> the current rule is in the rulings section and in `addressing-instances.md`.
+
+The two readings were not two mechanisms. `/name` always wrote one thing:
 
 ```css
 .animation-duration-800\/spin { --jumi-spin-animation-duration: 800ms; }
@@ -33,8 +39,10 @@ and a motion's slot link reads a **name** — the property when unlabelled, the 
 --jumi-slot-rotate-3zWYd-animation-duration: var(--jumi-spin-animation-duration);
 ```
 
-So a control reaches **every motion that reads that name**: all unlabelled motions for that property,
-and all motions labelled with it. There is one namespace, one write, and N readers.
+So a control reached **every motion that read that name**: all unlabelled motions for that property, and
+all motions labelled with it. One namespace, one write, N readers — which is the whole of finding 1, and
+why the fix separates the two readings rather than the syntax: a name now lives where a property cannot,
+so `animation-duration-800/spin` writes `--jumi-label-spin-animation-duration`.
 
 ## The measured table
 
@@ -42,11 +50,11 @@ and all motions labelled with it. There is one namespace, one write, and N reade
 |---|---|---|---|---|
 | baseline | `animate-scale-110` `animation-duration-[1200ms]/scale` | 1 | `jumi-scale-d38` | **1.2s** |
 | label | `animate-rotate-45/spin` `animation-duration-800/spin` | 1 | `jumi-rotate-3zWYd` | **0.8s** |
-| compound | `animate-filter-blur-4` `animate-filter-brightness-125` `animation-duration-900/filter` | 1 | `jumi-filter` | **0.9s** |
+| compound | `animate-filter-blur-[4px]` `animate-filter-brightness-125` `animation-duration-900/filter` | 1 | `jumi-filter` | **0.9s** |
 | **collision** | `animate-scale-110` `animate-rotate-45/scale` `animation-duration-1000/scale` | 2 | `jumi-scale-d38, jumi-rotate-3zWYd` | **1s, 1s** |
 | collision, self-labelled | `animate-scale-110/scale` `animation-duration-1000/scale` | 1 | `jumi-scale-d38` | **1s** |
 | two controls, one address | `animate-scale-110` `animation-duration-1000/scale` `animation-duration-400/scale` | 1 | `jumi-scale-d38` | **1s** |
-| compound + foreign label | `animate-filter-blur-4/foo` `animate-filter-brightness-125` `animation-duration-900/filter` `animation-duration-500/foo` | 1 | `jumi-filter` | **0.9s** |
+| compound + foreign label | `animate-filter-blur-[4px]/foo` `animate-filter-brightness-125` `animation-duration-900/filter` `animation-duration-500/foo` | 1 | `jumi-filter` | **0.5s** |
 | identical phrases, two labels | `animate-opacity-[0:0\|100:1]/enter` `…/exit` | 2 | `jumi-opacity-sluPU` | **1s** |
 | identical phrases, per-label timing | …plus `animation-duration-200/enter` `animation-duration-1800/exit` | 2 | `jumi-opacity-sluPU` | **1.8s** |
 | orphan label | `animate-rotate-45` `animation-duration-700/nope` | 1 | `jumi-rotate-3zWYd` | **1s** |
@@ -75,10 +83,19 @@ two names for one motion, and the cascade keeps whichever came last. For Studio,
 and renaming it is therefore not the independent duplicate the UI implies.
 
 **4 · Compounds compose to the bare property name, and a label member does not split them.**
-`animate-filter-blur-4` + `animate-filter-brightness-125` derive **one** slot named `jumi-filter`, so
-`/filter` addresses it even though neither class contains the string `filter` as a full utility name.
-Labelling one member (`animate-filter-blur-4/foo`) does **not** create a second slot: the `/foo`
-control's 500ms is discarded and `/filter` still owns the motion.
+A member utility plus its neighbour derive **one** slot named `jumi-filter`, so `/filter` addresses it even
+though neither class contains the string `filter` as a full utility name. Labelling one member
+(`animate-filter-blur-[4px]/foo`) does **not** create a second slot: `/foo` addresses the one compound
+motion, at `0.5s`, and `/filter` addresses the same motion.
+
+> **Correction (2026-09-15, after the ruling).** This finding was first measured with
+> `animate-filter-blur-4`, which is **not a candidate at all**: the matcher is `type: 'length'` against the
+> blur theme, so a bare `4` resolves to nothing and Tailwind drops it silently — no rule, no warning. Only
+> `animate-filter-brightness-125` compiled, so the label the corpus was testing never existed, and the
+> discarded `/foo` control read as "a member label cannot own timing" when the truth was "the member was
+> never emitted". Spelled `[4px]` it compiles, the label is declared, and the compound answers to it. The
+> wrong row is the reason `scripts/spike-instance-models.mjs` now prints the selectors it compiled, next to
+> the durations it measured: a class that Tailwind dropped looks exactly like a class that did nothing.
 
 ## What is not broken
 
@@ -117,14 +134,27 @@ Findings 2 and 3 are independent of the resolution: a "last class wins" expectat
   `@keyframes`. Measured: `…/enter` with `200ms/enter` beside `…/exit` with `1800ms/exit` resolves
   `0.2s, 1.8s` where it used to resolve `1.8s, 1.8s`, and the same phrase unnamed *and* named is two
   instances (`1s, 1.8s`). The same name twice stays one instance.
-- **Findings 1, 2 and 4 are not redesign targets.** The collision is a documented quirk: the engine is
-  deterministic and the resulting CSS is valid, and making class semantics depend on which classes
-  coexist on an element would spend Jumi's global knowledge on something the candidate model does not
-  ask for. Studio's job is to warn or refuse an obvious same-element collision; a `pnpm check` warning
-  for a control that resolves to more than one slot may follow.
+- **Finding 1 is fixed as well, by separating the readings rather than the syntax.** A control's token is
+  now classified before it is written: a property Jumi animates (or an effect) reads the property scope,
+  and anything else reads the label namespace `--jumi-label-<name>-<part>`, which no property scope can
+  occupy. Measured on the corpus that distinguishes the two readings — `animate-scale-110`,
+  `animate-rotate-45/scale`, `animation-duration-1000/scale`, `animation-duration-400/rotate` — the
+  result moved from **`1s, 1s`** to **`1s, 0.4s`**: the author's own control now wins. There is no new
+  public syntax, no element-local inference, and no keyframe change; the cost is six characters per
+  labelled control and one accepted behaviour change, that a motion labelled with the exact name of a
+  property it does not animate can no longer be addressed by that word. `structuralAddress` in `@/core`
+  holds the rule, and the third refusal — a name that is already a structural address — is reported by
+  the finalizer rather than dropped in silence.
 - **Finding 2 stays a warning, not a rule.** CSS gives no guarantee about authored class order, so Jumi
   should not invent "last class wins"; contradictory controls for one address are an authoring
-  mistake, and a warning is the honest signal.
+  mistake, and a warning is the honest signal. Measured unchanged: `animation-duration-1000/scale`
+  followed by `animation-duration-400/scale` still resolves `1s`.
+- **Finding 4 is not a defect and not a design target.** A label on a compound member names the whole
+  compound motion — one keyframe, one position, one timing — and the plain-CSS measurement says that is
+  the only correct reading: two animations of one `filter` under the default `replace` composition lose
+  one contribution (`brightness(1.8024)` where both were written; `blur` gone), and only an author's
+  explicit `animation-composition: add` composes them. Nothing here needs a warning, because nothing is
+  unusable: see the correction above for how the original evidence for this finding was wrong.
 - **The multi-carrier lead was closed as a harness fault** — see the section above.
 
 ## The multi-carrier lead is closed: it was a harness bug

@@ -595,29 +595,62 @@ describe('animation-name registration', () => {
     expect(parts.length).toBeGreaterThan(0)
 
     for (const part of parts) {
-      expect(utilities[`@property --jumi-flick-${part}`]).toEqual({
+      expect(utilities[`@property --jumi-label-flick-${part}`]).toEqual({
         inherits: 'false',
         syntax: '"*"',
       })
     }
   })
 
-  it('leaves the link inheritable when a label is the attribute name', () => {
+  it('never registers a name outside the label namespace', () => {
     const { addBase, creator } = setup()
 
-    // `/[rotate]` on `animate-rotate` resolves to the property scope's own
-    // variable, so registering it here would make a scope stop cascading.
+    // The invariant that replaced an exemption. A name used to be registered under itself —
+    // `--jumi-rotate-animation-duration` for the label `rotate` — which is the property scope's own
+    // variable, so the identity case had to be carved out to keep a scope cascading. Now the two live
+    // in namespaces that cannot meet: a scope is always `--jumi-<attribute>-<part>`, and a name is
+    // always `--jumi-label-<name>-<part>`.
     creator.property('rotate')('0:16deg|58:0deg', { modifier: 'rotate' })
+    creator.property('opacity')('0:0|100:1', { modifier: 'reveal' })
     creator.animations
 
     const utilities = registered(addBase)
 
+    expect(
+      Object.keys(utilities).filter(
+        name => name.startsWith('@property --jumi-reveal-'),
+      ),
+    ).toEqual([])
     expect(
       utilities['@property --jumi-rotate-animation-duration'],
     ).toBeUndefined()
     expect(
       utilities['@property --jumi-rotate-animation-timing-function'],
     ).toBeUndefined()
+  })
+
+  it('records a name that is already a structural address instead of linking it', () => {
+    const { creator } = setup()
+
+    // `animate-rotate-45/scale` cannot be addressed: `--jumi-scale-animation-duration` is the scale
+    // property's scope, read by every motion animating scale. The record is what the pass reports, and
+    // the absence of a label declaration is what keeps the CSS free of an address nothing fills.
+    const shadowed = creator.property('rotate')('0:0deg|58:0deg', {
+      modifier: 'scale',
+    })
+
+    expect(shadowed).toMatchObject({
+      [`--jumi-name-${shorthash2('scale')}-shadowed`]: 'scale',
+    })
+    expect(
+      Object.keys(shadowed).some(key => key.endsWith('-label')),
+    ).toBe(false)
+
+    // Naming a motion after the property it animates is not the same thing: one scope serves both
+    // readings, so nothing is recorded and nothing is lost.
+    expect(
+      creator.property('rotate')('0:90deg|100:180deg', { modifier: 'rotate' }),
+    ).not.toHaveProperty(`--jumi-name-${shorthash2('rotate')}-shadowed`)
   })
 
   it('registers a name once, however often the animations getter is read', () => {

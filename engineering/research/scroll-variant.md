@@ -113,9 +113,14 @@ nothing at all** — not the label, not the motion. The spelling that works is t
 
 ```text
 animate-opacity-[0:0|100:1]/[reveal]   → --jumi-opacity-sluPU-label: reveal, and the slot chain gains
-                                          var(--jumi-reveal-animation-duration, …)
-animation-duration-500/reveal          → --jumi-reveal-animation-duration: 500ms
+                                          var(--jumi-label-reveal-animation-duration, …)
+animation-duration-500/reveal          → --jumi-label-reveal-animation-duration: 500ms
 ```
+
+> The address variable read `--jumi-reveal-animation-duration` when this was measured. Names now live in
+the label namespace, so a name cannot be a property scope — `engineering/research/addressing-instances.md`
+has the ruling. The finding itself is unaffected: the unbracketed form still fails by vanishing, and the
+label is still what a control addresses.
 
 So `/` does introduce identity, and a control does address the label — but only when the label is
 written in brackets, and the unbracketed form fails by *vanishing* rather than by refusing. Worth

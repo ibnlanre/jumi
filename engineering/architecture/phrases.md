@@ -69,17 +69,33 @@ window is the time to take it.
 
 A phrase can be labelled where it is declared — `animate-rotate-[0:0deg|58:0deg]/[flick]` — and
 a control can then address that slot by the same word: `animation-timing-function-[…]/[flick]`. The
-label is the handle, not a property-qualified path; it becomes `--jumi-flick-animation-timing-function`.Nothing is prepended, so `/[rotate-flick]` on `animate-rotate` is `--jumi-rotate-flick-animation-timing-function`
+label is the handle, not a property-qualified path; it becomes `--jumi-label-flick-animation-timing-function`.
+Nothing is prepended to the word itself, so `/rotate-flick` on `animate-rotate` is `--jumi-label-rotate-flick-animation-timing-function`
 — one `rotate`, because the label is written, not derived; the attribute came back out of the chain when
 the dot form went away.
 
-There is no second namespace. Labels and property names are the same kind of word, which is what lets a
-control's modifier be either; the chain settles it, since a labelled slot reads `--jumi-{label}-{part}`,
-then `--jumi-{attr}-{part}`, then `--jumi-{part}`. So a label equal to its own attribute name is inert
-rather than dangerous: `/[rotate]` on `animate-rotate` emits
-`var(--jumi-rotate-animation-…, var(--jumi-rotate-animation-…, var(--jumi-animation-…)))` — the unlabelled
-chain with the property link repeated. The animation already read that variable first, and the tween rule
-sets no timing variable, so nothing changes and nothing is added to the element (measured).
+**There is a second namespace, and one collision is what forced it.** Labels and property names are the
+same kind of word — one control's modifier is either — and the chain is the same shape either way: a
+labelled slot reads `--jumi-label-{label}-{part}`, then `--jumi-{attr}-{part}`, then `--jumi-{part}`. What
+changed is *where a control writes*: a word that is a property Jumi animates goes to
+`--jumi-{word}-{part}`, the property scope every motion animating it reads, and anything else goes to the
+label namespace.
+
+They used to share one variable, and the sharing was measurable rather than theoretical:
+`animate-scale-110` beside `animate-rotate-45/scale` and `animation-duration-1000/scale` set the duration
+of **both** motions — so an author's `animation-duration-400/rotate` on the second one lost to a class they
+never wrote for it. One variable, two readers, and the label declaration was the only record of which
+reading was meant. Now `/scale` is the scale property's and the rotate motion keeps its own scope
+(`1s, 0.4s`), and the collision is reported rather than dropped: a name that is a structural address can
+no longer be addressed by that word, so the build says so and the author renames the motion.
+
+What the split costs is small and worth stating. A word is either a property or a name in **every**
+stylesheet — the vocabulary is `propertyVariables` plus `effectKeyframes`, not "what this page animates" —
+because the other reading would make `/scale` change meaning when an unrelated element elsewhere started
+animating scale. A label equal to its own attribute name is unaffected: `animate-rotate-45/rotate` beside
+`animation-duration-400/rotate` still resolves through one scope, which is the same variable it always
+read. The emitted cost is six characters per labelled control, and the fixture's canonical bytes moved
+45,689 → 45,929 (+0.53%).
 
 What the flat space does cost is that two animations labelled `flick` share one variable. That is a naming
 choice rather than a defect, and it is the price of a label being sufficient on its own: the control knows

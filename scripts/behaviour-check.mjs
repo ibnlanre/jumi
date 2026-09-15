@@ -626,6 +626,15 @@ const NAMED_ARMS = [
     'e',
     'animate-opacity-[0:0|100:1]/enter animate-rotate-[0:0deg|100:90deg]/enter animation-duration-500/enter animate-scale-[0:1|100:2]',
   ],
+  // A name that is also a property, which is the one token that could be read twice. `scale` is a
+  // property Jumi animates *and* the name given to the rotate motion, so the two readings have to stay
+  // apart: `/scale` is the property's (the scale motion takes 1s) and the rotate motion keeps its own
+  // `/rotate` control at 400ms. Sharing one namespace, one class set both and this arm read `1s, 1s` —
+  // which is the failure, and it is silent, because both motions still animate.
+  [
+    'f',
+    'animate-rotate-45/scale animate-scale-110 animation-duration-1000/scale animation-duration-400/rotate',
+  ],
 ]
 
 const NAMED_CANDIDATES = [
@@ -707,6 +716,11 @@ const naming = [
     durationOf(forward, 'e', 'jumi-opacity-') === '0.5s' &&
       durationOf(forward, 'e', 'jumi-rotate-') === '0.5s' &&
       durationOf(forward, 'e', 'jumi-scale-') === '1s',
+  ],
+  [
+    'a name a property already owns cannot take that property\'s control',
+    durationOf(forward, 'f', 'jumi-scale-') === '1s' &&
+      durationOf(forward, 'f', 'jumi-rotate-') === '0.4s',
   ],
   [
     'candidate order cannot decide which name wins',

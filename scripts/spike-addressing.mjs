@@ -43,7 +43,7 @@ const CASES = [
   {
     about: 'compound slot: neither class name is the address',
     classes: [
-      'animate-filter-blur-4',
+      'animate-filter-blur-[4px]',
       'animate-filter-brightness-125',
       'animation-duration-900/filter',
     ],
@@ -76,12 +76,22 @@ const CASES = [
   {
     about: 'compound plus a label that is not a property',
     classes: [
-      'animate-filter-blur-4/foo',
+      'animate-filter-blur-[4px]/foo',
       'animate-filter-brightness-125',
       'animation-duration-900/filter',
       'animation-duration-500/foo',
     ],
     id: 'compound-label',
+  },
+  {
+    about: 'a label that is also a property: which one does /scale reach?',
+    classes: [
+      'animate-scale-110',
+      'animate-rotate-45/scale',
+      'animation-duration-1000/scale',
+      'animation-duration-400/rotate',
+    ],
+    id: 'label-shadowed',
   },
   {
     about: 'identical phrase, one property, two labels: one motion or two?',

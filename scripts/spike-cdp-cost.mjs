@@ -734,7 +734,7 @@ const flick = await page.evaluate(() => {
 
   return {
     classes: element.className.split(' ').length,
-    control: read('--jumi-flick-animation-duration'),
+    control: read('--jumi-label-flick-animation-duration'),
     global: read('--jumi-animation-duration'),
     label: read('--jumi-rotate-Z2excak-label'),
     slotName: read('--jumi-rotate-Z2excak-animation-name'),

@@ -1,9 +1,10 @@
-import type { Container, Declaration, Root, Rule } from 'postcss'
+import type { Container, Root, Rule } from 'postcss'
 
 import type { Product, ViewTransitionStaging } from './view-transition'
 import type { Collection } from '@/types'
 
 import { RANGE_GRAMMAR, rangeAccepted, rangeReadings } from './animation-range'
+import { ACTIVATED_SLOT, instanceKeys, ownDeclarations } from './instance'
 import {
   emitViewTransitions,
   isStagingSelector,
@@ -106,6 +107,16 @@ export type CarrierKind = 'animations' | 'transitions'
 const REFUSED_NAME = /^--jumi-name-.+-refused$/
 
 /**
+ * A name the model refused as already taken, stated as a declaration of its own.
+ *
+ * The second refusal, and a different one: the name is perfectly writable, but it is also a structural
+ * address — a property Jumi animates — so a control written `/<name>` reads the property scope and not
+ * this motion. Nothing is broken: the motion runs, its timing is the property's, and the author simply
+ * cannot address it by that word.
+ */
+const SHADOWED_NAME = /^--jumi-name-.+-shadowed$/
+
+/**
  * The prefix every staged declaration is written under, and the only thing a host needs to
  * recognize a payload. It reaches no browser, so it never has to be a property a browser applies.
  */
@@ -154,9 +165,13 @@ const stagedEntry = (prop: string) => {
  * excludes the substrate (`--jumi-animation-name`, `--jumi-transition-property`) by construction
  * rather than by a blocklist — and the transition pattern requires `-transition-` outright, so
  * the stagger slot's `--jumi-stagger-animation-delay` is not mistaken for an activation.
+ *
+ * The animations pattern is `ACTIVATED_SLOT` rather than a second copy of it: it is the same fact —
+ * "this declaration names a definition" — and two spellings of one fact is how the range pass and the
+ * hoist came to disagree about which instance a rule meant (`./instance`).
  */
 const ACTIVATION: Record<CarrierKind, RegExp> = {
-  animations: /^--jumi-.+-animation-name$/,
+  animations: ACTIVATED_SLOT,
   transitions:
     /^--jumi-.+-transition-(?:delay|duration|property|timing-function)$/,
 }
@@ -228,11 +243,9 @@ const namedParts = [
  * The name is derived from the activation rather than from a position in the list, because
  * positions are a fact about the stylesheet and the declaration is a fact about the *rule*: an
  * `@apply`, a variant and a plain utility all carry the same activation variable, and each needs
- * the matching value on itself.
+ * the matching value on itself — and which *instance* of that definition the rule means is read the same
+ * way, by `instanceKeys`.
  */
-const ACTIVATED_SLOT = /^--jumi-(.+)-animation-name$/
-const LABELLED_SLOT = /^--jumi-(.+)-label$/
-
 const hoistedName = (slot: string) => `--jumi-slot-${slot}`
 
 /** The slot a composition entry reads, or null when the entry is not a slot reference. */
@@ -316,10 +329,6 @@ export type Finalized = {
    */
   warnings: string[]
 }
-
-/** The declarations of a rule itself, ignoring anything nested inside it. */
-const ownDeclarations = (rule: Rule) =>
-  (rule.nodes ?? []).filter((node): node is Declaration => node.type === 'decl')
 
 /**
  * The utilities-layer block the composition belongs in.
@@ -453,30 +462,16 @@ const hoist = (staged: Collection<string>, rules: Rule[]) => {
     const published = new Set(own.map(declaration => declaration.prop))
 
     /**
-     * Every slot key this rule can publish: the activation variable's own — the unnamed instance of
-     * the definition it activates — plus one per name the rule wrote down.
-     *
-     * A name lives in the label declaration and not in the activation variable, and it has to: two
-     * names over identical frames share one keyframe and therefore one activation variable. That is
-     * the whole of motion-instance identity at this end — the definition is what the variable names,
-     * the instance is what the label names.
+     * Every slot key this rule can publish — the instances it named, or the definition's own when it named
+     * none. The derivation is shared with the range pass, which has to agree with this one about which
+     * instance a rule means.
      */
-    const instances = (base: string) => [
-      base,
-      ...own
-        .map(candidate => LABELLED_SLOT.exec(candidate.prop)?.[1])
-        .filter(
-          (key): key is string =>
-            key !== undefined && key.startsWith(`${base}-`),
-        ),
-    ]
-
     for (const declaration of own) {
       const match = ACTIVATED_SLOT.exec(declaration.prop)
 
       if (!match) continue
 
-      for (const key of instances(match[1])) {
+      for (const key of instanceKeys(rule, match[1])) {
         const value = known.get(key)
         const prop = hoistedName(key)
 
@@ -501,7 +496,7 @@ const hoist = (staged: Collection<string>, rules: Rule[]) => {
 
       if (!match) continue
 
-      for (const key of instances(match[1])) {
+      for (const key of instanceKeys(rule, match[1])) {
         const name = own.find(
           candidate => candidate.prop === cssEscape(`--jumi-${key}-label`),
         )?.value
@@ -517,7 +512,7 @@ const hoist = (staged: Collection<string>, rules: Rule[]) => {
           rule.append(
             postcss.decl({
               prop,
-              value: `var(${cssEscape(`--jumi-${name}-${part}`)})`,
+              value: `var(${cssEscape(`--jumi-label-${name}-${part}`)})`,
             }),
           )
         }
@@ -627,14 +622,21 @@ export function finalize(
   // Phase 1a — names, reported rather than published.
   //
   // `animate-fade-in/reveal` records its name in the rule it was written in — `--jumi-<slot>-label` —
-  // and the composition reads it as the narrowest link of that slot's chain. Neither of those needs
-  // this pass. What does is the case the model refuses: a name becomes a custom-property segment
-  // (`--jumi-<name>-animation-duration`), where a whitespace character cannot be written at all —
-  // measured, `css.escape('a b')` is `a\ b`, which is legal CSS but ends PostCSS's identifier, so the
-  // build fails with `Unknown word b-animation-duration`. The model drops the link to keep that from
-  // happening, states the refusal in a declaration of its own, and has no channel to say so; this is
-  // the channel. The *property* carries the fact because CSS cannot carry a name's leading whitespace
-  // in a value — see `refusedName` in `@/core`.
+  // and the composition reads it as the narrowest link of that slot's chain, filling
+  // `--jumi-slot-<slot>-<part>` from `--jumi-label-<name>-<part>`. Neither of those needs this pass.
+  // What does is the two cases the model refuses to link, each stated in a declaration of its own
+  // because the model has no channel to say so; this is the channel.
+  //
+  // The first is unwritable: a name becomes a custom-property segment, where a whitespace character
+  // cannot be written at all — measured, `css.escape('a b')` is `a\ b`, which is legal CSS but ends
+  // PostCSS's identifier, so the build fails with `Unknown word b-animation-duration`. The *property*
+  // carries the fact because CSS cannot carry a name's leading whitespace in a value — see
+  // `refusedName` in `@/core`.
+  //
+  // The second is taken rather than unwritable: the name is a structural address, so `/<name>` on a
+  // control reads the property scope and never this motion. Silent by default is the worst outcome
+  // there — the control looks like it works — so it is said outright. A motion named after the property
+  // *it* animates is not this case, and the model does not record it: one scope serves both readings.
   //
   // Deliberately *not* here: an "unused name" warning. Controls configure motion, they do not create
   // it — `animation-duration-500` with nothing to animate is inert, and `animation-duration-500/reveal`
@@ -645,11 +647,19 @@ export function finalize(
 
   root.walkRules(rule => {
     for (const declaration of ownDeclarations(rule)) {
-      if (
-        !REFUSED_NAME.test(declaration.prop) ||
-        reported.has(declaration.prop)
-      )
+      if (reported.has(declaration.prop)) continue
+
+      if (SHADOWED_NAME.test(declaration.prop)) {
+        reported.add(declaration.prop)
+
+        finalized.warnings.push(
+          `"${declaration.value}" names a motion, but it is also a property Jumi animates, so a control written \`/${declaration.value}\` reads that property — every motion animating it, not this one. Reword the name to time this motion on its own.`,
+        )
+
         continue
+      }
+
+      if (!REFUSED_NAME.test(declaration.prop)) continue
 
       reported.add(declaration.prop)
 

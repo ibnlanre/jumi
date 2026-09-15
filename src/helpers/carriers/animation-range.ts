@@ -1,4 +1,6 @@
-import type { Declaration, Rule } from 'postcss'
+import type { Rule } from 'postcss'
+
+import { ACTIVATED_SLOT, instanceKeys, ownDeclarations } from './instance'
 
 /**
  * The range **composition** variant, read back out of the emitted stylesheet.
@@ -65,13 +67,9 @@ export type RangeReading = {
   source: string
 }
 
-const ACTIVATION = /^--jumi-(.+)-animation-name$/
 const RANGED = /^animation-range-(.+)$/
 const LENGTH_PERCENTAGE =
   /^(?:[+-]?(?:\d+\.?\d*|\.\d+)(?:%|[a-z]{1,4})?|0|(?:calc|clamp|max|min|var)\(.*\))$/i
-
-const ownDeclarations = (rule: Rule) =>
-  (rule.nodes ?? []).filter((node): node is Declaration => node.type === 'decl')
 
 /**
  * The class token a selector starts with.
@@ -207,11 +205,19 @@ export const rangeAccepted = (range: string) => {
  */
 export const rangeReadings = (rule: Rule): RangeReading[] => {
   const activations = ownDeclarations(rule).filter(node =>
-    ACTIVATION.test(node.prop),
+    ACTIVATED_SLOT.test(node.prop),
   )
+
+  // The **instance** and not the definition, which is the same derivation the hoist uses: a rule that
+  // named its motion qualifies that motion, and the name is what tells the two instances of one
+  // keyframe apart (`./instance`). Assuming the definition here ranged nothing for a named phrase —
+  // measured, the ranged motion fell back to the whole range while its neighbour kept its own.
   const slot =
     activations.length === 1
-      ? (ACTIVATION.exec(activations[0].prop)?.[1] ?? null)
+      ? (instanceKeys(
+          rule,
+          ACTIVATED_SLOT.exec(activations[0].prop)?.[1] ?? '',
+        )[0] ?? null)
       : null
   const readings: RangeReading[] = []
 

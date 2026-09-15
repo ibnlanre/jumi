@@ -272,10 +272,12 @@ class="animate-rotate-[0:0deg|20:-8deg|100:-8deg]/[flick]
        animation-delay-150/scale"
 ```
 
-Measured on the element: the label marker `--jumi-rotate-Z2excak-label` and the control variable
-`--jumi-flick-animation-duration: 500ms` are both present, the slot's duration chain reads the label
-first — `var(--jumi-flick-animation-duration, var(--jumi-rotate-animation-duration, …))` — and the
-position resolves `animation-duration: 0.5s`. The control is delivered.
+Measured on the element: the label marker `--jumi-rotate-Z2excak-label` and the control variable are both
+present, the slot's duration chain reads the label first —
+`var(--jumi-flick-animation-duration, var(--jumi-rotate-animation-duration, …))` — and the position
+resolves `animation-duration: 0.5s`. The control is delivered. The label's own variable is
+`--jumi-label-flick-animation-duration` since the namespace split, which does not change the order or the
+measurement (`engineering/research/addressing-instances.md`).
 
 **All ten longhands are identical** between the current emission and shallow-shorthand, on that
 position and on every live position:

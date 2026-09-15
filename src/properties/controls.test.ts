@@ -38,16 +38,38 @@ describe('per-attribute timing controls', () => {
   it.each(cases)('scopes %s to its property', (control, value, modifier) => {
     const { controls } = setup()
 
-    expect(controls[control]!.fn(value, { modifier })).toEqual({
+    expect(controls[control].fn(value, { modifier })).toEqual({
       [`--jumi-${modifier}-${control}`]: value,
     })
+  })
+
+  it('addresses a name in the label namespace, which no property can occupy', () => {
+    const { controls } = setup()
+
+    // One class, one address, and the split is what makes that true: a structural token reads the
+    // property scope, and anything else reads the motion that declared it as a name. Sharing one
+    // namespace, `animation-duration-1000/scale` reached the scale property *and* every motion named
+    // `scale` — measured, and it cost an author their own `/rotate` control on such a motion.
+    expect(
+      controls['animation-duration'].fn('1000ms', { modifier: 'scale' }),
+    ).toEqual({ '--jumi-scale-animation-duration': '1000ms' })
+
+    expect(
+      controls['animation-duration'].fn('400ms', { modifier: 'flick' }),
+    ).toEqual({ '--jumi-label-flick-animation-duration': '400ms' })
+
+    // An effect is a structural address too: it is a motion's name in the same sense a property is,
+    // and `animate-fade-in/fade-in` has to keep reaching it.
+    expect(
+      controls['animation-duration'].fn('600ms', { modifier: 'fade-in' }),
+    ).toEqual({ '--jumi-fade-in-animation-duration': '600ms' })
   })
 
   it('writes the global variable without a modifier', () => {
     const { controls } = setup()
 
     expect(
-      controls['animation-direction']!.fn('alternate', { modifier: null }),
+      controls['animation-direction'].fn('alternate', { modifier: null }),
     ).toEqual({
       '--jumi-animation-direction': 'alternate',
     })
@@ -56,16 +78,17 @@ describe('per-attribute timing controls', () => {
   it('addresses a labelled animation with the label as its modifier', () => {
     const { controls } = setup()
 
-    // `/[rotate-flick]` is the animation whose declaration carried
-    // `/[rotate-flick]` — how two animations of one property, summed by
-    // `animation-composition: add`, are given independent timing. A slot that is
-    // never addressed reads the property's variable instead.
+    // `/rotate-flick` is the animation whose declaration carried that name — how two animations of one
+    // property, summed by `animation-composition: add`, are given independent timing. A slot that is
+    // never addressed reads the property's variable instead. The label namespace is what keeps the two
+    // readings apart: `--jumi-rotate-animation-timing-function` is the rotate property's scope, and no
+    // name can be it.
     expect(
-      controls['animation-timing-function']!.fn('ease-out', {
+      controls['animation-timing-function'].fn('ease-out', {
         modifier: 'rotate-flick',
       }),
     ).toEqual({
-      '--jumi-rotate-flick-animation-timing-function': 'ease-out',
+      '--jumi-label-rotate-flick-animation-timing-function': 'ease-out',
     })
   })
 })
@@ -81,7 +104,7 @@ describe('transition controls', () => {
       const { controls, creator } = setup()
       const motion = vi.spyOn(creator, 'motion')
 
-      controls[control]!.fn('value', { modifier })
+      controls[control].fn('value', { modifier })
 
       expect(motion).toHaveBeenCalledWith(modifier)
     },
@@ -91,7 +114,7 @@ describe('transition controls', () => {
     const { controls } = setup()
 
     expect(
-      controls['transition-duration']!.fn('500ms', {
+      controls['transition-duration'].fn('500ms', {
         modifier: 'background-color',
       }),
     ).toEqual({
@@ -103,7 +126,7 @@ describe('transition controls', () => {
     const { controls } = setup()
 
     expect(
-      controls['transition-behavior']!.fn('allow-discrete', { modifier: null }),
+      controls['transition-behavior'].fn('allow-discrete', { modifier: null }),
     ).toEqual({
       '--jumi-transition-behavior': 'allow-discrete',
     })
@@ -114,7 +137,7 @@ describe('stagger utilities', () => {
     const { controls } = setup()
 
     expect(
-      controls['animate-stagger-forward']!.fn('100ms', { modifier: null }),
+      controls['animate-stagger-forward'].fn('100ms', { modifier: null }),
     ).toEqual({
       '& > *': {
         '--jumi-stagger-animation-delay': 'calc((sibling-index() - 1) * 100ms)',
@@ -126,7 +149,7 @@ describe('stagger utilities', () => {
     const { controls } = setup()
 
     expect(
-      controls['animate-stagger-backward']!.fn('150ms', { modifier: null }),
+      controls['animate-stagger-backward'].fn('150ms', { modifier: null }),
     ).toEqual({
       '& > *': {
         '--jumi-stagger-animation-delay':
@@ -139,7 +162,7 @@ describe('stagger utilities', () => {
     const { controls } = setup()
 
     expect(
-      controls['animate-stagger-forward']!.fn('100ms', { modifier: '5' }),
+      controls['animate-stagger-forward'].fn('100ms', { modifier: '5' }),
     ).toEqual([
       {
         '@supports (animation-delay: calc(sibling-index() * 1ms))': {
@@ -175,7 +198,7 @@ describe('stagger utilities', () => {
     const { controls } = setup()
 
     expect(
-      controls['animate-stagger-backward']!.fn('150ms', { modifier: '4' }),
+      controls['animate-stagger-backward'].fn('150ms', { modifier: '4' }),
     ).toEqual([
       {
         '@supports (animation-delay: calc(sibling-index() * 1ms))': {

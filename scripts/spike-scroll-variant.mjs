@@ -325,7 +325,7 @@ composition.walkRules(rule => {
 
 console.log(`\n  the composition's range list:\n    ${list?.value ?? '(none)'}`)
 console.log(
-  `\n  per-slot publications surviving finalization: ${(finalized.css.match(/--jumi-(fade-in|fade-out|reveal|opacity)-animation-range/g) ?? []).join(' ')}`,
+  `\n  per-slot publications surviving finalization: ${(finalized.css.match(/--jumi-(label-reveal|fade-in|fade-out|opacity)-animation-range/g) ?? []).join(' ')}`,
 )
 
 // ── 4 · does it actually place two motions differently? ─────────────────────────────────────────
@@ -362,7 +362,7 @@ const page = `<!doctype html>
       fadeInRange: style.getPropertyValue('--jumi-fade-in-animation-range').trim(),
       fadeOutRange: style.getPropertyValue('--jumi-fade-out-animation-range').trim(),
       list: style.getPropertyValue('animation-range').trim(),
-      revealRange: style.getPropertyValue('--jumi-reveal-animation-range').trim(),
+      revealRange: style.getPropertyValue('--jumi-label-reveal-animation-range').trim(),
       running: animations.map(animation => ({
         name: animation.animationName,
         progress: animation.effect.getComputedTiming().progress,

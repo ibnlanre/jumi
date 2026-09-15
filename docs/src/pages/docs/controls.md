@@ -62,7 +62,9 @@ When one property carries more than one animation, name each where you declare i
 
 A name belongs to the motion that declared it, on the element that wrote it. Two elements may use the same word for different motions, and naming a motion elsewhere in your stylesheet never widens what this element answers to. Two motions on one element may also share a name, and then a control written for that name reaches both — which is how a transition of several properties is tuned as one thing.
 
-The name is yours to choose, and it becomes the variable name exactly as written — nothing is prepended. Names and property names are one namespace, which is what lets `/rotate` and `/flick` be written the same way on a control: `--jumi-rotate-animation-timing-function` is the variable every rotate animation reads, so `rotate` is the name all of them answer to, and a name is a word one of them answers to. Give each animation you want to time apart its own word.
+The name is yours to choose, and a control reads it the same way whether you write `/rotate` or `/flick`. They resolve differently, and that is the one rule to know: a word that is a property Jumi can animate — `rotate`, `scale`, `filter` — is that property's, so every motion animating it answers; any other word is a name, and only the motion that declared it answers. `--jumi-rotate-animation-timing-function` is the variable every rotate animation reads, and a name is reached at `--jumi-label-flick-animation-timing-function`, which no property can occupy. Give each animation you want to time apart its own word, and make it a word that is not a property.
+
+That rule is why a name can never be half-shared. `animate-rotate-45/scale` names a rotate motion `scale`, and `/scale` on a control is the scale property's in every stylesheet, so the name does not steal it — the build tells you instead, and the motion keeps the timing of whatever addresses rotate.
 
 Naming is registered non-inheriting: a name does not travel into descendants, so a wrapper and the element inside it can use the same word without knowing about each other.
 
@@ -75,7 +77,7 @@ Reach for naming when one easing is not enough. A single `animation-timing-funct
 The name is written into the rule, so you can retime or re-ease that animation from your own CSS without touching the markup:
 
 ```css
-.petal { --jumi-flick-animation-duration: 900ms; }
+.petal { --jumi-label-flick-animation-duration: 900ms; }
 ```
 
 ## Write the shape of the animation

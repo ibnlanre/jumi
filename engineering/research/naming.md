@@ -68,7 +68,7 @@ animation-duration: var(--jumi-slot-fade-in-animation-duration,
 .animate-fade-in\/reveal {
   --jumi-fade-in-animation-name: jumi-fade-in;
   --jumi-fade-in-label: reveal;
-  --jumi-slot-fade-in-animation-duration: var(--jumi-reveal-animation-duration);
+  --jumi-slot-fade-in-animation-duration: var(--jumi-label-reveal-animation-duration);
   /* … one per part, filled by the finalizer */
 }
 ```
@@ -102,14 +102,15 @@ where a name exists, the composition grows by 1.8% (`aggregateBytes` 4281 → 43
 
 ## Refused names
 
-A name becomes part of a custom-property's name (`--jumi-<name>-animation-duration`), and that is the
-only thing that can be wrong with one. Measured, name by name:
+A name becomes part of a custom property's name, and that is the only thing that can be wrong with one.
+Two things are wrong with one now, and the second is newer than this section. Measured, name by name:
 
 | author writes | Jumi receives | outcome |
 | --- | --- | --- |
 | `/reveal` `/card` `/flick` `/return` `/hero-2` `/2x` `/_x` `/a_b` | same | addressable |
 | `/[a.b]` `/[a:b]` `/[a/b]` `/[a(b)]` `/[--x]` `/[A-Z]` | escaped | addressable |
-| `/[a b]` `/[a_b]` `/[_x]` `/[x_]` | `a b`, `a b`, ` x`, `x ` | **refused and reported** |
+| `/[a b]` `/[a_b]` `/[_x]` `/[x_]` | `a b`, `a b`, ` x`, `x ` | **refused and reported** — cannot be written |
+| `/scale` `/opacity` `/filter` on a motion that animates something else | same | **refused and reported** — the property's address |
 | `/[]`, bare `/unicodé`, bare `animation-range-nonsense:` | never a candidate | Tailwind drops it |
 
 Whitespace is unwritable: `css.escape('a b')` is `a\ b`, legal CSS that **ends PostCSS's
@@ -121,6 +122,31 @@ and nothing else; the motion still runs, unnamed, and the build says which name 
 The refusal travels in the **property** of a record declaration (`--jumi-name-<hash>-refused`), not
 in its value: CSS cannot keep a name's leading or trailing whitespace in a value — PostCSS moves it
 into `raws.between` — so a value-based record went silent for exactly the names `_` produces.
+
+## A name a property already owns
+
+The second refusal, and the resolution of the collision this file's sibling `addressing.md` found. A
+control's token used to be read twice — as a property scope and as a label — because they were one
+variable, so `animation-duration-1000/scale` set the duration of the scale motion *and* of any motion
+named `scale`, and an author's own `animation-duration-400/rotate` on that second motion lost. Measured,
+`1s, 1s`, against `1s, 0.4s` after the split.
+
+The rule now: a token that is a property Jumi animates, or an effect, reads the property scope
+(`--jumi-<token>-<part>`); anything else reads `--jumi-label-<name>-<part>`, a namespace no property
+scope can occupy. The vocabulary is static — `propertyVariables` and `effectKeyframes` — so `/scale` means
+the same thing in every stylesheet, and a sheet that later animates scale cannot re-point a control somebody
+already wrote.
+
+The name is recorded (`--jumi-name-<hash>-shadowed`) instead of linked, which does two things: the
+stylesheet carries no address that nothing fills, and the finalizer has something to report. Naming a
+motion after the property *it* animates is not this case — one scope serves both readings, and
+`animate-rotate-45/rotate` beside `animation-duration-400/rotate` is documented behaviour — so nothing is
+recorded. Measured on the distinguishing corpus: `structuralAddress` sends `/scale` to the property and
+`/rotate` to the motion, and the durations separate (`1s, 0.4s`) where they used to coincide (`1s, 1s`).
+
+The cost is stated in `controls.md` rather than hidden: a motion labelled with the exact name of a
+property it does not animate cannot be addressed by that word. `engineering/research/addressing-instances.md`
+has the measurements, the rejected alternatives, and the byte cost (+0.53% on the canonical fixture).
 
 Deliberately **not** reported: a name that no motion answers to. Controls configure motion, they do
 not create it; `animation-duration-500/reveal` with no `reveal` is inert in the same way

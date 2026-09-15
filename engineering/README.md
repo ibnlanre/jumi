@@ -23,6 +23,7 @@ engineering/
 | `architecture/carrier-locality.md` | why the aggregate resolves on the carrier, with the browser measurement |
 | `architecture/dependency-gap.md` | what still stands between Jumi and independent emission, and why that is a product decision |
 | `architecture/effect-model.md` | what an effect is mechanically — one element, one keyframe timeline |
+| `architecture/instances.md` | the one derivation of a motion instance from a rule, the two conflation defects that made it a rule rather than a convention, and the test that holds it |
 | `architecture/phrases.md` | the shipped phrase grammar, and the host value-parser constraints it works within |
 | `decisions/hooks-proposal.md` | a lifecycle-hooks proposal that was never implemented |
 | `decisions/CTO.md` | the running record of architectural direction and its approvals |

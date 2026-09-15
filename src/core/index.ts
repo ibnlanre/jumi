@@ -127,6 +127,33 @@ export const addressableName = (name: string) =>
   name.length > 0 && !/[\s\u0000-\u001F\u007F]/.test(name)
 
 /**
+ * Whether a token is a **structural address** — a property Jumi animates, or an effect — rather than a
+ * name an author chose.
+ *
+ * This is the one discriminator that lets `/scale` mean one thing. A control's modifier used to be read
+ * twice: as the property scope of every slot animating `scale`, and as the label address of any motion
+ * named `scale`. One variable, two readers — so `animation-duration-1000/scale` set both, and an
+ * author's `animation-duration-400/rotate` lost to a class they never wrote for that motion. Measured:
+ * `1s, 1s`, where the author's own control said `400ms`.
+ *
+ * The vocabulary is deliberately **static** — the properties of `propertyVariables` and the effects of
+ * `effectKeyframes` — and not "the attributes this stylesheet happens to animate". A structural address
+ * is implicit, stable and part of Jumi's core model: `--jumi-rotate-animation-duration` is the rotate
+ * property's scope whether or not a given page animates rotate. Reading it off the sheet instead would
+ * make `/scale` change meaning when an unrelated element elsewhere started animating scale, which is the
+ * same element-local inference this discriminator exists to remove, one level up.
+ *
+ * The cost is the accepted one: a motion labelled with the exact name of a property Jumi animates cannot
+ * be addressed by that name. `animate-rotate-45/scale` beside `animation-duration-500/scale` is the
+ * scale property's, and the rotate motion keeps its own scope. That label is not silently dropped —
+ * `nameSlot` records it and the pass reports it — because the alternative is a control that looks like
+ * it works.
+ */
+const structuralAddress = (token: string) =>
+  Object.hasOwn(propertyVariables, token) ||
+  Object.hasOwn(effectKeyframes, token)
+
+/**
  * A slot's key: the name a slot is addressed by throughout the model, and the middle of its
  * variable names. `attribute-id` for a phrase or a single value (identity is the value), the
  * attribute for a composed tween or an effect (identity is the property or the effect).
@@ -140,7 +167,8 @@ export const addressableName = (name: string) =>
  * The name enters **hashed**, so the key is a discriminator rather than the name itself. The
  * aggregate's chains are keyed by this string, and a name must not reach the composition: a name is
  * something an author writes on one element, and the composition is derived from the whole corpus.
- * The address a person writes down is `--jumi-<name>-<part>`, which is unchanged.
+ * The address a person writes down is `--jumi-label-<name>-<part>`, in a namespace of its own — so a name
+ * and a property can never end up being the same custom property.
  */
 const slotKey = (attribute: string, id?: string, name?: null | string) =>
   id ? `${attribute}-${id}${name ? `-${shorthash2(name)}` : ''}` : attribute
@@ -294,17 +322,46 @@ export function createJumiModel({
   })
 
   /**
+   * Record a name that is a structural address, so the build can report it.
+   *
+   * A different refusal from `refusedName`, and the difference is what an author should do about it: a
+   * name with whitespace is unwritable, and one that collides with a property is writable but already
+   * taken. `animate-rotate-45/scale` names the rotate motion `scale`, and `/scale` on a control is the
+   * scale property's scope — every motion animating scale, and not this one. Nothing is broken and
+   * nothing is ambiguous to the engine; the author's intent was simply unrepresentable, and a warning is
+   * the only thing that can say so.
+   *
+   * The record replaces the label declaration rather than accompanying it, so the CSS carries no address
+   * that nothing fills: with no label declared, the slot keeps the plain chain, and its timing is the
+   * property scope's, which is what a control written `/<attribute>` addresses anyway.
+   *
+   * Naming a motion after the property it animates is *not* this case. One scope serves both readings,
+   * so `animate-rotate-45/rotate` beside `animation-duration-400/rotate` is coincident rather than
+   * ambiguous — documented behaviour, and not something to warn about.
+   */
+  const shadowedName = (name: string): CssInJs => ({
+    [cssEscape(`--jumi-name-${shorthash2(name)}-shadowed`)]: name,
+  })
+
+  /**
    * Name a slot: install an address for the elements that wrote the name, and say so in the rule.
    *
    * Nothing here reaches the aggregate, and that is the point. A name is element-local —
    * `animate-fade-in/reveal` names the motion for the elements matching *that* rule — so the address
    * it installs is the slot-keyed variable the composition's chains already read
-   * (`--jumi-slot-<key>-<part>`), filled from the name's own variable. Both are registered
-   * non-inheriting: a descendant that animates the same property must not answer to a name declared
-   * above it, which is the same rule the activation variables follow.
+   * (`--jumi-slot-<key>-<part>`), filled from the name's own variable in the **label namespace**
+   * (`--jumi-label-<name>-<part>`). Both are registered non-inheriting: a descendant that animates the
+   * same property must not answer to a name declared above it, which is the same rule the activation
+   * variables follow.
    *
-   * A name the build cannot write — whitespace — is recorded instead of linked, so the motion still
-   * runs and the pass can report what it could not use.
+   * The label namespace is what makes a name unable to collide with a property. Structural addresses are
+   * always `--jumi-<attribute>-<part>`, and `label-` is never an attribute, so `/scale` as a property and
+   * `scale` as a name stop being one custom property. See `structuralAddress` for the reading that had to
+   * change with it, and the one case it costs.
+   *
+   * Two names that cannot be linked are recorded instead, so the motion still runs and the pass can
+   * report what it could not use: whitespace cannot be written at all (`refusedName`), and a name that is
+   * a structural address is already taken (`shadowedName`).
    *
    * Returns the declaration that records the name, because the rule it belongs to is the host's for
    * an effect: the host spreads it into the rule it is already emitting.
@@ -312,16 +369,21 @@ export function createJumiModel({
   const nameSlot = (key: string, attribute: string, name: string): CssInJs => {
     if (!addressableName(name)) return refusedName(name)
 
+    // A structural address wins, and the name is reported rather than linked — except when the name is
+    // this motion's own attribute, where one scope serves both readings and there is nothing to say.
+    if (structuralAddress(name))
+      return name === attribute ? {} : shadowedName(name)
+
     for (const part of slotParts) {
       // The slot's address is always registered: it is how a name reaches one motion, and a
       // descendant that animates the same property must not answer to a name declared above it.
       registerName(cssEscape(`--jumi-slot-${key}-${part}`))
 
-      // The name's own variable is registered the same way, with one exemption: when the name *is*
-      // the attribute, that variable is the property scope's (`--jumi-rotate-animation-duration`),
-      // and a scope cascades into subtrees on purpose. Registering it here would quietly turn
-      // `animate-rotate-[…]/rotate` into a private address.
-      if (name !== attribute) registerName(cssEscape(`--jumi-${name}-${part}`))
+      // The name's own variable lives in the label namespace, so it cannot be the property scope's:
+      // a scope is `--jumi-<attribute>-<part>`, and no attribute is `label-…`. This used to be
+      // registered under the name itself, with an exemption for the identity case, because there the
+      // two roles really were one variable.
+      registerName(cssEscape(`--jumi-label-${name}-${part}`))
     }
 
     // Publicly visible state, so a republish is owed: the slot's chain gains its address link only
@@ -854,8 +916,8 @@ export function createJumiModel({
             [`--jumi-${attribute}-${id}-animation-name`]: `jumi-${attribute}-${id}`,
             // The frame variables are keyed by a hash of the phrase, which nobody can write by hand.
             // The name is the address a person CAN write, so the rule states it: read the slot's
-            // name here, then set `--jumi-${name}-…` from your own CSS. Also what the pass reads to
-            // report a name it cannot address.
+            // name here, then set `--jumi-label-${name}-…` from your own CSS. Also what the pass reads
+            // to report a name it cannot address.
             ...named,
             ...variables,
           }
@@ -898,12 +960,22 @@ export function createJumiModel({
 
         // The modifier names a property — `rotate` — or the name a declaration gave one of its
         // animations — `flick`, from `animate-rotate-[…]/flick`. Either way it is one word, so the
-        // variable is just the modifier and the part. Escaped, because a custom property name
-        // cannot carry a stray dot — and refused outright when it carries whitespace, which is not
-        // a name any motion could have answered to and is not a declaration PostCSS can parse.
+        // variable is the modifier and the part, in one of two namespaces: a structural token reads
+        // the property scope every motion of that property answers to, and a name reads the label
+        // namespace only the motion that declared it fills. One class is one address — which is what
+        // stops `/scale` from configuring a motion named `scale` as well as the scale property.
+        // Escaped, because a custom property name cannot carry a stray dot — and refused outright when
+        // it carries whitespace, which is not a name any motion could have answered to and is not a
+        // declaration PostCSS can parse.
         if (!addressableName(modifier)) return refusedName(modifier)
 
-        return { [cssEscape(`--jumi-${modifier}-${part}`)]: value }
+        return {
+          [cssEscape(
+            structuralAddress(modifier)
+              ? `--jumi-${modifier}-${part}`
+              : `--jumi-label-${modifier}-${part}`,
+          )]: value,
+        }
       }
     },
 
