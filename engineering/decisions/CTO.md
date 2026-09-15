@@ -83,20 +83,47 @@ definition in the stylesheet.
 
 > **Accept the syntax with instance-precise specialization.** Preserve the definition-keyed base activation
 > and add an instance-keyed selection path; keep property scope fanning out across instances; keep
-> unaddressed refused for 1.0; ship the destructive-spelling warning independently, now; then measure cascade
+> unaddressed refused for 1.0; make the destructive shape emit nothing rather than warn; then measure cascade
 > placement against `base motion activation < instance specialization selection < aggregate consumption` and
 > verify: two names over one definition take different easings, one instance is specialized while its sibling
 > is untouched, property scope reaches every same-property instance, scalar easing still supplies the
 > fallback, nothing leaks to elements without the phrase, and Studio export/replay parity stays exact.
 
-**Shipped: the destructive-spelling warning** (independent of the feature, and before it). A phrase that
-reaches a part the `animation` shorthand carries is now refused at the model — `carriedByShorthand` derives
-the parts from `separateParts`, so the guard cannot drift from the split it depends on — recorded inertly as
-`--jumi-phrase-<hash>-unroutable`, and reported by the pass with the remedy in the message. The motion keeps
-its scalar easing instead of vanishing. Asserted three ways and falsified: `controls.test.ts` (refused at
-every address, scalar untouched, the three separate parts deliberately out of scope), `index.test.ts` (the
-message), and `behaviour:check`'s arm `h`, which fails — "no animation at all" — the moment the refusal is
-removed.
+**Shipped: the destructive shape emits nothing** (independent of the feature, and before it). This supersedes
+the earlier "ship the warning" ruling, and the distinction is the reason:
+
+```text
+destructive acceptance     the candidate compiles, writes an invalid timing value,
+                           and the animation shorthand dies
+silent non-emission        the candidate is unsupported, emits no rule, and nothing dies
+```
+
+The second is what a framework does with a candidate it does not recognize, so Jumi answers the same way: a
+phrase on a part the `animation` shorthand carries returns `{}` from the control — no declaration, and no
+record either, because with no address there is no intent to report on. `carriedByShorthand` derives the
+guarded parts from `separateParts`, so the guard cannot drift from the split it depends on, and it runs
+before the modifier is read, so it holds at every address. Measured: the candidate leaves no rule and no
+declaration in the output whatsoever, while `animation-timing-function-ease-out` still writes its scalar.
+
+The grammar that follows is strict without needing documentation about clone counts:
+
+```text
+animation-timing-function-ease-out                  valid — scalar control
+animation-timing-function-[cubic-bezier(…)]         valid — scalar arbitrary control
+animation-timing-function-[0:ease-out]/reveal       valid — segment easing, addressed to a motion
+animation-timing-function-[0:ease-out]/rotate       valid — segment easing, property-scoped
+animation-timing-function-[0:ease-out]              unsupported shape, ignored
+```
+
+**And warnings stay where acceptance proves the author wrong.** An unsupported candidate is not a diagnosis
+waiting to happen: Jumi has no address, so it has nothing to act on, and explaining the shape would be a
+second language for the same candidate. The existing name warnings are the contrast — there the build _did_
+accept a name and can prove it cannot be addressed.
+
+Asserted and falsified: `controls.test.ts` (nothing at every address, scalar untouched, the three separate
+parts deliberately out of scope), `behaviour:check`'s arm `h`, which reads no animation at all the moment the
+guard is removed, and the emission check above. The addressed forms are where the segment-easing path will
+attach, and that is the one thing the guard is written to leave room for.
 
 ## 2026-09-15 — the per-instance link layer: closed, with the residual recorded as intentional
 

@@ -378,18 +378,6 @@ export function createJumiModel({
   })
 
   /**
-   * Record a phrase that reached a part the `animation` shorthand carries, so the build can report it.
-   *
-   * The same channel as `refusedName`, and for the same reason: the fact has to survive to a pass that can
-   * speak, and it has to be **inert** — what is written is data, never a declaration an element resolves.
-   * Writing the value the author typed is the measured catastrophe `carriedByShorthand` describes, and the
-   * warning is the only thing that can say so.
-   */
-  const unroutablePhrase = (value: string): CssInJs => ({
-    [cssEscape(`--jumi-phrase-${shorthash2(value)}-unroutable`)]: value,
-  })
-
-  /**
    * Name a slot: install an address for the elements that wrote the name, and say so in the rule.
    *
    * Nothing here reaches the aggregate, and that is the point. A name is element-local —
@@ -1018,12 +1006,20 @@ export function createJumiModel({
 
     scope(part: string): MatchUtilitiesPropertyFunction {
       return (value, { modifier }) => {
-        // A phrase is not a value any part of the shorthand accepts, so it is refused rather than written.
-        // Segment easing *is* a phrase, and it is written with the motion's name —
-        // `animation-timing-function-[0:ease-out]/<name>` — never through the scalar chain, which is a
-        // distinction the warning states and this line enforces.
-        if (isPhrase(value) && carriedByShorthand(part))
-          return unroutablePhrase(value)
+        // An unsupported shape emits nothing, the way a candidate the framework does not recognize emits
+        // nothing — the same answer the motion matcher gives a non-phrase value
+        // (`isPhrase(value) ? fn(value, extra) : {}` in the host). A phrase here is *segment easing*, which
+        // is addressed to a motion (`/[0:ease-out]/reveal`) or to a property (`/[0:ease-out]/rotate`); with
+        // no address there is nothing to specialize, and writing the phrase into the chain is the one
+        // outcome that cannot be allowed: the shorthand is a single declaration, so it becomes invalid at
+        // computed-value time and the element reports `animation-name: none` — no motion at all, rather
+        // than a motion that misbehaves. When the segment-easing path lands, this is where an addressed
+        // phrase stops returning early.
+        //
+        // No warning, deliberately. There is nothing contradictory to report: Jumi has no address, so it has
+        // no intent to act on, and explaining an unsupported shape is not diagnostics — it is a second
+        // language for the same candidate. Warnings stay where acceptance proves the author wrong.
+        if (isPhrase(value) && carriedByShorthand(part)) return {}
 
         if (!modifier) return { [`--jumi-${part}`]: value }
 

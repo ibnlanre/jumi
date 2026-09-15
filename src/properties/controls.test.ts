@@ -92,29 +92,31 @@ describe('per-attribute timing controls', () => {
     })
   })
 
-  it('refuses a phrase on a part the shorthand carries, and records it instead', () => {
+  it('emits nothing for a phrase on a part the shorthand carries', () => {
     const { controls } = setup()
 
     // Measured: written into the chain, this left the element with `animation-name: none`, `0s` and *zero*
-    // animations — the shorthand is one declaration, so one invalid component takes the motion with it. The
-    // refusal is the difference between a motion that keeps its default easing and a motion that vanishes.
-    const refused = controls['animation-timing-function'].fn('0:ease-out', {
-      modifier: null,
-    })
+    // animations — the shorthand is one declaration, so one invalid component takes the motion with it.
+    //
+    // An unsupported shape emits **nothing**, the way a candidate the framework does not recognize emits
+    // nothing: no control declaration, and no record either, because there is no address and so no intent to
+    // report on. A phrase belongs to segment easing, which is addressed — `/[0:ease-out]/reveal` — and the
+    // addressed forms are where the segment-easing path will attach.
+    expect(
+      controls['animation-timing-function'].fn('0:ease-out', {
+        modifier: null,
+      }),
+    ).toEqual({})
 
-    expect(refused).not.toHaveProperty('--jumi-animation-timing-function')
-    expect(Object.values(refused)).toEqual(['0:ease-out'])
-    expect(Object.keys(refused)[0]).toMatch(/^--jumi-phrase-.+-unroutable$/)
-
-    // The same at every address, because it is the shorthand that cannot hold a phrase and not the chain.
+    // Every address, because it is the shorthand that cannot hold a phrase and not one chain.
     expect(
       controls['animation-duration'].fn('0:1s', { modifier: 'flick' }),
-    ).not.toHaveProperty('--jumi-label-flick-animation-duration')
+    ).toEqual({})
     expect(
       controls['animation-timing-function'].fn('0:ease-out', {
         modifier: 'rotate',
       }),
-    ).not.toHaveProperty('--jumi-rotate-animation-timing-function')
+    ).toEqual({})
 
     // A scalar is untouched: this is a guard about phrases, and it must not read as one about controls.
     expect(

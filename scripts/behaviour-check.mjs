@@ -652,8 +652,8 @@ const NAMED_ARMS = [
   // The destructive spelling, which must leave the motion **running**: a phrase written into a part the
   // `animation` shorthand carries makes the whole shorthand invalid at computed-value time, and the element
   // then reports `animation-name: none` — no animations at all, which reads as a page that never animated
-  // rather than as one that is broken. Asserted here because it is invisible in text and catastrophic in
-  // effect; measured three times in `spike-timing-phrase` before the refusal existed.
+  // rather than as one that is broken. The shape is unsupported, so it emits nothing at all; asserted here
+  // because the failure it prevents is invisible in text and catastrophic in effect.
   [
     'h',
     'animate-fade-in/hphrase animation-timing-function-[0:ease-out]/hphrase',
