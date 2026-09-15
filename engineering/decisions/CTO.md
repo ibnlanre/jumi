@@ -1,3 +1,64 @@
+## 2026-09-15 — segment easing: phrase-valued control accepted, last edge measured
+
+**Syntax — accepted.** `animate-rotate-[0:0deg|100:45deg]/test` beside
+`animation-timing-function-[0:ease-out-back]/test`: the motion phrase keeps its strict `offset:value`
+meaning, and all easing stays under `animation-timing-function-*`. The probe's catch does not invalidate the
+syntax, it routes it — a keyframe-local timing function cannot read a `var()`, so a timing phrase is not an
+ordinary control but a **specialization** of the addressed motion's definition.
+
+**Unaddressed — refused for 1.0.** `animation-timing-function-[0:ease-out-back]` measured +4,844 bytes on
+the probe sheet (19 clones, 19 selection declarations in one rule). Too much hidden cost for syntax whose
+scope is also vague: segments belong to a motion instance or a property scope, and the unaddressed form has
+neither.
+
+**Destructive path — warning, and structurally blocked.** A phrase that reaches the control chain is not a
+mis-set property: the composition's whole `animation` shorthand becomes invalid at computed-value time and
+the motion disappears (`animation-name: none`, zero animations). Measured twice — as a global variable, and
+again in the fan-out section, where leaving the phrase in place gave both elements _nothing animates_ until
+it was dropped. Statically provable, so it ships as a warning even before the feature.
+
+**Selection placement — measure before landing.** The invariant to satisfy is
+`motion activation < segment-specialization selection < aggregate consumption`, with the control's own rule
+owning selection: placement in the motion's rule leaked to every element animating that motion (`90` vs
+`86.441` on the probe).
+
+**Hard rule.** Specialization may change the selected keyframe definition; it must not alter the slot/control
+fallback chain. Scalar easing stays the fallback for every unclaimed segment (measured: `250ms` claim, `750ms`
+fallback).
+
+### The last semantic edge, measured: structural fan-out
+
+`…/rotate` beside a named `/spin` rotate motion, four rotate definitions in the sheet
+(`spike-timing-phrase` §8):
+
+| semantics                                       | element carrying both rotate motions            | cost                             |
+| ----------------------------------------------- | ----------------------------------------------- | -------------------------------- |
+| A · property scope, as every other `/…` control | both specialized                                | 4 clones, 4 selections, +2,799 B |
+| B · the structural instance only                | only the unaddressed one — `/spin` keeps `ease` | 3 clones, 3 selections, +2,078 B |
+
+Both keep the locality that matters: an element without the control class stays unspecialized.
+
+**And the granularity is the definition, not the instance.** The activation variable is keyed by the
+_definition_ (`--jumi-rotate-<hash(value)>-animation-name`) while only the label declaration carries the name
+hash (`--jumi-rotate-…-fzwY-label`), so a selection written into the activation lands on every motion sharing
+that definition — a `/<name>` control cannot be instance-precise today, and two names over one definition
+would be specialized together. Instance-precise selection needs a name-keyed variable the model does not
+emit, since the hoist reads the definition-keyed activation.
+
+So the question is no longer "instance or property" but **definition or instance**, and it has to be settled
+before the handler is written:
+
+- definition granularity — today's mechanism: `/rotate` and `/<name>` both mean "the definitions this token
+  reaches", one clone for a name and priced by the sheet for a property scope, and two names over one
+  definition cannot be eased apart;
+- instance granularity — a name-keyed selection variable, so `/<name>` means exactly one instance.
+
+### Call
+
+> **Accept the syntax; implementation waits on the granularity ruling.** Unaddressed refused for 1.0,
+> addressed allowed, the destructive spelling warns and is structurally blocked, scalar easing unchanged, and
+> placement measured before it lands.
+
 ## 2026-09-15 — the per-instance link layer: closed, with the residual recorded as intentional
 
 **Removing the link for the seven shorthand-carried parts — accepted.** A name reached those parts through a

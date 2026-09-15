@@ -789,3 +789,193 @@ const LARGE = [
     `     unaddressed (all):    +${everyRoot.toString().length - compiled.css.length} bytes, ${clones} clones, ${definitions.length} declarations in one rule`,
   )
 }
+
+/* ────────────────────────────────────────────────────────────────────────────────────────────────────
+ * 8 · Structural fan-out — what `…/rotate` means beside a *named* rotate motion
+ *
+ * `/<attribute>` is the property scope everywhere else: `animation-duration-500/rotate` sets every rotate
+ * motion on the element. A timing phrase cannot reuse that mechanism even in principle, because it selects a
+ * **definition** and every rotate motion has its own. So the open question is not mechanical but semantic —
+ * what `/rotate` is taken to mean:
+ *
+ *   A · the property scope, as everywhere else. Every rotate motion in the sheet is cloned and the control's
+ *       own rule selects them all. Correct per element; priced by the sheet, not by the page, because a class
+ *       cannot know which motions the elements matching it carry.
+ *   B · the structural instance only — the rotate motions nothing named. One clone, one declaration, and
+ *       `/rotate` means here what it means nowhere else.
+ *
+ * Reach is read off each animation rather than off a computed value: two rotate motions on one element
+ * compose onto the same property, so the computed angle can only show the winner. A keyframe's own easing
+ * says which definition *that* animation selected.
+ * ────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+console.log('\n── 8 · structural fan-out\n')
+
+const FAN_OUT = [
+  'animate-rotate-[0:0deg|100:45deg]',
+  'animate-rotate-[0:0deg|100:90deg]/spin',
+  'animation-timing-function-[0:step-start]/rotate',
+  'animation-duration-1000',
+  // Rotate motions this page never puts on an element: a property-scoped selector cannot know that.
+  'animate-rotate-[0:0deg|100:135deg]',
+  'animate-rotate-[0:0deg|100:180deg]',
+]
+
+const fanCompiled = await compile(FAN_OUT)
+const fanCss = fanCompiled.css
+
+/** Every rotate motion in the sheet: what it activates, what it names, and whether anything named it. */
+/**
+ * Every rotate motion in the sheet, per rule: the definition it activates, the key it is addressed by, and
+ * whether a name addressed it.
+ *
+ * The two keys are not the same, and that is the fact this section exists to surface. The **activation** is
+ * keyed by the definition (`--jumi-rotate-<hash(value)>-animation-name`, because identity is the value's
+ * text), while the **instance** key — the one carrying `hash(name)` — appears only in the label declaration.
+ * A selection is written into the activation variable, so it lands on every motion sharing that definition,
+ * whatever those motions are named.
+ */
+const rotateMotions = () => {
+  const found = []
+
+  parse(fanCss).walkRules(rule => {
+    const own = declarationsOf(rule)
+    const activation = own.find(node =>
+      /^--jumi-rotate-[\w-]+-animation-name$/.test(node.prop),
+    )
+
+    if (!activation) return
+
+    const label = own.find(node =>
+      /^--jumi-rotate-[\w-]+-label$/.test(node.prop),
+    )
+
+    found.push({
+      activation: activation.prop,
+      addressed: Boolean(label),
+      definition: activation.value,
+      key: label
+        ? label.prop.slice('--jumi-'.length, -'-label'.length)
+        : activation.prop.slice('--jumi-'.length, -'-animation-name'.length),
+    })
+  })
+
+  return found
+}
+
+const motions = rotateMotions()
+const fanBrowser = await chromium.launch()
+const fanPage = await fanBrowser.newPage()
+
+/** One semantics: which motions it reaches, what that costs, and what the browser then does. */
+const simulate = reach => {
+  const root = parse(fanCss)
+  const control = ruleHolding(root, '--jumi-rotate-animation-timing-function')
+
+  if (!control)
+    throw new Error('the sheet has no structural rotate timing control')
+
+  // The phrase must not ride the control chain, which is the same step section 6 measures: it is recorded
+  // as a selection, and the value that would have invalidated the `animation` shorthand is dropped.
+  dropPhrase(control)
+
+  const selected = new Map()
+
+  for (const motion of motions) {
+    if (!reach(motion) || selected.has(motion.activation)) continue
+
+    const clone = specialize(root, motion.definition, [['0', 'step-start']])
+
+    selected.set(motion.activation, clone)
+    control.append({ prop: motion.activation, value: clone.name })
+  }
+
+  return {
+    bytes: root.toString().length - fanCss.length,
+    clones: [...selected.values()].filter(clone => clone.added).length,
+    css: root.toString(),
+    selections: selected.size,
+  }
+}
+
+console.log(
+  `   the sheet holds ${motions.length} rotate motions over ${new Set(motions.map(motion => motion.activation)).size} definitions:\n`,
+)
+
+for (const motion of motions)
+  console.log(
+    `     ${motion.key.padEnd(22)} ${motion.addressed ? 'named' : 'structural'}   selects through ${motion.activation.slice('--jumi-'.length, -'-animation-name'.length)}`,
+  )
+
+console.log('')
+
+const addressed = motions.filter(motion => motion.addressed)
+const targets = addressed
+  .map(
+    motion =>
+      `${motion.key} selects through ${motion.activation.slice('--jumi-'.length, -'-animation-name'.length)}`,
+  )
+  .join('; ')
+
+console.log(
+  "   — a selection is written into the *definition's* activation variable, so two motions sharing a",
+)
+console.log(
+  `     definition cannot be specialized apart however they are named${
+    addressed.length ? ` (here: ${targets})` : ''
+  }.`,
+)
+console.log(
+  '     Instance-precise selection would need a name-keyed variable the model does not emit: the hoist',
+)
+console.log('     reads that definition-keyed activation.')
+
+for (const [label, reach] of [
+  ['A · property scope — every rotate motion in the sheet', () => true],
+  [
+    'B · structural instance — only the motions nothing named',
+    motion => !motion.addressed,
+  ],
+]) {
+  const simulated = simulate(reach)
+
+  await fanPage.setContent(`<!doctype html>
+<html><head><style>${simulated.css}</style></head>
+<body>
+<div id="struct" class="${FAN_OUT.slice(0, 4).join(' ')}"></div>
+<div id="named" class="animate-rotate-[0:0deg|100:90deg]/spin animation-timing-function-[0:step-start]/rotate animation-duration-1000"></div>
+<div id="bare" class="animate-rotate-[0:0deg|100:90deg]/spin animation-duration-1000"></div>
+</body></html>`)
+
+  console.log(`   ${label}`)
+
+  for (const id of ['struct', 'named', 'bare']) {
+    const reading = await fanPage.evaluate(
+      selector =>
+        document
+          .querySelector(`#${selector}`)
+          .getAnimations()
+          .map(
+            animation =>
+              `${animation.animationName} → ${
+                animation.effect?.getKeyframes?.()[0]?.easing ?? '?'
+              }`,
+          ),
+      id,
+    )
+
+    console.log(
+      `     #${id.padEnd(7)}${reading.join(', ') || '(nothing animates)'}${
+        id === 'bare' && reading.length
+          ? '   ← no control class: must stay unspecialized'
+          : ''
+      }`,
+    )
+  }
+
+  console.log(
+    `     cost: ${simulated.clones} clones, ${simulated.selections} selection declarations in one rule, +${simulated.bytes} bytes`,
+  )
+}
+
+await fanBrowser.close()
