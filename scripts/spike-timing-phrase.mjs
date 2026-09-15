@@ -38,7 +38,7 @@ import postcss from 'postcss'
 const browser = await chromium.launch()
 const page = await browser.newPage()
 
-const compile = async classes =>
+const compileRaw = async classes =>
   build(
     await compiler(
       '@import "tailwindcss"; @plugin "' + root + '/dist/index.js";',
@@ -61,6 +61,76 @@ const ruleHolding = (root, prop) => {
 
   return found
 }
+
+/** A candidate as a class selector, the way the framework escapes one. */
+const escapeSelector = candidate =>
+  `.${candidate.replace(/[^A-Za-z0-9_-]/g, character => `\\${character}`)}`
+
+/**
+ * Compile, with the addressed timing phrases **planted** — the step the segment-easing handler will do.
+ *
+ * The plugin refuses a phrase on a part the `animation` shorthand carries, and refuses it at every address
+ * until that handler exists, because the alternative is an invalid timing value that kills the shorthand. So
+ * the simulation supplies the declaration itself, on the rule its address would have produced: it compiles the
+ * scalar **twin** of the phrased candidate (`animation-timing-function-ease-out/enter` for
+ * `animation-timing-function-[0:step-start]/enter`), which emits the same address in the same namespace, and
+ * swaps that rule's selector for the phrased candidate's and its value for the phrase.
+ *
+ * Everything downstream — the chain, the selection, the browser — then reads the shape the real handler will
+ * emit, with no candidate in these fixtures needing to change.
+ */
+const compilePlanted = async classes => {
+  const plants = []
+  const twins = []
+
+  for (const candidate of classes) {
+    const match = /^animation-timing-function-\[([^\]]+)\](?:\/(.+))?$/.exec(
+      candidate,
+    )
+
+    if (match && match[1].includes(':')) {
+      const twin = match[2]
+        ? `animation-timing-function-ease-out/${match[2]}`
+        : 'animation-timing-function-ease-out'
+
+      plants.push({ candidate, phrase: match[1], twin })
+      twins.push(twin)
+
+      continue
+    }
+
+    twins.push(candidate)
+  }
+
+  const built = await compileRaw(twins)
+
+  if (!plants.length) return built
+
+  const root = postcss.parse(built.css)
+
+  for (const { candidate, phrase, twin } of plants) {
+    let planted = false
+
+    root.walkRules(rule => {
+      if (planted || rule.selector !== escapeSelector(twin)) return
+
+      rule.selector = escapeSelector(candidate)
+
+      for (const node of declarationsOf(rule))
+        if (/-animation-timing-function$/.test(node.prop)) {
+          node.value = phrase
+          planted = true
+        }
+    })
+
+    if (!planted) throw new Error(`nothing to plant ${candidate} into`)
+  }
+
+  return { ...built, css: root.toString() }
+}
+
+/** Every section compiles through the planting shim; `compileRaw` is the plugin as it actually is. */
+const compile = compilePlanted
 
 /** The rule that declared the named instance: `--jumi-<instance key>-label: <name>`. */
 const namedInstance = (root, name) => {
@@ -979,3 +1049,217 @@ for (const [label, reach] of [
 }
 
 await fanBrowser.close()
+
+/* ────────────────────────────────────────────────────────────────────────────────────────────────────
+ * 9 · Instance-keyed selection, and whether its placement is load-bearing
+ *
+ * The ruling: definition identity shares keyframes, instance identity selects which specialized definition a
+ * motion uses. So the base activation stays definition-keyed, and the selection is a **new variable keyed by
+ * the instance** — `--jumi-slot-<instance>-animation-name` — read first in the hoist's *name* position:
+ *
+ *   --jumi-<definition>-animation-name → jumi-<definition>                     the base, unchanged
+ *   --jumi-slot-<instance>-animation-name → jumi-<definition>-seg-<hash>       what the instance selects
+ *
+ * The name position gains one link and nothing else; the timing chain is not touched, which is the hard rule.
+ *
+ * Three placements are measured, on the case the ruling exists for — two names over **one** definition, so a
+ * definition-keyed selection could not tell them apart:
+ *
+ *   control's rule      the design: only elements carrying the timing candidate read the selection
+ *   motion's rule       the leak: every element animating that motion reads it, control or not
+ *   control's rule, first in the utilities layer   does sheet order decide anything at all?
+ * ────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+console.log('\n── 9 · instance-keyed selection: placement\n')
+
+const INSTANCES = [
+  'animate-rotate-[0:0deg|100:90deg]/first',
+  'animate-rotate-[0:0deg|100:90deg]/second',
+  'animation-timing-function-[0:step-start]/first',
+  'animation-duration-1000',
+]
+
+const instanceCss = (await compile(INSTANCES)).css
+
+/** The address the timing candidate writes: `/first` is a *name*, so it reads the label namespace. */
+const CONTROL_PROP = '--jumi-label-first-animation-timing-function'
+
+/** The named instances the sheet declares: instance key, definition, and the rule that declared the name. */
+const namedSlots = () => {
+  const found = []
+
+  parse(instanceCss).walkRules(rule => {
+    const own = declarationsOf(rule)
+    const label = own.find(node => /^--jumi-[\w-]+-label$/.test(node.prop))
+    const activation = own.find(node =>
+      /^--jumi-[\w-]+-animation-name$/.test(node.prop),
+    )
+
+    if (!label || !activation) return
+
+    found.push({
+      activation: activation.prop,
+      definition: activation.value,
+      key: label.prop.slice('--jumi-'.length, -'-label'.length),
+      label: label.value,
+    })
+  })
+
+  return found
+}
+
+const slots = namedSlots()
+const first = slots.find(slot => slot.label === 'first')
+
+if (!first) {
+  console.log(
+    '   the fixture named no `first` instance; what it declared instead:',
+  )
+
+  for (const slot of slots)
+    console.log(
+      `     ${slot.key}  label ${slot.label}  definition ${slot.definition}`,
+    )
+
+  console.log(
+    `   — and the sheet holds ${[...instanceCss.matchAll(/@keyframes /g)].length} definitions, ${[...instanceCss.matchAll(/-label:/g)].length} label declarations`,
+  )
+} else {
+  const utilitiesLayer = root => {
+    let found = null
+
+    root.walkAtRules('layer', atRule => {
+      if (atRule.params.includes('utilities')) found = atRule
+    })
+
+    return found
+  }
+
+  /** Apply the selection path, `where` deciding which rule declares it. */
+  const selectInstance = (root, where) => {
+    const selection = `--jumi-slot-${first.key}-animation-name`
+    const hoistProp = `--jumi-slot-${first.key}`
+    const hoist = declarationsOf(
+      ruleHolding(root, hoistProp) ?? { nodes: [] },
+    ).find(node => node.prop === hoistProp)
+
+    if (!hoist) throw new Error(`no hoist for ${hoistProp}`)
+
+    hoist.value = hoist.value.replace(
+      `var(--${first.definition}-animation-name, var(--jumi-animation-name))`,
+      `var(${selection}, var(--${first.definition}-animation-name, var(--jumi-animation-name)))`,
+    )
+
+    const clone = specialize(root, first.definition, [['0', 'step-start']])
+    const control = ruleHolding(root, CONTROL_PROP)
+
+    // The phrase still must not ride the scalar chain, whatever the placement: this is the step sections 6
+    // and 8 measure, and it is the handler's job alongside the selection rather than part of it.
+    if (control) dropPhrase(control)
+
+    const target =
+      where === 'motion' ? ruleHolding(root, first.activation) : control
+
+    target?.append({ prop: selection, value: clone.name })
+
+    // The order question, asked where it can be asked: same rule, earlier position in its own layer.
+    if (where === 'early' && control) utilitiesLayer(root)?.prepend(control)
+
+    // Printed rather than assumed: this rewrite is a string replacement on a value the compiler emitted, and
+    // a replacement that does not match fails silently. Reporting the reach and the text is the difference
+    // between a probe and a probe that stopped measuring what it claims to.
+    return {
+      clone,
+      hoist: hoist.value.slice(0, 88),
+      rewritten: hoist.value.includes(selection),
+      selection,
+      target: target?.selector ?? null,
+    }
+  }
+
+  const PLACEMENTS = [
+    ['control’s rule', 'control'],
+    ['motion’s rule (the leak)', 'motion'],
+    ['control’s rule, first in the layer', 'early'],
+  ]
+
+  const instanceBrowser = await chromium.launch()
+  const instancePage = await instanceBrowser.newPage()
+
+  for (const [label, where] of PLACEMENTS) {
+    const root = parse(instanceCss)
+    const applied = selectInstance(root, where)
+    const { clone, selection } = applied
+    const css = root.toString()
+
+    await instancePage.setContent(`<!doctype html>
+<html><head><style>${css}</style></head>
+<body>
+<div id="first" class="animate-rotate-[0:0deg|100:90deg]/first animation-timing-function-[0:step-start]/first animation-duration-1000"></div>
+<div id="both" class="animate-rotate-[0:0deg|100:90deg]/first animate-rotate-[0:0deg|100:90deg]/second animation-timing-function-[0:step-start]/first animation-duration-1000"></div>
+<div id="bare" class="animate-rotate-[0:0deg|100:90deg]/first animation-duration-1000"></div>
+</body></html>`)
+
+    const readings = await instancePage.evaluate(
+      ids =>
+        Object.fromEntries(
+          ids.map(id => [
+            id,
+            [...document.querySelector(`#${id}`).getAnimations()].map(
+              animation => animation.animationName,
+            ),
+          ]),
+        ),
+      ['first', 'both', 'bare'],
+    )
+
+    console.log(`   ${label}`)
+    console.log(`     selection declared as ${selection} → ${clone.name}`)
+    console.log(
+      `     written into ${applied.target ?? '(no rule!)'}; hoist rewritten: ${
+        applied.rewritten ? 'yes' : 'NO — the link never changed'
+      }`,
+    )
+    console.log(
+      `     control address present in the sheet: ${instanceCss.includes(CONTROL_PROP)}`,
+    )
+    console.log(`     hoist reads: ${applied.hoist}`)
+
+    for (const [id, names] of Object.entries(readings)) {
+      const specialized = names.filter(name => name.includes('-seg-')).length
+
+      console.log(
+        `     #${id.padEnd(5)} ${names.join(', ') || '(nothing animates)'}   ${
+          id === 'bare'
+            ? specialized
+              ? '← LEAKED: no timing candidate on this element'
+              : '(no candidate: correctly untouched)'
+            : specialized
+              ? `specialized ${specialized}/${names.length}`
+              : 'nothing specialized'
+        }`,
+      )
+    }
+
+    console.log(
+      `     cost: +${css.length - instanceCss.length} bytes, and one non-inheriting registration per named instance\n`,
+    )
+
+    if (!readings.first.length) {
+      const why = await instancePage.evaluate(slot => {
+        const style = getComputedStyle(document.querySelector('#first'))
+
+        return {
+          animation: style.animation.slice(0, 80),
+          duration: style.animationDuration.slice(0, 40),
+          name: style.animationName.slice(0, 40),
+          selection: style.getPropertyValue(slot),
+        }
+      }, `--jumi-slot-${first.key}-animation-name`)
+
+      console.log(`     why: ${JSON.stringify(why)}\n`)
+    }
+  }
+
+  await instanceBrowser.close()
+}
