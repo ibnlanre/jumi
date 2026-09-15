@@ -132,6 +132,22 @@ export const separateParts = [
 ] as const
 
 /**
+ * The parts the `animation` **shorthand** carries, and therefore the parts a phrase must never be written
+ * into.
+ *
+ * One declaration, so one invalid component costs the whole thing. Measured: `animation-timing-function-[0:ease-out]`
+ * left the element with `animation-name: none`, `animation-duration: 0s` and *zero* animations. The motion
+ * does not misbehave, it disappears — and nothing about the page says a motion was ever intended.
+ *
+ * `animation-*` less the three the shorthand cannot carry, because those are declared separately: a nonsense
+ * value there costs one longhand, which the cascade repairs through the fallback chain. Derived from
+ * `separateParts` rather than restated, so the guard cannot drift from the split it depends on.
+ */
+const carriedByShorthand = (part: string) =>
+  part.startsWith('animation-') &&
+  !(separateParts as readonly string[]).includes(part)
+
+/**
  * Whether a name is one a control can address.
  *
  * Measured, and it is not a style rule: a name becomes a custom-property segment
@@ -359,6 +375,18 @@ export function createJumiModel({
    */
   const shadowedName = (name: string): CssInJs => ({
     [cssEscape(`--jumi-name-${shorthash2(name)}-shadowed`)]: name,
+  })
+
+  /**
+   * Record a phrase that reached a part the `animation` shorthand carries, so the build can report it.
+   *
+   * The same channel as `refusedName`, and for the same reason: the fact has to survive to a pass that can
+   * speak, and it has to be **inert** — what is written is data, never a declaration an element resolves.
+   * Writing the value the author typed is the measured catastrophe `carriedByShorthand` describes, and the
+   * warning is the only thing that can say so.
+   */
+  const unroutablePhrase = (value: string): CssInJs => ({
+    [cssEscape(`--jumi-phrase-${shorthash2(value)}-unroutable`)]: value,
   })
 
   /**
@@ -990,6 +1018,13 @@ export function createJumiModel({
 
     scope(part: string): MatchUtilitiesPropertyFunction {
       return (value, { modifier }) => {
+        // A phrase is not a value any part of the shorthand accepts, so it is refused rather than written.
+        // Segment easing *is* a phrase, and it is written with the motion's name —
+        // `animation-timing-function-[0:ease-out]/<name>` — never through the scalar chain, which is a
+        // distinction the warning states and this line enforces.
+        if (isPhrase(value) && carriedByShorthand(part))
+          return unroutablePhrase(value)
+
         if (!modifier) return { [`--jumi-${part}`]: value }
 
         // The modifier names a property — `rotate` — or the name a declaration gave one of its

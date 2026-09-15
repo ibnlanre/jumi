@@ -386,6 +386,26 @@ describe('the finalizer', () => {
     expect(out).toContain('var(--b, "}" )')
   })
 
+  it('reports a phrase refused because the shorthand cannot carry it', () => {
+    const css = [
+      ANIMATIONS,
+      activation('.animate-rotate-45'),
+      ':root { --jumi-phrase-1a2b3-unroutable: 0:ease-out; }',
+    ].join('\n')
+
+    const { warnings } = finalizeCss(css)
+
+    // The only warning here about a *value* rather than a name, and the only refusal whose cost is the
+    // motion itself: written into the chain instead of recorded, the shorthand is invalid at computed-value
+    // time and the element reports `animation-name: none` — no animations at all, which reads as an
+    // untouched page rather than as a broken one.
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('segment phrase')
+    expect(warnings[0]).toContain(
+      'animation-timing-function-[0:ease-out]/<name>',
+    )
+  })
+
   it('takes the last publication, the way a later declaration would win', () => {
     const css = [
       payload('animations', 'animation-name: var(--first);'),

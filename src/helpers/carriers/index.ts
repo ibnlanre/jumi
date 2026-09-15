@@ -119,6 +119,16 @@ const REFUSED_NAME = /^--jumi-name-.+-refused$/
 const SHADOWED_NAME = /^--jumi-name-.+-shadowed$/
 
 /**
+ * A phrase that reached a part the `animation` shorthand carries.
+ *
+ * The one refusal in this pass that is fatal rather than cosmetic. The model records it instead of writing
+ * it (see `carriedByShorthand` in the model), because the shorthand is a single declaration: one invalid
+ * component takes the motion with it, and an element with `animation-name: none` reads as a page that never
+ * animated rather than as one that is broken.
+ */
+const UNROUTABLE_PHRASE = /^--jumi-phrase-.+-unroutable$/
+
+/**
  * The prefix every staged declaration is written under, and the only thing a host needs to
  * recognize a payload. It reaches no browser, so it never has to be a property a browser applies.
  */
@@ -686,6 +696,16 @@ export function finalize(
   root.walkRules(rule => {
     for (const declaration of ownDeclarations(rule)) {
       if (reported.has(declaration.prop)) continue
+
+      if (UNROUTABLE_PHRASE.test(declaration.prop)) {
+        reported.add(declaration.prop)
+
+        finalized.warnings.push(
+          `"${declaration.value}" is a segment phrase, and no part of the \`animation\` shorthand accepts one: written into it, the whole shorthand becomes invalid at computed-value time and the motion stops rather than misbehaves. Segment easing is written with the motion's name — \`animation-timing-function-[${declaration.value}]/<name>\`.`,
+        )
+
+        continue
+      }
 
       if (SHADOWED_NAME.test(declaration.prop)) {
         reported.add(declaration.prop)

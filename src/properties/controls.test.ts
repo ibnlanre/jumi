@@ -91,6 +91,48 @@ describe('per-attribute timing controls', () => {
       '--jumi-label-rotate-flick-animation-timing-function': 'ease-out',
     })
   })
+
+  it('refuses a phrase on a part the shorthand carries, and records it instead', () => {
+    const { controls } = setup()
+
+    // Measured: written into the chain, this left the element with `animation-name: none`, `0s` and *zero*
+    // animations — the shorthand is one declaration, so one invalid component takes the motion with it. The
+    // refusal is the difference between a motion that keeps its default easing and a motion that vanishes.
+    const refused = controls['animation-timing-function'].fn('0:ease-out', {
+      modifier: null,
+    })
+
+    expect(refused).not.toHaveProperty('--jumi-animation-timing-function')
+    expect(Object.values(refused)).toEqual(['0:ease-out'])
+    expect(Object.keys(refused)[0]).toMatch(/^--jumi-phrase-.+-unroutable$/)
+
+    // The same at every address, because it is the shorthand that cannot hold a phrase and not the chain.
+    expect(
+      controls['animation-duration'].fn('0:1s', { modifier: 'flick' }),
+    ).not.toHaveProperty('--jumi-label-flick-animation-duration')
+    expect(
+      controls['animation-timing-function'].fn('0:ease-out', {
+        modifier: 'rotate',
+      }),
+    ).not.toHaveProperty('--jumi-rotate-animation-timing-function')
+
+    // A scalar is untouched: this is a guard about phrases, and it must not read as one about controls.
+    expect(
+      controls['animation-timing-function'].fn('ease-out', { modifier: null }),
+    ).toEqual({ '--jumi-animation-timing-function': 'ease-out' })
+  })
+
+  it('leaves a phrase on a part the shorthand cannot carry alone', () => {
+    const { controls } = setup()
+
+    // The boundary is the shorthand and not the prefix. `animation-composition`, `animation-range` and
+    // `animation-timeline` are declared on their own, so a phrase there costs one longhand — which the
+    // fallback chain repairs — rather than the whole `animation` value. Guarding those too would be a
+    // wider rule than the failure justifies.
+    expect(
+      controls['animation-composition'].fn('0:add', { modifier: 'flick' }),
+    ).toEqual({ '--jumi-label-flick-animation-composition': '0:add' })
+  })
 })
 describe('transition controls', () => {
   it.each([

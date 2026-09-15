@@ -640,9 +640,23 @@ const NAMED_ARMS = [
   // declares them in one rule for every activating selector, so it cannot name a motion, and a name
   // reaches them through a link the naming rule fills. An unfilled link falls back or drops — silently,
   // because the motion still runs — so it is asserted rather than assumed.
+  // The three parts an `animation` shorthand cannot carry, all three addressed by the motion's own name.
+  // They are the parts that stay *assigned separately*, and the reason is structural: the composition
+  // declares them in one rule for every activating selector, so it cannot name a motion, and a name
+  // reaches them through a link the naming rule fills. An unfilled link falls back or drops — silently,
+  // because the motion still runs — so it is asserted rather than assumed.
   [
     'g',
     'animate-rotate-45/spin animation-composition-add/spin animation-timeline-scroll/spin animation-range-[25%_75%]/spin',
+  ],
+  // The destructive spelling, which must leave the motion **running**: a phrase written into a part the
+  // `animation` shorthand carries makes the whole shorthand invalid at computed-value time, and the element
+  // then reports `animation-name: none` — no animations at all, which reads as a page that never animated
+  // rather than as one that is broken. Asserted here because it is invisible in text and catastrophic in
+  // effect; measured three times in `spike-timing-phrase` before the refusal existed.
+  [
+    'h',
+    'animate-fade-in/hphrase animation-timing-function-[0:ease-out]/hphrase',
   ],
 ]
 
@@ -776,6 +790,11 @@ const naming = [
     'candidate order cannot decide which name wins',
     orderDrift.length === 0,
     orderDrift.join(' | '),
+  ],
+  [
+    'a phrase on a shorthand part leaves the motion running',
+    durationOf(forward, 'h', 'jumi-fade-in') === '1s',
+    `read ${durationOf(forward, 'h', 'jumi-fade-in') ?? 'no animation at all'} — the default duration is 1s`,
   ],
   [
     'a name reaches the parts the shorthand cannot carry',
