@@ -534,13 +534,13 @@ instructed.
 **Equivalence, with the sampling race fixed** (pause and delay set inline, so no
 turn elapses between them). Curves 100% → 0%:
 
-| sheet                 | result                                                              |
-| --------------------- | ------------------------------------------------------------------- |
-| `lone whole 2`        | `2 2 2 \| 1.75 1.75 1.75 \| 1.5 1.5 1.5 \| 1.25 1.25 1.25 \| 1`     |
-| `lone x 5`            | `5 1 \| 4 1 \| 3 1 \| 2 1 \| 1` — identical to the pre-C.5 baseline |
-| `lone whole 2 3`      | `2 3 \| … \| 1` — matches native `scale: 2 3`                       |
-| `lone x 50%`          | `0.5 1 \| … \| 1` — matches native `scale: 50%`                     |
-| `lone x 0:1/100:150%` | `1 \| 1 \| 1 \| 1 \| 1` — **withdrawn**, see below                  |
+| sheet                  | result                                                                           |
+| ---------------------- | -------------------------------------------------------------------------------- |
+| `lone whole 2`         | `2 2 2 \| 1.75 1.75 1.75 \| 1.5 1.5 1.5 \| 1.25 1.25 1.25 \| 1`                  |
+| `lone x 5`             | `5 1 \| 4 1 \| 3 1 \| 2 1 \| 1` — identical to the pre-C.5 baseline              |
+| `lone whole 2 3`       | `2 3 \| … \| 1` — matches native `scale: 2 3`                                    |
+| `lone x 50%`           | `0.5 1 \| … \| 1` — matches native `scale: 50%`                                  |
+| `lone x 0:1\|100:150%` | `1.5 1 \| 1.375 1 \| 1.25 1 \| 1.125 1 \| 1` — the multi-stop form canonicalizes |
 
 **The structural inversion.** At `efbab29` it was read as "every property-level
 `scale` frame declaration is gone, and leaf assignments replaced them" — 1/1/2/3
@@ -554,6 +554,16 @@ one the earlier pass was reaching for:
 | `scale: var(--jumi-scale-<id>)` | the animated value | **zero** under typed execution   |
 | `scale: var(--jumi-scale)`      | absent             | the **bridge**, present          |
 | `--jumi-scale-x/y/z`            | absent             | carries **every** animated value |
+
+That table is the standing audit taxonomy for the typed path, and it replaces
+"no `scale` declarations in typed keyframes":
+
+```text
+typed path
+- animated value carried by leaf declarations
+- scale declarations are bridge-only: scale: var(--jumi-scale)
+- no typed keyframe carries an authored scale value directly
+```
 
 Measured on the same four sheets, at the levels the earlier pass could not be
 directly compared across:
@@ -571,23 +581,57 @@ this table and the one this section first recorded. Only `lone scale-x` is still
 smaller than pre-C.5, by 21 bytes. "Three of four sheets shrank" was true of the
 bridge-less `efbab29` and is not true of what ships.
 
-**Withdrawal.** The table above once recorded `lone x 0:1/100:150%` as
-`1.5 1 | … | 1` with the note "the mixed form canonicalizes". That is not
-reproducible. Across `animate-scale-x-[0:1/100:150%]`,
-`animate-scale-[0:1/100:150%]`, `animate-scale-x-[1/150%]` and
-`animate-scale-[1/150%]`, the emitted keyframe holds a **single** frame — one
-frame, never two — so the animation is a no-op and the curve is
-`1 | 1 | 1 | 1 | 1` at both `07e2b23` and `65e977c`, with the same slot and the
-same zero substrate rules. The claim is withdrawn rather than carried. The
-multi-stop form declines typed execution and keeps the old path byte-for-byte,
-which is what the opt-in rule asked of it; whether it should canonicalize is D's
-to decide on proof, not this pass's to assert.
+**The multi-stop form twice, and a correction to the correction.** This row was
+got wrong in both directions in one pass, and both times by trusting a spelling
+it had not written down:
+
+- It was first recorded as `1.5 1 | … | 1`, "the mixed form canonicalizes", with
+  no class named.
+- It was then **withdrawn** as unreproducible. That measurement used
+  `animate-scale-x-[0:1/100:150%]` and three near-misses, and all four flat-lined
+  at `1 | 1 | 1 | 1 | 1`. They are different classes: Jumi separates frame stops
+  with `|`, so `0:1|100:150%` is two stops and `0:1/100:150%` is one — one frame,
+  hence a no-op animation, hence a flat line. The withdrawal measured a typo.
+
+Re-measured with the separator the harness itself uses, the row stands and is
+byte-identical at `07e2b23` and at HEAD:
+
+```text
+animate-scale-x-[0:1|100:150%]
+  100% → 0%   1.5 1 | 1.375 1 | 1.25 1 | 1.125 1 | 1
+  frames      two: 0% and 100%, reading --jumi-scale-x-<id>-0 and <id>-100
+  substrate   no rule carries it — this sheet declines typed execution
+```
+
+So the percentage **is** canonicalized (`150%` → `1.5`) and the sheet is unchanged
+by C.5, but not because the typed path handled it: the multi-stop form declines
+typed execution entirely and keeps the old composed representation, frame for
+frame. That is the opt-in rule behaving correctly — a value the proof predicate
+cannot read is not pushed through the typed path — and it belongs to D as a
+**constraint, not a bug to fix casually**:
+
+> multi-stop constituent phrases currently decline typed execution; do not
+> generalize typed-leaf support to them until their frame model is explicitly
+> represented and measured.
+
+Both halves of that mistake are worth keeping visible, because a sheet's _name_ is
+not its spelling, and this pass produced two measurements that looked like
+findings while measuring a typo and a stale `dist` respectively.
 
 **Audits:** `dead-links --strict` reports no dead reads and no unconsumed frame
 writes; `constituent-check` introduces no `scale` residual (its list is unchanged:
 `backdrop-filter`, `background-position`, `box-shadow`, `filter`, `object-position`);
 the serialization audit and differential pass. `pnpm check` is green on all 17
 stages, 400 unit tests.
+
+**And the boundary is now a browser gate** (`1f5dcf3`, section 16 of
+`scripts/behaviour-check.mjs`), because nothing else in the suite can see it. Five
+arms on computed `scale` at 0/25/50/75/100%: the mixed sheet, the same sheet with
+candidate discovery reversed, both motions still live, a lone typed constituent,
+and a lone typed whole. Both halves are falsified against a build carrying the
+defect — removing the pins reproduces the quadratic (64/68), removing the bridge
+reproduces `1 | 1 | 1 | 1 | 1` (66/68) **while both lone arms stay green**, which is
+what makes the arm specific to the mixed boundary rather than broad.
 
 ### C.5 — the mixed-execution boundary, found after the close (2026-09-16)
 
@@ -608,7 +652,7 @@ downstream could read it. Two execution models for one property had met at a
 boundary the topology had only been argued to be safe, and the argument was wrong.
 The record above is amended rather than left standing.
 
-**The fix is a composition bridge inside the typed keyframes** (`65e977c`), not a
+**The fix is a composition bridge inside the typed keyframes** (`c4f2ffb`), not a
 runtime set and not an accepted regression: every typed keyframe re-asserts
 `scale: var(--jumi-scale)`, so the same animation-list precedence that defined the
 pre-C.5 behaviour decides the property again and the leaves decide the value.
@@ -635,7 +679,7 @@ and reversing candidate discovery still yields byte-identical animation longhand
 lists. The intended rule holds without a special case: property ownership follows
 animation-list precedence, exactly as before C.5.
 
-**C is closed by `65e977c`.** `scale` is no longer a prototype, and the
+**C is closed by `c4f2ffb`.** `scale` is no longer a prototype, and the
 mixed-execution boundary is now measured against the pre-C.5 baseline rather than
 argued from the topology. D extracts the mechanism this implementation proved —
 typed substrate published by the candidate, direct-leaf keyframes, canonicalized
