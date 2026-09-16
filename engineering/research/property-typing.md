@@ -52,6 +52,38 @@ split is reported because the second group is the trivial case the pivot gets fo
 two cannot be told apart without the build's own rule: a candidate's surfaces are its parts, or its
 attribute when it declares none (`src/core/surfaces.ts`).
 
+## Does the census hold? 83 of the 106 constituents
+
+The pivot exists for the leaves that are a **part** of a composed value — that is what "the browser
+composes the result" means. Of those 106:
+
+|                                           | count |
+| ----------------------------------------- | ----- |
+| typed as written, or as one keyword union | 65    |
+| typed after the function reshape          | 18    |
+| cannot be typed                           | 23    |
+
+**78%.** And the 23 are not unknowns — each has a named reason, and none of the reasons is "we do not
+know what this is":
+
+| the 23                                                                                                           | count | why                                                                          |
+| ---------------------------------------------------------------------------------------------------------------- | ----- | ---------------------------------------------------------------------------- |
+| `background-position-x/y-edge`, `object-position-x/y-edge`, `offset-anchor-x/y-edge`, `offset-position-x/y-edge` | 8     | the keyword half of a position, whose numeric half (`…-offset`) **is** typed |
+| `border-image-outset-{top,right,bottom,left}`                                                                    | 4     | `length` and `number` in one grammar                                         |
+| `background-repeat-x/y`, `border-image-repeat-x/y`                                                               | 4     | keyword-valued                                                               |
+| `overflow-x`, `overflow-y`, `outline-style`                                                                      | 3     | keyword-valued                                                               |
+| `transform-origin-x/y`                                                                                           | 2     | typing them would remove `center`                                            |
+| `filter-url`, `backdrop-filter-url`                                                                              | 2     | a slot that holds a whole function                                           |
+
+So the census holds, with one caveat worth stating: **eight of the 23 are the keyword halves of the
+position families, and their numeric halves are typed.** For those, the pivot is not incomplete — the
+split of a position into an edge and an offset is exactly what makes the interpolable half interpolable,
+and the keyword half is animated by the property as it is today.
+
+The 96 keyword-valued leaves among the 185 attribute-named ones are the same story from the other side:
+`align-content` and `border-collapse` are not constituents and have no constituents, so the property is
+already the right unit and the pivot changes nothing about them.
+
 ## §1 The reshape is one technique applied 18 times, not 18 designs
 
 The 20 function-shaped leaves are the only ones where the slot cannot hold a typed scalar at all — the

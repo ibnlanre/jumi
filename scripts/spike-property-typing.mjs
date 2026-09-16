@@ -742,3 +742,53 @@ for (const slot of animatedSlots) {
     `    ${slot.padEnd(34)} ${classification.get(slot) ?? '— not a leaf the graph knows'}`,
   )
 }
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * §F The number the pivot turns on: of the leaves that are a **part** of a
+ *    composed value — the ones the pivot exists for — how many can be typed?
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+header('§F  pivot completeness, over the leaves that are constituents')
+
+const verdictOf = new Map([
+  ...judged.map(proposal => [
+    proposal.leaf.slot,
+    proposal.mechanism === 'argument'
+      ? `reshape — ${proposal.syntax}`
+      : `type the slot — ${proposal.syntax}`,
+  ]),
+  ...[...reasons].flatMap(([reason, of]) =>
+    of.map(leaf => [leaf.slot, `cannot be typed: ${reason}`]),
+  ),
+])
+
+const typed = leaf =>
+  verdictOf.get(leaf.slot)?.startsWith('type') ||
+  verdictOf.get(leaf.slot)?.startsWith('reshape')
+
+const partTypable = asPart.filter(leaf =>
+  verdictOf.get(leaf.slot)?.startsWith('type'),
+)
+const partReshaped = asPart.filter(leaf =>
+  verdictOf.get(leaf.slot)?.startsWith('reshape'),
+)
+const partRefused = asPart.filter(leaf => !typed(leaf))
+const attributeTypable = asAttribute.filter(leaf =>
+  verdictOf.get(leaf.slot)?.startsWith('type'),
+)
+
+console.log(
+  `  a part of a composed value                 ${asPart.length}  →  ${partTypable.length} typed, ${partReshaped.length} reshaped, ${partRefused.length} cannot be`,
+)
+console.log(
+  `  the attribute itself — the property is it  ${asAttribute.length}  →  ${attributeTypable.length} typed, ${asAttribute.length - attributeTypable.length} cannot be`,
+)
+console.log(
+  `\n  so the pivot reaches ${partTypable.length + partReshaped.length} of the ${asPart.length} constituents (${Math.round(((partTypable.length + partReshaped.length) / asPart.length) * 100)}%), and the ${partRefused.length} it does not have named reasons:`,
+)
+
+for (const leaf of partRefused) {
+  console.log(
+    `    ${leaf.slot.padEnd(30)} ${String(leaf.default).padEnd(12)} ${verdictOf.get(leaf.slot)}`,
+  )
+}
