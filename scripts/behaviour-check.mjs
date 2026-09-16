@@ -2093,7 +2093,8 @@ for (const [claim, ok, detail] of typed)
 
 // Every assertion above that can fail, so the summary line is the count it claims to be: the three
 // activation contexts, the pseudo substrate, the direct carriers, bare, applied, spacing, radius,
-// the three relationship-variant cases, non-inheritance, and the six composed sets.
+// the three relationship-variant cases, non-inheritance, the six composed sets, and the five typed
+// composition curves section 16 adds.
 const required =
   contexts.length +
   utilities.length +
