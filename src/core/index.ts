@@ -676,10 +676,8 @@ export function createJumiModel({
    * alone. A slot belonging to a different component comes back as `match` untouched.
    */
   const hookSlot = (value: string, part: string, hook: string) =>
-    value.replaceAll(
-      SLOT,
-      (match, name: string, fallback: string) =>
-        name === part ? `var(${hook}, var(${name}${fallback}))` : match,
+    value.replaceAll(SLOT, (match, name: string, fallback: string) =>
+      name === part ? `var(${hook}, var(${name}${fallback}))` : match,
     )
 
   function propertyKeyframeValue(

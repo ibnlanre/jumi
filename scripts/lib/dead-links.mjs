@@ -1,3 +1,5 @@
+import { varReferences } from './var-references.mjs'
+
 /**
  * The writer/read invariant, as a library — in **both** directions.
  *
@@ -67,30 +69,27 @@ export const OPTIONAL = [
 ]
 
 /**
- * `var(<frame key>, var(<base>` … — a read that names its own fallback. The closing paren is **not**
- * part of the match, and that is the whole design.
+ * A read is classified from `var()` references found **structurally**, by `varReferences` — not by a
+ * pattern over the value. The distinction is the whole of this file's history:
  *
- * Two shapes have to be told apart by the base: a **component hook**
+ * Two shapes must be told apart by the base of the *inner* read: a **component hook**
  * (`var(--jumi-scale-x-<id>-0, var(--jumi-scale-x))`, whose base is a component, and whose writer class
  * is a constituent phrase that may simply be absent from this stylesheet) and an **outer read**
  * (`var(--jumi-outline-<id>-0, var(--jumi-outline))`, whose base is the keyframe's own property, and which
  * the phrase that owns the keyframe must have written).
  *
- * Reaching the inner `var(` through a lookahead rather than by consuming it is what makes both the outer
- * read and the hook inside it get **visited**. A pattern that consumed the pair would match the outer one,
- * skip past the `var(` of the hook nested inside its fallback, and report every hook it swallowed as a dead
- * read — which is exactly what one version of this did to 20 reads across `rotate-x`, `scale-x` and the
- * logical corners.
- *
- * Not requiring the closing paren is also what makes a slot's own fallback irrelevant. A component's
- * fallback is another variable (`var(--jumi-scale-x)`), a composition slot's is a function call
- * (`var(--jumi-filter-url, opacity(1))`), and an outer read's is a whole chain of both — under a
- * closing-paren pattern only the first shape matches, and the correct CSS of the other two reads as dead.
+ * A pattern expressing that had to describe the text of a nested expression, and was wrong twice: it
+ * could not see a fallback that was not a single `var()` (so correct CSS read as dead), and widening it
+ * swallowed the `var(` of a hook nested inside an outer read's fallback (so 20 more correct reads read as
+ * dead). Reading the value instead makes the shape of a fallback — a variable, a function call, a whole
+ * chain — irrelevant to the question.
  */
-const LOOKUP = /var\(\s*(--jumi-[^,)\s]+)\s*,\s*(?=var\(\s*(--jumi-[^,)\s]+))/g
 
 /** A frame key: `<property>-<id>-<offset>`, as a phrase writes it and a keyframe reads it. */
 const FRAME_KEY = /^--jumi-[\w-]+-[A-Za-z0-9]{5,8}-\d+$/
+
+/** The names this audit is about. Every other `var()` in the sheet is somebody else's. */
+const OWNED = '--jumi-'
 
 /** The name a frame key is scoped to — `<base>` in `<base>-<id>-<offset>`. */
 const frameBase = name => name.replace(/-[A-Za-z0-9]{5,8}-\d+$/, '')
@@ -138,18 +137,31 @@ export const collect = css => {
     // writer) and is not part of this invariant.
     if (!owner && FRAME_KEY.test(node.prop)) frameWrites.add(node.prop)
 
-    if (owner)
-      for (const [, name] of node.value.matchAll(/var\((--jumi-[^,)\s]+)/g))
-        inKeyframes.add(name)
+    // Read once, structurally, and both answers taken from the one reading.
+    const references = varReferences(node.value).filter(reference =>
+      reference.name.startsWith(OWNED),
+    )
 
-    for (const [, name] of node.value.matchAll(/var\((--jumi-[^,)\s]+)/g))
+    for (const { name } of references) {
       reads.set(name, (reads.get(name) ?? 0) + 1)
+      if (owner) inKeyframes.add(name)
+    }
 
     if (!owner) return
 
-    for (const [, key, base] of node.value.matchAll(LOOKUP))
-      if (frameBase(key) === base && attribute !== base.replace(/^--jumi-/, ''))
-        hooked.add(key)
+    // A hook is a read whose fallback **begins with** a `var()`, and whose base is a component rather than
+    // the keyframe's own attribute. "Begins with" is the next reference starting where this one's fallback
+    // does — which is why the answer does not depend on what the fallback goes on to contain.
+    for (const [index, reference] of references.entries()) {
+      const next = references[index + 1]
+      if (!next || next.offset !== reference.fallbackStart) continue
+
+      const base = next.name
+      if (frameBase(reference.name) !== base) continue
+      if (attribute === base.slice(OWNED.length)) continue
+
+      hooked.add(reference.name)
+    }
   })
 
   document.walkAtRules('property', atRule =>

@@ -86,6 +86,65 @@ describe('classify', () => {
     expect(verdict(css, '--jumi-matrix-abc12-50')).toBe('DEAD')
   })
 
+  it('reads a fallback that only *contains* a var() as not a hook', () => {
+    // The distinction the structural read makes and a pattern could not state. The two fixtures differ by
+    // exactly one thing: whether the fallback *begins* with the reference. Both references are read in both
+    // cases — the one inside the function included — but only the second makes the enclosing read a hook.
+    // `calc(var(--x))` computes *from* the component rather than naming it, and a rule that hooked any read
+    // with a `var()` somewhere in its fallback would call the first one a hook too.
+    const indirect = collect(`@keyframes jumi-transform-abc12 {
+      50% { transform: var(--jumi-skew-x-abc12-50, calc(var(--jumi-skew-x) * 1deg)) }
+    }`)
+
+    expect([...indirect.reads.keys()].sort()).toEqual([
+      '--jumi-skew-x',
+      '--jumi-skew-x-abc12-50',
+    ])
+    expect(indirect.hooked.has('--jumi-skew-x-abc12-50')).toBe(false)
+
+    const direct = collect(`@keyframes jumi-transform-abc12 {
+      50% { transform: var(--jumi-skew-x-abc12-50, var(--jumi-skew-x)) }
+    }`)
+
+    expect(direct.hooked.has('--jumi-skew-x-abc12-50')).toBe(true)
+
+    // And the base has to match: a read whose fallback begins with a reference to *another frame key* is
+    // the outer read, not a hook, however deeply the chain inside it nests.
+    const outer = collect(`@keyframes jumi-transform-abc12 {
+      50% {
+        transform: var(--jumi-skew-abc12-50, var(--jumi-skew-x-abc12-50, var(--jumi-skew-x))
+          var(--jumi-skew-y-abc12-50, var(--jumi-skew-y)))
+      }
+    }`)
+
+    expect(outer.hooked.has('--jumi-skew-abc12-50')).toBe(false)
+    expect(outer.hooked.has('--jumi-skew-x-abc12-50')).toBe(true)
+    expect(outer.hooked.has('--jumi-skew-y-abc12-50')).toBe(true)
+  })
+
+  it('reads through a quoted string holding commas and parentheses', () => {
+    // The case that decides whether a `var()`'s arguments are split structurally. A reader that looked for
+    // the first comma in the text would take the one inside the string for the argument boundary, hand back
+    // a truncated name, and never reach the reference that follows — which is a hook, and here it is the
+    // only writer the read has.
+    const { hooked, reads } = collect(`@keyframes jumi-mask-abc12 {
+      50% {
+        mask: var(--jumi-mask-abc12-50, url("a,b(c)") var(--jumi-mask-image-abc12-50, var(--jumi-mask-image)))
+      }
+    }`)
+
+    expect([...reads.keys()].sort()).toEqual([
+      '--jumi-mask-abc12-50',
+      '--jumi-mask-image',
+      '--jumi-mask-image-abc12-50',
+    ])
+
+    // The outer read's fallback begins with `url(` and not with a reference, so it is not a hook; the one
+    // nested after the string is.
+    expect(hooked.has('--jumi-mask-abc12-50')).toBe(false)
+    expect(hooked.has('--jumi-mask-image-abc12-50')).toBe(true)
+  })
+
   it('answers a declared name as written before anything else', () => {
     const css = `:root { --jumi-filter-url: opacity(1) }
       @keyframes jumi-filter-abc12 {

@@ -167,20 +167,33 @@ neither question. The lesson is worth more than the measurement: a baseline that
 cannot distinguish *inert* from *fatal*, and the arm written from the wrong reading is what failed, not
 the reasoning about the fix.
 
-### The detector that had to be corrected twice (2026-09-16)
+### The detector that had to be corrected twice, and then replaced (2026-09-16)
 
 `LOOKUP` in `scripts/lib/dead-links.mjs` required `)` immediately after the inner variable name, so the
 new shape `var(key, var(base, opacity(1)))` was invisible to it and the two url hooks on the
 `backdrop-filter` composition were reported as dead reads while the CSS was correct. The first fix —
 letting the fallback group be greedy — was worse: the outer read matched, its match consumed the `var(`
 of the hook nested inside its fallback, and the scan never visited those hooks, turning 20 reads
-(`rotate-x`, `scale-x`, the logical corners) into dead ones. What works is reaching the inner `var(`
-through a **lookahead**, so both the outer read and the hook inside it are visited and a slot's fallback
-is irrelevant to the pattern. Pinned by `scripts/lib/dead-links.test.mjs`.
+(`rotate-x`, `scale-x`, the logical corners) into dead ones.
 
-Both failures are the same failure the whole track is about: a check that encodes an outdated belief
-reports the CSS as wrong instead of itself. A detector for a shape has to be updated with the shape, and
-the cost of not doing it is a false accusation rather than a missed one.
+**Both failures are one failure, and the second is why the regex was not extended a third time.** A
+pattern over `var(...)` is a description of one expression's *text*, and the expressions this pass emits
+are nested — so every shape it does not anticipate is either invisible or swallowing. The reader is now
+structural (`scripts/lib/var-references.mjs`): it walks the value, balancing parentheses and stepping
+over strings, and reports **every reachable `var()` exactly once**, whatever the fallback is — a
+variable, a function call, a quoted data URI with commas, a whole chain of both. The classification
+above it is unchanged; only the discovery is.
+
+Verified as a differential rather than by eye: the previous detector reconstructed from `HEAD` and the
+new one classify all 560 reads in the frozen sheet **identically** — no read added, none lost, none
+re-classified. The scanner is pinned by `scripts/lib/var-references.test.mjs` with the shapes that broke
+the pattern plus quoted and escaped strings, deep chains, adjacent functions, truncated input, and the
+exactly-once invariant; the detector's own test covers the three hook shapes and the boundary between
+them.
+
+This was hardened as a **prerequisite commit**, before the one-level expansion, for the reason the
+failures make plain: the expansion's whole purpose is to deepen these expressions, and the detector's
+correctness had been depending on their textual shape.
 
 ### The 33 traced: two topologies, not one (2026-09-16)
 
