@@ -335,6 +335,10 @@ Every scale frame declaration today is property-level and there are **zero** lea
 C.5 the decomposed cases must invert that, for `lone scale-x` as well as the wholes. (A sheet touching
 `scale` carries exactly three typed registrations — established end to end in C.2.)
 
+_(Amended 2026-09-16: the inversion is real but not total — typed keyframes carry `scale` again as a
+composition bridge, so "a frame writes `scale`" stops separating the two execution models. The reading
+that still does is which `scale`; see the result, below.)_
+
 **Acceptance, four classes:**
 
 ```text
@@ -530,35 +534,111 @@ instructed.
 **Equivalence, with the sampling race fixed** (pause and delay set inline, so no
 turn elapses between them). Curves 100% → 0%:
 
-| sheet                  | result                                                              |
-| ---------------------- | ------------------------------------------------------------------- |
-| `lone whole 2`         | `2 2 2 \| 1.75 1.75 1.75 \| 1.5 1.5 1.5 \| 1.25 1.25 1.25 \| 1`     |
-| `lone x 5`             | `5 1 \| 4 1 \| 3 1 \| 2 1 \| 1` — identical to the pre-C.5 baseline |
-| `lone whole 2 3`       | `2 3 \| … \| 1` — matches native `scale: 2 3`                       |
-| `lone x 50%`           | `0.5 1 \| … \| 1` — matches native `scale: 50%`                     |
-| `lone x 0:1\|100:150%` | `1.5 1 \| … \| 1` — the mixed form canonicalizes                    |
+| sheet                 | result                                                              |
+| --------------------- | ------------------------------------------------------------------- |
+| `lone whole 2`        | `2 2 2 \| 1.75 1.75 1.75 \| 1.5 1.5 1.5 \| 1.25 1.25 1.25 \| 1`     |
+| `lone x 5`            | `5 1 \| 4 1 \| 3 1 \| 2 1 \| 1` — identical to the pre-C.5 baseline |
+| `lone whole 2 3`      | `2 3 \| … \| 1` — matches native `scale: 2 3`                       |
+| `lone x 50%`          | `0.5 1 \| … \| 1` — matches native `scale: 50%`                     |
+| `lone x 0:1/100:150%` | `1 \| 1 \| 1 \| 1 \| 1` — **withdrawn**, see below                  |
 
-**The structural inversion, which is the clearest evidence the execution model
-changed rather than gaining metadata around the old one:**
+**The structural inversion.** At `efbab29` it was read as "every property-level
+`scale` frame declaration is gone, and leaf assignments replaced them" — 1/1/2/3
+frame declarations down to zero, 0 leaf declarations up to 3/1/4/5. The bridge
+puts `scale` back into those keyframes, so that reading no longer separates the
+two execution models. The distinction that does is _which_ `scale`, which is the
+one the earlier pass was reaching for:
 
-| sheet             | bytes         | keyframe bytes | slots | `var()`   | `scale` frame decls | leaf decls |
-| ----------------- | ------------- | -------------- | ----- | --------- | ------------------- | ---------- |
-| `lone scale`      | 8135 → 8179   | 70 → 107       | 1     | 55        | **1 → 0**           | **0 → 3**  |
-| `lone scale-x`    | 8648 → 8554   | 135 → 61       | 1     | 68 → 65   | **1 → 0**           | **0 → 1**  |
-| `scale + scale-x` | 9923 → 9873   | 205 → 168      | 2     | 93 → 90   | **2 → 0**           | **0 → 4**  |
-| `scale + x + y`   | 11711 → 11567 | 340 → 229      | 3     | 131 → 125 | **3 → 0**           | **0 → 5**  |
+| declaration in a frame          | pre-C.5            | after C.5 + bridge               |
+| ------------------------------- | ------------------ | -------------------------------- |
+| `scale: var(--jumi-scale-<id>)` | the animated value | **zero** under typed execution   |
+| `scale: var(--jumi-scale)`      | absent             | the **bridge**, present          |
+| `--jumi-scale-x/y/z`            | absent             | carries **every** animated value |
 
-Every property-level `scale` frame declaration is gone; leaf assignments replaced
-them. Three of four sheets shrank — `scale + x + y` by 1.2%, `lone scale-x` by 1.1%
-— and keyframe bytes fell 22–33% on the multi-motion sheets. Only `lone scale` grew,
-by 44 bytes, because one frame declaration became three.
+Measured on the same four sheets, at the levels the earlier pass could not be
+directly compared across:
+
+| sheet             | bytes         | kfBytes   | slots | `var()`   | animated  | bridge | leaf      |
+| ----------------- | ------------- | --------- | ----- | --------- | --------- | ------ | --------- |
+| `lone scale`      | 8135 → 8252   | 70 → 180  | 1     | 55 → 57   | **1 → 0** | 0 → 2  | **0 → 3** |
+| `lone scale-x`    | 8648 → 8627   | 135 → 134 | 1     | 68 → 67   | **1 → 0** | 0 → 2  | **0 → 1** |
+| `scale + scale-x` | 9923 → 10019  | 205 → 315 | 2     | 93 → 94   | **2 → 0** | 0 → 4  | **0 → 4** |
+| `scale + x + y`   | 11711 → 11786 | 340 → 450 | 3     | 131 → 131 | **3 → 0** | 0 → 6  | **0 → 5** |
+
+The bridge is exactly 73 bytes per typed keyframe — the four deltas over
+`efbab29` are 73, 73, 146, 219 — and that is the whole of the difference between
+this table and the one this section first recorded. Only `lone scale-x` is still
+smaller than pre-C.5, by 21 bytes. "Three of four sheets shrank" was true of the
+bridge-less `efbab29` and is not true of what ships.
+
+**Withdrawal.** The table above once recorded `lone x 0:1/100:150%` as
+`1.5 1 | … | 1` with the note "the mixed form canonicalizes". That is not
+reproducible. Across `animate-scale-x-[0:1/100:150%]`,
+`animate-scale-[0:1/100:150%]`, `animate-scale-x-[1/150%]` and
+`animate-scale-[1/150%]`, the emitted keyframe holds a **single** frame — one
+frame, never two — so the animation is a no-op and the curve is
+`1 | 1 | 1 | 1 | 1` at both `07e2b23` and `65e977c`, with the same slot and the
+same zero substrate rules. The claim is withdrawn rather than carried. The
+multi-stop form declines typed execution and keeps the old path byte-for-byte,
+which is what the opt-in rule asked of it; whether it should canonicalize is D's
+to decide on proof, not this pass's to assert.
 
 **Audits:** `dead-links --strict` reports no dead reads and no unconsumed frame
 writes; `constituent-check` introduces no `scale` residual (its list is unchanged:
 `backdrop-filter`, `background-position`, `box-shadow`, `filter`, `object-position`);
-the serialization audit and differential pass.
+the serialization audit and differential pass. `pnpm check` is green on all 17
+stages, 400 unit tests.
 
-**C is closed.** `scale` is no longer a prototype. D extracts the mechanism this
-implementation proved — typed substrate published by the candidate, direct-leaf
-keyframes, canonicalized frame values, and family-level decline-to-native fallback
-— rather than generalizing any of the preparatory abstractions.
+### C.5 — the mixed-execution boundary, found after the close (2026-09-16)
+
+`efbab29` was written up here as closing C, and it did not. A reviewed case
+computed `1` where the pre-C.5 baseline computes `5 1`:
+
+```text
+animate-scale-[none] + animate-scale-x-[5]
+  pre-C.5  07e2b23   5 1   4 1   3 1   2 1   1
+  C.5      efbab29   1     1     1     1     1
+```
+
+The whole had declined, so its keyframe wrote `scale: var(--jumi-scale-…);` — the
+native escape hatch doing exactly its job — and **a keyframe beats a rule**, so it
+beat the candidate's static substrate `scale: var(--jumi-scale)` outright. The
+constituent's leaf contribution was not weakened, it was invisible: nothing
+downstream could read it. Two execution models for one property had met at a
+boundary the topology had only been argued to be safe, and the argument was wrong.
+The record above is amended rather than left standing.
+
+**The fix is a composition bridge inside the typed keyframes** (`65e977c`), not a
+runtime set and not an accepted regression: every typed keyframe re-asserts
+`scale: var(--jumi-scale)`, so the same animation-list precedence that defined the
+pre-C.5 behaviour decides the property again and the leaves decide the value.
+
+**It is pinned at both ends, and that is a measurement rather than a style
+choice.** A keyframe that names `scale` only at `to` turns `scale` into a second
+animation whose implicit `from` is the _un-animated_ underlying value; substituted
+per frame against the animated leaf, that composes to `scale(p) = 1 + p(x(p) − 1)`.
+With that shape `lone x 5` curved `5 1 | 3.25 1 | 2 1 | 1.25 1 | 1` — $1 + 4p^2$
+where $1 + 4p$ is correct, and the fault was in the _leaf_, not in the bridge.
+Pinning `from` makes both ends the same expression, so there is nothing to
+interpolate and the frame's own composition passes through. Neither pin is
+redundant: dropping `from` from the constituent path restores $1 + 4p^2$ on
+`lone x 5`, and dropping it from the whole path curves `lone whole 2` to
+$1 + p^2$.
+
+**Re-run against pre-C.5**, all twelve sheets of the falsification set. The only
+curves that differ are the whole-value corrections C.5 intended: `scale: 2` is
+`2 2 2`, and pre-C.5 computed `2 1 1` because the whole only ever fed the x leaf
+(`1.5` for `scale: 150%`, the same reason). Everything else is unchanged,
+including the two that matter most here — `declined whole + x` and
+`x + declined whole` are byte-identical to pre-C.5 in **both** discovery orders,
+and reversing candidate discovery still yields byte-identical animation longhand
+lists. The intended rule holds without a special case: property ownership follows
+animation-list precedence, exactly as before C.5.
+
+**C is closed by `65e977c`.** `scale` is no longer a prototype, and the
+mixed-execution boundary is now measured against the pre-C.5 baseline rather than
+argued from the topology. D extracts the mechanism this implementation proved —
+typed substrate published by the candidate, direct-leaf keyframes, canonicalized
+frame values, family-level decline-to-native fallback, and the composition bridge
+that lets leaves own an animated property beside a native motion — rather than
+generalizing any of the preparatory abstractions.
