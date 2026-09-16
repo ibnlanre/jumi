@@ -29,23 +29,26 @@ simply never referenced these names.
 
 ## The three routes
 
-Counted from the audit's own output, which groups by the attribute each candidate declares:
+Counted from the audit's own output at 46, which groups by the attribute each candidate declares. The
+standings as of 2026-09-16: the 9 and the 4 are retired, and 2 of the 33 have landed with the url slots,
+which leaves **31** — all of them the nested route, and all of them the one-level expansion.
 
-**Nested — 33 candidates.** The writer is a component of an _intermediate_ composition, one level below
-the one the frame reads. `box-shadow` reads `box-shadow-inset`/`-outset`, which are themselves
-compositions over `box-shadow-blur`, `-color`, `-offset-x/y`, `-spread`; `transform` reads `skew`, which
-reads `skew-x`/`skew-y`; `background-position` reads `background-position-x`, which reads
+**Nested — 33 candidates, 31 left.** The writer is a component of an _intermediate_ composition, one
+level below the one the frame reads. `box-shadow` reads `box-shadow-inset`/`-outset`, which are
+themselves compositions over `box-shadow-blur`, `-color`, `-offset-x/y`, `-spread`; `transform` reads
+`skew`, which reads `skew-x`/`skew-y`; `background-position` reads `background-position-x`, which reads
 `…-x-edge`/`…-x-offset`. Also `filter`, `backdrop-filter`, `object-position`, `offset-anchor`,
-`offset-position`.
+`offset-position`. Two of these were not nested at all — the `*url` slots, referenced by nothing — and
+they are the two that have landed.
 
-**Not composed — 9 candidates.** The attribute declares no dependencies at all, so no part is ever read:
-`gap` (`column-gap`, `row-gap`), `transform-origin` (x/y/z), `border-block-width`,
+**Not composed — 9 candidates, retired.** The attribute declares no dependencies at all, so no part is
+ever read: `gap` (`column-gap`, `row-gap`), `transform-origin` (x/y/z), `border-block-width`,
 `border-inline-width`, `outline` (`outline-offset` is not part of the `outline` shorthand), `transform`
 (`transform-style` is its own property).
 
-**Other name — 4 candidates.** The composition reads a different name than the candidate writes:
-`border-radius` reads the four physical corners (`border-top-left-radius`, …) while the candidates write
-the logical ones (`border-end-end-radius`, `border-start-start-radius`, …).
+**Other name — 4 candidates, retired.** The composition reads a different name than the candidate
+writes: `border-radius` reads the four physical corners (`border-top-left-radius`, …) while the
+candidates write the logical ones (`border-end-end-radius`, `border-start-start-radius`, …).
 
 ## Order to attack it in
 
@@ -124,12 +127,60 @@ swaps each pair for itself, so the physical sets would be identical and the asse
 nothing). The rule is deliberately narrow — one recorded set of properties, no general multi-property
 engine — and it applies to the tween path as well, so the value form is not inert either.
 
-### What is left — 33
+### What is left — 31, and the arithmetic goes to zero
 
-- **The 33 nested** — the real work, and the only route where the acceptance test below has to answer
+Two of the 33 were never a depth problem, and they are the two to fix first: the composition omitted the
+slot that would read `--jumi-filter-url`, so the omission was a data correction rather than the
+one-level expansion. Landed 2026-09-16: **33 → 31**, `dead-links --strict` 0 dead / 0 unconsumed,
+behaviour 63/63 with arms for the route, and the baseline and snapshot re-recorded with it.
+
+- **The 2 `*url` slots — done.** `filter` and `backdrop-filter` now name a url slot, and the
+  substitution over the composition had to learn to keep a slot's own fallback.
+- **The 31 nested** — the real work, and the only route where the acceptance test below has to answer
   _how_ the value reaches the frame. `box-shadow` 5, `filter` 5, `backdrop-filter` 5, `transform` 2
   (`skew-x`/`skew-y`), and the four position families 4 each (`background-position`, `object-position`,
   `offset-anchor`, `offset-position`).
+
+**The endpoint is therefore zero, not 29.** An earlier reading subtracted the two data corrections from
+31 and stopped at 29; but the 31 nested cases are not a residual to be trimmed, they are the one-level
+expansion and nothing else, so the audit should reach 397 of 397 and the baseline should become empty.
+That is also what makes it worth converting the baseline into a zero-residual gate: a number left in it
+after this pass is a claim that some candidate has no consumer by design, and none does.
+
+### The probe that had to be corrected (2026-09-16)
+
+The url slot was built on a probe that concluded an empty or unresolved `url()` voids the filter chain,
+and the conclusion was wrong. Re-measured with a sibling whose effect is visible — `grayscale(1)` on a
+red box is grey when the chain resolves and red when it does not — in Chromium:
+
+| declaration | box | computed `filter` |
+| --- | --- | --- |
+| `grayscale(1)` | grey | `grayscale(1)` |
+| `grayscale(1) url(#black)` | black | `grayscale(1) url("#black")` |
+| `grayscale(1) url()` / `url("")` / `url(#missing)` | grey | the chain, with the url inert |
+| `grayscale(1) var(--jumi-nothing)` | red | `none` |
+
+So an unresolved url is **ignored**, and what voids the declaration is a read that references nothing.
+The first probe could not tell the two apart because its sibling filter *and* its baseline were both
+`blur(0px)`, the identity — "looks the same as plain" meant "no visible change", which is the answer to
+neither question. The lesson is worth more than the measurement: a baseline that does not itself move
+cannot distinguish *inert* from *fatal*, and the arm written from the wrong reading is what failed, not
+the reasoning about the fix.
+
+### The detector that had to be corrected twice (2026-09-16)
+
+`LOOKUP` in `scripts/lib/dead-links.mjs` required `)` immediately after the inner variable name, so the
+new shape `var(key, var(base, opacity(1)))` was invisible to it and the two url hooks on the
+`backdrop-filter` composition were reported as dead reads while the CSS was correct. The first fix —
+letting the fallback group be greedy — was worse: the outer read matched, its match consumed the `var(`
+of the hook nested inside its fallback, and the scan never visited those hooks, turning 20 reads
+(`rotate-x`, `scale-x`, the logical corners) into dead ones. What works is reaching the inner `var(`
+through a **lookahead**, so both the outer read and the hook inside it are visited and a slot's fallback
+is irrelevant to the pattern. Pinned by `scripts/lib/dead-links.test.mjs`.
+
+Both failures are the same failure the whole track is about: a check that encodes an outdated belief
+reports the CSS as wrong instead of itself. A detector for a shape has to be updated with the shape, and
+the cost of not doing it is a false accusation rather than a missed one.
 
 ### The 33 traced: two topologies, not one (2026-09-16)
 
@@ -185,9 +236,13 @@ record of the improvement.
 It must hold while it does:
 
 - `node scripts/dead-links.mjs --strict` stays green. The restored component lookups are `conditional`
-  — a known writer _class_, possibly absent from the sheet — and must not be re-classified as dead.
+  — a known writer _class_, possibly absent from the sheet — and must not be re-classified as dead. The
+  detector has already been wrong twice in this direction (see above), so a shape change is a change to
+  `scripts/lib/dead-links.mjs` and to its test in the same commit.
 - `pnpm behaviour:check` gains an arm per route: the computed value has to move across the animation,
-  and the arm has to be able to fail (see §10, which strips the lookups from its own sheet).
+  and the arm has to be able to fail (see §10, which strips the lookups from its own sheet). An arm
+  asserts a **pixel or a colour**, never `getComputedStyle().filter` — the computed string lists a chain
+  whose filter was dropped.
 - The predicate does not simply widen. Hooking a component no candidate addresses is exactly what
   `bb39449` measured as the sheet's only dead reads (112 of them, eight families) before it deleted
   them, and `surfaces` exists to stop that.
@@ -200,11 +255,12 @@ node scripts/constituent-check.mjs            # the audit, against the baseline
 node scripts/constituent-check.mjs --record   # re-record after a deliberate improvement
 ```
 
-The same audit against three trees, 2026-09-16:
+The same audit against four trees, 2026-09-16:
 
 ```text
 bb39449^ (before the regression)   351 read back ·  46 not · but 112 dead reads
 bb39449  (shipped)                 350 read back ·  47 not ·   0 dead reads
 restored lookup                    351 read back ·  46 not ·   0 dead reads
 route 1 landed (three changes)     360 read back ·  37 not ·   0 dead reads
+route 2 landed (the url slots)     366 read back ·  31 not ·   0 dead reads
 ```
