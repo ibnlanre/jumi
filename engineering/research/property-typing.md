@@ -259,6 +259,12 @@ does: registering `--jumi-column-rule-width` as `<length>` is refused on `initia
 the union rung would hide it again, since `<length> | currentColor` registers — which is the argument for
 reading the identity out of the model rather than out of whatever makes a registration succeed.
 
+**Fixed (2026-09-16).** The two are back where their families put them, and the invariant that catches it
+is now a test — a `*-width` leaf may never rest at a colour, a `*-color` leaf never at a line width —
+verified to fail on the transposition before being relied on. No shipped byte changed, which is itself the
+proof of how latent it was: the canonical corpus never registers the `column-rule` composition, so the two
+defaults were never emitted.
+
 ## §7 The census's own reader was wrong four times, and every wrong answer looked plausible
 
 The join between the model and the candidate table is text, so it was read by pattern first, and all four

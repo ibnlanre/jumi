@@ -119,6 +119,58 @@ describe('readCandidates', () => {
   })
 })
 
+/**
+ * The invariant that catches a transposed identity, and the reason it is worth having.
+ *
+ * `column-rule-width` and `column-rule-color` each held the other's default. Nothing noticed for as long
+ * as nothing read either slot on its own: the `column-rule` composition is order-insensitive
+ * (`<'width'> || <'style'> || <'color'>`), so the two keywords landed in the right slots anyway, and the
+ * canonical corpus never registers that composition at all. It surfaced only when the typing census read
+ * the identity of every leaf and tried to register `--jumi-column-rule-width` as a `<length>`.
+ *
+ * A test asserting the two literals would pin the fix without describing it. These assert the *shape* of
+ * the mistake instead — a width is not a colour and a colour is not a width — which is the check that was
+ * done by eye and the only reason the swap was ever found.
+ */
+describe('the identities in the model', () => {
+  const entries = readPropertyEntries()
+  const identityOf = slot => {
+    const value = entries.find(entry => entry.slot === slot)?.value
+
+    return value === undefined ? null : value.replace(/^'|'$/g, '')
+  }
+  const family = suffix =>
+    entries.map(entry => entry.slot).filter(slot => slot.endsWith(suffix))
+
+  const COLOURS = new Set([
+    'black',
+    'currentColor',
+    'red',
+    'transparent',
+    'white',
+  ])
+  const LINE_WIDTHS = new Set(['medium', 'thick', 'thin'])
+
+  it('never rests a *-width leaf at a colour', () => {
+    const wrong = family('-width').filter(slot => COLOURS.has(identityOf(slot)))
+
+    expect(wrong).toEqual([])
+  })
+
+  it('never rests a *-color leaf at a line width', () => {
+    const wrong = family('-color').filter(slot =>
+      LINE_WIDTHS.has(identityOf(slot)),
+    )
+
+    expect(wrong).toEqual([])
+  })
+
+  it('reads the two column-rule identities as their own properties rest at them', () => {
+    expect(identityOf('column-rule-width')).toBe('medium')
+    expect(identityOf('column-rule-color')).toBe('currentColor')
+  })
+})
+
 describe('readPropertyEntries', () => {
   const entries = readPropertyEntries()
 

@@ -222,11 +222,13 @@ Open workstreams, in order:
 
 What remains, in the order the ruling set:
 
-4. **Fix the swapped `column-rule-width` / `column-rule-color` identities.** Latent today because the
-   shorthand's `||` grammar absorbs the transposition — measured, both spellings compute `medium` and
-   `currentColor`. Fatal under the variable model, where a slot is read on its own, and the union rung
-   would hide it again (`<length> | currentColor` registers), which is why it has to be fixed rather than
-   accommodated.
+4. **The `column-rule` identities — fixed.** `column-rule-width` rested at `currentColor` and
+   `column-rule-color` at `medium`: each other's default. Both are back where their families put them,
+   and the invariant that catches it is a test rather than an eye — a `*-width` leaf may never rest at a
+   colour, and a `*-color` leaf never at a line width. Verified to fail on the transposition before being
+   relied on. Latent in every sense: the `column-rule` composition's grammar is order-insensitive, the
+   canonical corpus never registers it, and both were found only because the census read every identity
+   and tried to register `--jumi-column-rule-width` as a `<length>`. No shipped byte changed.
 5. **A compiler prototype on a real page** with typed leaves, the current implementation against the
    pivot, across document-time animation, named motions, independent durations, segment easing, scroll
    timelines, animation ranges, reduced motion, siblings, whole-plus-constituent conflict, DevTools

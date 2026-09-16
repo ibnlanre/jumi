@@ -1023,7 +1023,10 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-column-rule',
   },
   'column-rule-color': {
-    value: 'medium',
+    // `currentColor` because that is what the property's own grammar rests at, and because the identity
+    // is read as the property's value the moment a single slot is addressed on its own — the typed-slot
+    // model does exactly that, and `--jumi-column-rule-color: medium` is refused as a `<color>`.
+    value: 'currentColor',
     variable: '--jumi-column-rule-color',
   },
   'column-rule-style': {
@@ -1031,7 +1034,13 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-column-rule-style',
   },
   'column-rule-width': {
-    value: 'currentColor',
+    // `medium`, matching every other `*-width` leaf. This and `column-rule-color` were transposed, and
+    // the `column-rule` composition never showed it: its grammar is order-insensitive
+    // (`<'column-rule-width'> || <'column-rule-style'> || <'column-rule-color'>`), so the two keywords
+    // landed in the right slots anyway. Measured 2026-09-16 — both `currentColor none medium` and
+    // `medium none currentColor` compute `width: 3px`, `style: none`, `color: rgb(0, 0, 0)`. Nothing
+    // read either slot on its own until the typing census did.
+    value: 'medium',
     variable: '--jumi-column-rule-width',
   },
   'column-span': {
