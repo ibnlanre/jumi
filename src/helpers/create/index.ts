@@ -17,7 +17,6 @@ import type {
   Creator,
   GetMatchComponents,
   GetMatchUtilities,
-  MatchComponentsOptions,
   MatchComponentsPropertyValue,
   MatchPropertyFunction,
   Modifiers,
@@ -79,9 +78,21 @@ export function getCreator(api: Api): Creator {
       // of its own takes the composition's `var()` fallback rather than an ancestor's token. The two
       // declarations are one semantic unit — `inherits: false` cannot be written without a syntax,
       // and `syntax: "*"` alone would still inherit. See the `property` sink in `@/core`.
-      property: name =>
+      //
+      // A **typed** registration is the other shape, and it is not this one with fields filled in.
+      // It declares what the name holds, so the browser can interpolate it — which is what lets a
+      // constituent be animated on its own — and it therefore needs an `initial-value` the property
+      // falls to with nothing declared.
+      property: (name, registration = { kind: 'token' }) =>
         api.addBase({
-          [`@property ${name}`]: { inherits: 'false', syntax: '"*"' },
+          [`@property ${name}`]:
+            registration.kind === 'typed'
+              ? {
+                  'inherits': 'false',
+                  'initial-value': registration.initialValue,
+                  'syntax': `"${registration.syntax}"`,
+                }
+              : { inherits: 'false', syntax: '"*"' },
         }),
     },
     theme: (key, values) => resolveTheme(api, key, values),

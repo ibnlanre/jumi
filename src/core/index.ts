@@ -32,7 +32,6 @@ export type ModelOptions = {
 /** Everything the model needs from its host: where theme values come from, and
  * the two things it emits. Nothing else in this module knows the host. */
 export type ModelSink = {
-  /** Emit keyframe rules. */
   keyframes(rules: Collection<CssInJs>): void
   /** Publish what a kind's composition needs, as data that is never output.
    *
@@ -77,8 +76,31 @@ export type ModelSink = {
    * `behaviour:check` asserts this in a browser: a nested animating element must run its own slot
    * and not its ancestor's.
    */
-  property(name: string): void
+  property(name: string, registration?: PropertyRegistration): void
 }
+
+/**
+ * How a slot variable is registered — and there are exactly two shapes because there are exactly
+ * two semantic jobs.
+ *
+ * `token` is a **permissive** registration: no grammar, no initial value. It makes a name
+ * non-inheriting without imposing a contract on what it holds, which is the only way a token like
+ * `jumi-rotate-3zWYd` can be registered at all. With no `initial-value` the property stays at the
+ * guaranteed-invalid value, so a descendant that declares no activation of its own still takes the
+ * composition's `var()` fallback rather than an ancestor's token.
+ *
+ * `typed` is a **contract**: a real grammar and an initial value the property falls to when nothing
+ * declares it. It exists because a typed custom property is what makes a value interpolable by the
+ * browser, which is what lets a constituent be animated on its own instead of only as part of a
+ * composed property.
+ *
+ * Not one shape with optional fields. The two make different promises — one says "this name holds
+ * something, do not inherit it", the other says "this name holds *this kind of thing*" — and a
+ * caller that had to remember which optional fields to fill would be able to express a typed
+ * registration with no initial value, which is not a thing that can work.
+ */
+export type PropertyRegistration =
+  { initialValue: string; kind: 'typed'; syntax: string } | { kind: 'token' }
 
 /** How the model resolves a theme value. The shape of the values map is the
  * host's business; Jumi only ever hands it straight back to the host. */
