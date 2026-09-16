@@ -149,19 +149,19 @@ export const collect = css => {
 
     if (!owner) return
 
-    // A hook is a read whose fallback **begins with** a `var()`, and whose base is a component rather than
-    // the keyframe's own attribute. "Begins with" is the next reference starting where this one's fallback
-    // does — which is why the answer does not depend on what the fallback goes on to contain.
-    for (const [index, reference] of references.entries()) {
-      const next = references[index + 1]
-      if (!next || next.offset !== reference.fallbackStart) continue
-
-      const base = next.name
-      if (frameBase(reference.name) !== base) continue
-      if (attribute === base.slice(OWNED.length)) continue
-
-      hooked.add(reference.name)
-    }
+    // A frame-first read is a **hook** when the key it reads is scoped to a property other than the one the
+    // keyframe animates — `var(--jumi-skew-x-<id>-0, …)` inside `jumi-transform-<id>` names a component,
+    // whose writer class may simply be absent from this stylesheet. The read whose base *is* the keyframe's
+    // own attribute is the outer read, which the phrase that owns the keyframe wrote.
+    //
+    // The **fallback is deliberately not part of the test**, and that is the whole of this rule. It used to
+    // be: the pattern required the fallback to name the same variable the key read. An expanded
+    // intermediate's fallback is its own template — `var(--jumi-skew-<id>-0, skew(var(--jumi-skew-x-…)))` —
+    // so every hook of that shape read as dead the moment the shape was emitted, which is how the corpus
+    // caught it. What a read falls back *to* is a different question from what the read is.
+    for (const { name } of references)
+      if (FRAME_KEY.test(name) && frameBase(name) !== `--jumi-${attribute}`)
+        hooked.add(name)
   })
 
   document.walkAtRules('property', atRule =>

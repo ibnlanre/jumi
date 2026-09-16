@@ -86,30 +86,44 @@ describe('classify', () => {
     expect(verdict(css, '--jumi-matrix-abc12-50')).toBe('DEAD')
   })
 
-  it('reads a fallback that only *contains* a var() as not a hook', () => {
-    // The distinction the structural read makes and a pattern could not state. The two fixtures differ by
-    // exactly one thing: whether the fallback *begins* with the reference. Both references are read in both
-    // cases — the one inside the function included — but only the second makes the enclosing read a hook.
-    // `calc(var(--x))` computes *from* the component rather than naming it, and a rule that hooked any read
-    // with a `var()` somewhere in its fallback would call the first one a hook too.
-    const indirect = collect(`@keyframes jumi-transform-abc12 {
-      50% { transform: var(--jumi-skew-x-abc12-50, calc(var(--jumi-skew-x) * 1deg)) }
-    }`)
-
-    expect([...indirect.reads.keys()].sort()).toEqual([
-      '--jumi-skew-x',
-      '--jumi-skew-x-abc12-50',
-    ])
-    expect(indirect.hooked.has('--jumi-skew-x-abc12-50')).toBe(false)
-
-    const direct = collect(`@keyframes jumi-transform-abc12 {
+  it('reads a component read as a hook whatever its fallback is', () => {
+    // The rule, and the two shapes it has to hold for. A frame-first read is a hook when the key it reads
+    // is scoped to a property other than the one the keyframe animates — the *fallback is not part of the
+    // test*, because what a read falls back to is a different question from what the read is.
+    //
+    // That indirection is the fix for a real regression: the pattern used to require the fallback to name
+    // the same variable the key read, and an expanded intermediate's fallback is its own template, so
+    // every hook of that shape read as dead the moment the shape was emitted. The corpus caught it, which
+    // is why the fixture carries a `animate-skew-x-[…]` phrase.
+    const named = collect(`@keyframes jumi-transform-abc12 {
       50% { transform: var(--jumi-skew-x-abc12-50, var(--jumi-skew-x)) }
     }`)
 
-    expect(direct.hooked.has('--jumi-skew-x-abc12-50')).toBe(true)
+    expect(named.hooked.has('--jumi-skew-x-abc12-50')).toBe(true)
 
-    // And the base has to match: a read whose fallback begins with a reference to *another frame key* is
-    // the outer read, not a hook, however deeply the chain inside it nests.
+    const computed = collect(`@keyframes jumi-transform-abc12 {
+      50% { transform: var(--jumi-skew-x-abc12-50, calc(var(--jumi-skew-x) * 1deg)) }
+    }`)
+
+    expect([...computed.reads.keys()].sort()).toEqual([
+      '--jumi-skew-x',
+      '--jumi-skew-x-abc12-50',
+    ])
+    expect(computed.hooked.has('--jumi-skew-x-abc12-50')).toBe(true)
+
+    const expanded = collect(`@keyframes jumi-transform-abc12 {
+      50% {
+        transform: var(--jumi-skew-abc12-50,
+          skew(var(--jumi-skew-x-abc12-50, var(--jumi-skew-x)), var(--jumi-skew-y-abc12-50, var(--jumi-skew-y))))
+      }
+    }`)
+
+    expect(expanded.hooked.has('--jumi-skew-abc12-50')).toBe(true)
+
+    // And the exclusion is the base, not the fallback: the read whose base *is* the keyframe's own
+    // attribute is the outer read, which the phrase that owns the keyframe wrote.
+    expect(expanded.hooked.has('--jumi-transform-abc12-50')).toBe(false)
+
     const outer = collect(`@keyframes jumi-transform-abc12 {
       50% {
         transform: var(--jumi-skew-abc12-50, var(--jumi-skew-x-abc12-50, var(--jumi-skew-x))
@@ -117,7 +131,7 @@ describe('classify', () => {
       }
     }`)
 
-    expect(outer.hooked.has('--jumi-skew-abc12-50')).toBe(false)
+    expect(outer.hooked.has('--jumi-skew-abc12-50')).toBe(true)
     expect(outer.hooked.has('--jumi-skew-x-abc12-50')).toBe(true)
     expect(outer.hooked.has('--jumi-skew-y-abc12-50')).toBe(true)
   })
