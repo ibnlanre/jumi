@@ -272,6 +272,15 @@ What remains, in the order the ruling set:
    ships — the two-phrase case computes `5 1` or `2` from identical markup — but the semantic key should
    not be chosen until the boundary is known. The reshape's result narrows this: the key has to be
    **per attribute**, and an attribute may only be re-keyed when the reshape carries all of it.
+   7b. **Addressability is now a fact the model graph owns.** `src/variables/composition.ts` derives a
+   `CompositionEdge` per (composite, dependency) — `kind` `direct` / `fallback` / `composite`, plus
+   `addressable` — from the composition the graph already declares, and exposes
+   `isDirectlyAddressable(attribute, dependency)`. `src/helpers/slots` states the slot syntax once, so the
+   derivation and `hookSlot` cannot come to disagree about what a slot is. **97 of 104 composites have at
+   least one directly addressable dependency**; `filter` is 9/11 (the two failures are the composite
+   `filter-drop-shadow` and the fallback-read `filter-url`), and `transform` is 0/7 because every one of
+   its dependencies is itself a composite — which is why `skew-x` is a second-level routing problem and
+   `scale-x` is not. Nothing consumes the predicate yet; no emitted byte changed.
 8. **Then** the surface the prototype did not reach: Studio export/replay, DevTools inspection, and the
    broader byte accounting on a real page.
 9. **Only then decide whether to migrate the broader 79%.**

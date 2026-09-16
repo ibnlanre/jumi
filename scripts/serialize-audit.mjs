@@ -76,6 +76,7 @@ const CSS_TEXT =
 const carriers = 'src/helpers/carriers/index.ts'
 const instance = 'src/helpers/carriers/instance.ts'
 const range = 'src/helpers/carriers/animation-range.ts'
+const slots = 'src/helpers/slots/index.ts'
 const theme = 'src/helpers/create/theme.ts'
 const transitions = 'src/helpers/carriers/view-transition.ts'
 
@@ -177,20 +178,37 @@ const registry = [
     assumes:
       'that a composition spells a slot as `var(--jumi-<component>` with the delimiter — `,` or `)` — immediately after the name, and that a slot’s own fallback nests at most one level',
     breakable:
-      'only against a spelling Jumi does not produce. The text searched is the composition template this file builds in memory a few lines above, not a stylesheet, so no serializer stands between the two; and the lookahead is what stops a longer name that merely starts the same way (`--jumi-matrix` beside `--jumi-matrix-3d`) from being hooked by accident',
+      'only against a spelling Jumi does not produce. The text searched is the composition template the library builds from `src/composition`, not a stylesheet, so no serializer stands between the two; and the lookahead is what stops a longer name that merely starts the same way (`--jumi-matrix` beside `--jumi-matrix-3d`) from being hooked by accident',
     class: 'tolerant',
-    // The candidate the scan finds is the operation; the pattern it carries is the next line of the same
-    // statement, which is what the lookahead above is describing. Worth knowing when reading the entry:
-    // the audit is line-based, so a pattern on a line of its own is not a candidate at all.
+    // The candidate the scan finds is the operation; the pattern it carries is an argument, and the
+    // pattern itself lives one module away. Worth knowing when reading the entry: the audit is
+    // line-based, so a pattern on a line of its own is not a candidate at all — which is what keeps the
+    // syntax statement in `readSlots`/`replaceSlots`'s shared `SLOT` from needing an entry of its own.
     contains: 'value.replaceAll(',
-    file: 'src/core/index.ts',
+    file: slots,
     recovers:
       'which slot a frame reads frame-first, so a phrase addressing one component of a composition moves it',
     serialization:
       'no — the input is Jumi’s own construction. The hazard is the mirror image of the `namedHoist` entries: those search sheet text a minifier had rewritten, this one searches a string built here, and the two must not be filed under one assumption',
     structural:
       'the slots are known when the composition is built, so this could be construction — the substitution could happen as the template is assembled rather than as a search over the assembled string, which is the migration this entry exists to point at',
-    symbol: 'createJumiModel',
+    symbol: 'replaceSlots',
+  },
+  {
+    assumes:
+      'the same slot grammar as `replaceSlots` — the same pattern object, so the two cannot come to disagree about what a slot is',
+    breakable:
+      'no, for the same reason: the input is a composition string this library built, and the delimiter lookahead is what keeps `--jumi-matrix-3d` from being read as `--jumi-matrix`',
+    class: 'tolerant',
+    contains: 'value.matchAll(SLOT)',
+    file: slots,
+    recovers:
+      'which dependencies a composition reads bare, which carry a fallback, and which are reached only as another read’s fallback — the three-way split addressability is derived from',
+    serialization:
+      'no — the input is Jumi’s own construction, read for its structure rather than rewritten',
+    structural:
+      'the dependencies are declared in the graph beside the composition, so this could read the graph instead of the text — it reads the text because the graph does not record *how* each dependency is reached, and that is the fact being recovered',
+    symbol: 'readSlots',
   },
 
   // ── a range: selector and value grammar, read from an author's class ─────────────────────────
