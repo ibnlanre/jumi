@@ -119,13 +119,44 @@ decomposition should read `5 2 2`, which is the difference between the ownership
 prototype carries this as an explicit table (`REPEATS`), and an attribute that is not listed is refused
 rather than padded on a guess.
 
-**3. The function reshape — not built.** A slot whose value is a call (`filter-blur: blur(0)`) has no
-argument to animate until the composition reads one, so the substrate must become
-`blur(var(--jumi-filter-blur-amount))`. Two instances on the probe surface need it and both are reported.
-This is the same technique the architecture spike measured as working (`blur(var())` interpolates
-perfectly), just not yet wired.
+**3. The function reshape — built.** A slot whose value is a call (`filter-blur: blur(0)`) has no
+argument to animate until the composition reads one, so the substrate becomes
+`blur(var(--jumi-filter-blur-amount))`. The shape is deliberately narrow: **the composition owns the
+function, the typed slot owns only the argument, and no function string ever appears in the animated
+slot.** The keyframe writes `--jumi-filter-blur-amount: 0px`, never `blur(0px)`.
 
-**4. One structural fact worth recording.** A whole motion's composed value is **one outer `var()`** whose
+It is applied to a whole **attribute**, not to the instance that needs it, because the composition is one
+expression: a partly-reshaped `filter` could not decompose a whole filter motion at all, since some of
+its operands would hold arguments and some whole functions. So when any instance of a property animates an
+argument, every call-shaped leaf that property composes becomes `fn(var(--jumi-<leaf>-amount))` — and a
+leaf is excluded when its value is not a single call, when its grammar is a `url` (that slot holds a whole
+function — `opacity(1)` at rest, `url(…)` when written — so pinning it to one loses the other), and when
+the census mapped no syntax for its grammar. On `filter` that is nine leaves reshaped and `url` left
+alone.
+
+**4. A native instance blocks the reshape for its attribute.** This is the part that is easy to get wrong.
+A native instance writes the property itself as one self-contained expression built from the attribute's
+old operand list, so it does **not** compose with a reshaped instance — whichever animation lands last in
+the aggregate list wins the property outright and the other is silent. Measured on `animate-filter-url`
+(a native instance, whose grammar the reshape cannot carry) plus `animate-filter-blur` (an argument), the
+reshape swapped which one won and the url motion went quiet: `blur(8px)` became `blur(0px)`. With the rule
+in place the attribute falls back whole, reproducing the shipping emission exactly — including the fact
+that this pair is order-dependent, by the same two values, in both sheets. The reshape neither introduces
+nor repairs that, which is the correct result for a gate that may not touch the ordering of attributes it
+does not own.
+
+**5. Ordering is a claim about ownership, so it is only made where something is owned.** The semantic
+ordering is applied per attribute and only to attributes the reshape carries; an attribute whose every
+instance fell back to native keeps compile order. This was not a stylistic choice: ordering the url/blur
+pair by candidate name alone handed the slot from the blur motion to the url one, silently changing a
+property's value. Order _between_ attributes is not constrained, since two attributes never contest the
+same slot.
+
+**6. The reshape's category is not in the corpus.** Neither `variant.css` nor `input.css` contains a single
+argument instance — zero in both — so the canonical corpus cannot measure the reshape at all. Its cost and
+its gains are measured on sheets built for it, in §6.
+
+**7. One structural fact worth recording.** A whole motion's composed value is **one outer `var()`** whose
 fallback is the composed value:
 
 ```css
@@ -140,17 +171,96 @@ space-separated reads with the part first. Unwrapping unconditionally reads the 
 list and produces `--jumi-scale-x: var(--jumi-scale-x)) var(--jumi-scale-y-1vrwYE-0,` — which is what the
 prototype did until the unwrap was gated on the value being a single operand.
 
+## §6 What the reshape costs and saves
+
+The shape is `compose(fn)(amount)`: the static composition owns how argument units become a property
+value, and the animated slot owns only the unit. That is the architecture sentence — **Jumi should animate
+the smallest independently interpolable unit it can, while the static CSS composition owns how those
+units become a property value** — applied to the last constituent category that had no mechanism.
+
+| shape                           | bytes                      | keyframe bytes        | registrations | decls/frame |
+| ------------------------------- | -------------------------- | --------------------- | ------------- | ----------- |
+| independent blur and brightness | 13421 → 11777 (**−12.2%**) | 3129 → 267 (**−91%**) | 0 → 9         | 1 → 1       |
+| whole filter + blur constituent | 13503 → 12375 (**−8.4%**)  | 3214 → 868 (**−73%**) | 0 → 9         | 1 → 9       |
+| named control                   | 11265 → 10380 (−7.9%)      | 2279 → 176 (−92%)     | 0 → 9         | 1 → 1       |
+| scroll range and timeline       | 12072 → 11844 (−1.9%)      | 1576 → 130 (−92%)     | 0 → 9         | 1 → 1       |
+| constituent tween (`scale-x`)   | 8228 → 8161 (−0.8%)        | 386 → 200             | 0 → 1         | 1 → 1       |
+| whole that cannot be decomposed | unchanged                  | unchanged             | 0 → 0         | 1 → 1       |
+| quoted / arbitrary whole, `url` | unchanged                  | unchanged             | 0 → 0         | 1 → 1       |
+
+**Every case the reshape owns shrinks, and every case it declines is byte-identical.** That is a stronger
+result than the increment began with, and it only held once two defects the required tests exposed were
+removed (§6.1, §6.2): each was paying bytes for nothing, and together they turned the one growing case — a
+whole filter motion, `+13 bytes` — into `−1128`.
+
+The shape of the saving is the point: shipping writes the **whole 11-operand filter expression into every
+frame** — every leaf read, each with its own fallback — and the reshape writes one small variable per
+function instead. One large declaration per frame becomes several small declarations, and the keyframe
+bytes fall by 73–92%.
+
+On `input.css`, which contains no arguments, the prototype is **+2.17% bytes and +44 registrations** with
+`var()` _falling_ from 1549 to 1390. So the corpus measurement is really a measurement of the
+whole/constituent decomposition already in the prototype, not of the reshape: the reshape's own category
+appears nowhere in it. Registrations are the recurring price — nine for a function-shaped family, paid
+once per family rather than once per instance — and the one a real build can gate on a used-in-the-sheet
+check, since a registration is only emitted for a leaf some instance animates.
+
+### §6.1 A function-holding leaf is never a typed component
+
+A first pass had an argument instance register its own leaf, which published:
+
+```css
+@property --jumi-filter-blur {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: css('blur', '0');
+}
+```
+
+Both halves are wrong. `--jumi-filter-blur` is `blur(0px)` — the composition's operand, not an
+interpolable unit — so `grammarOf`'s answer is the grammar of the argument _inside_ the call, and
+labelling the leaf with it mistypes the leaf. The identity is the model's own source text, which is not a
+CSS value at all. After the reshape the composition reads `blur(var(--jumi-filter-blur-amount))` and this
+leaf is unreferenced, so there is nothing to register; on the native path it stays an ordinary custom
+property holding a function, which is what it is today. Only the `-amount` sibling is typed. Dropping
+these nine registrations is what moved the whole-motion case from `+13` bytes to `−1128`.
+
+### §6.2 The id must come from the canonical name, not the slot key
+
+The id that locates a slot's keyframes was sliced off the slot key, and a slot key carries the variant
+path: `animate-filter-blur-[…]/scroll` keys as `6-scroll-Z2nKX36-filter`, so the slice yielded an empty id
+and the keyframes lookup missed. The reshape then reshaped the substrate, **paid for its registrations**,
+and rewrote nothing — a silent no-op that cost `+1326` bytes on the scroll sheet and was invisible until
+the cost table counted keyframe bytes and found them unchanged. The canonical name is available in the
+slot variable's own value (`var(--jumi-filter-Z2nKX36-animation-name, …)`), so the id is read from there
+now, and the same sheet is `−228` bytes. Variant-carrying instances are the common case, not an edge one:
+the scroll, `@supports`, media and segment-easing forms all key this way.
+
+### What the browser shows that the byte count does not
+
+Two of the ruling's cases differ from shipping, and both differ because **a motion shipping lets go silent
+now animates**:
+
+| case                                                | shipping @100%              | reshape @100%               |
+| --------------------------------------------------- | --------------------------- | --------------------------- |
+| `animate-filter-blur` + `animate-filter-brightness` | `blur(0px)` `brightness(3)` | `blur(8px)` `brightness(3)` |
+| `animate-filter` (whole) + `animate-filter-blur`    | `blur(8px)` `brightness(1)` | `blur(8px)` `brightness(2)` |
+
+In the first, both motions address one slot, one of them wins the property, and the loser's keyframes are
+published and never read — the all-or-nothing ownership the ordering probe measured, now visible as a
+capability loss rather than a list artefact. In the second the whole motion was the one going silent.
+
 ## What this does not measure
 
-- **The function reshape** (§5.3), and therefore nothing about the 18 function-shaped leaves.
-- **Scroll timeline, animation range and segment easing by measurement.** They travel the chains §4
-  exercises, so they are in the same position as duration and naming, but they are asserted by the
-  shipping gate rather than compared here.
+- **Scroll timeline, animation range and segment easing beyond the named cases.** The reshape is now
+  exercised on a scroll range and timeline instance and matches shipping; segment easing is carried by the
+  same chain, and the shipping gate remains the assertion.
 - **Studio export/replay.** Out of reach in this increment and named as such.
 - **Independence for the tween form** (§2), which needs `computeSlots()` and is therefore the production
   decision rather than a prototype one.
-- **Bytes and DevTools readability.** The registrations are additions (§1) and the keyframes grow from one
-  composed declaration per frame to one per leaf; neither is counted here.
+- **DevTools inspectability.** Named as a manual check rather than automated here; the emitted shape is
+  one registered custom property per function, so a frame reads as nine small declarations instead of one
+  long expression.
 - **3D transform wholes**, for the reason the transform probe gives.
 
 ## Reproducing

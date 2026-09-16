@@ -135,6 +135,88 @@ const literalOf = (root, name) => {
   return found
 }
 
+/** Every frame value an instance published, by offset, or null when it published none. */
+const framesOf = (root, slot, id) => {
+  const out = new Map()
+
+  if (!id) return null
+
+  root.walkDecls(decl => {
+    const match = decl.prop.match(new RegExp(`^--jumi-${slot}-${id}-(\\d+)$`))
+
+    if (match) out.set(Number(match[1]), decl.value.trim())
+  })
+
+  return out.size ? out : null
+}
+
+/** The `fn(arg)` a model value declares: `css('blur', '0')` → `{ argument: '0', fn: 'blur' }`. */
+const callOf = value => {
+  const match = String(value).match(/^css\('([^']+)',\s*'([^']*)'\)$/)
+
+  return match ? { argument: match[2], fn: match[1] } : null
+}
+
+/**
+ * The `fn(arg)` a **written value** is, or null. Null is the answer for everything that is not one call
+ * inside one pair of parentheses — a quoted string, a list, a `url("…")` with a comma in it — and null is
+ * what keeps those on the native path rather than being reshaped into something they are not.
+ */
+const writtenCall = value => {
+  const match = String(value)
+    .trim()
+    .match(/^([\w-]+)\(([^]*)\)$/)
+
+  return match ? { argument: match[2].trim(), fn: match[1] } : null
+}
+
+/** The Tailwind value-types a leaf's candidates declare, which is the grammar the census maps. */
+const grammarOf = leaf =>
+  [
+    ...new Set(
+      [...leaf.writers, ...leaf.wholes].flatMap(writer => writer.types),
+    ),
+  ]
+    .filter(type => type !== 'any')
+    .sort()
+    .join(',')
+
+/** The leaves a composition names, read off the composition's own operands. */
+const composedLeaves = (root, attribute) => {
+  let value = null
+
+  root.walkDecls(decl => {
+    if (value === null && decl.prop === `--jumi-${attribute}`)
+      value = decl.value
+  })
+
+  return value ? splitSpaces(value).map(leafOf).filter(Boolean) : []
+}
+
+/**
+ * The leaves of a composition that can hold an **argument**: `fn` → the leaf that would hold it.
+ *
+ * A leaf is excluded when its value is not a single call, when its grammar is a `url` — a url slot holds
+ * a whole function, `opacity(1)` at rest and `url(…)` when written, so pinning it to one would lose the
+ * other — and when the census mapped no syntax for its grammar, which is the same refusal the census
+ * makes rather than a guess.
+ */
+const callShapedOf = (root, bySlot, attribute) => {
+  const map = new Map()
+
+  for (const slot of composedLeaves(root, attribute)) {
+    const leaf = bySlot.get(slot)
+    const call = leaf ? callOf(leaf.value) : null
+
+    if (!call || grammarOf(leaf) === 'url') continue
+    if (!SYNTAX_OF_TYPE[grammarOf(leaf)]) continue
+
+    map.set(call.fn, { argument: call.argument, fn: call.fn, slot })
+  }
+
+  return map
+}
+
 /** Every leaf under a slot, descending the graph: a part of a part is still a slot to write. */
 const leavesUnder = slot => {
   const entry = GRAPH.get(slot)
@@ -199,7 +281,21 @@ export const typedLeaves = (css, options = {}) => {
       composition = rule
   })
 
-  if (!composition) throw new Error('no composition rule in the sheet')
+  // A sheet whose every instance is behind a condition — `/hover`, `/focus` — has no unconditional
+  // carrier, so there is nothing to re-key. That is a decline, not a failure: the sheet ships as the
+  // shipping finalizer wrote it, and the caller is told why.
+  if (!composition)
+    return {
+      css,
+      report: {
+        argument: [],
+        constituent: [],
+        native: [{ reason: 'no unconditional composition rule in the sheet' }],
+        order: [],
+        registered: [],
+        whole: [],
+      },
+    }
 
   const shorthand = (composition.nodes ?? []).find(
     decl => decl.type === 'decl' && decl.prop === 'animation',
@@ -209,6 +305,27 @@ export const typedLeaves = (css, options = {}) => {
   ].map(match => match[1])
 
   /* ── Which candidate each slot came from ────────────────────────────────── */
+
+  /**
+   * The **canonical** name a slot belongs to — `filter-Z2nKX36` rather than the slot key.
+   *
+   * A slot key carries the variant path, so `animate-filter-blur-…` with a `scroll` variant keys as
+   * `6-scroll-Z2nKX36-filter`, and slicing the attribute off that yields an empty id and a keyframes
+   * lookup that misses. The slot variable's own value is the canonical reference —
+   * `--jumi-slot-6-scroll-Z2nKX36-filter: var(--jumi-filter-Z2nKX36-animation-name, …)` — so it is
+   * read from there instead of from the key. Without this the reshape silently did nothing for every
+   * variant-carrying instance while still paying for the registrations.
+   */
+  const canonicalOf = key => {
+    let value = null
+
+    root.walkDecls(decl => {
+      if (value === null && decl.prop === `--jumi-slot-${key}`)
+        value = decl.value
+    })
+
+    return value?.match(/var\(--jumi-([\w-]+?)-animation-/)?.[1] ?? key
+  }
 
   const activationOf = key => {
     let found = null
@@ -248,9 +365,10 @@ export const typedLeaves = (css, options = {}) => {
 
     const attribute = candidate.attribute
     // A phrase and a single-value instance publish `--jumi-<attribute>-<id>-…`; a shared tween publishes
-    // the attribute alone. The id is whatever the key carries past the attribute.
-    const id = key.startsWith(`${attribute}-`)
-      ? key.slice(attribute.length + 1)
+    // the attribute alone. The id is whatever the canonical name carries past the attribute.
+    const canonical = canonicalOf(key)
+    const id = canonical.startsWith(`${attribute}-`)
+      ? canonical.slice(attribute.length + 1)
       : ''
 
     if (candidate.parts.length === 0) {
@@ -293,27 +411,168 @@ export const typedLeaves = (css, options = {}) => {
           }
       }
 
+      /**
+       * A property whose composition is one **function per leaf** cannot be distributed by list
+       * position the way `scale` can: its leaves hold calls and its value names functions, so every
+       * function the value writes has to map to a leaf the reshape owns. A value naming anything else
+       * keeps the property — which is the ruling's "a whole value that cannot be decomposed stays
+       * native", and it is where an arbitrary or quoted filter value lands.
+       *
+       * `none` is the filter identity, and the spec replaces it with the identity function list when
+       * interpolating, so a frame writing it is already expressed in the amounts (every unnamed leaf
+       * takes its identity). It therefore passes the gate, and it is the one non-call that does. A
+       * motion in which *no* frame names a real function is a no-op and stays native rather than
+       * registering a composition's worth of amounts to say nothing.
+       */
+      const functions = callShapedOf(root, bySlot, attribute)
+
+      if (functions.size) {
+        let named = 0
+
+        for (const frame of atRule.nodes ?? []) {
+          const offset = Number(String(frame.selector).replace('%', ''))
+          const literal =
+            literalOf(root, `--jumi-${attribute}-${id}-${offset}`) ?? ''
+
+          for (const written of splitSpaces(literal)) {
+            const call = writtenCall(written)
+
+            if (call && functions.has(call.fn)) {
+              named += 1
+              continue
+            }
+
+            if (written === 'none') continue
+
+            return {
+              attribute,
+              category: 'native',
+              id,
+              key,
+              name,
+              reason: `\`${written}\` is not a function the reshape owns`,
+            }
+          }
+        }
+
+        if (!named)
+          return {
+            attribute,
+            category: 'native',
+            id,
+            key,
+            name,
+            reason: 'no frame names a function the reshape owns',
+          }
+
+        return {
+          attribute,
+          byFunction: true,
+          category: 'whole',
+          id,
+          key,
+          leaves: composedLeaves(root, attribute),
+          name,
+        }
+      }
+
       return { attribute, category: 'whole', id, key, leaves: owned, name }
     }
 
     const part = candidate.parts[0]
     const leaf = bySlot.get(part)
+    const call = leaf ? callOf(leaf.value) : null
 
-    if (leaf && String(leaf.value).startsWith('css('))
+    if (leaf && call) {
+      // A `url` slot holds a **whole function** — `opacity(1)` at rest, `url(…)` when written — so
+      // pinning it to one function would lose the other. That is the census's own rule for refusing
+      // these two, and it is what keeps `url()` on the native path here.
+      if (grammarOf(leaf) === 'url')
+        return {
+          attribute,
+          category: 'native',
+          id,
+          key,
+          name,
+          part,
+          reason: 'a slot that holds a whole function, not an argument',
+        }
+
+      const frames = framesOf(root, part, id)
+      const lifted = frames ? [...frames.values()].map(writtenCall) : [call]
+
+      if (lifted.some(one => !one))
+        return {
+          attribute,
+          category: 'native',
+          id,
+          key,
+          name,
+          part,
+          reason:
+            'a frame is not a single call, so there is no argument to lift',
+        }
+
+      const syntax = SYNTAX_OF_TYPE[grammarOf(leaf)]
+
+      if (!syntax)
+        return {
+          attribute,
+          category: 'native',
+          id,
+          key,
+          name,
+          part,
+          reason: `the argument's grammar is ${grammarOf(leaf) || 'unmapped'}`,
+        }
+
       return {
+        amount: `--jumi-${part}-amount`,
         attribute,
         category: 'argument',
+        fn: call.fn,
+        frames,
         id,
+        identity: call.argument,
         key,
+        leaf: part,
         name,
-        part,
-        reason: `the slot holds a call: ${leaf.value}`,
+        syntax,
       }
+    }
 
     return { attribute, category: 'constituent', id, key, name, part }
   }
 
   const classified = slots.map(key => classify(key))
+
+  /**
+   * The reshape is applied to a whole attribute, so it is only safe when **every** instance of that
+   * attribute can be carried by the reshaped composition. A native instance writes the property
+   * itself, as one self-contained expression built from the attribute's old operand list, and
+   * whichever animation lands last in the aggregate list wins the property outright. So a native
+   * instance contends with a reshaped one rather than composing with it: measured on
+   * `animate-filter-url` + `animate-filter-blur`, the reshape swapped which one won and the url
+   * motion — which the reshape cannot carry, its slot holds a whole `url()` function — went silent.
+   *
+   * The resolution is therefore that a native instance **blocks** the reshape for its attribute. The
+   * attribute falls back whole, which is today's behaviour and therefore not a regression, and the
+   * reshape only claims attributes it can carry entirely.
+   */
+  const contended = new Set(
+    classified
+      .filter(one => one.category === 'native')
+      .map(one => one.attribute),
+  )
+
+  for (const one of classified) {
+    if (one.category !== 'argument' && !one.byFunction) continue
+    if (!contended.has(one.attribute)) continue
+
+    one.category = 'native'
+    one.byFunction = false
+    one.reason = `\`${one.name}\` shares \`${one.attribute}\` with a motion the reshape cannot carry`
+  }
 
   for (const one of classified) {
     const entry = {
@@ -339,6 +598,51 @@ export const typedLeaves = (css, options = {}) => {
       for (const leaf of one.leaves) animated.add(leaf)
   }
 
+  /**
+   * The reshape, and the reason it is applied to a whole attribute rather than to the instance that
+   * needs it: the composition is one expression, so a partly-reshaped `filter` could not decompose a
+   * whole filter motion at all — some of its operands would be arguments and some whole functions.
+   *
+   * So the rule is: **when any instance of a property animates an argument, or a whole motion over
+   * that property decomposes by function, every call-shaped leaf that property composes becomes
+   * `fn(var(--jumi-<leaf>-amount))`.** Uniform, and the same rule that keeps a `url` slot out — it
+   * holds a whole function, so there is no single `fn` to pin.
+   */
+  const reshaped = new Map()
+
+  for (const one of classified) {
+    if (one.category !== 'argument' && !one.byFunction) continue
+    if (reshaped.has(one.attribute)) continue
+
+    const map = new Map()
+
+    for (const info of callShapedOf(root, bySlot, one.attribute).values())
+      map.set(info.slot, {
+        argument: info.argument,
+        fn: info.fn,
+        syntax: SYNTAX_OF_TYPE[grammarOf(bySlot.get(info.slot))],
+      })
+
+    reshaped.set(one.attribute, map)
+  }
+
+  for (const [attribute, map] of reshaped) {
+    let declaration = null
+
+    root.walkDecls(decl => {
+      if (declaration === null && decl.prop === `--jumi-${attribute}`)
+        declaration = decl
+    })
+
+    if (!declaration) continue
+
+    for (const [slot, one] of map)
+      declaration.value = declaration.value.replace(
+        `var(--jumi-${slot})`,
+        `${one.fn}(var(--jumi-${slot}-amount))`,
+      )
+  }
+
   const registrations = []
   const wanted = new Map()
 
@@ -347,18 +651,23 @@ export const typedLeaves = (css, options = {}) => {
 
     if (!leaf) continue
 
-    const grammar = [
-      ...new Set(
-        [...leaf.writers, ...leaf.wholes].flatMap(writer => writer.types),
-      ),
-    ]
-      .filter(type => type !== 'any')
-      .sort()
-      .join(',')
-    const syntax = SYNTAX_OF_TYPE[grammar]
+    const syntax = SYNTAX_OF_TYPE[grammarOf(leaf)]
     const identity = String(leaf.value).replace(/^'|'$/g, '')
 
     if (!syntax) continue
+
+    /**
+     * A leaf that holds a **whole function** is never a typed component.
+     *
+     * `--jumi-filter-blur` is `blur(0px)` — the composition's operand, not an interpolable unit — so
+     * its grammar is the grammar of the *argument* inside the call, and registering the leaf as that
+     * grammar would both mistype it and publish the model's own source as an `initial-value`
+     * (`css('blur', '0')`, which is not a CSS value at all). After the reshape the composition reads
+     * `blur(var(--jumi-filter-blur-amount))` and this leaf is unreferenced, so there is nothing to
+     * register; on the native path it stays an ordinary custom property holding a function, which is
+     * what it is today. Only the `-amount` sibling is typed.
+     */
+    if (callOf(leaf.value)) continue
 
     // The census's keyword-union rung: when the model's own identity is a keyword the bare component
     // refuses, and the union is the spelling that registers. Measured, not assumed.
@@ -371,6 +680,15 @@ export const typedLeaves = (css, options = {}) => {
       syntax: union ? `${syntax} | ${identity}` : syntax,
     })
   }
+
+  for (const map of reshaped.values())
+    for (const [slot, one] of map)
+      wanted.set(`${slot}-amount`, {
+        identity: one.argument,
+        name: `--jumi-${slot}-amount`,
+        slot: `${slot}-amount`,
+        syntax: one.syntax,
+      })
 
   /**
    * A leaf is **not** registered today. Only the per-instance activation names and the slot keys are,
@@ -403,18 +721,72 @@ export const typedLeaves = (css, options = {}) => {
   /* ── 2. Rewrite the keyframes so they write leaves ──────────────────────── */
 
   for (const one of classified) {
-    if (one.category === 'native' || one.category === 'argument') continue
+    if (one.category === 'native') continue
 
     const atRule = keyframesOf(one.attribute, one.id)
 
     if (!atRule) continue
 
+    /**
+     * An **argument** instance writes one amount per frame and nothing else, because the composition
+     * owns the function — `blur(var(--jumi-filter-blur-amount))` — so the frame has no property
+     * declaration left to make. The argument is lifted from the call the build published for that frame:
+     * `blur(0px)` becomes `0px`.
+     */
+    if (one.category === 'argument') {
+      for (const frame of atRule.nodes ?? []) {
+        const offset = Number(String(frame.selector).replace('%', ''))
+        const literal = literalOf(
+          root,
+          `--jumi-${one.leaf}-${one.id}-${offset}`,
+        )
+        const call = literal ? writtenCall(literal) : null
+
+        if (!call) continue
+
+        frame.removeAll()
+        frame.append(postcss.decl({ prop: one.amount, value: call.argument }))
+      }
+
+      continue
+    }
+
     for (const frame of atRule.nodes ?? []) {
+      const offset = Number(String(frame.selector).replace('%', ''))
       const decl = (frame.nodes ?? []).find(
         node => node.type === 'decl' && node.prop === one.attribute,
       )
 
       if (!decl) continue
+
+      /**
+       * A whole motion over a reshaped property is distributed by **function**, not by position: every
+       * amount is written, the ones the value does not name taking their identity, so the whole motion
+       * fully determines the property. A constituent later in the list then wins the amount it owns —
+       * which is what the ordering key is for.
+       */
+      if (one.byFunction) {
+        const map = [...reshaped.get(one.attribute)]
+        const byFn = new Map(map.map(([slot, info]) => [info.fn, slot]))
+        const literal =
+          literalOf(root, `--jumi-${one.attribute}-${one.id}-${offset}`) ?? ''
+        const written = new Map(
+          map.map(([slot, info]) => [slot, info.argument]),
+        )
+
+        for (const text of splitSpaces(literal)) {
+          const call = writtenCall(text)
+
+          if (call) written.set(byFn.get(call.fn), call.argument)
+        }
+
+        decl.remove()
+
+        for (const [slot, value] of written)
+          frame.append(postcss.decl({ prop: `--jumi-${slot}-amount`, value }))
+
+        continue
+      }
 
       /**
        * Two shapes, and they are told apart by how many operands the value has at the top level:
@@ -451,7 +823,6 @@ export const typedLeaves = (css, options = {}) => {
       // A whole motion distributes its own frame literal across the leaves the composition names, in the
       // composition's order. A short value fills its leaves by the property's grammar — repeating for
       // `scale`, and the identity otherwise — which is the whole reason this needs a table.
-      const offset = Number(String(frame.selector).replace('%', ''))
       const literal =
         literalOf(root, `--jumi-${one.attribute}-${one.id}-${offset}`) ?? ''
       const written = splitSpaces(literal)
@@ -490,7 +861,7 @@ export const typedLeaves = (css, options = {}) => {
   const composed = new Set()
 
   for (const one of classified) {
-    if (one.category === 'native' || one.category === 'argument') continue
+    if (one.category === 'native') continue
 
     const already = (composition.nodes ?? []).some(
       decl => decl.type === 'decl' && decl.prop === one.attribute,
@@ -510,18 +881,37 @@ export const typedLeaves = (css, options = {}) => {
    * What the ruling asked for: **a whole motion before a constituent**, so the constituent sits later in
    * the list and wins the slots it owns. The tiebreak is the candidate name — the class an author wrote —
    * which is stable and, unlike Tailwind's publication order, is not something no one can see.
+   *
+   * It is applied **per attribute**, and only to attributes the reshape actually carries. An attribute
+   * whose every instance fell back to native is left exactly in compile order, because the reshape has
+   * no opinion about it and reordering it would change which motion wins a property — measured on
+   * `animate-filter-url` + `animate-filter-blur`, where a name tiebreak alone handed the slot from the
+   * blur motion to the url one. Ordering is a claim about ownership, so it is only made where something
+   * is owned. Order between different attributes does not matter: two attributes never contest the same
+   * slot.
    */
-  const order = classified
-    .map((one, at) => ({
+  const ownedAttributes = new Set(
+    classified
+      .filter(one => one.category !== 'native')
+      .map(one => one.attribute),
+  )
+  const scoped = classified
+    .map((one, at) => at)
+    .filter(at => ownedAttributes.has(classified[at].attribute))
+  const moving = scoped
+    .map(at => ({
       at,
-      group: one.category === 'constituent' ? 1 : 0,
-      name: one.name ?? '',
+      group: classified[at].category === 'whole' ? 0 : 1,
+      name: classified[at].name ?? '',
     }))
     .sort(
       (a, b) =>
         a.group - b.group || a.name.localeCompare(b.name) || a.at - b.at,
     )
-    .map(entry => entry.at)
+
+  const order = classified.map((one, at) => at)
+
+  for (const [index, at] of scoped.entries()) order[at] = moving[index].at
 
   report.order = order.map(at => ({
     category: classified[at].category,

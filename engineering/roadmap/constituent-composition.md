@@ -241,18 +241,40 @@ What remains, in the order the ruling set:
    paths, which is the evidence that this is a first-class path rather than a parallel one. Three things
    the pivot must build at compile time: registrations (**additive** — no leaf is registered today),
    **list normalisation, which is grammar rather than padding** (`scale: 2` means `2 2 2`; `translate:
-100px` means `100px 0`), and the **function reshape**, which is not built. Independence is narrower
+100px` means `100px 0`), and the function reshape. Independence is narrower
    than the question: a part motion expressed as a _phrase_ is already its own animation, while the
    _tween_ form shares its parent's slot — and that is a keying question in `computeSlots()`, not a
    finalizer one. See [`engineering/research/typed-leaves.md`](../research/typed-leaves.md).
-6. **Then define the stable ordering key and the decomposition boundary together**, because the transform
+6. **The function reshape — built and measured, and it is cheaper than it looked.** The composition owns
+   the function and the typed slot owns only the argument (`blur(var(--jumi-filter-blur-amount))`, and no
+   function string in the animated slot). Keyframe bytes fall **73–92%** because shipping writes the whole
+   11-operand filter expression into every frame, and total bytes fall with them — −12.2% for two
+   arguments, −8.4% for a whole filter plus a blur constituent, −7.9% for a named control, −1.9% on a
+   scroll range. **Every case the reshape owns shrinks and every case it declines is byte-identical.**
+   Registrations are the recurring price, nine for a function-shaped family, and are the one part a real
+   build can gate on a used-in-the-sheet check. Two of the ruling's cases were **capability losses, not
+   byte costs**: a whole filter motion and a
+   blur constituent, or a blur and a brightness constituent, contend for one property and shipping lets
+   one of them go silent — `blur(0px)` where it should read `blur(8px)`. The rule that keeps it safe is
+   that **a native instance blocks the reshape for its whole attribute**, since a native instance writes
+   the property itself as one self-contained expression and therefore overwrites a reshaped one rather
+   than composing with it; and that **the semantic ordering is only applied to attributes the reshape
+   actually carries**, because ordering an attribute the reshape declines changed which motion won its
+   property. Neither corpus (`variant.css`, `input.css`) contains a single argument instance, so the
+   reshape's own category is measured on purpose-built sheets rather than on the corpus. The required
+   tests earned their place: they exposed two defects that each paid bytes for nothing — a
+   function-holding leaf typed as its argument's grammar (with the model's source as the
+   `initial-value`), and a slot id sliced off the variant-carrying key, which made the reshape a silent
+   no-op for every `scroll`/`@supports`/segment-easing instance while still emitting its registrations.
+7. **Then define the stable ordering key and the decomposition boundary together**, because the transform
    result is what says which whole motions may decompose at all. Nothing in `computeSlots()` moves before
    that. The compiler-order-dependent ordering is an independent bug to fix whether or not the pivot
    ships — the two-phrase case computes `5 1` or `2` from identical markup — but the semantic key should
-   not be chosen until the boundary is known.
-7. **Then** the surface the prototype did not reach: the function reshape, scroll and range and segment
-   easing by measurement, Studio export/replay, and bytes and inspectability.
-8. **Only then decide whether to migrate the broader 79%.**
+   not be chosen until the boundary is known. The reshape's result narrows this: the key has to be
+   **per attribute**, and an attribute may only be re-keyed when the reshape carries all of it.
+8. **Then** the surface the prototype did not reach: Studio export/replay, DevTools inspection, and the
+   broader byte accounting on a real page.
+9. **Only then decide whether to migrate the broader 79%.**
 
 The whole-plus-constituent case does **not** disappear in this model, and it is not the same defect:
 candidate-arrival order deciding the body of a shared definition is compiler nondeterminism;

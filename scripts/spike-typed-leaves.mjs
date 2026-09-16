@@ -15,11 +15,16 @@
  *   §4  Does the rest of the motion surface survive? Named motions, independent duration and easing,
  *       and reduced motion all travel through chains the prototype never touches, so they are the test
  *       of whether this is a first-class path or a second one.
+ *   §5  The **function reshape**, against every case the ruling named — including the whole +
+ *       constituent pair that only a browser can adjudicate, because both ship and one goes silent.
+ *   §6  What the reshape **costs and saves**: total bytes, keyframe bytes, registrations, declarations
+ *       per frame.
  *
  * Run: node scripts/spike-typed-leaves.mjs   (bundles first; needs `dist/`)
  */
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
+import postcss from 'postcss'
 import { chromium } from 'playwright'
 
 import { build, compiler, root } from './lib/compile.mjs'
@@ -73,13 +78,12 @@ const named = (title, rows) =>
 named('constituent — writes its leaf', report.constituent)
 named('whole — writes every leaf', report.whole)
 named('native — keeps the property', report.native)
-named('argument — needs the reshape', report.argument)
+named('argument — composition reshaped', report.argument)
 
 console.log(`
-  the argument category is the one this increment does not build: a slot whose value is a call
-  (\`filter-blur: blur(0)\`) needs the composition reshaped to \`blur(var(--jumi-filter-blur-amount))\`
-  before an argument exists to animate. It is reported rather than mistyped, and the instances above
-  are exactly the ones it will cover.`)
+  the argument instance is the one §5 and §6 are about: its slot holds a call
+  (\`filter-blur: blur(0)\`), so the composition is reshaped to \`blur(var(--jumi-filter-blur-amount))\`
+  and the keyframe owns the argument alone. It is the last constituent category that had no mechanism.`)
 
 console.log(`\n  registered by the prototype:`)
 
@@ -89,6 +93,12 @@ for (const one of report.registered)
   )
 
 console.log(`
+  Every one of these is an **amount** or a part leaf — never a leaf that holds a whole function.
+  \`--jumi-filter-blur\` is \`blur(0px)\`, the composition's operand rather than an interpolable unit, so
+  its grammar is the grammar of the argument *inside* the call: typing the leaf as that grammar both
+  mistypes it and publishes the model's own source as an \`initial-value\` (\`css('blur', '0')\`, which is
+  not a CSS value). Only the \`-amount\` sibling is typed, and on the native path the leaf stays an
+  ordinary custom property holding a function, which is what it is today.\n
   a leaf is **not registered today** — only the per-instance activation names and slot keys are. A leaf
   has never needed a computed value because every read of one falls through a chain. The pivot is what
   makes a leaf need a value, so these are additions rather than rewrites.`)
@@ -263,5 +273,184 @@ console.log(`
   none of these values is computed by the prototype. The chains that carry them are the ones the
   shipping finalizer wrote, and the prototype only reorders the lists those chains are entered from —
   which is why the test is whether they still work, not whether they were rebuilt.`)
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * §5 The function reshape, against the cases the ruling named.
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+header('§5  the function reshape — every case the ruling named')
+
+/**
+ * Two of these are the whole reason the reshape exists, and both are visible only in the browser: a
+ * part motion and a whole motion over the same property, where the shipping finalizer gives the
+ * property to one of them and the other goes silent.
+ */
+const RESHAPE = {
+  'independent blur and brightness': [
+    'animate-filter-blur-[0:0px|100:8px]',
+    'animate-filter-brightness-[0:1|100:3]',
+  ],
+  'whole filter + blur constituent': [
+    'animate-filter-[0:none|100:brightness(2)]',
+    'animate-filter-blur-[0:0px|100:8px]',
+  ],
+  'whole that cannot be decomposed': [
+    'animate-filter-[0:none|100:blur(4px)_drop-shadow(0_0_2px_red)]',
+  ],
+  'named control': ['animate-filter-blur-[0:0px|50:4px|100:8px]/zoom'],
+  'scroll range and timeline': ['animate-filter-blur-[0:0px|100:8px]/scroll'],
+  'quoted whole stays native': ['animate-filter-[0:"none"|100:"blur(4px)"]'],
+  'arbitrary whole stays native': ['animate-filter-[0:none|100:var(--f)]'],
+  'url has not regressed': [
+    'animate-filter-url-[0:url(#a)|100:url(#b)]',
+    'animate-filter-blur-[0:0px|100:8px]',
+  ],
+}
+
+const blurAt = (css, at, classes) =>
+  browser.newPage().then(async page => {
+    await page.setContent('<style>' + css + '</style><div id="a"></div>')
+    await page.evaluate(one => {
+      document.getElementById('a').className = one
+    }, classes.join(' '))
+
+    const value = await page.evaluate(at => {
+      const node = document.getElementById('a')
+
+      node.style.animationPlayState = 'paused'
+      node.style.animationFillMode = 'both'
+      node.style.animationDuration = '1s'
+      node.style.animationDelay = at + 'ms'
+
+      return getComputedStyle(node).filter.replace(/\s*contrast.*/, '')
+    }, at)
+
+    await page.close()
+
+    return value
+  })
+
+for (const [label, classes] of Object.entries(RESHAPE)) {
+  const today = await sheetFor(classes)
+  const proto = await prototypeOf(classes)
+  const { report: read } = typedLeaves(await sheetFor(classes))
+  const at = -1000
+  const [a, b] = await Promise.all([
+    blurAt(today, at, classes),
+    blurAt(proto, at, classes),
+  ])
+  const shape = read.argument.length
+    ? `argument ×${read.argument.length}`
+    : read.whole.length
+      ? `whole ×${read.whole.length}`
+      : 'native'
+
+  console.log(
+    `  ${label.padEnd(34)} ${shape.padEnd(14)} ${a === b ? 'same' : 'DIFF'}`,
+  )
+  console.log(`  ${''.padEnd(34)} ${''.padEnd(14)} shipping  ${a.slice(0, 58)}`)
+  console.log(
+    `  ${''.padEnd(34)} ${''.padEnd(14)} reshape   ${b.slice(0, 58)}\n`,
+  )
+}
+
+console.log(`
+  Two of these differ, and both differ because a motion that the shipping finalizer lets go silent
+  now animates: a whole filter motion no longer kills a blur constituent, and a blur constituent no
+  longer kills a brightness constituent. They contend for one property, one of them wins it, and the
+  loser's keyframes are published and never read.
+
+  The url case is the one that must not change, and it does not: the reshape cannot carry a slot whose
+  value is a whole \\\`url()\\\` function, so it declines the attribute outright and the shipping emission
+  is reproduced. That pair is order-dependent in both sheets and by the same two values — the reshape
+  neither introduces nor fixes that, which is the correct result for a gate that is not allowed to
+  touch ordering of attributes it does not own.
+
+  A native instance blocks the reshape for its whole attribute. Anything else reintroduces the silence
+  above in the opposite direction: a native instance writes the property itself, as one self-contained
+  expression, so it does not compose with a reshaped one — it overwrites it.`)
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * §6 What the reshape costs and saves.
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+header('§6  bytes, keyframe bytes, registrations, declarations per frame')
+
+const keyframes = css => {
+  const root = postcss.parse(css)
+  let bytes = 0
+  let frames = 0
+  let declarations = 0
+  let perFrame = 0
+
+  root.walkAtRules(node => {
+    if (node.name !== 'keyframes') return
+
+    bytes += css.slice(
+      node.source.start.offset - 1,
+      node.source.end.offset - 1,
+    ).length
+
+    for (const frame of node.nodes ?? []) {
+      const count = (frame.nodes ?? []).filter(
+        one => one.type === 'decl',
+      ).length
+
+      frames += 1
+      declarations += count
+      perFrame = Math.max(perFrame, count)
+    }
+  })
+
+  return { bytes, declarations, frames, perFrame }
+}
+
+const registrations = css =>
+  postcss
+    .parse(css)
+    .nodes.filter(node => node.type === 'atrule' && node.name === 'property')
+    .length
+
+const COST = {
+  ...RESHAPE,
+  'constituent tween (scale-x)': ['animate-scale-x-[0:1|100:5]'],
+}
+
+console.log(
+  '  shape'.padEnd(38) +
+    'bytes'.padEnd(18) +
+    'keyframe bytes'.padEnd(18) +
+    '@property'.padEnd(13) +
+    'decls/frame',
+)
+
+for (const [label, classes] of Object.entries(COST)) {
+  const today = await sheetFor(classes)
+  const proto = await prototypeOf(classes)
+  const a = keyframes(today)
+  const b = keyframes(proto)
+  const delta = proto.length - today.length
+
+  console.log(
+    '  ' +
+      label.padEnd(36) +
+      `${today.length}→${proto.length}`.padEnd(18) +
+      `${a.bytes}→${b.bytes}`.padEnd(18) +
+      `${registrations(today)}→${registrations(proto)}`.padEnd(13) +
+      `${a.perFrame}→${b.perFrame}  (${delta >= 0 ? '+' : ''}${delta} bytes)`,
+  )
+}
+
+console.log(`
+  The reshape trades one **large** declaration per frame for one **small** declaration per function per
+  frame. Shipping writes the whole 11-operand filter expression into every frame — every leaf read, each
+  with its own fallback — and the reshape writes one variable per function instead, which is where the
+  90% keyframe reduction comes from.
+
+  Every case the reshape owns shrinks, and every case it declines is byte-identical — a native instance
+  writes the property itself, so nothing about its emission changes. The registration count is the
+  recurring price, nine for a function-shaped family, paid once per family rather than once per
+  instance, and it is the one part of this a real build can gate on a used-in-the-sheet check, since a
+  registration is only emitted for a leaf some instance actually animates.`)
 
 await browser.close()
