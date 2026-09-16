@@ -28,6 +28,18 @@ export type TypedLeaf = {
  * grammar that is already understood, and an ownership case that is easy to reason about. A second
  * family joins when the mechanism has been shown to work end to end, not before.
  *
+ * The syntax is a **union, not `<number>`**, and that was measured rather than chosen. `scale` accepts
+ * a percentage, `animate-scale-x-[50%]` reaches the leaf through the `any` escape hatch and works
+ * today, and a `<number>` registration breaks it *silently*: the leaf computes to the registered
+ * initial instead of the authored value. `<number> | <percentage>` keeps that value and leaves
+ * numeric interpolation bit-identical — a midpoint of `1 → 5` reads `4.20961` under both. So the
+ * union costs nothing where only numbers are used and is the difference between accepting a
+ * percentage and discarding it.
+ *
+ * A union interpolates only between two spellings of the **same** component, so `1 → 150%` does not
+ * blend. That is a property of the union and not a regression: today that pair does not blend
+ * either, and the alternative is not "blending" but resetting to `1`.
+ *
  * Every leaf named here must be a leaf of the family it is declared under: a typed registration on a
  * name that is not part of the composition is a registration nothing reads.
  */
@@ -35,9 +47,9 @@ export const typedLeaves: Partial<
   Record<PropertyType, Record<string, TypedLeaf>>
 > = {
   scale: {
-    'scale-x': { initialValue: '1', syntax: '<number>' },
-    'scale-y': { initialValue: '1', syntax: '<number>' },
-    'scale-z': { initialValue: '1', syntax: '<number>' },
+    'scale-x': { initialValue: '1', syntax: '<number> | <percentage>' },
+    'scale-y': { initialValue: '1', syntax: '<number> | <percentage>' },
+    'scale-z': { initialValue: '1', syntax: '<number> | <percentage>' },
   },
 }
 

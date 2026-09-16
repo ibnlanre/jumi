@@ -8,14 +8,16 @@ import { propertyVariables } from '@/variables/property'
 import { typedLeaves, typedLeavesOf } from './typed-leaves'
 
 describe('typed leaf declarations', () => {
-  it('declares the three scale leaves as numbers resting at one', () => {
-    // `<number>` rather than `<number> | <percentage>`: `scale` accepts a percentage, but the
-    // *typed leaf* is the interpolation contract and Chromium does not implement
-    // `<number-percentage>` as a syntax. One grammar, measured rather than assumed.
+  it('declares the three scale leaves as numbers-or-percentages resting at one', () => {
+    // A union rather than `<number>`, measured: `animate-scale-x-[50%]` reaches the leaf through
+    // the `any` escape hatch and works today, and a `<number>` registration silently resets that
+    // value to the initial. The union keeps it and leaves numeric interpolation identical.
+    const syntax = '<number> | <percentage>'
+
     expect(typedLeavesOf('scale')).toEqual([
-      ['scale-x', { initialValue: '1', syntax: '<number>' }],
-      ['scale-y', { initialValue: '1', syntax: '<number>' }],
-      ['scale-z', { initialValue: '1', syntax: '<number>' }],
+      ['scale-x', { initialValue: '1', syntax }],
+      ['scale-y', { initialValue: '1', syntax }],
+      ['scale-z', { initialValue: '1', syntax }],
     ])
   })
 
