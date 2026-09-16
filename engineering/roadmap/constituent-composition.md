@@ -502,3 +502,63 @@ route 3 (the one-level expansion)  397 read back ·   0 not ·   0 dead reads   
 `HEAD` is the route-2 row. Route 3 is kept as a measurement rather than a destination: it is what this
 representation is _capable_ of reading back once every phrase writes a key a frame can hook, and the
 pivot is an argument that the representation, not the expansion, is the thing to change.
+
+### C.5 — result: `scale` is migrated
+
+Landed in `efbab29`, and the falsification set passes in full. Four things were
+proven rather than assumed, and each changed a decision:
+
+**Determinism — and the `kind` field was not needed.** The same three candidates
+compiled in both discovery orders produce **byte-identical** full animation
+longhand lists, because `values` and `partTweens` are separate groups in
+`computeSlots()` and are sorted independently. Whole-before-constituent therefore
+holds by construction, so the explicit `kind: whole-decomposed | constituent` was
+_not_ added: metadata that cannot change behaviour is machinery, and the falsifying
+test that would have justified it came back negative.
+
+**Variant scoping — the substrate follows the variant for free.** `hover:`-prefixed,
+the declaration lands inside `@media (hover: hover) { .hover\:…:hover { … } }`.
+That is the property of candidate ownership that aggregate publication could not
+have had.
+
+**Escape hatch — observable in the emitted CSS.** A declined whole beside a typed
+constituent leaves the whole's frame as `to { scale: var(--jumi-scale-…); }` with
+**no** typed-leaf frame declarations, and only one rule carries the substrate (the
+constituent's). The declined whole does not acquire the ownership model, as
+instructed.
+
+**Equivalence, with the sampling race fixed** (pause and delay set inline, so no
+turn elapses between them). Curves 100% → 0%:
+
+| sheet                  | result                                                              |
+| ---------------------- | ------------------------------------------------------------------- |
+| `lone whole 2`         | `2 2 2 \| 1.75 1.75 1.75 \| 1.5 1.5 1.5 \| 1.25 1.25 1.25 \| 1`     |
+| `lone x 5`             | `5 1 \| 4 1 \| 3 1 \| 2 1 \| 1` — identical to the pre-C.5 baseline |
+| `lone whole 2 3`       | `2 3 \| … \| 1` — matches native `scale: 2 3`                       |
+| `lone x 50%`           | `0.5 1 \| … \| 1` — matches native `scale: 50%`                     |
+| `lone x 0:1\|100:150%` | `1.5 1 \| … \| 1` — the mixed form canonicalizes                    |
+
+**The structural inversion, which is the clearest evidence the execution model
+changed rather than gaining metadata around the old one:**
+
+| sheet             | bytes         | keyframe bytes | slots | `var()`   | `scale` frame decls | leaf decls |
+| ----------------- | ------------- | -------------- | ----- | --------- | ------------------- | ---------- |
+| `lone scale`      | 8135 → 8179   | 70 → 107       | 1     | 55        | **1 → 0**           | **0 → 3**  |
+| `lone scale-x`    | 8648 → 8554   | 135 → 61       | 1     | 68 → 65   | **1 → 0**           | **0 → 1**  |
+| `scale + scale-x` | 9923 → 9873   | 205 → 168      | 2     | 93 → 90   | **2 → 0**           | **0 → 4**  |
+| `scale + x + y`   | 11711 → 11567 | 340 → 229      | 3     | 131 → 125 | **3 → 0**           | **0 → 5**  |
+
+Every property-level `scale` frame declaration is gone; leaf assignments replaced
+them. Three of four sheets shrank — `scale + x + y` by 1.2%, `lone scale-x` by 1.1%
+— and keyframe bytes fell 22–33% on the multi-motion sheets. Only `lone scale` grew,
+by 44 bytes, because one frame declaration became three.
+
+**Audits:** `dead-links --strict` reports no dead reads and no unconsumed frame
+writes; `constituent-check` introduces no `scale` residual (its list is unchanged:
+`backdrop-filter`, `background-position`, `box-shadow`, `filter`, `object-position`);
+the serialization audit and differential pass.
+
+**C is closed.** `scale` is no longer a prototype. D extracts the mechanism this
+implementation proved — typed substrate published by the candidate, direct-leaf
+keyframes, canonicalized frame values, and family-level decline-to-native fallback
+— rather than generalizing any of the preparatory abstractions.
