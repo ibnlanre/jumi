@@ -1877,6 +1877,117 @@ const urls = [
 
 for (const [claim, ok] of urls) if (!ok) failures.push(`url filter: ${claim}`)
 
+/* ------------------------------------------------------------------------------------
+ * 16. The typed path's composition bridge, and the curves the pins exist to keep straight
+ *     (added 2026-09-17).
+ * ---------------------------------------------------------------------------------- */
+
+// C.5 executed `scale` as typed leaves with the **candidate** owning the static substrate,
+// and the close was wrong. A declined motion's keyframe writes the property — that is what
+// the native escape hatch is — and a keyframe beats a rule, so it beat the candidate's
+// substrate outright and the typed motion's leaf contribution stopped reaching computed
+// style: measured `1` where the pre-C.5 baseline computes `5 1`. Every structural audit was
+// green, because every name was still in the sheet. Only computed style could tell, which is
+// this file's whole reason to exist.
+//
+// The fix (`c4f2ffb`) is a bridge: every typed keyframe re-asserts `scale: var(--jumi-scale)`
+// at `from` **and** `to`, beside the leaves it writes. The pin at both ends is load-bearing
+// rather than tidy. With `scale` named only at `to` it becomes a second animation whose
+// implicit `from` is the *un-animated* underlying value, and that composes to
+// `1 + p(x(p) - 1)` — a quadratic curve, which still looks like a curve. Measured on `lone
+// scale-x-[5]`, `1 | 1.25 1 | 2 1 | 3.25 1 | 5 1` in place of a straight line.
+//
+// So these arms assert five samples of computed `scale` rather than "the property moves",
+// and they do it in both candidate orders: the precedence the bridge restores is
+// animation-list precedence, and if that ever starts depending on discovery order, this is
+// the arm that says so.
+const typedReplay = async candidates => {
+  const css = finalizeCss(
+    (await compiler(constituentEntry, root)).build(candidates),
+  ).css
+
+  const reading = await stepped({
+    // Linear, so the five samples read the composition chain rather than the theme's default
+    // easing. Unset, `animation-timing-function` is `ease`, which bends every curve the same
+    // way and would make these arms assert the theme — measured `1 | 2.63404 1 | 4.20961 1 |
+    // 4.84184 1 | 5 1` for a line that is straight by construction.
+    body: `<div class="${candidates.join(' ')}" style="animation-timing-function: linear"></div>`,
+    css,
+    prefix: 'jumi-scale',
+    properties: ['scale'],
+  })
+
+  const values = scaleOf(reading)
+
+  return {
+    detail: values.join(' | ') || 'no animation',
+    names: reading.names,
+    values,
+  }
+}
+
+const DECLINED_BESIDE_TYPED = ['animate-scale-[none]', 'animate-scale-x-[5]']
+
+const declinedBesideTyped = await typedReplay(DECLINED_BESIDE_TYPED)
+const declinedBesideTypedReversed = await typedReplay(
+  [...DECLINED_BESIDE_TYPED].reverse(),
+)
+const loneTypedConstituent = await typedReplay(['animate-scale-x-[5]'])
+const loneTypedWhole = await typedReplay(['animate-scale-[2]'])
+
+/**
+ * The two straight lines, ascending through the animation.
+ *
+ * The first is the bridge's reason: the declined whole's `none` must not swallow the
+ * constituent's leaf. The second is the pin's reason: a typed whole is three leaves moving
+ * at once, and a one-ended pin flattens all three into `1 + p^2` — close enough at the ends
+ * to pass anything that only samples them.
+ */
+const STRAIGHT_TO_FIVE = ['1', '2 1', '3 1', '4 1', '5 1']
+const STRAIGHT_TO_TWO = [
+  '1',
+  '1.25 1.25 1.25',
+  '1.5 1.5 1.5',
+  '1.75 1.75 1.75',
+  '2 2 2',
+]
+
+const readsAs = (read, expected) =>
+  read.values.length === expected.length &&
+  read.values.every((value, index) => value === expected[index])
+
+const typed = [
+  [
+    'a declined whole beside a typed constituent computes a straight line',
+    readsAs(declinedBesideTyped, STRAIGHT_TO_FIVE),
+    `read ${declinedBesideTyped.detail} from ${
+      declinedBesideTyped.names.join(' + ') || 'no slot'
+    }`,
+  ],
+  [
+    'and reversing candidate discovery computes the same curve',
+    readsAs(declinedBesideTypedReversed, STRAIGHT_TO_FIVE),
+    `read ${declinedBesideTypedReversed.detail}`,
+  ],
+  [
+    'and both motions are live, so neither is winning the property outright',
+    declinedBesideTyped.names.length === 2,
+    `ran ${declinedBesideTyped.names.join(' + ') || 'nothing'}`,
+  ],
+  [
+    'a lone typed constituent is a straight line, not the quadratic of a one-ended pin',
+    readsAs(loneTypedConstituent, STRAIGHT_TO_FIVE),
+    `read ${loneTypedConstituent.detail}`,
+  ],
+  [
+    'a lone typed whole is a straight line in all three leaves',
+    readsAs(loneTypedWhole, STRAIGHT_TO_TWO),
+    `read ${loneTypedWhole.detail}`,
+  ],
+]
+
+for (const [claim, ok] of typed) if (!ok) failures.push(`typed: ${claim}`)
+
 await browser.close()
 
 /* ------------------------------------------------------------------------------------
@@ -1973,9 +2084,16 @@ for (const [claim, ok, detail] of urls)
     `    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`,
   )
 
+console.log('\n  typed composition')
+
+for (const [claim, ok, detail] of typed)
+  console.log(
+    `    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`,
+  )
+
 // Every assertion above that can fail, so the summary line is the count it claims to be: the three
 // activation contexts, the pseudo substrate, the direct carriers, bare, applied, spacing, radius,
-// the three relationship-variant cases, non-inheritance, and the five composed sets.
+// the three relationship-variant cases, non-inheritance, and the six composed sets.
 const required =
   contexts.length +
   utilities.length +
@@ -1986,7 +2104,8 @@ const required =
   compositions.length +
   origins.length +
   radius.length +
-  urls.length
+  urls.length +
+  typed.length
 const passing = required - failures.length
 
 console.log(`\n  ${passing}/${required} required contexts and carriers behave`)
