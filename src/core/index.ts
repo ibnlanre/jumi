@@ -568,15 +568,62 @@ export function createJumiModel({
   }
 
   /**
-   * A phrase's keyframe: every frame folded into the one keyframe the phrase
-   * owns, because a frame does not earn a keyframe of its own.
+   * The properties a generated frame may animate **as themselves**: CSS's logical corner radii.
+   *
+   * These four are longhands in their own right, not components of anything. `border-radius` is the
+   * *physical* shorthand, while these are an alternative set the platform resolves against the
+   * element's direction and writing mode — measured 2026-09-16 in Chromium: the same four values
+   * compute to `10px 20px 30px 40px` under `ltr`, `20px 10px 40px 30px` under `rtl`, and
+   * `40px 10px 20px 30px` under `vertical-rl`.
+   *
+   * So they cannot be composed into `border-radius` without Jumi deciding that mapping itself, and a
+   * build has no direction to decide it with. A frame that declares them lets the browser resolve, which
+   * is the whole reason this list exists: it is the one fact a generated frame needs that the table does
+   * not carry — that a part is a property the browser will place on its own.
+   *
+   * Recording it for these four is deliberately narrow. The general form is a property-kind fact on the
+   * table's entries, and that is a migration rather than a first step.
+   */
+  const independentProperties = new Set<string>([
+    'border-start-start-radius',
+    'border-start-end-radius',
+    'border-end-start-radius',
+    'border-end-end-radius',
+  ])
+
+  /**
+   * A phrase's keyframe: every frame folded into the one keyframe the phrase owns, because a frame does
+   * not earn a keyframe of its own.
+   *
+   * `properties` is the list of parts a phrase addresses **as properties**, or `null` for the ordinary
+   * case of components of a composition. When it is set, each part gets its own declaration reading its
+   * own frame key — the outer read's shape, repeated — and the composed attribute is not written at all.
+   * Synthesizing them back into it would put the logical-to-physical mapping in Jumi's hands instead of
+   * the browser's.
    */
   const phraseKeyframe = (
     attribute: AnimatableStandardPropertyType,
+    properties: string[] | null,
     id: string,
     frames: Frame[],
     writesOuterFrame: boolean,
   ): CssInJs => {
+    if (properties)
+      return frames.reduce((acc, { offset }) => {
+        acc[`${offset}%`] = Object.fromEntries(
+          properties.map(property => [
+            property,
+            css(
+              'var',
+              cssEscape(`--jumi-${property}-${id}-${offset}`),
+              css('var', `--jumi-${property}`),
+            ),
+          ]),
+        )
+
+        return acc
+      }, {} as CssInJs)
+
     const fallback = css('var', `--jumi-${attribute}`)
 
     return frames.reduce((acc, { offset, value }) => {
@@ -1064,6 +1111,18 @@ export function createJumiModel({
             `jumi-${attribute}-${id}`,
             phraseKeyframe(
               attribute,
+              // Every part a property the browser resolves on its own — and only then — makes this a
+              // frame of properties rather than of one composed value. A mixed phrase (one of these
+              // beside a component of a shorthand) is not a shape any candidate declares today, and it
+              // falls through to the composition rather than guessing.
+              parts.length &&
+                parts.every(part =>
+                  independentProperties.has(
+                    Array.isArray(part) ? part[0] : part,
+                  ),
+                )
+                ? parts.map(part => (Array.isArray(part) ? part[0] : part))
+                : null,
               id,
               frameList,
               // Did this phrase write the attribute's own frame key? With no parts it writes
@@ -1130,9 +1189,30 @@ export function createJumiModel({
 
         composed.add(attribute)
         registerName(`--jumi-${attribute}-animation-name`)
-        emitKeyframe(`jumi-${attribute}`, {
-          to: { [attribute]: css('var', `--jumi-${attribute}`) },
-        })
+
+        // The same rule on the tween path: a candidate addressing properties animates those properties,
+        // so a value addressed on a logical corner arrives as that corner and the browser places it.
+        const independent =
+          parts.length &&
+          parts.every(part =>
+            independentProperties.has(Array.isArray(part) ? part[0] : part),
+          )
+            ? parts.map(part => (Array.isArray(part) ? part[0] : part))
+            : null
+
+        emitKeyframe(
+          `jumi-${attribute}`,
+          independent
+            ? {
+                to: Object.fromEntries(
+                  independent.map(property => [
+                    property,
+                    css('var', `--jumi-${property}`),
+                  ]),
+                ),
+              }
+            : { to: { [attribute]: css('var', `--jumi-${attribute}`) } },
+        )
         aggregateChanged()
 
         const variables = parts.reduce((acc, part) => {

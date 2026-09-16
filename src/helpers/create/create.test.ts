@@ -347,6 +347,39 @@ describe('keyframe emission', () => {
     )
   })
 
+  it('emits one declaration per addressed property when the parts are properties', () => {
+    const { addUtilities, creator } = setup()
+
+    // `animate-border-block-start-radius` addresses two logical corner longhands — properties the
+    // browser resolves against direction and writing mode — so the frame declares them as themselves.
+    // Composing them into `border-radius` would mean Jumi deciding that mapping, and measured, the
+    // mapping is the browser's: the same four values place differently under `rtl` and `vertical-rl`.
+    creator.property('border-radius', [
+      'border-start-end-radius',
+      'border-start-start-radius',
+    ])('0:0px|100:20px', { modifier: null })
+
+    const id = shorthash2('0:0px|100:20px')
+    const keyframes = addUtilities.mock.calls
+      .map(([u]) => u)
+      .find(u => `@keyframes jumi-border-radius-${id}` in u)
+
+    expect(keyframes).toBeDefined()
+
+    const frame = keyframes[`@keyframes jumi-border-radius-${id}`]['100%']
+
+    expect(Object.keys(frame).sort()).toEqual([
+      'border-start-end-radius',
+      'border-start-start-radius',
+    ])
+    expect(frame['border-start-start-radius']).toBe(
+      `var(--jumi-border-start-start-radius-${id}-100, var(--jumi-border-start-start-radius))`,
+    )
+
+    // The point of the shape: the shorthand is not written at all, so nothing is placed physically.
+    expect(Object.keys(frame)).not.toContain('border-radius')
+  })
+
   it('keeps a dependency no candidate addresses on the element', () => {
     const { addUtilities, creator } = setup()
 

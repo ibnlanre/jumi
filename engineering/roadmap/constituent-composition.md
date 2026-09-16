@@ -115,20 +115,21 @@ each logical longhand it addresses,
 the browser resolves. Nothing is mapped in Jumi, no dependency read is widened, and the variables stay
 per-part.
 
-That needs one model extension: a phrase frame currently writes a single `[attribute]: value`, and each of
-these four candidates addresses **two** corners, so the frame has to carry one declaration per part. Multi
-property keyframes are not new here — the effect keyframes are hand-written that way — but this is the
-first *generated* one, which is why it is a ruling rather than a detail.
+That needed one model extension — a generated frame carrying one declaration per addressed property —
+and it landed the same day: **37 → 33**, `dead-links --strict` still green, and a browser arm that reads
+the *physical* corners under `ltr` and `vertical-rl` to show the browser doing the placing (the same
+animation lands on {top-left, top-right} and {bottom-left, bottom-right} under `ltr`, and on the
+diagonals under `vertical-rl`; RTL is not asserted because with these groupings the RTL permutation
+swaps each pair for itself, so the physical sets would be identical and the assertion would prove
+nothing). The rule is deliberately narrow — one recorded set of properties, no general multi-property
+engine — and it applies to the tween path as well, so the value form is not inert either.
 
-### What is left — 37
+### What is left — 33
 
 - **The 33 nested** — the real work, and the only route where the acceptance test below has to answer
   _how_ the value reaches the frame. `box-shadow` 5, `filter` 5, `backdrop-filter` 5, `transform` 2
   (`skew-x`/`skew-y`), and the four position families 4 each (`background-position`, `object-position`,
   `offset-anchor`, `offset-position`).
-- **The 4 "other name"** — the `*radius` candidates above. The probe has now chosen the representation
-  (logical names, browser-resolved), so this is no longer a naming question: what remains is the model
-  extension it needs, and then 37 → 33.
 
 ## The acceptance test for closing it
 

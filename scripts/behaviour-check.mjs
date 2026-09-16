@@ -1619,6 +1619,92 @@ const origins = [
 for (const [claim, ok] of origins)
   if (!ok) failures.push(`transform origin: ${claim}`)
 
+/* ------------------------------------------------------------------------------------
+ * 14. A phrase of properties: the logical corner radii.
+ * ---------------------------------------------------------------------------------- */
+
+// `animate-border-block-start-radius` addresses `border-start-start-radius` and
+// `border-start-end-radius` — longhands the browser resolves against direction and writing mode — so
+// Jumi emits them as themselves instead of composing them into the physical `border-radius` shorthand.
+// Composing would mean deciding the mapping at build time, and measured, the mapping is contextual.
+//
+// The arms read *physical* corners, which is where that resolution becomes visible. Two candidates with
+// different values keep the pairs unequal: block-start 20px, block-end 40px. Under `ltr` they land on
+// {top-left, top-right} and {bottom-left, bottom-right}; under `vertical-rl` the same animation lands on
+// the diagonals. RTL is deliberately absent — with these groupings the RTL permutation swaps each pair
+// for itself, so the physical sets would be identical and an assertion there would prove nothing.
+//
+// Sampling at the last offset is safe here for the reason the probe's lesson pointed at: Jumi's
+// composition declares `animation-fill-mode: forwards`, so the end value is held rather than released.
+const RADIUS_ENTRY = `\n@import "tailwindcss" source(none);\n@plugin "${path.join(root, 'dist', 'index.js')}";\n`
+
+const RADIUS_CANDIDATES = [
+  'animate-border-block-start-radius-[0:0px|100:20px]',
+  'animate-border-block-end-radius-[0:0px|100:40px]',
+]
+
+const radiusCss = finalizeCss(
+  (await compiler(RADIUS_ENTRY, root)).build(RADIUS_CANDIDATES),
+).css
+
+// The corner set is the fixture's own size, so the arms compare like with like.
+const RADIUS_CORNERS = [
+  'borderTopLeftRadius',
+  'borderTopRightRadius',
+  'borderBottomRightRadius',
+  'borderBottomLeftRadius',
+]
+
+const radiusBody = context =>
+  `<div style="${context}; width: 120px; height: 80px" class="${RADIUS_CANDIDATES.join(' ')}"></div>`
+
+const radiusLtr = await stepped({
+  body: radiusBody('direction: ltr'),
+  css: radiusCss,
+  prefix: 'jumi-border-radius',
+  properties: RADIUS_CORNERS,
+})
+
+const radiusVertical = await stepped({
+  body: radiusBody('writing-mode: vertical-rl'),
+  css: radiusCss,
+  prefix: 'jumi-border-radius',
+  properties: RADIUS_CORNERS,
+})
+
+const radiusHeld = await stepped({
+  body: radiusBody('direction: ltr'),
+  css: withoutFrameLookups(radiusCss),
+  prefix: 'jumi-border-radius',
+  properties: RADIUS_CORNERS,
+})
+
+/** The four physical corners at the last offset, as one comparable string. */
+const cornersAt = (reading, at) =>
+  RADIUS_CORNERS.map(part => (reading.samples[part] ?? [])[at] ?? 'none').join(' ')
+
+const radius = [
+  [
+    'a phrase of properties drives the physical corners it names (ltr)',
+    cornersAt(radiusLtr, 4) === '20px 20px 40px 40px' &&
+      RADIUS_CORNERS.every(part => changes(radiusLtr.samples[part] ?? [])),
+    `read ${cornersAt(radiusLtr, 4)}`,
+  ],
+  [
+    'and the same animation lands on the diagonals under vertical-rl',
+    cornersAt(radiusVertical, 4) === '40px 20px 20px 40px',
+    `read ${cornersAt(radiusVertical, 4)} — the browser resolved, Jumi did not`,
+  ],
+  [
+    'and the assertion can fail: without the frame-first lookups every corner holds',
+    RADIUS_CORNERS.every(part => constant(radiusHeld.samples[part] ?? [])),
+    `read ${cornersAt(radiusHeld, 4)} at the end and ${cornersAt(radiusHeld, 0)} at the start`,
+  ],
+]
+
+for (const [claim, ok] of radius)
+  if (!ok) failures.push(`radius: ${claim}`)
+
 await browser.close()
 
 /* ------------------------------------------------------------------------------------
@@ -1701,6 +1787,13 @@ for (const [claim, ok, detail] of origins)
     `    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`,
   )
 
+console.log('\n  logical corners')
+
+for (const [claim, ok, detail] of radius)
+  console.log(
+    `    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`,
+  )
+
 // Every assertion above that can fail, so the summary line is the count it claims to be: the three
 // activation contexts, the pseudo substrate, the direct carriers, bare, applied, spacing, radius,
 // the three relationship-variant cases, non-inheritance, and the four composed sets.
@@ -1712,7 +1805,8 @@ const required =
   constituent.length +
   ownProperty.length +
   compositions.length +
-  origins.length
+  origins.length +
+  radius.length
 const passing = required - failures.length
 
 console.log(`\n  ${passing}/${required} required contexts and carriers behave`)
