@@ -285,6 +285,78 @@ What remains, in the order the ruling set:
    broader byte accounting on a real page.
 9. **Only then decide whether to migrate the broader 79%.**
 
+### C.5 — the `scale` migration, fully specified
+
+Everything before this reduced uncertainty; C.5 is implementation. The three interfaces it consumes are
+merged and tested, and the two behaviours it must reproduce were **proven by hand in the browser**:
+
+```text
+multi-axis whole 1 → 2 3        native == typed leaves at 0/25/50/75/100%
+ownership        whole 1→2 + x 1→5    5 2 2 at 100%, x from the constituent
+                                      and y/z from the whole at every sample
+```
+
+**The two execution models, and the gate between them.** Direct typed-leaf animation is the production
+representation; the property-level `scale` animation is the fallback for what the proof predicate
+declines. No intermediate representation, and no partial entry:
+
+```text
+whole scale      → scaleLeafEndpoints(value)
+  success        →   keyframe writes --jumi-scale-x/y/z directly, values already canonical
+  null           →   the existing scale-property path, byte-for-byte
+
+scale-x/y/z      → scaleFactorToNumber(frame value)
+  success        →   write the canonical value to that typed leaf
+  null           →   preserve the existing composed-property representation
+
+ordering         → explicit `kind: whole-decomposed | constituent` on the slot,
+                   not inferred from a name's string shape
+```
+
+The constituent decline matters: a family being migrated must not mean every value the `any` escape
+hatch accepts is forced through the typed path.
+
+**Identities are preserved, not re-made.** A phrase was already per-instance; Commit B extended that to
+eligible part tweens. C.5 keeps both keys and changes only what their frames write.
+
+**The structural before/after** — the clearest proof that the execution model changed rather than gaining
+metadata around the old one, measured on four sheets before C.5:
+
+```text
+sheet              bytes   kfBytes   slots  var()   frame declarations
+                                                    scale(property)  leaf
+lone scale          8135     70        1      55           1            0
+lone scale-x        8648    135        1      68           1            0
+scale + scale-x     9923    205        2      93           2            0
+scale + x + y      11711    340        3     131           3            0
+```
+
+Every scale frame declaration today is property-level and there are **zero** leaf assignments. After
+C.5 the decomposed cases must invert that, for `lone scale-x` as well as the wholes. (A sheet touching
+`scale` carries exactly three typed registrations — established end to end in C.2.)
+
+**Acceptance, four classes:**
+
+```text
+equivalence   lone whole and lone constituent identical to before, including the
+              mixed number/percentage curves already measured
+composition   whole 2 + x 5 → 5 2 2, whole 2 + x 5 + y 7 → 5 7 2, sampled through
+              the curve rather than only at 100%
+determinism   reverse candidate discovery → identical aggregate lists and samples
+escape hatch  a whole that scaleLeafEndpoints() declines keeps its `scale:` frame
+              declaration with **no** typed-leaf frame declarations for that motion,
+              and a constituent beside it does not acquire the new ownership semantics
+```
+
+The escape hatch is asserted on **emitted CSS as well as computed output**, so "does not partially
+enter" is a structural invariant rather than only a behavioural observation — C.5 puts two execution
+models for one property into production at once and the boundary has to be observable.
+
+Then the gate, plus `dead-links --strict`, `constituent-check` and the serialize differential, because
+C.5 changes exactly the frame/write topology those police. If those pass, `scale` is migrated and C
+closes. **D then extracts the generic mechanism from the `scale` implementation — not another proving
+family, and not by generalizing the preparatory abstractions.**
+
 The whole-plus-constituent case does **not** disappear in this model, and it is not the same defect:
 candidate-arrival order deciding the body of a shared definition is compiler nondeterminism;
 animation-list order deciding which animation owns an animated custom property is ordinary CSS conflict
