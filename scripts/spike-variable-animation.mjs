@@ -42,10 +42,11 @@
  */
 import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright'
-import fs from 'node:fs'
-import path from 'node:path'
 
 import { varReferences } from './lib/var-references.mjs'
+
+import fs from 'node:fs'
+import path from 'node:path'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const root = path.join(here, '..')
@@ -383,14 +384,17 @@ const curve = async (label, sel, prop, count = 1) => {
   return values
 }
 
-const header = title => console.log(`\n${'─'.repeat(74)}\n${title}\n${'─'.repeat(74)}`)
+const header = title =>
+  console.log(`\n${'─'.repeat(74)}\n${title}\n${'─'.repeat(74)}`)
 
 const same = (a, b) => a.length === b.length && a.every((v, i) => v === b[i])
 
 console.log(`Chromium ${browser.version()}`)
 
 header('§1  does the keyframe interpolate the same either way?   (t = 0 → 1s)')
-console.log(`  ${'shape'.padEnd(34)} ${TIMES.map(t => `${t}s`.padEnd(22)).join('')}`)
+console.log(
+  `  ${'shape'.padEnd(34)} ${TIMES.map(t => `${t}s`.padEnd(22)).join('')}`,
+)
 
 const a = await curve('(a) today: keyframe writes `scale`', '.p1a', 'scale')
 const b = await curve('(b) proposed: typed registered slot', '.p1b', 'scale')
@@ -399,7 +403,9 @@ const c = await curve('(c) control: unregistered slot', '.p1c', 'scale')
 console.log(`\n  today ≡ proposed              ${same(a, b)}`)
 // Discrete reads as *whichever endpoint is winning*, not as a half-way value: the unregistered slot
 // steps to `3 1` at a frame boundary and holds it. The expected list is the measured one.
-console.log(`  unregistered is discrete      ${same(c, ['1', '1', '3 1', '3 1', '3 1'])}`)
+console.log(
+  `  unregistered is discrete      ${same(c, ['1', '1', '3 1', '3 1', '3 1'])}`,
+)
 
 header('§1b  does a registered property reach its var() fallback?')
 console.log(
@@ -413,7 +419,9 @@ console.log(
 )
 
 header('§2  sibling component timing — 1s and 3s on one property')
-console.log(`  ${'shape'.padEnd(34)} ${TIMES.map(t => `${t}s`.padEnd(22)).join('')}`)
+console.log(
+  `  ${'shape'.padEnd(34)} ${TIMES.map(t => `${t}s`.padEnd(22)).join('')}`,
+)
 
 await curve('(a) proposed: a variable each', '.p2a', 'scale', 2)
 await curve('(b) today: two `scale` keyframes', '.p2b', 'scale', 2)
@@ -428,16 +436,23 @@ await curve('(d) <number>+ slot, 1 → 3 tokens', '.p3d', 'scale', 1)
 // The end value, read with the animation off, so the frame's `2 2 1` is the only thing in play: the
 // curve above steps to the end value rather than reaching it gradually.
 console.log(
-  `  → with the animation off and the slot set to \`2 2 1\`, scale reads ${await page.$eval('.p3d', el => {
-    el.style.animation = 'none'
-    el.style.setProperty('--p3d', '2 2 1')
+  `  → with the animation off and the slot set to \`2 2 1\`, scale reads ${await page.$eval(
+    '.p3d',
+    el => {
+      el.style.animation = 'none'
+      el.style.setProperty('--p3d', '2 2 1')
 
-    return getComputedStyle(el).scale
-  })}`,
+      return getComputedStyle(el).scale
+    },
+  )}`,
 )
 
-header('§4  a function-valued slot  (--jumi-filter-blur: blur(0px) → blur(8px))')
-console.log(`  ${'shape'.padEnd(34)} ${TIMES.map(t => `${t}s`.padEnd(22)).join('')}`)
+header(
+  '§4  a function-valued slot  (--jumi-filter-blur: blur(0px) → blur(8px))',
+)
+console.log(
+  `  ${'shape'.padEnd(34)} ${TIMES.map(t => `${t}s`.padEnd(22)).join('')}`,
+)
 
 await curve('(a) today: composed `filter`', '.p4a', 'filter')
 await curve('(b) proposed: syntax "*" slot', '.p4b', 'filter')
@@ -463,7 +478,9 @@ const maxScroll = await page.evaluate(() => {
 const SCROLLS = [0, 0.125, 0.25, 0.5, 1].map(f => f * maxScroll)
 
 console.log(`  scroll range 0 … ${maxScroll}px`)
-console.log(`  ${'shape'.padEnd(34)} ${SCROLLS.map(s => `${Math.round(s)}px`.padEnd(22)).join('')}`)
+console.log(
+  `  ${'shape'.padEnd(34)} ${SCROLLS.map(s => `${Math.round(s)}px`.padEnd(22)).join('')}`,
+)
 
 const scrollCurve = async (label, sel, prop, count) => {
   const values = []
@@ -472,10 +489,13 @@ const scrollCurve = async (label, sel, prop, count) => {
     await page.evaluate(y => window.scrollTo(0, y), y)
 
     await page.evaluate(
-      () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))),
+      () =>
+        new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))),
     )
 
-    values.push(await page.$eval(sel, (el, prop) => getComputedStyle(el)[prop], prop))
+    values.push(
+      await page.$eval(sel, (el, prop) => getComputedStyle(el)[prop], prop),
+    )
   }
 
   console.log(
@@ -492,8 +512,12 @@ await scrollCurve('(b) today: two `scale` keyframes', '.p6b', 'scale', 2)
 await scrollCurve('(c) today + composition: add', '.p6c', 'scale', 2)
 
 header('§7  a whole-property phrase and a component phrase on one property')
-console.log(`  whole: --p7x/y/z 1 → 2.  component: --p7x 1 → 3.  both 1s linear.`)
-console.log(`  ${'shape'.padEnd(34)} ${TIMES.map(t => `${t}s`.padEnd(22)).join('')}`)
+console.log(
+  `  whole: --p7x/y/z 1 → 2.  component: --p7x 1 → 3.  both 1s linear.`,
+)
+console.log(
+  `  ${'shape'.padEnd(34)} ${TIMES.map(t => `${t}s`.padEnd(22)).join('')}`,
+)
 
 await curve('(a) whole listed first', '.p7a', 'scale', 1)
 await curve('(b) component listed first', '.p7b', 'scale', 1)
@@ -514,7 +538,9 @@ console.log(
 )
 
 header('§9  values a typed registration cannot hold')
-console.log(`  ${'shape'.padEnd(34)} ${TIMES.map(t => `${t}s`.padEnd(22)).join('')}`)
+console.log(
+  `  ${'shape'.padEnd(34)} ${TIMES.map(t => `${t}s`.padEnd(22)).join('')}`,
+)
 
 await curve('(a) <angle> slot, to `none`', '.p9a', 'rotate')
 await curve('(b) <length-percentage> slot', '.p9b', 'width')
@@ -522,7 +548,9 @@ await curve('(c) initial-value: var()', '.p9c', 'color')
 await curve('(d) <length>+ slot, 1 → 2 tokens', '.p9d', 'translate')
 
 header('§10 the reshaped function-valued composition (blur 1s, brightness 3s)')
-console.log(`  ${'shape'.padEnd(34)} ${TIMES.map(t => `${t}s`.padEnd(22)).join('')}`)
+console.log(
+  `  ${'shape'.padEnd(34)} ${TIMES.map(t => `${t}s`.padEnd(22)).join('')}`,
+)
 
 await curve('(a) blur(var(--amount)), a slot each', '.p10a', 'filter', 2)
 await curve('(b) today: both write `filter`', '.p10b', 'filter', 2)
@@ -541,7 +569,10 @@ await browser.close()
 
 header('§11  the inventory a typed registration would have to cover')
 
-const propertySource = fs.readFileSync(path.join(root, 'src/variables/property.ts'), 'utf8')
+const propertySource = fs.readFileSync(
+  path.join(root, 'src/variables/property.ts'),
+  'utf8',
+)
 
 /** One entry of the property table: what it is called, whether it is a whole, and its value's shape. */
 const readSlots = () => {
@@ -575,18 +606,25 @@ const readSlots = () => {
       composite: /dependencies: \[/.test(block),
       // The leaves a whole names. Read as text, because the list is the only place the relationship is
       // written down.
-      deps: [...(block.match(/dependencies: \[([^]*?)\]/)?.[1] ?? '').matchAll(/'([\w-]+)'/g)].map(
-        match => match[1],
-      ),
+      deps: [
+        ...(block.match(/dependencies: \[([^]*?)\]/)?.[1] ?? '').matchAll(
+          /'([\w-]+)'/g,
+        ),
+      ].map(match => match[1]),
       name: block.match(/variable: '(--jumi-[\w-]+)'/)?.[1],
-      shape: value.startsWith('css(') ? 'function' : /^['"]/.test(value) ? 'scalar' : 'named',
+      shape: value.startsWith('css(')
+        ? 'function'
+        : /^['"]/.test(value)
+          ? 'scalar'
+          : 'named',
     }
   })
 }
 
 const slots = readSlots().filter(slot => slot.name)
 const leaves = slots.filter(slot => !slot.composite)
-const shaped = shape => leaves.filter(slot => slot.shape === shape).map(slot => slot.name.slice(7))
+const shaped = shape =>
+  leaves.filter(slot => slot.shape === shape).map(slot => slot.name.slice(7))
 const functionShaped = new Set(shaped('function'))
 
 /**
@@ -603,17 +641,30 @@ const shapeOf = name => {
 }
 
 console.log(`  entries in the property table             ${slots.length}`)
-console.log(`  composites — they name the leaves         ${slots.length - leaves.length}`)
+console.log(
+  `  composites — they name the leaves         ${slots.length - leaves.length}`,
+)
 console.log(`  leaves                                    ${leaves.length}`)
-console.log(`    · scalar-shaped, a bare literal         ${shaped('scalar').length}`)
-console.log(`    · function-shaped, \`css('f', …)\`         ${shaped('function').length}`)
-console.log(`    · neither                               ${shaped('named').length}`)
-console.log(`\n  the function-shaped leaves — the ones a typed slot cannot hold:`)
+console.log(
+  `    · scalar-shaped, a bare literal         ${shaped('scalar').length}`,
+)
+console.log(
+  `    · function-shaped, \`css('f', …)\`         ${shaped('function').length}`,
+)
+console.log(
+  `    · neither                               ${shaped('named').length}`,
+)
+console.log(
+  `\n  the function-shaped leaves — the ones a typed slot cannot hold:`,
+)
 console.log(`  ${shaped('function').join(' ')}`)
 
 header('§11b  what a build emits today, and what the same frames would become')
 
-const snapshot = fs.readFileSync(path.join(root, 'scripts/css-snapshot/snapshot.css'), 'utf8')
+const snapshot = fs.readFileSync(
+  path.join(root, 'scripts/css-snapshot/snapshot.css'),
+  'utf8',
+)
 
 /** Every declaration in the render, by name. No value in this file carries a `;` of its own. */
 const declared = new Map(
@@ -634,9 +685,11 @@ const blocks = [...snapshot.matchAll(/@keyframes ([\w\\.-]+) \{([^]*?)\n\}/g)]
  * rule of this shape, and correctly drops out: an effect has no composition to decompose.
  */
 const instances = new Map(
-  [...snapshot.matchAll(/--jumi-([\w-]+?)-([\w]{3,8})-animation-name:\s*jumi-([\w-]+);/g)].map(
-    match => [`jumi-${match[3]}`, { attribute: match[1], hash: match[2] }],
-  ),
+  [
+    ...snapshot.matchAll(
+      /--jumi-([\w-]+?)-([\w]{3,8})-animation-name:\s*jumi-([\w-]+);/g,
+    ),
+  ].map(match => [`jumi-${match[3]}`, { attribute: match[1], hash: match[2] }]),
 )
 
 let frames = 0
@@ -683,7 +736,8 @@ for (const block of blocks) {
       // A key named for the whole attribute is the wholesale frame value, and the model cannot
       // assign it to a typed slot when the composition is a chain of functions: `blur(8px)` is not a
       // `<length>`. Those frames are the ones that would need the value decomposed at compile time.
-      if (slot === instance.attribute && shapeOf(slot) === 'function') decomposed += 1
+      if (slot === instance.attribute && shapeOf(slot) === 'function')
+        decomposed += 1
     }
   }
 }
@@ -693,29 +747,51 @@ const REGISTRATION = 74 // `@property --jumi-… { syntax: <type>; inherits: fal
 const typed = [...animated.keys()].filter(name => shapeOf(name) !== 'function')
 
 console.log(`  @keyframes blocks                        ${blocks.length}`)
-console.log(`  → belonging to a phrase (an instance)    ${[...blocks].filter(block => instances.has(block[1])).length}`)
+console.log(
+  `  → belonging to a phrase (an instance)    ${[...blocks].filter(block => instances.has(block[1])).length}`,
+)
 console.log(`  frame declarations                       ${frames}`)
 console.log(`  \`var()\` reads inside those frames        ${reads}`)
 console.log(`  bytes of the frame declarations          ${frameBytes}`)
-console.log(`  per-frame keys published beside them     ${animated.size} slots, ${keyBytes} bytes`)
+console.log(
+  `  per-frame keys published beside them     ${animated.size} slots, ${keyBytes} bytes`,
+)
 console.log(`\n  the same frames restated as slot assignments:`)
-console.log(`    frames holding a restatable value      ${measurable} of ${frames}`)
+console.log(
+  `    frames holding a restatable value      ${measurable} of ${frames}`,
+)
 console.log(`    assignments needing decomposition      ${decomposed}`)
 console.log(`    bytes                                  ${restated}`)
 console.log(`\n  the model also adds one registration per animated slot:`)
-console.log(`    ${typed.length} slots × ~${REGISTRATION} bytes  ${typed.length * REGISTRATION} bytes`)
-console.log(`\n  today, frames + published keys            ${frameBytes + keyBytes} bytes`)
-console.log(`  proposed, frames + registrations          ${restated + typed.length * REGISTRATION} bytes`)
+console.log(
+  `    ${typed.length} slots × ~${REGISTRATION} bytes  ${typed.length * REGISTRATION} bytes`,
+)
+console.log(
+  `\n  today, frames + published keys            ${frameBytes + keyBytes} bytes`,
+)
+console.log(
+  `  proposed, frames + registrations          ${restated + typed.length * REGISTRATION} bytes`,
+)
 
-header('§11c  the slots the corpus actually animates, against the shape they would need')
+header(
+  '§11c  the slots the corpus actually animates, against the shape they would need',
+)
 
 const animatedNames = [...animated.keys()].sort()
 const ofShape = shape => animatedNames.filter(name => shapeOf(name) === shape)
 
-console.log(`  animated slots                            ${animatedNames.length}`)
-console.log(`    · scalar-shaped, registerable as they are ${ofShape('scalar').length}`)
-console.log(`    · function-shaped, need the reshape       ${ofShape('function').length}`)
-console.log(`    · neither                                 ${ofShape('—').length}`)
+console.log(
+  `  animated slots                            ${animatedNames.length}`,
+)
+console.log(
+  `    · scalar-shaped, registerable as they are ${ofShape('scalar').length}`,
+)
+console.log(
+  `    · function-shaped, need the reshape       ${ofShape('function').length}`,
+)
+console.log(
+  `    · neither                                 ${ofShape('—').length}`,
+)
 console.log(`\n  ${animatedNames.join(' ')}`)
 
 if (ofShape('function').length > 0) {

@@ -37,11 +37,7 @@ describe('varReferences', () => {
   })
 
   it('reads every sibling reference, in source order', () => {
-    expect(names('var(--a) var(--b) var(--c)')).toEqual([
-      '--a',
-      '--b',
-      '--c',
-    ])
+    expect(names('var(--a) var(--b) var(--c)')).toEqual(['--a', '--b', '--c'])
   })
 
   it('reads a reference inside a function in a fallback', () => {

@@ -22,8 +22,9 @@
  * convention everywhere else in these fixtures — stays allowed.
  */
 import { readFileSync } from 'node:fs'
-import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+
+import path from 'node:path'
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -122,7 +123,9 @@ for (const file of SOURCES) {
 console.log()
 
 if (phantomsFound.length) {
-  console.error('✗ a phantom candidate — prose the compiler read as a utility:\n')
+  console.error(
+    '✗ a phantom candidate — prose the compiler read as a utility:\n',
+  )
 
   for (const { file, token } of phantomsFound)
     console.error(`  ${file}\n    ${token}`)
