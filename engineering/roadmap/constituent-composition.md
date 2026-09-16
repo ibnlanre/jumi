@@ -191,12 +191,20 @@ Open workstreams, in order:
    spelling that works; and the identity becomes load-bearing, which makes `column-rule-width`'s
    transposed default fatal where it is invisible today. See
    [`engineering/research/property-typing.md`](../research/property-typing.md).
-2. **A compiler prototype on a real page**, current implementation against typed slots, across
-   document-time animation, named motions, independent durations, segment easing, scroll timelines,
-   animation ranges, reduced motion, siblings, whole-plus-constituent conflict, DevTools readability,
-   CSS size, and Studio export/replay. The census names its largest open risk: **`transform`**, where
-   today the browser interpolates a whole transform list and the var model would interpolate each leaf
-   and rebuild the composition per frame.
+2. **The transform prototype — measured, and it is outcome B.** Decomposing a whole `transform` motion
+   into typed leaves is **exact** when the author's list is matched and in Jumi's composition order (4 of
+   4 matched cases, identical to <1e-6 at every sampled point). It **diverges along the path** when the
+   ends are unmatched but the order agrees (2 cases, up to 35.4 in a matrix component). And it describes
+   **a different motion** when the order differs (3 cases, up to 100.0), because Jumi's composition is one
+   fixed sequence — `perspective · matrix · matrix3d · rotate · scale · skew · translate` — while a native
+   list applies its functions in the order the author wrote them. Today a whole transform phrase emits the
+   author's list verbatim (`--jumi-transform-<id>: translate(100px,0px) rotate(90deg)`), so decomposing is
+   the operation that would lose the order. The rule is therefore three-way: a component transform motion
+   types its leaf; a matched whole in Jumi's order types its leaves; **every other whole keeps the actual
+   `transform` property**. That third row is broad — `translate(…) rotate(…)` is an author's habit and is
+   not Jumi's order — so the component-override guarantee applies to `transform` only where the whole
+   participates in the decomposed representation. See
+   [`engineering/research/transform-interpolation.md`](../research/transform-interpolation.md).
 3. **Aggregate ordering — measured.** The list _is_ the precedence order, and it is **not** currently
    independent of candidate compilation order: `computeSlots()` emits two of its four groups in `Map`
    insertion order, so two motions in one group are ordered by Tailwind's compile order. Two phrases of
@@ -211,6 +219,27 @@ Open workstreams, in order:
    nested inside it and no ordering recovers it (both orders read the whole's value), so the rule needs
    the companion requirement that a whole motion writes its constituents' slots. See
    [`engineering/research/aggregate-order.md`](../research/aggregate-order.md).
+
+What remains, in the order the ruling set:
+
+4. **Fix the swapped `column-rule-width` / `column-rule-color` identities.** Latent today because the
+   shorthand's `||` grammar absorbs the transposition — measured, both spellings compute `medium` and
+   `currentColor`. Fatal under the variable model, where a slot is read on its own, and the union rung
+   would hide it again (`<length> | currentColor` registers), which is why it has to be fixed rather than
+   accommodated.
+5. **A compiler prototype on a real page** with typed leaves, the current implementation against the
+   pivot, across document-time animation, named motions, independent durations, segment easing, scroll
+   timelines, animation ranges, reduced motion, siblings, whole-plus-constituent conflict, DevTools
+   readability, CSS size, and Studio export/replay. It carries one question of its own: whether
+   `skew`+`skew-x` and `filter-drop-shadow`+its blur — which today collapse into one shared slot — should
+   become independently animated slots under the pivot, or whether that collapse is an aggregation
+   artefact the new model no longer needs.
+6. **Then define the stable ordering key and the decomposition boundary together**, because the transform
+   result is what says which whole motions may decompose at all. Nothing in `computeSlots()` moves before
+   that. The compiler-order-dependent ordering is an independent bug to fix whether or not the pivot
+   ships — the two-phrase case computes `5 1` or `2` from identical markup — but the semantic key should
+   not be chosen until the boundary is known.
+7. **Only then decide whether to migrate the broader 78%.**
 
 The whole-plus-constituent case does **not** disappear in this model, and it is not the same defect:
 candidate-arrival order deciding the body of a shared definition is compiler nondeterminism;

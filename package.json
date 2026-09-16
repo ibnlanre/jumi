@@ -106,6 +106,7 @@
     "spike:variable-animation": "node scripts/spike-variable-animation.mjs",
     "spike:property-typing": "node scripts/spike-property-typing.mjs",
     "spike:aggregate-order": "node scripts/spike-aggregate-order.mjs",
+    "spike:transform-interpolation": "node scripts/spike-transform-interpolation.mjs",
     "candidate:diff": "node scripts/candidate-diff.mjs",
     "check": "node scripts/check.mjs"
   },
