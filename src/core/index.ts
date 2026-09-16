@@ -20,7 +20,11 @@ import { replaceSlots } from '@/helpers/slots'
 import { effectKeyframes } from '@/keyframes/effects'
 import { isFullyAddressable } from '@/variables/composition'
 import { propertyVariables } from '@/variables/property'
-import { typedLeavesOf } from '@/variables/typed-leaves'
+import {
+  scaleLeafEndpoints,
+  typedLeafOf,
+  typedLeavesOf,
+} from '@/variables/typed-leaves'
 
 import cssEscape from 'css.escape'
 import shorthash2 from 'shorthash2'
@@ -653,6 +657,40 @@ export function createJumiModel({
     instances.set(key, id)
 
     registerName(`--jumi-${attribute}-${id}-animation-name`)
+
+    /**
+     * A whole value the proof predicate can read is animated as **typed leaves**, and the candidate
+     * that opts into that execution model also **establishes the composition that consumes them**.
+     *
+     * `scale: var(--jumi-scale)` is emitted here rather than through the animation aggregate, because
+     * it is not timing data: it is a declaration the execution model requires, and it belongs on the
+     * same selector that activates the motion. That also makes it automatically correct under a
+     * variant — the substrate travels with the rule that names the motion instead of appearing
+     * wherever the stylesheet happens to contain one.
+     *
+     * The keyframe carries the canonical values and the utility writes no resting leaf: under a
+     * static substrate the element's computed leaf is the tween's implicit `from`, so a resting
+     * write would make `from` equal `to` and the animation would never move while looking correct.
+     */
+    const endpoints = attribute === 'scale' ? scaleLeafEndpoints(value) : null
+
+    if (endpoints) {
+      emitKeyframe(`jumi-${attribute}-${id}`, {
+        to: {
+          '--jumi-scale-x': endpoints[0],
+          '--jumi-scale-y': endpoints[1],
+          '--jumi-scale-z': endpoints[2],
+        },
+      })
+      aggregateChanged()
+
+      return {
+        [`--jumi-${attribute}-${id}-animation-name`]: `jumi-${attribute}-${id}`,
+        [attribute]: css('var', `--jumi-${attribute}`),
+        ...(name ? nameSlot(key, attribute, name) : {}),
+      }
+    }
+
     emitKeyframe(`jumi-${attribute}-${id}`, {
       to: { [attribute]: css('var', `--jumi-${attribute}-${id}`) },
     })
@@ -1425,8 +1463,6 @@ export function createJumiModel({
 
         if (component && isFullyAddressable(attribute)) {
           const nameVar = `--jumi-${component}-animation-name`
-          const endpoint = cssEscape(`--jumi-${component}-100`)
-          const leaf = propertyVariables[component as PropertyType].variable
 
           partTweens.set(component, {
             attribute,
@@ -1441,6 +1477,53 @@ export function createJumiModel({
           // longer the attribute, and nothing else would record it.
           recordComponents(component, parts)
           registerName(nameVar)
+
+          /**
+           * A constituent the family declares as a typed leaf writes **that leaf**, canonically,
+           * and establishes the substrate on its own rule — same reasoning as the whole path.
+           *
+           * The candidate matters here more than anywhere: a typed-leaf motion must carry
+           * `scale: var(--jumi-scale)` itself, because a lone `animate-scale-x-[5]` has no whole
+           * motion to establish it and a substrate published per attribute would appear on
+           * selectors that never opted in.
+           *
+           * Declining is narrow and deliberate. A value the canonicalizer does not understand keeps
+           * the composed-property representation below.
+           */
+          const endpoints =
+            attribute === 'scale'
+              ? (() => {
+                  const declaration = typedLeafOf(attribute, component)
+                  const authored = String(
+                    variables[`--jumi-${component}`] ?? value,
+                  )
+                  const canonical =
+                    declaration?.animationCanonicalizer?.(authored) ?? null
+
+                  return declaration && canonical !== null
+                    ? { canonical, declaration }
+                    : null
+                })()
+              : null
+
+          if (endpoints) {
+            emitKeyframe(`jumi-${component}`, {
+              to: {
+                [propertyVariables[component as PropertyType].variable]:
+                  endpoints.canonical,
+              },
+            })
+            aggregateChanged()
+
+            return {
+              [nameVar]: `jumi-${component}`,
+              [attribute]: css('var', `--jumi-${attribute}`),
+              ...(modifier ? nameSlot(component, component, modifier) : {}),
+            }
+          }
+
+          const endpoint = cssEscape(`--jumi-${component}-100`)
+          const leaf = propertyVariables[component as PropertyType].variable
 
           /**
            * The frame hooks **only the owned component**.

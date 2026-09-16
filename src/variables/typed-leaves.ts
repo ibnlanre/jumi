@@ -132,6 +132,18 @@ export const typedLeaves: Partial<
 }
 
 /**
+ * The typed-leaf declaration for one leaf of a family, or `undefined`.
+ *
+ * A lookup rather than a predicate, because every consumer needs the declaration and not merely the
+ * fact of it: the syntax to register with, the initial value to fall to, and the canonicalizer to
+ * write a frame with.
+ */
+export const typedLeafOf = (
+  attribute: PropertyType,
+  leaf: string,
+): TypedLeaf | undefined => typedLeaves[attribute]?.[leaf]
+
+/**
  * The typed leaves a family declares, or an empty list.
  *
  * Returns pairs rather than a record so the caller does not decide the order it registers them in:
