@@ -197,10 +197,20 @@ Open workstreams, in order:
    CSS size, and Studio export/replay. The census names its largest open risk: **`transform`**, where
    today the browser interpolates a whole transform list and the var model would interpolate each leaf
    and rebuild the composition per frame.
-3. **Aggregate ordering**, which is where the whole-plus-constituent conflict goes. A whole motion and a
-   component motion overlap semantically, so precedence must be explicit: if Jumi orders component
-   animations after whole-property animations, component ownership wins deterministically and the
-   conflict stops being a defect. That is a probe, not an assumption.
+3. **Aggregate ordering — measured.** The list _is_ the precedence order, and it is **not** currently
+   independent of candidate compilation order: `computeSlots()` emits two of its four groups in `Map`
+   insertion order, so two motions in one group are ordered by Tailwind's compile order. Two phrases of
+   `scale` with different frames compile to reversed lists, and the same two classes on the same element
+   then compute `5 1` or `2` — identical markup, an order nobody wrote. The four pairs in the ruling are
+   mostly shielded from this by a grouping artefact (`values` before `shared`), and two of the four
+   (`skew`+`skew-x`, `filter-drop-shadow`+`drop-shadow-blur`) collapse to one slot and have no order
+   question at all. **The semantics the ruling wants are real and measured:** under the pivot's slot
+   representation, whole-first reads `3 2` — the component owns x, the whole keeps y and z — while
+   whole-last reads `2`; today's representation is all-or-nothing in both orders. **But the rule is
+   necessary and not sufficient:** a whole motion that writes a composed value bypasses a component
+   nested inside it and no ordering recovers it (both orders read the whole's value), so the rule needs
+   the companion requirement that a whole motion writes its constituents' slots. See
+   [`engineering/research/aggregate-order.md`](../research/aggregate-order.md).
 
 The whole-plus-constituent case does **not** disappear in this model, and it is not the same defect:
 candidate-arrival order deciding the body of a shared definition is compiler nondeterminism;
