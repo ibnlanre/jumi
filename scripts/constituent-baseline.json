@@ -2,7 +2,7 @@
   "recorded": "2026-09-16",
   "note": "The nested-writer residual, recorded rather than accepted. Every name below writes a frame value no keyframe reads, because the writer sits below the composition boundary and the composed value has no route to it — a different class from the `scale-x` regression, which was a direct consumer going missing. Tracked in `engineering/roadmap/constituent-composition.md`; a fall in this number is an improvement to re-record with `node scripts/constituent-check.mjs --record`.",
   "candidates": 398,
-  "readBack": 364,
+  "readBack": 366,
   "unparseable": [
     "animate"
   ],
@@ -11,7 +11,6 @@
     "animate-backdrop-filter-drop-shadow-color",
     "animate-backdrop-filter-drop-shadow-offset-x",
     "animate-backdrop-filter-drop-shadow-offset-y",
-    "animate-backdrop-filter-url",
     "animate-background-position-x-edge",
     "animate-background-position-x-offset",
     "animate-background-position-y-edge",
@@ -25,7 +24,6 @@
     "animate-filter-drop-shadow-color",
     "animate-filter-drop-shadow-offset-x",
     "animate-filter-drop-shadow-offset-y",
-    "animate-filter-url",
     "animate-object-position-x-edge",
     "animate-object-position-x-offset",
     "animate-object-position-y-edge",

@@ -585,10 +585,10 @@ export function createJumiModel({
    * table's entries, and that is a migration rather than a first step.
    */
   const independentProperties = new Set<string>([
-    'border-start-start-radius',
-    'border-start-end-radius',
-    'border-end-start-radius',
     'border-end-end-radius',
+    'border-end-start-radius',
+    'border-start-end-radius',
+    'border-start-start-radius',
   ])
 
   /**
@@ -603,7 +603,7 @@ export function createJumiModel({
    */
   const phraseKeyframe = (
     attribute: AnimatableStandardPropertyType,
-    properties: string[] | null,
+    properties: null | string[],
     id: string,
     frames: Frame[],
     writesOuterFrame: boolean,
@@ -678,8 +678,26 @@ export function createJumiModel({
           if (!surfaces.get(attribute)?.has(dependency)) return result
 
           return result.replaceAll(
-            `var(${part})`,
-            `var(${cssEscape(`${part}-${suffix}`)}, var(${part}))`,
+            // The **whole slot** is matched and re-emitted — `var(<name>)` becomes
+            // `var(<hook>, var(<name>))` — rather than the name being rewritten in place. Two things then
+            // hold that a name-only match cannot give:
+            //
+            // The slot's fallback travels with it. `var(--jumi-filter-url, opacity(1))` keeps its
+            // fallback *inside* the inner read — `var(<hook>, var(--jumi-filter-url, opacity(1)))` — so
+            // the writer that never ran still lands on the identity value instead of on nothing. One
+            // level of nesting in the fallback group covers every slot the compositions declare today;
+            // Jumi builds these slots itself, so the depth is a fact about this file, not a guess.
+            //
+            // The parens balance by construction. A name-only match consumes the slot's `var(` but leaves
+            // its `)`, so any replacement closes one of the two reads wrongly; re-emitting the slot makes
+            // the replacement self-contained. For a plain slot the text is identical to what the previous
+            // `replaceAll('var(<name>)', 'var(<hook>, var(<name>))')` emitted, so the change reaches only
+            // the slots that carry a fallback.
+            //
+            // The lookahead is the boundary: it is what stops a longer name that merely starts the same
+            // way (`var(--jumi-matrix-3d)` beside `var(--jumi-matrix)`) from being matched by accident.
+            new RegExp(`var\\(${part}(?=[,)])((?:[^()]|\\([^()]*\\))*)\\)`, 'g'),
+            `var(${cssEscape(`${part}-${suffix}`)}, var(${part}$1))`,
           )
         }, value)
       : fallback

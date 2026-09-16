@@ -312,6 +312,7 @@ export const propertyVariables: DependencyGraph = {
       'backdrop-filter-opacity',
       'backdrop-filter-saturate',
       'backdrop-filter-sepia',
+      'backdrop-filter-url',
     ],
     value: backdropFilter,
     variable: '--jumi-backdrop-filter',
@@ -379,7 +380,11 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-backdrop-filter-sepia',
   },
   'backdrop-filter-url': {
-    value: css('url'),
+    // The identity function rather than `url()`, matching what every sibling slot on the chain rests
+    // at. Both are inert when no phrase wrote the slot — measured, `url()` and `url(#missing)` resolve
+    // with the url ignored — so this is about the resting state reading as "nothing here" instead of as
+    // an empty url filter that a reader cannot tell apart from a broken one. Same for `filter-url`.
+    value: css('opacity', '1'),
     variable: '--jumi-backdrop-filter-url',
   },
   'backface-visibility': {
@@ -1163,6 +1168,7 @@ export const propertyVariables: DependencyGraph = {
       'filter-sepia',
       'filter-opacity',
       'filter-drop-shadow',
+      'filter-url',
     ],
     value: filter,
     variable: '--jumi-filter',
@@ -1230,7 +1236,7 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-filter-sepia',
   },
   'filter-url': {
-    value: css('url'),
+    value: css('opacity', '1'),
     variable: '--jumi-filter-url',
   },
   'flex': {

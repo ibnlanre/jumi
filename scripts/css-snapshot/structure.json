@@ -4,7 +4,7 @@
     "aggregateShare": 12,
     "aggregateWrites": 4,
     "animations": 1,
-    "bytes": 97209,
+    "bytes": 97468,
     "keyframes": 41,
     "media": 5,
     "properties": 104,
@@ -16,15 +16,15 @@
     "supports": 5,
     "transitions": 1,
     "publishEvents": 44,
-    "rawBytes": 930610,
-    "stagingBytes": 888845,
+    "rawBytes": 930895,
+    "stagingBytes": 888959,
     "colorValues": {
       "literal": 6,
       "token": 6
     },
     "themeResolution": {
       "formula": 4,
-      "literal": 222,
+      "literal": 223,
       "token": 12
     }
   },

@@ -309,8 +309,17 @@ describe('keyframe emission', () => {
         'var(--jumi-filter-grayscale) var(--jumi-filter-hue-rotate) ' +
         'var(--jumi-filter-invert) var(--jumi-filter-saturate) ' +
         'var(--jumi-filter-sepia) var(--jumi-filter-opacity) ' +
-        'var(--jumi-filter-drop-shadow)',
+        'var(--jumi-filter-drop-shadow) ' +
+        'var(--jumi-filter-url, opacity(1))',
     )
+
+    // The url slot is read, and the components around it are not, which is the whole distinction the
+    // predicate makes: `filter-url` has a candidate addressing it and `filter-brightness` is reached
+    // transitively through the `filter-brightness` shorthand, so only the first has a writer a phrase
+    // can supply. The url slot also carries a fallback, which makes it the case that separates "a read
+    // with no writer" from "a read that voids the declaration" — an unresolved `var()` inside a filter
+    // list computes to `none` and drops every filter with it, measured.
+    expect(frame).toContain('var(--jumi-filter-url, opacity(1))')
 
     // The outer read is still absent, and for the opposite reason: `filter` is authored as parts, so
     // this phrase never wrote `--jumi-filter-${id}-40` and a lookup for it could never be answered.

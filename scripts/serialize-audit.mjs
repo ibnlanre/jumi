@@ -173,6 +173,22 @@ const registry = [
     'includes(part as never)',
     'whether a part takes the name or the slot key',
   ),
+  {
+    assumes:
+      'that a composition spells a slot as `var(--jumi-<component>` with the delimiter — `,` or `)` — immediately after the name, and that a slot’s own fallback nests at most one level',
+    breakable:
+      'only against a spelling Jumi does not produce. The text searched is the composition template this file builds in memory a few lines above, not a stylesheet, so no serializer stands between the two; and the lookahead is what stops a longer name that merely starts the same way (`--jumi-matrix` beside `--jumi-matrix-3d`) from being hooked by accident',
+    class: 'tolerant',
+    contains: '(?=[,)])((?:',
+    file: 'src/core/index.ts',
+    recovers:
+      'which slot a frame reads frame-first, so a phrase addressing one component of a composition moves it',
+    serialization:
+      'no — the input is Jumi’s own construction. The hazard is the mirror image of the `namedHoist` entries: those search sheet text a minifier had rewritten, this one searches a string built here, and the two must not be filed under one assumption',
+    structural:
+      'the slots are known when the composition is built, so this could be construction — the substitution could happen as the template is assembled rather than as a search over the assembled string, which is the migration this entry exists to point at',
+    symbol: 'createJumiModel',
+  },
 
   // ── a range: selector and value grammar, read from an author's class ─────────────────────────
   inferred(

@@ -13,6 +13,9 @@ export const backdropFilter = join(
     css('var', '--jumi-backdrop-filter-opacity'),
     css('var', '--jumi-backdrop-filter-saturate'),
     css('var', '--jumi-backdrop-filter-sepia'),
+    // The same slot as `filter`'s, and the same reason for the fallback: an unresolved url is ignored,
+    // but a read that references nothing voids the declaration. See `filter.ts`.
+    css('var', '--jumi-backdrop-filter-url', css('opacity', '1')),
   ],
   ' ',
 )

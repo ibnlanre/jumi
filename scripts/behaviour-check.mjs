@@ -1681,7 +1681,9 @@ const radiusHeld = await stepped({
 
 /** The four physical corners at the last offset, as one comparable string. */
 const cornersAt = (reading, at) =>
-  RADIUS_CORNERS.map(part => (reading.samples[part] ?? [])[at] ?? 'none').join(' ')
+  RADIUS_CORNERS.map(part => (reading.samples[part] ?? [])[at] ?? 'none').join(
+    ' ',
+  )
 
 const radius = [
   [
@@ -1702,8 +1704,175 @@ const radius = [
   ],
 ]
 
-for (const [claim, ok] of radius)
-  if (!ok) failures.push(`radius: ${claim}`)
+for (const [claim, ok] of radius) if (!ok) failures.push(`radius: ${claim}`)
+
+/* ------------------------------------------------------------------------------------
+ * 15. The url filter slots, and a fallback that is load-bearing.
+ * ---------------------------------------------------------------------------------- */
+
+// `filter` and `backdrop-filter` each carry a `url()` slot, and the writer that fills it is a phrase
+// whose frame key nothing used to read. The slot is what makes the authored url reach the chain.
+//
+// What the slot needs is a fallback, and the measurement that says so is narrower than the first probe
+// claimed. Measured 2026-09-16, in Chromium:
+//
+//   `grayscale(1) url()`          → the chain resolves, the url is inert
+//   `grayscale(1) url(#missing)`  → the chain resolves, the url is inert
+//   `grayscale(1) var(--unset)`   → the chain VOIDS — computed `filter: none`, nothing applies
+//
+// So an empty or unresolved url is **ignored**, not fatal; what voids the declaration is a read that
+// references nothing. The reason the first probe reached the opposite conclusion is a design flaw worth
+// keeping: its sibling filter and its baseline were both `blur(0px)`, the identity, so "looks the same
+// as plain" could not tell "voided" from "inert". The arms below read a pixel that can only mean one
+// thing — `grayscale(1)` on a red box is grey when the chain resolves and red when it does not — and the
+// pixel is also what caught the error, because the arm written from the old reading failed.
+const URL_FILTER_ENTRY = `\n@import "tailwindcss" source(none);\n@plugin "${path.join(root, 'dist', 'index.js')}";\n`
+
+const FILTER_URL = 'animate-filter-url-[0:#black|100:#black]'
+
+// The candidate that makes the fallback observable on its own: `grayscale(1)` on a red box is grey when
+// the chain resolves and red when it does not, so the pixel is an answer with no timing in it.
+const FILTER_GRAYSCALE = 'animate-filter-grayscale-[0:1|100:1]'
+const BACKDROP_URL = 'animate-backdrop-filter-url-[0:#black|100:#black]'
+
+const urlFilterCss = finalizeCss(
+  (await compiler(URL_FILTER_ENTRY, root)).build([
+    FILTER_URL,
+    FILTER_GRAYSCALE,
+    BACKDROP_URL,
+  ]),
+).css
+
+// An SVG filter that drives every channel to zero, so "the url applied" is a colour and not a
+// near-miss.
+const URL_FILTER_SVG = `<svg width="0" height="0"><filter id="black" color-interpolation-filters="sRGB">
+      <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" /></filter></svg>`
+
+const urlFilterBody = classes =>
+  `${URL_FILTER_SVG}<div style="width: 40px; height: 40px; background: rgb(255, 0, 0)" class="${classes}"></div>`
+
+/**
+ * The box as pixels, with the animation paused at the first offset so the reading is an offset rather
+ * than a race. A pixel is the assertion because the computed string is what lied in the probe: it
+ * listed the whole chain after the box had already stopped being filtered.
+ */
+const filtered = async ({ css, classes }) => {
+  const page = await load(css, urlFilterBody(classes))
+
+  await page.evaluate(async () => {
+    document.querySelector('div').getAnimations().forEach(animation => {
+      animation.pause()
+      animation.currentTime = 0
+    })
+
+    await new Promise(resolve => requestAnimationFrame(resolve))
+  })
+
+  const shot = await page.locator('div').screenshot()
+  await page.close()
+
+  return shot
+}
+
+/**
+ * The slot with no fallback and no resting declaration, which is what a writer that never ran leaves
+ * behind: the read references nothing, and an unresolved `var()` voids the whole declaration.
+ */
+const withoutUrlFallback = css =>
+  css
+    .replaceAll('var(--jumi-filter-url, opacity(1))', 'var(--jumi-filter-url)')
+    .replaceAll(
+      'var(--jumi-backdrop-filter-url, opacity(1))',
+      'var(--jumi-backdrop-filter-url)',
+    )
+    .replaceAll('--jumi-filter-url: opacity(1);', '')
+    .replaceAll('--jumi-backdrop-filter-url: opacity(1);', '')
+
+/** The frame-first url read removed, so the slot can only reach its fallback. */
+const withoutUrlFrameRead = css =>
+  css.replace(
+    /var\(--jumi-(backdrop-)?filter-url-[\w-]+-\d+, var\(--jumi-(?:backdrop-)?filter-url, opacity\(1\)\)\)/g,
+    'var(--jumi-$1filter-url, opacity(1))',
+  )
+
+const red = await filtered({ css: urlFilterCss, classes: '' })
+const urlApplied = await filtered({ css: urlFilterCss, classes: FILTER_URL })
+const urlUnhooked = await filtered({
+  css: withoutUrlFrameRead(urlFilterCss),
+  classes: FILTER_URL,
+})
+const grey = await filtered({ css: urlFilterCss, classes: FILTER_GRAYSCALE })
+const greyVoided = await filtered({
+  css: withoutUrlFallback(urlFilterCss),
+  classes: FILTER_GRAYSCALE,
+})
+
+/** `false` when the box is the untouched red reference, i.e. nothing filtered it. */
+const pixelsDiffer = shot => Buffer.compare(shot, red) !== 0
+
+const backdropOf = async css => {
+  const instance = await load(css, urlFilterBody(BACKDROP_URL))
+  const reading = await instance.evaluate(
+    () => getComputedStyle(document.querySelector('div')).backdropFilter,
+  )
+  await instance.close()
+  return reading
+}
+
+// The authorable form of the url slot: the candidate supplies `url(…)`, so the fragment inside is a
+// bare reference. A quoted fragment with a comma and angle brackets is the case that decides whether
+// the value is carried verbatim or re-parsed on the way through the composition.
+const quotedCss = finalizeCss(
+  (await compiler(URL_FILTER_ENTRY, root)).build([
+    'animate-filter-url-[0:"data:image/svg+xml,<svg/>"|100:"data:image/svg+xml,<svg/>"]',
+  ]),
+).css
+
+const quotedVerbatim =
+  /--jumi-filter-url-[\w-]+-0:\s*url\("data:image\/svg\+xml,<svg\/>"\)/.test(
+    quotedCss,
+  )
+
+const backdropUrl = await backdropOf(urlFilterCss)
+const backdropUnhooked = await backdropOf(withoutUrlFrameRead(urlFilterCss))
+
+const urls = [
+  [
+    'an authored url filter reaches the composed chain',
+    pixelsDiffer(urlApplied),
+    `the box rendered ${pixelsDiffer(urlApplied) ? 'black' : 'still the red reference'}`,
+  ],
+  [
+    'and it arrives through the frame, not the resting value',
+    !pixelsDiffer(urlUnhooked),
+    `with the frame read removed the box is ${pixelsDiffer(urlUnhooked) ? 'still black' : 'the red reference again'}`,
+  ],
+  [
+    'and a chain with no url authored keeps its other filters',
+    pixelsDiffer(grey),
+    `grayscale(1) rendered the box ${pixelsDiffer(grey) ? 'grey' : 'still red — the chain voided'}`,
+  ],
+  [
+    'and the assertion can fail: a slot with no fallback voids the chain',
+    !pixelsDiffer(greyVoided),
+    `with the fallback and the resting value gone the box is ${pixelsDiffer(greyVoided) ? 'still grey' : 'red, so grayscale never applied'}`,
+  ],
+  [
+    'backdrop-filter carries its url slot the same way',
+    backdropUrl.includes('url("#black")') &&
+      !backdropUnhooked.includes('url("#black")'),
+    `read ${backdropUrl.slice(0, 44)}…`,
+  ],
+  [
+    'and the author fragment reaches the slot verbatim, quoting included',
+    quotedVerbatim,
+    quotedVerbatim
+      ? 'quote, comma and angle brackets intact'
+      : 'the value was rewritten',
+  ],
+]
+
+for (const [claim, ok] of urls) if (!ok) failures.push(`url filter: ${claim}`)
 
 await browser.close()
 
@@ -1794,9 +1963,16 @@ for (const [claim, ok, detail] of radius)
     `    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`,
   )
 
+console.log('\n  url filters')
+
+for (const [claim, ok, detail] of urls)
+  console.log(
+    `    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`,
+  )
+
 // Every assertion above that can fail, so the summary line is the count it claims to be: the three
 // activation contexts, the pseudo substrate, the direct carriers, bare, applied, spacing, radius,
-// the three relationship-variant cases, non-inheritance, and the four composed sets.
+// the three relationship-variant cases, non-inheritance, and the five composed sets.
 const required =
   contexts.length +
   utilities.length +
@@ -1806,7 +1982,8 @@ const required =
   ownProperty.length +
   compositions.length +
   origins.length +
-  radius.length
+  radius.length +
+  urls.length
 const passing = required - failures.length
 
 console.log(`\n  ${passing}/${required} required contexts and carriers behave`)

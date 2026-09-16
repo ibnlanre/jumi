@@ -67,16 +67,27 @@ export const OPTIONAL = [
 ]
 
 /**
- * `var(<frame key>, var(<base>))` — a read that names its own fallback.
+ * `var(<frame key>, var(<base>` … — a read that names its own fallback. The closing paren is **not**
+ * part of the match, and that is the whole design.
  *
- * Matched as a shape rather than inferred from name arithmetic, because the two readings of the same
- * name are exactly what has to be told apart: a **component hook**
- * (`var(--jumi-scale-x-<id>-0, var(--jumi-scale-x))`, whose base is a component) and an **outer read**
- * (`var(--jumi-outline-<id>-0, var(--jumi-outline))`, whose base is the keyframe's own property). The
- * second must be written by the phrase that owns the keyframe; only the first has a writer class that
- * may simply be missing from this stylesheet.
+ * Two shapes have to be told apart by the base: a **component hook**
+ * (`var(--jumi-scale-x-<id>-0, var(--jumi-scale-x))`, whose base is a component, and whose writer class
+ * is a constituent phrase that may simply be absent from this stylesheet) and an **outer read**
+ * (`var(--jumi-outline-<id>-0, var(--jumi-outline))`, whose base is the keyframe's own property, and which
+ * the phrase that owns the keyframe must have written).
+ *
+ * Reaching the inner `var(` through a lookahead rather than by consuming it is what makes both the outer
+ * read and the hook inside it get **visited**. A pattern that consumed the pair would match the outer one,
+ * skip past the `var(` of the hook nested inside its fallback, and report every hook it swallowed as a dead
+ * read — which is exactly what one version of this did to 20 reads across `rotate-x`, `scale-x` and the
+ * logical corners.
+ *
+ * Not requiring the closing paren is also what makes a slot's own fallback irrelevant. A component's
+ * fallback is another variable (`var(--jumi-scale-x)`), a composition slot's is a function call
+ * (`var(--jumi-filter-url, opacity(1))`), and an outer read's is a whole chain of both — under a
+ * closing-paren pattern only the first shape matches, and the correct CSS of the other two reads as dead.
  */
-const LOOKUP = /var\(\s*(--jumi-[^,)\s]+)\s*,\s*var\(\s*(--jumi-[^,)\s]+)\s*\)/g
+const LOOKUP = /var\(\s*(--jumi-[^,)\s]+)\s*,\s*(?=var\(\s*(--jumi-[^,)\s]+))/g
 
 /** A frame key: `<property>-<id>-<offset>`, as a phrase writes it and a keyframe reads it. */
 const FRAME_KEY = /^--jumi-[\w-]+-[A-Za-z0-9]{5,8}-\d+$/
