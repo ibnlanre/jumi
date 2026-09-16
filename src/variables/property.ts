@@ -27,6 +27,7 @@ import { borderBlock } from '@/composition/border-block'
 import { borderBlockEnd } from '@/composition/border-block-end'
 import { borderBlockRadius } from '@/composition/border-block-radius'
 import { borderBlockStart } from '@/composition/border-block-start'
+import { borderBlockWidth } from '@/composition/border-block-width'
 import { borderBottom } from '@/composition/border-bottom'
 import { borderImage } from '@/composition/border-image'
 import {
@@ -40,6 +41,7 @@ import { borderInlineEnd } from '@/composition/border-inline-end'
 import { borderInlineRadius } from '@/composition/border-inline-radius'
 import { borderInlineStart } from '@/composition/border-inline-start'
 import { borderLeft } from '@/composition/border-left'
+import { borderInlineWidth } from '@/composition/border-inline-width'
 import { borderRadius } from '@/composition/border-radius'
 import { borderRight } from '@/composition/border-right'
 import { borderTop } from '@/composition/border-top'
@@ -59,6 +61,7 @@ import { font } from '@/composition/font'
 import { fontSynthesis } from '@/composition/font-synthesis'
 import { grid } from '@/composition/grid'
 import { gridArea } from '@/composition/grid-area'
+import { gap } from '@/composition/gap'
 import { gridColumn } from '@/composition/grid-column'
 import { gridRow } from '@/composition/grid-row'
 import { gridTemplate } from '@/composition/grid-template'
@@ -565,7 +568,10 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-border-block-style',
   },
   'border-block-width': {
-    value: 'medium',
+    // A real shorthand over its logical edges, modelled late rather than never: `border-block` reads
+    // `border-block-width`, and this reads the two edges beneath it.
+    dependencies: ['border-block-start-width', 'border-block-end-width'],
+    value: borderBlockWidth,
     variable: '--jumi-border-block-width',
   },
   'border-bottom': {
@@ -1380,7 +1386,11 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-forced-color-adjust',
   },
   'gap': {
-    value: '0',
+    // The composition was written and never imported — `src/composition/gap.ts` existed with no
+    // importer at all, which is what an unfinished integration looks like from the outside. Its order
+    // is row then column, which is the order the `gap` shorthand itself takes.
+    dependencies: ['row-gap', 'column-gap'],
+    value: gap,
     variable: '--jumi-gap',
   },
   'grid': {
