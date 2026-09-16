@@ -5,19 +5,23 @@ import { describe, expect, it } from 'vitest'
 import { compositionEdges } from '@/variables/composition'
 import { propertyVariables } from '@/variables/property'
 
-import { typedLeaves, typedLeavesOf } from './typed-leaves'
+import { typedLeaves, typedLeavesOf, scaleFactorToNumber } from './typed-leaves'
 
 describe('typed leaf declarations', () => {
   it('declares the three scale leaves as numbers-or-percentages resting at one', () => {
     // A union rather than `<number>`, measured: `animate-scale-x-[50%]` reaches the leaf through
     // the `any` escape hatch and works today, and a `<number>` registration silently resets that
     // value to the initial. The union keeps it and leaves numeric interpolation identical.
-    const syntax = '<number> | <percentage>'
+    const leaf = {
+      animationCanonicalizer: scaleFactorToNumber,
+      initialValue: '1',
+      syntax: '<number> | <percentage>',
+    }
 
     expect(typedLeavesOf('scale')).toEqual([
-      ['scale-x', { initialValue: '1', syntax }],
-      ['scale-y', { initialValue: '1', syntax }],
-      ['scale-z', { initialValue: '1', syntax }],
+      ['scale-x', leaf],
+      ['scale-y', leaf],
+      ['scale-z', leaf],
     ])
   })
 
@@ -63,5 +67,81 @@ describe('typed leaf declarations', () => {
     // The overwhelming majority, and the answer a consumer must handle.
     expect(typedLeavesOf('rotate')).toEqual([])
     expect(typedLeavesOf('not-a-property' as PropertyType)).toEqual([])
+  })
+})
+
+describe('scaleFactorToNumber', () => {
+  it('writes a percentage as the scale factor it equals', () => {
+    // Native `scale` treats `50%` and `0.5` as the same factor. A registered property does not
+    // interpolate across the union, so a frame has to pick one representation — this one.
+    expect(scaleFactorToNumber('150%')).toBe('1.5')
+    expect(scaleFactorToNumber('50%')).toBe('0.5')
+    expect(scaleFactorToNumber('100%')).toBe('1')
+    expect(scaleFactorToNumber('0%')).toBe('0')
+  })
+
+  it('keeps the sign and the fraction', () => {
+    expect(scaleFactorToNumber('-25%')).toBe('-0.25')
+    expect(scaleFactorToNumber('+25%')).toBe('0.25')
+    expect(scaleFactorToNumber('12.25%')).toBe('0.1225')
+    expect(scaleFactorToNumber('33.333%')).toBe('0.33333')
+    expect(scaleFactorToNumber('-0.5%')).toBe('-0.005')
+  })
+
+  it('returns a plain number as authored', () => {
+    // Identity, deliberately: normalizing `2` to `2` is a change with no effect, and one more
+    // thing a test has to pin.
+    expect(scaleFactorToNumber('2')).toBe('2')
+    expect(scaleFactorToNumber('-1')).toBe('-1')
+    expect(scaleFactorToNumber('1.5')).toBe('1.5')
+    expect(scaleFactorToNumber('.5')).toBe('.5')
+  })
+
+  it('declines anything outside the scalar forms rather than guessing', () => {
+    // The narrowness is the contract: a frame may differ from what an author wrote only when the
+    // difference is equivalent *under `scale`'s own grammar*. Everything here is either a
+    // different property's value, a whole-property keyword, or not a value at all.
+    for (const value of [
+      'none',
+      'var(--x)',
+      'calc(1)',
+      '1px',
+      '1deg',
+      '50 %',
+      '50%%',
+      '%',
+      '',
+      '  ',
+      '2 3',
+      'auto',
+      'NaN%',
+    ])
+      expect(scaleFactorToNumber(value), value).toBeNull()
+  })
+
+  it('trims before deciding, so a padded value is still a scale factor', () => {
+    expect(scaleFactorToNumber(' 150% ')).toBe('1.5')
+    expect(scaleFactorToNumber(' 2 ')).toBe('2')
+  })
+
+  it('is declared on every scale leaf', () => {
+    // The field is the reason the union is safe for animation: without it a frame writes the
+    // authored form and a mixed number/percentage pair steps instead of blending.
+    for (const [, leaf] of typedLeavesOf('scale'))
+      expect(leaf.animationCanonicalizer).toBe(scaleFactorToNumber)
+  })
+
+  it('reproduces the measured native endpoints for the pinned pairs', () => {
+    // The measurement this field exists for, as the values it consumes: animating `1 → 150%`
+    // native-blends, and the canonical pair is what makes the typed leaf blend the same way.
+    const pairs: Array<[string, string]> = [
+      ['1', '1'],
+      ['150%', '1.5'],
+      ['50%', '0.5'],
+      ['2', '2'],
+    ]
+
+    for (const [authored, canonical] of pairs)
+      expect(scaleFactorToNumber(authored)).toBe(canonical)
   })
 })
