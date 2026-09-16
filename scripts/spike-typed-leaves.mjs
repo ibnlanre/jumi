@@ -24,13 +24,13 @@
  */
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
-import postcss from 'postcss'
 import { chromium } from 'playwright'
 
 import { build, compiler, root } from './lib/compile.mjs'
 import { typedLeaves } from './prototype/typed-leaves.mjs'
 
 import path from 'node:path'
+import postcss from 'postcss'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 
@@ -286,9 +286,17 @@ header('§5  the function reshape — every case the ruling named')
  * property to one of them and the other goes silent.
  */
 const RESHAPE = {
+  'arbitrary whole stays native': ['animate-filter-[0:none|100:var(--f)]'],
   'independent blur and brightness': [
     'animate-filter-blur-[0:0px|100:8px]',
     'animate-filter-brightness-[0:1|100:3]',
+  ],
+  'named control': ['animate-filter-blur-[0:0px|50:4px|100:8px]/zoom'],
+  'quoted whole stays native': ['animate-filter-[0:"none"|100:"blur(4px)"]'],
+  'scroll range and timeline': ['animate-filter-blur-[0:0px|100:8px]/scroll'],
+  'url has not regressed': [
+    'animate-filter-url-[0:url(#a)|100:url(#b)]',
+    'animate-filter-blur-[0:0px|100:8px]',
   ],
   'whole filter + blur constituent': [
     'animate-filter-[0:none|100:brightness(2)]',
@@ -296,14 +304,6 @@ const RESHAPE = {
   ],
   'whole that cannot be decomposed': [
     'animate-filter-[0:none|100:blur(4px)_drop-shadow(0_0_2px_red)]',
-  ],
-  'named control': ['animate-filter-blur-[0:0px|50:4px|100:8px]/zoom'],
-  'scroll range and timeline': ['animate-filter-blur-[0:0px|100:8px]/scroll'],
-  'quoted whole stays native': ['animate-filter-[0:"none"|100:"blur(4px)"]'],
-  'arbitrary whole stays native': ['animate-filter-[0:none|100:var(--f)]'],
-  'url has not regressed': [
-    'animate-filter-url-[0:url(#a)|100:url(#b)]',
-    'animate-filter-blur-[0:0px|100:8px]',
   ],
 }
 
