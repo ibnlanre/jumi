@@ -208,8 +208,23 @@ export const identityAccepted = (identity: string) =>
  */
 const SINGLE_CLASS = /^\.(?:\\.|[^:\\])+$/
 
+/**
+ * A `:where(…)` marker, with the whitespace a serializer may put inside the parens tolerated.
+ *
+ * One helper rather than three patterns, because the three readers share one assumption and copies of an
+ * assumption drift — which this file has already paid for once, in a reader that assumed one selector per
+ * rule. Whitespace inside the parens is legal and a printer may introduce it: `:where( .hero )` is the same
+ * selector, and a literal written `:where(.hero)` reads nothing off it. Measured — `padded-parens` in
+ * `serialize-differential.mjs` loses both view-transition identities without this.
+ *
+ * Whitespace *before* the `(` is deliberately not tolerated. `:where (` is not valid CSS, so no serializer
+ * produces it, and tolerating it would mean matching text no stylesheet can hold.
+ */
+const markerPattern = (body: string) =>
+  new RegExp(`:where\\(\\s*${body}\\s*\\)$`)
+
 /** The marker a staged rule ends with, and the two facts it carries. */
-const MARKER = new RegExp(`:where\\(\\.${markerPrefix}(old|new)-([\\w-]+)\\)$`)
+const MARKER = markerPattern(`\\.${markerPrefix}(old|new)-([\\w-]+)`)
 
 /**
  * The marker's shape without its content, for deciding what is staging rather than what it says.
@@ -218,7 +233,7 @@ const MARKER = new RegExp(`:where\\(\\.${markerPrefix}(old|new)-([\\w-]+)\\)$`)
  * own — collected, taken out of the element's cascade, and reported — instead of being left in the
  * output as a rule that matches nothing and says nothing.
  */
-const STAGING_SHAPE = new RegExp(`:where\\(\\.${markerPrefix}[^)]*\\)$`)
+const STAGING_SHAPE = markerPattern(`\\.${markerPrefix}[^)]*`)
 
 /** A media query Jumi owns, so it never conditions participation. */
 const JUMI_OWNED_QUERY =
@@ -311,9 +326,9 @@ const readStaged = (
   isMotion: (rule: Rule) => boolean,
 ): null | Staged | ViewTransitionRefusal => {
   const { rule, selector } = staging
-  const refused = new RegExp(
-    `:where\\(\\.${invalidPrefix}(missing|name)\\)$`,
-  ).exec(selector)
+  const refused = markerPattern(`\\.${invalidPrefix}(missing|name)`).exec(
+    selector,
+  )
 
   if (refused) return refused[1] as ViewTransitionRefusal
 

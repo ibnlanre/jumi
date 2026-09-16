@@ -263,6 +263,38 @@ const shorthandParts = SHORTHAND.filter(part => part !== 'animation-name')
  */
 const hoistedName = (slot: string) => `--jumi-slot-${slot}`
 
+/** A literal made safe to put in a pattern. */
+const escapePattern = (text: string) =>
+  text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+/**
+ * A `var()` link whose head is swapped, matched however the sheet spaced it.
+ *
+ * The whitespace is not decoration and this is not defensive spelling. A link Jumi builds reads
+ * `var(--jumi-slot-<key>-<part>, …`, and the text it is matched against **came off the sheet** — which a
+ * minifier may already have been through, in which case the same link reads `,(` and a literal written
+ * with the space matches nothing at all. That is the whole failure: the seven parts kept the slot-keyed
+ * address while the one link built in the same call kept its label, so the sheet contained both spellings
+ * and neither looked wrong on its own. Two producers, two spacings.
+ *
+ * Measured by building the docs site against an unminified CLI build of the same commit: the docs — the
+ * only pipeline here that optimizes — swapped nothing.
+ */
+const linkHead = (variable: string) =>
+  new RegExp(`var\\(\\s*${escapePattern(variable)}\\s*,\\s*`, 'g')
+
+/**
+ * A whole `var(<variable>, var(<fallback>))` link, for the one swap that wraps rather than splices.
+ *
+ * Whole, because the replacement has to close a paren the match opened: consuming only the head would leave
+ * the wrapper unbalanced, and consuming the tail separately would be a second textual assumption about the
+ * fallback instead of one about the link.
+ */
+const wholeLink = (variable: string, fallback: string) =>
+  new RegExp(
+    `var\\(\\s*${escapePattern(variable)}\\s*,\\s*var\\(\\s*${escapePattern(fallback)}\\s*\\)\\s*\\)`,
+  )
+
 /**
  * The hoist's value with the author's name as the first link of every part the shorthand carries.
  *
@@ -299,18 +331,24 @@ const namedHoist = (
     ACTIVATED_SLOT.test(candidate.prop),
   )?.value
 
+  // The selection link is a whole link wrapped, and the search for it is the same lesson as the seven
+  // below: Jumi writes this one with `, ` and the value it searches came off the sheet. Minified, that
+  // space is gone — and this link is the *entire* output of a timing phrase, so a phrase that stopped
+  // matching did not look broken, it looked unapplied.
   const selectedValue =
     definition && selected.has(key)
       ? value.replace(
-          `var(--${definition}-animation-name, var(--jumi-animation-name))`,
+          wholeLink(`--${definition}-animation-name`, '--jumi-animation-name'),
           `var(${cssEscape(`--jumi-slot-${key}-animation-name`)}, var(--${definition}-animation-name, var(--jumi-animation-name)))`,
         )
       : value
 
+  // Both swaps go through the one helper, because the reason one of them was wrong is the reason the other
+  // one could be: a link Jumi built with a space in it, searched for inside text that came off the sheet.
   return shorthandParts.reduce(
     (text, part) =>
       text.replaceAll(
-        `var(${hoistedName(key)}-${part}, `,
+        linkHead(`${hoistedName(key)}-${part}`),
         `var(${cssEscape(`--jumi-label-${name}-${part}`)}, `,
       ),
     selectedValue,
@@ -319,7 +357,10 @@ const namedHoist = (
 
 /** The slot a composition entry reads, or null when the entry is not a slot reference. */
 const referencedSlot = (entry: string) => {
-  const match = /^var\(--jumi-(.+?)-animation-name\b/.exec(entry.trim())
+  // The same matched-not-prefixed reading as `linkedSlot`, and found the same way — by measuring rather
+  // than by looking: with whitespace inside the parens this reader answered null for every position, so
+  // the instances that fall back to the definition's key lost their hoist entirely.
+  const match = /^var\(\s*--jumi-(.+?)-animation-name\b/.exec(entry.trim())
 
   return match ? match[1] : null
 }
@@ -346,11 +387,15 @@ const referencedSlot = (entry: string) => {
  */
 const linkedSlot = (entry: string, part: string) => {
   const text = entry.trim()
-  const prefix = 'var(--jumi-slot-'
+  // Matched rather than prefixed, for the same reason the swaps are patterns: whitespace just inside the
+  // parens is legal, so `var( --jumi-slot-…` is the same link and a prefix test read no instance off it —
+  // the hoist was then published under the definition's key and every name-keyed control reached nothing.
+  // Measured as arm `padded-parens` in `serialize-differential.mjs`, which is where it surfaces.
+  const opened = /^var\(\s*--jumi-slot-/.exec(text)
 
-  if (!text.startsWith(prefix)) return null
+  if (!opened) return null
 
-  const body = text.slice(prefix.length)
+  const body = text.slice(opened[0].length)
   const cut = body.indexOf('-')
 
   if (cut < 1) return null
