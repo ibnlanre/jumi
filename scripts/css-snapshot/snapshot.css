@@ -1454,6 +1454,21 @@
   }
 }
 @layer base {
+  @property --jumi-scale-x {
+    inherits: false;
+    initial-value: 1;
+    syntax: "<number> | <percentage>";
+  }
+  @property --jumi-scale-y {
+    inherits: false;
+    initial-value: 1;
+    syntax: "<number> | <percentage>";
+  }
+  @property --jumi-scale-z {
+    inherits: false;
+    initial-value: 1;
+    syntax: "<number> | <percentage>";
+  }
   @property --jumi-scale-d38-animation-name {
     inherits: false;
     syntax: "*";

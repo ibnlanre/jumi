@@ -20,6 +20,7 @@ import { replaceSlots } from '@/helpers/slots'
 import { effectKeyframes } from '@/keyframes/effects'
 import { isFullyAddressable } from '@/variables/composition'
 import { propertyVariables } from '@/variables/property'
+import { typedLeavesOf } from '@/variables/typed-leaves'
 
 import cssEscape from 'css.escape'
 import shorthash2 from 'shorthash2'
@@ -322,6 +323,17 @@ export function createJumiModel({
   const phrases = new Map<AnimatableStandardPropertyType, Map<string, string>>()
   // Names already registered as non-inheriting.
   const registered = new Set<string>()
+
+  /**
+   * Leaves already registered as **typed**.
+   *
+   * A set of its own rather than a share of `registered`, because the two registrations are
+   * different promises over the same namespace: a token registration says "do not inherit this",
+   * and a typed one says "this holds this kind of thing". A name can need one, the other, or — if a
+   * leaf were ever both an activation and a typed leaf — both, and sharing the set would silently
+   * make the second registration a no-op.
+   */
+  const typed = new Set<string>()
 
   /**
    * Register a slot's activation variable as non-inheriting, the moment the slot
@@ -1123,6 +1135,33 @@ export function createJumiModel({
 
   const register = (attribute: AnimatableStandardPropertyType) => {
     properties.add(attribute)
+
+    /**
+     * A family's typed leaves are registered **because the family is brought into the build**, not
+     * because the family is declared.
+     *
+     * The declaration is static — the model always knows `scale` has three typed leaves — but a
+     * stylesheet that never mentions scale must not acquire three `@property` rules for it. So the
+     * demand is this call, which is made where a candidate declares it animates the attribute, and
+     * the `typed` set keeps it to one registration per leaf however many candidates arrive.
+     *
+     * Separate from `registerName` on purpose, and the lifetimes are the reason: an activation name
+     * is registered **per slot**, a typed leaf **per family leaf**. Conflating them would make it
+     * hard to say when a leaf got its computed initial value, and a leaf has one whether or not any
+     * slot exists.
+     */
+    for (const [leaf, declaration] of typedLeavesOf(
+      attribute as PropertyType,
+    )) {
+      if (typed.has(leaf)) continue
+
+      typed.add(leaf)
+      sink.property(`--jumi-${leaf}`, {
+        initialValue: declaration.initialValue,
+        kind: 'typed',
+        syntax: declaration.syntax,
+      })
+    }
   }
 
   function transitionVariables(attribute: string): string {

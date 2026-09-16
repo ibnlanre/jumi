@@ -4,10 +4,10 @@
     "aggregateShare": 12,
     "aggregateWrites": 4,
     "animations": 1,
-    "bytes": 99215,
+    "bytes": 99560,
     "keyframes": 41,
     "media": 5,
-    "properties": 104,
+    "properties": 107,
     "protocol": {
       "staging": 0
     },
@@ -16,7 +16,7 @@
     "supports": 5,
     "transitions": 1,
     "publishEvents": 44,
-    "rawBytes": 966873,
+    "rawBytes": 967218,
     "stagingBytes": 924659,
     "colorValues": {
       "literal": 6,
@@ -33,10 +33,10 @@
     "aggregateShare": 12,
     "aggregateWrites": 3,
     "animations": 1,
-    "bytes": 42107,
+    "bytes": 42452,
     "keyframes": 18,
     "media": 1,
-    "properties": 58,
+    "properties": 61,
     "protocol": {
       "staging": 0
     },
@@ -45,7 +45,7 @@
     "supports": 5,
     "transitions": 0,
     "publishEvents": 21,
-    "rawBytes": 222741,
+    "rawBytes": 223086,
     "stagingBytes": 204455,
     "colorValues": {
       "literal": 2,
