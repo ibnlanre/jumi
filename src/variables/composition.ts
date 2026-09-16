@@ -105,3 +105,33 @@ export const isDirectlyAddressable = (
   compositionEdges
     .get(attribute)
     ?.some(edge => edge.dependency === dependency && edge.addressable) ?? false
+
+/**
+ * Whether **every** dependency `attribute` composes is directly addressable — the
+ * eligibility a part motion needs before it may be given an animation identity of
+ * its own.
+ *
+ * It is a property of the graph, and that is the point: it is fixed before any
+ * candidate compiles, so a decision keyed on it cannot change when a later
+ * candidate arrives. The alternative — deciding against the live instance set —
+ * is architecturally cleaner and was deliberately not taken, because a slot's
+ * keyframe is emitted where the slot is created, and a slot that later became
+ * ineligible could not retract it. The cost of the graph-stable rule is reach,
+ * not correctness: `scale` qualifies at 3/3, `filter` does not at 9/11, and
+ * `transform` does not at 0/7 because all seven of its dependencies are
+ * composites.
+ *
+ * Deliberately asks about the **declared dependencies**, not the parts any
+ * candidate exposes. A property whose public surface looks complete can still
+ * compose an internal fallback edge — `box-shadow` composes `inset` over
+ * `outset` — and a rule reading the candidate set would call that property
+ * addressable while one of its reads is not.
+ *
+ * A property that composes nothing has no dependencies to fail on and answers
+ * `false`: a leaf is not a composition that parts belong to.
+ */
+export const isFullyAddressable = (attribute: PropertyType): boolean => {
+  const edges = compositionEdges.get(attribute)
+
+  return !!edges?.length && edges.every(edge => edge.addressable)
+}

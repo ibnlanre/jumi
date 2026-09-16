@@ -1,9 +1,14 @@
-import { describe, expect, it } from 'vitest'
-
 import type { PropertyType } from '@/types'
 
-import { compositionEdges, isDirectlyAddressable } from './composition'
+import { describe, expect, it } from 'vitest'
+
 import { propertyVariables } from '@/variables/property'
+
+import {
+  compositionEdges,
+  isDirectlyAddressable,
+  isFullyAddressable,
+} from './composition'
 
 const edge = (attribute: PropertyType, dependency: PropertyType) =>
   compositionEdges.get(attribute)?.find(one => one.dependency === dependency)
@@ -107,5 +112,43 @@ describe('composition edges', () => {
     expect(
       isDirectlyAddressable('not-a-property' as PropertyType, 'scale-x'),
     ).toBe(false)
+  })
+})
+
+describe('fully addressable composites', () => {
+  it('qualifies a composite whose every dependency is a bare leaf', () => {
+    // `scale` composes `var(--jumi-scale-x) var(--jumi-scale-y) var(--jumi-scale-z)` —
+    // three bare reads of three leaves, so a part motion on it may be keyed on its own.
+    expect(isFullyAddressable('scale')).toBe(true)
+  })
+
+  it('refuses a composite with a single fallback read', () => {
+    // `filter` is 9 of 11: `filter-url` is read with a fallback and
+    // `filter-drop-shadow` is itself a composite. One non-addressable edge is enough —
+    // this is the whole reason the rule reads every dependency rather than a sample.
+    expect(isFullyAddressable('filter')).toBe(false)
+    expect(isFullyAddressable('backdrop-filter')).toBe(false)
+  })
+
+  it('refuses a composite whose dependencies are all composites', () => {
+    // `transform` is 0 of 7: `skew-x` is reachable only by descending `skew`, which is
+    // a routing problem this rule declines rather than solves.
+    expect(isFullyAddressable('transform')).toBe(false)
+  })
+
+  it('refuses a composite with an internal fallback edge', () => {
+    // `box-shadow` composes `var(--jumi-box-shadow-inset, var(--jumi-box-shadow-outset))`.
+    // Both dependencies are `fallback`, so the property is refused — which is the case a
+    // rule reading the candidate surface instead of the declared dependencies would miss,
+    // because no candidate addresses either component.
+    expect(isFullyAddressable('box-shadow')).toBe(false)
+  })
+
+  it('refuses a property that composes nothing', () => {
+    // A leaf has no dependencies to fail on, and must not read as "vacuously
+    // addressable" — that would make every leaf a composition parts belong to.
+    expect(isFullyAddressable('scale-x')).toBe(false)
+    expect(isFullyAddressable('filter-blur')).toBe(false)
+    expect(isFullyAddressable('not-a-property' as PropertyType)).toBe(false)
   })
 })
