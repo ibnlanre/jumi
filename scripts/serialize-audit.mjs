@@ -193,35 +193,16 @@ const registry = [
     'the numeric offsets a keyframe selector names',
     'commas separate the list and each part is trimmed — a keyframe offset cannot contain either',
   ),
-  // ── the marker readers: the one bucket left standing ────────────────────────────────────────
-  {
-    anchor:
-      'const MARKER = new RegExp(`:where\\(\\\\.${markerPrefix}(old|new)-([\\\\w-]+)',
-    assumes:
-      'the emitted selector spells `:where(.jumi-vt-old-hero)` with no space after `(` — the shape Jumi itself writes',
-    breakable:
-      'only a serializer that **inserts** whitespace where there was none. Minification only tightens, so a build cannot reach it; a beautifier could',
-    class: 'spacing',
-    file: transitions,
-    recovers: 'the side, the identity and the source element of a staged rule',
-    serialization:
-      'no for minified, formatted or tightened — measured — and yes for a space-inserting printer',
-    structural:
-      'the marker is Jumi’s own emission, so the alternative is carrying the two facts beside the selector instead of re-reading them out of it',
-  },
-  {
-    anchor:
-      'const STAGING_SHAPE = new RegExp(`:where\\\\.\\${markerPrefix}[^)]*\\\\)$`)',
-    assumes:
-      'the same, wider: `:where(` immediately followed by the marker prefix',
-    breakable: 'no — the pattern it names is built by `markerPattern` now',
-    class: 'tolerant',
-    file: transitions,
-    recovers:
-      'that a selector is staging at all, when its content cannot be read',
-    serialization: 'no for every serializer measured here',
-    structural: 'same as above',
-  },
+  // ── the marker readers — hardened, and reachable by the differential ────────────────────────────────────────
+  tolerant(
+    transitions,
+    'new RegExp(`:where',
+    'the side, the identity or the refusal a `:where(…)` marker carries',
+    'whitespace inside the parens — `\\s*` on both sides of the marker body — and none before the `(`, which is not valid CSS',
+  ),
+  // The two pattern definitions that stood here are gone as entries, and not as an omission: their code is
+  // `markerPattern`'s body now, which carries no operation a line-based scan can see.
+
   {
     anchor: 'const refused = markerPattern(',
     assumes:

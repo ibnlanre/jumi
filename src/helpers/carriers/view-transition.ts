@@ -220,8 +220,12 @@ const SINGLE_CLASS = /^\.(?:\\.|[^:\\])+$/
  * Whitespace *before* the `(` is deliberately not tolerated. `:where (` is not valid CSS, so no serializer
  * produces it, and tolerating it would mean matching text no stylesheet can hold.
  */
-const markerPattern = (body: string) =>
-  new RegExp(`:where\\(\\s*${body}\\s*\\)$`)
+// The parameter is named for what it is *and* so this line stays visible to `serialize-audit`: the audit
+// inventories rewrites by operation and subject, so a line that calls `new RegExp` over something called
+// `body` is a rewrite nobody can see. Renaming it back would take the helper's one assumption — any
+// whitespace inside the parens, none before it — out of the census without changing a character of it.
+const markerPattern = (markerBody: string) =>
+  new RegExp(`:where\\(\\s*${markerBody}\\s*\\)$`)
 
 /** The marker a staged rule ends with, and the two facts it carries. */
 const MARKER = markerPattern(`\\.${markerPrefix}(old|new)-([\\w-]+)`)
