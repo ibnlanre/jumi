@@ -85,15 +85,50 @@ the property it is declared under, so adding dependencies would invent a relatio
 the graph: `property('outline-offset')` and `property('transform-style')`, one line each — after which
 the frame reads the key the phrase wrote, because part and attribute are by then the same name.
 
+### The 4 logical/physical cases — probed 2026-09-16
+
+The four `*radius` candidates declare `property('border-radius', ['border-end-end-radius', …])` — logical
+corner names — while `border-radius` composes the four **physical** corners, so the parts are never read.
+The question is which representation should be canonical. Measured in Chromium, three contexts, same
+declared values:
+
+| context        | `border-radius: 10 20 30 40` | logical longhands `ss se ee es` = 10 20 30 40 |
+| -------------- | ---------------------------- | --------------------------------------------- |
+| `ltr`          | 10px 20px 30px 40px          | 10px 20px 30px 40px                           |
+| `rtl`          | 10px 20px 30px 40px          | **20px 10px 40px 30px**                        |
+| `vertical-rl`  | 10px 20px 30px 40px          | **40px 10px 20px 30px**                        |
+
+The physical shorthand is context-independent; the logical names are resolved **by the browser, per
+context**. So converting logical candidates to physical corners inside Jumi — the easy-looking option —
+would bake in LTR/horizontal assumptions, since a class is used in any context and the build has no
+direction to consult. That model is falsified by the table above.
+
+What does work, measured: a keyframe that animates the **logical longhands themselves** drives the
+physical corners through the browser's own resolution in all three contexts (at 999ms of a 1s
+linear from `10 20 30 40` to `40 30 20 10`: `39.97 29.99 20.01 10.03` under `ltr`, `29.99 39.97 10.03
+20.01` under `rtl`, `10.03 39.97 29.99 20.01` under `vertical-rl`). Both `border-start-start-radius` and
+`border-block-start-start-radius` are supported.
+
+**Recommended representation:** the candidate's parts are the *animated properties*. The frame declares
+each logical longhand it addresses,
+`border-end-end-radius: var(--jumi-border-end-end-radius-<id>-0, var(--jumi-border-end-end-radius))`, and
+the browser resolves. Nothing is mapped in Jumi, no dependency read is widened, and the variables stay
+per-part.
+
+That needs one model extension: a phrase frame currently writes a single `[attribute]: value`, and each of
+these four candidates addresses **two** corners, so the frame has to carry one declaration per part. Multi
+property keyframes are not new here — the effect keyframes are hand-written that way — but this is the
+first *generated* one, which is why it is a ruling rather than a detail.
+
 ### What is left — 37
 
 - **The 33 nested** — the real work, and the only route where the acceptance test below has to answer
   _how_ the value reaches the frame. `box-shadow` 5, `filter` 5, `backdrop-filter` 5, `transform` 2
   (`skew-x`/`skew-y`), and the four position families 4 each (`background-position`, `object-position`,
   `offset-anchor`, `offset-position`).
-- **The 4 "other name"** — logical against physical. `border-radius` composes the four physical corners
-  while the candidates write `border-end-end-radius` and friends. Either the composition reads both
-  spellings or the candidates address the physical ones; that is a naming ruling, not new machinery.
+- **The 4 "other name"** — the `*radius` candidates above. The probe has now chosen the representation
+  (logical names, browser-resolved), so this is no longer a naming question: what remains is the model
+  extension it needs, and then 37 → 33.
 
 ## The acceptance test for closing it
 
