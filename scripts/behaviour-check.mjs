@@ -1253,81 +1253,186 @@ const constituentCss = finalizeCss(
  * happened to reach, and two models compared that way differ by timing rather than by chain — measured
  * on the harness this replaces.
  */
-const stretched = async css => {
-  const page = await load(
-    css,
-    `<div class="animate-scale-x-[0:1|100:0] animate-scale-y-[0:1|100:0] animate-scale-z-[0:1|100:0]"></div>`,
+/**
+ * A page stepped to five offsets, sampled for the properties asked of it.
+ *
+ * Paused and stepped by `currentTime`, not sampled live: a live read takes whatever moment the machine
+ * happened to reach, and two models compared that way differ by timing rather than by chain — measured
+ * on the harness this replaces. `prefix` selects the animations under test, so one page can carry more
+ * than one motion without the two being read for each other.
+ */
+const stepped = async ({ body, css, prefix, properties }) => {
+  const page = await load(css, body)
+
+  const reading = await page.evaluate(
+    async ({ prefix: startsWith, properties: parts }) => {
+      const element = document.querySelector('div')
+      const own = element
+        .getAnimations()
+        .filter(animation =>
+          (animation.animationName ?? '').startsWith(startsWith),
+        )
+
+      if (!own.length) return { names: [], samples: {} }
+
+      own.forEach(animation => animation.pause())
+
+      const duration = own[0].effect?.getTiming?.().duration ?? 0
+      const samples = Object.fromEntries(parts.map(part => [part, []]))
+
+      for (const share of [0, 0.25, 0.5, 0.75, 1]) {
+        own.forEach(animation => {
+          animation.currentTime = duration * share
+        })
+
+        await new Promise(resolve => requestAnimationFrame(resolve))
+
+        const style = getComputedStyle(element)
+
+        for (const part of parts) samples[part].push(style[part])
+      }
+
+      return { names: own.map(animation => animation.animationName), samples }
+    },
+    { prefix, properties },
   )
-
-  const reading = await page.evaluate(async () => {
-    const element = document.querySelector('div')
-    const own = element
-      .getAnimations()
-      .filter(animation =>
-        (animation.animationName ?? '').startsWith('jumi-scale'),
-      )
-
-    if (!own.length) return { names: [], samples: [] }
-
-    own.forEach(animation => animation.pause())
-
-    const duration = own[0].effect?.getTiming?.().duration ?? 0
-    const samples = []
-
-    for (const share of [0, 0.25, 0.5, 0.75, 1]) {
-      own.forEach(animation => {
-        animation.currentTime = duration * share
-      })
-
-      await new Promise(resolve => requestAnimationFrame(resolve))
-      samples.push(getComputedStyle(element).scale)
-    }
-
-    return { names: own.map(animation => animation.animationName), samples }
-  })
 
   await page.close()
 
   return reading
 }
 
-const moved = await stretched(constituentCss)
+/**
+ * The same sheet with every frame-first lookup rewritten to the element-level value it falls back to —
+ * the shape `bb39449` shipped, reconstructed by text so each arm falsifies against its own build rather
+ * than a remembered one. `--jumi-<component>-<id>-<offset>` is matched with a lazy base because the
+ * instance hash is 5–8 word characters and a `-` cannot be part of it.
+ */
+const withoutFrameLookups = css =>
+  css.replace(
+    /var\((--jumi-[\w-]+?)-[A-Za-z0-9]{5,8}-\d+, var\(--jumi-[\w-]+\)\)/g,
+    'var($1)',
+  )
 
-// The same sheet with every frame-first lookup rewritten to the element-level value it falls back to —
-// the shape `bb39449` shipped, reconstructed by text so the comparison is against this build's own
-// sheet rather than a remembered one. `--jumi-<component>-<id>-<offset>` is matched with a lazy base
-// because the instance hash is 5–8 word characters and a `-` cannot be part of it.
-const flattened = constituentCss.replace(
-  /var\((--jumi-[\w-]+?)-[A-Za-z0-9]{5,8}-\d+, var\(--jumi-[\w-]+\)\)/g,
-  'var($1)',
-)
+const SCALE_BODY = `<div class="animate-scale-x-[0:1|100:0] animate-scale-y-[0:1|100:0] animate-scale-z-[0:1|100:0]"></div>`
 
-const held = await stretched(flattened)
+const moved = await stepped({
+  body: SCALE_BODY,
+  css: constituentCss,
+  prefix: 'jumi-scale',
+  properties: ['scale'],
+})
 
-const moving =
-  moved.samples.length === 5 &&
-  new Set(moved.samples).size === 5 &&
-  !!moved.names.length
-const still =
-  held.samples.length === 5 &&
-  new Set(held.samples).size === 1 &&
-  !!held.names.length
+const flattened = withoutFrameLookups(constituentCss)
+
+const held = await stepped({
+  body: SCALE_BODY,
+  css: flattened,
+  prefix: 'jumi-scale',
+  properties: ['scale'],
+})
+
+/** Five values, and the two questions asked of them: did every offset differ, or none of them. */
+const stepped5 = values => values.length === 5 && new Set(values).size === 5
+const changes = values => values.length === 5 && new Set(values).size > 1
+const constant = values => values.length === 5 && new Set(values).size === 1
+
+const scaleOf = reading => reading.samples.scale ?? []
 
 const constituent = [
   [
     'a constituent phrase moves the composed property at every offset',
-    moving,
-    `read ${moved.samples.join(' | ') || 'no animation'} from ${moved.names.join(' + ') || 'no slot'}`,
+    stepped5(scaleOf(moved)) && !!moved.names.length,
+    `read ${scaleOf(moved).join(' | ') || 'no animation'} from ${moved.names.join(' + ') || 'no slot'}`,
   ],
   [
     'and the assertion can fail: without the frame-first lookups it holds one value',
-    still && flattened !== constituentCss,
-    `read ${held.samples.join(' | ') || 'no animation'} — the same sheet with the lookups stripped`,
+    constant(scaleOf(held)) && flattened !== constituentCss,
+    `read ${scaleOf(held).join(' | ') || 'no animation'} — the same sheet with the lookups stripped`,
   ],
 ]
 
 for (const [claim, ok] of constituent)
   if (!ok) failures.push(`composed: ${claim}`)
+
+/* ------------------------------------------------------------------------------------
+ * 11. Two declarations that named the wrong property (corrected 2026-09-16).
+ * ---------------------------------------------------------------------------------- */
+
+// `animate-outline-offset` and `animate-transform-style` were declared as parts of `outline` and
+// `transform`. Neither part belongs to the property it was declared under, so the keyframe animated
+// *that* property: a phrase on `animate-outline-offset` emitted `outline: <width> <style> <color>` and
+// never touched `outline-offset` at all, and `animate-transform-style` emitted the whole `transform`
+// composition. Worse than inert — a page asking for an outline offset got the outline shorthand
+// animating.
+//
+// So each arm asserts both halves: the named property moves, and the property that used to move does
+// not. The second half is the correction itself; without it, "something animates" would pass the wrong
+// declaration as readily as the right one.
+const OWN_PROPERTY_ENTRY = `\n@import "tailwindcss" source(none);\n@plugin "${path.join(root, 'dist', 'index.js')}";\n`
+
+const ownPropertyCss = finalizeCss(
+  (await compiler(OWN_PROPERTY_ENTRY, root)).build([
+    'animate-outline-offset-[0:0px|100:8px]',
+    'animate-transform-style-[0:flat|100:preserve-3d]',
+  ]),
+).css
+
+const OWN_PROPERTY_BODY =
+  '<div class="animate-outline-offset-[0:0px|100:8px] ' +
+  'animate-transform-style-[0:flat|100:preserve-3d]"></div>'
+
+const offsetMoved = await stepped({
+  body: OWN_PROPERTY_BODY,
+  css: ownPropertyCss,
+  prefix: 'jumi-outline-offset',
+  properties: ['outlineOffset', 'outline'],
+})
+
+const styleMoved = await stepped({
+  body: OWN_PROPERTY_BODY,
+  css: ownPropertyCss,
+  prefix: 'jumi-transform-style',
+  properties: ['transformStyle', 'transform'],
+})
+
+const offsetHeld = await stepped({
+  body: OWN_PROPERTY_BODY,
+  css: withoutFrameLookups(ownPropertyCss),
+  prefix: 'jumi-outline-offset',
+  properties: ['outlineOffset'],
+})
+
+const ownProperty = [
+  [
+    'animate-outline-offset moves outline-offset at every offset',
+    stepped5(offsetMoved.samples.outlineOffset ?? []),
+    `read ${(offsetMoved.samples.outlineOffset ?? []).join(' | ') || 'no animation'}`,
+  ],
+  [
+    'and does not animate the outline shorthand',
+    constant(offsetMoved.samples.outline ?? []),
+    `outline read ${(offsetMoved.samples.outline ?? []).join(' | ') || 'nothing'}`,
+  ],
+  [
+    'animate-transform-style moves transform-style',
+    changes(styleMoved.samples.transformStyle ?? []),
+    `read ${(styleMoved.samples.transformStyle ?? []).join(' | ') || 'no animation'}`,
+  ],
+  [
+    'and does not animate transform',
+    constant(styleMoved.samples.transform ?? []),
+    `transform read ${(styleMoved.samples.transform ?? []).join(' | ') || 'nothing'}`,
+  ],
+  [
+    'and the assertion can fail: without the frame-first lookups outline-offset holds',
+    constant(offsetHeld.samples.outlineOffset ?? []),
+    `read ${(offsetHeld.samples.outlineOffset ?? []).join(' | ') || 'no animation'}`,
+  ],
+]
+
+for (const [claim, ok] of ownProperty)
+  if (!ok) failures.push(`own property: ${claim}`)
 
 await browser.close()
 
@@ -1383,18 +1488,32 @@ for (const [claim, ok, detail] of naming)
     `    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`,
   )
 
-console.log('\n  composed')
+// One loop over the composed sets, so a set is a row rather than a fourth copy of the same printer.
+// That is also what lets each set's browser arm land in the commit that changed the behaviour it
+// checks, without three of them rewriting this block.
+const arms = [
+  ['composed', constituent],
+  ['own property', ownProperty],
+]
 
-for (const [claim, ok, detail] of constituent)
-  console.log(
-    `    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`,
-  )
+for (const [heading, claims] of arms) {
+  console.log(`\n  ${heading}`)
+
+  for (const [claim, ok, detail] of claims)
+    console.log(
+      `    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`,
+    )
+}
 
 // Every assertion above that can fail, so the summary line is the count it claims to be: the three
 // activation contexts, the pseudo substrate, the direct carriers, bare, applied, spacing, radius,
-// the three relationship-variant cases, non-inheritance, and the composed pair.
+// the three relationship-variant cases, non-inheritance, and every composed set.
 const required =
-  contexts.length + utilities.length + 9 + naming.length + constituent.length
+  contexts.length +
+  utilities.length +
+  9 +
+  naming.length +
+  arms.reduce((total, [, claims]) => total + claims.length, 0)
 const passing = required - failures.length
 
 console.log(`\n  ${passing}/${required} required contexts and carriers behave`)

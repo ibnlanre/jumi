@@ -1960,7 +1960,10 @@ export const getMatchTween: GetMatchComponents = creator => {
       values: theme('outlineColor'),
     },
     'animate-outline-offset': {
-      fn: property('outline', ['outline-offset']),
+      // Its own property, not a part of `outline`. The `outline` shorthand is width, style and colour —
+      // `outline-offset` is not in it — so declaring it as a part animated `outline` while the key the
+      // phrase wrote was never read: wrong property, not merely inert (measured 2026-09-16).
+      fn: property('outline-offset'),
       type: 'length',
       values: theme('outlineOffset'),
     },
@@ -2301,7 +2304,10 @@ export const getMatchTween: GetMatchComponents = creator => {
       values: empty.number,
     },
     'animate-transform-style': {
-      fn: property('transform', ['transform-style']),
+      // Its own property, not a part of `transform` — `transform` is not a shorthand and has no such
+      // longhand. Declared as a part it animated the whole `transform` composition instead; measured
+      // 2026-09-16, and the reason this now reads like its neighbours `animate-transform-origin*`.
+      fn: property('transform-style'),
       type: ['any'],
       values: transformStyle,
     },
