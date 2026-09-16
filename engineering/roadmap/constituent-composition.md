@@ -686,3 +686,94 @@ typed substrate published by the candidate, direct-leaf keyframes, canonicalized
 frame values, family-level decline-to-native fallback, and the composition bridge
 that lets leaves own an animated property beside a native motion — rather than
 generalizing any of the preparatory abstractions.
+
+## D — the extraction
+
+D is **extraction only**, on the CTO's ruling: "extract shape, do not migrate behaviour", with a
+byte-identical snapshot and 68/68 behaviour as the standard. "If D.1 cannot extract the mechanism
+without changing emitted CSS, then it is probably extracting too much at once."
+
+### D.1 — the four facets, and where each one actually lives
+
+The mechanism `scale` proved is four facets:
+
+```text
+substrate     the declaration a typed motion's own rule publishes,
+              `<property>: var(--jumi-<property>)`
+constituent   a constituent value → its one canonical leaf value, or null
+whole         a whole value → the leaf assignments it sets, or null
+bridge        every typed keyframe re-asserts the composition beside the leaves,
+              pinned at from and to
+```
+
+D.1 puts **one** of them in the family declaration — `typedExecutions`, beside `typedLeaves` — and
+that is a finding rather than a partial job:
+
+| facet         | where it lives                 | why it is not a per-family function                                                                           |
+| ------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| `whole`       | declared, in `typed-leaves.ts` | the only family-shaped data there is: the family's own value grammar                                          |
+| `constituent` | already declared, per leaf     | the leaf's `animationCanonicalizer`; a second copy in a facet could drift from the one that writes the frames |
+| `substrate`   | derived, in the core           | a family supplies it by having a `propertyVariables` entry, which it must have to be animatable at all        |
+| `bridge`      | derived, in the core           | it follows from a keyframe beating a rule — a fact about CSS, not about a family                              |
+
+A function per family for the last two would be **machinery that cannot change behaviour**, which is
+the test that already kept an explicit `kind` field off the slot when its falsifying test came back
+negative. What a family declares is what it can read.
+
+The whole facet names its own leaves (`[['scale-x', …], …]`) instead of returning three values for
+the core to zip against the leaf list. Positionally the two agree today — and that is exactly the
+coupling that would stop being true silently, with a second family rather than a failing test to say
+so.
+
+### What D.1 changed, and what it did not
+
+Two gates in `src/core/index.ts` named a family, and both are gone:
+
+```ts
+const endpoints = attribute === 'scale' ? scaleLeafEndpoints(value) : null
+const endpoints = attribute === 'scale' ? (() => { … typedLeafOf(…) … })() : null
+```
+
+The whole path now asks the declaration. The constituent path needed **no family test at all** —
+`typedLeafOf` already answers `undefined` for a family that declares no leaf, so the ternary was a
+second copy of a question the lookup already answers, and removing it removed the `scale` token from
+the core's code entirely: what is left of the word in `src/core/index.ts` is comments.
+
+**Proof of zero output change**, which is the standard this was given:
+
+```text
+snapshot    99660 bytes, structure.json unchanged — `git diff scripts/css-snapshot` empty
+behaviour   68/68 contexts and carriers
+unit        405 passed (400 + 5 new)
+types       clean
+pnpm check  all 17 stages
+```
+
+### The deferrals, kept out of D.1 on purpose
+
+Separate evidence tracks, not D.1's to absorb: phrase migration, nested composite recursion,
+filter/function reshape, transform decomposition, attribute-wide conflict policy. Plus the constraint
+carried out of C, which is a decline D must not casually remove:
+
+> multi-stop constituent phrases currently decline typed execution; do not generalize typed-leaf
+> support to them until their frame model is explicitly represented and measured.
+
+### The new unit invariants, and how they fail
+
+Five arms under `typed execution declarations` in `src/variables/typed-leaves.test.ts`, each
+table-driven over the declaration rather than over `scale`, so they hold for the second family:
+
+```text
+names the leaf each component becomes    the facet carries the names, not the core
+names only leaves the family declares,   an undeclared name is a write to an unregistered custom
+and every one of them                    property — discrete instead of interpolable, and silent; an
+                                         unassigned leaf is a leaf the motion does not move
+declines exactly what the family does    one entrance into the typed path, so nothing half-enters
+never declares an execution a family     an execution is only meaningful if the leaves it writes
+has no leaves for                        were registered
+has no facet for a family with none      the answer the core branches on instead of a name
+```
+
+Falsified rather than assumed: dropping one leaf assignment from the `scale` facet fails two of them
+with the names it lost — `expected [ 'scale-x', 'scale-z' ] to deeply equal [ 'scale-x', 'scale-y',
+'scale-z' ]`.

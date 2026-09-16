@@ -323,3 +323,60 @@ activation base, so nothing depends any more on the shape of `attribute-id` or o
 > inferring it, keep `linkedSlot` explicit about the part, and keep the round-trip corpus as a gate. The byte
 > cost is trivial beside the correctness win: this is the first version of the readable key I would call
 > structurally exact before 1.0.**
+
+## 2026-09-16 — close C on measurement, not on topology
+
+The C.5 pass reported C closed with its falsification set green. It was not closed.
+`animate-scale-[none]` beside `animate-scale-x-[5]` computed `1` where the pre-C.5 baseline computes
+`5 1`, and every structural audit stayed green, because the regression is not a shape: every name was
+still in the sheet and only computed style could tell.
+
+The boundary is nobody's blunder in particular. A declined motion writes the property in its own
+keyframe — that is what the native escape hatch _is_ — and a keyframe beats a rule, so it beat the
+typed motion's candidate-owned substrate outright. Two execution models for one property met at a
+boundary that had been argued from the topology, and the argument was wrong.
+
+### Call
+
+> **Fix the mixed boundary with a composition bridge in typed keyframes, not a runtime set and not an
+> accepted regression. Baseline the declined whole beside a typed constituent against pre-C.5. If
+> unchanged: close C definitively. If changed: fix only that mixed-execution boundary, re-run the C
+> falsification set, then close.**
+
+The bridge is pinned at `from` **and** `to`, and the pin is a measurement rather than a style. Naming
+the property only at `to` makes it a second animation whose implicit `from` is the un-animated
+underlying value, which composes to `1 + p(x(p) − 1)` — a quadratic that still looks like a curve.
+That is precisely why it needed a curve to catch rather than a shape, and the record of the C.5 close
+was amended rather than left standing.
+
+## 2026-09-17 — the gate before D, and D.1 extracts shape only
+
+The bridge is a release-critical invariant and nothing in the suite proved it, so C is not closed
+until it is a gate. The arm is narrow and explicit rather than broad: the mixed sheet, the same sheet
+with candidate discovery reversed, and the two bridge-shape curves — the from/to pinning failure
+produced its quadratic while looking superficially valid, and no structural audit will ever catch
+that.
+
+It distinguishes three failure classes, which is the standard it was held to: with the bridge missing
+the mixed arms fail **while the lone arms stay green**; with the pins missing both lone curves distort;
+an ordering regression diverges the reversed arm. A gate that fails specifically enough to name the
+architectural break is worth more than a broad one that only says something is wrong.
+
+Two process findings are recorded with it, because both contaminated measurements before they were
+caught: cross-commit browser comparisons must rebuild `dist` for each revision, and stash restoration
+can resurrect superseded edits — always diff after a pop or apply.
+
+### Call
+
+> **85e68f4 stays — the declaration-order swap changes no semantics, passes all 68 arms both ways, and
+> the snapshot records the chosen form, so it is not worth churning over provenance. C is closed. D.1
+> is structural extraction only: extract shape, do not migrate behaviour, with zero semantic/output
+> change preferred and proven by a byte-identical snapshot plus 68/68 behaviour. If D.1 cannot extract
+> the mechanism without changing emitted CSS, it is extracting too much at once.**
+
+Held to that: D.1 moved exactly one facet into the family declaration — the whole-value decomposition,
+the only family-shaped data there is — and derived the substrate and the bridge in the core rather
+than handing families two functions that could not change behaviour. The snapshot is byte-identical,
+the 68 arms are unchanged, and `src/core/index.ts` no longer contains the `scale` token outside its
+comments. Phrase migration, nested composite recursion, filter/function reshape, transform
+decomposition and attribute-wide conflict policy are separate evidence tracks and were left alone.
