@@ -60,6 +60,31 @@
   "css.format.enable": false,
   "html.format.enable": false,
   "prettier.enable": false,
+  // **Biome is installed and enabled on this machine, and it must not write here.** There is no
+  // `biome.json` in this repository, so its defaults apply — and they disagree with
+  // `prettier.config.mjs`: `semi: true` against `semi: false`. It is not the named formatter for any
+  // language in this file, which is exactly what made it dangerous rather than redundant. Naming a
+  // default stops VS Code *choosing* a provider; it does not stop it **falling back** to the next one
+  // when the named one declines. Prettier is disabled for `js`/`ts` here and the built-in formatter is
+  // off, so the fallback was Biome — measured as "the semicolons are removed, then added again" on
+  // every save of a `.ts` file, with the two import lines re-semicoloned and nothing else touched.
+  "biome.enabled": false,
+  // And the four languages ESLint owns are named explicitly, because a *language-specific* default
+  // beats this file's language-agnostic one. A user-level `[typescript]` block naming Prettier was
+  // therefore still in the running for `.ts` while `prettier.enable` was false — which is a provider
+  // that is selected and cannot run, the condition the fallback above needs.
+  "[javascript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
   "editor.codeActionsOnSave": {
     "source.addMissingImports.ts": "always",
     "source.fixAll.eslint": "always",
