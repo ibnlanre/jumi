@@ -104,9 +104,9 @@ describe('classify', () => {
   it('answers a documented level that exists only when written as optional', () => {
     const css = `@keyframes jumi-rotate-abc12 { 50% { rotate: 45deg } }`
 
-    expect(
-      verdict(css, '--jumi-rotate-abc12-animation-duration'),
-    ).toContain('optional (')
+    expect(verdict(css, '--jumi-rotate-abc12-animation-duration')).toContain(
+      'optional (',
+    )
   })
 
   it('answers a name nothing in the model can produce as DEAD', () => {

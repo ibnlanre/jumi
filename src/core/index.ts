@@ -646,6 +646,42 @@ export function createJumiModel({
     sink.keyframes(effectKeyframes[attribute])
   }
 
+  /**
+   * A composition slot: `var(<name>)`, or `var(<name>, <fallback>)` where the fallback nests at most one
+   * level. Written once as a literal and compared by name rather than compiled per component, so there is
+   * no variable name interpolated into a pattern and the serializer audit has a single operation to read.
+   */
+  const SLOT = /var\((--jumi-[\w-]+)(?=[,)])((?:[^()]|\([^()]*\))*)\)/g
+
+  /**
+   * One composition slot, read and rewritten: `var(<name>)` becomes `var(<hook>, var(<name>))`.
+   *
+   * The **whole slot** is re-emitted rather than the name being rewritten in place, for two reasons a
+   * name-only match cannot give.
+   *
+   * The slot's fallback travels with it. `var(--jumi-filter-url, opacity(1))` keeps its fallback *inside*
+   * the inner read — `var(<hook>, var(--jumi-filter-url, opacity(1)))` — so a slot with no writer of its
+   * own still lands on the identity value instead of on a read that resolves to nothing, which is the one
+   * shape measured to void the whole declaration. Jumi builds these slots itself in `src/composition`, so
+   * the fallback depth is a fact about this repository rather than a guess about CSS.
+   *
+   * The parens balance by construction. A name-only match consumes the slot's `var(` but leaves its `)`,
+   * so any replacement closes one of the two reads wrongly; re-emitting the slot makes the replacement
+   * self-contained. For a slot with no fallback the text is identical to what the previous
+   * `replaceAll('var(<name>)', 'var(<hook>, var(<name>))')` emitted, so the change reaches only the slots
+   * that carry one.
+   *
+   * The name is `[\w-]+` and greedy, so the capture is the whole name and the comparison against `part` is
+   * exact: `var(--jumi-matrix-3d)` captures `--jumi-matrix-3d`, which is not `--jumi-matrix`, and is left
+   * alone. A slot belonging to a different component comes back as `match` untouched.
+   */
+  const hookSlot = (value: string, part: string, hook: string) =>
+    value.replaceAll(
+      SLOT,
+      (match, name: string, fallback: string) =>
+        name === part ? `var(${hook}, var(${name}${fallback}))` : match,
+    )
+
   function propertyKeyframeValue(
     attribute: AnimatableStandardPropertyType,
     suffix: string,
@@ -677,28 +713,7 @@ export function createJumiModel({
 
           if (!surfaces.get(attribute)?.has(dependency)) return result
 
-          return result.replaceAll(
-            // The **whole slot** is matched and re-emitted — `var(<name>)` becomes
-            // `var(<hook>, var(<name>))` — rather than the name being rewritten in place. Two things then
-            // hold that a name-only match cannot give:
-            //
-            // The slot's fallback travels with it. `var(--jumi-filter-url, opacity(1))` keeps its
-            // fallback *inside* the inner read — `var(<hook>, var(--jumi-filter-url, opacity(1)))` — so
-            // the writer that never ran still lands on the identity value instead of on nothing. One
-            // level of nesting in the fallback group covers every slot the compositions declare today;
-            // Jumi builds these slots itself, so the depth is a fact about this file, not a guess.
-            //
-            // The parens balance by construction. A name-only match consumes the slot's `var(` but leaves
-            // its `)`, so any replacement closes one of the two reads wrongly; re-emitting the slot makes
-            // the replacement self-contained. For a plain slot the text is identical to what the previous
-            // `replaceAll('var(<name>)', 'var(<hook>, var(<name>))')` emitted, so the change reaches only
-            // the slots that carry a fallback.
-            //
-            // The lookahead is the boundary: it is what stops a longer name that merely starts the same
-            // way (`var(--jumi-matrix-3d)` beside `var(--jumi-matrix)`) from being matched by accident.
-            new RegExp(`var\\(${part}(?=[,)])((?:[^()]|\\([^()]*\\))*)\\)`, 'g'),
-            `var(${cssEscape(`${part}-${suffix}`)}, var(${part}$1))`,
-          )
+          return hookSlot(result, part, cssEscape(`${part}-${suffix}`))
         }, value)
       : fallback
 

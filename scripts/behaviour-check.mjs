@@ -1756,14 +1756,17 @@ const urlFilterBody = classes =>
  * than a race. A pixel is the assertion because the computed string is what lied in the probe: it
  * listed the whole chain after the box had already stopped being filtered.
  */
-const filtered = async ({ css, classes }) => {
+const filtered = async ({ classes, css }) => {
   const page = await load(css, urlFilterBody(classes))
 
   await page.evaluate(async () => {
-    document.querySelector('div').getAnimations().forEach(animation => {
-      animation.pause()
-      animation.currentTime = 0
-    })
+    document
+      .querySelector('div')
+      .getAnimations()
+      .forEach(animation => {
+        animation.pause()
+        animation.currentTime = 0
+      })
 
     await new Promise(resolve => requestAnimationFrame(resolve))
   })
@@ -1795,16 +1798,16 @@ const withoutUrlFrameRead = css =>
     'var(--jumi-$1filter-url, opacity(1))',
   )
 
-const red = await filtered({ css: urlFilterCss, classes: '' })
-const urlApplied = await filtered({ css: urlFilterCss, classes: FILTER_URL })
+const red = await filtered({ classes: '', css: urlFilterCss })
+const urlApplied = await filtered({ classes: FILTER_URL, css: urlFilterCss })
 const urlUnhooked = await filtered({
-  css: withoutUrlFrameRead(urlFilterCss),
   classes: FILTER_URL,
+  css: withoutUrlFrameRead(urlFilterCss),
 })
-const grey = await filtered({ css: urlFilterCss, classes: FILTER_GRAYSCALE })
+const grey = await filtered({ classes: FILTER_GRAYSCALE, css: urlFilterCss })
 const greyVoided = await filtered({
-  css: withoutUrlFallback(urlFilterCss),
   classes: FILTER_GRAYSCALE,
+  css: withoutUrlFallback(urlFilterCss),
 })
 
 /** `false` when the box is the untouched red reference, i.e. nothing filtered it. */

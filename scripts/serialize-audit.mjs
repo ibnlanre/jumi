@@ -179,7 +179,10 @@ const registry = [
     breakable:
       'only against a spelling Jumi does not produce. The text searched is the composition template this file builds in memory a few lines above, not a stylesheet, so no serializer stands between the two; and the lookahead is what stops a longer name that merely starts the same way (`--jumi-matrix` beside `--jumi-matrix-3d`) from being hooked by accident',
     class: 'tolerant',
-    contains: '(?=[,)])((?:',
+    // The candidate the scan finds is the operation; the pattern it carries is the next line of the same
+    // statement, which is what the lookahead above is describing. Worth knowing when reading the entry:
+    // the audit is line-based, so a pattern on a line of its own is not a candidate at all.
+    contains: 'value.replaceAll(',
     file: 'src/core/index.ts',
     recovers:
       'which slot a frame reads frame-first, so a phrase addressing one component of a composition moves it',
