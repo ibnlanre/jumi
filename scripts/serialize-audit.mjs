@@ -2,34 +2,53 @@
 /**
  * Semantic text rewrites over serialized CSS — the census, and its classification.
  *
- * A defect proved that Jumi's compiler path can feed the carrier pass CSS in more than one
- * serialization form, and that at least one lookup depended on the exact form. The question this file
- * answers is not "is that regex safe" but "how many places assume something about serialized text".
+ * A defect proved Jumi's compiler path can feed the carrier pass CSS in more than one serialization form,
+ * and that at least one lookup depended on the exact form. The question this answers is not "is that regex
+ * safe" but "how many places assume something about serialized text".
  *
- * It is a **registry, not a linter**. Nothing here can decide whether a `replace` is semantically
- * sound; only a reader can, and having decided, only a registry can keep the decision alive. So the
- * scan finds every candidate, every candidate must appear below with a classification and answers, and
- * a candidate that is missing — or an entry whose line has moved or changed — fails the check. That is
- * what stops the audit from being a thing that happened once.
+ * It is a **registry, not a linter**. Nothing here can decide whether a `replace` is semantically sound;
+ * only a reader can, and having decided, only a registry keeps the decision alive. So the scan finds every
+ * candidate, every candidate must be claimed by exactly one entry below, and every entry must claim at
+ * least one — a candidate that is missing, or an entry that claims nothing, fails.
  *
- * Scoped to `src/`, minus tests: the shipped pass, which is what reads sheets a build produced. The
- * studio parses CSS text too, and is deliberately out of scope here — noted rather than silently
- * skipped, because "not audited" and "audited and fine" are different claims.
+ * ## How an entry identifies a line
+ *
+ * By **`file` + `symbol` + `contains`**, resolved from the source at run time:
+ *
+ *   { file, symbol: 'namedHoist', contains: 'replaceAll(', class: 'tolerant' }
+ *
+ * The first version identified lines by *their own text* — a truncated copy of the source — which meant an
+ * entry for a regex-heavy line carried that line's escaping. Transcribing it was both painful and
+ * dangerous: a miscount between two and four backslashes produced an entry that classified nothing,
+ * silently, twice in one session. A descriptor cannot make that mistake, because it never reproduces the
+ * source. Ask instead whether the entry would still find its line after someone re-indents or re-wraps it;
+ * that is the property this format exists to have, and `--selftest` measures it directly.
+ *
+ * `contains` is a short fragment — an operation name, a callee, a variable — and must not span a line
+ * break, because a fragment that does would be a small copy of the source again. It is omitted only when
+ * the symbol holds exactly one candidate, which the run asserts.
+ *
+ * ## The buckets
+ *
+ * `structural` — identifiers, property names, arrays. Cannot be reached by a serializer.
+ * `tolerant`   — meant to be text, and written for a serializer (`\s+`, trimmed parts).
+ * `spacing`    — depends on how something happened to be written. **Asserted to be zero**: this is the
+ *                bucket the shipped defect came from, and a new entry here is a decision, not a detail.
+ * `inferred`   — recovers structure by reading characters. Sound where escape-aware, and the bucket a
+ *                tokenizer would replace; acceptable, but it has to be named.
  *
  *   node scripts/serialize-audit.mjs            verify the registry against the source
- *   node scripts/serialize-audit.mjs --list     print every candidate, for building the registry
+ *   node scripts/serialize-audit.mjs --list     print every candidate with its symbol and class
  *
- * The five questions are the ones the classification has to answer to be worth anything:
- *
- *   recovers       what semantic fact is this code trying to recover?
- *   assumes        what textual assumption does it rely on?
- *   serialization  does minified vs formatted CSS change the result?
- *   breakable      can nested var(), escaping, or whitespace variation break it?
- *   structural     is there already a structural representation available instead?
+ * Scoped to `src/`, minus tests: the shipped pass, which is what reads sheets a build produced. The studio
+ * parses CSS text too, and is deliberately out of scope — noted rather than silently skipped, because "not
+ * audited" and "audited and fine" are different claims.
  */
 import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+
+import { symbolAt } from './lib/symbols.mjs'
 
 import path from 'node:path'
 
@@ -46,108 +65,184 @@ const OPERATIONS =
   /\.(?:replace|replaceAll|split|match|matchAll|includes|startsWith|endsWith|indexOf|lastIndexOf|test|exec)\(|new RegExp\(/
 
 /**
- * Whether a line is plausibly about CSS text, rather than about arrays, ids or DOM classes.
+ * Whether a line is plausibly about CSS text, rather than arrays, ids or DOM classes.
  *
- * Transparent, and deliberately generous: it decides what gets *claimed* as audited, so a line it
- * misses is a line nobody said was fine. Widening it is the safe direction; narrowing it is how an
- * audit starts lying.
+ * Transparent, and deliberately generous: it decides what gets *claimed* as audited, so a line it misses is
+ * a line nobody said was fine. Widening it is the safe direction; narrowing it is how an audit starts lying.
  */
 const CSS_TEXT =
   /value|prop|selector|declaration|params|\bcss\b|entry|\btext\b|\brule\b|token|frame|range|slot|staging|var\(|--jumi|\bclass\b|marker|label|\bpart\b|\bkey\b|\bname\b|definition|address/
 
-/** A hit's stable name: the file, and enough of the line to notice it changing. */
-const anchor = line => line.replace(/\s+/g, ' ').trim().slice(0, 74)
-
-/**
- * The classification, and the answers.
- *
- * Buckets: `structural` · `tolerant` · `spacing` · `inferred`
- *
- * `structural` and `tolerant` are sound and their answers are the same every time, which is why they
- * are built by a helper rather than retyped: the class *is* the answer.
- *
- * `spacing` depends on how something happened to be written. It is the bucket the shipped defect came
- * from, and the only one where the questions have to be answered one line at a time.
- *
- * `inferred` recovers structure by reading characters rather than by matching a pattern. Sound where it
- * is escape-aware — and every one of these is — but it is a design question rather than a bug: this is
- * the bucket a tokenizer would replace, if this side of the build ever had one.
- *
- * The distinction that decides most of these: **author text or sheet text**. A value an author typed is
- * in a shape Tailwind wrote; a value read back off the sheet may have been through an optimizer, and
- * that is the text this audit exists for.
- */
+const carriers = 'src/helpers/carriers/index.ts'
+const instance = 'src/helpers/carriers/instance.ts'
+const range = 'src/helpers/carriers/animation-range.ts'
+const theme = 'src/helpers/create/theme.ts'
+const transitions = 'src/helpers/carriers/view-transition.ts'
 
 /** A rewrite whose target is an identifier, a property name or an array — never serialized text. */
-const safe = (file, anchor, recovers) => ({
-  anchor,
+const safe = (file, symbol, contains, recovers) => ({
   assumes:
     'nothing about spacing: the target is an identifier, a property name or an array',
   breakable: 'no',
   class: 'structural',
+  contains,
   file,
   recovers,
   serialization: 'no',
   structural: 'n/a',
+  symbol,
 })
 
 /** Text that is meant to be text, and survives a serializer because it was written for one. */
-const tolerant = (file, anchor, recovers, assumes) => ({
-  anchor,
+const tolerant = (file, symbol, contains, recovers, assumes) => ({
   assumes,
   breakable: 'no',
   class: 'tolerant',
+  contains,
   file,
   recovers,
   serialization: 'no',
   structural: 'n/a',
+  symbol,
 })
 
-/** Recovers structure by reading characters. Same five answers for all of them. */
-const inferred = (file, anchor, recovers, structural) => ({
-  anchor,
+/** Recovers structure by reading characters rather than by matching a pattern. */
+const inferred = (file, symbol, contains, recovers, structural) => ({
   assumes:
     'the characters of a selector or a variable name, read one at a time and escape-aware',
   breakable: 'no',
   class: 'inferred',
+  contains,
   file,
   recovers,
   serialization: 'no',
   structural,
+  symbol,
 })
 
-const carriers = 'src/helpers/carriers/index.ts'
-const transitions = 'src/helpers/carriers/view-transition.ts'
-
 const registry = [
+  // ── the phrase grammar: the author's candidate, with its whitespace written out ───────────────
+  tolerant(
+    'src/core/index.ts',
+    'parsePhrase',
+    '.test(value))',
+    'that a candidate is a timing phrase at all',
+    'nothing unstated: `\\s*` is spelled at every join',
+  ),
+  tolerant(
+    'src/core/index.ts',
+    'parsePhrase',
+    "indexOf(':')",
+    'where the offsets end and the value begins',
+    'the separator the grammar fixed, not a value',
+  ),
+  tolerant(
+    'src/core/index.ts',
+    'parsePhrase',
+    "split(',')",
+    'the offsets a phrase frame names',
+    'commas separate offsets, and each part is trimmed',
+  ),
   safe(
     'src/core/index.ts',
-    "part.startsWith('animation-') &&",
+    'carriedByShorthand',
+    "startsWith('animation-')",
     'which parts the shorthand carries',
   ),
   safe(
     'src/core/index.ts',
-    '!(separateParts as readonly string[]).includes(part)',
+    'carriedByShorthand',
+    'includes(part)',
     'which parts it cannot carry',
   ),
   safe(
     'src/core/index.ts',
-    'name.length > 0 && !/[\\s\\u0000-\\u001F\\u007F]/.test(name)',
+    'addressableName',
+    '.test(name)',
     'whether a name can be written into a custom-property segment at all',
   ),
   safe(
     'src/core/index.ts',
-    'name && separateParts.includes(part as never) ? name : null',
+    'createJumiModel',
+    '.exec(name)',
+    'the slot a variable names',
+  ),
+  safe(
+    'src/core/index.ts',
+    'createJumiModel',
+    'includes(part as never)',
     'whether a part takes the name or the slot key',
   ),
-  // ── the link layer: the two swaps, and the two readers they stand on ──────────────────────────
+
+  // ── a range: selector and value grammar, read from an author's class ─────────────────────────
+  inferred(
+    range,
+    'classToken',
+    '.:#[]>+~',
+    'where a class token ends, with escapes stepped over rather than through',
+    'a tokenizer: the walk stops at the first unescaped character that ends a class',
+  ),
+  inferred(
+    range,
+    'segments',
+    'startsWith(',
+    'a variant boundary, which is an escaped colon',
+    'as above — the escape handling is the walk’s',
+  ),
+  tolerant(
+    range,
+    'rangeFromSelector',
+    'replace(/_/g,',
+    'the range an author wrote, from the class Tailwind escaped',
+    'Tailwind’s `_`-for-space convention. Not a serializer’s doing — but it is textual, and an escaped `\\_` (a literal underscore) becomes a space. Probed: the value that reaches `rangeAccepted` is then refused, not mis-read (`scripts/spike-underscore.mjs`)',
+  ),
+  safe(
+    range,
+    'rangeFromSelector',
+    "startsWith('[')",
+    'whether an author wrote a bracketed value',
+  ),
+  safe(range, 'isName', 'RANGE_NAMES', 'whether a token names a range keyword'),
+  safe(
+    range,
+    'isName',
+    'LENGTH_PERCENTAGE.test(token)',
+    'whether a token is a length or percentage',
+  ),
+  safe(
+    range,
+    'rangeAccepted',
+    'range.trim().split(',
+    'the tokens of an accepted range',
+  ),
+  safe(
+    range,
+    'rangeReadings',
+    'ACTIVATED_SLOT.test(node.prop)',
+    'whether a rule activates a slot',
+  ),
+  safe(
+    range,
+    'rangeReadings',
+    'activations[0].prop',
+    'the base that activation names',
+  ),
+  inferred(
+    range,
+    'rangeReadings',
+    'classToken(selector).replace(',
+    'the author’s own class, for a message',
+    'a tokenizer, as above',
+  ),
+
+  // ── the link layer: the two swaps, and the two readers they stand on ─────────────────────────
   {
-    anchor: '? value.replace(',
     assumes:
       'the fallback inside the link is spelled `--jumi-animation-name`, and the link itself is whatever `wholeLink` matches — any spacing',
     breakable:
       'no for whitespace or escaping: the definition it embeds is an identifier. A different fallback would miss, which is a refusal to add the link rather than a link that resolves wrong',
     class: 'tolerant',
+    contains: 'value.replace(',
     file: carriers,
     recovers:
       'whether this position should read its selection ahead of the definition — the only output a timing phrase has',
@@ -155,359 +250,331 @@ const registry = [
       'was **yes**, and this is one of the two lines the audit was opened for: written with `, ` against sheet text, it matched nothing under a minifier and the phrase silently stopped applying',
     structural:
       'the entries are in hand when the value is built, so this could be construction instead of a search over the built string',
+    symbol: 'namedHoist',
   },
   {
-    anchor: 'text.replaceAll(',
     assumes: 'the seven part links are spelled by `linkHead` — any spacing',
     breakable: 'no, since the anchor became a pattern',
     class: 'tolerant',
+    contains: 'replaceAll(',
     file: carriers,
     recovers: 'the author’s name as the outermost link of each shorthand part',
     serialization:
       'was **yes** — the shipped defect: seven parts kept the slot-keyed address while the name link beside them kept its label',
     structural: 'same as above: the parts are entries here too',
+    symbol: 'namedHoist',
   },
   tolerant(
     carriers,
-    'const match = /^var\\(\\s*--jumi-(.+?)-animation-name\\b/.exec(entry.trim())',
+    'referencedSlot',
+    '.exec(entry.trim())',
     'the slot a composition entry addresses',
     'matched, not prefixed — `\\s*` inside the parens — after measuring that a prefix test dropped every position',
   ),
   tolerant(
     carriers,
-    'const opened = /^var\\(\\s*--jumi-slot-/.exec(text)',
+    'linkedSlot',
+    '.exec(text)',
     'the instance a staged entry addresses, read from its length prefix',
     'matched, not prefixed, for the same measured reason; the rest of the parse is arithmetic, not a search',
   ),
-  // ── the one textual read that is sound because it wrote its own separator ─────────────────────
-  tolerant(
-    carriers,
-    "const [address, ...rest] = declaration.value.trim().split(' ')",
-    'the action and the phrase a segment record carries',
-    'the single space it wrote itself as a token separator — which no serializer removes, only tightens toward. Measured: `minified` and `tight-comma` both leave the phrase applying',
-  ),
-  // ── a record’s offsets: a selector, so whitespace is decorative between the commas ────────────
-  tolerant(
-    carriers,
-    "const offsets = selector.split(',').map(part => {",
-    'the numeric offsets a keyframe selector names',
-    'commas separate the list and each part is trimmed — a keyframe offset cannot contain either',
-  ),
-  // ── the marker readers — hardened, and reachable by the differential ────────────────────────────────────────
-  tolerant(
-    transitions,
-    'new RegExp(`:where',
-    'the side, the identity or the refusal a `:where(…)` marker carries',
-    'whitespace inside the parens — `\\s*` on both sides of the marker body — and none before the `(`, which is not valid CSS',
-  ),
-  // The two pattern definitions that stood here are gone as entries, and not as an omission: their code is
-  // `markerPattern`'s body now, which carries no operation a line-based scan can see.
-
-  {
-    anchor: 'const refused = markerPattern(',
-    assumes:
-      'the refused-marker pattern, which anchors on `:where(` the same way',
-    breakable: 'no: measured green under every serializer',
-    class: 'tolerant',
-    file: transitions,
-    recovers: 'the reason a staged rule was refused, so the message names it',
-    serialization: 'no for every serializer measured here',
-    structural: 'same as above',
-  },
-  {
-    anchor: 'const marker = MARKER.exec(selector)',
-    assumes:
-      'nothing of its own — it applies `MARKER`, and inherits that answer',
-    breakable: 'no — it applies `MARKER`, which `markerPattern` builds',
-    class: 'tolerant',
-    file: transitions,
-    recovers: 'the same three facts, at the call site',
-    serialization: 'no for every serializer measured here',
-    structural: 'same as above',
-  },
-  {
-    anchor: 'STAGING_SHAPE.test(selector)',
-    assumes: 'nothing of its own — it applies `STAGING_SHAPE`',
-    breakable: 'no — it applies `STAGING_SHAPE`, which `markerPattern` builds',
-    class: 'tolerant',
-    file: transitions,
-    recovers: 'whether a rule is staging, at the call site',
-    serialization: 'no for every serializer measured here',
-    structural: 'same as above',
-  },
-  // ── inferred: character walks over selectors, all escape-aware ────────────────────────────────
-  inferred(
-    'src/helpers/carriers/animation-range.ts',
-    "if ('.:#[]>+~ '.includes(selector[index])) return selector.slice(1, index)",
-    'where a class token ends, with escapes stepped over rather than through',
-    'a tokenizer: the walk stops at the first unescaped character that ends a class',
-  ),
-  inferred(
-    'src/helpers/carriers/animation-range.ts',
-    "if (token.startsWith('\\\\:', index)) {",
-    'a variant boundary, which is an escaped colon',
-    'as above — the escape handling is the walk’s',
-  ),
-  inferred(
-    'src/helpers/carriers/animation-range.ts',
-    "source: classToken(selector).replace(/\\\\(.)/g, '$1'),",
-    'the author’s own class, for a message',
-    'a tokenizer, as above',
-  ),
-  inferred(
-    transitions,
-    "const body = selector.replace(/^\\./, '')",
-    'the author’s candidate with the leading dot removed',
-    'a tokenizer, and the walk that follows it is the same escape-aware shape',
-  ),
-  // ── a convention read textually, and the one place it can be wrong ────────────────────────────
-  tolerant(
-    'src/helpers/carriers/animation-range.ts',
-    "const value = innermost.match![1].replace(/_/g, ' ')",
-    'the range an author wrote, from the class Tailwind escaped',
-    'Tailwind’s `_`-for-space convention. Not a serializer’s doing — but it is textual, and an escaped `\\\\_` (a literal underscore) becomes a space',
-  ),
-  // ── the phrase grammar: the author’s candidate, with its whitespace written out ───────────────
-  tolerant(
-    'src/core/index.ts',
-    'if (!/^\\s*\\d+(?:\\.\\d+)?(?:\\s*,\\s*\\d+(?:\\.\\d+)?)*\\s*:/.test(value)) return',
-    'that a candidate is a timing phrase at all',
-    'nothing unstated: `\\s*` is spelled at every join',
-  ),
-  tolerant(
-    'src/core/index.ts',
-    "const colon = frame.indexOf(':')",
-    'where the offsets end and the value begins',
-    'the separator the grammar fixed, not a value',
-  ),
-  tolerant(
-    'src/core/index.ts',
-    "for (const part of frame.slice(0, colon).split(',')) {",
-    'the offsets a phrase frame names',
-    'commas separate offsets, and each part is trimmed',
-  ),
-  // ── author-facing values: Tailwind’s spelling, not a sheet’s ─────────────────────────────────
-  tolerant(
-    'src/properties/tween.ts',
-    "css(name, value.split(/\\s+/).join(', '))",
-    'the arguments of a multi-argument transform function',
-    'whitespace separates the arguments — and `\\s+` is what reads it',
-  ),
-  tolerant(
-    'src/helpers/create/theme.ts',
-    'return numeric.test(name) ? value : `var(--${target.namespace}-${name})`',
-    'whether a theme name resolves through a variable',
-    'an identifier, tested numerically',
-  ),
-  tolerant(
-    'src/helpers/paint/index.ts',
-    'if (/^color-mix\\(/i.test(value)) {',
-    'that a value is a colour mix worth resolving',
-    'a prefix the author wrote, in a value the author typed — not sheet text',
-  ),
-  tolerant(
-    'src/helpers/paint/index.ts',
-    'const match = value.match(',
-    'the space, the two colours and their weights',
-    '`\\s+` after `in`, and `[^,]*` for the rest — spelled out',
-  ),
-  tolerant(
-    'src/helpers/paint/index.ts',
-    'const matchEnd = part.match(/^(.*?)\\s+(\\d+(?:\\.\\d+)?)%$/)',
-    'a colour and its weight, written weight-last',
-    '`\\s*` and `\\s+`, spelled out',
-  ),
-  tolerant(
-    'src/helpers/paint/index.ts',
-    'const matchStart = part.match(/^(\\d+(?:\\.\\d+)?)%\\s+(.*)$/)',
-    'a colour and its weight, written weight-first',
-    'the same, against the other spelling the spec allows',
-  ),
-  tolerant(
-    'src/helpers/register/index.ts',
-    '/^["\']?tailwindcss(\\/[\\w.-]+)*["\']?(\\s|$)/.test(atRule.params.trim())',
-    'whether an `@plugin` names Tailwind itself',
-    'a leading quote and a trailing boundary, both optional',
-  ),
-  tolerant(
-    'src/helpers/register/index.ts',
-    "const value = params.trim().replace(/^[\"']|[\"']$/g, '')",
-    'the specifier an `@plugin` names',
-    'quotes around it, which the pattern makes optional',
-  ),
-  tolerant(
-    'src/helpers/register/index.ts',
-    'return value === specifier || /jumi/i.test(value)',
-    'whether the specifier is Jumi',
-    'a substring, case-insensitively',
-  ),
-  tolerant(
-    'src/vite.ts',
-    "if (!id.includes('.css')) return null",
-    'whether a module is a stylesheet',
-    'a substring of a module id — presence, not shape',
-  ),
-  tolerant(
-    'src/vite.ts',
-    "if (!code.includes(stagingMarker) && !code.includes('jumi-vt-'))",
-    'whether a stylesheet carries Jumi’s staging',
-    'presence of a marker, which no serializer rewrites',
-  ),
-  tolerant(
-    'src/vite.ts',
-    "if (!id.includes('.css') || !code.includes('tailwindcss')) return null",
-    'whether to process a module at all',
-    'presence, as above',
-  ),
-  tolerant(
-    'src/helpers/carriers/instance.ts',
-    "const cut = key.indexOf('-')",
-    'the length prefix a named instance key carries',
-    'a hyphen inside an emitted variable name, where no whitespace can occur',
-  ),
-  // ── identifiers, property names and arrays: the safe majority ────────────────────────────────
   safe(
     carriers,
-    "text.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')",
-    'an escaped literal, for a pattern',
-  ),
-  safe(
-    carriers,
-    'ACTIVATED_SLOT.test(candidate.prop),',
+    'namedHoist',
+    'ACTIVATED_SLOT.test(candidate.prop)',
     'whether a declaration names a definition',
   ),
   safe(
     carriers,
-    'ownDeclarations(rule).some(declaration => pattern.test(declaration.prop))',
+    'escapePattern',
+    '[.*+?^',
+    'an escaped literal, for a pattern',
+  ),
+  safe(
+    carriers,
+    'activates',
+    'pattern.test(declaration.prop)',
     'which rule carried the payload',
   ),
-  safe(
+  tolerant(
     carriers,
-    'const activation = own.find(node => ACTIVATED_SLOT.test(node.prop))',
-    'the activation a rule declares',
+    'keyframeOffsets',
+    "selector.split(',')",
+    'the numeric offsets a keyframe selector names',
+    'commas separate the list and each part is trimmed — a keyframe offset cannot contain either',
   ),
   safe(
     carriers,
-    'const base = ACTIVATED_SLOT.exec(activation.prop)?.[1]',
+    'addressedInstances',
+    'ACTIVATED_SLOT.test(node.prop)',
+    'whether a rule activates a slot',
+  ),
+  safe(
+    carriers,
+    'addressedInstances',
+    'ACTIVATED_SLOT.exec(activation.prop)',
     'the definition base an activation names',
   ),
   safe(
     carriers,
-    'definition.startsWith(`jumi-${address}-`)',
+    'addressedInstances',
+    'jumi-${address}',
     'whether a definition belongs to an attribute',
   ),
   safe(
     carriers,
-    'const named = own.find(node => LABELLED_SLOT.test(node.prop))?.value',
+    'addressedInstances',
+    'LABELLED_SLOT.test(',
     'the name a rule installed',
   ),
   safe(
     carriers,
-    'if (!SEGMENT_RECORD.test(declaration.prop)) continue',
+    'segmentSelections',
+    'SEGMENT_RECORD.test(',
     'whether a declaration is a phrase record',
+  ),
+  tolerant(
+    carriers,
+    'segmentSelections',
+    ".trim().split(' ')",
+    'the action and the phrase a segment record carries',
+    'the single space it wrote itself as a token separator — which no serializer removes, only tightens toward. Measured: `minified` and `tight-comma` both leave the phrase applying',
   ),
   safe(
     carriers,
-    'const match = ACTIVATED_SLOT.exec(declaration.prop)',
+    'hoist',
+    'ACTIVATED_SLOT.exec(declaration.prop)',
     'the definition a declaration activates',
   ),
   safe(
     carriers,
-    'declaration.prop.startsWith(stagingMarker),',
+    'finalize',
+    'startsWith(stagingMarker)',
     'which declarations are staging',
   ),
   safe(
     carriers,
-    'if (SHADOWED_NAME.test(declaration.prop)) {',
+    'finalize',
+    'SHADOWED_NAME.test(',
     'whether a name shadows a property address',
   ),
   safe(
     carriers,
-    'if (!REFUSED_NAME.test(declaration.prop)) continue',
+    'finalize',
+    'REFUSED_NAME.test(',
     'whether a name cannot be written',
   ),
   safe(
     carriers,
-    "if (name.startsWith('--')) {",
+    'finalize',
+    "name.startsWith('--')",
     'whether a payload entry is a custom property',
   ),
-  safe(carriers, "name.startsWith('--') ||", 'as above, in the second pass'),
   safe(
     carriers,
+    'finalize',
     'SHORTHAND.includes(name) ||',
     'whether a payload entry is a shorthand part',
   ),
   safe(
     carriers,
-    'AFTER_SHORTHAND.includes(name)',
+    'finalize',
+    'AFTER_SHORTHAND.includes(',
     'whether a payload entry is written after the shorthand',
   ),
-  safe(
-    'src/helpers/carriers/animation-range.ts',
-    'ACTIVATED_SLOT.test(node.prop),',
-    'whether a rule activates a slot',
+
+  // ── instance keys: emitted text, parsed by length rather than searched ────────────────────────
+  tolerant(
+    instance,
+    'parseInstanceKey',
+    "key.indexOf('-')",
+    'the length prefix a named instance key carries',
+    'a hyphen inside an emitted variable name, where no whitespace can occur',
   ),
   safe(
-    'src/helpers/carriers/animation-range.ts',
-    "ACTIVATED_SLOT.exec(activations[0].prop)?.[1] ?? '',",
-    'the base that activation names',
+    instance,
+    'instanceKeys',
+    'LABELLED_SLOT.exec(',
+    'the names a rule installed',
   ),
-  safe(
-    'src/helpers/carriers/animation-range.ts',
-    "return value.startsWith('[') && value.endsWith(']')",
-    'whether an author wrote a bracketed value',
+
+  // ── the marker readers: one shared assumption, hardened, and reachable by the differential ────
+  tolerant(
+    transitions,
+    'markerPattern',
+    ':where',
+    'the side, the identity or the refusal a `:where(…)` marker carries',
+    'whitespace inside the parens — `\\s*` on both sides of the marker body — and none before the `(`, which is not valid CSS',
   ),
-  safe(
-    'src/helpers/carriers/animation-range.ts',
-    '(RANGE_NAMES as readonly string[]).includes(token)',
-    'whether a token names a range keyword',
+  tolerant(
+    transitions,
+    'readStaged',
+    'markerPattern(',
+    'the reason a staged rule was refused, so the message names it',
+    'nothing of its own — it applies what `markerPattern` builds',
   ),
-  safe(
-    'src/helpers/carriers/animation-range.ts',
-    'const isLength = (token: string) => LENGTH_PERCENTAGE.test(token)',
-    'whether a token is a length or percentage',
+  tolerant(
+    transitions,
+    'readStaged',
+    'MARKER.exec(',
+    'the side, the identity and the source element of a staged rule',
+    'nothing of its own — it applies `MARKER`, which `markerPattern` builds',
   ),
-  safe(
-    'src/helpers/carriers/animation-range.ts',
-    'const tokens = range.trim().split(/\\s+/).filter(Boolean)',
-    'the tokens of an accepted range',
+  tolerant(
+    transitions,
+    'isStagingSelector',
+    'STAGING_SHAPE.test(',
+    'whether a rule is staging at all, so a marker this pass cannot read still leaves the cascade',
+    'nothing of its own — it applies `STAGING_SHAPE`, which `markerPattern` builds',
   ),
   safe(
     transitions,
-    'conditions.filter(condition => !JUMI_OWNED_QUERY.test(condition.params))',
+    'kept',
+    'JUMI_OWNED_QUERY.test(',
     'whether a condition is one Jumi owns',
   ),
   safe(
     transitions,
-    'REFUSED_QUERY.test(condition.params),',
+    'viewTransitionProducts',
+    'REFUSED_QUERY.test(',
     'whether a condition contradicts Jumi’s policy',
   ),
   safe(
     transitions,
-    "const separator = key.indexOf(':')",
+    'viewTransitionProducts',
+    "key.indexOf(':')",
     'where a key’s side ends and its identity begins',
   ),
-  safe(
-    'src/core/index.ts',
-    'const slot = /^--jumi-(.+)-animation-name$/.exec(name)?.[1]',
-    'the slot a variable names',
+  inferred(
+    transitions,
+    'authored',
+    'replace(/^\\./',
+    'the author’s candidate with the leading dot removed',
+    'a tokenizer, and the walk that follows it is the same escape-aware shape',
+  ),
+
+  // ── author-facing values: Tailwind’s spelling, not a sheet’s ─────────────────────────────────
+  tolerant(
+    'src/properties/tween.ts',
+    'getMatchTween',
+    'join(',
+    'the arguments of a multi-argument transform function',
+    'whitespace separates the arguments — and `\\s+` is what reads it',
+  ),
+  tolerant(
+    theme,
+    'representation',
+    'numeric.test(name) ?',
+    'whether a theme name resolves through a variable',
+    'an identifier, tested numerically',
   ),
   safe(
-    'src/helpers/carriers/instance.ts',
-    '.map(candidate => LABELLED_SLOT.exec(candidate.prop)?.[1])',
-    'the names a rule installed',
+    theme,
+    'spacingRepresentation',
+    '!numeric.test(name))',
+    'whether a spacing name is a literal',
   ),
   safe(
-    'src/helpers/create/theme.ts',
-    'if (!numeric.test(name)) return null',
-    'whether a theme name is a literal',
-  ),
-  safe(
-    'src/helpers/create/theme.ts',
-    'if (!supplied || !target || target.literal?.includes(name)) return value',
+    theme,
+    'representation',
+    'target.literal?.includes(name)',
     'whether a name is already literal',
   ),
+  tolerant(
+    'src/helpers/paint/index.ts',
+    'toPaintHex',
+    '/^color-mix',
+    'that a value is a colour mix worth resolving',
+    'a prefix the author wrote, in a value the author typed — not sheet text',
+  ),
+  tolerant(
+    'src/helpers/paint/index.ts',
+    'resolveColorMix',
+    'value.match(',
+    'the space, the two colours and their weights',
+    '`\\s+` after `in`, and `[^,]*` for the rest — spelled out',
+  ),
+  tolerant(
+    'src/helpers/paint/index.ts',
+    'splitColorWeight',
+    'matchEnd',
+    'a colour and its weight, written weight-last',
+    '`\\s*` and `\\s+`, spelled out',
+  ),
+  tolerant(
+    'src/helpers/paint/index.ts',
+    'splitColorWeight',
+    'matchStart',
+    'a colour and its weight, written weight-first',
+    'the same, against the other spelling the spec allows',
+  ),
+  tolerant(
+    'src/helpers/register/index.ts',
+    'isEntry',
+    'tailwindcss',
+    'whether an `@plugin` names Tailwind itself',
+    'a leading quote and a trailing boundary, both optional',
+  ),
+  tolerant(
+    'src/helpers/register/index.ts',
+    'isEntry',
+    'params.trim().replace(',
+    'the specifier an `@plugin` names',
+    'quotes around it, which the pattern makes optional',
+  ),
+  tolerant(
+    'src/helpers/register/index.ts',
+    'isEntry',
+    'specifier ||',
+    'whether the specifier is Jumi',
+    'a substring, case-insensitively',
+  ),
+
+  // ── module source: presence tests, not shape ─────────────────────────────────────────────────
+  tolerant(
+    'src/vite.ts',
+    'jumiFinalizer',
+    "id.includes('.css')",
+    'whether a module is a stylesheet',
+    'a substring of a module id — presence, not shape',
+  ),
+  tolerant(
+    'src/vite.ts',
+    'jumiFinalizer',
+    'code.includes(stagingMarker)',
+    'whether a stylesheet carries Jumi’s staging',
+    'presence of a marker, which no serializer rewrites',
+  ),
+  tolerant(
+    'src/vite.ts',
+    'jumiRegister',
+    "code.includes('tailwindcss')",
+    'whether to process a module at all',
+    'presence, as above',
+  ),
 ]
+
+/** Every candidate, with the symbol it sits in. */
+const candidates = source => {
+  const lines = source.split('\n')
+  const found = []
+
+  lines.forEach((line, index) => {
+    if (!OPERATIONS.test(line)) return
+    if (!CSS_TEXT.test(line)) return
+
+    const offset = lines.slice(0, index).join('\n').length
+
+    found.push({
+      file: '',
+      line: index + 1,
+      symbol: symbolAt(source, offset),
+      text: line.trim(),
+    })
+  })
+
+  return found
+}
 
 const files = execFileSync('git', ['ls-files', 'src'], {
   cwd: root,
@@ -518,101 +585,172 @@ const files = execFileSync('git', ['ls-files', 'src'], {
     name => name.endsWith('.ts') && !name.endsWith('.test.ts') && name.length,
   )
 
-const candidates = []
-
-for (const file of files) {
-  const source = readFileSync(path.join(root, file), 'utf8').split('\n')
-
-  source.forEach((line, index) => {
-    if (!OPERATIONS.test(line)) return
-    if (!CSS_TEXT.test(line)) return
-
-    candidates.push({ anchor: anchor(line), file, line: index + 1 })
-  })
-}
+const sources = new Map(
+  files.map(file => [file, readFileSync(path.join(root, file), 'utf8')]),
+)
 
 /**
- * Anchors are compared with their backslashes removed, and by prefix.
+ * Which candidates an entry claims.
  *
- * Both, and both were learned by trying the strict version first. An anchor is a **documented** line, so a
- * registry that has to reproduce that line's escaping exactly is a copy of the thing it audits — four
- * entries here were copies with the copy's mistakes in them. And an anchor is truncated at 74 characters,
- * so an entry for a long line would have to reproduce the truncation too. Flattened and prefixed, an entry
- * still notices what matters: if the line changes, the prefix stops matching.
+ * The whole match is `file` + `symbol` + an optional `contains`. No line numbers, no copied text: the entry
+ * says *where the operation lives*, and the source says *what it is*.
  */
-const loose = text => text.replace(/\\/g, '')
-
-const classify = candidate =>
-  registry.find(
-    entry =>
-      entry.file === candidate.file &&
-      loose(candidate.anchor).startsWith(loose(entry.anchor)),
+const claimsOf = (entry, all) =>
+  all.filter(
+    candidate =>
+      candidate.file === entry.file &&
+      candidate.symbol === entry.symbol &&
+      (!entry.contains || candidate.text.includes(entry.contains)),
   )
 
-const known = new Map(
-  registry.map(entry => [`${entry.file}\u0000${entry.anchor}`, entry]),
-)
-const seen = new Set()
-const unregistered = []
-const stale = []
-const counts = new Map()
+const census = all => {
+  const tally = new Map()
 
-for (const candidate of candidates) {
-  const entry = classify(candidate)
-  const key = entry
-    ? `${entry.file}\u0000${entry.anchor}`
-    : `${candidate.file}\u0000${candidate.anchor}`
+  for (const entry of registry) {
+    const claims = claimsOf(entry, all).length
 
-  seen.add(key)
-
-  if (!entry) {
-    unregistered.push(candidate)
-
-    continue
+    tally.set(entry.class, (tally.get(entry.class) ?? 0) + claims)
   }
 
-  counts.set(entry.class, (counts.get(entry.class) ?? 0) + 1)
+  return tally
 }
 
-for (const [key, entry] of known) if (!seen.has(key)) stale.push(entry)
+const scan = all => {
+  const doubled = []
+  const empty = []
+  const unclaimed = []
 
-if (process.argv.includes('--list')) {
-  for (const candidate of candidates)
-    console.log(
-      `${candidate.file}:${candidate.line}\n    ${candidate.anchor}\n    ${
-        known.get(`${candidate.file}\u0000${candidate.anchor}`)?.class ??
-        'UNREGISTERED'
-      }`,
+  for (const candidate of all) {
+    const matching = registry.filter(
+      entry => claimsOf(entry, [candidate]).length === 1,
     )
 
-  console.log(
-    `\n${candidates.length} candidate${candidates.length === 1 ? '' : 's'} in ${files.length} files · ${known.size} registered`,
-  )
+    if (!matching.length) unclaimed.push(candidate)
+    else if (matching.length > 1) doubled.push({ candidate, matching })
+  }
+
+  for (const entry of registry)
+    if (!claimsOf(entry, all).length) empty.push(entry)
+
+  return { doubled, empty, unclaimed }
+}
+
+/** The candidate set, with each file attached. */
+const collect = () => {
+  const all = []
+
+  for (const [file, source] of sources)
+    for (const candidate of candidates(source)) all.push({ ...candidate, file })
+
+  return all
+}
+
+const found = collect()
+const { doubled, empty, unclaimed } = scan(found)
+const tally = census(found)
+
+if (process.argv.includes('--list')) {
+  for (const candidate of found) {
+    const entry = registry.find(
+      entry => claimsOf(entry, [candidate]).length === 1,
+    )
+
+    console.log(
+      `${candidate.file}:${candidate.line} | ${candidate.symbol} | ${
+        entry?.class ?? 'UNCLAIMED'
+      } | ${candidate.text.slice(0, 96)}`,
+    )
+  }
+
+  console.log(`\n${found.length} candidates · ${registry.length} entries`)
 
   process.exit(0)
 }
 
 console.log(
-  `Serialized-text rewrites in src/ — ${candidates.length} candidate${candidates.length === 1 ? '' : 's'} in ${files.length} files`,
+  `Serialized-text rewrites in src/ — ${found.length} candidate${found.length === 1 ? '' : 's'} in ${files.length} files`,
 )
 console.log(
   `  ${['structural', 'tolerant', 'spacing', 'inferred']
-    .map(name => `${name} ${counts.get(name) ?? 0}`)
+    .map(name => `${name} ${tally.get(name) ?? 0}`)
     .join(' · ')}\n`,
 )
 
-for (const candidate of unregistered)
+for (const candidate of unclaimed)
   console.error(
-    `✗ unregistered: ${candidate.file}:${candidate.line}\n    ${candidate.anchor}\n    Classify it in the registry — a rewrite nobody classified is the state this file exists to prevent.`,
+    `✗ unclaimed: ${candidate.file}:${candidate.line} (${candidate.symbol})\n    ${candidate.text.slice(0, 96)}\n    Classify it in the registry — a rewrite nobody classified is the state this file exists to prevent.`,
   )
 
-for (const entry of stale)
-  console.log(
-    `· entry without a line: ${entry.file} — ${entry.anchor.slice(0, 56)}\n    Either the line was rewritten, or it stopped being a candidate at all — a pattern moving into a\n    shared helper does that. Re-read it: an entry that matches nothing documents nothing.`,
+for (const { candidate, matching } of doubled)
+  console.error(
+    `✗ claimed twice: ${candidate.file}:${candidate.line} (${candidate.symbol})\n    ${matching.map(entry => `${entry.symbol} · ${entry.contains ?? '—'}`).join('\n    ')}\n    One operation, one entry: merge them, or narrow the fragments.`,
   )
 
-if (unregistered.length) process.exit(1)
+for (const entry of empty)
+  console.error(
+    `✗ claims nothing: ${entry.file} · ${entry.symbol}${entry.contains ? ` · ${entry.contains}` : ''}\n    Either the line moved, or it stopped carrying an operation. Re-read it and re-derive the entry.`,
+  )
+
+if ((tally.get('spacing') ?? 0) > 0)
+  console.error(
+    `✗ ${tally.get('spacing')} spacing-sensitive rewrite${tally.get('spacing') === 1 ? '' : 's'}\n    This bucket is the shipped defect. Harden the matcher, or make the dependency a decision here.`,
+  )
+
+/**
+ * The self-test: the property this registry format exists to have.
+ *
+ * Reformat every audited file — collapse horizontal whitespace, then re-indent every line — and require the
+ * census to be identical. If a descriptor identified its line by copied text, the first perturbation would
+ * find it and the second would not; if it identified it by *position*, both would pass and a re-wrap would
+ * break it. So: same counts, same classes, and every entry still claiming what it claimed.
+ */
+const perturbed = [
+  ['collapsed whitespace', text => text.replace(/[^\S\n]+/g, ' ')],
+  ['re-indented', text => text.replace(/\n/g, '\n      ')],
+]
+
+let drift = 0
+
+for (const [name, perturb] of perturbed) {
+  const all = []
+
+  for (const [file, source] of sources)
+    for (const candidate of candidates(perturb(source)))
+      all.push({ ...candidate, file })
+
+  const other = census(all)
+
+  for (const bucket of ['structural', 'tolerant', 'spacing', 'inferred']) {
+    const before = tally.get(bucket) ?? 0
+    const after = other.get(bucket) ?? 0
+
+    if (before === after) continue
+
+    drift += 1
+    console.error(
+      `✗ self-test, ${name}: ${bucket} counted ${before} before and ${after} after — an entry is tied to spelling rather than to a symbol`,
+    )
+  }
+}
+
+const hygiene = registry.filter(
+  entry => entry.contains?.includes('\n') || entry.contains?.includes('  '),
+)
+
+for (const entry of hygiene)
+  console.error(
+    `✗ fragment spans or pads whitespace: ${entry.file} · ${entry.symbol} · ${entry.contains}\n    Keep it short and single-spaced, or it is a copy of the source again.`,
+  )
+
+if (
+  unclaimed.length ||
+  doubled.length ||
+  empty.length ||
+  drift ||
+  hygiene.length
+)
+  process.exit(1)
 
 console.log(
-  '✓ every rewrite against serialized CSS is registered and classified',
+  `✓ every rewrite against serialized CSS is registered, classified, and still found after reformatting (self-test: ${perturbed.map(([name]) => name).join(' · ')})`,
 )
