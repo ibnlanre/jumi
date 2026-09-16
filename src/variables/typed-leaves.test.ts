@@ -5,7 +5,12 @@ import { describe, expect, it } from 'vitest'
 import { compositionEdges } from '@/variables/composition'
 import { propertyVariables } from '@/variables/property'
 
-import { typedLeaves, typedLeavesOf, scaleFactorToNumber } from './typed-leaves'
+import {
+  normalizeScale,
+  scaleFactorToNumber,
+  typedLeaves,
+  typedLeavesOf,
+} from './typed-leaves'
 
 describe('typed leaf declarations', () => {
   it('declares the three scale leaves as numbers-or-percentages resting at one', () => {
@@ -143,5 +148,57 @@ describe('scaleFactorToNumber', () => {
 
     for (const [authored, canonical] of pairs)
       expect(scaleFactorToNumber(authored)).toBe(canonical)
+  })
+})
+
+describe('normalizeScale', () => {
+  it('repeats a single value across the three axes', () => {
+    // `scale: 2` is `2 2 2`, and the computed serialization is `2` because the three agree.
+    expect(normalizeScale('2')).toEqual(['2', '2', '2'])
+    expect(normalizeScale('150%')).toEqual(['150%', '150%', '150%'])
+  })
+
+  it('pads two values with the identity, not with the first', () => {
+    // Measured: `scale: 2 3` computes to `2 3`, which is `2 3 1` — a trailing value equal to the
+    // initial is collapsed in the serialization. Padding with the first value would give `2 3 3`.
+    expect(normalizeScale('2 3')).toEqual(['2', '3', '1'])
+  })
+
+  it('keeps three values as authored', () => {
+    expect(normalizeScale('2 3 4')).toEqual(['2', '3', '4'])
+    expect(normalizeScale('-1 2.5 -3')).toEqual(['-1', '2.5', '-3'])
+  })
+
+  it('accepts mixed number and percentage forms', () => {
+    // Native accepts them, so decomposition must too; the frame representation is the
+    // canonicalizer's problem, not this one's.
+    expect(normalizeScale('2 150%')).toEqual(['2', '150%', '1'])
+    expect(normalizeScale('50% 150% 2')).toEqual(['50%', '150%', '2'])
+  })
+
+  it('returns values as authored, never canonicalized', () => {
+    // Folding the two steps together would make a grammar decision indistinguishable from an
+    // interpolation one, and only the second of those may differ from what the author wrote.
+    expect(normalizeScale('150%')).toEqual(['150%', '150%', '150%'])
+  })
+
+  it('declines rather than guessing', () => {
+    for (const value of [
+      'none',
+      '2 3 4 5',
+      '',
+      '  ',
+      'var(--x)',
+      'calc(2 * 3)',
+      '2 3 none',
+      '2px',
+      'auto',
+      '2,3',
+    ])
+      expect(normalizeScale(value), value).toBeNull()
+  })
+
+  it('tolerates padding and repeated whitespace', () => {
+    expect(normalizeScale('   2     3   ')).toEqual(['2', '3', '1'])
   })
 })

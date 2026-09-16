@@ -144,3 +144,49 @@ export const typedLeavesOf = (
   Object.entries(typedLeaves[attribute] ?? {}).sort(([a], [b]) =>
     a.localeCompare(b),
   )
+
+/**
+ * A whole `scale` value decomposed into the three leaves it sets, or `null` when the value is not
+ * safely decomposable and the caller should keep the property-level animation.
+ *
+ * The forms are **measured from the browser**, not read off a grammar, because the computed
+ * serialization hides the distinction that matters:
+ *
+ *   scale: 2        → 2          one value **repeats**     → [2, 2, 2]
+ *   scale: 2 3      → 2 3        two values **pad** with the identity → [2, 3, 1]
+ *   scale: 2 3 4    → 2 3 4      three values              → [2, 3, 4]
+ *   scale: 2 3 4 5  → none       invalid, the declaration is dropped → null
+ *   scale: none     → none       a whole-property keyword, not three scalars → null
+ *   scale: 2 150%   → 2 1.5      mixed forms are accepted   → [2, 150%, 1]
+ *
+ * `2 3` serializes as `2 3` rather than `2 3 1` because a trailing value equal to the initial is
+ * collapsed — so the serialization cannot tell "z was given as 1" from "z was not given", and both
+ * are the same value. It can look like padding and repetition are the same rule; they are not, and
+ * `2` versus `2 3` is exactly where they differ.
+ *
+ * Declines rather than guesses, and the declines are the honest half: a value the shape cannot be
+ * read from keeps the current property-level path, which is what ships today and is correct.
+ *
+ * Values are returned **as authored** — normalisation decides the shape, `animationCanonicalizer`
+ * decides the representation, and folding the two together would make it impossible to tell a
+ * grammar decision from an interpolation one.
+ */
+export const normalizeScale = (
+  value: string,
+): [string, string, string] | null => {
+  const parts = value.trim().split(/\s+/)
+
+  if (!parts.length || parts.length > 3) return null
+
+  // The same grammar the leaves accept, reused rather than restated: a part that is not a scale
+  // scalar is not something this can decompose, and `scaleFactorToNumber` is already the statement
+  // of what a scale scalar is.
+  if (parts.some(part => scaleFactorToNumber(part) === null)) return null
+
+  if (parts.length === 1)
+    return [parts[0] as string, parts[0] as string, parts[0] as string]
+
+  if (parts.length === 2) return [parts[0] as string, parts[1] as string, '1']
+
+  return [parts[0] as string, parts[1] as string, parts[2] as string]
+}

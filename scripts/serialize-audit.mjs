@@ -77,6 +77,7 @@ const carriers = 'src/helpers/carriers/index.ts'
 const instance = 'src/helpers/carriers/instance.ts'
 const range = 'src/helpers/carriers/animation-range.ts'
 const slots = 'src/helpers/slots/index.ts'
+const typedLeaves = 'src/variables/typed-leaves.ts'
 const theme = 'src/helpers/create/theme.ts'
 const transitions = 'src/helpers/carriers/view-transition.ts'
 
@@ -209,6 +210,23 @@ const registry = [
     structural:
       'the dependencies are declared in the graph beside the composition, so this could read the graph instead of the text — it reads the text because the graph does not record *how* each dependency is reached, and that is the fact being recovered',
     symbol: 'readSlots',
+  },
+
+  {
+    assumes:
+      'that a whole `scale` value separates its components on whitespace, and that the components hold no whitespace of their own',
+    breakable:
+      'only against a spelling Jumi does not produce. The value split here is neither sheet text nor a definition — it is the author’s own class token, which is what an arbitrary value is — so no serializer stands between the two, and a component that contained whitespace would not be a single `scale` scalar in the first place',
+    class: 'structural',
+    contains: 'value.trim().split(',
+    file: typedLeaves,
+    recovers:
+      'the three leaves a whole `scale` writes, so a whole motion can be decomposed into typed leaves',
+    serialization:
+      'no — the input is the authored value, and the split is the value grammar rather than a search over built text',
+    structural:
+      'the count of parts is the grammar: one repeats, two pad with the identity, three are as authored, anything else declines — which is why this reads characters rather than consulting a list utility',
+    symbol: 'normalizeScale',
   },
 
   // ── a range: selector and value grammar, read from an author's class ─────────────────────────
