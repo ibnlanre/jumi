@@ -17,7 +17,6 @@ import { merge } from '@/helpers/merge'
 import { toPaintHex } from '@/helpers/paint'
 import { replaceSlots } from '@/helpers/slots'
 import { effectKeyframes } from '@/keyframes/effects'
-import { isDirectlyAddressable } from '@/variables/composition'
 import { propertyVariables } from '@/variables/property'
 
 import cssEscape from 'css.escape'
@@ -94,6 +93,18 @@ type Frame = {
  * per-element control chain reads before the property scope and the global default. */
 type Slot = {
   attribute: string
+  /**
+   * The components this slot's candidates address — `scale-x` for `animate-scale-x-[…]` — as
+   * **metadata for the timing chain**, not as identity. The chain reads the component's scope
+   * outermost, because that is the address an author-facing control already writes
+   * (`animation-duration-3000/scale-x` becomes `--jumi-scale-x-animation-duration`).
+   *
+   * Empty for a slot that addresses no component, and **more than one entry when several candidates
+   * share the slot** — the shared composed slot a `scale-x` and a `scale-y` tween both join. That is
+   * why it is a list rather than a name: a slot claiming two components has no single component
+   * address, and the chain declines the rung rather than picking one.
+   */
+  components?: string[] | undefined
   key?: string | undefined
   nameVar?: string | undefined
 }
@@ -360,6 +371,43 @@ export function createJumiModel({
    * the other, and only this one answers the question the substitution asks.
    */
   const surfaces = new Map<AnimatableStandardPropertyType, Set<string>>()
+
+  /**
+   * The components each **slot** addresses, recorded where the slot is created.
+   *
+   * A slot's component is what an author-facing `/scale-x` control addresses, so the timing chain
+   * has to read it — and it is not derivable from the slot key, which for a phrase is a hash of the
+   * phrase's frames (`scale-1vrwYE`). Recorded per slot rather than read off `surfaces`, because
+   * `surfaces` is keyed by attribute and answers a different question: which components *some*
+   * candidate addresses, not which one this motion does.
+   *
+   * A `Set`, so two candidates sharing one slot accumulate rather than overwrite — and so the chain
+   * can tell "one component" from "several", which is the distinction that decides whether a
+   * component-specific rung is answerable at all.
+   */
+  const componentsOf = new Map<string, Set<string>>()
+
+  /**
+   * Record the components a motion addresses, against the slot it creates.
+   *
+   * A whole motion addresses none, and records none: `animate-scale-[2]` writes the property rather
+   * than a component of it, so a component rung for its slot would be a read with no writer.
+   */
+  const recordComponents = (
+    key: string,
+    parts: ReadonlyArray<[string, ...unknown[]] | string>,
+  ) => {
+    const names = parts.map(part =>
+      String(Array.isArray(part) ? part[0] : part),
+    )
+
+    if (!names.length) return
+
+    const known = componentsOf.get(key)
+
+    if (known) for (const name of names) known.add(name)
+    else componentsOf.set(key, new Set(names))
+  }
 
   /**
    * The slots some candidate gave a name to.
@@ -710,11 +758,41 @@ export function createJumiModel({
     nameVar?: string,
     key?: string,
   ): CssInJs {
-    // At most four links, narrowest first: the label a *name* wrote, the range variant's publication,
-    // the property's control, then the global default. Folded from the inside out, so the most specific
-    // link is outermost and each one falls through to the next.
+    // At most five links, narrowest first: the **component** the motion addresses, the label or slot a
+    // name wrote, the range variant's publication, the property's control, then the global default.
+    // Folded from the inside out, so the most specific link is outermost and each one falls through to
+    // the next — which is what keeps a `/rotate` control on a wrapper reaching a descendant, since the
+    // property scope is a rung rather than the only link.
     const timing = (part: string) => {
       const links: string[] = []
+
+      /**
+       * The **component** scope, and the reason it is outermost.
+       *
+       * `animation-duration-3000/scale-x` writes `--jumi-scale-x-animation-duration`, and a part phrase
+       * animating `scale-x` already owns a slot of its own with its own name — but its duration,
+       * delay and easing read the *property* scope, so the control reached nothing. A motion that is
+       * independently named and not independently timed is internally inconsistent, and that is the
+       * whole of this rung.
+       *
+       * Made only when the slot addresses **exactly one** component. A slot several candidates share
+       * — the composed `scale` slot both a `scale-x` and a `scale-y` tween join — has no single
+       * component address, and picking one would hand `/scale-x` a motion the author never pointed
+       * it at. Declining is the honest answer: those slots fall through to the property scope, which
+       * is where they were before.
+       *
+       * Skipped when the component *is* the attribute (`animate-border-block-color` addresses
+       * `border-block-color` on `border-block-color`), because the property scope below is then the
+       * same address and a second rung would read the identical variable.
+       */
+      const components = componentsOf.get(key ?? attribute)
+
+      if (components?.size === 1) {
+        const [component] = [...components]
+
+        if (component && component !== attribute)
+          links.push(cssEscape(`--jumi-${component}-${part}`))
+      }
 
       // The three the shorthand cannot carry, and only for an addressed slot. The other seven are swapped
       // for the label inside the hoist's **value** (`namedHoist`), and that value is published on the rule
@@ -793,6 +871,7 @@ export function createJumiModel({
       for (const [key, id] of instances) {
         slots.push({
           attribute,
+          components: [...(componentsOf.get(key) ?? [])],
           key,
           nameVar: `--jumi-${attribute}-${id}-animation-name`,
         })
@@ -805,12 +884,17 @@ export function createJumiModel({
     for (const attribute of composed) shared.add(attribute)
 
     for (const attribute of sorted(shared))
-      slots.push({ attribute, key: slotKey(attribute) })
+      slots.push({
+        attribute,
+        components: [...(componentsOf.get(slotKey(attribute)) ?? [])],
+        key: slotKey(attribute),
+      })
 
     for (const [attribute, instances] of phrases) {
       for (const [key, id] of instances) {
         slots.push({
           attribute,
+          components: [...(componentsOf.get(key) ?? [])],
           key,
           nameVar: `--jumi-${attribute}-${id}-animation-name`,
         })
@@ -1116,6 +1200,7 @@ export function createJumiModel({
 
           instances.set(key, id)
           registerName(`--jumi-${attribute}-${id}-animation-name`)
+          recordComponents(key, parts)
           emitKeyframe(
             `jumi-${attribute}-${id}`,
             phraseKeyframe(
@@ -1198,6 +1283,7 @@ export function createJumiModel({
 
         composed.add(attribute)
         registerName(`--jumi-${attribute}-animation-name`)
+        recordComponents(slotKey(attribute), parts)
 
         // The same rule on the tween path: a candidate addressing properties animates those properties,
         // so a value addressed on a logical corner arrives as that corner and the browser places it.
