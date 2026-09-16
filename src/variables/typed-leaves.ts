@@ -190,3 +190,37 @@ export const normalizeScale = (
 
   return [parts[0] as string, parts[1] as string, parts[2] as string]
 }
+
+/**
+ * The three frame endpoints a whole `scale` motion writes, already canonical — or `null` when the
+ * motion cannot be represented as typed leaves and must stay on the property path.
+ *
+ * One function rather than two calls at the call site, because the two declines have the same
+ * consequence and must not be separable. **Decomposition is opt-in by proof, not by family name**:
+ * if normalisation cannot read the shape, or the canonicalizer does not understand a value it
+ * produced, the motion does not partially enter the typed-leaf path — it does not enter it at all.
+ *
+ * That boundary is not hypothetical. `filter` already showed what a partial move costs: a native
+ * whole-property animation and a constituent motion over the same property contend for it, one wins
+ * outright, and the loser goes silent — published keyframes nothing reads. A half-decomposed `scale`
+ * would be the same shape.
+ *
+ *   "2"       → normalize ['2','2','2']       → canonicalize ['2','2','2']
+ *   "150%"    → normalize ['150%',…]          → canonicalize ['1.5','1.5','1.5']
+ *   "2 3"     → normalize ['2','3','1']       → canonicalize ['2','3','1']
+ *   "2 150%"  → normalize ['2','150%','1']    → canonicalize ['2','1.5','1']
+ *   "none", "2 3 4 5", "2px", "var(--x)"      → null
+ */
+export const scaleLeafEndpoints = (
+  value: string,
+): [string, string, string] | null => {
+  const leaves = normalizeScale(value)
+
+  if (!leaves) return null
+
+  const canonical = leaves.map(scaleFactorToNumber)
+
+  if (canonical.some(one => one === null)) return null
+
+  return canonical as [string, string, string]
+}

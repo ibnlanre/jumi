@@ -8,6 +8,7 @@ import { propertyVariables } from '@/variables/property'
 import {
   normalizeScale,
   scaleFactorToNumber,
+  scaleLeafEndpoints,
   typedLeaves,
   typedLeavesOf,
 } from './typed-leaves'
@@ -200,5 +201,38 @@ describe('normalizeScale', () => {
 
   it('tolerates padding and repeated whitespace', () => {
     expect(normalizeScale('   2     3   ')).toEqual(['2', '3', '1'])
+  })
+})
+
+describe('scaleLeafEndpoints', () => {
+  it('returns canonical endpoints for a decomposable whole value', () => {
+    expect(scaleLeafEndpoints('2')).toEqual(['2', '2', '2'])
+    expect(scaleLeafEndpoints('2 3')).toEqual(['2', '3', '1'])
+    expect(scaleLeafEndpoints('2 3 4')).toEqual(['2', '3', '4'])
+  })
+
+  it('canonicalizes a percentage so the frames stay on one interpolation branch', () => {
+    // The reason the two steps are composed here: a frame writing `150%` into a
+    // `<number> | <percentage>` leaf steps instead of blending.
+    expect(scaleLeafEndpoints('150%')).toEqual(['1.5', '1.5', '1.5'])
+    expect(scaleLeafEndpoints('50% 150%')).toEqual(['0.5', '1.5', '1'])
+  })
+
+  it('accepts mixed authored forms by canonicalizing them together', () => {
+    expect(scaleLeafEndpoints('2 150%')).toEqual(['2', '1.5', '1'])
+  })
+
+  it('declines as one decision, so a motion cannot half-enter the typed path', () => {
+    // Either decline has the same consequence, which is why the two are composed into one
+    // function rather than left to the call site to remember to check.
+    for (const value of [
+      'none',
+      '2 3 4 5',
+      'var(--x)',
+      'calc(2 * 3)',
+      '2px',
+      '',
+    ])
+      expect(scaleLeafEndpoints(value), value).toBeNull()
   })
 })
