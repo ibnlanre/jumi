@@ -131,6 +131,51 @@ engine — and it applies to the tween path as well, so the value form is not in
   (`skew-x`/`skew-y`), and the four position families 4 each (`background-position`, `object-position`,
   `offset-anchor`, `offset-position`).
 
+### The 33 traced: two topologies, not one (2026-09-16)
+
+One representative per family, traced from the model's own tables plus the compiled emission — candidate,
+what it writes, which entry claims the part, what that entry's template reads, what the attribute's
+composition reads. No production change.
+
+| representative | intermediate that claims the written part | attribute reads | where it stops |
+| --- | --- | --- | --- |
+| `skew-x` | `skew` (authorable) | `… var(--jumi-skew) …` | the intermediate |
+| `box-shadow-blur` | `box-shadow-inset` **and** `-outset` (both internal) | `var(--jumi-box-shadow-inset), var(--jumi-box-shadow-outset)` | both, 2-way |
+| `filter-drop-shadow-blur` | `filter-drop-shadow` (authorable) | `… var(--jumi-filter-drop-shadow) …` | the intermediate |
+| `background-position-x-edge` | `background-position-x` (authorable) | `… var(--jumi-background-position-x) …` | the intermediate |
+| `object-position-x-edge`, `offset-anchor-x-edge`, `offset-position-x-edge` | the axis entry, authorable | `… var(--jumi-<axis>) …` | the intermediate |
+
+**31 of the 33 are that shape** — one level deeper, box-shadow being the only family whose leaf is claimed
+by two intermediates. **The other two are not nested at all**: `filter-url` and `backdrop-filter-url` are
+referenced by nothing (`--jumi-filter-url` appears only on its own entry), so `filter`'s composition simply
+omits the `url()` filter function. That is the orphaned-`gap.ts` omission again — a data correction, not a
+depth problem.
+
+The four questions:
+
+1. **One level, always** — bar box-shadow's 2-way fan-out and the two `*url` cases, which have no level.
+2. **Yes, every intermediate already has a template reading its parts.** One reader artefact to record:
+   `filter-drop-shadow.ts` builds its parts in a local const (`filterDropShadowValues`), so a scan of the
+   symbol body alone reports no reads — the template is fine.
+3. **Six of seven intermediates are authorable**; `box-shadow-inset`/`-outset` are purely internal. A fix
+   keyed on "expand only authorable intermediates" would therefore miss box-shadow: the walk has to expand
+   whatever the composition reads, and earn its safety elsewhere.
+4. **Yes — and the safety is already in the model.** Expanding an intermediate *in place* (replacing
+   `var(--jumi-skew)` with `skew`'s own template) lets the frame hook the leaf the phrase actually wrote,
+   and only that leaf. Such a hook has the two properties the old 112 dead reads lacked: its base is a
+   declared variable, and its frame key has *this phrase* as its writer — nothing is hooked merely because
+   a writer *class* exists.
+
+The shape, for `skew-x` — `transform`'s composition with `var(--jumi-skew)` replaced by `skew`'s template,
+the written leaf read frame-first inside it:
+
+```css
+transform: … skew(var(--jumi-skew-x-<id>-0, var(--jumi-skew-x)), var(--jumi-skew-y)) …
+```
+
+Scope note: only the *phrase* path needs this. The tween path already works for these families, because
+the element-level chain (`--jumi-transform` → `--jumi-skew` → `--jumi-skew-x`) resolves without a frame.
+
 ## The acceptance test for closing it
 
 A change is finished when `node scripts/constituent-check.mjs` is run and the names it repaired have
