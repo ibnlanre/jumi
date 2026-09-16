@@ -52,6 +52,7 @@
     "docs:preview": "astro preview --root docs",
     "css:snapshot": "node scripts/css-snapshot.mjs --update",
     "css:check": "node scripts/css-snapshot.mjs --check && node scripts/dead-links.mjs --strict && node scripts/serialize-audit.mjs && node scripts/serialize-differential.mjs",
+    "constituent:check": "node scripts/constituent-check.mjs",
     "theme:map": "node scripts/theme-map.mjs",
     "incremental:check": "node scripts/incremental-build.mjs",
     "lint": "eslint --fix .",

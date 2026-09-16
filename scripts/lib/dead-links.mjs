@@ -1,6 +1,28 @@
 /**
- * The writer/read invariant, as a library — every custom property Jumi emits a read for must have
- * something that writes it, or be a level that is documented as latent.
+ * The writer/read invariant, as a library — in **both** directions.
+ *
+ * The first direction is the one this file was written for: every custom property Jumi emits a read
+ * for must have something that can write it, or be a level that is documented as latent. Stated as a
+ * rule rather than a list, that is
+ *
+ *   read exists → some writer **class** must be able to satisfy it
+ *
+ * and a *class* is the point: the writer does not have to be in this stylesheet, it has to be
+ * expressible in the language. A per-frame component lookup `var(--jumi-scale-x-<id>-0,
+ * var(--jumi-scale-x))` is answered by `animate-scale-x-[0:1|100:0]` — a candidate that may simply be
+ * absent from the page being compiled, which is why those reads are classified `conditional` rather
+ * than dead.
+ *
+ * The second direction is the converse, and it was missing: for frame-scoped values it is not enough
+ * that a read could be satisfied — a writer must be **consumed**:
+ *
+ *   authorable constituent writes a frame value → its owning composed keyframe must read it
+ *
+ * That is the half `bb39449` removed. It kept the first direction (no read without a writer) and
+ * dropped the second, so `animate-scale-x-[0:1|100:0]` went on emitting `--jumi-scale-x-<id>-0` while
+ * the composed `scale` keyframe stopped reading it — every frame resolved to the same components, and
+ * both this audit and the differential stayed green, because deleting a read can only ever *satisfy* a
+ * no-dead-reads check. `unconsumedWrites` below is the assertion that closes it.
  *
  * Splitting this out of the CLI is not tidiness. The differential that decides whether a dead class can
  * be removed has to identify **exactly** the same reads the audit reports, and a second copy of the
@@ -14,6 +36,8 @@
  *               long before any control names a motion
  *   optional    a level that is documented as absent until written, each entry naming the code that
  *               writes it
+ *   conditional a per-frame component lookup, whose writer class is a constituent phrase over the same
+ *               frames — named, and possibly absent from this stylesheet
  *   DEAD        none of the above: a name nothing in the model can produce
  */
 import postcss from 'postcss'
@@ -43,6 +67,28 @@ export const OPTIONAL = [
 ]
 
 /**
+ * `var(<frame key>, var(<base>))` — a read that names its own fallback.
+ *
+ * Matched as a shape rather than inferred from name arithmetic, because the two readings of the same
+ * name are exactly what has to be told apart: a **component hook**
+ * (`var(--jumi-scale-x-<id>-0, var(--jumi-scale-x))`, whose base is a component) and an **outer read**
+ * (`var(--jumi-outline-<id>-0, var(--jumi-outline))`, whose base is the keyframe's own property). The
+ * second must be written by the phrase that owns the keyframe; only the first has a writer class that
+ * may simply be missing from this stylesheet.
+ */
+const LOOKUP = /var\(\s*(--jumi-[^,)\s]+)\s*,\s*var\(\s*(--jumi-[^,)\s]+)\s*\)/g
+
+/** A frame key: `<property>-<id>-<offset>`, as a phrase writes it and a keyframe reads it. */
+const FRAME_KEY = /^--jumi-[\w-]+-[A-Za-z0-9]{5,8}-\d+$/
+
+/** The name a frame key is scoped to — `<base>` in `<base>-<id>-<offset>`. */
+const frameBase = name => name.replace(/-[A-Za-z0-9]{5,8}-\d+$/, '')
+
+/** A keyframe's own attribute, from the name it was emitted under. */
+const ownerAttribute = name =>
+  name.replace(/^jumi-/, '').replace(/-[A-Za-z0-9]{5,8}$/, '')
+
+/**
  * Read a stylesheet and answer with everything the invariant needs.
  *
  * `keyframes` is tracked separately because it is what tells one class of dead read from another when a
@@ -55,37 +101,68 @@ export const collect = css => {
   const registered = new Set()
   const reads = new Map()
   const inKeyframes = new Set()
+  // Frame-scoped component lookups: reads whose fallback is a *different* name from the keyframe that
+  // reads them, i.e. `var(--jumi-scale-x-<id>-0, var(--jumi-scale-x))` inside `jumi-scale-<id>`. The
+  // writer is a phrase addressing `scale-x`, which this stylesheet may not contain.
+  const hooked = new Set()
+  // Frame keys a phrase wrote, outside any keyframe: what the converse invariant holds a keyframe to.
+  const frameWrites = new Set()
 
-  const target = node => {
+  const keyframeOf = node => {
     for (let parent = node.parent; parent; parent = parent.parent)
       if (parent.type === 'atrule' && /keyframes$/i.test(parent.name))
-        return true
+        return parent.params.trim()
 
-    return false
+    return null
   }
 
   document.walkDecls(node => {
     if (node.prop.startsWith('--')) written.add(node.prop)
 
-    if (target(node))
+    const owner = keyframeOf(node)
+    const attribute = owner ? ownerAttribute(owner) : null
+
+    // Written by a phrase's own rule, which is outside any keyframe: the composed keyframe is what has
+    // to read it back. A frame key declared *inside* a keyframe is a different mechanism (a per-frame
+    // writer) and is not part of this invariant.
+    if (!owner && FRAME_KEY.test(node.prop)) frameWrites.add(node.prop)
+
+    if (owner)
       for (const [, name] of node.value.matchAll(/var\((--jumi-[^,)\s]+)/g))
         inKeyframes.add(name)
 
     for (const [, name] of node.value.matchAll(/var\((--jumi-[^,)\s]+)/g))
       reads.set(name, (reads.get(name) ?? 0) + 1)
+
+    if (!owner) return
+
+    for (const [, key, base] of node.value.matchAll(LOOKUP))
+      if (frameBase(key) === base && attribute !== base.replace(/^--jumi-/, ''))
+        hooked.add(key)
   })
 
   document.walkAtRules('property', atRule =>
     registered.add(atRule.params.trim()),
   )
 
-  return { document, inKeyframes, reads, registered, written }
+  return {
+    document,
+    frameWrites,
+    hooked,
+    inKeyframes,
+    reads,
+    registered,
+    written,
+  }
 }
 
 /** The class a name belongs to, or `DEAD` when nothing in the model can write it. */
-export const classify = (name, { registered, written }) => {
+export const classify = (name, { hooked, registered, written }) => {
   if (written.has(name)) return 'written'
   if (registered.has(name)) return 'registered'
+
+  if (hooked.has(name))
+    return `conditional (a phrase addressing ${frameBase(name)} over the same frames)`
 
   for (const [pattern, writer] of OPTIONAL)
     if (pattern.test(name)) return `optional (${writer})`
@@ -102,11 +179,11 @@ export const classify = (name, { registered, written }) => {
  * one family across two reported shapes.
  */
 export const deadReads = css => {
-  const { inKeyframes, reads, registered, written } = collect(css)
+  const { hooked, inKeyframes, reads, registered, written } = collect(css)
   const dead = []
 
   for (const [name, count] of reads) {
-    if (classify(name, { registered, written }) !== 'DEAD') continue
+    if (classify(name, { hooked, registered, written }) !== 'DEAD') continue
 
     dead.push({
       count,
@@ -119,4 +196,33 @@ export const deadReads = css => {
   }
 
   return dead.sort((one, two) => one.name.localeCompare(two.name))
+}
+
+/**
+ * The converse: frame keys a phrase wrote that no keyframe reads.
+ *
+ * The shape of the defect `bb39449` introduced, expressed as an assertion rather than as a story about
+ * one property. A phrase that addresses a component writes `<base>-<id>-<offset>`; the composed
+ * keyframe that owns `<id>` is the only place the value can be consumed, so a key nothing reads is a
+ * motion that computes but never moves — exactly the symptom, on any family.
+ *
+ * Reported as a *class of name* rather than a count, for the same reason the dead reads are: a gate
+ * failure has to say which family lost its consumer.
+ */
+export const unconsumedWrites = css => {
+  const { frameWrites, inKeyframes } = collect(css)
+  const unconsumed = []
+
+  for (const name of frameWrites) {
+    if (inKeyframes.has(name)) continue
+
+    unconsumed.push({
+      name,
+      shape: name
+        .replace(/^--jumi-/, '')
+        .replace(/-[A-Za-z0-9]{5,8}(?:-\d+)?$/, '-<id>'),
+    })
+  }
+
+  return unconsumed.sort((one, two) => one.name.localeCompare(two.name))
 }

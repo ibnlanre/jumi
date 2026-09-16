@@ -34,6 +34,14 @@
  * descendant. The emitted CSS for that case looks entirely reasonable, which is the whole reason it
  * belongs here — see the `property` sink, and section 6.
  *
+ * And it asserts the composed-property path in computed style, because a constituent phrase can emit
+ * every correct name and still not move: `animate-scale-x-[0:1|100:0]` writes
+ * `--jumi-scale-x-<id>-0: 1` and `<id>-100: 0`, and the composed `scale` keyframe has to read *those*
+ * per frame. With the frame-first lookup missing, both frames resolve `var(--jumi-scale-x)`, the sheet
+ * contains every name it should, and the animation holds one value at every offset. That shipped for a
+ * month behind a green snapshot, a green audit and this harness, so the arm below reads the *computed*
+ * `scale` and then strips the lookups from the same sheet to prove it can fail.
+ *
  * Run: pnpm behaviour:check
  */
 import { execFileSync } from 'node:child_process'
@@ -1221,6 +1229,106 @@ const naming = [
 
 for (const [claim, ok] of naming) if (!ok) failures.push(`naming: ${claim}`)
 
+/* ------------------------------------------------------------------------------------
+ * 10. A constituent phrase moves the composed property.
+ * ---------------------------------------------------------------------------------- */
+
+// Three constituent phrases over one frame list, which is the case the id-sharing design exists for:
+// the id hashes the frames and not the surface, so all three write keys the *one* composed `scale`
+// keyframe reads, per frame.
+const constituentEntry = `\n@import "tailwindcss" source(none);\n@plugin "${path.join(root, 'dist', 'index.js')}";\n`
+
+const constituentCss = finalizeCss(
+  (await compiler(constituentEntry, root)).build([
+    'animate-scale-x-[0:1|100:0]',
+    'animate-scale-y-[0:1|100:0]',
+    'animate-scale-z-[0:1|100:0]',
+  ]),
+).css
+
+/**
+ * The composed property as it computes at five offsets, on a page given nothing but those utilities.
+ *
+ * Paused and stepped by `currentTime`, not sampled live: a live read takes whatever moment the machine
+ * happened to reach, and two models compared that way differ by timing rather than by chain — measured
+ * on the harness this replaces.
+ */
+const stretched = async css => {
+  const page = await load(
+    css,
+    `<div class="animate-scale-x-[0:1|100:0] animate-scale-y-[0:1|100:0] animate-scale-z-[0:1|100:0]"></div>`,
+  )
+
+  const reading = await page.evaluate(async () => {
+    const element = document.querySelector('div')
+    const own = element
+      .getAnimations()
+      .filter(animation =>
+        (animation.animationName ?? '').startsWith('jumi-scale'),
+      )
+
+    if (!own.length) return { names: [], samples: [] }
+
+    own.forEach(animation => animation.pause())
+
+    const duration = own[0].effect?.getTiming?.().duration ?? 0
+    const samples = []
+
+    for (const share of [0, 0.25, 0.5, 0.75, 1]) {
+      own.forEach(animation => {
+        animation.currentTime = duration * share
+      })
+
+      await new Promise(resolve => requestAnimationFrame(resolve))
+      samples.push(getComputedStyle(element).scale)
+    }
+
+    return { names: own.map(animation => animation.animationName), samples }
+  })
+
+  await page.close()
+
+  return reading
+}
+
+const moved = await stretched(constituentCss)
+
+// The same sheet with every frame-first lookup rewritten to the element-level value it falls back to —
+// the shape `bb39449` shipped, reconstructed by text so the comparison is against this build's own
+// sheet rather than a remembered one. `--jumi-<component>-<id>-<offset>` is matched with a lazy base
+// because the instance hash is 5–8 word characters and a `-` cannot be part of it.
+const flattened = constituentCss.replace(
+  /var\((--jumi-[\w-]+?)-[A-Za-z0-9]{5,8}-\d+, var\(--jumi-[\w-]+\)\)/g,
+  'var($1)',
+)
+
+const held = await stretched(flattened)
+
+const moving =
+  moved.samples.length === 5 &&
+  new Set(moved.samples).size === 5 &&
+  !!moved.names.length
+const still =
+  held.samples.length === 5 &&
+  new Set(held.samples).size === 1 &&
+  !!held.names.length
+
+const constituent = [
+  [
+    'a constituent phrase moves the composed property at every offset',
+    moving,
+    `read ${moved.samples.join(' | ') || 'no animation'} from ${moved.names.join(' + ') || 'no slot'}`,
+  ],
+  [
+    'and the assertion can fail: without the frame-first lookups it holds one value',
+    still && flattened !== constituentCss,
+    `read ${held.samples.join(' | ') || 'no animation'} — the same sheet with the lookups stripped`,
+  ],
+]
+
+for (const [claim, ok] of constituent)
+  if (!ok) failures.push(`composed: ${claim}`)
+
 await browser.close()
 
 /* ------------------------------------------------------------------------------------
@@ -1275,10 +1383,18 @@ for (const [claim, ok, detail] of naming)
     `    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`,
   )
 
+console.log('\n  composed')
+
+for (const [claim, ok, detail] of constituent)
+  console.log(
+    `    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`,
+  )
+
 // Every assertion above that can fail, so the summary line is the count it claims to be: the three
 // activation contexts, the pseudo substrate, the direct carriers, bare, applied, spacing, radius,
-// the three relationship-variant cases, and non-inheritance.
-const required = contexts.length + utilities.length + 9 + naming.length
+// the three relationship-variant cases, non-inheritance, and the composed pair.
+const required =
+  contexts.length + utilities.length + 9 + naming.length + constituent.length
 const passing = required - failures.length
 
 console.log(`\n  ${passing}/${required} required contexts and carriers behave`)

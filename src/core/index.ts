@@ -341,6 +341,25 @@ export function createJumiModel({
   const composed = new Set<AnimatableStandardPropertyType>()
 
   /**
+   * What each candidate addresses on a composed attribute — the writer class a per-frame component
+   * read depends on.
+   *
+   * A composed property's frame value is its composition, and a component of that composition is read
+   * **frame-first**: `var(--jumi-scale-x-<id>-0, var(--jumi-scale-x))`. The key is written by a phrase
+   * that *addresses* the component — `animate-scale-x-[0:1|100:0]` writes `--jumi-scale-x-<id>-0` —
+   * and `<id>` is a hash of the frames alone, so a constituent phrase and a phrase over the same frames
+   * on the composed attribute share it. That is what makes the read safe to emit: the writer exists as
+   * a **class**, whether or not the stylesheet being compiled happens to contain it.
+   *
+   * Recorded where each candidate declares what it addresses, and deliberately **not** derived from the
+   * dependency graph, because the two disagree in both directions: `box-shadow` declares
+   * `box-shadow-inset`/`box-shadow-outset` as dependencies and no candidate addresses either, while
+   * `scale` declares three components and candidates address all three. Neither table can stand in for
+   * the other, and only this one answers the question the substitution asks.
+   */
+  const surfaces = new Map<AnimatableStandardPropertyType, Set<string>>()
+
+  /**
    * The slots some candidate gave a name to.
    *
    * A boolean per slot, and deliberately not the names: a name never reaches the composition — that
@@ -590,16 +609,33 @@ export function createJumiModel({
     const { dependencies = [], value = fallback } = propertyVariables[attribute]
 
     // A composed property's value names its own components, so a frame's value is that composition —
-    // `var(--jumi-scale-x) var(--jumi-scale-y) var(--jumi-scale-z)` — and each component reads the
-    // element's own value.
+    // `var(--jumi-scale-x) var(--jumi-scale-y) var(--jumi-scale-z)` — with every component a candidate
+    // can address read frame-first instead:
     //
-    // Each component used to be wrapped in a frame-scoped copy as well:
-    // `var(--jumi-scale-x-<id>-<offset>, var(--jumi-scale-x))`. Its only possible writer would be a
-    // phrase addressing that component *and* pinning this frame, and no phrase does both — the suffix
-    // belongs to the phrase that owns the keyframe. `dead-links.mjs` reported those copies as the
-    // canonical sheet's only dead reads (112 of them, eight families), and
-    // `spike-keyframe-hooks.mjs` reads identically at five offsets with them removed.
-    const composed = dependencies.length ? value : fallback
+    //   `var(--jumi-scale-x-<id>-0, var(--jumi-scale-x)) var(--jumi-scale-y) var(--jumi-scale-z)`
+    //
+    // Both halves of that read are load-bearing. The frame key is written by a phrase addressing the
+    // component, and because `<id>` hashes the frames and not the surface, `animate-scale-x-[0:1|100:0]`
+    // and the composed phrase over the same frames agree on it — which is how an element carrying both
+    // resolves each component at its own frame. The element-level fallback keeps a lone phrase honest:
+    // no sibling wrote that key, so the component rests at the value the element already had.
+    //
+    // Made **only** for components in `surfaces`, i.e. where a candidate class exists to write the key.
+    // `box-shadow-inset`/`box-shadow-outset` are the counter-example that makes the predicate
+    // load-bearing: dependencies of `box-shadow` that no candidate addresses, so a hook for either
+    // would be a read no phrase in the language can satisfy.
+    const composed = dependencies.length
+      ? dependencies.reduce((result, dependency) => {
+          const part = propertyVariables[dependency].variable
+
+          if (!surfaces.get(attribute)?.has(dependency)) return result
+
+          return result.replaceAll(
+            `var(${part})`,
+            `var(${cssEscape(`${part}-${suffix}`)}, var(${part}))`,
+          )
+        }, value)
+      : fallback
 
     // The outer read is emitted only when **this phrase wrote that key**. A constituent-authored
     // phrase writes its parts' keys instead (`--jumi-scale-x-<id>-<offset>`), so its frame would
@@ -991,6 +1027,18 @@ export function createJumiModel({
     },
 
     property: (attribute, parts = []): MatchComponentsPropertyFunction => {
+      // Recorded at the declaration, not at the use: the substitution in `propertyKeyframeValue` asks
+      // whether a writer *class* exists, so a candidate that is registered but never used is exactly as
+      // relevant as one that is. Unregistering on use would make the answer depend on candidate order
+      // — the shape that made the label links order-sensitive twice already.
+      for (const part of parts) {
+        const component = Array.isArray(part) ? part[0] : part
+        const known = surfaces.get(attribute)
+
+        if (known) known.add(component)
+        else surfaces.set(attribute, new Set([component]))
+      }
+
       const fn: MatchComponentsPropertyFunction = (value, { modifier }) => {
         const frameList = parsePhrase(value)
 
@@ -1014,7 +1062,25 @@ export function createJumiModel({
           registerName(`--jumi-${attribute}-${id}-animation-name`)
           emitKeyframe(
             `jumi-${attribute}-${id}`,
-            phraseKeyframe(attribute, id, frameList, !parts.length),
+            phraseKeyframe(
+              attribute,
+              id,
+              frameList,
+              // Did this phrase write the attribute's own frame key? With no parts it writes
+              // `--jumi-${attribute}-${id}-${offset}` and nothing else, so yes. With parts it writes the
+              // parts' keys — and a part that *is* the attribute (`animate-border-block-color` declares
+              // `color('border-block-color', ['border-block-color'])` in `src/properties/tween.ts`) means
+              // the part key and the attribute key are the same name, so the read is this frame's only
+              // possible consumer.
+              //
+              // The narrowing is the whole of the difference: `!parts.length` alone left that second
+              // case reading nothing at all, measured as one of the candidates whose frame value was
+              // written and never read.
+              !parts.length ||
+                parts.some(
+                  part => (Array.isArray(part) ? part[0] : part) === attribute,
+                ),
+            ),
           )
           aggregateChanged()
 

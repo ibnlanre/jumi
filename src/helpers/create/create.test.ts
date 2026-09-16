@@ -274,14 +274,17 @@ describe('keyframe emission', () => {
     expect(names).toHaveLength(2)
   })
 
-  it('expands the composition per frame for a composed property', () => {
+  it('reads a component frame-first when a candidate addresses it', () => {
     const { addUtilities, creator } = setup()
 
+    // The declaration is what makes `filter-blur` addressable: the model records what a candidate
+    // addresses at the moment it declares it, which is the same call that registers
+    // `animate-filter-blur` in `src/properties/tween.ts`. `filter-brightness` is a component of the
+    // same composition and no candidate addresses it, which is why it appears below untouched.
     creator.property('filter', [['filter-blur', value => css('blur', value)]])(
       '0:0px|40:8px',
       { modifier: null },
     )
-    creator.animations
 
     const id = shorthash2('0:0px|40:8px')
     const keyframes = addUtilities.mock.calls
@@ -292,25 +295,84 @@ describe('keyframe emission', () => {
 
     const frame = keyframes[`@keyframes jumi-filter-${id}`]['40%'].filter
 
-    // The frame reads the composition itself, and nothing else.
+    // Frame-first, with the element's own value as the fallback. The key this reads is written by a
+    // phrase addressing `filter-blur` over *these* frames — the id hashes the frames and not the
+    // surface, so `animate-filter-blur-[0:0px|40:8px]` writes exactly this name and the read is
+    // satisfied; the fallback is what a page without that sibling phrase resolves to.
     //
-    // `filter` is authored as parts, so this phrase wrote the parts' keys — `--jumi-filter-blur-${id}-40`
-    // — and never `--jumi-filter-${id}-40`. A lookup for a key the phrase cannot write is what
-    // `propertyKeyframeValue` no longer emits, so the outer read is absent rather than dead: measured
-    // before the change as one of the sheet's writes-nothing reads.
-    //
-    // The frame-scoped copy of each component went with it (`var(--jumi-filter-blur-${id}-40,
-    // var(--jumi-filter-blur))`), for the same reason: its only possible writer would address that
-    // component *and* pin this frame, and the suffix belongs to the phrase that owns the keyframe.
-    expect(frame).not.toContain(`var(--jumi-filter-${id}-40`)
-    expect(frame).not.toContain(`var(--jumi-filter-blur-${id}-40`)
+    // Measured, and the reason this assertion exists at all: with the read removed, every frame of
+    // `animate-filter-blur-[…]` resolved to the same components and the motion computed but never
+    // moved. A test that asserts the *absence* of this lookup is what let that ship.
     expect(frame).toBe(
-      'var(--jumi-filter-blur) var(--jumi-filter-brightness) ' +
-        'var(--jumi-filter-contrast) var(--jumi-filter-grayscale) ' +
-        'var(--jumi-filter-hue-rotate) var(--jumi-filter-invert) ' +
-        'var(--jumi-filter-saturate) var(--jumi-filter-sepia) ' +
-        'var(--jumi-filter-opacity) var(--jumi-filter-drop-shadow)',
+      `var(--jumi-filter-blur-${id}-40, var(--jumi-filter-blur)) ` +
+        'var(--jumi-filter-brightness) var(--jumi-filter-contrast) ' +
+        'var(--jumi-filter-grayscale) var(--jumi-filter-hue-rotate) ' +
+        'var(--jumi-filter-invert) var(--jumi-filter-saturate) ' +
+        'var(--jumi-filter-sepia) var(--jumi-filter-opacity) ' +
+        'var(--jumi-filter-drop-shadow)',
     )
+
+    // The outer read is still absent, and for the opposite reason: `filter` is authored as parts, so
+    // this phrase never wrote `--jumi-filter-${id}-40` and a lookup for it could never be answered.
+    expect(frame).not.toContain(`var(--jumi-filter-${id}-40`)
+  })
+
+  it('reads the attribute frame when a part is the attribute itself', () => {
+    const { addUtilities, creator } = setup()
+
+    // `animate-border-block-color` is declared `color('border-block-color', ['border-block-color'])` in
+    // the candidate table — the part *is* the attribute — so the key this phrase writes and the key a
+    // frame would have to read are the same name. The outer read is then the value's only possible
+    // consumer, and narrowing the read to "no parts at all" left it reading nothing: measured as one
+    // candidate whose frame value was written and never read.
+    creator.property('border-block-color', ['border-block-color'])(
+      '0:red|50:blue',
+      { modifier: null },
+    )
+
+    const id = shorthash2('0:red|50:blue')
+    const keyframes = addUtilities.mock.calls
+      .map(([u]) => u)
+      .find(u => `@keyframes jumi-border-block-color-${id}` in u)
+
+    expect(keyframes).toBeDefined()
+
+    const frame =
+      keyframes[`@keyframes jumi-border-block-color-${id}`]['50%'][
+        'border-block-color'
+      ]
+
+    expect(frame).toBe(
+      `var(--jumi-border-block-color-${id}-50, var(--jumi-border-block-color))`,
+    )
+  })
+
+  it('keeps a dependency no candidate addresses on the element', () => {
+    const { addUtilities, creator } = setup()
+
+    // `box-shadow` declares `box-shadow-inset` and `box-shadow-outset` as dependencies and no
+    // candidate addresses either — the counter-example that makes the addressability predicate
+    // load-bearing rather than a refinement. The dependency graph alone would hook both, and
+    // `dead-links` measured the result as the sheet's only dead reads before the predicate existed.
+    creator.property('box-shadow')('0:0px|50:8px', { modifier: null })
+
+    const id = shorthash2('0:0px|50:8px')
+    const keyframes = addUtilities.mock.calls
+      .map(([u]) => u)
+      .find(u => `@keyframes jumi-box-shadow-${id}` in u)
+
+    expect(keyframes).toBeDefined()
+
+    const frame =
+      keyframes[`@keyframes jumi-box-shadow-${id}`]['50%']['box-shadow']
+
+    // The composition as written, wrapped in the outer frame read — no candidate can address either
+    // component, so neither has a frame-scoped copy to read instead.
+    expect(frame).toBe(
+      `var(--jumi-box-shadow-${id}-50, ` +
+        'var(--jumi-box-shadow-inset, var(--jumi-box-shadow-outset)))',
+    )
+    expect(frame).not.toContain('--jumi-box-shadow-inset-')
   })
 
   it('derives the definition id from the phrase value alone, not the attribute', () => {

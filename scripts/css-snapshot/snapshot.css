@@ -825,10 +825,10 @@
 }
 @keyframes jumi-backdrop-filter-gSBmS {
   0% {
-    backdrop-filter: var(--jumi-backdrop-filter-gSBmS-0, var(--jumi-backdrop-filter-blur) var(--jumi-backdrop-filter-brightness) var(--jumi-backdrop-filter-contrast) var(--jumi-backdrop-filter-drop-shadow) var(--jumi-backdrop-filter-grayscale) var(--jumi-backdrop-filter-hue-rotate) var(--jumi-backdrop-filter-invert) var(--jumi-backdrop-filter-opacity) var(--jumi-backdrop-filter-saturate) var(--jumi-backdrop-filter-sepia));
+    backdrop-filter: var(--jumi-backdrop-filter-gSBmS-0, var(--jumi-backdrop-filter-blur-gSBmS-0, var(--jumi-backdrop-filter-blur)) var(--jumi-backdrop-filter-brightness-gSBmS-0, var(--jumi-backdrop-filter-brightness)) var(--jumi-backdrop-filter-contrast-gSBmS-0, var(--jumi-backdrop-filter-contrast)) var(--jumi-backdrop-filter-drop-shadow-gSBmS-0, var(--jumi-backdrop-filter-drop-shadow)) var(--jumi-backdrop-filter-grayscale-gSBmS-0, var(--jumi-backdrop-filter-grayscale)) var(--jumi-backdrop-filter-hue-rotate-gSBmS-0, var(--jumi-backdrop-filter-hue-rotate)) var(--jumi-backdrop-filter-invert-gSBmS-0, var(--jumi-backdrop-filter-invert)) var(--jumi-backdrop-filter-opacity-gSBmS-0, var(--jumi-backdrop-filter-opacity)) var(--jumi-backdrop-filter-saturate-gSBmS-0, var(--jumi-backdrop-filter-saturate)) var(--jumi-backdrop-filter-sepia-gSBmS-0, var(--jumi-backdrop-filter-sepia)));
   }
   50% {
-    backdrop-filter: var(--jumi-backdrop-filter-gSBmS-50, var(--jumi-backdrop-filter-blur) var(--jumi-backdrop-filter-brightness) var(--jumi-backdrop-filter-contrast) var(--jumi-backdrop-filter-drop-shadow) var(--jumi-backdrop-filter-grayscale) var(--jumi-backdrop-filter-hue-rotate) var(--jumi-backdrop-filter-invert) var(--jumi-backdrop-filter-opacity) var(--jumi-backdrop-filter-saturate) var(--jumi-backdrop-filter-sepia));
+    backdrop-filter: var(--jumi-backdrop-filter-gSBmS-50, var(--jumi-backdrop-filter-blur-gSBmS-50, var(--jumi-backdrop-filter-blur)) var(--jumi-backdrop-filter-brightness-gSBmS-50, var(--jumi-backdrop-filter-brightness)) var(--jumi-backdrop-filter-contrast-gSBmS-50, var(--jumi-backdrop-filter-contrast)) var(--jumi-backdrop-filter-drop-shadow-gSBmS-50, var(--jumi-backdrop-filter-drop-shadow)) var(--jumi-backdrop-filter-grayscale-gSBmS-50, var(--jumi-backdrop-filter-grayscale)) var(--jumi-backdrop-filter-hue-rotate-gSBmS-50, var(--jumi-backdrop-filter-hue-rotate)) var(--jumi-backdrop-filter-invert-gSBmS-50, var(--jumi-backdrop-filter-invert)) var(--jumi-backdrop-filter-opacity-gSBmS-50, var(--jumi-backdrop-filter-opacity)) var(--jumi-backdrop-filter-saturate-gSBmS-50, var(--jumi-backdrop-filter-saturate)) var(--jumi-backdrop-filter-sepia-gSBmS-50, var(--jumi-backdrop-filter-sepia)));
   }
 }
 @layer base {
@@ -903,10 +903,10 @@
 }
 @keyframes jumi-border-radius-Z2ouRLV {
   0% {
-    border-radius: var(--jumi-border-radius-Z2ouRLV-0, var(--jumi-border-top-left-radius) var(--jumi-border-top-right-radius) var(--jumi-border-bottom-right-radius) var(--jumi-border-bottom-left-radius));
+    border-radius: var(--jumi-border-radius-Z2ouRLV-0, var(--jumi-border-top-left-radius-Z2ouRLV-0, var(--jumi-border-top-left-radius)) var(--jumi-border-top-right-radius-Z2ouRLV-0, var(--jumi-border-top-right-radius)) var(--jumi-border-bottom-right-radius-Z2ouRLV-0, var(--jumi-border-bottom-right-radius)) var(--jumi-border-bottom-left-radius-Z2ouRLV-0, var(--jumi-border-bottom-left-radius)));
   }
   50% {
-    border-radius: var(--jumi-border-radius-Z2ouRLV-50, var(--jumi-border-top-left-radius) var(--jumi-border-top-right-radius) var(--jumi-border-bottom-right-radius) var(--jumi-border-bottom-left-radius));
+    border-radius: var(--jumi-border-radius-Z2ouRLV-50, var(--jumi-border-top-left-radius-Z2ouRLV-50, var(--jumi-border-top-left-radius)) var(--jumi-border-top-right-radius-Z2ouRLV-50, var(--jumi-border-top-right-radius)) var(--jumi-border-bottom-right-radius-Z2ouRLV-50, var(--jumi-border-bottom-right-radius)) var(--jumi-border-bottom-left-radius-Z2ouRLV-50, var(--jumi-border-bottom-left-radius)));
   }
 }
 @layer base {
@@ -1182,10 +1182,10 @@
 }
 @keyframes jumi-outline-Z1GJwtX {
   0% {
-    outline: var(--jumi-outline-width) var(--jumi-outline-style) var(--jumi-outline-color);
+    outline: var(--jumi-outline-width-Z1GJwtX-0, var(--jumi-outline-width)) var(--jumi-outline-style-Z1GJwtX-0, var(--jumi-outline-style)) var(--jumi-outline-color-Z1GJwtX-0, var(--jumi-outline-color));
   }
   50% {
-    outline: var(--jumi-outline-width) var(--jumi-outline-style) var(--jumi-outline-color);
+    outline: var(--jumi-outline-width-Z1GJwtX-50, var(--jumi-outline-width)) var(--jumi-outline-style-Z1GJwtX-50, var(--jumi-outline-style)) var(--jumi-outline-color-Z1GJwtX-50, var(--jumi-outline-color));
   }
 }
 @layer base {
@@ -1263,13 +1263,13 @@
 }
 @keyframes jumi-rotate-Z2excak {
   0% {
-    rotate: var(--jumi-rotate-Z2excak-0, var(--jumi-rotate-x) var(--jumi-rotate-y) var(--jumi-rotate-z) var(--jumi-rotate-angle));
+    rotate: var(--jumi-rotate-Z2excak-0, var(--jumi-rotate-x-Z2excak-0, var(--jumi-rotate-x)) var(--jumi-rotate-y-Z2excak-0, var(--jumi-rotate-y)) var(--jumi-rotate-z-Z2excak-0, var(--jumi-rotate-z)) var(--jumi-rotate-angle-Z2excak-0, var(--jumi-rotate-angle)));
   }
   20% {
-    rotate: var(--jumi-rotate-Z2excak-20, var(--jumi-rotate-x) var(--jumi-rotate-y) var(--jumi-rotate-z) var(--jumi-rotate-angle));
+    rotate: var(--jumi-rotate-Z2excak-20, var(--jumi-rotate-x-Z2excak-20, var(--jumi-rotate-x)) var(--jumi-rotate-y-Z2excak-20, var(--jumi-rotate-y)) var(--jumi-rotate-z-Z2excak-20, var(--jumi-rotate-z)) var(--jumi-rotate-angle-Z2excak-20, var(--jumi-rotate-angle)));
   }
   100% {
-    rotate: var(--jumi-rotate-Z2excak-100, var(--jumi-rotate-x) var(--jumi-rotate-y) var(--jumi-rotate-z) var(--jumi-rotate-angle));
+    rotate: var(--jumi-rotate-Z2excak-100, var(--jumi-rotate-x-Z2excak-100, var(--jumi-rotate-x)) var(--jumi-rotate-y-Z2excak-100, var(--jumi-rotate-y)) var(--jumi-rotate-z-Z2excak-100, var(--jumi-rotate-z)) var(--jumi-rotate-angle-Z2excak-100, var(--jumi-rotate-angle)));
   }
 }
 @layer base {
@@ -1328,13 +1328,13 @@
 }
 @keyframes jumi-rotate-1CgNAd {
   0% {
-    rotate: var(--jumi-rotate-1CgNAd-0, var(--jumi-rotate-x) var(--jumi-rotate-y) var(--jumi-rotate-z) var(--jumi-rotate-angle));
+    rotate: var(--jumi-rotate-1CgNAd-0, var(--jumi-rotate-x-1CgNAd-0, var(--jumi-rotate-x)) var(--jumi-rotate-y-1CgNAd-0, var(--jumi-rotate-y)) var(--jumi-rotate-z-1CgNAd-0, var(--jumi-rotate-z)) var(--jumi-rotate-angle-1CgNAd-0, var(--jumi-rotate-angle)));
   }
   20% {
-    rotate: var(--jumi-rotate-1CgNAd-20, var(--jumi-rotate-x) var(--jumi-rotate-y) var(--jumi-rotate-z) var(--jumi-rotate-angle));
+    rotate: var(--jumi-rotate-1CgNAd-20, var(--jumi-rotate-x-1CgNAd-20, var(--jumi-rotate-x)) var(--jumi-rotate-y-1CgNAd-20, var(--jumi-rotate-y)) var(--jumi-rotate-z-1CgNAd-20, var(--jumi-rotate-z)) var(--jumi-rotate-angle-1CgNAd-20, var(--jumi-rotate-angle)));
   }
   100% {
-    rotate: var(--jumi-rotate-1CgNAd-100, var(--jumi-rotate-x) var(--jumi-rotate-y) var(--jumi-rotate-z) var(--jumi-rotate-angle));
+    rotate: var(--jumi-rotate-1CgNAd-100, var(--jumi-rotate-x-1CgNAd-100, var(--jumi-rotate-x)) var(--jumi-rotate-y-1CgNAd-100, var(--jumi-rotate-y)) var(--jumi-rotate-z-1CgNAd-100, var(--jumi-rotate-z)) var(--jumi-rotate-angle-1CgNAd-100, var(--jumi-rotate-angle)));
   }
 }
 @layer base {
@@ -1393,10 +1393,10 @@
 }
 @keyframes jumi-rotate-27XhA7 {
   0% {
-    rotate: var(--jumi-rotate-27XhA7-0, var(--jumi-rotate-x) var(--jumi-rotate-y) var(--jumi-rotate-z) var(--jumi-rotate-angle));
+    rotate: var(--jumi-rotate-27XhA7-0, var(--jumi-rotate-x-27XhA7-0, var(--jumi-rotate-x)) var(--jumi-rotate-y-27XhA7-0, var(--jumi-rotate-y)) var(--jumi-rotate-z-27XhA7-0, var(--jumi-rotate-z)) var(--jumi-rotate-angle-27XhA7-0, var(--jumi-rotate-angle)));
   }
   50% {
-    rotate: var(--jumi-rotate-27XhA7-50, var(--jumi-rotate-x) var(--jumi-rotate-y) var(--jumi-rotate-z) var(--jumi-rotate-angle));
+    rotate: var(--jumi-rotate-27XhA7-50, var(--jumi-rotate-x-27XhA7-50, var(--jumi-rotate-x)) var(--jumi-rotate-y-27XhA7-50, var(--jumi-rotate-y)) var(--jumi-rotate-z-27XhA7-50, var(--jumi-rotate-z)) var(--jumi-rotate-angle-27XhA7-50, var(--jumi-rotate-angle)));
   }
 }
 @layer base {
@@ -1411,10 +1411,10 @@
 }
 @keyframes jumi-rotate-JgEqx {
   0% {
-    rotate: var(--jumi-rotate-JgEqx-0, var(--jumi-rotate-x) var(--jumi-rotate-y) var(--jumi-rotate-z) var(--jumi-rotate-angle));
+    rotate: var(--jumi-rotate-JgEqx-0, var(--jumi-rotate-x-JgEqx-0, var(--jumi-rotate-x)) var(--jumi-rotate-y-JgEqx-0, var(--jumi-rotate-y)) var(--jumi-rotate-z-JgEqx-0, var(--jumi-rotate-z)) var(--jumi-rotate-angle-JgEqx-0, var(--jumi-rotate-angle)));
   }
   58% {
-    rotate: var(--jumi-rotate-JgEqx-58, var(--jumi-rotate-x) var(--jumi-rotate-y) var(--jumi-rotate-z) var(--jumi-rotate-angle));
+    rotate: var(--jumi-rotate-JgEqx-58, var(--jumi-rotate-x-JgEqx-58, var(--jumi-rotate-x)) var(--jumi-rotate-y-JgEqx-58, var(--jumi-rotate-y)) var(--jumi-rotate-z-JgEqx-58, var(--jumi-rotate-z)) var(--jumi-rotate-angle-JgEqx-58, var(--jumi-rotate-angle)));
   }
 }
 @layer base {
@@ -1429,10 +1429,10 @@
 }
 @keyframes jumi-rotate-5fjp3 {
   0% {
-    rotate: var(--jumi-rotate-5fjp3-0, var(--jumi-rotate-x) var(--jumi-rotate-y) var(--jumi-rotate-z) var(--jumi-rotate-angle));
+    rotate: var(--jumi-rotate-5fjp3-0, var(--jumi-rotate-x-5fjp3-0, var(--jumi-rotate-x)) var(--jumi-rotate-y-5fjp3-0, var(--jumi-rotate-y)) var(--jumi-rotate-z-5fjp3-0, var(--jumi-rotate-z)) var(--jumi-rotate-angle-5fjp3-0, var(--jumi-rotate-angle)));
   }
   100% {
-    rotate: var(--jumi-rotate-5fjp3-100, var(--jumi-rotate-x) var(--jumi-rotate-y) var(--jumi-rotate-z) var(--jumi-rotate-angle));
+    rotate: var(--jumi-rotate-5fjp3-100, var(--jumi-rotate-x-5fjp3-100, var(--jumi-rotate-x)) var(--jumi-rotate-y-5fjp3-100, var(--jumi-rotate-y)) var(--jumi-rotate-z-5fjp3-100, var(--jumi-rotate-z)) var(--jumi-rotate-angle-5fjp3-100, var(--jumi-rotate-angle)));
   }
 }
 @layer base {
@@ -1477,10 +1477,10 @@
 }
 @keyframes jumi-scale-ZhUH2y {
   0% {
-    scale: var(--jumi-scale-ZhUH2y-0, var(--jumi-scale-x) var(--jumi-scale-y) var(--jumi-scale-z));
+    scale: var(--jumi-scale-ZhUH2y-0, var(--jumi-scale-x-ZhUH2y-0, var(--jumi-scale-x)) var(--jumi-scale-y-ZhUH2y-0, var(--jumi-scale-y)) var(--jumi-scale-z-ZhUH2y-0, var(--jumi-scale-z)));
   }
   50% {
-    scale: var(--jumi-scale-ZhUH2y-50, var(--jumi-scale-x) var(--jumi-scale-y) var(--jumi-scale-z));
+    scale: var(--jumi-scale-ZhUH2y-50, var(--jumi-scale-x-ZhUH2y-50, var(--jumi-scale-x)) var(--jumi-scale-y-ZhUH2y-50, var(--jumi-scale-y)) var(--jumi-scale-z-ZhUH2y-50, var(--jumi-scale-z)));
   }
 }
 @layer base {
@@ -1495,10 +1495,10 @@
 }
 @keyframes jumi-scale-1lufTA {
   0% {
-    scale: var(--jumi-scale-1lufTA-0, var(--jumi-scale-x) var(--jumi-scale-y) var(--jumi-scale-z));
+    scale: var(--jumi-scale-1lufTA-0, var(--jumi-scale-x-1lufTA-0, var(--jumi-scale-x)) var(--jumi-scale-y-1lufTA-0, var(--jumi-scale-y)) var(--jumi-scale-z-1lufTA-0, var(--jumi-scale-z)));
   }
   50% {
-    scale: var(--jumi-scale-1lufTA-50, var(--jumi-scale-x) var(--jumi-scale-y) var(--jumi-scale-z));
+    scale: var(--jumi-scale-1lufTA-50, var(--jumi-scale-x-1lufTA-50, var(--jumi-scale-x)) var(--jumi-scale-y-1lufTA-50, var(--jumi-scale-y)) var(--jumi-scale-z-1lufTA-50, var(--jumi-scale-z)));
   }
 }
 @layer base {
