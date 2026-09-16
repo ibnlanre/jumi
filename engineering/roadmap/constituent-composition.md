@@ -229,19 +229,30 @@ What remains, in the order the ruling set:
    relied on. Latent in every sense: the `column-rule` composition's grammar is order-insensitive, the
    canonical corpus never registers it, and both were found only because the census read every identity
    and tried to register `--jumi-column-rule-width` as a `<length>`. No shipped byte changed.
-5. **A compiler prototype on a real page** with typed leaves, the current implementation against the
-   pivot, across document-time animation, named motions, independent durations, segment easing, scroll
-   timelines, animation ranges, reduced motion, siblings, whole-plus-constituent conflict, DevTools
-   readability, CSS size, and Studio export/replay. It carries one question of its own: whether
-   `skew`+`skew-x` and `filter-drop-shadow`+its blur — which today collapse into one shared slot — should
-   become independently animated slots under the pivot, or whether that collapse is an aggregation
-   artefact the new model no longer needs.
+5. **The typed-leaf compiler prototype — built, and the two mandatory questions answer in the pivot's
+   favour.** `scripts/prototype/typed-leaves.mjs` is a **second finalizer** over the sheet the shipping
+   finalizer produces, so everything the pivot does not change is the real machinery rather than a
+   reimplementation. **Ownership:** with `animate-scale-[0:1|100:2]` and `animate-scale-x-[0:1|100:5]` on
+   one element, the prototype reads `5 2 2` at 100% — the constituent owns x, the whole keeps y and z —
+   and today reads `5 1` or `2`, all-or-nothing in both orders. **Determinism:** today the aggregate list
+   _reverses_ with the candidate compilation order; the prototype emits the same list in both orders,
+   keyed whole-before-constituent with the candidate name as tiebreak. **And the surface it never touched
+   still works** — a named motion with an independent duration reads `2s, 0.5s` identically through both
+   paths, which is the evidence that this is a first-class path rather than a parallel one. Three things
+   the pivot must build at compile time: registrations (**additive** — no leaf is registered today),
+   **list normalisation, which is grammar rather than padding** (`scale: 2` means `2 2 2`; `translate:
+100px` means `100px 0`), and the **function reshape**, which is not built. Independence is narrower
+   than the question: a part motion expressed as a _phrase_ is already its own animation, while the
+   _tween_ form shares its parent's slot — and that is a keying question in `computeSlots()`, not a
+   finalizer one. See [`engineering/research/typed-leaves.md`](../research/typed-leaves.md).
 6. **Then define the stable ordering key and the decomposition boundary together**, because the transform
    result is what says which whole motions may decompose at all. Nothing in `computeSlots()` moves before
    that. The compiler-order-dependent ordering is an independent bug to fix whether or not the pivot
    ships — the two-phrase case computes `5 1` or `2` from identical markup — but the semantic key should
    not be chosen until the boundary is known.
-7. **Only then decide whether to migrate the broader 79%.**
+7. **Then** the surface the prototype did not reach: the function reshape, scroll and range and segment
+   easing by measurement, Studio export/replay, and bytes and inspectability.
+8. **Only then decide whether to migrate the broader 79%.**
 
 The whole-plus-constituent case does **not** disappear in this model, and it is not the same defect:
 candidate-arrival order deciding the body of a shared definition is compiler nondeterminism;

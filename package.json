@@ -107,6 +107,7 @@
     "spike:property-typing": "node scripts/spike-property-typing.mjs",
     "spike:aggregate-order": "node scripts/spike-aggregate-order.mjs",
     "spike:transform-interpolation": "node scripts/spike-transform-interpolation.mjs",
+    "spike:typed-leaves": "node scripts/spike-typed-leaves.mjs",
     "candidate:diff": "node scripts/candidate-diff.mjs",
     "check": "node scripts/check.mjs"
   },
