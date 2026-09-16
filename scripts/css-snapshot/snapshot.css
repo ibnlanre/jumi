@@ -1478,10 +1478,14 @@
   }
 }
 @keyframes jumi-scale-d38 {
+  from {
+    scale: var(--jumi-scale);
+  }
   to {
     --jumi-scale-x: 1.1;
     --jumi-scale-y: 1.1;
     --jumi-scale-z: 1.1;
+    scale: var(--jumi-scale);
   }
 }
 @layer base {
@@ -1531,7 +1535,11 @@
   }
 }
 @keyframes jumi-scale-y {
+  from {
+    scale: var(--jumi-scale);
+  }
   to {
+    scale: var(--jumi-scale);
     --jumi-scale-y: 0.2;
   }
 }

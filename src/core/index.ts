@@ -675,11 +675,26 @@ export function createJumiModel({
     const endpoints = attribute === 'scale' ? scaleLeafEndpoints(value) : null
 
     if (endpoints) {
+      /**
+       * The keyframe writes the leaves **and reasserts the composition**.
+       *
+       * The bridge is what keeps a typed motion from going silent beside a property-level one.
+       * Measured: a declined whole's keyframe writes `scale: none`, which beats the candidate's
+       * substrate because a keyframe beats a rule — so the constituent's leaf contribution became
+       * invisible and a case that computed `5 1` before this migration computed `1`. With every
+       * typed keyframe writing `scale: var(--jumi-scale)`, the same animation-list precedence that
+       * defined the old behaviour decides the property again, and the leaves decide the value.
+       *
+       * It does not weaken the ownership model: in a fully typed case every keyframe writes the
+       * same expression, so whichever one wins is irrelevant. Only the leaves differ.
+       */
       emitKeyframe(`jumi-${attribute}-${id}`, {
+        from: { [attribute]: css('var', `--jumi-${attribute}`) },
         to: {
           '--jumi-scale-x': endpoints[0],
           '--jumi-scale-y': endpoints[1],
           '--jumi-scale-z': endpoints[2],
+          [attribute]: css('var', `--jumi-${attribute}`),
         },
       })
       aggregateChanged()
@@ -1507,8 +1522,13 @@ export function createJumiModel({
               : null
 
           if (endpoints) {
+            // The same bridge as the whole path, and for the case it exists to fix: this
+            // constituent is the motion that must win `scale` back from a declined whole's
+            // keyframe, which writes the property rather than the leaves.
             emitKeyframe(`jumi-${component}`, {
+              from: { [attribute]: css('var', `--jumi-${attribute}`) },
               to: {
+                [attribute]: css('var', `--jumi-${attribute}`),
                 [propertyVariables[component as PropertyType].variable]:
                   endpoints.canonical,
               },
