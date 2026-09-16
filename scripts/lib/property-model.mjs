@@ -223,8 +223,18 @@ export const readCandidates = () => {
   for (const file of files) {
     const text = fs.readFileSync(path.join(root, file), 'utf8')
 
+    /**
+     * Three candidate shapes address a property, and reading only the first was a **second** gap in
+     * this reader's own history — it reported every census figure with six `color(…)` part-writers
+     * missing, which understated the constituent count:
+     *
+     *   property('scale', ['scale-x'])   the ordinary shape
+     *   color('outline', ['outline-color'])   identical arguments; `color` only adds paint handling
+     *   token('display', 'prepend')      calls `property(display)`; the second argument is an order,
+     *                                    not a parts list, so it addresses the attribute alone
+     */
     for (const entry of readEntries(text, 4)) {
-      const at = entry.body.search(/\bfn: property\(/)
+      const at = entry.body.search(/\bfn: (?:property|color|token)\(/)
 
       if (at === -1) {
         candidates.push({
@@ -241,8 +251,11 @@ export const readCandidates = () => {
       // parts that appear in their own `type:` list or inside a wrapper function.
       const call = readCall(entry.body, entry.body.indexOf('(', at)) ?? ''
       const attribute = call.match(/^\s*'([\w-]+)'/)?.[1] ?? null
+      // `token('display', 'prepend')` consumes a modifier into the value and calls `property(display)`,
+      // so it addresses the attribute and never a part — its second argument is an order, not a list.
+      const token = /\bfn: token\(/.test(entry.body)
       const comma = call.indexOf(',')
-      const rest = comma === -1 ? '' : call.slice(comma + 1)
+      const rest = comma === -1 || token ? '' : call.slice(comma + 1)
       const typesAt = entry.body.search(/\btypes?:/)
 
       candidates.push({

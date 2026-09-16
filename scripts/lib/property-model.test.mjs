@@ -76,6 +76,47 @@ describe('readCandidates', () => {
 
     expect(unknown).toEqual([])
   })
+
+  it('reads a color() candidate, which addresses a property exactly as property() does', () => {
+    // The second gap in this reader's history: reading only `property(` left all eighteen `color(…)`
+    // candidates unattributed, and six of them address a **part** of a composition. Every census figure
+    // had been reported with those six missing, which understated the constituent count.
+    const outline = named('animate-outline-color')
+
+    expect(outline.attribute).toBe('outline')
+    expect(outline.parts).toEqual(['outline-color'])
+    expect(outline.types).toEqual(['color'])
+  })
+
+  it('reads a color() candidate with no parts as addressing its own attribute', () => {
+    // `color('column-rule-color')` — the leaf the identity swap is about, and a reader that cannot see
+    // it cannot see the defect either.
+    const colour = named('animate-column-rule-color')
+
+    expect(colour.attribute).toBe('column-rule-color')
+    expect(colour.parts).toEqual([])
+  })
+
+  it('reads a token() candidate as addressing its attribute, never a part', () => {
+    // `token('display', 'prepend')` consumes a modifier into the value and calls `property(display)`.
+    // Its second argument is an order, not a parts list, so reading it as one would invent a part.
+    const display = named('animate-display')
+
+    expect(display.attribute).toBe('display')
+    expect(display.parts).toEqual([])
+  })
+
+  it('reads the display family of token() candidates as one attribute', () => {
+    const family = candidates.filter(
+      candidate => candidate.attribute === 'display',
+    )
+
+    expect(family.map(candidate => candidate.name).sort()).toEqual([
+      'animate-display',
+      'animate-display-inside',
+      'animate-display-outside',
+    ])
+  })
 })
 
 describe('readPropertyEntries', () => {

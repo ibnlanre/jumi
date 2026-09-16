@@ -185,8 +185,8 @@ whole-versus-leaves boundary keeps a fallback, by staying permissive.
 Open workstreams, in order:
 
 1. **The typing census — measured.** Every animated leaf classified against whether the identity the
-   model already declares fits the syntax its candidate implies: **172 of 291 addressable leaves can be
-   typed, 117 cannot** (96 keyword-valued, 21 whose grammar is wider than one component). Two findings
+   model already declares fits the syntax its candidate implies: **187 of 316 addressable leaves can be
+   typed, 129 cannot** (103 keyword-valued, 24 whose grammar is wider than one component). Two findings
    carry forward: `<number-percentage>` is not an implemented syntax, so unions of components are the
    spelling that works; and the identity becomes load-bearing, which makes `column-rule-width`'s
    transposed default fatal where it is invisible today. See
@@ -239,7 +239,7 @@ What remains, in the order the ruling set:
    that. The compiler-order-dependent ordering is an independent bug to fix whether or not the pivot
    ships — the two-phrase case computes `5 1` or `2` from identical markup — but the semantic key should
    not be chosen until the boundary is known.
-7. **Only then decide whether to migrate the broader 78%.**
+7. **Only then decide whether to migrate the broader 79%.**
 
 The whole-plus-constituent case does **not** disappear in this model, and it is not the same defect:
 candidate-arrival order deciding the body of a shared definition is compiler nondeterminism;
