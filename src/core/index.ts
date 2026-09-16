@@ -21,7 +21,7 @@ import { effectKeyframes } from '@/keyframes/effects'
 import { isFullyAddressable } from '@/variables/composition'
 import { propertyVariables } from '@/variables/property'
 import {
-  scaleLeafEndpoints,
+  typedExecutionOf,
   typedLeafOf,
   typedLeavesOf,
 } from '@/variables/typed-leaves'
@@ -672,9 +672,10 @@ export function createJumiModel({
      * static substrate the element's computed leaf is the tween's implicit `from`, so a resting
      * write would make `from` equal `to` and the animation would never move while looking correct.
      */
-    const endpoints = attribute === 'scale' ? scaleLeafEndpoints(value) : null
+    const leaves =
+      typedExecutionOf(attribute as PropertyType)?.whole(value) ?? null
 
-    if (endpoints) {
+    if (leaves) {
       /**
        * The keyframe writes the leaves **and reasserts the composition**.
        *
@@ -682,26 +683,35 @@ export function createJumiModel({
        * Measured: a declined whole's keyframe writes `scale: none`, which beats the candidate's
        * substrate because a keyframe beats a rule — so the constituent's leaf contribution became
        * invisible and a case that computed `5 1` before this migration computed `1`. With every
-       * typed keyframe writing `scale: var(--jumi-scale)`, the same animation-list precedence that
-       * defined the old behaviour decides the property again, and the leaves decide the value.
+       * typed keyframe writing the composition, the same animation-list precedence that defined
+       * the old behaviour decides the property again, and the leaves decide the value.
        *
        * It does not weaken the ownership model: in a fully typed case every keyframe writes the
        * same expression, so whichever one wins is irrelevant. Only the leaves differ.
+       *
+       * Pinned at **both** ends, and that is load-bearing rather than tidy: a keyframe naming the
+       * property only at `to` makes it a second animation whose implicit `from` is the un-animated
+       * underlying value, which composes to `1 + p(x(p) - 1)` — a quadratic curve that still looks
+       * like a curve. Measured `1 | 1.25 1 | 2 1 | 3.25 1 | 5 1` for a line that is straight, and
+       * `scripts/behaviour-check.mjs` section 16 is the arm that holds it.
        */
+      const composition = propertyVariables[attribute as PropertyType].variable
+      const substrate = { [attribute]: css('var', composition) }
+
       emitKeyframe(`jumi-${attribute}-${id}`, {
-        from: { [attribute]: css('var', `--jumi-${attribute}`) },
+        from: substrate,
         to: {
-          '--jumi-scale-x': endpoints[0],
-          '--jumi-scale-y': endpoints[1],
-          '--jumi-scale-z': endpoints[2],
-          [attribute]: css('var', `--jumi-${attribute}`),
+          ...Object.fromEntries(
+            leaves.map(([leaf, leafValue]) => [`--jumi-${leaf}`, leafValue]),
+          ),
+          ...substrate,
         },
       })
       aggregateChanged()
 
       return {
         [`--jumi-${attribute}-${id}-animation-name`]: `jumi-${attribute}-${id}`,
-        [attribute]: css('var', `--jumi-${attribute}`),
+        ...substrate,
         ...(name ? nameSlot(key, attribute, name) : {}),
       }
     }
@@ -1497,46 +1507,44 @@ export function createJumiModel({
            * A constituent the family declares as a typed leaf writes **that leaf**, canonically,
            * and establishes the substrate on its own rule — same reasoning as the whole path.
            *
-           * The candidate matters here more than anywhere: a typed-leaf motion must carry
-           * `scale: var(--jumi-scale)` itself, because a lone `animate-scale-x-[5]` has no whole
-           * motion to establish it and a substrate published per attribute would appear on
-           * selectors that never opted in.
+           * The candidate matters here more than anywhere: a typed-leaf motion must carry the
+           * composition itself, because a lone `animate-scale-x-[5]` has no whole motion to
+           * establish it and a substrate published per attribute would appear on selectors that
+           * never opted in.
            *
-           * Declining is narrow and deliberate. A value the canonicalizer does not understand keeps
-           * the composed-property representation below.
+           * Declining is narrow and deliberate, and it needs no family test of its own: a
+           * component the family declares no leaf for has no canonicalizer, so a family that has
+           * not opted in reaches the composed-property representation below by the same branch a
+           * value this family cannot read does.
            */
-          const endpoints =
-            attribute === 'scale'
-              ? (() => {
-                  const declaration = typedLeafOf(attribute, component)
-                  const authored = String(
-                    variables[`--jumi-${component}`] ?? value,
-                  )
-                  const canonical =
-                    declaration?.animationCanonicalizer?.(authored) ?? null
+          const declaration = typedLeafOf(attribute, component)
+          const authored = String(variables[`--jumi-${component}`] ?? value)
+          const canonical =
+            declaration?.animationCanonicalizer?.(authored) ?? null
 
-                  return declaration && canonical !== null
-                    ? { canonical, declaration }
-                    : null
-                })()
-              : null
+          if (canonical !== null) {
+            const substrate = {
+              [attribute]: css(
+                'var',
+                propertyVariables[attribute as PropertyType].variable,
+              ),
+            }
 
-          if (endpoints) {
             // The same bridge as the whole path, and for the case it exists to fix: this
-            // constituent is the motion that must win `scale` back from a declined whole's
+            // constituent is the motion that must win the property back from a declined whole's
             // keyframe, which writes the property rather than the leaves.
             emitKeyframe(`jumi-${component}`, {
-              from: { [attribute]: css('var', `--jumi-${attribute}`) },
+              from: substrate,
               to: {
-                [attribute]: css('var', `--jumi-${attribute}`),
+                ...substrate,
                 [propertyVariables[component as PropertyType].variable]:
-                  endpoints.canonical,
+                  canonical,
               },
             })
             aggregateChanged()
 
             return {
-              [attribute]: css('var', `--jumi-${attribute}`),
+              ...substrate,
               [nameVar]: `jumi-${component}`,
               ...(modifier ? nameSlot(component, component, modifier) : {}),
             }

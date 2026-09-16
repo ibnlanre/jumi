@@ -9,6 +9,8 @@ import {
   normalizeScale,
   scaleFactorToNumber,
   scaleLeafEndpoints,
+  typedExecutionOf,
+  typedExecutions,
   typedLeaves,
   typedLeavesOf,
 } from './typed-leaves'
@@ -234,5 +236,68 @@ describe('scaleLeafEndpoints', () => {
       '',
     ])
       expect(scaleLeafEndpoints(value), value).toBeNull()
+  })
+})
+
+describe('typed execution declarations', () => {
+  it('names the leaf each component of a whole value becomes', () => {
+    // The facet carries the names, and that is the point of extracting it: the core writes
+    // `--jumi-<leaf>` for each pair without knowing which family it is animating, or assuming that
+    // a decomposition returns its values in the same order as the leaves happen to be registered.
+    expect(typedExecutionOf('scale')?.whole('2 3 4')).toEqual([
+      ['scale-x', '2'],
+      ['scale-y', '3'],
+      ['scale-z', '4'],
+    ])
+    expect(typedExecutionOf('scale')?.whole('150%')).toEqual([
+      ['scale-x', '1.5'],
+      ['scale-y', '1.5'],
+      ['scale-z', '1.5'],
+    ])
+  })
+
+  it('names only leaves the family declares, and every one of them', () => {
+    // Both halves matter and neither is checkable from the other declaration alone. A name the
+    // family does not declare is a write to an **unregistered** custom property — discrete instead
+    // of interpolable, and silent, because the keyframe still carries it. A declared leaf the whole
+    // facet never assigns is a leaf the motion does not move.
+    for (const [attribute, execution] of Object.entries(typedExecutions)) {
+      const declared = typedLeavesOf(attribute as PropertyType).map(
+        ([leaf]) => leaf,
+      )
+      const assigned = execution.whole('2 3 4') ?? []
+
+      for (const [leaf] of assigned)
+        expect(declared, `${attribute}: ${leaf}`).toContain(leaf)
+
+      expect([...assigned.map(([leaf]) => leaf)].sort()).toEqual(declared)
+    }
+  })
+
+  it('declines exactly what the family declines, so the core has one entrance', () => {
+    // The facet is the entrance the core uses, and it must not be more permissive than the
+    // composition it wraps: a value that reaches the typed path without a complete decomposition is
+    // the partial move this whole boundary exists to prevent.
+    const execution = typedExecutionOf('scale')!
+
+    for (const value of ['none', '2 3 4 5', 'var(--x)', '2px', ''])
+      expect(execution.whole(value), value).toBeNull()
+
+    for (const value of ['2', '2 3', '2 3 4', '150%', '2 150%'])
+      expect(execution.whole(value), value).not.toBeNull()
+  })
+
+  it('has no facet for a family that declares no typed leaves', () => {
+    // The overwhelming majority, and the answer the core branches on instead of naming a family.
+    expect(typedExecutionOf('rotate')).toBeUndefined()
+    expect(typedExecutionOf('not-a-property' as PropertyType)).toBeUndefined()
+  })
+
+  it('never declares an execution a family has no leaves for', () => {
+    // One-way on purpose: a family may declare leaves and decline whole decomposition — the
+    // constituent path is useful without it. The reverse is not a state to be in, because every
+    // leaf an execution writes is a leaf that has to have been registered.
+    for (const attribute of Object.keys(typedExecutions))
+      expect(typedLeavesOf(attribute as PropertyType).length).toBeGreaterThan(0)
   })
 })

@@ -236,3 +236,76 @@ export const scaleLeafEndpoints = (
 
   return canonical as [string, string, string]
 }
+
+/**
+ * What a family supplies to be animated as **typed leaves**.
+ *
+ * Four facets make up the execution model, and they are worth naming together because only one of
+ * them is data this file does not already hold elsewhere:
+ *
+ * ```text
+ * substrate     the declaration a typed motion's own rule publishes,
+ *               `<property>: var(--jumi-<property>)`
+ * constituent   a constituent value → its one canonical leaf value, or `null`
+ * whole         a whole value → the leaf assignments it sets, or `null`
+ * bridge        every typed keyframe re-asserts the composition beside the leaves,
+ *               pinned at `from` and `to`
+ * ```
+ *
+ * `whole` is the one facet declared here. The constituent facet is the leaf's own
+ * `animationCanonicalizer`, already declared per leaf above. `substrate` is a derivation from the
+ * composition the property model already holds — a family supplies it by having a
+ * `propertyVariables` entry, which it must have to be animatable at all. And `bridge` is not a
+ * choice any family gets to make: it is the consequence of a keyframe beating a rule, which is a
+ * fact about CSS rather than about a family.
+ *
+ * So a function per family for those last two would be machinery that cannot change behaviour —
+ * the same test that kept an explicit `kind` off the slot when the falsifying test came back
+ * negative. What a family *declares* is what it can read: the shape of its own whole values.
+ */
+export type TypedExecution = {
+  /**
+   * A whole value → the leaves it sets, in the family's own order, or `null` to **decline** the
+   * motion so the caller keeps the property-level representation.
+   *
+   * Declining is all-or-nothing on purpose: a motion that cannot be represented completely does not
+   * enter the typed path partially, because a native whole-property animation and a constituent
+   * motion over one property contend for it and the loser goes silent.
+   */
+  whole: (value: string) => Array<[string, string]> | null
+}
+
+/**
+ * The families that animate as typed leaves.
+ *
+ * **Only `scale` is here, and deliberately.** It is the proving family — fully addressable, a
+ * grammar already understood, and an ownership case that is easy to reason about. The declaration
+ * is what makes a second family an addition rather than a copy: it says which leaf each component
+ * of a whole value becomes, and a family that cannot say that does not get the execution model.
+ */
+export const typedExecutions: Partial<Record<PropertyType, TypedExecution>> = {
+  scale: {
+    whole: value => {
+      const endpoints = scaleLeafEndpoints(value)
+
+      return endpoints
+        ? [
+            ['scale-x', endpoints[0]],
+            ['scale-y', endpoints[1]],
+            ['scale-z', endpoints[2]],
+          ]
+        : null
+    },
+  },
+}
+
+/**
+ * The typed-execution facets one family declares, or `undefined` when it has none.
+ *
+ * The core asks this question instead of naming a family, which is the whole point of the
+ * declaration: a build that animates `scale` and a build that animates nothing typed run the same
+ * branch, and the second one simply gets `undefined`.
+ */
+export const typedExecutionOf = (
+  attribute: PropertyType,
+): TypedExecution | undefined => typedExecutions[attribute]
