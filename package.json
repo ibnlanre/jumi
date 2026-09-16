@@ -104,6 +104,7 @@
     "measure:real-page": "node scripts/measure-real-page.mjs",
     "spike:real-page": "node scripts/spike-real-page.mjs",
     "spike:variable-animation": "node scripts/spike-variable-animation.mjs",
+    "spike:property-typing": "node scripts/spike-property-typing.mjs",
     "candidate:diff": "node scripts/candidate-diff.mjs",
     "check": "node scripts/check.mjs"
   },

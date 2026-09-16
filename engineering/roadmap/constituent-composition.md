@@ -17,12 +17,12 @@ becomes unconsumed. A fall is reported as an improvement and re-recorded on purp
 
 Same symptom, opposite cause, and the difference decides the fix:
 
-|                    | `scale-x` (`bb39449`)                     | these 46                                          |
-| ------------------ | ----------------------------------------- | ------------------------------------------------- |
-| the writer         | exists (`--jumi-scale-x-<id>-0`)          | exists                                            |
-| the consumer       | **was deleted**                           | **has no expression in the current architecture** |
-| what to change     | the keyframe (`propertyKeyframeValue`)    | how a nested component value reaches the value    |
-| protection         | both directions in `dead-links --strict`  | this audit's baseline                             |
+|                | `scale-x` (`bb39449`)                    | these 46                                          |
+| -------------- | ---------------------------------------- | ------------------------------------------------- |
+| the writer     | exists (`--jumi-scale-x-<id>-0`)         | exists                                            |
+| the consumer   | **was deleted**                          | **has no expression in the current architecture** |
+| what to change | the keyframe (`propertyKeyframeValue`)   | how a nested component value reaches the value    |
+| protection     | both directions in `dead-links --strict` | this audit's baseline                             |
 
 The `scale-x` fix restored a read that had been removed. Nothing here was removed: the composition
 simply never referenced these names.
@@ -71,10 +71,10 @@ qualitatively different (40 → 37). Each change carried a browser arm for the c
 falsification arm, and — for the wrong-property pair — the negative assertion that the property which
 used to move no longer does. The nine are retired; what follows is history.
 
-**The seven.** `gap` (2 candidates): `gap` *is* the shorthand for `row-gap` + `column-gap`, and
+**The seven.** `gap` (2 candidates): `gap` _is_ the shorthand for `row-gap` + `column-gap`, and
 `src/composition/gap.ts` **already exists**, already in the correct row-then-column order, and is
 imported nowhere. `border-block-width` and `border-inline-width`: both real shorthands, and their
-*radius* siblings (`border-block-radius`, `border-inline-radius`) are already wired, so these look
+_radius_ siblings (`border-block-radius`, `border-inline-radius`) are already wired, so these look
 missed rather than modelled. `transform-origin` (3 candidates): not a shorthand at all — one property
 taking one to three components — so it needs a new decomposition rather than a longhand list, and the
 browser's grammar makes `z` imply `x` and `y`.
@@ -95,11 +95,11 @@ corner names — while `border-radius` composes the four **physical** corners, s
 The question is which representation should be canonical. Measured in Chromium, three contexts, same
 declared values:
 
-| context        | `border-radius: 10 20 30 40` | logical longhands `ss se ee es` = 10 20 30 40 |
-| -------------- | ---------------------------- | --------------------------------------------- |
-| `ltr`          | 10px 20px 30px 40px          | 10px 20px 30px 40px                           |
-| `rtl`          | 10px 20px 30px 40px          | **20px 10px 40px 30px**                        |
-| `vertical-rl`  | 10px 20px 30px 40px          | **40px 10px 20px 30px**                        |
+| context       | `border-radius: 10 20 30 40` | logical longhands `ss se ee es` = 10 20 30 40 |
+| ------------- | ---------------------------- | --------------------------------------------- |
+| `ltr`         | 10px 20px 30px 40px          | 10px 20px 30px 40px                           |
+| `rtl`         | 10px 20px 30px 40px          | **20px 10px 40px 30px**                       |
+| `vertical-rl` | 10px 20px 30px 40px          | **40px 10px 20px 30px**                       |
 
 The physical shorthand is context-independent; the logical names are resolved **by the browser, per
 context**. So converting logical candidates to physical corners inside Jumi — the easy-looking option —
@@ -112,7 +112,7 @@ linear from `10 20 30 40` to `40 30 20 10`: `39.97 29.99 20.01 10.03` under `ltr
 20.01` under `rtl`, `10.03 39.97 29.99 20.01` under `vertical-rl`). Both `border-start-start-radius` and
 `border-block-start-start-radius` are supported.
 
-**Recommended representation:** the candidate's parts are the *animated properties*. The frame declares
+**Recommended representation:** the candidate's parts are the _animated properties_. The frame declares
 each logical longhand it addresses,
 `border-end-end-radius: var(--jumi-border-end-end-radius-<id>-0, var(--jumi-border-end-end-radius))`, and
 the browser resolves. Nothing is mapped in Jumi, no dependency read is widened, and the variables stay
@@ -120,32 +120,92 @@ per-part.
 
 That needed one model extension — a generated frame carrying one declaration per addressed property —
 and it landed the same day: **37 → 33**, `dead-links --strict` still green, and a browser arm that reads
-the *physical* corners under `ltr` and `vertical-rl` to show the browser doing the placing (the same
+the _physical_ corners under `ltr` and `vertical-rl` to show the browser doing the placing (the same
 animation lands on {top-left, top-right} and {bottom-left, bottom-right} under `ltr`, and on the
 diagonals under `vertical-rl`; RTL is not asserted because with these groupings the RTL permutation
 swaps each pair for itself, so the physical sets would be identical and the assertion would prove
 nothing). The rule is deliberately narrow — one recorded set of properties, no general multi-property
 engine — and it applies to the tween path as well, so the value form is not inert either.
 
-### What is left — 31, and the arithmetic goes to zero
+### Superseded — the 31 nested cases (2026-09-16)
 
-Two of the 33 were never a depth problem, and they are the two to fix first: the composition omitted the
-slot that would read `--jumi-filter-url`, so the omission was a data correction rather than the
-one-level expansion. Landed 2026-09-16: **33 → 31**, `dead-links --strict` 0 dead / 0 unconsumed,
-behaviour 63/63 with arms for the route, and the baseline and snapshot re-recorded with it.
+Route 2 landed the two `*url` slots as a data correction: **33 → 31**, `dead-links --strict` 0 dead / 0
+unconsumed, behaviour 63/63, and the baseline and snapshot re-recorded with it. `filter` and
+`backdrop-filter` now name a url slot, and the substitution over the composition learned to keep a
+slot's own fallback.
 
-- **The 2 `*url` slots — done.** `filter` and `backdrop-filter` now name a url slot, and the
-  substitution over the composition had to learn to keep a slot's own fallback.
-- **The 31 nested** — the real work, and the only route where the acceptance test below has to answer
-  _how_ the value reaches the frame. `box-shadow` 5, `filter` 5, `backdrop-filter` 5, `transform` 2
-  (`skew-x`/`skew-y`), and the four position families 4 each (`background-position`, `object-position`,
-  `offset-anchor`, `offset-position`).
+**The remaining 31 were the one-level expansion — `box-shadow` 5, `filter` 5, `backdrop-filter` 5,
+`transform` 2 (`skew-x`/`skew-y`), and the four position families 4 each — and that route is
+discarded.** It was implemented, reached 397 of 397 with an empty baseline, and was reverted before
+landing.
 
-**The endpoint is therefore zero, not 29.** An earlier reading subtracted the two data corrections from
-31 and stopped at 29; but the 31 nested cases are not a residual to be trimmed, they are the one-level
-expansion and nothing else, so the audit should reach 397 of 397 and the baseline should become empty.
-That is also what makes it worth converting the baseline into a zero-residual gate: a number left in it
-after this pass is a claim that some candidate has no consumer by design, and none does.
+It was discarded because an architectural spike showed it to be a good answer to a question the
+representation should not have been asking. The expansion exists to keep a _generated
+parent-property keyframe_ consistent when several constituent phrases write into one composed property:
+under it, every frame re-composes the CSS property out of its leaves. The spike measured the
+alternative — each constituent animates its own registered custom property, and the real property is
+composed **once**, outside the animation — and found that it interpolates identically, makes sibling
+components independent by default, and removes about seven eighths of the frame bytes. See
+[`engineering/research/variable-animation.md`](../research/variable-animation.md).
+
+The route was paused before the pivot for a defect worth recording, because the pivot is argued from
+it. A keyframe is shared by every phrase whose frames hash to the same id and is emitted on first use,
+so **which body won depended on compilation order**: `animate-scale-[0:1|100:2] animate-scale-x-[0:1|100:2]`
+and the same pair reversed emitted different bodies and computed `scale: 2` against `scale: 2 1`. That is
+compiler nondeterminism, and the rule it has to satisfy is that _any shared keyframe definition must
+have a canonical body independent of which candidate caused that definition to be emitted._ The variable
+model removes the shared definition rather than making it canonical, so the defect evaporates wherever
+the model reaches instead of being managed.
+
+**The residual stays 31 and the baseline stays at 31** — not as a target, but as an honest count of what
+this representation cannot read back, until the typing census and the compiler prototype decide what
+replaces it. The discarded implementation is archived at `/tmp/route-3-full.patch` and does not belong in
+the repository. Routes 1 and 2 stand.
+
+### The direction it pivots to
+
+Jumi should animate variables **when the variable is the natural interpolation unit**, and CSS
+properties when it is not. That is a hybrid, not a rewrite, and the spike draws the line:
+
+| category                    | motion                                                              | mechanism                                                                           |
+| --------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| typed scalar constituent    | `scale-x`, `rotate-angle`, `translate-x`, `skew-x`, a `blur` amount | animate the slot's own registered custom property                                   |
+| function-shaped constituent | `filter: blur(…)`, `backdrop-filter: brightness(…)`                 | animate a typed **argument** variable; the function stays in the static composition |
+| whole / complex / effect    | effects, keyword-bearing values, arbitrary values                   | animate the actual CSS property; its native semantics are the right abstraction     |
+
+The composite property is composed once from its slots wherever that applies, so the browser does the
+combining and no compiler machinery is built to make property-level keyframes cooperate.
+
+Two things are now **model data, not implementation detail**, because the experiment proved they
+decide both interpolation and fallback behaviour: a leaf's CSS Properties & Values API `syntax`, and its
+identity `initial-value`. A registered property always has a computed value, so an animated slot's
+`var()` fallback is unreachable — an animated slot is read _directly_, and only the
+whole-versus-leaves boundary keeps a fallback, by staying permissive.
+
+Open workstreams, in order:
+
+1. **The typing census — measured.** Every animated leaf classified against whether the identity the
+   model already declares fits the syntax its candidate implies: **172 of 291 addressable leaves can be
+   typed, 117 cannot** (96 keyword-valued, 21 whose grammar is wider than one component). Two findings
+   carry forward: `<number-percentage>` is not an implemented syntax, so unions of components are the
+   spelling that works; and the identity becomes load-bearing, which makes `column-rule-width`'s
+   transposed default fatal where it is invisible today. See
+   [`engineering/research/property-typing.md`](../research/property-typing.md).
+2. **A compiler prototype on a real page**, current implementation against typed slots, across
+   document-time animation, named motions, independent durations, segment easing, scroll timelines,
+   animation ranges, reduced motion, siblings, whole-plus-constituent conflict, DevTools readability,
+   CSS size, and Studio export/replay. The census names its largest open risk: **`transform`**, where
+   today the browser interpolates a whole transform list and the var model would interpolate each leaf
+   and rebuild the composition per frame.
+3. **Aggregate ordering**, which is where the whole-plus-constituent conflict goes. A whole motion and a
+   component motion overlap semantically, so precedence must be explicit: if Jumi orders component
+   animations after whole-property animations, component ownership wins deterministically and the
+   conflict stops being a defect. That is a probe, not an assumption.
+
+The whole-plus-constituent case does **not** disappear in this model, and it is not the same defect:
+candidate-arrival order deciding the body of a shared definition is compiler nondeterminism;
+animation-list order deciding which animation owns an animated custom property is ordinary CSS conflict
+resolution.
 
 ### The probe that had to be corrected (2026-09-16)
 
@@ -153,18 +213,18 @@ The url slot was built on a probe that concluded an empty or unresolved `url()` 
 and the conclusion was wrong. Re-measured with a sibling whose effect is visible — `grayscale(1)` on a
 red box is grey when the chain resolves and red when it does not — in Chromium:
 
-| declaration | box | computed `filter` |
-| --- | --- | --- |
-| `grayscale(1)` | grey | `grayscale(1)` |
-| `grayscale(1) url(#black)` | black | `grayscale(1) url("#black")` |
-| `grayscale(1) url()` / `url("")` / `url(#missing)` | grey | the chain, with the url inert |
-| `grayscale(1) var(--jumi-nothing)` | red | `none` |
+| declaration                                        | box   | computed `filter`             |
+| -------------------------------------------------- | ----- | ----------------------------- |
+| `grayscale(1)`                                     | grey  | `grayscale(1)`                |
+| `grayscale(1) url(#black)`                         | black | `grayscale(1) url("#black")`  |
+| `grayscale(1) url()` / `url("")` / `url(#missing)` | grey  | the chain, with the url inert |
+| `grayscale(1) var(--jumi-nothing)`                 | red   | `none`                        |
 
 So an unresolved url is **ignored**, and what voids the declaration is a read that references nothing.
-The first probe could not tell the two apart because its sibling filter *and* its baseline were both
+The first probe could not tell the two apart because its sibling filter _and_ its baseline were both
 `blur(0px)`, the identity — "looks the same as plain" meant "no visible change", which is the answer to
 neither question. The lesson is worth more than the measurement: a baseline that does not itself move
-cannot distinguish *inert* from *fatal*, and the arm written from the wrong reading is what failed, not
+cannot distinguish _inert_ from _fatal_, and the arm written from the wrong reading is what failed, not
 the reasoning about the fix.
 
 ### The detector that had to be corrected twice, and then replaced (2026-09-16)
@@ -177,7 +237,7 @@ of the hook nested inside its fallback, and the scan never visited those hooks, 
 (`rotate-x`, `scale-x`, the logical corners) into dead ones.
 
 **Both failures are one failure, and the second is why the regex was not extended a third time.** A
-pattern over `var(...)` is a description of one expression's *text*, and the expressions this pass emits
+pattern over `var(...)` is a description of one expression's _text_, and the expressions this pass emits
 are nested — so every shape it does not anticipate is either invisible or swallowing. The reader is now
 structural (`scripts/lib/var-references.mjs`): it walks the value, balancing parentheses and stepping
 over strings, and reports **every reachable `var()` exactly once**, whatever the fallback is — a
@@ -201,13 +261,13 @@ One representative per family, traced from the model's own tables plus the compi
 what it writes, which entry claims the part, what that entry's template reads, what the attribute's
 composition reads. No production change.
 
-| representative | intermediate that claims the written part | attribute reads | where it stops |
-| --- | --- | --- | --- |
-| `skew-x` | `skew` (authorable) | `… var(--jumi-skew) …` | the intermediate |
-| `box-shadow-blur` | `box-shadow-inset` **and** `-outset` (both internal) | `var(--jumi-box-shadow-inset), var(--jumi-box-shadow-outset)` | both, 2-way |
-| `filter-drop-shadow-blur` | `filter-drop-shadow` (authorable) | `… var(--jumi-filter-drop-shadow) …` | the intermediate |
-| `background-position-x-edge` | `background-position-x` (authorable) | `… var(--jumi-background-position-x) …` | the intermediate |
-| `object-position-x-edge`, `offset-anchor-x-edge`, `offset-position-x-edge` | the axis entry, authorable | `… var(--jumi-<axis>) …` | the intermediate |
+| representative                                                             | intermediate that claims the written part            | attribute reads                                               | where it stops   |
+| -------------------------------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------- | ---------------- |
+| `skew-x`                                                                   | `skew` (authorable)                                  | `… var(--jumi-skew) …`                                        | the intermediate |
+| `box-shadow-blur`                                                          | `box-shadow-inset` **and** `-outset` (both internal) | `var(--jumi-box-shadow-inset), var(--jumi-box-shadow-outset)` | both, 2-way      |
+| `filter-drop-shadow-blur`                                                  | `filter-drop-shadow` (authorable)                    | `… var(--jumi-filter-drop-shadow) …`                          | the intermediate |
+| `background-position-x-edge`                                               | `background-position-x` (authorable)                 | `… var(--jumi-background-position-x) …`                       | the intermediate |
+| `object-position-x-edge`, `offset-anchor-x-edge`, `offset-position-x-edge` | the axis entry, authorable                           | `… var(--jumi-<axis>) …`                                      | the intermediate |
 
 **31 of the 33 are that shape** — one level deeper, box-shadow being the only family whose leaf is claimed
 by two intermediates. **The other two are not nested at all**: `filter-url` and `backdrop-filter-url` are
@@ -224,23 +284,28 @@ The four questions:
 3. **Six of seven intermediates are authorable**; `box-shadow-inset`/`-outset` are purely internal. A fix
    keyed on "expand only authorable intermediates" would therefore miss box-shadow: the walk has to expand
    whatever the composition reads, and earn its safety elsewhere.
-4. **Yes — and the safety is already in the model.** Expanding an intermediate *in place* (replacing
+4. **Yes — and the safety is already in the model.** Expanding an intermediate _in place_ (replacing
    `var(--jumi-skew)` with `skew`'s own template) lets the frame hook the leaf the phrase actually wrote,
    and only that leaf. Such a hook has the two properties the old 112 dead reads lacked: its base is a
-   declared variable, and its frame key has *this phrase* as its writer — nothing is hooked merely because
-   a writer *class* exists.
+   declared variable, and its frame key has _this phrase_ as its writer — nothing is hooked merely because
+   a writer _class_ exists.
 
 The shape, for `skew-x` — `transform`'s composition with `var(--jumi-skew)` replaced by `skew`'s template,
 the written leaf read frame-first inside it:
 
 ```css
-transform: … skew(var(--jumi-skew-x-<id>-0, var(--jumi-skew-x)), var(--jumi-skew-y)) …
+transform: …
+  skew(var(--jumi-skew-x-<id>-0, var(--jumi-skew-x)), var(--jumi-skew-y)) …;
 ```
 
-Scope note: only the *phrase* path needs this. The tween path already works for these families, because
+Scope note: only the _phrase_ path needs this. The tween path already works for these families, because
 the element-level chain (`--jumi-transform` → `--jumi-skew` → `--jumi-skew-x`) resolves without a frame.
 
-## The acceptance test for closing it
+## The acceptance test
+
+This is the test routes 1 and 2 were accepted by, and it is what any change to the read model still has
+to satisfy. It is no longer a test for closing the residual to zero: the residual counts what the current
+representation cannot read back, and the pivot changes the representation rather than the read model.
 
 A change is finished when `node scripts/constituent-check.mjs` is run and the names it repaired have
 left the residual — then the baseline is re-recorded with `--record` in the same commit, which is the
@@ -276,4 +341,9 @@ bb39449  (shipped)                 350 read back ·  47 not ·   0 dead reads
 restored lookup                    351 read back ·  46 not ·   0 dead reads
 route 1 landed (three changes)     360 read back ·  37 not ·   0 dead reads
 route 2 landed (the url slots)     366 read back ·  31 not ·   0 dead reads
+route 3 (the one-level expansion)  397 read back ·   0 not ·   0 dead reads   ← discarded, reverted
 ```
+
+`HEAD` is the route-2 row. Route 3 is kept as a measurement rather than a destination: it is what this
+representation is _capable_ of reading back once every phrase writes a key a frame can hook, and the
+pivot is an argument that the representation, not the expansion, is the thing to change.
