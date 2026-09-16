@@ -103,6 +103,7 @@
     "spike:recalc": "node scripts/spike-recalc.mjs",
     "measure:real-page": "node scripts/measure-real-page.mjs",
     "spike:real-page": "node scripts/spike-real-page.mjs",
+    "spike:variable-animation": "node scripts/spike-variable-animation.mjs",
     "candidate:diff": "node scripts/candidate-diff.mjs",
     "check": "node scripts/check.mjs"
   },
