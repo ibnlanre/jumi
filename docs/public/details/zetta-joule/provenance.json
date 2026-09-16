@@ -1,0 +1,594 @@
+[
+  {
+    "file": "hero.webp",
+    "source": "https://cdn.prod.website-files.com/695e44c5cda75248659e97f1/696a6637ba3fff5cf7e4326a_zj-home-atf-reactor.webp"
+  },
+  {
+    "file": "poster.webp",
+    "source": "https://cdn.prod.website-files.com/695e44c5cda75248659e97f1/69680419e6f814b622cdad5e_Homepage%20Video%20Poster.webp"
+  },
+  {
+    "file": "building.webp",
+    "source": "https://cdn.prod.website-files.com/695e44c5cda75248659e97f1/69aada08819f41c24bb14aa6_home-building.webp"
+  },
+  {
+    "file": "cities.webp",
+    "source": "https://cdn.prod.website-files.com/695e44c5cda75248659e97f1/697b9086bf46f572e49c7ce3_Cities%20%26%20infrastructure.webp"
+  },
+  {
+    "file": "materials.webp",
+    "source": "https://cdn.prod.website-files.com/695e44c5cda75248659e97f1/697b9086b5bb830f9131a517_Materials%20%26%20manufacturing.webp"
+  },
+  {
+    "file": "fuels.webp",
+    "source": "https://cdn.prod.website-files.com/695e44c5cda75248659e97f1/697b9087b0a86eeb3a2db9a0_Fuels%20%26%20upstream.webp"
+  },
+  {
+    "file": "chart.webp",
+    "source": "https://cdn.prod.website-files.com/695e44c5cda75248659e97f1/697b8c20cee891cc29cdab97_Capabilities%20BG.webp"
+  },
+  {
+    "file": "hydrogen.webp",
+    "source": "https://cdn.prod.website-files.com/695e44c5cda75248659e97f1/697b9086bea790d5c29d9f7f_H2%20Hydrogen.webp"
+  },
+  {
+    "file": "frames/3000.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3000.webp"
+  },
+  {
+    "file": "frames/3001.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3001.webp"
+  },
+  {
+    "file": "frames/3002.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3002.webp"
+  },
+  {
+    "file": "frames/3003.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3003.webp"
+  },
+  {
+    "file": "frames/3004.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3004.webp"
+  },
+  {
+    "file": "frames/3005.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3005.webp"
+  },
+  {
+    "file": "frames/3006.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3006.webp"
+  },
+  {
+    "file": "frames/3007.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3007.webp"
+  },
+  {
+    "file": "frames/3008.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3008.webp"
+  },
+  {
+    "file": "frames/3011.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3011.webp"
+  },
+  {
+    "file": "frames/3013.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3013.webp"
+  },
+  {
+    "file": "frames/3010.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3010.webp"
+  },
+  {
+    "file": "frames/3012.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3012.webp"
+  },
+  {
+    "file": "frames/3009.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3009.webp"
+  },
+  {
+    "file": "frames/3015.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3015.webp"
+  },
+  {
+    "file": "frames/3014.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3014.webp"
+  },
+  {
+    "file": "frames/3018.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3018.webp"
+  },
+  {
+    "file": "frames/3016.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3016.webp"
+  },
+  {
+    "file": "frames/3017.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3017.webp"
+  },
+  {
+    "file": "frames/3019.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3019.webp"
+  },
+  {
+    "file": "frames/3020.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3020.webp"
+  },
+  {
+    "file": "frames/3021.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3021.webp"
+  },
+  {
+    "file": "frames/3022.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3022.webp"
+  },
+  {
+    "file": "frames/3024.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3024.webp"
+  },
+  {
+    "file": "frames/3025.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3025.webp"
+  },
+  {
+    "file": "frames/3023.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3023.webp"
+  },
+  {
+    "file": "frames/3026.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3026.webp"
+  },
+  {
+    "file": "frames/3029.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3029.webp"
+  },
+  {
+    "file": "frames/3030.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3030.webp"
+  },
+  {
+    "file": "frames/3027.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3027.webp"
+  },
+  {
+    "file": "frames/3028.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3028.webp"
+  },
+  {
+    "file": "frames/3031.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3031.webp"
+  },
+  {
+    "file": "frames/3032.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3032.webp"
+  },
+  {
+    "file": "frames/3034.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3034.webp"
+  },
+  {
+    "file": "frames/3033.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3033.webp"
+  },
+  {
+    "file": "frames/3036.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3036.webp"
+  },
+  {
+    "file": "frames/3039.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3039.webp"
+  },
+  {
+    "file": "frames/3040.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3040.webp"
+  },
+  {
+    "file": "frames/3041.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3041.webp"
+  },
+  {
+    "file": "frames/3035.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3035.webp"
+  },
+  {
+    "file": "frames/3043.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3043.webp"
+  },
+  {
+    "file": "frames/3045.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3045.webp"
+  },
+  {
+    "file": "frames/3038.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3038.webp"
+  },
+  {
+    "file": "frames/3046.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3046.webp"
+  },
+  {
+    "file": "frames/3047.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3047.webp"
+  },
+  {
+    "file": "frames/3037.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3037.webp"
+  },
+  {
+    "file": "frames/3042.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3042.webp"
+  },
+  {
+    "file": "frames/3044.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3044.webp"
+  },
+  {
+    "file": "frames/3048.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3048.webp"
+  },
+  {
+    "file": "frames/3049.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3049.webp"
+  },
+  {
+    "file": "frames/3051.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3051.webp"
+  },
+  {
+    "file": "frames/3050.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3050.webp"
+  },
+  {
+    "file": "frames/3052.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3052.webp"
+  },
+  {
+    "file": "frames/3057.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3057.webp"
+  },
+  {
+    "file": "frames/3060.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3060.webp"
+  },
+  {
+    "file": "frames/3062.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3062.webp"
+  },
+  {
+    "file": "frames/3064.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3064.webp"
+  },
+  {
+    "file": "frames/3054.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3054.webp"
+  },
+  {
+    "file": "frames/3056.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3056.webp"
+  },
+  {
+    "file": "frames/3053.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3053.webp"
+  },
+  {
+    "file": "frames/3055.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3055.webp"
+  },
+  {
+    "file": "frames/3059.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3059.webp"
+  },
+  {
+    "file": "frames/3061.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3061.webp"
+  },
+  {
+    "file": "frames/3058.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3058.webp"
+  },
+  {
+    "file": "frames/3063.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3063.webp"
+  },
+  {
+    "file": "frames/3067.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3067.webp"
+  },
+  {
+    "file": "frames/3069.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3069.webp"
+  },
+  {
+    "file": "frames/3072.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3072.webp"
+  },
+  {
+    "file": "frames/3071.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3071.webp"
+  },
+  {
+    "file": "frames/3074.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3074.webp"
+  },
+  {
+    "file": "frames/3070.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3070.webp"
+  },
+  {
+    "file": "frames/3073.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3073.webp"
+  },
+  {
+    "file": "frames/3065.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3065.webp"
+  },
+  {
+    "file": "frames/3066.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3066.webp"
+  },
+  {
+    "file": "frames/3068.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3068.webp"
+  },
+  {
+    "file": "frames/3075.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3075.webp"
+  },
+  {
+    "file": "frames/3076.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3076.webp"
+  },
+  {
+    "file": "frames/3077.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3077.webp"
+  },
+  {
+    "file": "frames/3078.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3078.webp"
+  },
+  {
+    "file": "frames/3079.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3079.webp"
+  },
+  {
+    "file": "frames/3080.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3080.webp"
+  },
+  {
+    "file": "frames/3081.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3081.webp"
+  },
+  {
+    "file": "frames/3083.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3083.webp"
+  },
+  {
+    "file": "frames/3084.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3084.webp"
+  },
+  {
+    "file": "frames/3085.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3085.webp"
+  },
+  {
+    "file": "frames/3082.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3082.webp"
+  },
+  {
+    "file": "frames/3086.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3086.webp"
+  },
+  {
+    "file": "frames/3087.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3087.webp"
+  },
+  {
+    "file": "frames/3088.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3088.webp"
+  },
+  {
+    "file": "frames/3090.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3090.webp"
+  },
+  {
+    "file": "frames/3089.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3089.webp"
+  },
+  {
+    "file": "frames/3091.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3091.webp"
+  },
+  {
+    "file": "frames/3092.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3092.webp"
+  },
+  {
+    "file": "frames/3093.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3093.webp"
+  },
+  {
+    "file": "frames/3094.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3094.webp"
+  },
+  {
+    "file": "frames/3095.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3095.webp"
+  },
+  {
+    "file": "frames/3098.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3098.webp"
+  },
+  {
+    "file": "frames/3096.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3096.webp"
+  },
+  {
+    "file": "frames/3097.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3097.webp"
+  },
+  {
+    "file": "frames/3099.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3099.webp"
+  },
+  {
+    "file": "frames/3100.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3100.webp"
+  },
+  {
+    "file": "frames/3101.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3101.webp"
+  },
+  {
+    "file": "frames/3102.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3102.webp"
+  },
+  {
+    "file": "frames/3107.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3107.webp"
+  },
+  {
+    "file": "frames/3103.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3103.webp"
+  },
+  {
+    "file": "frames/3104.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3104.webp"
+  },
+  {
+    "file": "frames/3105.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3105.webp"
+  },
+  {
+    "file": "frames/3106.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3106.webp"
+  },
+  {
+    "file": "frames/3108.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3108.webp"
+  },
+  {
+    "file": "frames/3110.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3110.webp"
+  },
+  {
+    "file": "frames/3111.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3111.webp"
+  },
+  {
+    "file": "frames/3120.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3120.webp"
+  },
+  {
+    "file": "frames/3128.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3128.webp"
+  },
+  {
+    "file": "reactor-mobile.webp",
+    "source": "https://cdn.prod.website-files.com/695e44c5cda75248659e97f1/698e0426c2766ca571c6e042_home-mobile-reactor.webp"
+  },
+  {
+    "file": "city.webp",
+    "source": "https://cdn.prod.website-files.com/695e44c5cda75248659e97f1/695f9bd0e1140175555390f8_ZettaJoule%20-%20City%20placeholder.webp"
+  },
+  {
+    "file": "mission.mp4",
+    "source": "https://zetta-joule.b-cdn.net/Zj-Homepage-Video.mp4"
+  },
+  {
+    "file": "frames/3109.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3109.webp"
+  },
+  {
+    "file": "frames/3112.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3112.webp"
+  },
+  {
+    "file": "frames/3113.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3113.webp"
+  },
+  {
+    "file": "frames/3114.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3114.webp"
+  },
+  {
+    "file": "frames/3116.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3116.webp"
+  },
+  {
+    "file": "frames/3122.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3122.webp"
+  },
+  {
+    "file": "frames/3123.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3123.webp"
+  },
+  {
+    "file": "frames/3126.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3126.webp"
+  },
+  {
+    "file": "frames/3127.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3127.webp"
+  },
+  {
+    "file": "frames/3132.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3132.webp"
+  },
+  {
+    "file": "frames/3133.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3133.webp"
+  },
+  {
+    "file": "frames/3134.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3134.webp"
+  },
+  {
+    "file": "frames/3136.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3136.webp"
+  },
+  {
+    "file": "frames/3115.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3115.webp"
+  },
+  {
+    "file": "frames/3117.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3117.webp"
+  },
+  {
+    "file": "frames/3118.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3118.webp"
+  },
+  {
+    "file": "frames/3119.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3119.webp"
+  },
+  {
+    "file": "frames/3121.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3121.webp"
+  },
+  {
+    "file": "frames/3124.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3124.webp"
+  },
+  {
+    "file": "frames/3125.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3125.webp"
+  },
+  {
+    "file": "frames/3129.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3129.webp"
+  },
+  {
+    "file": "frames/3130.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3130.webp"
+  },
+  {
+    "file": "frames/3131.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3131.webp"
+  },
+  {
+    "file": "frames/3135.webp",
+    "source": "https://zetta-joule.b-cdn.net/Image%20Sequence/Home%20-%20Reactor%20v3/ZettaJoule_Exploded-Redshift_Reactor_Expand_3135.webp"
+  }
+]
