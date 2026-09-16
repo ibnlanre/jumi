@@ -328,8 +328,8 @@
     --jumi-slot-scale-d38: var(--jumi-scale-d38-animation-name, var(--jumi-animation-name)) var(--jumi-scale-animation-duration, var(--jumi-animation-duration)) var(--jumi-scale-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-scale-animation-delay, var(--jumi-animation-delay)) var(--jumi-scale-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-scale-animation-direction, var(--jumi-animation-direction)) var(--jumi-scale-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-scale-animation-play-state, var(--jumi-animation-play-state));
   }
   .animate-scale-y-\[0\.2\] {
-    --jumi-scale-y-animation-name: jumi-scale-y;
     scale: var(--jumi-scale);
+    --jumi-scale-y-animation-name: jumi-scale-y;
     --jumi-slot-scale-y: var(--jumi-scale-y-animation-name, var(--jumi-animation-name)) var(--jumi-scale-y-animation-duration, var(--jumi-scale-animation-duration, var(--jumi-animation-duration))) var(--jumi-scale-y-animation-timing-function, var(--jumi-scale-animation-timing-function, var(--jumi-animation-timing-function))) var(--jumi-scale-y-animation-delay, var(--jumi-scale-animation-delay, var(--jumi-animation-delay))) var(--jumi-scale-y-animation-iteration-count, var(--jumi-scale-animation-iteration-count, var(--jumi-animation-iteration-count))) var(--jumi-scale-y-animation-direction, var(--jumi-scale-animation-direction, var(--jumi-animation-direction))) var(--jumi-scale-y-animation-fill-mode, var(--jumi-scale-animation-fill-mode, var(--jumi-animation-fill-mode))) var(--jumi-scale-y-animation-play-state, var(--jumi-scale-animation-play-state, var(--jumi-animation-play-state)));
   }
   .shadow-sm {

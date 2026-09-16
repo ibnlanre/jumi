@@ -1536,8 +1536,8 @@ export function createJumiModel({
             aggregateChanged()
 
             return {
-              [nameVar]: `jumi-${component}`,
               [attribute]: css('var', `--jumi-${attribute}`),
+              [nameVar]: `jumi-${component}`,
               ...(modifier ? nameSlot(component, component, modifier) : {}),
             }
           }
