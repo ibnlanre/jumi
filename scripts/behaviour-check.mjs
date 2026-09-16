@@ -1434,6 +1434,191 @@ const ownProperty = [
 for (const [claim, ok] of ownProperty)
   if (!ok) failures.push(`own property: ${claim}`)
 
+/* ------------------------------------------------------------------------------------
+ * 12. Compositions declared late: gap, and the two logical border widths.
+ * ---------------------------------------------------------------------------------- */
+
+// `gap` is the one worth reading twice: `src/composition/gap.ts` had existed with **no importer at
+// all**, so a phrase on `animate-column-gap` wrote a key nothing read and the property itself was never
+// built from its parts — the value form was as inert as the phrase form, which is what makes this
+// unfinished wiring rather than a compiler defect. The border widths are the same omission with the
+// model's own radius siblings already doing it correctly beside them.
+const COMPOSITION_ENTRY = `\n@import "tailwindcss" source(none);\n@plugin "${path.join(root, 'dist', 'index.js')}";\n`
+
+const compositionCss = finalizeCss(
+  (await compiler(COMPOSITION_ENTRY, root)).build([
+    'animate-row-gap-[0:0px|100:10px]',
+    'animate-column-gap-[0:0px|100:10px]',
+    'animate-border-block-width-[0:0px|100:8px]',
+    'animate-border-inline-width-[0:0px|100:4px]',
+  ]),
+).css
+
+// The border arms need a style for a width to compute at all: CSS reports every border-width as `0px`
+// while the border-style is `none`, so the author's own declaration is part of the fixture rather than
+// a convenience. The gap pair shares one frame list on purpose — the frame key's id hashes the frames,
+// so identical frames are what let two constituent phrases reach one keyframe.
+const COMPOSITION_BODY =
+  '<div style="border-block-style: solid; border-inline-style: solid" ' +
+  'class="animate-row-gap-[0:0px|100:10px] animate-column-gap-[0:0px|100:10px] ' +
+  'animate-border-block-width-[0:0px|100:8px] animate-border-inline-width-[0:0px|100:4px]"></div>'
+
+const gapMoved = await stepped({
+  body: COMPOSITION_BODY,
+  css: compositionCss,
+  prefix: 'jumi-gap',
+  properties: ['gap', 'rowGap', 'columnGap'],
+})
+
+const blockWidthMoved = await stepped({
+  body: COMPOSITION_BODY,
+  css: compositionCss,
+  prefix: 'jumi-border-block-width',
+  properties: ['borderBlockStartWidth', 'borderBlockEndWidth'],
+})
+
+const inlineWidthMoved = await stepped({
+  body: COMPOSITION_BODY,
+  css: compositionCss,
+  prefix: 'jumi-border-inline-width',
+  properties: ['borderInlineStartWidth', 'borderInlineEndWidth'],
+})
+
+const gapHeld = await stepped({
+  body: COMPOSITION_BODY,
+  css: withoutFrameLookups(compositionCss),
+  prefix: 'jumi-gap',
+  properties: ['gap'],
+})
+
+const compositions = [
+  [
+    'gap is built from row-gap and column-gap per frame',
+    changes(gapMoved.samples.gap ?? []),
+    `gap read ${(gapMoved.samples.gap ?? []).join(' | ') || 'no animation'}`,
+  ],
+  [
+    'and each axis follows its own written key',
+    changes(gapMoved.samples.rowGap ?? []) &&
+      changes(gapMoved.samples.columnGap ?? []),
+    `row ${(gapMoved.samples.rowGap ?? []).join(' | ') || 'nothing'}`,
+  ],
+  [
+    'border-block-width reaches both logical edges',
+    changes(blockWidthMoved.samples.borderBlockStartWidth ?? []) &&
+      changes(blockWidthMoved.samples.borderBlockEndWidth ?? []),
+    `start ${(blockWidthMoved.samples.borderBlockStartWidth ?? []).join(' | ') || 'not exposed'}`,
+  ],
+  [
+    'border-inline-width reaches both logical edges',
+    changes(inlineWidthMoved.samples.borderInlineStartWidth ?? []) &&
+      changes(inlineWidthMoved.samples.borderInlineEndWidth ?? []),
+    `start ${(inlineWidthMoved.samples.borderInlineStartWidth ?? []).join(' | ') || 'not exposed'}`,
+  ],
+  [
+    'and the assertion can fail: without the frame-first lookups gap holds',
+    constant(gapHeld.samples.gap ?? []),
+    `read ${(gapHeld.samples.gap ?? []).join(' | ') || 'no animation'}`,
+  ],
+]
+
+for (const [claim, ok] of compositions)
+  if (!ok) failures.push(`composition: ${claim}`)
+
+/* ------------------------------------------------------------------------------------
+ * 13. transform-origin: three components, and the grammar that needs all of them.
+ * ---------------------------------------------------------------------------------- */
+
+// Not a shorthand, and that is the whole difference from `gap` beside it. The platform accepts
+// `transform-origin: <x> <y> <z>` only when both positions are present, so a composition that let a
+// lone `z` reach the frame would emit a declaration the browser drops — and the motion would be inert
+// in exactly the way this track exists to remove. Every frame therefore states all three, with each
+// part's own default filling whatever the phrase did not write.
+//
+// So the arms assert the grammar rather than the names: a z-only phrase must still compute to a value
+// whose first two components are the defaults, at every offset.
+const ORIGIN_ENTRY = `\n@import "tailwindcss" source(none);\n@plugin "${path.join(root, 'dist', 'index.js')}";\n`
+
+// Identical frame lists, because the frame key's id hashes the frames: it is what lets the two
+// constituent phrases share one keyframe instead of running two animations over one property.
+const ORIGIN_X_AND_Z =
+  'animate-transform-origin-x-[0:0px|100:20px] ' +
+  'animate-transform-origin-z-[0:0px|100:20px]'
+const ORIGIN_Z_ONLY = 'animate-transform-origin-z-[0:0px|100:20px]'
+
+const originCss = finalizeCss(
+  (await compiler(ORIGIN_ENTRY, root)).build(ORIGIN_X_AND_Z.split(' ')),
+).css
+
+const originZOnlyCss = finalizeCss(
+  (await compiler(ORIGIN_ENTRY, root)).build([ORIGIN_Z_ONLY]),
+).css
+
+const originMoved = await stepped({
+  body: `<div class="${ORIGIN_X_AND_Z}"></div>`,
+  css: originCss,
+  prefix: 'jumi-transform-origin',
+  properties: ['transformOrigin'],
+})
+
+const zOnlyMoved = await stepped({
+  body: `<div class="${ORIGIN_Z_ONLY}"></div>`,
+  css: originZOnlyCss,
+  prefix: 'jumi-transform-origin',
+  properties: ['transformOrigin'],
+})
+
+const zOnlyHeld = await stepped({
+  body: `<div class="${ORIGIN_Z_ONLY}"></div>`,
+  css: withoutFrameLookups(originZOnlyCss),
+  prefix: 'jumi-transform-origin',
+  properties: ['transformOrigin'],
+})
+
+/**
+ * Chromium resolves a percentage position into a length in the computed value (`50%` on a 1280px box
+ * is `640px`), so "valid" here is two or three components, and "the defaults are still there" is the
+ * positions *not moving* while the length animates — which is the platform's grammar stated as an
+ * observable rather than as the spelling this build happens to emit.
+ */
+const componentsOf = value =>
+  String(value ?? '')
+    .trim()
+    .split(/\s+/)
+const positionsOf = value => componentsOf(value).slice(0, 2).join(' ')
+const lengthOf = value => componentsOf(value)[2] ?? ''
+
+const positionsNeverAlone = values =>
+  values.length === 5 && values.every(value => componentsOf(value).length > 1)
+const positionsHold = values =>
+  values.length === 5 && new Set(values.map(positionsOf)).size === 1
+const lengthMoves = values =>
+  values.length === 5 && new Set(values.map(lengthOf)).size === 5
+
+const origins = [
+  [
+    'a phrase writing x and z moves transform-origin',
+    changes(originMoved.samples.transformOrigin ?? []) &&
+      positionsNeverAlone(originMoved.samples.transformOrigin ?? []),
+    `read ${(originMoved.samples.transformOrigin ?? []).join(' | ') || 'no animation'}`,
+  ],
+  [
+    'and a z-only phrase moves the length with the positions untouched',
+    changes(zOnlyMoved.samples.transformOrigin ?? []) &&
+      positionsHold(zOnlyMoved.samples.transformOrigin ?? []) &&
+      lengthMoves(zOnlyMoved.samples.transformOrigin ?? []),
+    `read ${(zOnlyMoved.samples.transformOrigin ?? []).join(' | ') || 'no animation'}`,
+  ],
+  [
+    'and the assertion can fail: without the frame-first lookups it holds',
+    constant(zOnlyHeld.samples.transformOrigin ?? []),
+    `read ${(zOnlyHeld.samples.transformOrigin ?? []).join(' | ') || 'no animation'}`,
+  ],
+]
+
+for (const [claim, ok] of origins)
+  if (!ok) failures.push(`transform origin: ${claim}`)
+
 await browser.close()
 
 /* ------------------------------------------------------------------------------------
@@ -1488,32 +1673,46 @@ for (const [claim, ok, detail] of naming)
     `    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`,
   )
 
-// One loop over the composed sets, so a set is a row rather than a fourth copy of the same printer.
-// That is also what lets each set's browser arm land in the commit that changed the behaviour it
-// checks, without three of them rewriting this block.
-const arms = [
-  ['composed', constituent],
-  ['own property', ownProperty],
-]
+console.log('\n  composed')
 
-for (const [heading, claims] of arms) {
-  console.log(`\n  ${heading}`)
+for (const [claim, ok, detail] of constituent)
+  console.log(
+    `    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`,
+  )
 
-  for (const [claim, ok, detail] of claims)
-    console.log(
-      `    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`,
-    )
-}
+console.log('\n  own property')
+
+for (const [claim, ok, detail] of ownProperty)
+  console.log(
+    `    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`,
+  )
+
+console.log('\n  compositions')
+
+for (const [claim, ok, detail] of compositions)
+  console.log(
+    `    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`,
+  )
+
+console.log('\n  transform origin')
+
+for (const [claim, ok, detail] of origins)
+  console.log(
+    `    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`,
+  )
 
 // Every assertion above that can fail, so the summary line is the count it claims to be: the three
 // activation contexts, the pseudo substrate, the direct carriers, bare, applied, spacing, radius,
-// the three relationship-variant cases, non-inheritance, and every composed set.
+// the three relationship-variant cases, non-inheritance, and the four composed sets.
 const required =
   contexts.length +
   utilities.length +
   9 +
   naming.length +
-  arms.reduce((total, [, claims]) => total + claims.length, 0)
+  constituent.length +
+  ownProperty.length +
+  compositions.length +
+  origins.length
 const passing = required - failures.length
 
 console.log(`\n  ${passing}/${required} required contexts and carriers behave`)

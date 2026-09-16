@@ -40,8 +40,8 @@ import { borderInline } from '@/composition/border-inline'
 import { borderInlineEnd } from '@/composition/border-inline-end'
 import { borderInlineRadius } from '@/composition/border-inline-radius'
 import { borderInlineStart } from '@/composition/border-inline-start'
-import { borderLeft } from '@/composition/border-left'
 import { borderInlineWidth } from '@/composition/border-inline-width'
+import { borderLeft } from '@/composition/border-left'
 import { borderRadius } from '@/composition/border-radius'
 import { borderRight } from '@/composition/border-right'
 import { borderTop } from '@/composition/border-top'
@@ -59,9 +59,9 @@ import { flex } from '@/composition/flex'
 import { flexFlow } from '@/composition/flex-flow'
 import { font } from '@/composition/font'
 import { fontSynthesis } from '@/composition/font-synthesis'
+import { gap } from '@/composition/gap'
 import { grid } from '@/composition/grid'
 import { gridArea } from '@/composition/grid-area'
-import { gap } from '@/composition/gap'
 import { gridColumn } from '@/composition/grid-column'
 import { gridRow } from '@/composition/grid-row'
 import { gridTemplate } from '@/composition/grid-template'
@@ -124,6 +124,7 @@ import {
   transform,
   translate3d,
 } from '@/composition/transform'
+import { transformOrigin } from '@/composition/transform-origin'
 import { transition } from '@/composition/transition'
 import { translate } from '@/composition/translate'
 import { viewTimeline } from '@/composition/view-timeline'
@@ -768,7 +769,8 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-border-inline-style',
   },
   'border-inline-width': {
-    value: 'medium',
+    dependencies: ['border-inline-start-width', 'border-inline-end-width'],
+    value: borderInlineWidth,
     variable: '--jumi-border-inline-width',
   },
   'border-left': {
@@ -2801,7 +2803,15 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-transform-box',
   },
   'transform-origin': {
-    value: 'center',
+    // Not a shorthand: one property, three components, and the platform only accepts the length when
+    // both positions are present. Every frame therefore states all three — the parts default to
+    // `50% 50% 0px` — which is what keeps a phrase that writes only `z` a valid value.
+    dependencies: [
+      'transform-origin-x',
+      'transform-origin-y',
+      'transform-origin-z',
+    ],
+    value: transformOrigin,
     variable: '--jumi-transform-origin',
   },
   'transform-origin-x': {

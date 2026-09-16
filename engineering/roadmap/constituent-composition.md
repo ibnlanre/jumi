@@ -8,9 +8,10 @@ A constituent phrase writes a frame value — `--jumi-<component>-<id>-<offset>`
 it. The sheet is well formed, every name is spelled correctly, the motion computes, and it never moves.
 
 Measured across the whole registration table (`node scripts/constituent-check.mjs`: 398 candidates,
-one phrase each, `source(none)` so nothing else is in the sheet): **46 candidates**. That number is
-recorded in `scripts/constituent-baseline.json` and the audit fails if it grows, or if a candidate that
-was consumed becomes unconsumed. A fall is reported as an improvement and re-recorded on purpose.
+one phrase each, `source(none)` so nothing else is in the sheet): **46 candidates** when the audit was
+written, **37** after the first route landed the same day. That number is recorded in
+`scripts/constituent-baseline.json` and the audit fails if it grows, or if a candidate that was consumed
+becomes unconsumed. A fall is reported as an improvement and re-recorded on purpose.
 
 ## Why it is not the `scale-x` regression
 
@@ -50,18 +51,49 @@ the logical ones (`border-end-end-radius`, `border-start-start-radius`, …).
 
 By **route**, not by candidate count (ruling, 2026-09-16). There is no single nested-writer fix waiting
 to be discovered, and trying to reach all three routes with one broader predicate is precisely how the
-112 dead reads come back. The two small routes are also the closer ones:
+112 dead reads come back.
 
-- **The 9 "not composed"** — a missing `dependencies` declaration, which is a data correction rather
-  than an architectural one: `gap` over `column-gap` + `row-gap`, `transform-origin` over
-  `transform-origin-x/y/z`, `border-block-width` over its two logical edges, `outline` over
-  `outline-offset`, `transform` over `transform-style`. Declaring the composition is the whole fix, and
-  it is the same edit that makes the *value* path name its own parts.
+### The 9 "not composed" — traced, and it is two classes (2026-09-16)
+
+Candidate by candidate, no production change: each one compiled as a phrase and as a value, then read
+for the keyframe it emits, the property in that keyframe, the key the phrase writes, and whether
+anything reads it. **Seven are real missing composition metadata. Two are independent CSS properties
+this table groups under a composition they are not part of — and for those the emitted animation is not
+inert, it is wrong.**
+
+**Landed the same day, in three changes, with the baseline re-recorded each time:** declarations
+corrected for the two wrong-property candidates (46 → 44), then the four straightforward compositions
+including the orphaned `gap.ts` (44 → 40), then `transform-origin` on its own because its grammar is
+qualitatively different (40 → 37). Each change carried a browser arm for the computed property, a
+falsification arm, and — for the wrong-property pair — the negative assertion that the property which
+used to move no longer does. The nine are retired; what follows is history.
+
+**The seven.** `gap` (2 candidates): `gap` *is* the shorthand for `row-gap` + `column-gap`, and
+`src/composition/gap.ts` **already exists**, already in the correct row-then-column order, and is
+imported nowhere. `border-block-width` and `border-inline-width`: both real shorthands, and their
+*radius* siblings (`border-block-radius`, `border-inline-radius`) are already wired, so these look
+missed rather than modelled. `transform-origin` (3 candidates): not a shorthand at all — one property
+taking one to three components — so it needs a new decomposition rather than a longhand list, and the
+browser's grammar makes `z` imply `x` and `y`.
+
+**The two.** `animate-outline-offset` declares `property('outline', ['outline-offset'])` and
+`animate-transform-style` declares `property('transform', ['transform-style'])`. Neither part belongs to
+the property it is declared under, so adding dependencies would invent a relationship CSS does not have
+— and measured, both animate the **wrong property** today: a phrase on `animate-outline-offset` emits
+`outline: <width> <style> <color>` and never touches `outline-offset`, and a phrase on
+`animate-transform-style` emits the whole `transform` composition. The treatment is the declaration, not
+the graph: `property('outline-offset')` and `property('transform-style')`, one line each — after which
+the frame reads the key the phrase wrote, because part and attribute are by then the same name.
+
+### What is left — 37
+
+- **The 33 nested** — the real work, and the only route where the acceptance test below has to answer
+  _how_ the value reaches the frame. `box-shadow` 5, `filter` 5, `backdrop-filter` 5, `transform` 2
+  (`skew-x`/`skew-y`), and the four position families 4 each (`background-position`, `object-position`,
+  `offset-anchor`, `offset-position`).
 - **The 4 "other name"** — logical against physical. `border-radius` composes the four physical corners
   while the candidates write `border-end-end-radius` and friends. Either the composition reads both
   spellings or the candidates address the physical ones; that is a naming ruling, not new machinery.
-- **The 33 nested** — the real work, and the only route where the acceptance test below has to answer
-  *how* the value reaches the frame.
 
 ## The acceptance test for closing it
 
@@ -93,4 +125,5 @@ The same audit against three trees, 2026-09-16:
 bb39449^ (before the regression)   351 read back ·  46 not · but 112 dead reads
 bb39449  (shipped)                 350 read back ·  47 not ·   0 dead reads
 restored lookup                    351 read back ·  46 not ·   0 dead reads
+route 1 landed (three changes)     360 read back ·  37 not ·   0 dead reads
 ```
