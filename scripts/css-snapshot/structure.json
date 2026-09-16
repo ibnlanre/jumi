@@ -1,10 +1,10 @@
 {
   "canonical": {
-    "aggregateBytes": 11662,
+    "aggregateBytes": 11742,
     "aggregateShare": 12,
     "aggregateWrites": 4,
     "animations": 1,
-    "bytes": 98833,
+    "bytes": 99215,
     "keyframes": 41,
     "media": 5,
     "properties": 104,
@@ -16,24 +16,24 @@
     "supports": 5,
     "transitions": 1,
     "publishEvents": 44,
-    "rawBytes": 965547,
-    "stagingBytes": 923611,
+    "rawBytes": 966873,
+    "stagingBytes": 924659,
     "colorValues": {
       "literal": 6,
-      "token": 6
+      "token": 7
     },
     "themeResolution": {
       "formula": 4,
-      "literal": 223,
-      "token": 12
+      "literal": 224,
+      "token": 13
     }
   },
   "carrierVariant": {
-    "aggregateBytes": 4953,
+    "aggregateBytes": 4990,
     "aggregateShare": 12,
     "aggregateWrites": 3,
     "animations": 1,
-    "bytes": 41958,
+    "bytes": 42107,
     "keyframes": 18,
     "media": 1,
     "properties": 58,
@@ -45,15 +45,15 @@
     "supports": 5,
     "transitions": 0,
     "publishEvents": 21,
-    "rawBytes": 222440,
-    "stagingBytes": 204260,
+    "rawBytes": 222741,
+    "stagingBytes": 204455,
     "colorValues": {
       "literal": 2,
       "token": 2
     },
     "themeResolution": {
       "formula": 0,
-      "literal": 100,
+      "literal": 101,
       "token": 3
     }
   }

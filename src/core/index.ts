@@ -6,6 +6,7 @@ import type {
   CssInJs,
   MatchComponentsPropertyFunction,
   MatchUtilitiesPropertyFunction,
+  PropertyType,
   StaggerContext,
 } from '@/types'
 
@@ -17,6 +18,7 @@ import { merge } from '@/helpers/merge'
 import { toPaintHex } from '@/helpers/paint'
 import { replaceSlots } from '@/helpers/slots'
 import { effectKeyframes } from '@/keyframes/effects'
+import { isFullyAddressable } from '@/variables/composition'
 import { propertyVariables } from '@/variables/property'
 
 import cssEscape from 'css.escape'
@@ -352,6 +354,32 @@ export function createJumiModel({
   const values = new Map<AnimatableStandardPropertyType, Map<string, string>>()
 
   const composed = new Set<AnimatableStandardPropertyType>()
+
+  /**
+   * The part tween instances that own their motion identity.
+   *
+   * A part tween on a **fully addressable** composite operates on one component of a composed
+   * property — `scale-x` of `scale` — and that component is a property in its own right, so the
+   * motion can be addressed and timed on its own. The three names are recorded apart rather than
+   * collapsed into a key because here they genuinely diverge, and a reader that assumed
+   * `key === attribute` would be wrong for every entry in this bucket:
+   *
+   *   attribute    the property the animation writes      `scale`
+   *   component    the constituent it owns                `scale-x`
+   *   key          the slot identity, and its address     `scale-x`
+   *
+   * Not folded into `composed`: a composed slot is one shared slot per attribute, which is exactly
+   * the identity independence is being given up for.
+   */
+  const partTweens = new Map<
+    string,
+    {
+      attribute: AnimatableStandardPropertyType
+      component: string
+      key: string
+      nameVar: string
+    }
+  >()
 
   /**
    * What each candidate addresses on a composed attribute — the writer class a per-frame component
@@ -890,6 +918,22 @@ export function createJumiModel({
         key: slotKey(attribute),
       })
 
+    // A part tween that owns its identity, keyed by the **component** rather than the attribute. Its
+    // `nameVar` is built from the component too, which is the one place a slot's name variable is not
+    // `--jumi-<attribute>-<id>-…` — the attribute and the key diverge here by design.
+    for (const key of [...partTweens.keys()].sort()) {
+      const one = partTweens.get(key)
+
+      if (!one) continue
+
+      slots.push({
+        attribute: one.attribute,
+        components: [one.component],
+        key: one.key,
+        nameVar: one.nameVar,
+      })
+    }
+
     for (const [attribute, instances] of phrases) {
       for (const [key, id] of instances) {
         slots.push({
@@ -1281,10 +1325,6 @@ export function createJumiModel({
         if (!parts.length)
           return perValue(attribute, value, modifier ?? undefined)
 
-        composed.add(attribute)
-        registerName(`--jumi-${attribute}-animation-name`)
-        recordComponents(slotKey(attribute), parts)
-
         // The same rule on the tween path: a candidate addressing properties animates those properties,
         // so a value addressed on a logical corner arrives as that corner and the browser places it.
         const independent =
@@ -1294,6 +1334,96 @@ export function createJumiModel({
           )
             ? parts.map(part => (Array.isArray(part) ? part[0] : part))
             : null
+
+        const variables = parts.reduce((acc, part) => {
+          const [property, transform] = Array.isArray(part) ? part : [part]
+          acc[`--jumi-${property}`] = transform ? transform(value) : value
+          return acc
+        }, {} as CssInJs)
+
+        /**
+         * A part tween on a fully addressable composite **owns its motion identity**.
+         *
+         * The gate is `isFullyAddressable`, which is a fact about the graph and therefore fixed
+         * before any candidate compiles — so this is not a decision that a later candidate can
+         * invalidate, and nothing has to be retracted. What it buys is a slot an author's control
+         * can address on its own: a `/scale-x` duration, delay or easing, which no part motion had
+         * before, because every part tween of an attribute shared one identity.
+         *
+         * A whole tween on the same attribute is **orthogonal**. `animate-scale-[2]` registers
+         * through `perValue` and keeps its own identity, so `scale` plus `scale-x` is two live
+         * motions whatever order Tailwind discovers them in.
+         *
+         * One part only. A candidate addressing two components has no single identity to take, and
+         * inventing one would put two constituents behind an address that names neither.
+         */
+        const component =
+          parts.length === 1
+            ? String(Array.isArray(parts[0]) ? parts[0][0] : parts[0])
+            : null
+
+        if (component && isFullyAddressable(attribute)) {
+          const nameVar = `--jumi-${component}-animation-name`
+          const endpoint = cssEscape(`--jumi-${component}-100`)
+          const leaf = propertyVariables[component as PropertyType].variable
+
+          partTweens.set(component, {
+            attribute,
+            component,
+            key: component,
+            nameVar,
+          })
+
+          // Recorded under the **component** so the timing chain reads the component scope
+          // (`--jumi-scale-x-animation-duration`) as its narrowest rung — the address `/scale-x`
+          // writes. Recorded here rather than left to the shared path because the slot key is no
+          // longer the attribute, and nothing else would record it.
+          recordComponents(component, parts)
+          registerName(nameVar)
+
+          /**
+           * The frame hooks **only the owned component**.
+           *
+           * `scale: var(--jumi-scale-x-100, var(--jumi-scale-x)) var(--jumi-scale-y)
+           * var(--jumi-scale-z)` — the other components read their element-level leaves, which is
+           * what keeps a lone part tween animating the whole property to the value it always did.
+           * A frame that hooked every addressable component would read `--jumi-scale-y-100`, which
+           * nothing writes: a dead read, and the exact class this session has already paid for
+           * twice.
+           */
+          emitKeyframe(`jumi-${component}`, {
+            to: independent
+              ? Object.fromEntries(
+                  independent.map(property => [
+                    property,
+                    css('var', `--jumi-${property}`),
+                  ]),
+                )
+              : {
+                  [attribute]: hookSlot(
+                    propertyVariables[attribute].value,
+                    leaf,
+                    cssEscape(`${leaf}-100`),
+                  ),
+                },
+          })
+          aggregateChanged()
+
+          return {
+            // Both, not either: the endpoint is what the animation reads, and the resting leaf is
+            // what the element resolves to with no animation running. Writing only the endpoint
+            // would move an element's resting value; writing only the leaf would give the
+            // animation no target of its own.
+            [endpoint]: String(variables[`--jumi-${component}`] ?? value),
+            [nameVar]: `jumi-${component}`,
+            ...(modifier ? nameSlot(component, component, modifier) : {}),
+            ...variables,
+          }
+        }
+
+        composed.add(attribute)
+        registerName(`--jumi-${attribute}-animation-name`)
+        recordComponents(slotKey(attribute), parts)
 
         emitKeyframe(
           `jumi-${attribute}`,
@@ -1309,12 +1439,6 @@ export function createJumiModel({
             : { to: { [attribute]: css('var', `--jumi-${attribute}`) } },
         )
         aggregateChanged()
-
-        const variables = parts.reduce((acc, part) => {
-          const [property, transform] = Array.isArray(part) ? part : [part]
-          acc[`--jumi-${property}`] = transform ? transform(value) : value
-          return acc
-        }, {} as CssInJs)
 
         return {
           [`--jumi-${attribute}-animation-name`]: `jumi-${attribute}`,
