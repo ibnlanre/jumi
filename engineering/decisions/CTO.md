@@ -3487,3 +3487,47 @@ way. Validity and addressability were never the same question; this is the incre
 
 **State.** Gate 17/17, 498 unit tests, 87/87 behaviour arms, `tsc` clean, census 305 unchanged — candidates are not
 compositions, which is why this cleanup could be made without moving a single measured number.
+
+---
+
+## D.3.7 closed, unqualified
+
+```text
+authoring surface     x-edge · y-edge · x-offset · y-offset
+public motion surface x-edge · y-edge
+execution surface     x-position · y-position
+composition graph     offset-anchor reads x-position + y-position
+```
+
+Four surfaces, each doing work rather than bookkeeping: the census counts the first, the candidate table defines the
+second, frames write the third, and the property is made of the third. Two rules came out of it proved by production
+rather than argued:
+
+```text
+valid authoring state does not imply public animation capability
+authoring state → normalization → execution state, never back
+```
+
+The first is why the offset leaves remain while their classes are gone. The second is why the projection is built from
+the declared surface when the candidate compiles, and why no sibling class can supply what a candidate did not carry.
+
+**The verdict class is empty.** Read from the evidence: 49 records — **37 `movable`**, 5 `fixture-unobservable`
+(four `mask-border-outset` the engine does not implement, one `rotate-z` that normalises away), 7 `unresolved` — and
+**no `reshape-required` record at all**. Both of its members landed: `math-depth-add` in D.3.6, `offset-anchor` here.
+
+**What is left, ranked, and where I would go next.** The census's `reshape` bucket is 96 pairs across 25 parents:
+
+```text
+matrix-3d:16  backdrop-filter:11  filter:11  transform:7  matrix:6  filter-drop-shadow:4
+backdrop-filter-drop-shadow:4  rotate-3d:4  background:3  scale-3d:3  translate-3d:3  …
+```
+
+The largest coherent cluster is the **3D matrix family** — `matrix-3d` 16, `matrix` 6, `rotate-3d` 4, `scale-3d` 3,
+`translate-3d` 3, thirty-two pairs, a third of the bucket — and every one of them is the shape D.3.6 solved once:
+a component that is an **argument inside a function** (`matrix3d(…)`, `rotate3d(…)`). So it is the leverage pick and
+the generalization test for that mechanism in one. The filter cluster is next at thirty (`filter` 11,
+`backdrop-filter` 11, the two drop-shadow pairs 4 + 4), with a second argument inside the function to reason about.
+
+Neither is a test of the *three-surface* model, and that is worth saying plainly: every candidate above still names its
+components in its composition. A family that separates all three the way `offset-anchor` did would be a different
+search, and the census does not obviously contain one.
