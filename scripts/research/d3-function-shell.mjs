@@ -27,6 +27,7 @@
  * Run: `pnpm research:d3-function-shell` (exits non-zero only on an arm defect, never on a finding).
  */
 import { chromium } from 'playwright'
+
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -34,6 +35,7 @@ const root = path.resolve(import.meta.dirname, '..', '..')
 const WALL = [0, 250, 500, 750, 1000]
 const DURATION = 1000
 const IDENTITY = 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)'
+const IDENTITY2 = 'matrix(1, 0, 0, 1, 0, 0)'
 
 /**
  * The arms. `shell` is the *consumer's* static value with the argument slot in it; `native` is the same motion
@@ -42,29 +44,42 @@ const IDENTITY = 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)'
 const ARMS = [
   {
     family: 'scale3d',
+    leaf: { from: '1', to: '2' },
     native: { from: 'scale3d(1, 1, 1)', to: 'scale3d(2, 1, 1)' },
+    shell: 'scale3d(var(--jumi-d38-scale-x), 1, 1)',
     slot: '--jumi-d38-scale-x',
     syntax: '<number>',
-    shell: 'scale3d(var(--jumi-d38-scale-x), 1, 1)',
-    leaf: { from: '1', to: '2' },
   },
   {
     family: 'translate3d',
-    native: { from: 'translate3d(0px, 0px, 0px)', to: 'translate3d(20px, 0px, 0px)' },
+    leaf: { from: '0px', to: '20px' },
+    native: {
+      from: 'translate3d(0px, 0px, 0px)',
+      to: 'translate3d(20px, 0px, 0px)',
+    },
+    shell: 'translate3d(var(--jumi-d38-translate-x), 0px, 0px)',
     slot: '--jumi-d38-translate-x',
     syntax: '<length>',
-    shell: 'translate3d(var(--jumi-d38-translate-x), 0px, 0px)',
-    leaf: { from: '0px', to: '20px' },
   },
   {
     family: 'rotate3d (fixed axis)',
+    leaf: { from: '0deg', to: '90deg' },
     native: { from: 'rotate3d(0, 0, 1, 0deg)', to: 'rotate3d(0, 0, 1, 90deg)' },
+    shell: 'rotate3d(0, 0, 1, var(--jumi-d38-rotate-angle))',
     slot: '--jumi-d38-rotate-angle',
     syntax: '<angle>',
-    shell: 'rotate3d(0, 0, 1, var(--jumi-d38-rotate-angle))',
-    leaf: { from: '0deg', to: '90deg' },
   },
   {
+    extra: [
+      { from: '0', slot: '--jumi-d38-axis-y', syntax: '<number>', to: '1' },
+      { from: '1', slot: '--jumi-d38-axis-z', syntax: '<number>', to: '0' },
+      {
+        from: '0deg',
+        slot: '--jumi-d38-angle',
+        syntax: '<angle>',
+        to: '90deg',
+      },
+    ],
     // The axis turns **while** the angle turns, which is the shape native interpolation handles jointly: CSS
     // interpolates the pair as a unit. Every argument gets its own leaf, so this is per-argument interpolation
     // against joint interpolation with both sides moving — the first version of this arm held the angle fixed and
@@ -72,36 +87,39 @@ const ARMS = [
     // belonged to the fixture rather than to the representation.
     family: 'rotate3d (moving axis)',
     kind: 'simultaneous',
+    leaf: { from: '0', to: '1' },
     native: { from: 'rotate3d(0, 0, 1, 0deg)', to: 'rotate3d(1, 1, 0, 90deg)' },
-    slot: '--jumi-d38-axis-x',
-    syntax: '<number>',
     shell:
       'rotate3d(var(--jumi-d38-axis-x), var(--jumi-d38-axis-y), var(--jumi-d38-axis-z), var(--jumi-d38-angle))',
-    leaf: { from: '0', to: '1' },
-    extra: [
-      { from: '0', slot: '--jumi-d38-axis-y', syntax: '<number>', to: '1' },
-      { from: '1', slot: '--jumi-d38-axis-z', syntax: '<number>', to: '0' },
-      { from: '0deg', slot: '--jumi-d38-angle', syntax: '<angle>', to: '90deg' },
-    ],
+    slot: '--jumi-d38-axis-x',
+    syntax: '<number>',
   },
   {
     family: 'matrix3d (coefficient)',
-    native: { from: IDENTITY, to: 'matrix3d(2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)' },
+    leaf: { from: '1', to: '2' },
+    native: {
+      from: IDENTITY,
+      to: 'matrix3d(2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)',
+    },
+    shell:
+      'matrix3d(var(--jumi-d38-matrix-a1), 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)',
     slot: '--jumi-d38-matrix-a1',
     syntax: '<number>',
-    shell: 'matrix3d(var(--jumi-d38-matrix-a1), 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)',
-    leaf: { from: '1', to: '2' },
   },
   {
     // The adversarial matrix arm, and the reason it is fair: **one** coefficient moves, so the proposal can
     // express the whole motion. Native interpolation decomposes the matrix and normalises the scale, so a
     // negative determinant becomes a rotation — a different series from interpolating the coefficient through.
     family: 'matrix3d (negative scale)',
-    native: { from: IDENTITY, to: 'matrix3d(-1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)' },
+    leaf: { from: '1', to: '-1' },
+    native: {
+      from: IDENTITY,
+      to: 'matrix3d(-1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)',
+    },
+    shell:
+      'matrix3d(var(--jumi-d38-matrix-neg), 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)',
     slot: '--jumi-d38-matrix-neg',
     syntax: '<number>',
-    shell: 'matrix3d(var(--jumi-d38-matrix-neg), 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)',
-    leaf: { from: '1', to: '-1' },
   },
 
   /**
@@ -119,29 +137,18 @@ const ARMS = [
    * interpolation will keep the basis a unit vector where linear coefficients collapse it to zero at the midpoint.
    */
   {
-    family: 'scale3d (x + y)',
-    kind: 'simultaneous',
-    native: { from: 'scale3d(1, 1, 1)', to: 'scale3d(2, 3, 1)' },
-    slot: '--jumi-d38-s2-scale-x',
-    syntax: '<number>',
-    shell: 'scale3d(var(--jumi-d38-s2-scale-x), var(--jumi-d38-s2-scale-y), 1)',
-    leaf: { from: '1', to: '2' },
     extra: [
       { from: '1', slot: '--jumi-d38-s2-scale-y', syntax: '<number>', to: '3' },
     ],
+    family: 'scale3d (x + y)',
+    kind: 'simultaneous',
+    leaf: { from: '1', to: '2' },
+    native: { from: 'scale3d(1, 1, 1)', to: 'scale3d(2, 3, 1)' },
+    shell: 'scale3d(var(--jumi-d38-s2-scale-x), var(--jumi-d38-s2-scale-y), 1)',
+    slot: '--jumi-d38-s2-scale-x',
+    syntax: '<number>',
   },
   {
-    family: 'translate3d (x + y)',
-    kind: 'simultaneous',
-    native: {
-      from: 'translate3d(0px, 0px, 0px)',
-      to: 'translate3d(20px, 40px, 0px)',
-    },
-    slot: '--jumi-d38-s2-translate-x',
-    syntax: '<length>',
-    shell:
-      'translate3d(var(--jumi-d38-s2-translate-x), var(--jumi-d38-s2-translate-y), 0px)',
-    leaf: { from: '0px', to: '20px' },
     extra: [
       {
         from: '0px',
@@ -150,44 +157,55 @@ const ARMS = [
         to: '40px',
       },
     ],
+    family: 'translate3d (x + y)',
+    kind: 'simultaneous',
+    leaf: { from: '0px', to: '20px' },
+    native: {
+      from: 'translate3d(0px, 0px, 0px)',
+      to: 'translate3d(20px, 40px, 0px)',
+    },
+    shell:
+      'translate3d(var(--jumi-d38-s2-translate-x), var(--jumi-d38-s2-translate-y), 0px)',
+    slot: '--jumi-d38-s2-translate-x',
+    syntax: '<length>',
   },
   {
+    extra: [
+      { from: '0', slot: '--jumi-d38-s2-m12', syntax: '<number>', to: '0.5' },
+    ],
     family: 'matrix3d (scale + shear)',
     kind: 'simultaneous',
+    leaf: { from: '1', to: '2' },
     native: {
       from: IDENTITY,
       to: 'matrix3d(2, 0.5, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)',
     },
-    slot: '--jumi-d38-s2-m11',
-    syntax: '<number>',
     shell:
       'matrix3d(var(--jumi-d38-s2-m11), var(--jumi-d38-s2-m12), 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)',
-    leaf: { from: '1', to: '2' },
-    extra: [
-      { from: '0', slot: '--jumi-d38-s2-m12', syntax: '<number>', to: '0.5' },
-    ],
+    slot: '--jumi-d38-s2-m11',
+    syntax: '<number>',
   },
   {
-    family: 'matrix3d (rotation-like)',
-    kind: 'simultaneous',
-    native: {
-      from: IDENTITY,
-      to: 'matrix3d(0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)',
-    },
-    slot: '--jumi-d38-s2-r11',
-    syntax: '<number>',
-    shell:
-      'matrix3d(var(--jumi-d38-s2-r11), var(--jumi-d38-s2-r12), 0, 0, var(--jumi-d38-s2-r21), var(--jumi-d38-s2-r22), 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)',
-    leaf: { from: '1', to: '0' },
     extra: [
       { from: '0', slot: '--jumi-d38-s2-r12', syntax: '<number>', to: '1' },
       { from: '0', slot: '--jumi-d38-s2-r21', syntax: '<number>', to: '-1' },
       { from: '1', slot: '--jumi-d38-s2-r22', syntax: '<number>', to: '0' },
     ],
+    family: 'matrix3d (rotation-like)',
+    kind: 'simultaneous',
+    leaf: { from: '1', to: '0' },
+    native: {
+      from: IDENTITY,
+      to: 'matrix3d(0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)',
+    },
+    shell:
+      'matrix3d(var(--jumi-d38-s2-r11), var(--jumi-d38-s2-r12), 0, 0, var(--jumi-d38-s2-r21), var(--jumi-d38-s2-r22), 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)',
+    slot: '--jumi-d38-s2-r11',
+    syntax: '<number>',
   },
 ]
 
-const sheetFor = ({ arm, keyframes, registered, id }) => {
+const sheetFor = ({ arm, id, keyframes, registered }) => {
   const name = `${id}-${arm.family.replace(/[^a-z0-9]+/gi, '-')}`
 
   return `
@@ -206,11 +224,11 @@ const nativeSheet = arm => {
   const name = `native-${slugOf(arm)}`
 
   return {
-    name,
     css: `
 @keyframes ${name} { from { transform: ${arm.native.from}; } to { transform: ${arm.native.to}; } }
 #${name} { animation: ${name} ${DURATION}ms linear both; }
 `.trim(),
+    name,
   }
 }
 
@@ -233,17 +251,20 @@ const typedSheet = (arm, { to, variant = 'typed' } = {}) => {
   const name = `${variant}-${slugOf(arm)}`
   // Every slot the arm needs, the addressed one first. A family whose native subject is a *pair* — an axis beside
   // an angle — needs a leaf per argument, which is exactly the question this pass asks of that arm.
-  const slots = [{ ...arm.leaf, slot: arm.slot, syntax: arm.syntax }, ...(arm.extra ?? [])]
+  const slots = [
+    { ...arm.leaf, slot: arm.slot, syntax: arm.syntax },
+    ...(arm.extra ?? []),
+  ]
   const frame = (one, value) => `${one.slot}: ${value};`
   const moved = slots.map((one, at) => (at === 0 && to ? { ...one, to } : one))
 
   return {
-    name,
     css: `
 ${moved.map(one => `@property ${one.slot} { syntax: '${one.syntax}'; inherits: false; initial-value: ${one.from}; }`).join('\n')}
 @keyframes ${name} { from { ${moved.map(one => frame(one, one.from)).join(' ')} } to { ${moved.map(one => frame(one, one.to)).join(' ')} } }
 #${name} { animation: ${name} ${DURATION}ms linear both; transform: ${arm.shell}; }
 `.trim(),
+    name,
   }
 }
 
@@ -259,7 +280,7 @@ const seriesOf = async sheets => {
   )
 
   const readings = await page.evaluate(
-    async ({ ids, wall, duration }) => {
+    async ({ duration, ids, wall }) => {
       const out = {}
 
       for (const id of ids) {
@@ -295,11 +316,102 @@ const seriesOf = async sheets => {
   return readings
 }
 
+/**
+ * The second batch: the three-way arms, and `matrix` measured on its own.
+ *
+ * Kept as its own array rather than woven into the first, so the readings the first batch produced stay exactly
+ * where they were while these are added — the comparison is against the same wall and the same sheet builders.
+ */
+const EXTRA_ARMS = [
+  {
+    // **All three** components, because the criterion is family-level separability: the strongest realistic
+    // combination has to survive, not merely `x + y`.
+    family: 'scale3d (x + y + z)',
+    kind: 'simultaneous',
+    native: { from: 'scale3d(1, 1, 1)', to: 'scale3d(2, 3, 0.5)' },
+    slot: '--jumi-d38-s3-scale-x',
+    syntax: '<number>',
+    shell:
+      'scale3d(var(--jumi-d38-s3-scale-x), var(--jumi-d38-s3-scale-y), var(--jumi-d38-s3-scale-z))',
+    leaf: { from: '1', to: '2' },
+    extra: [
+      { from: '1', slot: '--jumi-d38-s3-scale-y', syntax: '<number>', to: '3' },
+      { from: '1', slot: '--jumi-d38-s3-scale-z', syntax: '<number>', to: '0.5' },
+    ],
+  },
+  {
+    // The richest grammar the candidates carry — `<length>` and `<percentage>` side by side — because a difference
+    // that only appears when two units are interpolated together is the kind this pass exists to find.
+    family: 'translate3d (x + y + z, mixed)',
+    kind: 'simultaneous',
+    native: {
+      from: 'translate3d(0%, 0px, 0px)',
+      to: 'translate3d(50%, 40px, 20px)',
+    },
+    slot: '--jumi-d38-s3-translate-x',
+    syntax: '<length-percentage>',
+    shell:
+      'translate3d(var(--jumi-d38-s3-translate-x), var(--jumi-d38-s3-translate-y), var(--jumi-d38-s3-translate-z))',
+    leaf: { from: '0%', to: '50%' },
+    extra: [
+      {
+        from: '0px',
+        slot: '--jumi-d38-s3-translate-y',
+        syntax: '<length>',
+        to: '40px',
+      },
+      {
+        from: '0px',
+        slot: '--jumi-d38-s3-translate-z',
+        syntax: '<length>',
+        to: '20px',
+      },
+    ],
+  },
+  {
+    // `matrix` is measured **independently**: `matrix3d` being falsified is a reason to distrust it, not evidence
+    // about the 2-D function, which has its own decomposition. Three arms — the control and both adversarial shapes.
+    family: 'matrix (coefficient)',
+    native: { from: IDENTITY2, to: 'matrix(2, 0, 0, 1, 0, 0)' },
+    slot: '--jumi-d38-m2-a',
+    syntax: '<number>',
+    shell: 'matrix(var(--jumi-d38-m2-a), 0, 0, 1, 0, 0)',
+    leaf: { from: '1', to: '2' },
+  },
+  {
+    family: 'matrix (scale + shear)',
+    kind: 'simultaneous',
+    native: { from: IDENTITY2, to: 'matrix(2, 0.5, 0, 1, 0, 0)' },
+    slot: '--jumi-d38-m2-sa',
+    syntax: '<number>',
+    shell: 'matrix(var(--jumi-d38-m2-sa), var(--jumi-d38-m2-sb), 0, 1, 0, 0)',
+    leaf: { from: '1', to: '2' },
+    extra: [
+      { from: '0', slot: '--jumi-d38-m2-sb', syntax: '<number>', to: '0.5' },
+    ],
+  },
+  {
+    family: 'matrix (rotation-like)',
+    kind: 'simultaneous',
+    native: { from: IDENTITY2, to: 'matrix(0, 1, -1, 0, 0, 0)' },
+    slot: '--jumi-d38-m2-r1',
+    syntax: '<number>',
+    shell:
+      'matrix(var(--jumi-d38-m2-r1), var(--jumi-d38-m2-r2), var(--jumi-d38-m2-r3), var(--jumi-d38-m2-r4), 0, 0)',
+    leaf: { from: '1', to: '0' },
+    extra: [
+      { from: '0', slot: '--jumi-d38-m2-r2', syntax: '<number>', to: '1' },
+      { from: '0', slot: '--jumi-d38-m2-r3', syntax: '<number>', to: '-1' },
+      { from: '1', slot: '--jumi-d38-m2-r4', syntax: '<number>', to: '0' },
+    ],
+  },
+]
+
 const records = []
 
 const slugOf = arm => arm.family.replace(/[^a-z0-9]+/gi, '-')
 
-for (const arm of ARMS) {
+for (const arm of [...ARMS, ...EXTRA_ARMS]) {
   const native = nativeSheet(arm)
   const typed = typedSheet(arm)
   const canary = typedSheet(arm, {
@@ -330,18 +442,45 @@ for (const arm of ARMS) {
 
 await browser.close()
 
+const families = [...new Set(records.map(one => one.arm.split(' ')[0]))].map(
+  family => {
+    const own = records.filter(one => one.arm.split(' ')[0] === family)
+
+    /**
+     * The class production reads, and it is deliberately the **whole family**: every arm, single and simultaneous,
+     * must reproduce native for the family to be eligible. `separable` is not a compliment for one route; it is a
+     * claim about the function's arguments when they move together, which is the only claim that survives the fact
+     * that a route compiles without knowing what else is on the element.
+     */
+    return {
+      arms: own.length,
+      class: own.every(one => one.verdict === 'same-series')
+        ? 'separable'
+        : 'coupled',
+      family,
+    }
+  },
+)
+
 const target = path.join(root, 'scripts', 'function-argument-series.json')
 
 fs.writeFileSync(
   target,
-  `${JSON.stringify({ source: 'scripts/research/d3-function-shell.mjs', wall: WALL, records }, null, 2)}\n`,
+  `${JSON.stringify({ families, source: 'scripts/research/d3-function-shell.mjs', wall: WALL, records }, null, 2)}\n`,
 )
 
 const truthy = value => (value ? 'yes' : 'no')
 
 for (const one of records)
   console.log(
-    `${one.kind.padEnd(12)} ${one.arm.padEnd(26)} identical=${truthy(one.identical)} canary=${truthy(one.liveCanary)}  ${one.verdict}`,
+    `${one.kind.padEnd(12)} ${one.arm.padEnd(30)} identical=${truthy(one.identical)} canary=${truthy(one.liveCanary)}  ${one.verdict}`,
+  )
+
+console.log('')
+
+for (const one of families)
+  console.log(
+    `${one.family.padEnd(14)} ${one.class.padEnd(10)} ${one.arms} arm(s)`,
   )
 
 console.log(`\nwritten to \`${path.relative(root, target)}\``)

@@ -3536,7 +3536,7 @@ search, and the census does not obviously contain one.
 
 ## Appendix: what "no `reshape-required` records" does and does not mean, and what the 3D cluster actually is
 
-**It does not mean the reshape work is done.** The verdict is a property of a *route the validation pass could plan*,
+**It does not mean the reshape work is done.** The verdict is a property of a _route the validation pass could plan_,
 and the pass plans routes for pairs that are `value`-bucket, declared, or shell-shaped. The 96 pairs in the `reshape`
 bucket are mostly none of those, so they carry **no records at all** — un-recorded rather than resolved. Reading the
 empty class as "nothing left" would be the mistake the census's ratios exist to prevent, and the bucket is the honest
@@ -3552,7 +3552,7 @@ scale-3d (3)     scale-x => 1          scale-y => 1        scale-z => 1
 translate-3d (3) translate-x => 0px    translate-y => 0px  translate-z => 0px
 ```
 
-None of them is a function *value* — that is the `filter-blur => blur(0)` shape. They are `reshape` because of the
+None of them is a function _value_ — that is the `filter-blur => blur(0)` shape. They are `reshape` because of the
 **depth** test: the parent nests them inside a shell (`matrix3d(var(--jumi-matrix-a1), …)`, `rotate3d(…)`,
 `scale3d(…)`, `translate3d(…)`), which is D.3.6's class, solved once at `math-depth`'s `add(...)`.
 
@@ -3576,7 +3576,7 @@ registry's key, decidable in one experiment, and it sits inside the largest clus
 
 ## D.3.8 opened as falsification: function-argument shape ≠ argument-level interpolation
 
-The premise to reject first is that "argument inside a function" is a *structural resemblance* to D.3.6 rather than
+The premise to reject first is that "argument inside a function" is a _structural resemblance_ to D.3.6 rather than
 evidence that the argument is the browser's interpolation unit. So this pass measures the two routes against each
 other — native whole-function motion, and a static shell whose argument is a registered typed leaf — and requires
 the `transform` computed value to agree **sample for sample** at five instants. No production change, nothing
@@ -3599,7 +3599,7 @@ rotate3d (moving axis)     no         live    differs
 ```
 
 **The abstraction holds for functions whose arguments are themselves interpolation units, and fails where arguments
-participate jointly in the function's own semantics.** The boundary is not "rotate3d is bad": a *fixed* axis with a
+participate jointly in the function's own semantics.** The boundary is not "rotate3d is bad": a _fixed_ axis with a
 turning angle reproduces native exactly. It is that a turning axis beside a turning angle is one subject to the
 engine and several to the proposal:
 
@@ -3614,12 +3614,12 @@ interpolated axis, which is a different rotation from the one the engine interpo
 **One prediction was wrong and is recorded as wrong.** `matrix3d` interpolating a scale through `1 → 0 → -1` was
 expected to diverge, on the reasoning that native interpolation decomposes the matrix and normalises the scale.
 Measured, it is linear in the coefficient (`1 · 0.5 · 0 · -0.5 · -1`) and identical. The decomposition coincided
-here, which is the useful form of the result: the adversarial arm that *did* split is the joint one, and it split
+here, which is the useful form of the result: the adversarial arm that _did_ split is the joint one, and it split
 for the reason the abstraction predicted rather than for the reason this one anticipated.
 
 **So the 32-pair cluster is not one migration class.** It splits by interpolation semantics rather than by
 morphology: `scale-3d`, `translate-3d` and the `matrix`/`matrix-3d` coefficients have independently interpolable
-arguments and can take the typed shell path; a motion whose arguments move *together* — `rotate-3d` with a turning
+arguments and can take the typed shell path; a motion whose arguments move _together_ — `rotate-3d` with a turning
 axis — is one subject and stays native. Filters remain the next cluster, and the question there is now sharper:
 drop-shadow's arguments beside its blur are a second argument inside the function.
 
@@ -3632,8 +3632,8 @@ drop-shadow's arguments beside its blur are a second argument inside the functio
 
 The single-argument result establishes one condition — **fixed siblings plus one changing argument** — and says
 nothing about two migrated arguments moving at once. That second question is the one production has to answer, because
-Jumi cannot discover class co-presence at compile time: every route compiles independently, and *"another constituent
-is on this element, use native instead"* is the element-context problem this track already refused. So the same
+Jumi cannot discover class co-presence at compile time: every route compiles independently, and _"another constituent
+is on this element, use native instead"_ is the element-context problem this track already refused. So the same
 differential was run with **two or more arguments moving simultaneously**, same endpoints, same timing, interior
 sampled:
 
@@ -3682,7 +3682,7 @@ falsified   matrix3d                  one coefficient and a negative scale repro
 ```
 
 `matrix` is untested and inherits the doubt: the ruling was to include it once `matrix-3d` said which way this goes,
-and the direction is *falsified*, so the 2-D form is a separate measurement rather than an assumption.
+and the direction is _falsified_, so the 2-D form is a separate measurement rather than an assumption.
 
 The durable criterion for production, and it is stronger than "arguments are interpolation units": **a function family
 is eligible for transparent constituent migration only if independently migrated arguments remain equivalent when
@@ -3690,3 +3690,66 @@ combined.** That is decidable at research time, per family, which is the only ti
 
 **State.** No production code moved. Gate 17/17, 498 unit tests, 87/87 behaviour arms, `tsc` clean; the readings are
 in `scripts/function-argument-series.json`.
+
+---
+
+## The separability proof is complete, and the class is `separable` or `coupled`
+
+Both loose ends are closed. Three components moving at once, and `matrix` measured on its own rather than inheriting
+`matrix3d`'s doubt:
+
+```text
+kind          arm                          identical  canary  verdict
+single        scale3d                      yes        live    same-series
+simultaneous  scale3d (x + y)              yes        live    same-series
+simultaneous  scale3d (x + y + z)          yes        live    same-series
+single        translate3d                  yes        live    same-series
+simultaneous  translate3d (x + y)          yes        live    same-series
+simultaneous  translate3d (x + y + z, mixed)  yes     live    same-series
+single        rotate3d (fixed axis)        yes        live    same-series
+simultaneous  rotate3d (moving axis)       no         live    differs
+single        matrix3d (coefficient)       yes        live    same-series
+single        matrix3d (negative scale)    yes        live    same-series
+simultaneous  matrix3d (scale + shear)     no         live    differs
+simultaneous  matrix3d (rotation-like)     no         live    differs
+single        matrix (coefficient)         yes        live    same-series
+simultaneous  matrix (scale + shear)       no         live    differs
+simultaneous  matrix (rotation-like)       no         live    differs
+```
+
+`translate3d`'s three-way arm carries the richest grammar the candidates support — `<percentage>` beside `<length>` —
+because a difference that only appears when two units interpolate side by side is the kind this pass exists to find,
+and there is none.
+
+```text
+separable   scale3d · translate3d       every arm, single and simultaneous, reproduces native
+coupled     rotate3d · matrix3d · matrix   each passes alone or in one pair and fails when more moves
+```
+
+`matrix` was measured rather than inferred, and it fails on both adversarial arms with its control passing: the 2-D
+function has its own decomposition and it is not separable either. Nothing more is owed by `rotate3d` or `matrix3d`.
+
+**The taxonomy is production's, not the hypothesis test's.** `falsified` was the right word for a test outcome and the
+wrong word for an execution class. The classes are two, and the criterion is one:
+
+> **Transparent constituent migration requires compositional separability, not merely single-argument equivalence.**
+
+And with it a **permanent negative rule**, which this pass earned and which the reach work has to be guarded against
+re-learning:
+
+```text
+one constituent matches native in isolation
+≠
+that constituent is safe to migrate
+```
+
+Single-route evidence is admission for a *simple* constituent, where the route is the subject. For a function shell it
+is not admission at all: the subject is the function's argument set moving together, so the record that admits a
+family has to be a **compositional** one. That is the shape the promotion increment will need — an arm naming the
+simultaneous combination, measured, in the place route evidence already lives.
+
+**The research classification of this cluster is closed**, and the promotable set is exactly two families. Promotion is
+a production increment of its own and is not part of this one: it needs the two families declared as typed leaves with
+the shell owned statically by their compositions, and the compositional arm above as their evidence.
+
+**State.** No production code moved. Gate 17/17, 498 unit tests, 87/87 behaviour arms, `tsc` clean.
