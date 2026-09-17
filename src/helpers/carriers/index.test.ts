@@ -52,6 +52,7 @@ const ANIMATIONS = payload(
   'animations',
   [
     'animation-name: var(--jumi-rotate-3zWYd-animation-name, var(--jumi-animation-name));',
+    'slot: rotate-3zWYd;',
     'interpolate-size: var(--jumi-interpolate-size);',
     '--jumi-animation-duration: 1s;',
   ].join(' '),
@@ -105,6 +106,75 @@ describe('the finalizer', () => {
     expect(out).not.toContain(stagingMarker)
   })
 
+  it('carries the slot at each position, and writes nothing of it', () => {
+    /**
+     * The one payload entry that is not a declaration.
+     *
+     * It states which **slot** each position belongs to, and nothing in the composition can stand in for it:
+     * `animation-name` is keyed by the *definition*, deliberately, because two names over identical frames
+     * share one keyframe and therefore one activation variable — so a named motion and an unnamed one over the
+     * same frames are the same characters in the same order. The finalizer used to recover the instance from
+     * the **head** of the timing chain instead, which made cascade order load-bearing for identity; building
+     * the component rung outermost then silently stopped every named motion on a constituent from animating.
+     *
+     * So the two facts are separated, and this asserts both halves of the separation: the instance reaches the
+     * right address, and the entry that told it so is **transport** — read here, never written.
+     */
+    const named = [
+      payload(
+        'animations',
+        [
+          'animation-name: var(--jumi-rotate-3zWYd-animation-name, var(--jumi-animation-name));',
+          'slot: 4-loop-3zWYd-rotate;',
+        ].join(' '),
+      ),
+      '.animate-rotate-45\\/loop {',
+      '  --jumi-rotate-3zWYd-animation-name: jumi-rotate-3zWYd;',
+      '  --jumi-4-loop-3zWYd-rotate-label: loop;',
+      '}',
+    ].join('\n')
+
+    const { css: out } = finalizeCss(named)
+
+    // The **instance**, not the definition, and the same name on both sides: the rule publishes under it and
+    // the composition reads it. Reading the definition here is what the old head-of-chain reader did whenever
+    // a rung sat in front of the slot link.
+    expect(out).toContain('--jumi-slot-4-loop-3zWYd-rotate:')
+    expect(out).toContain(
+      'animation: var(--jumi-slot-4-loop-3zWYd-rotate, none);',
+    )
+
+    const properties: string[] = []
+    postcss.parse(out).walkDecls(declaration => {
+      properties.push(declaration.prop)
+    })
+
+    expect(properties).not.toContain('slot')
+    expect(out).not.toContain(stagingMarker)
+  })
+
+  it('says so when a composition arrives with no position list', () => {
+    // The one way to reach this is a host supplying the aggregate: it holds the composition's lists, and the
+    // positions are a separate entry it has to stage beside them. Without them nothing can be placed — every
+    // named motion falls back to the shared chain and quietly loses the address its name installed — and the
+    // motion still runs, which is exactly why silence is the wrong answer here.
+    const listsOnly = payload(
+      'animations',
+      'animation-name: var(--jumi-rotate-3zWYd-animation-name, var(--jumi-animation-name));',
+    )
+
+    const { css: out, warnings } = finalizeCss(
+      [listsOnly, activation('.animate-rotate-45')].join('\n'),
+    )
+
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('no position list')
+
+    // What it warns about, stated as the output: nothing was placed, so the position is the chain itself.
+    expect(out).toContain('animation: var(--jumi-rotate-3zWYd-animation-name')
+    expect(out).not.toContain('--jumi-slot-rotate-3zWYd')
+  })
+
   it('separates the element-local defaults from the composition', () => {
     const { css: out } = finalizeCss(
       [ANIMATIONS, activation('.animate-rotate-45')].join('\n'),
@@ -130,6 +200,7 @@ describe('the finalizer', () => {
       'animations',
       [
         'animation-name: var(--jumi-fade-in-animation-name, var(--jumi-animation-name));',
+        'slot: fade-in;',
         'animation-duration: var(--jumi-slot-fade-in-animation-duration, var(--jumi-fade-in-animation-duration, var(--jumi-animation-duration)));',
         'animation-composition: var(--jumi-slot-fade-in-animation-composition, var(--jumi-fade-in-animation-composition, var(--jumi-animation-composition)));',
       ].join(' '),
@@ -190,7 +261,7 @@ describe('the finalizer', () => {
   it('leaves a motion nothing named reading its own slot', () => {
     const named = payload(
       'animations',
-      'animation-name: var(--jumi-fade-in-animation-name, var(--jumi-animation-name)); animation-duration: var(--jumi-slot-fade-in-animation-duration, var(--jumi-fade-in-animation-duration, var(--jumi-animation-duration)));',
+      'animation-name: var(--jumi-fade-in-animation-name, var(--jumi-animation-name)); slot: fade-in; animation-duration: var(--jumi-slot-fade-in-animation-duration, var(--jumi-fade-in-animation-duration, var(--jumi-animation-duration)));',
     )
 
     const { css: out } = finalizeCss(
@@ -429,9 +500,14 @@ describe('the finalizer', () => {
 
     const { css: out } = finalizeCss(css, { 'animation-name': 'var(--fresh)' })
 
+    // The aggregate replaces the composition's **lists**, and only those: the position list still says what
+    // each position is, so the replacement is placed on the activating rule like any other value rather than
+    // written where the composition stands. The aggregate's data governs either way — which is the claim —
+    // and the placing is what keeps a named motion's address on the rule that declared the name.
     expect(out).toContain(
-      'animation: var(--fresh) 0s linear 0s 1 normal none running;',
+      '--jumi-slot-rotate-3zWYd: var(--fresh) 0s linear 0s 1 normal none running;',
     )
+    expect(out).toContain('animation: var(--jumi-slot-rotate-3zWYd, none);')
     expect(out).not.toContain('var(--jumi-animation-name)')
     expect(out).not.toContain(stagingMarker)
   })

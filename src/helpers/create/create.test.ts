@@ -1086,6 +1086,16 @@ describe('the payload', () => {
     'animation-timing-function',
   ]
 
+  /**
+   * The one payload entry that is not a declaration.
+   *
+   * It says which **slot** each composition position belongs to, which the lists cannot: `animation-name`
+   * is keyed by the *definition*, so a named motion and an unnamed one over the same frames are the same
+   * characters in the same order. It is read by the finalizer and never written — see the transport note
+   * in `@/helpers/carriers`.
+   */
+  const transport = 'slot'
+
   // `sink.payload` writes `{ ':root': { [stagingMarker]: kind, … } }`, so every publication is one
   // `addBase` call and several accumulate: a later declaration wins, and nothing is ever retracted.
   /** Every payload rule published so far, in order. */
@@ -1161,12 +1171,12 @@ describe('the payload', () => {
       `var(--jumi-opacity-${id}-animation-name, var(--jumi-animation-name))`,
     )
 
-    // The payload is exactly the aggregate parts and nothing else. `interpolate-size` used to ride this
-    // channel as a real property; it does not any more, because it is **inherited** — written on a carrier
-    // it opts the whole descendant subtree in, and a child's own `width: 200px → auto` transition starts
-    // interpolating because an ancestor happens to animate. Measured, and this assertion is what stops it
-    // coming back.
-    expect(Object.keys(staged).sort()).toEqual([...parts].sort())
+    // The payload is the aggregate parts, plus the one entry that is **transport**: the slot at each
+    // position. `interpolate-size` used to ride this channel as a real property; it does not any more,
+    // because it is **inherited** — written on a carrier it opts the whole descendant subtree in, and a
+    // child's own `width: 200px → auto` transition starts interpolating because an ancestor happens to
+    // animate. Measured, and this assertion is what stops it coming back.
+    expect(Object.keys(staged).sort()).toEqual([...parts, transport].sort())
     expect(staged['interpolate-size']).toBeUndefined()
   })
 
@@ -1276,13 +1286,17 @@ describe('the payload', () => {
     const order = compositionFor([second, first])
     const appended = compositionFor([first, second])
 
-    // The whole composition, all eleven lists at once: `A → B → A` resolves to exactly
-    // what `B → A` would have. Comparing the composition rather than each list's
-    // entries is what makes the relationship atomic — and it is also the only
-    // way to state it for the lists whose entries are per-attribute rather than
-    // per-slot (`animation-composition` lists the same chain twice when one
-    // property has two slots, so its order is not observable at all).
-    expect(Object.keys(reregistered)).toHaveLength(parts.length)
+    // The whole composition, all eleven lists at once, plus the position entry that says which slot each
+    // position is: `A → B → A` resolves to exactly what `B → A` would have. Comparing the composition
+    // rather than each list's entries is what makes the relationship atomic — and it is also the only
+    // way to state it for the lists whose entries are per-attribute rather than per-slot
+    // (`animation-composition` lists the same chain twice when one property has two slots, so its order
+    // is not observable at all).
+    //
+    // The position entry belongs in the comparison for a reason of its own: it has to move with the lists,
+    // because a position is only meaningful as an index into them. A version that reordered the lists and
+    // left the positions behind would place every motion on the wrong slot.
+    expect(Object.keys(reregistered)).toHaveLength(parts.length + 1)
     expect(reregistered).toEqual(order)
     expect(reregistered).not.toEqual(appended)
 
@@ -1375,13 +1389,22 @@ describe('the payload', () => {
 
     expect(compositions).toHaveLength(mutations.length + 1)
 
-    // And a payload is bounded — one declaration per longhand, whatever the slot count. The lists get
-    // longer; the payload does not get bigger. This is the property the linked representation existed to
-    // provide, and stating it here means a change that reintroduces per-slot publication fails loudly
-    // rather than quietly growing the stylesheet.
-    for (const entry of compositions) {
-      expect(Object.keys(entry)).toHaveLength(parts.length)
-    }
+    // And a payload is bounded — one declaration per longhand, plus the one position list when there is a
+    // position to name. The lists get longer; the payload does not get bigger. This is the property the
+    // linked representation existed to provide, and stating it here means a change that reintroduces
+    // per-slot publication fails loudly rather than quietly growing the stylesheet.
+    for (const entry of compositions)
+      expect(Object.keys(entry).length).toBeLessThanOrEqual(parts.length + 1)
+
+    // The strongest case is the last, with fifteen slots in the lists: still one entry per longhand plus the
+    // single position list.
+    expect(Object.keys(compositions.at(-1) ?? {})).toHaveLength(
+      parts.length + 1,
+    )
+
+    // And the construction publication, which has no slots at all, must not invent a position: the
+    // composition with nothing registered is one position per longhand and no instance to name.
+    expect(transport in (compositions[0] ?? {})).toBe(false)
   })
 })
 

@@ -52,6 +52,21 @@ export const instanceKey = (attribute: string, id: string, name: string) =>
   `${emitted(name).length}-${name}-${id}-${attribute}`
 
 /**
+ * A slot key as it appears **inside an emitted variable name** — `8-foo\.bar-d38-scale`.
+ *
+ * This is the form every reader has, and therefore the form two keys are compared in: `instanceKeys` reads
+ * it out of a rule's own declarations, and the composition publishes one per position, so the two sides can
+ * be matched without either parsing the other. Nothing is decoded, because nothing has to be — the same text
+ * on both sides is the whole comparison.
+ *
+ * The escaping is `emitted`'s, applied to the prefix a Jumi variable carries. A key is never at position 0
+ * of the string that ships — it is always behind `--jumi-…` — so the leading-character rule `emitted` guards
+ * against cannot apply to it, and this is the text the compiler will write.
+ */
+export const instanceText = (key: string) =>
+  emitted(`--jumi-${key}`).slice('--jumi-'.length)
+
+/**
  * The triple a named instance key spells, or null when the key is not one.
  *
  * Takes **emitted** text: the key as it appears inside a variable name, escaped, because that is what a

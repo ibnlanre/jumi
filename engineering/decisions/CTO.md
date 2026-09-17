@@ -508,3 +508,70 @@ bodies.
 D.2 now starts from a baseline where "typed constituent definitions are value-free and reusable across
 authored values" is independently true and independently gated, which is what makes the broader question
 askable: can that per-leaf model support the second family and the rest of the typed execution surface?
+
+## 2026-09-17 — instance identity travels as data, and the timing chain keeps its precedence
+
+A **named** motion on a composite constituent stopped animating entirely — `animation-name: none`, zero
+instances — and the first suspect was wrong. It looked like the typed-leaf migration; the arms that
+reproduced it were `blur` and `skew-x`, which have no typed leaves at all. Bisecting `cee40e2..38412b5`
+named `3b15b84` ("make the timing chain resolve from the component address first"), and the emitted diff
+was unambiguous: the `--jumi-slot-<key>` hoist disappeared and the position read fell back to `none`.
+
+The cause was a **coupling**, not a fault in either half. The pass recovered which *instance* a composition
+position belonged to by matching the **head** of that position's timing entry
+(`^var\(\s*--jumi-slot-<count>-…`). So `component → slot → property → global` and *this position is instance
+K* were one fact, and `component`-outermost displaced the slot link: every position read as the
+*definition*, no hoist was published, and the motion vanished. Taking the reorder as the repair would have
+paid for an implementation constraint with cascade precedence — **ruled against**, and the two facts were
+separated instead:
+
+```text
+component → addressed instance → property → global     the chain states precedence, and keeps it
+the slot at each position, published as data           identity, matched as text, never parsed
+```
+
+`linkedSlot` and `referencedSlot` are **deleted** — this supersedes the 2026-09-15 call to keep `linkedSlot`
+explicit about the part. The composition publishes the slot at each position (payload entry `slot`, in the
+same publication as the lists it indexes, so the two cannot arrive out of step) and `hoist` matches it
+against `instanceKeys`. Both sides are produced by `instanceText`, so identity is a comparison of identical
+text and nothing is reconstructed from an expression's shape.
+
+The edge that justifies carrying it structurally: a slot whose name was **refused** or **shadowed**
+(`animate-rotate-45/scale`) keeps the name in its *key* while publishing under its **definition** —
+`rotate-3zWYd`, not `5-scale-3zWYd-rotate`. Slot key and published key are not always the same string, so
+treating the instance key as canonical would have been wrong. `publishedKey` states the rule, and behaviour
+arm `f` is what caught its absence.
+
+Transport is staging-only by construction: read by `hoist`, skipped by the emission loop through an explicit
+`TRANSPORT` set, asserted by a unit test that no `slot:` declaration ships, and reported by a warning when a
+composition arrives with activators and no position list — a failure that would otherwise lose every address
+silently while the motion still ran.
+
+### Call
+
+> **Instance identity must travel as model data; it must not be reconstructed from the shape or ordering of
+> serialized CSS expressions. Preserve `component → addressed instance → property → global`; move the
+> plumbing, not the contract. Keep the slot publication staging-only, and keep the no-shipped-transport
+> assertion. Do not file the corner issue.**
+
+Held to that. The **falsification triangle** closes the precedence question rather than relocating the
+regression, and its three arms fail in different directions: a named constituent phrase animates, the
+`/part` control **beats** the name, and the name is still reachable when no part control is set. A repair
+that pushed the label outward passes the first and third; one that searched the chain for a slot-shaped
+`var()` passes the first and second and is the coupling being removed. 79/79 contexts and carriers behave,
+17/17 stages.
+
+**Cost, measured rather than asserted.** The shipped stylesheet is **byte-identical** — `snapshot.css`
+unchanged, `publishEvents` unchanged at 44/21 — because the entry rides the publication that already
+existed. Only `rawBytes` and `stagingBytes` grow, by 2.1%, and both are deleted before anything ships, so the
+recorded structure is re-recorded deliberately. The version that gave the entry a payload kind of its own
+cost an emptied `@layer base` and +16 shipped bytes, which is why it is not the version that landed.
+
+**A finding withdrawn.** The "corner" case that appeared to fail before the regression
+(`animate-border-radius-top-left-…/drift`) does not exist. The attribute is `border-top-left-radius`, and the
+spelling in the arm was never a candidate, so it emitted no rule and read zero instances at *every* revision
+including the pre-regression baseline; correctly spelled it animates, named and unnamed. It is a measurement
+artefact rather than a defect, so it is withdrawn from the narrative rather than carried as a known-bad
+baseline, and it is not filed.
+
+D.2 lands **after** this, with its own acceptance book and no timing-infrastructure change mixed in.

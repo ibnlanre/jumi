@@ -166,6 +166,32 @@ const stagedEntry = (prop: string) => {
 }
 
 /**
+ * The payload entry that says which **slot** each composition position belongs to.
+ *
+ * It rides in the `animations` payload rather than a kind of its own, and that is a decision about atomicity
+ * rather than about tidiness: a position is only meaningful beside the lists it indexes, and two publications
+ * are two chances to arrive out of step. This is the same payload, read in the same pass, consumed at the same
+ * moment.
+ *
+ * It is **transport** — read here, never written — which is why `TRANSPORT` exists.
+ */
+const POSITIONS = 'slot'
+
+/**
+ * Payload entries that are read by this pass and never written to the composition.
+ *
+ * Every other entry in the payload becomes a declaration, because every other entry *is* one: a longhand is a
+ * part of the composition, and a custom property is a default the element resolves through. This one is
+ * neither — it says what the composition's positions are, which is not something a browser applies — so it is
+ * the one name the emission loop skips.
+ *
+ * Named as a set rather than an inline comparison so that "the payload carries entries that are not
+ * declarations" is one statement a reader can find, and `behaviour-check.mjs` asserts the consequence: no
+ * `slot` declaration reaches a stylesheet.
+ */
+const TRANSPORT = new Set([POSITIONS])
+
+/**
  * What activates a composition: a rule that declares the generated variable a slot is named by.
  *
  *   .animate-rotate-45 { --jumi-rotate-3zWYd-animation-name: jumi-rotate-3zWYd; … }
@@ -355,74 +381,32 @@ const namedHoist = (
   )
 }
 
-/** The slot a composition entry reads, or null when the entry is not a slot reference. */
-const referencedSlot = (entry: string) => {
-  // The same matched-not-prefixed reading as `linkedSlot`, and found the same way — by measuring rather
-  // than by looking: with whitespace inside the parens this reader answered null for every position, so
-  // the instances that fall back to the definition's key lost their hoist entirely.
-  const match = /^var\(\s*--jumi-(.+?)-animation-name\b/.exec(entry.trim())
-
-  return match ? match[1] : null
-}
-
 /**
- * The **instance** a chain entry addresses, when the author named one.
+ * Why nothing here reads the instance out of a chain any more.
  *
- * Every part of a named motion carries `--jumi-slot-<instance>-<part>` as its outermost link, and
- * that is the only place the instance appears in the aggregate. `animation-name` is deliberately not
- * that place: it is keyed by the definition, because two names over identical frames share one
- * keyframe and therefore one activation variable. Reading the slot from the name alone collapsed two
- * instances onto one — measured, `…/enter` with `200ms/enter` beside `…/exit` with `1800ms/exit`
- * resolved `1.8s, 1.8s`, both positions reading the single hoist the last position won.
+ * The instance used to be recovered from the **text** of a position's timing entry: the addressed slot link
+ * was written outermost, so `^var\(\s*--jumi-slot-<count>-…` read it off the head. That made two questions
+ * one question — *which instance does this position belong to* and *where does a rung sit in the fallback
+ * chain* — and they are not the same fact.
  *
- * The part is **given**, and the key is read by its own length prefix.
+ * Building the component scope outermost, so `animation-duration-3000/scale-x` could time a part phrase, moved
+ * the slot link out of the head and **every** named motion on a constituent stopped animating: the pass read
+ * the position as the definition, published no hoist, and the element resolved `animation-name: none` with
+ * zero instances. Measured on `blur`, which has no typed leaves at all — the first suspect was the typed-leaf
+ * work, and it was innocent.
  *
- * Both halves of that are corrections to a reader that guessed. An instance name may read like a part —
- * `flick-animation-duration` is legal, and `behaviour-check.mjs` arm `n` is exactly it — so scanning for the
- * first part-shaped suffix inside the variable read `flick` out of it, published the hoist under a key nothing
- * activates, and the motion silently never ran. Handing the part in removes the guess; the prefix removes the
- * need for one, because the name's end is stated rather than searched for. What is left is arithmetic: the
- * digits say how many units the name occupies, the id runs to the next hyphen, and the attribute is what
- * remains before the part.
+ * Restoring the reader by moving the rung back inside would have paid for an implementation constraint with
+ * cascade precedence, and precedence is the author-facing fact of the two. So the instance travels as **data**:
+ * the composition publishes the slot at each position (`--jumi-staging-positions-slot`), and `hoist` matches
+ * those against `instanceKeys` — produced by the same `instanceText`, so the two sides are the same text and
+ * nothing is parsed.
+ *
+ * Three corrections were made to the readers this replaces, and every one of them was a fix to the *shape of
+ * the text*: a part-shaped instance name read `flick` out of `flick-animation-duration`; a space just inside
+ * the parens made the head test miss; and a lazy attribute swallowed the fallback that carries the same part
+ * again. None can recur, because there is no text to read. The arms that recorded them — `n`, `o` and
+ * `padded-parens` — stay, and now hold the data path instead.
  */
-const linkedSlot = (entry: string, part: string) => {
-  const text = entry.trim()
-  // Matched rather than prefixed, for the same reason the swaps are patterns: whitespace just inside the
-  // parens is legal, so `var( --jumi-slot-…` is the same link and a prefix test read no instance off it —
-  // the hoist was then published under the definition's key and every name-keyed control reached nothing.
-  // Measured as arm `padded-parens` in `serialize-differential.mjs`, which is where it surfaces.
-  const opened = /^var\(\s*--jumi-slot-/.exec(text)
-
-  if (!opened) return null
-
-  const body = text.slice(opened[0].length)
-  const cut = body.indexOf('-')
-
-  if (cut < 1) return null
-
-  const count = Number(body.slice(0, cut))
-
-  if (!Number.isSafeInteger(count) || count < 1) return null
-
-  const rest = body.slice(cut + 1)
-  const name = rest.slice(0, count)
-
-  if (name.length !== count) return null
-
-  // The attribute is **lazy** and the part is anchored: the first occurrence of the part that ends a variable
-  // name is the variable's own, and the chain carries the same part again inside its fallback copy
-  // (`… -animation-duration, var(--jumi-rotate-animation-duration, …)`), where a greedy attribute would run
-  // past it and swallow the fallback — measured, arm `o` in `behaviour-check.mjs` read the whole chain as an
-  // attribute and published the hoist under a key that filled nothing. Nothing inside an attribute can look
-  // like the end of one either: a vocabulary attribute holds no comma, paren or whitespace of its own.
-  const match = new RegExp(
-    `^-(?<id>[^-]+)-(?<attribute>.+?)-${part}(?=[,)\\s])`,
-  ).exec(rest.slice(count))
-
-  return match?.groups
-    ? `${count}-${name}-${match.groups.id}-${match.groups.attribute}`
-    : null
-}
 
 /**
  * Split a comma-separated value on its top-level commas.
@@ -849,36 +833,41 @@ const segmentSelections = (root: Root) => {
   return selected
 }
 
+/**
+ * Move the aggregate's per-position chains onto the rules that activate them.
+ *
+ * `slots` is the payload's `positions` list — the slot each position belongs to, position-aligned with the
+ * lists and published by the composition that built them. It is passed in rather than read off the chains
+ * because the instance and the precedence order are different facts, and only one of them is the author's:
+ * see the note above on why the text reader is gone.
+ */
 const hoist = (
   staged: Collection<string>,
   rules: Rule[],
   selected: ReadonlyMap<string, string>,
+  slots: ReadonlyArray<string>,
 ) => {
   const entries = Object.fromEntries(
     SHORTHAND.map(part => [part, splitTopLevel(staged[part] ?? '')]),
   )
-  const positions = entries['animation-name'].map((entry, position) => {
-    // The instance first, the definition only as a fallback: a name is what distinguishes two
-    // motions that share one keyframe, and only a named part carries it.
-    const slot =
-      linkedSlot(
-        entries['animation-duration']?.[position] ?? '',
-        'animation-duration',
-      ) ?? referencedSlot(entry)
 
-    return slot
-      ? {
-          position,
-          slot,
-          value: SHORTHAND.map(
-            part => entries[part][position] || FALLBACK[part],
-          ).join(' '),
-        }
-      : null
-  })
+  /**
+   * The slot at each position, or `null` where the composition named none.
+   *
+   * A sheet with no slots publishes the ten shared fallbacks as **one** position and no keys — the single
+   * shape with no instance to name — and a position past the end of the list is the same absence, so both
+   * fall back to the shared chain rather than to an address nothing fills.
+   */
+  const at = entries['animation-name'].map(
+    (_, position) => slots[position] ?? null,
+  )
+
+  const valueAt = (position: number) =>
+    SHORTHAND.map(part => entries[part][position] || FALLBACK[part]).join(' ')
+
   const known = new Map(
-    positions.flatMap(entry =>
-      entry ? [[entry.slot, entry.value] as const] : [],
+    at.flatMap((slot, position) =>
+      slot ? [[slot, valueAt(position)] as const] : [],
     ),
   )
 
@@ -954,13 +943,9 @@ const hoist = (
     }
   }
 
-  return positions
-    .map((entry, position) =>
-      entry
-        ? `var(${hoistedName(entry.slot)}, none)`
-        : SHORTHAND.map(part => entries[part][position] || FALLBACK[part]).join(
-            ' ',
-          ),
+  return at
+    .map((slot, position) =>
+      slot ? `var(${hoistedName(slot)}, none)` : valueAt(position),
     )
     .join(', ')
 }
@@ -1226,6 +1211,15 @@ export function finalize(
     // this pass already paid for once on the element side.
     const selected = segmentSelections(root)
 
+    // A composition with activators and no position list cannot place anything: every named motion would
+    // quietly lose its address and fall back to the shared chain — the motion still runs, which is exactly
+    // why silence here is the wrong answer. It is a protocol error rather than a stylesheet one, and the only
+    // way to make it is for a host to supply the aggregate without the `slot` entry the model publishes.
+    if (kind === 'animations' && rules?.length && !staged[POSITIONS])
+      finalized.warnings.push(
+        'the animations payload carries a composition but no position list, so no slot can be placed on the rules that activate it. A host supplying the aggregate must stage `slot` beside the lists.',
+      )
+
     const hoisted =
       kind === 'animations'
         ? hoist(
@@ -1235,6 +1229,7 @@ export function finalize(
               ...new Set(stagedTransitions.map(entry => entry.rule)),
             ],
             selected,
+            staged[POSITIONS] ? splitTopLevel(staged[POSITIONS]) : [],
           )
         : null
     const { aggregate, substrate } = data[kind]
@@ -1268,6 +1263,13 @@ export function finalize(
       }
 
       for (const [name, value] of Object.entries(staged)) {
+        // Transport first, and as a statement of its own, because it is a different reason from the three
+        // below: they are declarations the composition writes somewhere else, and this one is not a
+        // declaration at all. It has been read by now — `hoist` matched it against the rules — and writing it
+        // would put a `slot:` property into every activating rule, which no browser applies and no author
+        // asked for.
+        if (TRANSPORT.has(name)) continue
+
         if (
           name.startsWith('--') ||
           SHORTHAND.includes(name) ||

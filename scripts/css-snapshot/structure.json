@@ -16,8 +16,8 @@
     "supports": 5,
     "transitions": 1,
     "publishEvents": 44,
-    "rawBytes": 967367,
-    "stagingBytes": 924659,
+    "rawBytes": 986859,
+    "stagingBytes": 944151,
     "colorValues": {
       "literal": 6,
       "token": 7
@@ -45,8 +45,8 @@
     "supports": 5,
     "transitions": 0,
     "publishEvents": 21,
-    "rawBytes": 223232,
-    "stagingBytes": 204455,
+    "rawBytes": 227385,
+    "stagingBytes": 208608,
     "colorValues": {
       "literal": 2,
       "token": 2

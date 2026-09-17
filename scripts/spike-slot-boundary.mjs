@@ -388,11 +388,15 @@ try {
 /* ────────────────────────────────────────────────────────────────────────────────────────────────────
  * 4 · The part suffix, which is what makes the variable and not just the key
  *
- * A slot variable is `--jumi-slot-<key>-<part>`. A reader is either handed the part — which is what
- * `linkedSlot(entry, part)` does today, after a guessed suffix read `flick` out of a name of
- * `flick-animation-duration` and published the hoist under a key that nothing fills — or it strips a part
- * from the end. Stripping is decidable exactly when no two `attribute-part` strings are equal, which is a
- * fact about the vocabulary and the part list rather than about any name.
+ * A slot variable is `--jumi-slot-<key>-<part>`. A reader is either handed the part or it strips a part from
+ * the end — and stripping is decidable exactly when no two `attribute-part` strings are equal, which is a fact
+ * about the vocabulary and the part list rather than about any name. That is what this section measures.
+ *
+ * The question is **historical** for the finalizer: the reader that had to be handed the part was
+ * `linkedSlot(entry, part)`, removed 2026-09-17 when instance identity moved onto the payload. It was handed
+ * the part because a guessed suffix had read `flick` out of a name of `flick-animation-duration` and published
+ * the hoist under a key that nothing fills. The measurement stands as the record of why reading a part out of a
+ * variable at all is the trap.
  * ────────────────────────────────────────────────────────────────────────────────────────────────── */
 
 console.log(

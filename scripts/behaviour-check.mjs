@@ -699,12 +699,16 @@ const NAMED_ARMS = [
     'm',
     'animate-rotate-[0:0deg|100:90deg]/alpha animate-rotate-[0:0deg|100:90deg]/beta animation-timing-function-[0:step-start]/alpha animation-timing-function-[0:step-end]/beta animation-duration-1000',
   ],
-  // A name that reads like a section of the shorthand. The slot key spells the name first, so an instance
-  // may legitimately be called `flick-animation-duration` — and the pass reads the instance out of the
-  // staged chain, where the key is followed by `-animation-duration` of its own. A reader that takes the
-  // first part-shaped suffix inside the variable reads `flick`, publishes the hoist under a key nothing
-  // activates, and the motion still runs: only the control goes missing, silently. This is the arm that
-  // would catch it, and it is why `linkedSlot` is handed the part instead of guessing it.
+  // A name that reads like a section of the shorthand. The slot key spells the name first, so an instance may
+  // legitimately be called `flick-animation-duration` — and the pass has to tell that name from the part that
+  // follows it in the variable. The reader that used to do so read the instance out of the staged **chain**,
+  // and one that took the first part-shaped suffix inside the variable read `flick`, published the hoist under
+  // a key nothing activates, and left the motion running with only its control missing — silently.
+  //
+  // That reader is gone (2026-09-17: the instance travels as data, see the note above `hoist`), so the guess
+  // cannot recur in that form. The arm stays because the hazard it names is unchanged in its new one: the key
+  // still spells the name, the rule still answers to the definition, and `publishedKey` has to produce exactly
+  // the string the rule declared.
   [
     'n',
     'animate-scale-110/flick-animation-duration animation-duration-600/flick-animation-duration',
@@ -2162,6 +2166,140 @@ const reuse = [
 
 for (const [claim, ok] of reuse) if (!ok) failures.push(`reuse: ${claim}`)
 
+/* ------------------------------------------------------------------------------------
+ * 18. Timing precedence and instance identity are two separate facts (added 2026-09-17).
+ * ---------------------------------------------------------------------------------- */
+
+// Found by bisecting a *named* constituent phrase that had stopped animating, and the culprit was not the
+// typed-leaf work it was first blamed on — the arms below are on `backdrop-filter-blur`, which has no typed
+// leaves at all. The pass used to work out which *instance* a composition position belonged to by reading the
+// **head** of that position's timing entry, because the addressed slot link was written outermost there. So
+// `component → slot → property → global` and `this position is instance K` were one fact, and the chain's order
+// was load-bearing for something it has nothing to do with. Building the component rung outermost — so a
+// `/part` control could time a part phrase at all — moved the slot link off the head, the pass read the
+// position as the *definition*, no hoist was published, and the element read `animation-name: none` with zero
+// live animations: measured against the identical phrase **unnamed**, which ran.
+//
+// The repair is **not** to reorder the chain. Precedence is the author-facing fact of the two — a control
+// naming the part is narrower than one naming the property, and a name is a rung inside both — so the reader
+// was changed to stop inferring, and the instance now travels as data: the composition publishes the slot at
+// each position (`--jumi-staging-positions-slot`) and the pass matches it against what each rule declares.
+// See the note above `hoist` in `@/helpers/carriers`.
+//
+// That gives a **falsification triangle**, and all three arms are needed because they fail in different
+// directions. A repair that moves the label outward passes the first and third and fails the second; a
+// repair that reads the instance by searching the chain passes the first and second and is exactly the
+// coupling this section exists to refuse. The pair in the first two arms is what makes the third feasible at
+// all: the unnamed element is the control which says the labelled one's silence was a regression rather than
+// an unsupported shape, and both constituents are covered, one typed and one not.
+const timingChains = async ({ body, candidates, ids = ['a', 'b'] }) => {
+  const css = finalizeCss(
+    (await compiler(constituentEntry, root)).build(candidates),
+  ).css
+
+  const page = await load(css, body)
+
+  // The element's own animations, unfiltered, and **not** matched by name prefix. A definition's name is
+  // either the attribute plus a hash (`jumi-scale-1vrwYE`) or the component (`jumi-scale-x`), so a prefix
+  // test is a guess about which route a candidate took — and `none` is not an animation at all, so a count
+  // of the element's live animations is the whole assertion.
+  const reading = await page.evaluate(
+    ({ ids }) =>
+      Object.fromEntries(
+        ids.map(id => {
+          const element = document.getElementById(id)
+
+          if (!element) return [id, { count: 0, duration: '', names: '' }]
+
+          const style = getComputedStyle(element)
+
+          return [
+            id,
+            {
+              count: element.getAnimations().length,
+              duration: style.animationDuration,
+              names: style.animationName,
+            },
+          ]
+        }),
+      ),
+    { ids },
+  )
+
+  await page.close()
+
+  return { css, reading }
+}
+
+const BLUR = 'animate-backdrop-filter-blur-[0:1px|100:5px]'
+const SCALE_X = 'animate-scale-x-[0:1|100:5]'
+const PART_CONTROL = 'animation-duration-3000/backdrop-filter-blur'
+const NAME_CONTROL = 'animation-duration-400/drift'
+
+const blurPair = await timingChains({
+  body: `<div id="a" class="${BLUR}/drift"></div><div id="b" class="${BLUR}"></div>`,
+  candidates: [`${BLUR}/drift`, BLUR],
+})
+
+const scalePair = await timingChains({
+  body: `<div id="a" class="${SCALE_X}/drift"></div><div id="b" class="${SCALE_X}"></div>`,
+  candidates: [`${SCALE_X}/drift`, SCALE_X],
+})
+
+const partOnly = await timingChains({
+  body: `<div id="a" class="${BLUR}/drift ${PART_CONTROL}"></div>`,
+  candidates: [`${BLUR}/drift`, PART_CONTROL],
+  ids: ['a'],
+})
+
+const bothControls = await timingChains({
+  body: `<div id="a" class="${BLUR}/drift ${NAME_CONTROL} ${PART_CONTROL}"></div>`,
+  candidates: [`${BLUR}/drift`, NAME_CONTROL, PART_CONTROL],
+  ids: ['a'],
+})
+
+const nameOnly = await timingChains({
+  body: `<div id="a" class="${BLUR}/drift ${NAME_CONTROL}"></div>`,
+  candidates: [`${BLUR}/drift`, NAME_CONTROL],
+  ids: ['a'],
+})
+
+const chains = [
+  [
+    'a named phrase on an untyped constituent animates',
+    blurPair.reading.a.count >= 1,
+    `${blurPair.reading.a.count} instances, names [${blurPair.reading.a.names}]`,
+  ],
+  [
+    'and the identical phrase unnamed animates, so the label is the only difference',
+    blurPair.reading.b.count >= 1,
+    `${blurPair.reading.b.count} instances, names [${blurPair.reading.b.names}]`,
+  ],
+  [
+    'a named phrase on a composed constituent animates, which is the typed-leaf route',
+    scalePair.reading.a.count >= 1,
+    `${scalePair.reading.a.count} instances, names [${scalePair.reading.a.names}]`,
+  ],
+  [
+    'the /part control reaches a named part phrase, so the rung is not dead weight',
+    partOnly.reading.a.duration === '3s',
+    `read ${partOnly.reading.a.duration}`,
+  ],
+  [
+    'and the component wins over the name, which is the precedence the chain states',
+    bothControls.reading.a.duration === '3s',
+    `read ${bothControls.reading.a.duration}`,
+  ],
+  [
+    'while the name is still reachable on its own, so neither control is swallowed',
+    nameOnly.reading.a.duration === '0.4s',
+    `read ${nameOnly.reading.a.duration}`,
+  ],
+]
+
+for (const [claim, ok, detail] of chains)
+  if (!ok) failures.push(`chains: ${claim} — ${detail}`)
+
 await browser.close()
 
 /* ------------------------------------------------------------------------------------
@@ -2272,10 +2410,18 @@ for (const [claim, ok, detail] of reuse)
     `    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`,
   )
 
+console.log('\n  instance identity, apart from timing precedence')
+
+for (const [claim, ok, detail] of chains)
+  console.log(
+    `    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`,
+  )
+
 // Every assertion above that can fail, so the summary line is the count it claims to be: the three
 // activation contexts, the pseudo substrate, the direct carriers, bare, applied, spacing, radius,
 // the three relationship-variant cases, non-inheritance, the six composed sets, the five typed
-// composition curves section 16 adds, and the four definition-reuse arms section 17 adds.
+// composition curves section 16 adds, the four definition-reuse arms section 17 adds, and the six
+// timing-chain arms section 18 adds.
 const required =
   contexts.length +
   utilities.length +
@@ -2288,7 +2434,8 @@ const required =
   radius.length +
   urls.length +
   typed.length +
-  reuse.length
+  reuse.length +
+  chains.length
 const passing = required - failures.length
 
 console.log(`\n  ${passing}/${required} required contexts and carriers behave`)

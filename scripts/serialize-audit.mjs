@@ -336,20 +336,15 @@ const registry = [
     structural: 'same as above: the parts are entries here too',
     symbol: 'namedHoist',
   },
-  tolerant(
-    carriers,
-    'referencedSlot',
-    '.exec(entry.trim())',
-    'the slot a composition entry addresses',
-    'matched, not prefixed — `\\s*` inside the parens — after measuring that a prefix test dropped every position',
-  ),
-  tolerant(
-    carriers,
-    'linkedSlot',
-    '.exec(text)',
-    'the instance a staged entry addresses, read from its length prefix',
-    'matched, not prefixed, for the same measured reason; the rest of the parse is arithmetic, not a search',
-  ),
+  // `referencedSlot` and `linkedSlot` were both registered here, and they are **removed rather than
+  // re-classed**. Each recovered a position's instance out of the **text** of its timing chain — the
+  // definition from the `animation-name` fallback, the instance from the length prefix on the slot link —
+  // which is why this audit had to care how a sheet spaced its parens, and why three of its entries were
+  // written after a reader got the shape of the text wrong.
+  //
+  // The instance now travels as data: the composition publishes the slot at each position (`slot`, in the
+  // payload) and `hoist` matches it against what each rule declares. There is nothing left to match against
+  // a serialized string, so the entries go because the coupling goes.
   safe(
     carriers,
     'namedHoist',

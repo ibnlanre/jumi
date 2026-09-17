@@ -11,7 +11,12 @@ import type {
 } from '@/types'
 
 import { assemble } from '@/helpers/assemble'
-import { instanceKey, parseInstanceKey } from '@/helpers/carriers/instance'
+import {
+  instanceDefinition,
+  instanceKey,
+  instanceText,
+  parseInstanceKey,
+} from '@/helpers/carriers/instance'
 import { css } from '@/helpers/css'
 import { join } from '@/helpers/join'
 import { merge } from '@/helpers/merge'
@@ -884,11 +889,18 @@ export function createJumiModel({
     nameVar?: string,
     key?: string,
   ): CssInJs {
-    // At most five links, narrowest first: the **component** the motion addresses, the label or slot a
-    // name wrote, the range variant's publication, the property's control, then the global default.
-    // Folded from the inside out, so the most specific link is outermost and each one falls through to
-    // the next — which is what keeps a `/rotate` control on a wrapper reaching a descendant, since the
-    // property scope is a rung rather than the only link.
+    // At most five links, narrowest first: the **component** the motion addresses, the label or slot a name
+    // wrote, the range variant's publication, the property's control, then the global default. Folded from the
+    // inside out, so the most specific link is outermost and each one falls through to the next — which is what
+    // keeps a `/rotate` control on a wrapper reaching a descendant, since the property scope is a rung rather
+    // than the only link.
+    //
+    // The order is a **cascade** decision and nothing else. Where a position sits in this chain and which
+    // instance that position belongs to are two different facts, and they are now kept apart: the payload
+    // publishes the slot at each position (`positions`), so the pass reads identity from data and is free of
+    // this order entirely. It used to read the instance off the head of the chain, which made one fact of two —
+    // and building the component rung outermost then silently stopped **every** named motion on a constituent
+    // from animating, because the head was no longer a slot link.
     const timing = (part: string) => {
       const links: string[] = []
 
@@ -900,6 +912,12 @@ export function createJumiModel({
        * delay and easing read the *property* scope, so the control reached nothing. A motion that is
        * independently named and not independently timed is internally inconsistent, and that is the
        * whole of this rung.
+       *
+       * Outermost rather than merely present, and that is precedence rather than plumbing: a control naming
+       * the **part** is more specific than one naming the property, and a part phrase's slot key is a hash of
+       * its frames (`scale-1vrwYE`), which no control can write — while `/scale-x` writes this scope by
+       * construction. The element-local label is still a rung inside it, so a name keeps its locality: the
+       * label is registered `inherits: false` on the rule that named the motion, while this scope cascades.
        *
        * Made only when the slot addresses **exactly one** component. A slot several candidates share
        * — the composed `scale` slot both a `scale-x` and a `scale-y` tween join — has no single
@@ -1049,9 +1067,14 @@ export function createJumiModel({
     return slots
   }
 
-  function computeAnimationVariable(): CssInJs {
-    const slots = computeSlots()
-
+  /**
+   * The composition's lists, for a slot order the caller already holds.
+   *
+   * Takes the order rather than recomputing it, because two things are published from one build of it — the
+   * lists, and the slot at each position — and a second `computeSlots()` would be a second chance for them to
+   * disagree about a position, which is the one thing that must not happen between those two.
+   */
+  function composeAnimation(slots: ReadonlyArray<Slot>): CssInJs {
     // One animation per slot, written as longhand sub-property LISTS. Chromium
     // re-parses the `animation` shorthand when var() chains resolve inside it,
     // and shuffles values between slots: a fill-mode keyword lands in
@@ -1096,6 +1119,10 @@ export function createJumiModel({
     return animation
   }
 
+  function computeAnimationVariable(): CssInJs {
+    return composeAnimation(computeSlots())
+  }
+
   /** Every longhand a slot contributes an entry to. */
   const aggregateParts = [...slotParts, 'animation-name']
 
@@ -1112,14 +1139,65 @@ export function createJumiModel({
    * makes it safe to publish the data away from the element it belongs to — a rule nothing
    * consumes cannot be wrong.
    */
-  const animationPayload = (): Collection<string> => {
-    const lists = computeAnimationVariable()
+  const animationPayload = (slots: ReadonlyArray<Slot>): Collection<string> => {
+    const lists = composeAnimation(slots)
 
-    return Object.fromEntries([
-      ...aggregateParts
-        .filter(part => typeof lists[part] === 'string')
-        .map(part => [part, lists[part] as string]),
-    ])
+    return {
+      ...Object.fromEntries(
+        aggregateParts
+          .filter(part => typeof lists[part] === 'string')
+          .map(part => [part, lists[part] as string]),
+      ),
+      ...positionEntry(slots),
+    }
+  }
+
+  /**
+   * The slot each composition position belongs to, position-aligned with the lists above.
+   *
+   * The one fact the lists cannot carry and the far end cannot recover: `animation-name` is keyed by the
+   * **definition**, deliberately, because two names over identical frames share one keyframe and therefore
+   * one activation variable. So the instance is nowhere in the composition's text — a named motion and an
+   * unnamed one over the same frames are the same characters in the same order.
+   *
+   * It used to be read back out of the timing chain, by requiring the addressed slot link to be the
+   * outermost link of every entry — which made *where a rung sits* and *which instance a position means*
+   * one fact, and left the reader free to be broken by any change to precedence. It was: see the note above
+   * `hoist` in `@/helpers/carriers`.
+   *
+   * Keyed by `instanceText`, the same spelling `instanceKeys` reads out of a rule's own declarations, so the
+   * two sides are compared as text and neither one parses the other.
+   *
+   * Which key, though, is not always the one the slot holds. A slot whose name was **refused** — or was a
+   * structural address, `animate-rotate-45/scale` naming a motion `scale` — still carries the name in its key,
+   * because the instance is genuinely a different motion from its unnamed sibling. But no address was
+   * installed for it, so no rule declares a label for it, and `instanceKeys` answers with the **definition**:
+   * `rotate-3zWYd`, not `5-scale-3zWYd-rotate`. The composition has to read the same name the rule publishes
+   * under, so that is what this states. It is the one case where the two differ, and it is a property of the
+   * slot rather than of the rule, which is why the model can answer it and the pass cannot.
+   *
+   * It rides in the `animations` payload rather than a kind of its own, and that is a decision about atomicity
+   * rather than about tidiness: a position is only meaningful beside the lists it indexes, and two publications
+   * are two chances to arrive out of step. The pass reads it in the same walk, at the same moment, and treats
+   * it as **transport** — one name it consumes and never writes.
+   */
+  const positionEntry = (slots: ReadonlyArray<Slot>): Collection<string> =>
+    slots.length
+      ? { slot: slots.map(({ key }) => publishedKey(key ?? '')).join(', ') }
+      : {}
+
+  /**
+   * The name a position is addressed by, as the rule that activates it spells it.
+   *
+   * `instanceText` first, because every comparison on the far side is against text a rule declared. An
+   * addressed slot keeps its own key; anything else is named by its definition, so the name is stripped back
+   * off — and a key that never spelled one (`rotate-3zWYd`, `scale-d38`) is its own definition already, which
+   * is what the `??` covers.
+   */
+  const publishedKey = (key: string) => {
+    const text = instanceText(key)
+
+    return addressed.has(key) ? text : (instanceDefinition(text) ?? text)
   }
 
   /**
@@ -1182,7 +1260,11 @@ export function createJumiModel({
     if (publishedAt === registrations) return
     publishedAt = registrations
 
-    sink.payload('animations', animationPayload())
+    // One `computeSlots()` for both halves of the payload, so the lists and the positions cannot
+    // disagree about a position.
+    const slots = computeSlots()
+
+    sink.payload('animations', animationPayload(slots))
     sink.payload('transitions', transitionPayload())
   }
 
