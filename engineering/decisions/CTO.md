@@ -2580,3 +2580,82 @@ until the representation is asked to carry real candidates rather than fixtures.
 `scripts/research/d3-anchor-normalizer.mjs` (`pnpm research:d3-anchor-normalizer`), evidence at
 `scripts/anchor-normalizer.json`. No `src/` change, nothing promoted, no API decision taken.
 17/17 stages, 485 unit tests.
+
+
+## 2026-09-17 — D.3.7 · the candidate projection: what the existing surface survives
+
+### The ruling
+
+> **Run the existing `offset-anchor` candidate surface through the proven explicit-form normalizer and determine,
+> candidate by candidate, which existing semantics survive the resolved-axis model, which become static
+> authoring inputs, and which must decline. No production change and no API rewrite yet.**
+
+The projection is structural and runs the ruled pipeline literally: the candidate sets **one** leaf to an authored
+probe, every other leaf keeps its resting value, the whole `offset-anchor` value is composed from those, and the
+result goes through the normalizer. Both the roles and the probes are read off the model rather than off names —
+a leaf whose rest is a keyword is keyword-bearing, one whose rest is a length is value-bearing, one with
+dependencies is compound, and a compound leaf is probed with a position because that is what its own candidates
+accept.
+
+### The table
+
+```text
+candidate / route                role             normalized x/y        independent animation   needs static edge context   var()       verdict
+animate-offset-anchor            whole property   10px / 20px           yes                     no                          declines    preserves
+  (left 10px top 20px · 20% 80%)
+animate-offset-anchor            whole property   —                     —                       —                           yes         declines safely
+  (var(--x) var(--y))
+animate-offset-anchor-x          compound         declines              no, not as it stands    yes — directional edges     declines    compound normalization
+animate-offset-anchor-y          compound         declines              no, not as it stands    yes — directional edges     declines    compound normalization
+animate-offset-anchor-x-edge     keyword-bearing  declines              **no**                  yes (it *is* the context)   declines    cannot preserve
+animate-offset-anchor-y-edge     keyword-bearing  declines              **no**                  yes (it *is* the context)   declines    cannot preserve
+animate-offset-anchor-x-offset   value-bearing    declines as they rest; composes once directional   **yes**   yes             declines    preserves
+animate-offset-anchor-y-offset   value-bearing    declines as they rest; composes once directional   **yes**   yes             declines    preserves
+```
+
+Nine projections: four preserve independent control, one declines safely, four require compound normalization or
+lose their current semantics.
+
+### The four answers, from the browser arms
+
+```text
+the composition the model declares today      center 0 center 0                      auto
+the same composition, edges directional       left 0 top 0                           0px 0px
+an offset leaf under directional edges        left var(--leaf) top 20px              10px · 15px · 20px · 25px · 30px  (y fixed: independent)
+an edge leaf moving on its own                var(--leaf) 10px top 20px              10px · 10px · calc(100% - 10px) · …  (discrete)
+a per-axis spelling inside the composition    left 10px center                       auto
+an unresolved var() in an authored position   var(--missing) var(--missing)          auto
+```
+
+The middle reading is the one that decides the API, and it is now measured rather than argued: the offset leaf
+moves independently and smoothly under static directional edges, while the edge leaf cannot move at all — its
+series flips. And the per-axis short spelling inside the two-axis composition computes to `auto`, which is why
+the compound candidates need the explicit form rather than their own value: `left 10px` is a whole position
+component but not one the composition can consume as a leaf.
+
+### The API consequence, stated from candidates
+
+> **The existing edge utilities remain valid as configuration and authoring inputs, but edge animation itself
+> cannot retain its current independent execution semantics under the resolved-axis representation.**
+
+That is stronger than "edges are keywords" and it comes from the surface rather than from grammar: the offsets
+survive as independently animatable values, the axes survive as compound motions once the edges are directional,
+and the edges survive as the static context the other two need.
+
+### Two things this pass does not do
+
+It does not widen the normalizer — `center`, `center 20px` and `20px center` remain declined even though the
+browser resolves them, because no candidate in this inventory needs them. And it decides nothing: the shape above
+is what the evidence now supports, and the production reshape is still unwritten.
+
+### What the pass cost, in its own defects
+
+Three, all in the projection rather than the model, and all worth naming because each produced a confident wrong
+answer: the whole-property test read the *attribute*, which every leaf candidate also addresses, so six candidates
+were reported as the seventh; the composition was resolved one level deep, leaving `offsetAnchorX` in the form;
+and the resting-state map included the intermediate slots, whose source values are those same identifiers, so the
+substitution never reached a value.
+
+**State.** New book `scripts/research/d3-anchor-candidates.mjs` (`pnpm research:d3-anchor-candidates`), evidence
+at `scripts/anchor-candidates.json`. No `src/` change, nothing promoted, no API rewrite. 17/17 stages, 485 unit
+tests.

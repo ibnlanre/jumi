@@ -1,0 +1,263 @@
+{
+  "arms": [
+    {
+      "label": "the composition the model declares today",
+      "reading": "auto",
+      "why": "the composed rest of the current four-leaf model"
+    },
+    {
+      "label": "the same composition, edges directional",
+      "reading": "0px 0px",
+      "why": "the one change that makes the four-value form grammatical"
+    },
+    {
+      "label": "an offset leaf moving under static directional edges",
+      "reading": "10px 20px · 15px 20px · 20px 20px · 25px 20px · 30px 20px",
+      "why": "whether the value-bearing leaf keeps independent control"
+    },
+    {
+      "label": "an edge leaf moving on its own",
+      "reading": "10px 20px · 10px 20px · calc(100% - 10px) 20px · calc(100% - 10px) 20px · calc(100% - 10px) 20px",
+      "why": "whether a keyword-bearing leaf can be a typed subject at all"
+    },
+    {
+      "label": "a per-axis spelling inside the two-axis composition",
+      "reading": "auto",
+      "why": "what an axis candidate contributes when its value is not a whole position"
+    },
+    {
+      "label": "an unresolved var() in an authored position",
+      "reading": "auto",
+      "why": "what a dynamic source leaves behind — for the whole motion, not one leaf"
+    }
+  ],
+  "candidates": [
+    {
+      "attribute": "offset-anchor",
+      "name": "animate-offset-anchor",
+      "parts": [],
+      "types": [
+        "length",
+        "percentage",
+        "position",
+        "any"
+      ]
+    },
+    {
+      "attribute": "offset-anchor",
+      "name": "animate-offset-anchor-x",
+      "parts": [
+        "offset-anchor-x"
+      ],
+      "types": [
+        "length",
+        "percentage",
+        "position"
+      ]
+    },
+    {
+      "attribute": "offset-anchor",
+      "name": "animate-offset-anchor-x-edge",
+      "parts": [
+        "offset-anchor-x-edge"
+      ],
+      "types": [
+        "position"
+      ]
+    },
+    {
+      "attribute": "offset-anchor",
+      "name": "animate-offset-anchor-x-offset",
+      "parts": [
+        "offset-anchor-x-offset"
+      ],
+      "types": [
+        "length",
+        "percentage"
+      ]
+    },
+    {
+      "attribute": "offset-anchor",
+      "name": "animate-offset-anchor-y",
+      "parts": [
+        "offset-anchor-y"
+      ],
+      "types": [
+        "length",
+        "percentage",
+        "position"
+      ]
+    },
+    {
+      "attribute": "offset-anchor",
+      "name": "animate-offset-anchor-y-edge",
+      "parts": [
+        "offset-anchor-y-edge"
+      ],
+      "types": [
+        "position"
+      ]
+    },
+    {
+      "attribute": "offset-anchor",
+      "name": "animate-offset-anchor-y-offset",
+      "parts": [
+        "offset-anchor-y-offset"
+      ],
+      "types": [
+        "length",
+        "percentage"
+      ]
+    }
+  ],
+  "projection": [
+    {
+      "authored": "left 10px top 20px",
+      "candidate": "animate-offset-anchor",
+      "normalized": [
+        "10px",
+        "20px"
+      ],
+      "rest": null,
+      "role": "whole property",
+      "staticContext": null,
+      "verdict": "preserves independent control — two resolved axes come straight out of the authored form"
+    },
+    {
+      "authored": "20% 80%",
+      "candidate": "animate-offset-anchor",
+      "normalized": [
+        "20%",
+        "80%"
+      ],
+      "rest": null,
+      "role": "whole property",
+      "staticContext": null,
+      "verdict": "preserves independent control — two resolved axes come straight out of the authored form"
+    },
+    {
+      "authored": "var(--x) var(--y)",
+      "candidate": "animate-offset-anchor",
+      "normalized": null,
+      "rest": null,
+      "role": "whole property",
+      "staticContext": null,
+      "verdict": "declines safely — nothing can resolve it at build time, so the whole motion stays native"
+    },
+    {
+      "alsoDirectional": [
+        "10px",
+        "0"
+      ],
+      "authored": "left 10px",
+      "candidate": "animate-offset-anchor-x",
+      "composed": "left 10px center 0",
+      "directional": false,
+      "edgesAtRest": [
+        "center",
+        "center"
+      ],
+      "normalized": null,
+      "rest": "offsetAnchorX",
+      "role": "compound",
+      "staticContext": null,
+      "verdict": "requires compound normalization — it is several components, and it composes only as an explicit two-axis form"
+    },
+    {
+      "alsoDirectional": [
+        "0",
+        "0"
+      ],
+      "authored": "left",
+      "candidate": "animate-offset-anchor-x-edge",
+      "composed": "left 0 center 0",
+      "directional": false,
+      "edgesAtRest": [
+        "center",
+        "center"
+      ],
+      "normalized": null,
+      "rest": "center",
+      "role": "keyword-bearing",
+      "staticContext": null,
+      "verdict": "cannot preserve independent animation — a keyword is not a registrable value, and the browser series is discrete"
+    },
+    {
+      "alsoDirectional": [
+        "10px",
+        "0"
+      ],
+      "authored": "10px",
+      "candidate": "animate-offset-anchor-x-offset",
+      "composed": "center 10px center 0",
+      "directional": false,
+      "edgesAtRest": [
+        "center",
+        "center"
+      ],
+      "normalized": null,
+      "rest": "0",
+      "role": "value-bearing",
+      "staticContext": "edges at rest are center/center, and the four-value form needs left|right and top|bottom",
+      "verdict": "preserves independent control **if the edges become directional** — the value alone does not compose"
+    },
+    {
+      "alsoDirectional": [
+        "0",
+        "20px"
+      ],
+      "authored": "top 20px",
+      "candidate": "animate-offset-anchor-y",
+      "composed": "center 0 top 20px",
+      "directional": false,
+      "edgesAtRest": [
+        "center",
+        "center"
+      ],
+      "normalized": null,
+      "rest": "offsetAnchorY",
+      "role": "compound",
+      "staticContext": null,
+      "verdict": "requires compound normalization — it is several components, and it composes only as an explicit two-axis form"
+    },
+    {
+      "alsoDirectional": [
+        "0",
+        "0"
+      ],
+      "authored": "top",
+      "candidate": "animate-offset-anchor-y-edge",
+      "composed": "center 0 top 0",
+      "directional": false,
+      "edgesAtRest": [
+        "center",
+        "center"
+      ],
+      "normalized": null,
+      "rest": "center",
+      "role": "keyword-bearing",
+      "staticContext": null,
+      "verdict": "cannot preserve independent animation — a keyword is not a registrable value, and the browser series is discrete"
+    },
+    {
+      "alsoDirectional": [
+        "0",
+        "10px"
+      ],
+      "authored": "10px",
+      "candidate": "animate-offset-anchor-y-offset",
+      "composed": "center 0 center 10px",
+      "directional": false,
+      "edgesAtRest": [
+        "center",
+        "center"
+      ],
+      "normalized": null,
+      "rest": "0",
+      "role": "value-bearing",
+      "staticContext": "edges at rest are center/center, and the four-value form needs left|right and top|bottom",
+      "verdict": "preserves independent control **if the edges become directional** — the value alone does not compose"
+    }
+  ],
+  "source": "D.3.7 · scripts/research/d3-anchor-candidates.mjs"
+}
