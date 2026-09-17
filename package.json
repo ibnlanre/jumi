@@ -56,7 +56,7 @@
     "theme:map": "node scripts/theme-map.mjs",
     "incremental:check": "node scripts/incremental-build.mjs",
     "lint": "eslint --fix .",
-    "bundle": "tsup",
+    "bundle": "node scripts/bundle.mjs",
     "watch-bundle": "tsup src/index.ts --format cjs,esm --dts --watch",
     "build": "pnpm run bundle && pnpm run examples:build",
     "examples:build": "node scripts/build-examples.mjs",

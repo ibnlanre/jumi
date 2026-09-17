@@ -25,9 +25,9 @@
  * registered after `animations` was compiled still reaches the element. Run with
  * `pnpm incremental:check`.
  */
-import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
+import { ensureBundle } from './bundle.mjs'
 import {
   aggregateSlots,
   expectedDeclarations,
@@ -55,8 +55,7 @@ const css = [
   '',
 ].join('\n')
 
-console.log('· bundling')
-execFileSync('pnpm', ['run', 'bundle'], { cwd: root, stdio: 'pipe' })
+ensureBundle()
 
 // After bundling: the helper loads the finalizer out of `dist/`.
 const { build, compiler } = await import('./lib/compile.mjs')

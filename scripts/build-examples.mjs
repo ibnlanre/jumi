@@ -21,6 +21,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { fileURLToPath } from 'node:url'
 
+import { ensureBundle } from './bundle.mjs'
 import {
   aggregateSlots,
   expectedDeclarations,
@@ -35,8 +36,7 @@ const root = path.join(here, '..')
 const input = path.join(root, 'examples', 'input.css')
 const output = path.join(root, 'examples', 'output.css')
 
-console.log('· bundling')
-execFileSync('pnpm', ['run', 'bundle'], { cwd: root, stdio: 'pipe' })
+ensureBundle()
 
 const { complete } = await import('./lib/compile.mjs')
 

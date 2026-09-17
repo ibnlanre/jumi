@@ -34,6 +34,7 @@ import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { fileURLToPath } from 'node:url'
 
+import { ensureBundle } from './bundle.mjs'
 import {
   aggregateSlots,
   expectedDeclarations,
@@ -253,9 +254,9 @@ const variantChecks = [
   },
 ]
 
-// The fixtures load dist/index.js, so the bundle has to reflect src first.
-console.log('· bundling')
-execFileSync('pnpm', ['run', 'bundle'], { cwd: root, stdio: 'pipe' })
+// The fixtures load dist/index.js, so the bundle has to reflect src first — unless the gate already
+// built it, in which case building again here would delete the artifact its peers are reading.
+ensureBundle()
 
 // After bundling: the helper loads the finalizer out of `dist/`, so the harness exercises the
 // artifact that ships rather than the source it was built from.

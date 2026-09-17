@@ -16,6 +16,8 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 
+import { ensureBundle } from './bundle.mjs'
+
 import path from 'node:path'
 import postcss from 'postcss'
 
@@ -25,7 +27,7 @@ const manifest = JSON.parse(
   readFileSync(path.join(root, 'package.json'), 'utf8'),
 )
 
-execFileSync('pnpm', ['run', 'bundle'], { cwd: root, stdio: 'pipe' })
+ensureBundle()
 
 const line = (label, value) => console.log(`  ${label.padEnd(46)} ${value}`)
 const heading = text => {

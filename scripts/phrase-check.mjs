@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import { execFileSync } from 'node:child_process'
 /**
  * The phrase contract, as a permanent gate stage.
  *
@@ -27,13 +26,15 @@ import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
+import { ensureBundle } from './bundle.mjs'
+
 import path from 'node:path'
 import postcss from 'postcss'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const root = path.join(here, '..')
 
-execFileSync('pnpm', ['run', 'bundle'], { cwd: root, stdio: 'pipe' })
+ensureBundle()
 
 const { build, compiler } = await import('./lib/compile.mjs')
 

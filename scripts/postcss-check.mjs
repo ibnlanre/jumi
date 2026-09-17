@@ -19,10 +19,10 @@
  *
  * Run: pnpm postcss:check
  */
-import { execFileSync } from 'node:child_process'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
+import { ensureBundle } from './bundle.mjs'
 import {
   compositionScope,
   expectedDeclarations,
@@ -36,8 +36,7 @@ const here = path.dirname(fileURLToPath(import.meta.url))
 const root = path.join(here, '..')
 const dir = path.join(here, 'tmp-postcss')
 
-console.log('· bundling jumi')
-execFileSync('pnpm', ['run', 'bundle'], { cwd: root, stdio: 'pipe' })
+ensureBundle()
 
 const tailwind = (await import('@tailwindcss/postcss')).default
 const jumiModule = await import(path.join(root, 'dist', 'postcss.js'))

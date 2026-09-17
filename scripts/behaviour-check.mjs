@@ -44,17 +44,17 @@
  *
  * Run: pnpm behaviour:check
  */
-import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright'
+
+import { ensureBundle } from './bundle.mjs'
 
 import path from 'node:path'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const root = path.join(here, '..')
 
-console.log('· bundling')
-execFileSync('pnpm', ['run', 'bundle'], { cwd: root, stdio: 'pipe' })
+ensureBundle()
 
 // Bundling comes first because the helper loads the finalizer out of `dist/`: the harness
 // exercises the artifact that ships, not the source it was built from.

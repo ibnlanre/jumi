@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import { execFileSync } from 'node:child_process'
 /**
  * Scroll-driven check — does a retargeted slot actually scrub, in a real browser?
  *
@@ -37,14 +36,15 @@ import { createServer } from 'node:http'
 import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright'
 
+import { ensureBundle } from './bundle.mjs'
+
 import path from 'node:path'
 import postcss from 'postcss'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const root = path.join(here, '..')
 
-console.log('· bundling')
-execFileSync('pnpm', ['run', 'bundle'], { cwd: root, stdio: 'pipe' })
+ensureBundle()
 
 const { build, compiler } = await import('./lib/compile.mjs')
 const { splitTopLevel } = await import('./lib/css.mjs')

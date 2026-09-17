@@ -41,11 +41,12 @@
  *
  * Run: pnpm view-transition:check
  */
-import { execFileSync } from 'node:child_process'
 import { readdirSync, readFileSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright'
+
+import { ensureBundle } from './bundle.mjs'
 
 import path from 'node:path'
 import postcss from 'postcss'
@@ -60,9 +61,14 @@ const fixtures = path.join(here, 'view-transition-check')
  * Everything below loads `dist/`, so a check that skips this step tests whatever was last built — which
  * is how a stale artifact reported a bug that had already been fixed, in this very file, once. The
  * carrier instrument bundles for the same reason.
+ *
+ * It is `ensureBundle()` rather than the `pnpm run bundle` that used to be here because the *gate*
+ * builds, not the stages below it: under `check.mjs` nine stages used to bundle concurrently, and `tsup`
+ * is `clean: true`, so each one deleted the artifact its peers were reading. Run this file alone and
+ * nothing has built for it, so it still bundles — the stale artifact this comment is about is exactly
+ * what the standalone path must not lose.
  */
-console.log('· bundling')
-execFileSync('pnpm', ['run', 'bundle'], { cwd: root, stdio: 'pipe' })
+ensureBundle()
 
 const { build, compiler, finalizeCss } = await import('./lib/compile.mjs')
 

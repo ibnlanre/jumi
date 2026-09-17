@@ -23,12 +23,12 @@
  *
  * Run: pnpm vite:check
  */
-import { execFileSync } from 'node:child_process'
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright'
 import { build, createServer, preview } from 'vite'
 
+import { ensureBundle } from './bundle.mjs'
 import {
   compositionRules,
   countedParts,
@@ -43,8 +43,7 @@ const here = path.dirname(fileURLToPath(import.meta.url))
 const root = path.join(here, '..')
 const dir = path.join(here, 'tmp-vite')
 
-console.log('· bundling jumi')
-execFileSync('pnpm', ['run', 'bundle'], { cwd: root, stdio: 'pipe' })
+ensureBundle()
 
 // Both of these are CJS-interop defaults: the function sits on `default`.
 const tailwind = (await import('@tailwindcss/vite')).default
