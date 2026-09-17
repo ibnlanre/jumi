@@ -2659,3 +2659,72 @@ substitution never reached a value.
 **State.** New book `scripts/research/d3-anchor-candidates.mjs` (`pnpm research:d3-anchor-candidates`), evidence
 at `scripts/anchor-candidates.json`. No `src/` change, nothing promoted, no API rewrite. 17/17 stages, 485 unit
 tests.
+
+
+## 2026-09-17 — D.3.7 · edge motion survives: authoring identity is not interpolation identity
+
+### The ruling
+
+> **Can an edge-addressed motion be normalized at its endpoints into the resolved axis and reproduce native
+> whole-property edge motion?** … If those match sample-for-sample, the API consequence changes materially: the
+> edge candidate stays a valid independent authoring control that compiles to resolved-axis animation.
+
+### Measured
+
+```text
+the keyword mapping, through whole positions
+  left top               → 0% 0%              right bottom          → 100% 100%
+  center center          → 50% 50%            left 0 top 20px       → 0px 20px
+  right 10px bottom 20px → calc(100% - 10px) calc(100% - 20px)
+
+x edge, static y                                    native ≡ executed        yes
+  native       left 0 top 20px  →  right 0 top 20px
+  executed     --x: 0% → 100%, --y: 20px → 20px
+  series       0% 20px · 25% 20px · 50% 20px · 75% 20px · 100% 20px        (both)
+
+y edge, pinned x                                    native ≡ executed        yes
+  native       left 0 top 20px  →  left 0 bottom 10px
+  executed     --x: 0px → 0px, --y: 20px → calc(100% - 10px)
+  series       0px calc(0% + 20px) · 0px calc(25% + 12.5px) · 0px calc(50% + 5px) · …
+```
+
+Both arms reproduce the native transition sample for sample, so **an edge-addressed motion can be executed as the
+resolved axis**. The candidate keeps its independent authoring identity — an author still writes a motion that
+addresses an edge — while the *subject the frames animate* is the resolved component. That is the same
+distinction `math-depth-add` established one track earlier, where the author addresses `add(2)` and the frames
+animate the integer argument.
+
+The previous entry's conclusion is therefore narrowed, and the narrowing is the ruling's point: an edge cannot be
+an **independently interpolating typed leaf** — measured, the keyword custom property flips while the offset moves
+smoothly — but that is a fact about the execution subject and not about the authoring surface. Demoting the edge
+utilities to configuration-only would have been a real loss, and the measurements did not require it.
+
+### One correction the arm produced against itself
+
+The obvious native spelling for the x arm, `left top 20px`, is **three components**, which `offset-anchor` does
+not accept: both endpoints compute to `auto`, and the arm's own defect guard refused to compare a reading of
+nothing. The explicit four-component form `left 0 top 20px` is the one that means what the intent says. Worth
+recording because the first spelling is the one that reads correctly, and the guard is the reason the difference
+was caught rather than reported as a mismatch.
+
+### The architecture this now supports
+
+```text
+public surface                        execution subject
+whole position        ───────┐
+axis compound         ───────┤
+edge motion           ───────┼──→  resolved-x / resolved-y  (<length-percentage> typed leaves)
+offset motion         ───────┘
+
+dynamic var() forms  →  decline, and the whole motion stays on the native/composed path
+```
+
+Every public class has an execution path, no class is demoted, and the decline boundary is the one already
+established: nothing partially typed. What remains before a production reshape is design rather than discovery —
+which is the first time in this track that has been true.
+
+> **Authoring identity and interpolation identity do not have to be the same thing.**
+
+**State.** New book `scripts/research/d3-anchor-edge.mjs` (`pnpm research:d3-anchor-edge`), evidence at
+`scripts/anchor-edge.json`. No `src/` change, nothing promoted, no API decision taken. 17/17 stages, 485 unit
+tests.

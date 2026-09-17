@@ -1,0 +1,111 @@
+{
+  "arms": [
+    {
+      "axis": "x",
+      "intent": "x-edge: left → right, over a static y: top 20px",
+      "native": [
+        "left 0 top 20px",
+        "right 0 top 20px"
+      ],
+      "resolved": [
+        [
+          "--x",
+          "0%",
+          "100%"
+        ],
+        [
+          "--y",
+          "20px",
+          "20px"
+        ]
+      ],
+      "computed": {
+        "from": "0px 20px",
+        "to": "100% 20px"
+      },
+      "equal": true,
+      "nativeSeries": [
+        "0% 20px",
+        "25% 20px",
+        "50% 20px",
+        "75% 20px",
+        "100% 20px"
+      ],
+      "resolvedSeries": [
+        "0% 20px",
+        "25% 20px",
+        "50% 20px",
+        "75% 20px",
+        "100% 20px"
+      ]
+    },
+    {
+      "axis": "y",
+      "intent": "y-edge: top → bottom, over a pinned x: left 0",
+      "native": [
+        "left 0 top 20px",
+        "left 0 bottom 10px"
+      ],
+      "resolved": [
+        [
+          "--x",
+          "0px",
+          "0px"
+        ],
+        [
+          "--y",
+          "20px",
+          "calc(100% - 10px)"
+        ]
+      ],
+      "computed": {
+        "from": "0px 20px",
+        "to": "0px calc(100% - 10px)"
+      },
+      "equal": true,
+      "nativeSeries": [
+        "0px calc(0% + 20px)",
+        "0px calc(25% + 12.5px)",
+        "0px calc(50% + 5px)",
+        "0px calc(75% - 2.5px)",
+        "0px calc(100% - 10px)"
+      ],
+      "resolvedSeries": [
+        "0px calc(0% + 20px)",
+        "0px calc(25% + 12.5px)",
+        "0px calc(50% + 5px)",
+        "0px calc(75% - 2.5px)",
+        "0px calc(100% - 10px)"
+      ]
+    }
+  ],
+  "conclusion": "edge-addressed motion executes as the resolved axis",
+  "mapping": [
+    {
+      "computed": "0% 0%",
+      "why": "x edge left, y edge top",
+      "value": "left top"
+    },
+    {
+      "computed": "100% 100%",
+      "why": "x edge right, y edge bottom",
+      "value": "right bottom"
+    },
+    {
+      "computed": "50% 50%",
+      "why": "both edges center",
+      "value": "center center"
+    },
+    {
+      "computed": "0px 20px",
+      "why": "directional edges with offsets",
+      "value": "left 0 top 20px"
+    },
+    {
+      "computed": "calc(100% - 10px) calc(100% - 20px)",
+      "why": "the resolved pair the model composes",
+      "value": "right 10px bottom 20px"
+    }
+  ],
+  "source": "D.3.7 · scripts/research/d3-anchor-edge.mjs"
+}
