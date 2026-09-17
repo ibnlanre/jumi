@@ -21,6 +21,7 @@ import { effectKeyframes } from '@/keyframes/effects'
 import { isFullyAddressable } from '@/variables/composition'
 import { propertyVariables } from '@/variables/property'
 import {
+  canonicalizeLeaf,
   typedExecutionOf,
   typedLeafOf,
   typedLeavesOf,
@@ -1512,15 +1513,15 @@ export function createJumiModel({
            * establish it and a substrate published per attribute would appear on selectors that
            * never opted in.
            *
-           * Declining is narrow and deliberate, and it needs no family test of its own: a
-           * component the family declares no leaf for has no canonicalizer, so a family that has
-           * not opted in reaches the composed-property representation below by the same branch a
-           * value this family cannot read does.
+           * Declining needs no family test of its own: a component the family declares no leaf for
+           * is not a typed leaf, so a family that has not opted in reaches the composed-property
+           * representation below by the same branch a value this family cannot read does. The three
+           * states — not a typed leaf, no canonicalizer declared, canonicalizer declined — are
+           * `canonicalizeLeaf`'s, so they cannot be read as one here.
            */
           const declaration = typedLeafOf(attribute, component)
           const authored = String(variables[`--jumi-${component}`] ?? value)
-          const canonical =
-            declaration?.animationCanonicalizer?.(authored) ?? null
+          const canonical = canonicalizeLeaf(declaration, authored)
 
           if (canonical !== null) {
             const substrate = {

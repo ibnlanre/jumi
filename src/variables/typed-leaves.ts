@@ -158,6 +158,38 @@ export const typedLeavesOf = (
   )
 
 /**
+ * What a frame writes for one leaf, or `null` to **decline** — three states, and the middle one is
+ * the reason this is a function rather than an optional call at the call site.
+ *
+ * ```text
+ * the leaf is not a typed leaf of this family   → null
+ * typed, and declares no canonicalizer          → the authored value
+ * typed, with a canonicalizer                   → whatever it decides, including `null`
+ * ```
+ *
+ * The alternative — `declaration?.animationCanonicalizer?.(value) ?? null` — reads **one `null` for
+ * two different facts**, which is not a style problem. A family whose leaves are a single
+ * interpolation branch needs no canonicalizer: `<length-percentage>` for `translate` is one branch,
+ * so the authored value is already the canonical frame value. Under the conflated form that family's
+ * constituents silently declined while its whole motion went typed, and with both present the two
+ * execution models contended for one property: measured on a spiked `translate`, a compound curve
+ * that returned to its 100% value at 0%, so the motion never started.
+ *
+ * Note that "declares no canonicalizer" must **not** be read as "cannot decline": a family with no
+ * canonicalizer still declines by not declaring the leaf at all, which is the first state.
+ */
+export const canonicalizeLeaf = (
+  declaration: TypedLeaf | undefined,
+  value: string,
+): null | string => {
+  if (!declaration) return null
+
+  return declaration.animationCanonicalizer
+    ? declaration.animationCanonicalizer(value)
+    : value
+}
+
+/**
  * A whole `scale` value decomposed into the three leaves it sets, or `null` when the value is not
  * safely decomposable and the caller should keep the property-level animation.
  *

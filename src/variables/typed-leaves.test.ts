@@ -6,11 +6,13 @@ import { compositionEdges } from '@/variables/composition'
 import { propertyVariables } from '@/variables/property'
 
 import {
+  canonicalizeLeaf,
   normalizeScale,
   scaleFactorToNumber,
   scaleLeafEndpoints,
   typedExecutionOf,
   typedExecutions,
+  typedLeafOf,
   typedLeaves,
   typedLeavesOf,
 } from './typed-leaves'
@@ -236,6 +238,37 @@ describe('scaleLeafEndpoints', () => {
       '',
     ])
       expect(scaleLeafEndpoints(value), value).toBeNull()
+  })
+})
+
+describe('canonicalizeLeaf', () => {
+  it('answers null for a leaf the family does not declare', () => {
+    // The first state, and the one a family that has not opted in always reaches.
+    expect(canonicalizeLeaf(undefined, '5')).toBeNull()
+    expect(canonicalizeLeaf(typedLeafOf('gap', 'row-gap'), '5px')).toBeNull()
+  })
+
+  it('takes the authored value when the leaf declares no canonicalizer', () => {
+    // The second state, which the shape this replaced could not express. A leaf that is one
+    // interpolation branch needs no rewrite — `<length-percentage>` is one branch, so the authored
+    // value is already what a frame writes — and reading that as a decline is the conflation.
+    const leaf = { initialValue: '0px', syntax: '<length-percentage>' }
+
+    expect(canonicalizeLeaf(leaf, '10px')).toBe('10px')
+    expect(canonicalizeLeaf(leaf, '50%')).toBe('50%')
+  })
+
+  it('defers to a declared canonicalizer, decline included', () => {
+    // The third state, and the one that must not be folded into the second: a `?? value` after the
+    // call would accept exactly what the canonicalizer just refused, writing a value nothing can
+    // interpolate into a registered property.
+    const leaf = typedLeafOf('scale', 'scale-x')
+
+    expect(canonicalizeLeaf(leaf, '150%')).toBe('1.5')
+    expect(canonicalizeLeaf(leaf, '2')).toBe('2')
+    expect(canonicalizeLeaf(leaf, 'none')).toBeNull()
+    expect(canonicalizeLeaf(leaf, 'var(--x)')).toBeNull()
+    expect(canonicalizeLeaf(leaf, '2px')).toBeNull()
   })
 })
 
