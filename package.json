@@ -112,6 +112,7 @@
     "research:batching-eligibility": "node scripts/research/batching-eligibility.mjs",
     "research:cross-element": "node scripts/research/cross-element-isolation.mjs",
     "research:d2-acceptance": "node scripts/research/d2-acceptance.mjs",
+    "research:d3-reach": "node scripts/research/d3-reach.mjs",
     "research:identity-collision": "node scripts/research/identity-collision.mjs",
     "candidate:diff": "node scripts/candidate-diff.mjs",
     "check": "node scripts/check.mjs",

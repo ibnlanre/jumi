@@ -618,3 +618,84 @@ what says the family abstraction is holding.
 > change mixed in. The family abstraction holds: the second family reuses the mechanism without a
 > branch of its own, and the one defect the test surfaced was in shared plumbing rather than in the
 > abstraction.**
+
+## 2026-09-17 — D.3 opens on reach, and the surface is three comparable populations
+
+D.3 is framed narrowly around **reach** rather than another family proof — how much of the constituent
+surface can move onto value-free per-leaf typed execution before it hits cases that cannot move? Starting
+from the latest census rather than another family, and keeping the standard: no family-specific core
+branch, no value-bearing shared definition, no element-context inference, no regression to
+cascade-addressable timing, and browser behaviour over textual resemblance.
+
+The first increment is a census, and it had to be corrected twice before it was true.
+
+**The unit is the pair, not the leaf.** `translate-x` is a bare component of `translate` and an *argument*
+of `translate3d(…)` — the same token participates two ways — so a per-leaf verdict would have to be wrong
+about one of them. Over (parent, component) pairs the surface is 324, of which 21 are parts of the
+`animation`/`transition`/`*-timeline` shorthands: the motion machinery, not constituents, and excluded
+from reach.
+
+**The remaining 303 split almost exactly three ways**, which is the architectural result:
+
+```text
+reshape    97   ≈ 32%   typing requires changing the interpolation unit or static composition shape
+value     107   ≈ 35%   the resting constituent already has a scalar-like typed representation
+keyword    99   ≈ 33%   the leaf rests on an identifier -- none, auto, medium, normal, left
+```
+
+Reach is therefore **not** "mostly easy values with a few ugly cases": it is three comparably large
+populations that succeed or fail for fundamentally different reasons. D.3 does not become "migrate the
+remaining leaves"; it becomes three separate reach questions. The buckets are recorded as **census
+morphology, not execution classes** — `reshape` does not mean "cannot be typed", it names the work
+(typed function arguments, static function wrappers, nested composition) that D.1 deliberately deferred,
+and `value` does not claim readiness either, since execution still depends on the authored grammar.
+
+**The keyword bucket is a candidate list, and the browser measures a narrower property than the one the
+first draft claimed.** `pnpm research:d3-reach` registers a leaf typed and compares the parent property's
+computed value at rest:
+
+```text
+column-gap                 gap                   0px normal -> 0px        registration-unsafe at rest
+aspect-ratio-width         aspect-ratio          auto 0 / 1 -> auto       registration-unsafe at rest
+background-size-width      background-size       auto 0px   -> 0px 0px    registration-unsafe at rest
+background-position-x-edge background-position-x 0%         -> 0%         registration-safe at rest
+translate-x                translate             0px        -> 0px        registration-safe at rest
+border-bottom-width        border-bottom-width   0px        -> 0px        not exercised
+```
+
+Registration-unsafety is **sufficient** to keep a leaf on the property/native path; registration-safety
+is **not sufficient** to type it. It makes the leaf *eligible* for the interpolation differential —
+native against typed-leaf, for representative authored values — and only both stages together would
+license `movable`. `background-position-x-edge` is why the gate is worth having: `left` is a keyword, so
+the shape of the resting text says "unsafe", and `left` is also exactly `0%`, so the resting rendering is
+identical and it is safe. Two fixture errors were found by getting them wrong first and are recorded in
+the book: animating the leaf under test hides the resting value behind the animated one, and an arm whose
+family computes its resting value to `0px` — a `border-*-width` with no border style — was never
+exercised at all while looking exactly like a gate that held.
+
+**A conflation corrected before it became durable.** `scale` needed a leaf `animationCanonicalizer`
+because its leaf grammar admitted number/percentage spellings that native `scale` cross-interpolates and
+the registered union does not. `translate` is the opposite example and the reason it was chosen for D.2:
+`<length-percentage>` is **one** interpolation grammar, so no leaf canonicalizer should be required
+merely to make `10px` interpolate. What translate needs is **whole decomposition** (`translate: 10px` →
+`x = 10px, y = 0, z = 0`), which is a different mechanism. The distinction is kept explicitly:
+
+```text
+whole normalization / decomposition   ≠   leaf animation canonicalization
+```
+
+### Call
+
+> **Keep D.3 open and keep the pair-based census. Do not commit the census with the wider verdicts:
+> rename them to the narrower measured property — registration-safe / registration-unsafe at rest —
+> correct the scale/translate statement so whole decomposition is not conflated with leaf
+> canonicalization, and report reach over the 303 non-machinery pairs. Then land it as the D.3 census
+> increment.**
+
+> **The next increment classifies the keyword population using typed representations the model or the
+> family itself justifies, followed by a browser differential for both resting and interpolation
+> behaviour. Do not infer syntax from computed text merely to fill the table — a pair with no defensible
+> syntax mapping is `unresolved`, not guessed.**
+
+Landed as the census increment: `src/variables/reach.test.ts` for the morphology and
+`pnpm research:d3-reach` for the gate. 17/17 stages, 79/79 behaviour.
