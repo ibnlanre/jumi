@@ -1163,3 +1163,55 @@ source reader against the evaluated model **entry for entry** — rather than co
 `scripts/research/d3-projection.mjs` and its `package.json` entry, and `d3-coverage.mjs` now taking its
 citations from the registry. No `src/` behaviour change and no emitted-CSS change; 17/17 stages,
 79/79 behaviour, and no measurement was taken to produce any of it.
+
+## 2026-09-17 — D.3.5's diagnostic: the 199 are three different problems
+
+### Call
+
+> **After that, I would move to the 199 missing representations, not the 98 missing candidates.** But I would
+> not attack those 199 as one migration queue. The next decision should be: **what representation metadata is
+> missing, and how many of the 199 can be justified mechanically from the model rather than hand-authored
+> family by family?** We already know the 199 contain three very different morphologies from the census […]
+> So before adding declarations, I would project the unresolved-descriptor population back onto those buckets.
+> […] So I would make the next increment **diagnostic before migratory**: `303 reach pairs × morphology ×
+> descriptor failure reason`. No new representation yet.
+
+`pnpm research:d3-crosstab` is that map, and it creates nothing — no representation, no measurement, no verdict:
+
+```text
+  descriptor status       value  keyword  reshape   total
+  ───────────────────────────────────────────────────────
+  complete                    6        0        0       6
+  no-representation          72       79       48     199
+  no-candidate               29       20       49      98
+  ───────────────────────────────────────────────────────
+  total                     107       99       97     303
+```
+
+**The columns are the census's own totals**, computed from the same shared predicate, which is the tab's
+cross-check rather than a coincidence: 107 value / 99 keyword / 97 reshape, and 303 constituent pairs. The rows
+are pass one's status. The cells are therefore the join of the two passes, and a test asserts the one that
+matters most — the `complete` cell must be exactly the coverage class in the evidence registry, pair for pair,
+so neither pass can be the more generous of the two while both look internally consistent.
+
+**Read off the counts, before any interpretation:** the largest unresolved cell is
+`no-representation × keyword` (79), with `no-representation × value` close behind (72) and
+`no-representation × reshape` at 48. The 98 missing candidates split almost evenly across the morphologies
+(29 / 20 / 49), so "no candidate" is not confined to the awkward shapes either.
+
+**What each column would mean for the increment that follows, stated in the ruling before the counts were
+read** — and it is this, not the numbers, that decides the next move:
+
+```text
+value      a typed syntax plausibly derivable from what the model already carries — possibly a rule
+keyword    D.3.4's observation protocol is the path, and the questions become surface and contexts
+reshape    no declaration alone helps; the interpolation unit is D.1's decomposition work
+```
+
+The nuance the tab adds to the ruling's own guess is in the reshape column: those pairs split between a missing
+representation (48) and a missing candidate (49), so reshape is *not* uniformly an interpolation-unit problem —
+half of it is the candidate table.
+
+**Not yet committed.** Working tree only: `scripts/lib/crosstab.mjs` with its 5-test suite,
+`scripts/research/d3-crosstab.mjs`, and its `package.json` entry. No `src/` behaviour change, no emitted-CSS
+change, and no representation declared; 17/17 stages, 79/79 behaviour.
