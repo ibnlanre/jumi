@@ -216,6 +216,53 @@ export const readPropertyEntries = () => {
  * (`property('transform', [['skew', args('skew')]])`). What the census needs from it is only which
  * slots the candidate can write.
  */
+/**
+ * One candidate entry, read structurally from its own source.
+ *
+ * Pure, and exported for that reason: the walk it performs splits on parentheses and quotes, so the text it
+ * is handed **is** structure to it. A comment carrying a stray `(` unbalanced the walk and one carrying an
+ * apostrophe opened a string that never closed, and either made the whole entry unreadable — measured twice
+ * during D.3.6, and both times the symptom was a pair with no candidate, no route and no derivation, pointing
+ * nowhere near a comment. Removing comments here, before the walk, is what makes that impossible rather than
+ * unlikely; doing it around the walk was the bespoke workaround this replaces.
+ *
+ * The entry's name and file are the caller's business, because they are where the text came from rather than
+ * what it says.
+ */
+export const readCandidate = body => {
+  const text = stripComments(body)
+  const at = text.search(/\bfn: (?:property|color|token)\(/)
+
+  if (at === -1) return { attribute: null, parts: [], types: [] }
+
+  // Balanced, not matched: see `readCall` and `readParts`. The greedy form credited candidates with parts
+  // that appear in their own `type:` list or inside a wrapper function.
+  const call = readCall(text, text.indexOf('(', at)) ?? ''
+  const attribute = call.match(/^\s*'([\w-]+)'/)?.[1] ?? null
+  // `token('display', 'prepend')` consumes a modifier into the value and calls `property(display)`, so it
+  // addresses the attribute and never a part — its second argument is an order, not a list.
+  const token = /\bfn: token\(/.test(text)
+  const comma = call.indexOf(',')
+  const rest = comma === -1 || token ? '' : call.slice(comma + 1)
+  const typesAt = text.search(/\btypes?:/)
+
+  return {
+    attribute,
+    parts: readParts(rest),
+    // `type: 'length'` and `type: ['length', 'any']` are one list; the expression reader keeps a multi-line
+    // list together and a quoted default whole.
+    types:
+      typesAt === -1
+        ? []
+        : [
+            ...readExpression(
+              text,
+              typesAt + text.slice(typesAt).indexOf(':') + 1,
+            ).matchAll(/'([\w-]+)'/g),
+          ].map(match => match[1]),
+  }
+}
+
 export const readCandidates = () => {
   const files = ['src/properties/tween.ts', 'src/properties/controls.ts']
   const candidates = []
@@ -245,49 +292,12 @@ export const readCandidates = () => {
      *   token('display', 'prepend')      calls `property(display)`; the second argument is an order,
      *                                    not a parts list, so it addresses the attribute alone
      */
-    for (const entry of readEntries(text, 4)) {
-      const at = entry.body.search(/\bfn: (?:property|color|token)\(/)
-
-      if (at === -1) {
-        candidates.push({
-          attribute: null,
-          file,
-          name: entry.name,
-          parts: [],
-          types: [],
-        })
-        continue
-      }
-
-      // Balanced, not matched: see `readCall` and `readParts`. The greedy form credited candidates with
-      // parts that appear in their own `type:` list or inside a wrapper function.
-      const call = readCall(entry.body, entry.body.indexOf('(', at)) ?? ''
-      const attribute = call.match(/^\s*'([\w-]+)'/)?.[1] ?? null
-      // `token('display', 'prepend')` consumes a modifier into the value and calls `property(display)`,
-      // so it addresses the attribute and never a part — its second argument is an order, not a list.
-      const token = /\bfn: token\(/.test(entry.body)
-      const comma = call.indexOf(',')
-      const rest = comma === -1 || token ? '' : call.slice(comma + 1)
-      const typesAt = entry.body.search(/\btypes?:/)
-
+    for (const entry of readEntries(text, 4))
       candidates.push({
-        attribute,
+        ...readCandidate(entry.body),
         file,
         name: entry.name,
-        parts: readParts(rest),
-        // `type: 'length'` and `type: ['length', 'any']` are one list; the expression reader keeps a
-        // multi-line list together and a quoted default whole.
-        types:
-          typesAt === -1
-            ? []
-            : [
-                ...readExpression(
-                  entry.body,
-                  typesAt + entry.body.slice(typesAt).indexOf(':') + 1,
-                ).matchAll(/'([\w-]+)'/g),
-              ].map(match => match[1]),
       })
-    }
   }
 
   return candidates

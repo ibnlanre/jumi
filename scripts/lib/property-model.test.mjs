@@ -5,6 +5,7 @@ import { propertyVariables } from '../../src/variables/property.ts'
 
 import {
   bucketOf,
+  readCandidate,
   readCandidates,
   readExpressions,
   readPropertyEntries,
@@ -140,6 +141,72 @@ describe('readCandidates', () => {
  * the mistake instead — a width is not a colour and a colour is not a width — which is the check that was
  * done by eye and the only reason the swap was ever found.
  */
+describe('the candidate walk', () => {
+  /**
+   * The two shapes a comment can take that made an entry **unreadable**, both measured during D.3.6.
+   *
+   * The walk splits on parentheses and quotes, so a comment is structure to it: a stray `(` leaves the call
+   * unclosed and an apostrophe opens a string that never closes. Both left the same fingerprint — the pair
+   * had no candidate, no route and no derivation, and nothing pointed at a comment. Those are the fixtures
+   * this walk exists to be pinned by, and they are the reason it is a pure function of the entry's text
+   * rather than a loop buried in a reader that only ever runs over fixed paths.
+   */
+  it('reads a part written below a comment carrying an unbalanced parenthesis', () => {
+    const entry = `
+      fn: property('math-depth', [
+        // the shell, spelled add(var(--jumi-math-depth-add)), and a bare add( of its own
+        ['math-depth-add', value => value],
+      ]),`
+
+    expect(readCandidate(entry)).toEqual({
+      attribute: 'math-depth',
+      parts: ['math-depth-add'],
+      types: [],
+    })
+  })
+
+  it('reads a part written below a comment carrying an apostrophe', () => {
+    const entry = `
+      fn: property('scale', [
+        // the entry's own parts, in the author's order
+        ['scale-x', value => value],
+      ]),`
+
+    expect(readCandidate(entry)).toEqual({
+      attribute: 'scale',
+      parts: ['scale-x'],
+      types: [],
+    })
+  })
+
+  it('still reads the shapes the walk was written for', () => {
+    // A whole candidate addresses the attribute and declares no part of its own.
+    expect(readCandidate(`
+      fn: property('scale'),
+      type: 'number',`)).toEqual({
+      attribute: 'scale',
+      parts: [],
+      types: ['number'],
+    })
+
+    // `token(…)`'s second argument is an order rather than a parts list, so it addresses the attribute alone.
+    expect(readCandidate(`
+      fn: token('display', 'prepend'),`)).toEqual({
+      attribute: 'display',
+      parts: [],
+      types: [],
+    })
+
+    // An entry that addresses no property at all is not an error; it is a candidate with nothing to write.
+    expect(readCandidate(`
+      values: empty.number,`)).toEqual({
+      attribute: null,
+      parts: [],
+      types: [],
+    })
+  })
+})
+
 describe('the identities in the model', () => {
   const entries = readPropertyEntries()
   const identityOf = slot => {

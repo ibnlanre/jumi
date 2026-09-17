@@ -2231,3 +2231,37 @@ spelling it was proven through. The 22 filter/backdrop leaves remain structurall
 
 **Next:** the structural regression arm the ruling asked for (the frame writes the leaf, the property is
 bridge-only), then `offset-anchor`.
+
+
+## 2026-09-17 — the reader hardening closed: the walk is a pure function, and its two failure modes are pinned
+
+### The ruling
+
+> **I would not count the reader hardening as fully closed until those two fixtures exist … Expose the
+> structural walk as a small pure helper rather than add a special fixture file if that refactor stays local.**
+
+The refactor stayed local. The walk is now `readCandidate(body)` — a pure function of one entry's text that
+removes comments **before** splitting on parentheses and quotes — and `readCandidates` composes it with the
+entry's name and file, which are where the text came from rather than what it says.
+
+### The two fixtures, and the falsification that makes them arms rather than prose
+
+```text
+a comment carrying add(          and a bare ( of its own
+a comment carrying an apostrophe
+
+  the un-stripped walk closes: false | quote open at end: true     ← both cases
+```
+
+Both fixtures are checked against a walk with the stripping removed, so their claim is that the *bug* is
+unreachable, not merely that the fix is present. And their fingerprint is the one worth remembering: neither
+produced an error. The pair simply had no candidate, no route and no derivation — which is a silent loss of
+reach, and the reason the failure mode was preserved in prose for a session before it could be pinned in code.
+
+Three more cases pin the shapes the walk was written for, so the extraction did not quietly narrow it: a whole
+candidate addressing its attribute, `token(…)`'s argument being an order rather than a parts list, and an entry
+that addresses nothing at all.
+
+**State.** 17/17 stages, 480 unit tests. Next: `offset-anchor`, starting from the browser grammar rather than
+from the current four-leaf vocabulary, with "two `<length-percentage>` axes" treated as the hypothesis to
+falsify rather than the answer.
