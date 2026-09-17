@@ -3244,6 +3244,11 @@ decision above, are the increment's opening items.
 it, and a decline spelling that never compiled — and both read exactly like an emission that does not work. Read the
 fixture before the emission; the detail strings exist so a failure says which of the two it is.
 
-**State.** Corrections `0a48f0e`, emission `<landing>`. Gate 17/17, 496 unit tests, 87/87 behaviour arms, `tsc` clean.
+**State.** Corrections `0a48f0e`, emission `4b2e030`.
+
+**Correction, appended:** the entry above was written with a placeholder for the emission's tip and committed with it
+still in place. The emission commit is `4b2e030`; it was first staged with `git add -A`, which took the untracked probe
+and a docs reflow that are not this track's, and the commit was redone with only the twelve files this increment
+touched. Both facts are recorded here rather than in the entry, because the entry is history. Gate 17/17, 496 unit tests, 87/87 behaviour arms, `tsc` clean.
 The six assumptions stand unreopened; the spike's measurements stand; the landing is in and measured, with two items
 open rather than deferred.
