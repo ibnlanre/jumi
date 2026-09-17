@@ -7,7 +7,10 @@ import { compositionEdges } from '@/variables/composition'
 import { propertyVariables } from '@/variables/property'
 
 import {
+  addressableLeavesOf,
+  authoringOf,
   canonicalizeLeaf,
+  isExecutionLeaf,
   normalizeScale,
   scaleFactorToNumber,
   scaleLeafEndpoints,
@@ -18,6 +21,8 @@ import {
   typedLeaves,
   typedLeavesOf,
 } from './typed-leaves'
+
+import { expressions, readCandidates } from '../../scripts/lib/property-model.mjs'
 
 import path from 'node:path'
 
@@ -495,6 +500,13 @@ describe('typed execution declarations', () => {
     // family does not declare is a write to an **unregistered** custom property — discrete instead
     // of interpolable, and silent, because the keyframe still carries it. A declared leaf the whole
     // facet never assigns is a leaf the motion does not move.
+    //
+    // The second half is stated over the **addressable** leaves, which is a narrowing rather than a
+    // relaxation. It used to say every declared leaf, and that was only true while every declared leaf
+    // was something an author could address; a family that resolves execution out of an authoring
+    // surface has leaves no whole value can name — they are named by the resolver, from authoring
+    // state the whole facet does not receive — and requiring them here would demand the facet invent
+    // an entrance. What an author can address still owes a whole-value reading, and that is asserted.
     for (const [attribute, execution] of Object.entries(typedExecutions)) {
       const declared = typedLeavesOf(attribute as PropertyType).map(
         ([leaf]) => leaf,
@@ -507,7 +519,11 @@ describe('typed execution declarations', () => {
       // Compared as a **set**, so this arm answers exactly one question — which leaves are named.
       // Cardinality is the next arm, and the two have to be separable: a repeated name passes this
       // one and has to fail that one.
-      expect([...new Set(names)].sort()).toEqual(declared)
+      const addressable = addressableLeavesOf(attribute as PropertyType).map(
+        ([leaf]) => leaf,
+      )
+
+      expect([...new Set(names)].sort()).toEqual(addressable)
     }
   })
 
@@ -559,5 +575,40 @@ describe('typed execution declarations', () => {
     // leaf an execution writes is a leaf that has to have been registered.
     for (const attribute of Object.keys(typedExecutions))
       expect(typedLeavesOf(attribute as PropertyType).length).toBeGreaterThan(0)
+  })
+
+  it('evidences an execution leaf through the family that produces it', () => {
+    // An execution leaf **cannot** have route evidence of its own, because a route means an author can enter
+    // through something. What stands in its place is the family, and both halves of that are checked here,
+    // since either alone is satisfiable by a leaf that is dead in a different way: a leaf the composition never
+    // reads is a write to a property nothing consumes, and a leaf some candidate addresses is authoring surface
+    // wearing an execution marker — a distinction that would then be wrong rather than merely unused.
+    for (const attribute of Object.keys(typedExecutions) as PropertyType[]) {
+      const composed = expressions().get(attribute) ?? ''
+
+      for (const [leaf, declaration] of typedLeavesOf(attribute))
+        if (isExecutionLeaf(declaration)) {
+          expect(composed, `${attribute}: ${leaf}`).toContain(
+            `var(--jumi-${leaf})`,
+          )
+
+          expect(
+            readCandidates().some(
+              one => one.attribute === leaf || one.parts.includes(leaf),
+            ),
+            `${leaf} is addressed by a candidate, so it is authoring surface`,
+          ).toBe(false)
+        }
+    }
+  })
+
+  it('declares an authoring surface wherever execution exists', () => {
+    // Execution is *resolved out of* authoring state, so the state has to exist and the way an author reaches
+    // it has to be declared. A family with execution leaves and no authoring surface is one whose leaves can
+    // never move — the resolver would have nothing to read, and the routes that are supposed to prove the
+    // execution would have nothing to enter through.
+    for (const attribute of Object.keys(typedExecutions) as PropertyType[])
+      if (typedLeavesOf(attribute).some(([, one]) => isExecutionLeaf(one)))
+        expect(authoringOf(attribute).length, attribute).toBeGreaterThan(0)
   })
 })

@@ -1,4 +1,4 @@
-import { describe, population } from './observation.mjs'
+import { censusPopulation, describe } from './observation.mjs'
 import { bucketOf } from './property-model.mjs'
 
 /**
@@ -41,7 +41,7 @@ export const statusOf = descriptor => {
  * picked from a list, and a count is a summary of a list that has to be derived again to be used.
  */
 export const crossTab = () => {
-  const constituent = population().filter(
+  const constituent = censusPopulation().filter(
     pair => bucketOf(pair.parent, pair.component) !== 'machinery',
   )
 
@@ -68,12 +68,12 @@ export const crossTab = () => {
   return {
     at,
     column,
+    columnTotal: morphology =>
+      column(morphology).reduce((total, cell) => total + cell.length, 0),
     constituents: constituent.length,
     described,
     row,
     rowTotal: status =>
       row(status).reduce((total, cell) => total + cell.length, 0),
-    columnTotal: morphology =>
-      column(morphology).reduce((total, cell) => total + cell.length, 0),
   }
 }

@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import {
   applicationOf,
+  censusOf,
+  censusPopulation,
   chainsOf,
   describe as describePair,
   descriptorOf,
@@ -224,5 +226,54 @@ describe('population coverage', () => {
     expect(served.status).toBe('complete')
     expect(other.status).toBe('unresolved-descriptor')
     expect(other.reason).toBe('no candidate addresses the pair')
+  })
+})
+
+describe('the census population', () => {
+  it('counts the authoring surface where the composition no longer reads it', () => {
+    // The rule a reshape needs, stated as a function of its inputs so it can be exercised without moving the
+    // model underneath it: the graph stopped naming the authoring components, and they did not stop being
+    // constituents. A pair leaves this population because the graph stopped reading it, not because an author
+    // lost the ability to address it.
+    expect(
+      censusOf({
+        authoring: [{ component: 'edge', parent: 'anchor' }],
+        composition: [{ component: 'position', parent: 'anchor' }],
+      }),
+    ).toEqual([
+      { component: 'position', parent: 'anchor' },
+      { component: 'edge', parent: 'anchor' },
+    ])
+  })
+
+  it('leaves the execution machinery out of it', () => {
+    // An execution leaf is reached by the composition and by nothing else — no candidate addresses it — so
+    // counting it would say an author can address something they cannot see.
+    expect(
+      censusOf({
+        authoring: [{ component: 'edge', parent: 'anchor' }],
+        composition: [{ component: 'position', parent: 'anchor' }],
+        execution: ['position'],
+      }),
+    ).toEqual([{ component: 'edge', parent: 'anchor' }])
+  })
+
+  it('counts a pair once when both relations name it', () => {
+    // A family whose composition still reads an authoring component contributes it through both halves, and
+    // without this the buckets would each grow by a pair nobody can explain.
+    expect(
+      censusOf({
+        authoring: [{ component: 'edge', parent: 'anchor' }],
+        composition: [{ component: 'edge', parent: 'anchor' }],
+      }),
+    ).toHaveLength(1)
+  })
+
+  it('is the graph while no family declares either relation', () => {
+    // The rule is inert until a family needs it, and that is asserted rather than assumed: with no authoring
+    // surface and no execution leaf declared, the census is exactly the composition graph it has always been,
+    // which is what makes the counts in `crosstab.test.mjs` a statement about the model rather than about this
+    // function. The increment that lands `offset-anchor` restates this identity with both halves non-empty.
+    expect(censusPopulation()).toEqual(population())
   })
 })

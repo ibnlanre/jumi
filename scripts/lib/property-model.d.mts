@@ -9,6 +9,15 @@
  * where that distinction is visible.
  */
 
+/** One candidate-table entry. */
+export interface Candidate {
+  attribute: null | string
+  file: string
+  name: string
+  parts: string[]
+  types: string[]
+}
+
 /** One `propertyVariables` entry, read from the source. */
 export interface PropertyEntry {
   /** Whether the entry declares `dependencies`, i.e. composes parts of its own. */
@@ -20,17 +29,8 @@ export interface PropertyEntry {
   /** The entry's key: the slot's public name. */
   slot: string
   /** The entry's `value:` **as written** — a quoted literal, an identifier, or a call. */
-  value: string | null
+  value: null | string
   variable: string | undefined
-}
-
-/** One candidate-table entry. */
-export interface Candidate {
-  attribute: string | null
-  file: string
-  name: string
-  parts: string[]
-  types: string[]
 }
 
 export declare const root: string
@@ -38,11 +38,21 @@ export declare const root: string
 export declare const readPropertyEntries: () => PropertyEntry[]
 export declare const readCandidates: () => Candidate[]
 export declare const readCompositions: () => Map<string, string>
-export declare const readExpressions: () => Map<string, string | null>
-export declare const expressions: () => Map<string, string | null>
+export declare const readExpressions: () => Map<string, null | string>
+export declare const expressions: () => Map<string, null | string>
 export declare const readTypedLeaves: () => Map<
   string,
-  { family: string; initialValue: string | null; syntax: string | null }
+  {
+    execution: boolean
+    family: string
+    initialValue: null | string
+    syntax: null | string
+  }
+>
+
+export declare const readTypedExecutions: () => Map<
+  string,
+  { authoring: string[] }
 >
 
 export declare const FUNCTION: RegExp
@@ -51,7 +61,7 @@ export declare const MACHINERY: RegExp
 export declare const depthOf: (
   expression: unknown,
   component: string,
-) => number | null
+) => null | number
 
 export declare const bucketOf: (
   parent: string,

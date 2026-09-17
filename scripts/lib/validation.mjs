@@ -1,5 +1,9 @@
 import { derive } from './derivation.mjs'
-import { describe, population, servingCandidates } from './observation.mjs'
+import {
+  censusPopulation,
+  describe,
+  servingCandidates,
+} from './observation.mjs'
 import {
   bucketOf,
   readCandidates,
@@ -287,7 +291,7 @@ export const plans = () => {
   const declared = readTypedLeaves()
 
   return (
-    population()
+    censusPopulation()
       /**
        * Membership is **the representation the model proposes or declares**, not the census bucket.
        *

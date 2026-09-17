@@ -278,9 +278,7 @@ export const readCandidates = () => {
      * all along; this reader now does too, so there is one preprocessing rule rather than a bespoke workaround
      * per reader.
      */
-    const text = stripComments(
-      fs.readFileSync(path.join(root, file), 'utf8'),
-    )
+    const text = stripComments(fs.readFileSync(path.join(root, file), 'utf8'))
 
     /**
      * Three candidate shapes address a property, and reading only the first was a **second** gap in
@@ -607,12 +605,43 @@ export const readTypedLeaves = () => {
   for (const family of readBareEntries(body, 2))
     for (const leaf of readEntries(family.body, 4))
       leaves.set(leaf.name, {
+        execution: /\bexecution: true\b/.test(leaf.body),
         family: family.name,
         initialValue: leaf.body.match(/initialValue: '([^']+)'/)?.[1] ?? null,
         syntax: leaf.body.match(/syntax: '([^']+)'/)?.[1] ?? null,
       })
 
   return leaves
+}
+
+/**
+ * The **authoring surfaces** the families declare: the components each family exposes to an author, which after a
+ * reshape are no longer the ones its composition reads.
+ *
+ * Read from `typedExecutions` and deliberately not joined to the composition graph, because the whole point of
+ * the declaration is that the two relations are different — the graph says what the property is made of, this
+ * says what an author writes.
+ */
+export const readTypedExecutions = () => {
+  const text = fs.readFileSync(
+    path.join(root, 'src/variables/typed-leaves.ts'),
+    'utf8',
+  )
+  const start = text.indexOf('export const typedExecutions')
+  const body = text.slice(start, text.indexOf('\nexport const', start))
+  const families = new Map()
+
+  for (const family of readBareEntries(body, 2)) {
+    const surface = /authoring: \[([^\]]*)\]/.exec(family.body)
+
+    families.set(family.name, {
+      authoring: surface
+        ? [...surface[1].matchAll(/'([\w-]+)'/g)].map(match => match[1])
+        : [],
+    })
+  }
+
+  return families
 }
 
 /** Every leaf — an entry no other entry composes — joined to the candidates that can address it. */ export const readLeaves =

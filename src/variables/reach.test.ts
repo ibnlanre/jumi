@@ -1,6 +1,14 @@
+import type { PropertyType } from '@/types'
+
 import { describe, expect, it } from 'vitest'
 
 import { propertyVariables } from '@/variables/property'
+import {
+  authoringPairs,
+  isExecutionLeaf,
+  typedLeaves,
+  typedLeavesOf,
+} from '@/variables/typed-leaves'
 
 import {
   bucketOf,
@@ -85,17 +93,45 @@ const parents = Object.entries(propertyVariables).filter(
 // parted company, and the pair-by-pair bucket assertions below are computed from the source either way.
 const sourceParents = readPropertyEntries().filter(entry => entry.composite)
 
-const components = new Set(
-  parents.flatMap(([, entry]) => entry.dependencies ?? []),
+/**
+ * The **execution machinery**: leaves that exist to be written by a frame and cannot be entered through.
+ *
+ * Not population, and not an absence of reach either — a leaf no author can address was never on the surface.
+ */
+const executionLeaves = new Set(
+  Object.keys(typedLeaves)
+    .flatMap(attribute => typedLeavesOf(attribute as PropertyType))
+    .filter(([, declaration]) => isExecutionLeaf(declaration))
+    .map(([leaf]) => leaf),
 )
 
-const pairs = parents.flatMap(([parent, entry]) =>
-  (entry.dependencies ?? []).map(leaf => ({
-    bucket: bucketOf(parent, leaf),
-    leaf,
-    parent,
-  })),
-)
+/**
+ * The surface, in the two relations the model states separately: what each property **composes**, and what each
+ * family **exposes to an author**.
+ *
+ * They were one list until a reshape needed them apart — `dependencies` is what the property is made of, and an
+ * emission that resolves two execution leaves out of four authoring components has a composition that reads
+ * neither pair correctly. Counting only the graph would drop the four the moment the composition stopped naming
+ * them; counting only the declarations would drop every pair nobody has had reason to declare yet.
+ */
+const surface = [
+  ...parents.flatMap(([parent, entry]) =>
+    (entry.dependencies ?? []).map(leaf => ({ leaf, parent })),
+  ),
+  ...authoringPairs().map(one => ({ leaf: one.component, parent: one.parent })),
+]
+
+// Counted once per pair, and never an execution leaf: both rules are the ones
+// `scripts/lib/observation.mjs`'s `censusOf` applies, and the counts below are asserted in both files.
+const pairs = [
+  ...new Map(
+    surface.map(one => [`${one.parent}/${one.leaf}`, one]),
+  ).values(),
+]
+  .filter(one => !executionLeaves.has(one.leaf))
+  .map(one => ({ bucket: bucketOf(one.parent, one.leaf), ...one }))
+
+const components = new Set(pairs.map(one => one.leaf))
 
 const buckets = pairs.reduce<
   Record<string, Array<{ leaf: string; parent: string }>>
@@ -144,6 +180,29 @@ describe("D.3's constituent census", () => {
       expect(size(bucket) / constituent).toBeGreaterThan(0.25)
       expect(size(bucket) / constituent).toBeLessThan(0.45)
     }
+  })
+
+  it('counts the authoring surface, and never the execution machinery', () => {
+    // The two halves of the population rule, each stated where it can fail. An authoring component stays a
+    // constituent whether or not the composition still names it: a reshape moves work, it does not unexpose a
+    // surface. An execution leaf is the opposite — it has no entrance, so it was never census population.
+    for (const one of authoringPairs())
+      expect(
+        pairs.some(pair => pair.leaf === one.component && pair.parent === one.parent),
+        `${one.parent}/${one.component}`,
+      ).toBe(true)
+
+    for (const leaf of executionLeaves)
+      expect(
+        pairs.some(pair => pair.leaf === leaf),
+        `${leaf} is execution machinery and is in the census`,
+      ).toBe(false)
+
+    // Counted once, from either relation: a family that exposed a component its composition also read would
+    // otherwise contribute it twice, and the buckets would each grow by a pair nobody can explain.
+    expect(new Set(pairs.map(one => `${one.parent}/${one.leaf}`)).size).toBe(
+      pairs.length,
+    )
   })
 
   it('places the decisive pairs, whose buckets the browser book confirms or refutes', () => {

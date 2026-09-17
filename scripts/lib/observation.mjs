@@ -37,6 +37,7 @@
 import {
   readCandidates,
   readPropertyEntries,
+  readTypedExecutions,
   readTypedLeaves,
 } from './property-model.mjs'
 import { varReferences } from './var-references.mjs'
@@ -62,7 +63,7 @@ export const chainsOf = (slot, seen = new Set()) => {
   if (!parents.length) return [[]]
 
   return parents.flatMap(entry =>
-    chainsOf(entry.slot, new Set([...seen, entry.slot])).map(rest => [
+    chainsOf(entry.slot, new Set([entry.slot, ...seen])).map(rest => [
       entry.slot,
       ...rest,
     ]),
@@ -78,7 +79,7 @@ export const chainsOf = (slot, seen = new Set()) => {
  * or an ancestor of its parent). A component whose candidate addresses a surface the graph cannot reach
  * means one of the two has moved, and the descriptor fails loudly instead of measuring something adjacent.
  */
-export const descriptorOf = ({ candidate, component, method, contexts }) => {
+export const descriptorOf = ({ candidate, component, contexts, method }) => {
   const entry = CANDIDATES.find(one => one.name === candidate)
 
   if (!entry || !entry.attribute)
@@ -128,6 +129,70 @@ export const population = () => {
 
   return pairs
 }
+
+/**
+ * The **authoring** half of the population: components a family exposes to authors, whether or not its
+ * composition still names them.
+ */
+export const authoringPopulation = () => {
+  const pairs = []
+
+  for (const [attribute, surface] of readTypedExecutions())
+    for (const component of surface.authoring)
+      pairs.push({ component, parent: attribute })
+
+  return pairs
+}
+
+/** The names of the leaves that exist only to be **executed**, and so cannot be entered through. */
+export const executionLeaves = () =>
+  new Set([...TYPED].filter(([, one]) => one.execution).map(([name]) => name))
+
+/**
+ * The census population as a **function of its three inputs** rather than as a computation over the model.
+ *
+ * Pure on purpose. The rule is the thing worth stating, and a rule that can only be exercised by changing the
+ * model underneath it is a rule nothing tests — which is how a distinction this load-bearing stayed invisible
+ * until an emission needed it.
+ */
+export const censusOf = ({
+  authoring = [],
+  composition = [],
+  execution = [],
+} = {}) => {
+  const hidden = new Set(execution)
+  const seen = new Set()
+  const pairs = []
+
+  for (const pair of [...composition, ...authoring]) {
+    const key = `${pair.parent}/${pair.component}`
+
+    if (seen.has(key) || hidden.has(pair.component)) continue
+
+    seen.add(key)
+    pairs.push(pair)
+  }
+
+  return pairs
+}
+
+/**
+ * The **census population**: every pair the model exposes to an author, which is the composition graph plus the
+ * declared authoring surfaces, minus the leaves that exist only to be executed.
+ *
+ * Neither half of that is tidying, and the two are the same missing distinction seen from opposite sides. An
+ * execution leaf is reached by the composition and by nothing else — no candidate addresses it — so counting it
+ * says an author can address something they cannot see. Leaving the authoring components out because the graph
+ * stopped reading them says the opposite: that a reshape removed them from the surface. `dependencies` answers
+ * what the property is made of and cannot answer either question, which is why the unit of measurement is
+ * stated once here rather than recomputed per consumer.
+ */
+export const censusPopulation = () =>
+  censusOf({
+    authoring: authoringPopulation(),
+    composition: population(),
+    execution: executionLeaves(),
+  })
 
 /**
  * The candidates that address a pair, nearest surface first.
@@ -296,13 +361,13 @@ export const computedOf = (page, property, declarations) =>
     )
     .then(() =>
       page.evaluate(
-        ({ property, count }) =>
+        ({ count, property }) =>
           Array.from({ length: count }, (_, index) =>
             getComputedStyle(document.getElementById(`q${index}`))
               .getPropertyValue(property)
               .trim(),
           ),
-        { property, count: declarations.length },
+        { count: declarations.length, property },
       ),
     )
 

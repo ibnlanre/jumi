@@ -29,6 +29,18 @@ export type TypedLeaf = {
    * outside the forms it understands must pass through untouched rather than be guessed at.
    */
   animationCanonicalizer?: ((value: string) => null | string) | undefined
+  /**
+   * This leaf is **execution machinery** rather than an authoring component: what a frame writes, not what an
+   * author writes.
+   *
+   * The distinction is first-class because three subsystems were conflating it — the census counted such a leaf
+   * as a constituent, the evidence model required a route for it, and the only way to give it one was to invent
+   * an entrance no author has. What is true of it instead: it has **no candidate route** and never will, it is
+   * not population, and it is evidenced through the public routes that generate it. Absence means addressable,
+   * which is why this is a marker rather than a required field — the map's overwhelming majority is authoring
+   * surface and should not have to say so.
+   */
+  execution?: true | undefined
   /** The value the property falls to when nothing declares it. */
   initialValue: string
   /** A CSS syntax string, unquoted — `@/core` quotes it into the `syntax` descriptor. */
@@ -408,6 +420,22 @@ export const typedLeavesOf = (
     a.localeCompare(b),
   )
 
+/** Whether a leaf is execution machinery rather than an authoring component. */
+export const isExecutionLeaf = (declaration: TypedLeaf | undefined): boolean =>
+  declaration?.execution === true
+
+/**
+ * The leaves a family declares that an author can **address**, which are the ones that owe route evidence.
+ *
+ * The invariant is narrowed rather than relaxed. A route means an author can enter through something, and an
+ * execution leaf cannot be entered through at all — it is proven by the public routes that produce it, which is
+ * a different kind of evidence and belongs to the family rather than to the leaf.
+ */
+export const addressableLeavesOf = (
+  attribute: PropertyType,
+): Array<[string, TypedLeaf]> =>
+  typedLeavesOf(attribute).filter(([, one]) => !isExecutionLeaf(one))
+
 /**
  * What a frame writes for one leaf, or `null` to **decline** — three states, and the middle one is
  * the reason this is a function rather than an optional call at the call site.
@@ -548,6 +576,22 @@ export const scaleLeafEndpoints = (
  */
 export type TypedExecution = {
   /**
+   * The family's **authoring surface**: the public components it exposes, and the set the resolver's projection
+   * is built from.
+   *
+   * Deliberately not the composition's `dependencies`, and the difference is not bookkeeping. After a reshape the
+   * property composes the **resolved** components while the authoring ones stay public — candidates still address
+   * them and the resolver still reads them — so one list cannot be both without saying the composition reads
+   * something it does not. `dependencies` says what the property is made of; this says what an author writes.
+   *
+   * Two consumers read it, and they are why it is declared rather than inferred: the **context projection** is
+   * exactly these slots, and the **constituent census** counts a family's authoring components as its constituents
+   * even where the composition no longer names them. A pair leaves the population because the graph stopped
+   * reading it, not because an author lost the ability to address it.
+   */
+  authoring?: readonly string[]
+
+  /**
    * A whole value → the leaves it sets, in the family's own order, or `null` to **decline** the
    * motion so the caller keeps the property-level representation.
    *
@@ -584,7 +628,12 @@ export type TypedExecution = {
   constituent?: (
     component: string,
     value: string,
-    context: Record<string, string>,
+    /**
+     * The family's authoring state, keyed by **exactly the slots the family declares as its authoring surface**:
+     * the authored value where the candidate wrote the slot, the model's rest where it did not, and absent where
+     * the model declares nothing at all — which is a decline rather than a default.
+     */
+    authoring: Record<string, string>,
   ) => Array<[string, string]> | null
 }
 
@@ -653,3 +702,24 @@ export const typedExecutions: Partial<Record<PropertyType, TypedExecution>> = {
 export const typedExecutionOf = (
   attribute: PropertyType,
 ): TypedExecution | undefined => typedExecutions[attribute]
+
+/**
+ * The authoring surface one family declares, or an empty list.
+ *
+ * Read by the census, which counts a family's authoring components even where the composition no longer names
+ * them: the reshape moved them out of `dependencies`, and it did not move them out of the model.
+ */
+export const authoringOf = (attribute: PropertyType): readonly string[] =>
+  typedExecutions[attribute]?.authoring ?? []
+
+/** Every `(parent, component)` pair the declared authoring surfaces expose. */
+export const authoringPairs = (): Array<{
+  component: string
+  parent: string
+}> =>
+  Object.entries(typedExecutions).flatMap(([attribute, execution]) =>
+    (execution.authoring ?? []).map(component => ({
+      component,
+      parent: attribute,
+    })),
+  )
