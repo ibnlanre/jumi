@@ -517,11 +517,11 @@ reproduced it were `blur` and `skew-x`, which have no typed leaves at all. Bisec
 named `3b15b84` ("make the timing chain resolve from the component address first"), and the emitted diff
 was unambiguous: the `--jumi-slot-<key>` hoist disappeared and the position read fell back to `none`.
 
-The cause was a **coupling**, not a fault in either half. The pass recovered which *instance* a composition
+The cause was a **coupling**, not a fault in either half. The pass recovered which _instance_ a composition
 position belonged to by matching the **head** of that position's timing entry
-(`^var\(\s*--jumi-slot-<count>-…`). So `component → slot → property → global` and *this position is instance
-K* were one fact, and `component`-outermost displaced the slot link: every position read as the
-*definition*, no hoist was published, and the motion vanished. Taking the reorder as the repair would have
+(`^var\(\s*--jumi-slot-<count>-…`). So `component → slot → property → global` and _this position is instance
+K_ were one fact, and `component`-outermost displaced the slot link: every position read as the
+_definition_, no hoist was published, and the motion vanished. Taking the reorder as the repair would have
 paid for an implementation constraint with cascade precedence — **ruled against**, and the two facts were
 separated instead:
 
@@ -537,7 +537,7 @@ against `instanceKeys`. Both sides are produced by `instanceText`, so identity i
 text and nothing is reconstructed from an expression's shape.
 
 The edge that justifies carrying it structurally: a slot whose name was **refused** or **shadowed**
-(`animate-rotate-45/scale`) keeps the name in its *key* while publishing under its **definition** —
+(`animate-rotate-45/scale`) keeps the name in its _key_ while publishing under its **definition** —
 `rotate-3zWYd`, not `5-scale-3zWYd-rotate`. Slot key and published key are not always the same string, so
 treating the instance key as canonical would have been wrong. `publishedKey` states the rule, and behaviour
 arm `f` is what caught its absence.
@@ -569,7 +569,7 @@ cost an emptied `@layer base` and +16 shipped bytes, which is why it is not the 
 
 **A finding withdrawn.** The "corner" case that appeared to fail before the regression
 (`animate-border-radius-top-left-…/drift`) does not exist. The attribute is `border-top-left-radius`, and the
-spelling in the arm was never a candidate, so it emitted no rule and read zero instances at *every* revision
+spelling in the arm was never a candidate, so it emitted no rule and read zero instances at _every_ revision
 including the pre-regression baseline; correctly spelled it animates, named and unnamed. It is a measurement
 artefact rather than a defect, so it is withdrawn from the narrative rather than carried as a known-bad
 baseline, and it is not filed.
@@ -629,7 +629,7 @@ cascade-addressable timing, and browser behaviour over textual resemblance.
 
 The first increment is a census, and it had to be corrected twice before it was true.
 
-**The unit is the pair, not the leaf.** `translate-x` is a bare component of `translate` and an *argument*
+**The unit is the pair, not the leaf.** `translate-x` is a bare component of `translate` and an _argument_
 of `translate3d(…)` — the same token participates two ways — so a per-leaf verdict would have to be wrong
 about one of them. Over (parent, component) pairs the surface is 324, of which 21 are parts of the
 `animation`/`transition`/`*-timeline` shorthands: the motion machinery, not constituents, and excluded
@@ -664,7 +664,7 @@ border-bottom-width        border-bottom-width   0px        -> 0px        not ex
 ```
 
 Registration-unsafety is **sufficient** to keep a leaf on the property/native path; registration-safety
-is **not sufficient** to type it. It makes the leaf *eligible* for the interpolation differential —
+is **not sufficient** to type it. It makes the leaf _eligible_ for the interpolation differential —
 native against typed-leaf, for representative authored values — and only both stages together would
 license `movable`. `background-position-x-edge` is why the gate is worth having: `left` is a keyword, so
 the shape of the resting text says "unsafe", and `left` is also exactly `0%`, so the resting rendering is
@@ -745,8 +745,8 @@ C  background-position-x-edge   unresolved
 ```
 
 **The strict version of the question found two fixture defects that the loose version would have
-published as results.** Reading a declaration out of the sheet with a first-match regex read a *staging
-name* — `--jumi-staging-animations---jumi-background-position-x` contains the declaration it stages — so
+published as results.** Reading a declaration out of the sheet with a first-match regex read a _staging
+name_ — `--jumi-staging-animations---jumi-background-position-x` contains the declaration it stages — so
 the fixture wrote `0%` where the model's pair belonged and the typed arm read a constant. That is a
 textbook `registration-safe, interpolation-unsafe`, and it was nothing of the kind. The extractor now
 selects the candidate containing the slot under test and throws when none does. The second: arm A's
@@ -765,12 +765,12 @@ What each verdict now rests on:
   in both containers.
 - **`unresolved` (C)** is a boundary the engine drew, not one inferred from the text: the model's
   composition for `background-position-x` is a **pair**, and the longhand drops it (`100% 0%` → `0%`).
-  The leaf interpolates `0% → 100%` and the parent never moves. The pair *is* honoured by the shorthand
+  The leaf interpolates `0% → 100%` and the parent never moves. The pair _is_ honoured by the shorthand
   the model composes above it, which is a **different parent** — measured so the boundary is a reading
   rather than an attribution, and deliberately not asked to a verdict here.
 
 **The finding that outlives the three verdicts: an observability class.** The result is not "one movable,
-2 unresolved" — it is that a keyword case can stay unresolved for two *different* reasons, and neither is
+2 unresolved" — it is that a keyword case can stay unresolved for two _different_ reasons, and neither is
 a failure of typed execution. So the relation the census unit needs is not only `(parent, component)`:
 
 ```text
@@ -831,7 +831,7 @@ Then, on landing:
 > result counts as evidence.**
 
 > **An unsafe verdict belongs to the tested representation, not automatically to the conceptual constituent
-> forever.** So enough identity is recorded with the verdict to know *what* failed: `background-position-x-edge`
+> forever.** So enough identity is recorded with the verdict to know _what_ failed: `background-position-x-edge`
 > under a percentage representation is `interpolation-unsafe`, which is not the claim that the edge can never
 > be typed in any form — a representation preserving the edge keyword semantics could change the answer.
 
@@ -877,8 +877,8 @@ D  border-bottom-width          fixture-unobservable — no execution verdict, i
 ```
 
 **C is the finding, and it is sharper than the differential could state it.** The composed consumer test ran,
-and it separates the two halves of one pair under one registration shape in one composition: the *edge* slot
-is `registration-safe, interpolation-unsafe` while the *offset* slot is `movable`. `left` is `0%` on the
+and it separates the two halves of one pair under one registration shape in one composition: the _edge_ slot
+is `registration-safe, interpolation-unsafe` while the _offset_ slot is `movable`. `left` is `0%` on the
 longhand — the gate measured that — so a `<length-percentage>` looks justified; inside the shorthand's
 four-value grammar the first value is an edge **keyword** and a percentage there is not a value, so the leaf
 moves, the composition moves, and the user-visible property does not. That is the class's whole content: the
@@ -887,18 +887,18 @@ is also why D.3.5 cannot classify at family level, or from syntax alone — **th
 
 **B is the other half of the same lesson, in the other direction.** The computed surface reports a
 difference in all three contexts; the used value diverges in one and is unchanged in two. A `used-gap`
-reading is only evidence if it can *see* a gap, so every context carries a canary (`column-gap: 20px`) — an
+reading is only evidence if it can _see_ a gap, so every context carries a canary (`column-gap: 20px`) — an
 observable that reads the same with and without one cannot distinguish `preserved` from `blind`. That is the
 gate's own `border-bottom-width` lesson arriving in a second class, and it is now a standing rule.
 
 **Three reader defects were found by getting them wrong, and each is unit-tested.** A first-match extractor
 read Tailwind's own `font-weight: bolder` before Jumi's application and reported that the emission never
 applies the property. A whole-value candidate writes both ends of its motion as `var(<frame>, var(<live>))`,
-so a fixture that applies the *frame* is measuring frame zero and calling it the rest — read as `0px tall`
+so a fixture that applies the _frame_ is measuring frame zero and calling it the rest — read as `0px tall`
 for a border that should be `3px`. Resolving to the live slot beneath a frame then leaked the wrapper's `)`,
 emitting `var(--jumi-border-bottom-width))`: an unbalanced pair in a declaration, which reads exactly like a
-property that never resolves. Three shapes of one mistake — reading the emission's *text* where its
-*structure* carries the meaning.
+property that never resolves. Three shapes of one mistake — reading the emission's _text_ where its
+_structure_ carries the meaning.
 
 **The durable verdict vocabulary**, five values, with the two `unsafe` classes deliberately not collapsed:
 
@@ -947,7 +947,7 @@ when structure carries meaning, do not recover it from serialized text
 > `(parent, component, representation, consumer, contexts)`.
 
 Pass one derives and stops. `pnpm research:d3-coverage` asks the **model** what it can justify for every
-census pair — a class that addresses it, the consumer that class hands the value to through *this* pair's
+census pair — a class that addresses it, the consumer that class hands the value to through _this_ pair's
 chain, and the typed leaf the model declares — and records where it stops and why. No browser, no compile, no
 verdict: a pass that derived and classified together is the one that starts inventing things to avoid an
 empty cell.
@@ -975,7 +975,7 @@ and browser behaviour not yet — nothing measured has ever stopped at the engin
 coverage pass exists to give, and it inverts the intuition the census invited: the keyword population is not
 blocked by what the browser will refuse, it is blocked by what the model has not yet said.
 
-Completeness is *exactly* the declared-representation set restricted to served pairs, and that is asserted
+Completeness is _exactly_ the declared-representation set restricted to served pairs, and that is asserted
 rather than counted — `scripts/lib/observation.test.mjs` holds that a declared leaf whose pairs are not all
 complete is a defect, so the pass keeps telling the truth as families are typed instead of needing its
 numbers updated.
@@ -994,16 +994,16 @@ background-position-x-offset  movable                proposed `<length-percentag
 border-bottom-width  fixture-unobservable    proposed `<length>`                     d3-observation.mjs D
 ```
 
-**Two findings about the population itself came out of deriving it.** A component can be composed by *two*
+**Two findings about the population itself came out of deriving it.** A component can be composed by _two_
 parents and a candidate serves one of them: `scale-x` is composed by `scale` and by `scale-3d`, and
 `animate-scale-x` addresses `scale` — so `(scale, scale-x)` is complete and `(scale-3d, scale-x)` has no
 candidate. Selecting by component alone made the second look like a broken descriptor instead of an unserved
-pair, which is a different finding and a different piece of work. And 20 pairs are served at *two* levels at
+pair, which is a different finding and a different piece of work. And 20 pairs are served at _two_ levels at
 once; the nearest surface is taken as the motion's, and the alternative is recorded rather than dropped,
 because a pair served twice is a fact the classification pass has to know.
 
 **A reader limitation, recorded rather than reconciled.** This pass counts 30 machinery pairs by the parent
-rule while the census reports 21, because the census's `reshape` check runs first and reads a *composed*
+rule while the census reports 21, because the census's `reshape` check runs first and reads a _composed_
 expression where this reader sees the identifier a composition module exports (`value: animationTimelineScroll`
 — `property-model.mjs` reads the source, not the evaluated value). The difference is a property of the reader,
 not a correction of the census, and it is written down here so the next reader does not rediscover it as a
@@ -1068,13 +1068,13 @@ pairs (the census unit)                        324
 
 **The bottleneck, in the CTO's phrasing, with the record it rests on:** at population scale the immediate
 bottleneck is model metadata and candidate coverage — most pairs do not yet reach the browser-classification
-stage. Browser behaviour has already been the limit *where a representation was proposed*: the
+stage. Browser behaviour has already been the limit _where a representation was proposed_: the
 `background-position-x-edge` slot is `interpolation-unsafe` under a percentage, `column-gap` is
 context-dependent, and the six complete descriptors were decided there.
 
-**No verdict changed to make the totals agree.** The nine pairs moved *upward into the census's own reach*,
+**No verdict changed to make the totals agree.** The nine pairs moved _upward into the census's own reach_,
 exactly as the census had always counted them; the sub-counts moved because the population did (199/98 rather
-than 199/89) and are not treated as durable — the assertions hold the *shape* (completeness is exactly the
+than 199/89) and are not treated as durable — the assertions hold the _shape_ (completeness is exactly the
 declared-representation set restricted to served pairs, every incomplete pair carries a reason), so they keep
 telling the truth as families are typed.
 
@@ -1115,7 +1115,7 @@ of the 303 pairs Jumi can describe structurally, 6 of 6 are behaviourally proven
 ```
 
 **The scope column is the honest part.** `§16`'s five curve arms are **scale's**; for translate the standing
-gate holds the *definition* contract (§17) and the curve equivalence is the D.2 landing record, not a
+gate holds the _definition_ contract (§17) and the curve equivalence is the D.2 landing record, not a
 standing arm. `translate-z` is a separate record because its declaration differs from its siblings' — a verdict
 belongs to the representation it was measured under, and a family is not a representation. Every record says
 which of the two kinds of evidence it is, so no row reads as "the gate holds this" when it does not.
@@ -1174,7 +1174,7 @@ citations from the registry. No `src/` behaviour change and no emitted-CSS chang
 > family by family?** We already know the 199 contain three very different morphologies from the census […]
 > So before adding declarations, I would project the unresolved-descriptor population back onto those buckets.
 > […] So I would make the next increment **diagnostic before migratory**: `303 reach pairs × morphology ×
-> descriptor failure reason`. No new representation yet.
+descriptor failure reason`. No new representation yet.
 
 `pnpm research:d3-crosstab` is that map, and it creates nothing — no representation, no measurement, no verdict:
 
@@ -1209,7 +1209,7 @@ reshape    no declaration alone helps; the interpolation unit is D.1's decomposi
 ```
 
 The nuance the tab adds to the ruling's own guess is in the reshape column: those pairs split between a missing
-representation (48) and a missing candidate (49), so reshape is *not* uniformly an interpolation-unit problem —
+representation (48) and a missing candidate (49), so reshape is _not_ uniformly an interpolation-unit problem —
 half of it is the candidate table.
 
 **Not yet committed.** Working tree only: `scripts/lib/crosstab.mjs` with its 5-test suite,
@@ -1269,8 +1269,8 @@ no defensible rule — named, not summarised
 ```
 
 **Two shapes the rule had to be taught, and both came out of the data rather than from the string.** A bare
-integer literal is a `<number>` *and* an `<integer>`, and `0` is a `<length>` too — so the *shape* answers with
-every reading it can support and the *grammar* decides which one is meant. That is the ruling's rule made
+integer literal is a `<number>` _and_ an `<integer>`, and `0` is a `<length>` too — so the _shape_ answers with
+every reading it can support and the _grammar_ decides which one is meant. That is the ruling's rule made
 operational: `0` under `[length | percentage | any]` and `0` under `[number | length]` are the same string and
 different derivations. And a union of two families is not a derivation even when every name has a spelling: the
 same text means different things in each branch, which the model records for `border-image-outset` and which
@@ -1288,7 +1288,7 @@ descriptor and the classification remain two passes, which is the whole reason t
 diagnostic.
 
 **The next decision, with both sides counted.** The 41 are one rule away from being model metadata; the 29 are
-a *narrowing* decision the model cannot make for us (do the `margin`/`padding` motions stop accepting `any`?);
+a _narrowing_ decision the model cannot make for us (do the `margin`/`padding` motions stop accepting `any`?);
 the 2 are keyword rests that belong to the observation protocol or to nothing.
 
 **Not yet committed.** Working tree only: `scripts/lib/derivation.mjs` with its 6-test suite,
@@ -1315,7 +1315,7 @@ Everything except one probe per syntax comes out of the emission — the rest th
 for (`restOf`), the frame the motion goes to (`framesOf`), the surface the pair is read on and the wiring that
 hands the value there (`applicationOf`), and the slot the leaf actually is (`pinningOf`, which follows the
 sheet's own compositions rather than the first `var(` it sees). The probe is the arm's only authored input, and
-the test suite asserts each one is a value its own syntax admits *by the shape reader's judgement*, so an arm
+the test suite asserts each one is a value its own syntax admits _by the shape reader's judgement_, so an arm
 cannot test a representation against a value the representation does not cover.
 
 ```text
@@ -1360,13 +1360,13 @@ proposed syntax  <integer>
 
 The moving thing is an argument inside `add(...)`, not the scalar leaf the resting value suggested — so the
 interpolation unit is **not** the leaf this pair was bucketed as. That is **reshape**, D.1's subject, and it is
-recorded here as a falsification of the census bucket rather than as a defect in the emission: *resting-value
-morphology alone cannot always identify the interpolation unit*. The test is the model's own `FUNCTION`
+recorded here as a falsification of the census bucket rather than as a defect in the emission: _resting-value
+morphology alone cannot always identify the interpolation unit_. The test is the model's own `FUNCTION`
 pattern over the emitted frames, not a list of properties, so it generalises past `math-depth`.
 
 **`registration-unsafe` is 0 by construction, and that is a result rather than a gap.** The syntax came from
 the resting value's own shape, so the rest is inside the syntax the derivation proposed — and the reach gate's
-`registration-unsafe` belongs to the *keyword* population, where the rest is a keyword and the grammar is a
+`registration-unsafe` belongs to the _keyword_ population, where the rest is a keyword and the grammar is a
 promise. The pass measures the rest anyway: the emission's rest is read from the sheet rather than assumed from
 the model, and the two disagreeing is a reader defect it **fails** on rather than a finding it reports.
 
@@ -1378,8 +1378,8 @@ the model, and the two disagreeing is a reader defect it **fails** on rather tha
   `#0000ff80` now, and the suite asserts no probe carries whitespace.
 - **A fixture that forgets the emitted sheet reads `none` and agrees.** The first run omitted it and produced
   27 `movable` verdicts from two invalid readings each. Two arms that never moved are one reading, so it is now
-  a **hard failure**: a flat native series *with* an identical typed series exits non-zero.
-- **The one-value spelling makes the arm motionless.** `-[2]` sets the leaf's *live* slot to the target, so the
+  a **hard failure**: a flat native series _with_ an identical typed series exits non-zero.
+- **The one-value spelling makes the arm motionless.** `-[2]` sets the leaf's _live_ slot to the target, so the
   application's frame reference wins and the leaf drives nothing; the phrase form `-[0:<rest>|100:<probe>]`
   keeps the live slot at its rest and is the only spelling under which the leaf is the source of truth.
 - **The report is part of the instrument.** The assembler returned an object per verdict while the tally
@@ -1415,3 +1415,55 @@ pass found real defects standing behind a representation question, and neither i
 **State at the time of writing.** Working tree only: `scripts/lib/validation.mjs` with its 16-test suite,
 `scripts/research/d3-validation.mjs`, and its `package.json` entry. No `src/` behaviour change, no emitted-CSS
 change, no representation declared; 17/17 stages, 79/79 behaviour.
+
+## 2026-09-17 — D.3.5 · the accounting correction, and the evidence a declaration has to name
+
+### Call
+
+> **"If `math-depth-add` has been reclassified as 'the interpolation unit is actually inside `add(...)`,' then it
+> should not remain `interpolation-unsafe`. We did not prove that its typed representation interpolates
+> incorrectly. We proved that the proposed representation was aimed at the wrong unit."** […] **"That keeps the
+> evidence honest. `math-depth-add` falsified its morphology, not its interpolation behavior."** […] **"the
+> permanent guard should be stronger than 'every declaration has some movable evidence.' Make it exact."**
+
+### The accounting, corrected
+
+```text
+movable                 31
+registration-unsafe      0
+interpolation-unsafe     0
+fixture-unobservable     5   mask-border-outset ×4 · rotate-z
+unresolved               2   rotate-x/y — no native baseline
+blocked-by-emission      2   offset-anchor x/y
+reshape-required         1   math-depth-add
+                        ──
+                        41
+```
+
+`reshape-required` is a class of its own rather than a soft note on an unsafe verdict, and it is decided **before**
+the interpolation differential in `verdictOf`'s precedence — after the canary and after the rest, and before the
+series are compared. The order carries the argument: a unit the syntax cannot name makes "does it interpolate the
+same?" the wrong question rather than a failed one, so a rest that does not survive the registration is still
+`registration-unsafe` (the test pins that) while an expression unit is `reshape-required` even when the series also
+disagree. Two tests cover it, and the class is in the vocabulary with its reason attached rather than in a comment
+beside it.
+
+### The evidence a declaration has to name
+
+`pnpm research:d3-validation` now writes **`scripts/validated-representations.json`**: one record per pair, with the
+pair, the candidate, the consumer, the **syntax**, the **initial value**, the number of magnitudes actually
+exercised, and the verdict. It is data — written by a research book, read by a unit test — and `src/` never imports
+it, so nothing in production depends on the pass that produced it.
+
+Two fields are there because a declaration can be compared against them **exactly**, which is what the ruling's
+guard needs: not "this pair has some evidence" but "this pair has a `movable` record whose representation is the
+representation that shipped".
+
+And the arms themselves changed one thing: when the model declares a component, they register **that** metadata
+rather than the proposal, and a declaration that disagrees with the proposal is a **failure** rather than a second
+measurement. That is the promotion proof — the research run proved the proposal, and the rerun proves that what
+landed in `typedLeaves` is the same thing that was validated. Before the promotion there is nothing declared, so
+this is inert; it exists now so the promotion commit needs no research edit of its own.
+
+**State.** 41 records · 31 `movable` · 18 tests in `validation.test.mjs`. No `src/` behaviour change, no emitted-CSS
+change, no declaration; 17/17 stages, 79/79 behaviour.

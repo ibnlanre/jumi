@@ -1,0 +1,415 @@
+{
+  "pairs": [
+    {
+      "candidate": "animate-background-position-x-offset",
+      "component": "background-position-x-offset",
+      "consumer": "background-position",
+      "initialValue": "0%",
+      "magnitudes": 2,
+      "parent": "background-position-x",
+      "syntax": "<percentage>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-background-position-y-offset",
+      "component": "background-position-y-offset",
+      "consumer": "background-position",
+      "initialValue": "0%",
+      "magnitudes": 2,
+      "parent": "background-position-y",
+      "syntax": "<percentage>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-background-color",
+      "component": "background-color",
+      "consumer": "background-color",
+      "initialValue": "transparent",
+      "magnitudes": 2,
+      "parent": "background",
+      "syntax": "<color>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-border-block-color",
+      "component": "border-block-color",
+      "consumer": "border-block-color",
+      "initialValue": "currentColor",
+      "magnitudes": 2,
+      "parent": "border-block",
+      "syntax": "<color>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-border-bottom-left-radius",
+      "component": "border-bottom-left-radius",
+      "consumer": "border-bottom-left-radius",
+      "initialValue": "0",
+      "magnitudes": 2,
+      "parent": "border-radius",
+      "syntax": "<length>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-border-bottom-radius",
+      "component": "border-bottom-right-radius",
+      "consumer": "border-radius",
+      "initialValue": "0",
+      "magnitudes": 2,
+      "parent": "border-radius",
+      "syntax": "<length>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-border-left-radius",
+      "component": "border-top-left-radius",
+      "consumer": "border-radius",
+      "initialValue": "0",
+      "magnitudes": 2,
+      "parent": "border-radius",
+      "syntax": "<length>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-border-right-radius",
+      "component": "border-top-right-radius",
+      "consumer": "border-radius",
+      "initialValue": "0",
+      "magnitudes": 2,
+      "parent": "border-radius",
+      "syntax": "<length>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-border-color",
+      "component": "border-color",
+      "consumer": "border-color",
+      "initialValue": "currentColor",
+      "magnitudes": 2,
+      "parent": "border",
+      "syntax": "<color>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-box-shadow-blur",
+      "component": "box-shadow-blur",
+      "consumer": "box-shadow",
+      "initialValue": "0",
+      "magnitudes": 2,
+      "parent": "box-shadow-inset",
+      "syntax": "<length>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-box-shadow-color",
+      "component": "box-shadow-color",
+      "consumer": "box-shadow",
+      "initialValue": "transparent",
+      "magnitudes": 2,
+      "parent": "box-shadow-inset",
+      "syntax": "<color>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-box-shadow-offset-x",
+      "component": "box-shadow-offset-x",
+      "consumer": "box-shadow",
+      "initialValue": "0",
+      "magnitudes": 2,
+      "parent": "box-shadow-inset",
+      "syntax": "<length>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-box-shadow-offset-y",
+      "component": "box-shadow-offset-y",
+      "consumer": "box-shadow",
+      "initialValue": "0",
+      "magnitudes": 2,
+      "parent": "box-shadow-inset",
+      "syntax": "<length>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-box-shadow-spread",
+      "component": "box-shadow-spread",
+      "consumer": "box-shadow",
+      "initialValue": "0",
+      "magnitudes": 2,
+      "parent": "box-shadow-inset",
+      "syntax": "<length>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-box-shadow-blur",
+      "component": "box-shadow-blur",
+      "consumer": "box-shadow",
+      "initialValue": "0",
+      "magnitudes": 2,
+      "parent": "box-shadow-outset",
+      "syntax": "<length>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-box-shadow-color",
+      "component": "box-shadow-color",
+      "consumer": "box-shadow",
+      "initialValue": "transparent",
+      "magnitudes": 2,
+      "parent": "box-shadow-outset",
+      "syntax": "<color>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-box-shadow-offset-x",
+      "component": "box-shadow-offset-x",
+      "consumer": "box-shadow",
+      "initialValue": "0",
+      "magnitudes": 2,
+      "parent": "box-shadow-outset",
+      "syntax": "<length>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-box-shadow-offset-y",
+      "component": "box-shadow-offset-y",
+      "consumer": "box-shadow",
+      "initialValue": "0",
+      "magnitudes": 2,
+      "parent": "box-shadow-outset",
+      "syntax": "<length>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-box-shadow-spread",
+      "component": "box-shadow-spread",
+      "consumer": "box-shadow",
+      "initialValue": "0",
+      "magnitudes": 2,
+      "parent": "box-shadow-outset",
+      "syntax": "<length>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-column-rule-color",
+      "component": "column-rule-color",
+      "consumer": "column-rule-color",
+      "initialValue": "currentColor",
+      "magnitudes": 2,
+      "parent": "column-rule",
+      "syntax": "<color>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-mask-border-outset-bottom",
+      "component": "mask-border-outset-bottom",
+      "consumer": "mask-border-outset",
+      "initialValue": "0",
+      "magnitudes": 1,
+      "parent": "mask-border-outset",
+      "syntax": "<length>",
+      "verdict": "fixture-unobservable"
+    },
+    {
+      "candidate": "animate-mask-border-outset-left",
+      "component": "mask-border-outset-left",
+      "consumer": "mask-border-outset",
+      "initialValue": "0",
+      "magnitudes": 1,
+      "parent": "mask-border-outset",
+      "syntax": "<length>",
+      "verdict": "fixture-unobservable"
+    },
+    {
+      "candidate": "animate-mask-border-outset-right",
+      "component": "mask-border-outset-right",
+      "consumer": "mask-border-outset",
+      "initialValue": "0",
+      "magnitudes": 1,
+      "parent": "mask-border-outset",
+      "syntax": "<length>",
+      "verdict": "fixture-unobservable"
+    },
+    {
+      "candidate": "animate-mask-border-outset-top",
+      "component": "mask-border-outset-top",
+      "consumer": "mask-border-outset",
+      "initialValue": "0",
+      "magnitudes": 1,
+      "parent": "mask-border-outset",
+      "syntax": "<length>",
+      "verdict": "fixture-unobservable"
+    },
+    {
+      "candidate": "animate-math-depth-add",
+      "component": "math-depth-add",
+      "consumer": "math-depth",
+      "initialValue": "0",
+      "magnitudes": 2,
+      "parent": "math-depth",
+      "syntax": "<integer>",
+      "verdict": "reshape-required"
+    },
+    {
+      "candidate": "animate-object-position-x-offset",
+      "component": "object-position-x-offset",
+      "consumer": "object-position",
+      "initialValue": "50%",
+      "magnitudes": 2,
+      "parent": "object-position-x",
+      "syntax": "<percentage>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-object-position-y-offset",
+      "component": "object-position-y-offset",
+      "consumer": "object-position",
+      "initialValue": "50%",
+      "magnitudes": 2,
+      "parent": "object-position-y",
+      "syntax": "<percentage>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-offset-anchor-x-offset",
+      "component": "offset-anchor-x-offset",
+      "consumer": "offset-anchor",
+      "initialValue": "0",
+      "magnitudes": 1,
+      "parent": "offset-anchor-x",
+      "syntax": "<length>",
+      "verdict": "blocked-by-emission"
+    },
+    {
+      "candidate": "animate-offset-anchor-y-offset",
+      "component": "offset-anchor-y-offset",
+      "consumer": "offset-anchor",
+      "initialValue": "0",
+      "magnitudes": 1,
+      "parent": "offset-anchor-y",
+      "syntax": "<length>",
+      "verdict": "blocked-by-emission"
+    },
+    {
+      "candidate": "animate-offset-position-x-offset",
+      "component": "offset-position-x-offset",
+      "consumer": "offset-position",
+      "initialValue": "50%",
+      "magnitudes": 2,
+      "parent": "offset-position-x",
+      "syntax": "<percentage>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-offset-position-y-offset",
+      "component": "offset-position-y-offset",
+      "consumer": "offset-position",
+      "initialValue": "50%",
+      "magnitudes": 2,
+      "parent": "offset-position-y",
+      "syntax": "<percentage>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-outline-color",
+      "component": "outline-color",
+      "consumer": "outline",
+      "initialValue": "currentColor",
+      "magnitudes": 2,
+      "parent": "outline",
+      "syntax": "<color>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-rotate-angle",
+      "component": "rotate-angle",
+      "consumer": "rotate",
+      "initialValue": "0deg",
+      "magnitudes": 2,
+      "parent": "rotate",
+      "syntax": "<angle>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-rotate-x",
+      "component": "rotate-x",
+      "consumer": "rotate",
+      "initialValue": "0",
+      "magnitudes": 2,
+      "parent": "rotate",
+      "syntax": "<number>",
+      "verdict": "unresolved"
+    },
+    {
+      "candidate": "animate-rotate-y",
+      "component": "rotate-y",
+      "consumer": "rotate",
+      "initialValue": "0",
+      "magnitudes": 2,
+      "parent": "rotate",
+      "syntax": "<number>",
+      "verdict": "unresolved"
+    },
+    {
+      "candidate": "animate-rotate-z",
+      "component": "rotate-z",
+      "consumer": "rotate",
+      "initialValue": "1",
+      "magnitudes": 1,
+      "parent": "rotate",
+      "syntax": "<number>",
+      "verdict": "fixture-unobservable"
+    },
+    {
+      "candidate": "animate-text-shadow-blur",
+      "component": "text-shadow-blur-radius",
+      "consumer": "text-shadow",
+      "initialValue": "0",
+      "magnitudes": 2,
+      "parent": "text-shadow",
+      "syntax": "<length>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-text-shadow-color",
+      "component": "text-shadow-color",
+      "consumer": "text-shadow",
+      "initialValue": "currentColor",
+      "magnitudes": 2,
+      "parent": "text-shadow",
+      "syntax": "<color>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-text-shadow-offset-x",
+      "component": "text-shadow-offset-x",
+      "consumer": "text-shadow",
+      "initialValue": "0px",
+      "magnitudes": 2,
+      "parent": "text-shadow",
+      "syntax": "<length>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-text-shadow-offset-y",
+      "component": "text-shadow-offset-y",
+      "consumer": "text-shadow",
+      "initialValue": "0px",
+      "magnitudes": 2,
+      "parent": "text-shadow",
+      "syntax": "<length>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-transform-origin-z",
+      "component": "transform-origin-z",
+      "consumer": "transform-origin",
+      "initialValue": "0px",
+      "magnitudes": 2,
+      "parent": "transform-origin",
+      "syntax": "<length>",
+      "verdict": "movable"
+    }
+  ],
+  "source": "scripts/research/d3-validation.mjs"
+}

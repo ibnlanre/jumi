@@ -1,4 +1,4 @@
-import { derivations, SYNTAX_OF } from './derivation.mjs'
+import { derivations } from './derivation.mjs'
 import { describe } from './observation.mjs'
 import { readCandidates } from './property-model.mjs'
 
@@ -53,6 +53,12 @@ export const VERDICTS = [
   // value for the pair. Calling that `unresolved` or `fixture-unobservable` would file a defect in the
   // emission under the D.3 workstream it does not belong to.
   'blocked-by-emission',
+  // Also the ruling's, and also outside the four: the arm did run, and what it falsified was the pair's
+  // **morphology** rather than its interpolation. `math-depth-add`'s emission moves `add(0)` -> `add(2)`,
+  // so the interpolation unit is an argument inside the call and not the scalar leaf the resting value
+  // suggested. Calling that `interpolation-unsafe` would claim we proved a typed representation
+  // interpolates incorrectly when what we proved is that the representation was aimed at the wrong unit.
+  'reshape-required',
 ]
 
 /**
@@ -292,6 +298,7 @@ export const verdictOf = ({
   property,
   rest,
   series,
+  unit,
 }) => {
   if (!canary.exercised) {
     if (applied === '')
@@ -323,6 +330,19 @@ export const verdictOf = ({
       cause: 'rest not preserved',
       reason: `the rest does not survive the syntax: \`${rest.without}\` unregistered, \`${rest.registered}\` registered`,
       verdict: 'registration-unsafe',
+    }
+
+  // Before the differential, and that order is the ruling's: a unit the syntax cannot name is a fact about
+  // *what* moves, and it makes the question "does it interpolate the same?" the wrong question rather than a
+  // failed one. `unit.frames` is the emission's own pair of endpoints, so the reason cites what it read.
+  if (unit?.expression)
+    return {
+      cause: 'the interpolation unit is an expression',
+      reason:
+        `the emission animates \`${unit.frames.join('\` -> \`')}\` while \`${property}\` rests at ` +
+        `\`${rest.without}\`: the thing that moves is an argument inside the call, not the scalar leaf ` +
+        `\`${unit.syntax}\` was derived for`,
+      verdict: 'reshape-required',
     }
 
   if (!series.agrees) {

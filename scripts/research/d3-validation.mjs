@@ -1,9 +1,13 @@
+import { writeFileSync } from 'node:fs'
 import { chromium } from 'playwright'
 
 import { compiler, finalizeCss, root } from '../lib/compile.mjs'
 import { applicationOf, restOf } from '../lib/observation.mjs'
 import { FUNCTION } from '../lib/property-model.mjs'
+import { readTypedLeaves } from '../lib/property-model.mjs'
 import { framesOf, pinningOf, plans, verdictOf } from '../lib/validation.mjs'
+
+import path from 'node:path'
 
 /**
  * D.3.5 · pass three: **the derived representations, validated in a browser**.
@@ -64,6 +68,17 @@ const compile = async candidates =>
 
 const DURATION = 1000
 const WALL = [0, 250, 500, 750, 1000]
+
+/**
+ * Where the evidence lands, as a record rather than as a report.
+ *
+ * The standing guard reads this: a declaration is admitted only with a `movable` record naming *that* pair and
+ * *that* representation, so the record has to exist outside the run that produced it. It is data — written by
+ * a research book, read by a unit test — and nothing in `src/` ever imports it.
+ */
+const EVIDENCE = path.join(root, 'scripts', 'validated-representations.json')
+
+const DECLARED = readTypedLeaves()
 
 const browser = await chromium.launch()
 const page = await browser.newPage()
@@ -160,8 +175,25 @@ for (const plan of plans()) {
     continue
   }
 
+  /**
+   * What the arm registers: the **declared** representation when the model carries one, the proposal otherwise.
+   *
+   * That is the difference between validating a proposal and validating what shipped. The derivation proved the
+   * syntax; the arms below prove that the thing `typedLeaves` names is the same thing — so they register the
+   * declared metadata once it exists, and a declaration that differs from the proposal is a **failure** rather
+   * than a second measurement, because then the run would be testing something no proposal asked for.
+   */
+  const declared = DECLARED.get(plan.component)
+
+  if (declared && declared.syntax !== plan.syntax)
+    failures.push(
+      `${plan.pair}: typedLeaves declares \`${declared.syntax}\` where the derivation proposed \`${plan.syntax}\``,
+    )
+
+  const syntax = declared?.syntax ?? plan.syntax
+
   const registration = `@property ${arm.pin} {
-    syntax: "${plan.syntax}";
+    syntax: "${syntax}";
     inherits: false;
     initial-value: ${arm.rest};
   }`
@@ -280,6 +312,10 @@ for (const plan of plans()) {
       nativeFlat: new Set(native.values).size === 1,
       typed: typed.values,
     },
+    // The unit the *emission* names, which the resting shape cannot always see: `add(0)` is a function of the
+    // value, so what moves is an argument inside it rather than the scalar leaf the rest suggested. It is
+    // reported to the assembler rather than turned into a verdict here, so the precedence stays testable.
+    unit: { expression: arm.expression, frames: [arm.first, arm.far], syntax },
   })
 
   // A flat leaf is the *reason* a typed arm diverges, and it is worth naming precisely: the registration did
@@ -296,7 +332,7 @@ for (const plan of plans()) {
     native: native.values,
     plan,
     reason: flat
-      ? `the leaf never leaves \`${leaf.values[0]}\`: the frames \`${arm.first}\` -> \`${arm.far}\` are not \`${plan.syntax}\``
+      ? `the leaf never leaves \`${leaf.values[0]}\`: the frames \`${arm.first}\` -> \`${arm.far}\` are not \`${syntax}\``
       : verdict.reason,
     rest: {
       registered: withRegistration.values[0],
@@ -328,6 +364,7 @@ for (const arm of arms) {
 }
 const order = [
   'registration-unsafe',
+  'reshape-required',
   'interpolation-unsafe',
   'blocked-by-emission',
   'fixture-unobservable',
@@ -384,8 +421,40 @@ const causes = [
     .map(one => one.pair),
 }))
 
-/** The pairs whose *interpolation unit* is an expression rather than the scalar leaf the rest suggested. */
-const reshaping = counted.map(one => one.verdict).filter(arm => arm.expression)
+/**
+ * The evidence, as the standing guard has to read it: one record per pair.
+ *
+ * `syntax` and `initialValue` are the two fields a declaration can be compared against exactly, which is why
+ * they are here rather than only in the printed report. The file is data written by a research book and read by
+ * a unit test; nothing in `src/` imports it, and production never depends on the pass that produced it.
+ */
+writeFileSync(
+  EVIDENCE,
+  `${JSON.stringify(
+    {
+      pairs: counted
+        .map(one => ({
+          candidate: one.verdict.plan.candidate,
+          component: one.verdict.plan.component,
+          consumer: one.verdict.plan.consumer,
+          initialValue: one.verdict.plan.rest,
+          magnitudes: one.arms.filter(arm => arm.context === 'exercised')
+            .length,
+          parent: one.verdict.plan.parent,
+          syntax: one.verdict.plan.syntax,
+          verdict: one.verdict.verdict,
+        }))
+        .sort((left, right) =>
+          `${left.parent}/${left.component}`.localeCompare(
+            `${right.parent}/${right.component}`,
+          ),
+        ),
+      source: 'scripts/research/d3-validation.mjs',
+    },
+    null,
+    2,
+  )}\n`,
+)
 
 console.log(
   [
@@ -414,6 +483,7 @@ console.log(
     `  fixture-unobservable   ${tally('fixture-unobservable')}`,
     `  unresolved             ${tally('unresolved')}`,
     `  blocked-by-emission    ${tally('blocked-by-emission')}`,
+    `  reshape-required       ${tally('reshape-required')}`,
     '',
     // A zero that is a result rather than a gap, said in as many words: the syntax was derived from the resting
     // value's own shape, so the rest is inside the syntax by construction, and the reach gate's
@@ -429,22 +499,15 @@ console.log(
         `  ${one.cause}:\n` + one.pairs.map(pair => `    ${pair}`).join('\n'),
     ),
     '',
-    // Not a verdict class: a reading that says the census bucket was the wrong question. Kept in the report
-    // rather than in the tally, because a pair whose interpolation unit is an expression is not a
-    // representation that failed — it is a constituent that has to be reshaped before it can be typed.
-    ...reshaping.map(
-      one =>
-        `  the interpolation unit is an expression, not the leaf: ${one.plan.pair}\n` +
-        `    the emission animates \`${one.first}\` -> \`${one.far}\` while the rest is \`${one.rest.without}\` — ` +
-        `so what moves is an argument inside the call, which is reshape work rather than a syntax decision`,
-    ),
+    `evidence recorded at \`${path.relative(root, EVIDENCE)}\` — ${counted.filter(one => one.verdict.verdict === 'movable').length} movable record(s), which is what a declaration has to name to be admitted`,
     '',
     'The proposal is not the declaration. `movable` means the derived representation held at rest and through',
     'the motion, under every magnitude this pass exercised, for the values the emission animates this pair',
-    'to — nothing here writes `typedLeaves`, and the promotion is a separate decision with this report as its',
-    'evidence.',
-    '`blocked-by-emission` is outside the four census classes on purpose: the representation was never tested,',
-    'so the pair belongs to an emission fix and not to this workstream.',
+    'to — and once the model declares a component these arms register **that** metadata, so the run measures',
+    'what shipped rather than what was proposed.',
+    '`blocked-by-emission` and `reshape-required` are outside the four census classes on purpose: in the first',
+    'the representation was never tested, and in the second what a rest cannot reveal is that the thing that',
+    'moves is not the leaf.',
   ].join('\n'),
 )
 

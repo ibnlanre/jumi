@@ -191,6 +191,41 @@ describe('the verdict', () => {
     expect(neverComputed.cause).toBe('the emission produces no valid value')
   })
 
+  test('an expression unit is reshape, not unsafe interpolation, and it wins over the differential', () => {
+    // The ruling: we did not prove the typed representation interpolates incorrectly — we proved the
+    // representation was aimed at the wrong unit. So it is neither `interpolation-unsafe` nor a
+    // divergence, even when the series also differ.
+    const verdict = verdictOf({
+      ...seen,
+      series: {
+        agrees: false,
+        native: ['0', '1', '1', '2', '2'],
+        nativeEndpoints: ['0', '2'],
+        nativeFlat: false,
+        typed: ['0', '0', '0', '0', '0'],
+      },
+      unit: {
+        expression: true,
+        frames: ['add(0)', 'add(2)'],
+        syntax: '<integer>',
+      },
+    })
+
+    expect(verdict.verdict).toBe('reshape-required')
+    expect(verdict.cause).toBe('the interpolation unit is an expression')
+    expect(verdict.reason).toContain('add(2)')
+  })
+
+  test('a rest that does not survive the syntax is still registration-unsafe, unit or not', () => {
+    expect(
+      verdictOf({
+        ...seen,
+        rest: { preserved: false, registered: '0px', without: 'medium' },
+        unit: { expression: true, frames: ['a', 'b'], syntax: '<length>' },
+      }).verdict,
+    ).toBe('registration-unsafe')
+  })
+
   test('a missing native baseline is not a divergence', () => {
     const flat = verdictOf({
       ...seen,
@@ -273,6 +308,10 @@ describe('the verdict', () => {
           nativeFlat: true,
           typed: ['b'],
         },
+      }),
+      verdictOf({
+        ...seen,
+        unit: { expression: true, frames: ['a', 'b'], syntax: '<integer>' },
       }),
       verdictOf(seen),
     ])
