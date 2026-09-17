@@ -2506,3 +2506,77 @@ permit.
 **State.** Book extended in place (`pnpm research:d3-anchor-normal`), evidence at
 `scripts/anchor-normalization.json`. No `src/` change, nothing promoted, no design recorded as decided.
 17/17 stages, 480 unit tests.
+
+
+## 2026-09-17 — D.3.7 · the normalizer: a declining prototype, differentialled end to end
+
+### The ruling
+
+> **Build a pure, declining normalization prototype from accepted explicit authored syntax to `[x, y]`
+> `<length-percentage>` values, and differential its reconstructed result against native behavior. Do not touch
+> production or redesign the edge API yet. Short spellings, unresolved `var()`, and unproven grammar forms must
+> decline rather than be interpreted.**
+
+### The contract
+
+`normalizeOffsetAnchor(value) → [x, y] | null`, pure, in `scripts/lib/anchor.mjs`, with five contract tests
+beside the browser differential. Accepted: an already-resolved pair, two edge keywords, and the explicit
+edge-plus-offset form. Declined: short spellings, anything containing `var(`, logical spellings, and any arity
+the browser work did not establish.
+
+### The differential: 7/7 identical
+
+```text
+authored                          reconstruction                                  identical
+50% 50% → 20% 80%                 50% 50% → 20% 80%                               yes
+10px 20px → 30px 40px             10px 20px → 30px 40px                           yes
+calc(50% + 10px) calc(25% - 4px) → …                                yes
+left top → right bottom           0% 0% → 100% 100%                               yes
+center center → 20% 80%           50% 50% → 20% 80%                               yes
+left 10px top 20px → right 10px bottom 20px   10px 20px → calc(100% - 10px) calc(100% - 20px)   yes
+left 10% bottom 25% → right 25% top 10%       10% calc(100% - 25%) → calc(100% - 25%) 10%       yes
+```
+
+The criterion was that the browser cannot tell the authored pair from the reconstructed one, and it cannot: the
+series agree sample for sample, including the arm whose offsets are percentages and whose reconstruction moves
+`75% → 10%` on one axis and `10% → 75%` on the other, and the arithmetic arm to the digit.
+
+### The arities, decided by the browser rather than by reading position syntax
+
+```text
+center              computed 50% 50%      normalizer declines
+center center       computed 50% 50%      normalizer 50% 50%
+center 20px         computed 50% 20px     normalizer declines
+20px center         computed 20px 50%     normalizer declines
+left center         computed 0% 50%       normalizer 0% 50%
+center top          computed 50% 0%       normalizer 50% 0%
+left top            computed 0% 0%        normalizer 0% 0%
+left 10px top 20px  computed 10px 20px    normalizer 10px 20px
+top 20px            computed auto         normalizer declines
+left 10px           computed 0% 10px      normalizer declines
+start top           computed auto         normalizer declines
+```
+
+Three of those refusals are **conservative rather than forced**, and it is worth saying which and why. The
+browser resolves `center` to `50% 50%`, `center 20px` to `50% 20px`, and `20px center` to `20px 50%`, so these
+are not forms it rejects; they are arities this track has not established, and the ruling's instruction was to
+decline rather than interpret. `top 20px` and `start top` are different in kind — the browser computes `auto`,
+so there is nothing to normalize — and `left 10px` is the instructive one: it is accepted, and it computes to
+`0% 10px`, which is *not* "left plus 10px with the other axis at centre". Reading position syntax by intuition
+would have produced exactly the wrong value here.
+
+### What this establishes
+
+Both halves the reshape needs now exist and are measured: **the browser's actual interpolation unit** (two
+resolved positional components, faithful on both axes, established by the falsification and the anomaly pass)
+and **a defensible way for Jumi to reach it** (a pure normalizer that declines rather than guesses, whose
+reconstruction the browser cannot distinguish from the authored form).
+
+Neither is a decision to ship. What remains is the semantic question the ruling deferred — whether the existing
+edge utilities become authoring inputs into the resolved axis or change shape — and it does not need answering
+until the representation is asked to carry real candidates rather than fixtures.
+
+**State.** New `scripts/lib/anchor.mjs` (+ 5 contract tests), new book
+`scripts/research/d3-anchor-normalizer.mjs` (`pnpm research:d3-anchor-normalizer`), evidence at
+`scripts/anchor-normalizer.json`. No `src/` change, nothing promoted, no API decision taken.
+17/17 stages, 485 unit tests.

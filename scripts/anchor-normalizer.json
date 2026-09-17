@@ -1,0 +1,343 @@
+{
+  "accepted": [
+    {
+      "authoredSeries": [
+        "50% 50%",
+        "42.5% 57.5%",
+        "35% 65%",
+        "27.5% 72.5%",
+        "20% 80%"
+      ],
+      "equal": true,
+      "from": "50% 50%",
+      "normalized": [
+        [
+          "50%",
+          "50%"
+        ],
+        [
+          "20%",
+          "80%"
+        ]
+      ],
+      "reconstructedFrom": "50% 50%",
+      "reconstructedSeries": [
+        "50% 50%",
+        "42.5% 57.5%",
+        "35% 65%",
+        "27.5% 72.5%",
+        "20% 80%"
+      ],
+      "reconstructedTo": "20% 80%",
+      "to": "20% 80%"
+    },
+    {
+      "authoredSeries": [
+        "10px 20px",
+        "15px 25px",
+        "20px 30px",
+        "25px 35px",
+        "30px 40px"
+      ],
+      "equal": true,
+      "from": "10px 20px",
+      "normalized": [
+        [
+          "10px",
+          "20px"
+        ],
+        [
+          "30px",
+          "40px"
+        ]
+      ],
+      "reconstructedFrom": "10px 20px",
+      "reconstructedSeries": [
+        "10px 20px",
+        "15px 25px",
+        "20px 30px",
+        "25px 35px",
+        "30px 40px"
+      ],
+      "reconstructedTo": "30px 40px",
+      "to": "30px 40px"
+    },
+    {
+      "authoredSeries": [
+        "calc(50% + 10px) calc(25% - 4px)",
+        "calc(42.5% + 8px) calc(38.75% - 1px)",
+        "calc(35% + 6px) calc(52.5% + 2px)",
+        "calc(27.5% + 4px) calc(66.25% + 5px)",
+        "calc(20% + 2px) calc(80% + 8px)"
+      ],
+      "equal": true,
+      "from": "calc(50% + 10px) calc(25% - 4px)",
+      "normalized": [
+        [
+          "calc(50% + 10px)",
+          "calc(25% - 4px)"
+        ],
+        [
+          "calc(20% + 2px)",
+          "calc(80% + 8px)"
+        ]
+      ],
+      "reconstructedFrom": "calc(50% + 10px) calc(25% - 4px)",
+      "reconstructedSeries": [
+        "calc(50% + 10px) calc(25% - 4px)",
+        "calc(42.5% + 8px) calc(38.75% - 1px)",
+        "calc(35% + 6px) calc(52.5% + 2px)",
+        "calc(27.5% + 4px) calc(66.25% + 5px)",
+        "calc(20% + 2px) calc(80% + 8px)"
+      ],
+      "reconstructedTo": "calc(20% + 2px) calc(80% + 8px)",
+      "to": "calc(20% + 2px) calc(80% + 8px)"
+    },
+    {
+      "authoredSeries": [
+        "0% 0%",
+        "25% 25%",
+        "50% 50%",
+        "75% 75%",
+        "100% 100%"
+      ],
+      "equal": true,
+      "from": "left top",
+      "normalized": [
+        [
+          "0%",
+          "0%"
+        ],
+        [
+          "100%",
+          "100%"
+        ]
+      ],
+      "reconstructedFrom": "0% 0%",
+      "reconstructedSeries": [
+        "0% 0%",
+        "25% 25%",
+        "50% 50%",
+        "75% 75%",
+        "100% 100%"
+      ],
+      "reconstructedTo": "100% 100%",
+      "to": "right bottom"
+    },
+    {
+      "authoredSeries": [
+        "50% 50%",
+        "42.5% 57.5%",
+        "35% 65%",
+        "27.5% 72.5%",
+        "20% 80%"
+      ],
+      "equal": true,
+      "from": "center center",
+      "normalized": [
+        [
+          "50%",
+          "50%"
+        ],
+        [
+          "20%",
+          "80%"
+        ]
+      ],
+      "reconstructedFrom": "50% 50%",
+      "reconstructedSeries": [
+        "50% 50%",
+        "42.5% 57.5%",
+        "35% 65%",
+        "27.5% 72.5%",
+        "20% 80%"
+      ],
+      "reconstructedTo": "20% 80%",
+      "to": "20% 80%"
+    },
+    {
+      "authoredSeries": [
+        "calc(0% + 10px) calc(0% + 20px)",
+        "calc(25% + 5px) calc(25% + 10px)",
+        "50% 50%",
+        "calc(75% - 5px) calc(75% - 10px)",
+        "calc(100% - 10px) calc(100% - 20px)"
+      ],
+      "equal": true,
+      "from": "left 10px top 20px",
+      "normalized": [
+        [
+          "10px",
+          "20px"
+        ],
+        [
+          "calc(100% - 10px)",
+          "calc(100% - 20px)"
+        ]
+      ],
+      "reconstructedFrom": "10px 20px",
+      "reconstructedSeries": [
+        "calc(0% + 10px) calc(0% + 20px)",
+        "calc(25% + 5px) calc(25% + 10px)",
+        "50% 50%",
+        "calc(75% - 5px) calc(75% - 10px)",
+        "calc(100% - 10px) calc(100% - 20px)"
+      ],
+      "reconstructedTo": "calc(100% - 10px) calc(100% - 20px)",
+      "to": "right 10px bottom 20px"
+    },
+    {
+      "authoredSeries": [
+        "10% 75%",
+        "26.25% 58.75%",
+        "42.5% 42.5%",
+        "58.75% 26.25%",
+        "75% 10%"
+      ],
+      "equal": true,
+      "from": "left 10% bottom 25%",
+      "normalized": [
+        [
+          "10%",
+          "calc(100% - 25%)"
+        ],
+        [
+          "calc(100% - 25%)",
+          "10%"
+        ]
+      ],
+      "reconstructedFrom": "10% calc(100% - 25%)",
+      "reconstructedSeries": [
+        "10% 75%",
+        "26.25% 58.75%",
+        "42.5% 42.5%",
+        "58.75% 26.25%",
+        "75% 10%"
+      ],
+      "reconstructedTo": "calc(100% - 25%) 10%",
+      "to": "right 25% top 10%"
+    }
+  ],
+  "arities": [
+    {
+      "accepted": true,
+      "computed": "50% 50%",
+      "normalized": null,
+      "value": "center"
+    },
+    {
+      "accepted": true,
+      "computed": "50% 50%",
+      "normalized": [
+        "50%",
+        "50%"
+      ],
+      "value": "center center"
+    },
+    {
+      "accepted": true,
+      "computed": "50% 20px",
+      "normalized": null,
+      "value": "center 20px"
+    },
+    {
+      "accepted": true,
+      "computed": "20px 50%",
+      "normalized": null,
+      "value": "20px center"
+    },
+    {
+      "accepted": true,
+      "computed": "0% 50%",
+      "normalized": [
+        "0%",
+        "50%"
+      ],
+      "value": "left center"
+    },
+    {
+      "accepted": true,
+      "computed": "50% 0%",
+      "normalized": [
+        "50%",
+        "0%"
+      ],
+      "value": "center top"
+    },
+    {
+      "accepted": true,
+      "computed": "10px 20px",
+      "normalized": [
+        "10px",
+        "20px"
+      ],
+      "value": "left 10px top 20px"
+    },
+    {
+      "accepted": true,
+      "computed": "0% 0%",
+      "normalized": [
+        "0%",
+        "0%"
+      ],
+      "value": "left top"
+    },
+    {
+      "accepted": false,
+      "computed": "auto",
+      "normalized": null,
+      "value": "top 20px"
+    },
+    {
+      "accepted": true,
+      "computed": "0% 10px",
+      "normalized": null,
+      "value": "left 10px"
+    },
+    {
+      "accepted": false,
+      "computed": "auto",
+      "normalized": null,
+      "value": "start top"
+    }
+  ],
+  "declined": [
+    {
+      "computed": "auto",
+      "normalized": null,
+      "rationale": "a short spelling the browser rejects",
+      "value": "top 20px"
+    },
+    {
+      "computed": "0% 10px",
+      "normalized": null,
+      "rationale": "a short spelling the browser reads as something else",
+      "value": "left 10px"
+    },
+    {
+      "computed": "50% 20px",
+      "normalized": null,
+      "rationale": "an arity this track did not establish",
+      "value": "center 20px"
+    },
+    {
+      "computed": "auto",
+      "normalized": null,
+      "rationale": "not statically resolvable",
+      "value": "var(--ax) var(--ay)"
+    },
+    {
+      "computed": "auto",
+      "normalized": null,
+      "rationale": "not a logical-position property here",
+      "value": "start top"
+    },
+    {
+      "computed": "auto",
+      "normalized": null,
+      "rationale": "three components, which is no form at all",
+      "value": "left 10px top"
+    }
+  ],
+  "source": "D.3.7 · scripts/research/d3-anchor-normalizer.mjs"
+}
