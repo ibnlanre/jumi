@@ -3354,7 +3354,7 @@ than by defect (`center` over a non-zero offset has no resolved position, which 
 spellings are constant.
 
 So the branch is the first one, and the conclusion is **not** to extend the resolver to phrase stops. D.3.6's boundary
-therefore stands unamended, and it stands *with evidence*: the phrase entrance on a component of a compound family was
+therefore stands unamended, and it stands _with evidence_: the phrase entrance on a component of a compound family was
 not a working capability that the reshape broke, so there is nothing to preserve and no semantics to invent. The phrase
 half of the amendment the ruling sketched is not taken.
 
@@ -3362,7 +3362,7 @@ half of the amendment the ruling sketched is not taken.
 writes the same value at every stop. That shape is now not emitted, in both places it can arise — the constituent path,
 where the hook finds nothing in the composition, and the phrase path, where the frame is built the same way. The frame's
 own values are compared against the composition rather than matched by pattern, and that distinction is measured: the
-first attempt tested whether the composition's text contained the part's name, which skipped phrases that *do* move —
+first attempt tested whether the composition's text contained the part's name, which skipped phrases that _do_ move —
 `filter` and `backdrop-filter` reach their part through `url(var(--jumi-filter-url))` — and two behaviour arms caught it
 immediately. The predicate is now the exact one, made by the same function the frames are.
 
@@ -3404,7 +3404,7 @@ evidence      auto ×5 — no execution assignment, and no sibling state unblock
 
 The offsets are the finding the ruling anticipated, and the measurement came out **stronger** than the vocabulary it
 offered. `conditional` would have said "resolves under compatible sibling authoring state", but the shipped build has
-no such state: the projection is built when *this* candidate compiles, from *this* candidate's own slots, so a second
+no such state: the projection is built when _this_ candidate compiles, from _this_ candidate's own slots, so a second
 class on the element cannot supply the edge the offset needs beside it. `center` over a non-zero offset is refused by
 contract, and the route that would have to resolve it carries only one of the two values. So the verdict is
 `declined`, with the reason recorded — which is the whole point of asking the question rather than asserting
@@ -3430,7 +3430,7 @@ leaf while claiming to work is the half-typed state the decline exists to preven
 **Two measurement corrections, and both nearly overstated the result.** The first read searched the whole sheet for
 assigned leaves, so the sibling edge route's frames were counted as the offset route's, and the offsets came out
 `conditional` on the strength of somebody else's motion. The second matched the endpoint form (`--jumi-…-100:`) where
-the leaves are written through `var(--jumi-…-100)`, and then *every* route read `declined`, including the two whose
+the leaves are written through `var(--jumi-…-100)`, and then _every_ route read `declined`, including the two whose
 series plainly move. Both are the same lesson as the rest of this track: the measurement is a fixture, and a fixture
 that is wrong looks exactly like an emission that is wrong.
 
@@ -3528,6 +3528,46 @@ a component that is an **argument inside a function** (`matrix3d(…)`, `rotate3
 the generalization test for that mechanism in one. The filter cluster is next at thirty (`filter` 11,
 `backdrop-filter` 11, the two drop-shadow pairs 4 + 4), with a second argument inside the function to reason about.
 
-Neither is a test of the *three-surface* model, and that is worth saying plainly: every candidate above still names its
+Neither is a test of the _three-surface_ model, and that is worth saying plainly: every candidate above still names its
 components in its composition. A family that separates all three the way `offset-anchor` did would be a different
 search, and the census does not obviously contain one.
+
+---
+
+## Appendix: what "no `reshape-required` records" does and does not mean, and what the 3D cluster actually is
+
+**It does not mean the reshape work is done.** The verdict is a property of a *route the validation pass could plan*,
+and the pass plans routes for pairs that are `value`-bucket, declared, or shell-shaped. The 96 pairs in the `reshape`
+bucket are mostly none of those, so they carry **no records at all** — un-recorded rather than resolved. Reading the
+empty class as "nothing left" would be the mistake the census's ratios exist to prevent, and the bucket is the honest
+number: 96 pairs across 25 parents.
+
+**And the 3D cluster is the argument shape, not the function-value shape.** Its components rest on plain values:
+
+```text
+matrix-3d (16)   matrix-a1 => 1        matrix-b1 => 0      matrix-c1 => 0     matrix-d1 => 0
+matrix (6)       matrix-a => 1         matrix-b => 0       matrix-c => 0      matrix-d => 1
+rotate-3d (4)    rotate-x => 0         rotate-y => 0       rotate-z => 1      rotate-angle => 0deg
+scale-3d (3)     scale-x => 1          scale-y => 1        scale-z => 1
+translate-3d (3) translate-x => 0px    translate-y => 0px  translate-z => 0px
+```
+
+None of them is a function *value* — that is the `filter-blur => blur(0)` shape. They are `reshape` because of the
+**depth** test: the parent nests them inside a shell (`matrix3d(var(--jumi-matrix-a1), …)`, `rotate3d(…)`,
+`scale3d(…)`, `translate3d(…)`), which is D.3.6's class, solved once at `math-depth`'s `add(...)`.
+
+Thirty-two pairs, one shape, and three sub-cases that are not the same work:
+
+```text
+matrix-3d 16 · matrix 6      a shell no other family reads — new leaves, one family each
+rotate-3d 4                  rotate-x/y/z are already typed under `rotate`, and their own
+                             records are `unresolved` — a second parent for one component
+scale-3d 3 · translate-3d 3  the same components as `scale` and `translate`, whose leaves are
+                             declared and `movable` — and the registry is keyed by attribute,
+                             so the second parent must redeclare them or be keyed differently
+```
+
+The last two sub-cases are the generalizing question this cluster actually poses, and it is not the three-surface one:
+**can one component be typed under two parents without a declaration per parent?** That is a question about the
+registry's key, decidable in one experiment, and it sits inside the largest cluster in the bucket — which is why the
+3D cluster is still the recommendation for the next target.
