@@ -1992,6 +1992,56 @@ const typed = [
 
 for (const [claim, ok] of typed) if (!ok) failures.push(`typed: ${claim}`)
 
+/* --------------------------------------------------------------------------------
+ * 18. A shell-shaped typed constituent animates its **argument**, and the property is only the bridge
+ *     (added 2026-09-17, closing D.3.6).
+ * -------------------------------------------------------------------------------- */
+
+// This arm is structural, and deliberately so: D.3.6 moved the animated subject of this pair from the
+// *property* to its registered argument, and a sampled curve does not hold that on its own. A later refactor
+// could write the endpoint back into the property — `math-depth: add(...)` inside the frames — and a browser
+// series could still look plausible while the subject quietly reverted. So what is asserted is which leaf the
+// animated stop writes, and that every write of the property inside the motion is its composition and nothing
+// else, which is the same statement as "no endpoint slot, and no `add(...)`".
+const typedArgumentSheet = finalizeCss(
+  (await compiler(COMPOSITION_ENTRY, root)).build([
+    'animate-math-depth-add-[2]',
+  ]),
+).css
+const typedArgumentFrames =
+  /@keyframes jumi-math-depth-add\s*\{([\s\S]*?)\n\}/.exec(
+    typedArgumentSheet,
+  )?.[1] ?? ''
+const typedArgumentProperties = [
+  ...typedArgumentFrames.matchAll(/math-depth:\s*([^;]+);/g),
+].map(match => match[1].trim())
+
+const subject = [
+  [
+    'the composition owns the shell, statically',
+    typedArgumentSheet.includes(
+      '--jumi-math-depth: add(var(--jumi-math-depth-add))',
+    ),
+    'the composition spells the shell itself',
+  ],
+  [
+    'the frames animate the argument, not the property',
+    typedArgumentFrames.includes(
+      '--jumi-math-depth-add: var(--jumi-math-depth-add-100)',
+    ),
+    'the keyframe writes the registered leaf through its endpoint slot',
+  ],
+  [
+    'and every write of the property inside the motion is the bridge alone',
+    typedArgumentProperties.length > 0 &&
+      typedArgumentProperties.every(value => value === 'var(--jumi-math-depth)'),
+    `the motion writes math-depth as ${typedArgumentProperties.join(' | ') || 'nothing'}`,
+  ],
+]
+
+for (const [claim, ok, detail] of subject)
+  if (!ok) failures.push(`subject: ${claim} — ${detail}`)
+
 /* ------------------------------------------------------------------------------------
  * 17. A typed constituent definition is value-free, and shared by every authored value
  *     (added 2026-09-17).
@@ -2434,6 +2484,7 @@ const required =
   radius.length +
   urls.length +
   typed.length +
+  subject.length +
   reuse.length +
   chains.length
 const passing = required - failures.length
