@@ -151,12 +151,56 @@ const STAGES = [
   },
 ]
 
-const results = STAGES.map(stage => ({
+let failures = 0
+
+/**
+ * A **subset** by label, for the inner loop — with the prerequisites always included.
+ *
+ * The gate is ~2.5 minutes of stage work and roughly twice that of wall clock, and 4½ of those five
+ * minutes are stages that cannot observe a change to one file: the site build (`studio`, 28s), the
+ * View Transition replay (20s), and `lint` over the whole repository (11s). So `node scripts/check.mjs
+ * css behaviour` runs those two stages instead of seventeen, and `bundle` and `prepare` come along
+ * because every stage below them loads `dist/` and fails with `Cannot find module` without them —
+ * which is the reason they are stages here at all.
+ *
+ * It is deliberately **not** a quiet mode. A subset prints its own summary and never claims the gate:
+ * the label list is the only way in, the count says how much of the gate ran, and the closing line
+ * says plainly that this is not it. The default — no arguments — is unchanged, stage for stage.
+ */
+const requested = process.argv.slice(2)
+const prerequisites = ['bundle', 'prepare']
+const known = STAGES.map(stage => stage.label)
+
+if (requested.length) {
+  const unknown = requested.filter(label => !known.includes(label))
+
+  if (unknown.length) {
+    console.error(
+      `\n✗ no such stage${unknown.length === 1 ? '' : 's'}: ${unknown.join(', ')}\n` +
+        `  labels: ${known.join(' ')}\n`,
+    )
+    process.exit(1)
+  }
+}
+
+const selected = requested.length
+  ? STAGES.filter(
+      stage =>
+        prerequisites.includes(stage.label) || requested.includes(stage.label),
+    )
+  : STAGES
+
+const results = selected.map(stage => ({
   ...stage,
   seconds: 0,
   status: 'not run',
 }))
-let failures = 0
+
+if (requested.length)
+  console.log(
+    `\n  a subset: ${requested.join(', ')} ` +
+      `(${selected.length} of ${STAGES.length} stages, prerequisites included)`,
+  )
 
 for (const [index, result] of results.entries()) {
   const { label, run } = result
@@ -184,7 +228,9 @@ for (const [index, result] of results.entries()) {
 
 const width = Math.max(...results.map(result => result.label.length))
 
-console.log(`\n${'═'.repeat(72)}\n  the gate\n${'═'.repeat(72)}`)
+console.log(
+  `\n${'═'.repeat(72)}\n  ${requested.length ? 'a subset — this is NOT the gate' : 'the gate'}\n${'═'.repeat(72)}`,
+)
 
 for (const result of results) {
   const mark =
@@ -209,4 +255,11 @@ if (failures) {
   process.exit(1)
 }
 
-console.log(`\n✓ all ${results.length} stages passed.\n`)
+if (requested.length)
+  console.log(
+    `\n✓ ${results.length - prerequisites.length} selected stage${
+      requested.length === 1 ? '' : 's'
+    } passed, prerequisites included — ` +
+      `**${STAGES.length - results.length} stages did not run** and nothing here says they would.\n`,
+  )
+else console.log(`\n✓ all ${results.length} stages passed.\n`)
