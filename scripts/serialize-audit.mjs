@@ -229,6 +229,23 @@ const registry = [
     symbol: 'normalizeScale',
   },
 
+  {
+    assumes:
+      'that a whole `translate` value separates its components on whitespace, and that the components hold no whitespace of their own',
+    breakable:
+      'only against a spelling Jumi does not produce. The value split here is the author’s own class token, which is what an arbitrary value is, so no serializer stands between the two, and a component carrying whitespace would not be a single `translate` component in the first place',
+    class: 'structural',
+    contains: 'value.trim().split(',
+    file: typedLeaves,
+    recovers:
+      'the leaves a whole `translate` writes, with the missing components padded by the **identity** rather than by the first — the rule `scale` deliberately does not share',
+    serialization:
+      'no — the input is the authored value, and the split is the value grammar rather than a search over built text',
+    structural:
+      'the guards decide, not the count: each component is put through the same canonicalizer its leaf declares, so a value one entrance accepts and the other refuses is not expressible, and the padding is the family’s own rule rather than a shared shorthand reading',
+    symbol: 'translateLeaves',
+  },
+
   // ── a range: selector and value grammar, read from an author's class ─────────────────────────
   inferred(
     range,

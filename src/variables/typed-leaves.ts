@@ -82,6 +82,30 @@ export const scaleFactorToNumber = (value: string): null | string => {
 }
 
 /**
+ * A `<length>` or a `<length-percentage>`, as **one** interpolation branch, or `null`.
+ *
+ * This canonicalizer does not rewrite anything — it is a **guard**, and the distinction matters: the
+ * constituent path's only validator is the leaf's canonicalizer, so a family that declares leaves
+ * without one will claim its property for values the leaf cannot hold, animating nothing while
+ * suppressing every other declaration of that property.
+ *
+ * Declines `calc()` and `var()` as well as keywords, which is the same line `scale` draws: a value
+ * whose *shape* cannot be checked keeps the composed-property path, which is correct today.
+ */
+export const lengthish = (value: string): null | string => {
+  const trimmed = value.trim()
+
+  return /^[+-]?(\d+\.?\d*|\.\d+)([a-z]+|%)?$/i.test(trimmed) ? trimmed : null
+}
+
+/** The same guard for a component that takes a `<length>` only — `translate`'s z axis. */
+export const lengthOnly = (value: string): null | string => {
+  const guarded = lengthish(value)
+
+  return guarded !== null && guarded.endsWith('%') ? null : guarded
+}
+
+/**
  * The typed leaves of each family that has them.
  *
  * Declared per family rather than emitted where a family is implemented, because the alternative is
@@ -127,6 +151,23 @@ export const typedLeaves: Partial<
       animationCanonicalizer: scaleFactorToNumber,
       initialValue: '1',
       syntax: '<number> | <percentage>',
+    },
+  },
+  translate: {
+    'translate-x': {
+      animationCanonicalizer: lengthish,
+      initialValue: '0px',
+      syntax: '<length-percentage>',
+    },
+    'translate-y': {
+      animationCanonicalizer: lengthish,
+      initialValue: '0px',
+      syntax: '<length-percentage>',
+    },
+    'translate-z': {
+      animationCanonicalizer: lengthOnly,
+      initialValue: '0px',
+      syntax: '<length>',
     },
   },
 }
@@ -308,6 +349,34 @@ export type TypedExecution = {
 }
 
 /**
+ * The leaves a whole `translate` writes, or `null` when the value is not one this family represents.
+ *
+ * The components are guarded by the **same** canonicalizers the constituent path uses, so a value one
+ * path accepts and the other refuses is not expressible — one statement of what the family accepts,
+ * read by both entrances.
+ *
+ * The missing components take the **identity**, not the first value: `translate: 10px` is
+ * `10px 0 0`, where `scale: 2` is `2 2 2`. The two families deliberately do not share a rule, which
+ * is the whole reason this is a declaration rather than something the core could have assumed.
+ */
+export const translateLeaves = (
+  value: string,
+): Array<[string, string]> | null => {
+  const parts = value.trim().split(/\s+/)
+
+  if (!parts.length || parts.length > 3) return null
+
+  const leaves = ['translate-x', 'translate-y', 'translate-z'] as const
+  const guarded = parts.map((part, at) =>
+    (at === 2 ? lengthOnly : lengthish)(part as string),
+  )
+
+  if (guarded.some(one => one === null)) return null
+
+  return leaves.map((leaf, at) => [leaf, (guarded[at] ?? '0') as string])
+}
+
+/**
  * The families that animate as typed leaves.
  *
  * **Only `scale` is here, and deliberately.** It is the proving family — fully addressable, a
@@ -328,6 +397,9 @@ export const typedExecutions: Partial<Record<PropertyType, TypedExecution>> = {
           ]
         : null
     },
+  },
+  translate: {
+    whole: translateLeaves,
   },
 }
 

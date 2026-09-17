@@ -10,6 +10,7 @@ import {
   normalizeScale,
   scaleFactorToNumber,
   scaleLeafEndpoints,
+  translateLeaves,
   typedExecutionOf,
   typedExecutions,
   typedLeafOf,
@@ -238,6 +239,60 @@ describe('scaleLeafEndpoints', () => {
       '',
     ])
       expect(scaleLeafEndpoints(value), value).toBeNull()
+  })
+})
+
+describe('translateLeaves', () => {
+  it('pads the missing components with the identity, not with the first value', () => {
+    // `scale: 2` is `2 2 2`; `translate: 10px` is `10px 0 0`. The two families deliberately do not
+    // share a rule, and a shared one would have been the obvious wrong generalization — which is the
+    // argument for a declared facet rather than a rule the core could have assumed.
+    expect(translateLeaves('10px')).toEqual([
+      ['translate-x', '10px'],
+      ['translate-y', '0'],
+      ['translate-z', '0'],
+    ])
+    expect(translateLeaves('10px 20px')).toEqual([
+      ['translate-x', '10px'],
+      ['translate-y', '20px'],
+      ['translate-z', '0'],
+    ])
+    expect(translateLeaves('10px 20px 30px')).toEqual([
+      ['translate-x', '10px'],
+      ['translate-y', '20px'],
+      ['translate-z', '30px'],
+    ])
+  })
+
+  it('declines through the same guards the constituent path uses', () => {
+    // One statement of what the family accepts, read by both entrances, so a value one path accepts
+    // and the other refuses is not expressible. A leaf cannot hold a keyword, so claiming the motion
+    // for one would animate nothing while suppressing every other declaration of the property.
+    for (const value of [
+      'none',
+      'auto',
+      'banana',
+      '10px 20px 30px 40px',
+      'calc(2px)',
+      'var(--x)',
+      '',
+    ])
+      expect(translateLeaves(value), value).toBeNull()
+
+    expect(
+      canonicalizeLeaf(typedLeafOf('translate', 'translate-x'), 'banana'),
+    ).toBeNull()
+  })
+
+  it('takes a percentage on x and y, and refuses one on z', () => {
+    // `translate`'s z is a `<length>`: a percentage there is not a value the leaf can hold, so the
+    // whole value declines rather than writing one the browser would drop.
+    expect(translateLeaves('50%')).toEqual([
+      ['translate-x', '50%'],
+      ['translate-y', '0'],
+      ['translate-z', '0'],
+    ])
+    expect(translateLeaves('10px 20px 30%')).toBeNull()
   })
 })
 

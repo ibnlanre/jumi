@@ -889,3 +889,96 @@ including the one already in production.
 
 Nothing else is needed: no family token in the core, no new bridge mode, no new substrate mode, no
 slot ordering.
+
+#### D.2 — result: `translate` is migrated, with no core change at all
+
+Landed as three additions and nothing else — two `TypedLeaf` entries, one `typedExecutions` entry,
+and the tests. The six table-driven invariants already covered the new family without being touched,
+which is what they were written that way for.
+
+```text
+animate-translate-x-[10px]          typed      keyframe  from { translate: var(--jumi-translate); }
+                                               to   { translate: var(--jumi-translate);
+                                                      --jumi-translate-x: 10px; }
+animate-translate-[10px]            typed      to   { --jumi-translate-x: 10px; --jumi-translate-y: 0;
+                                                      --jumi-translate-z: 0;
+                                                      translate: var(--jumi-translate); }
+animate-translate-[10px] + x-[30px] both live  curve 0px | 9.375px | 17.5px | 24.375px | 30px
+```
+
+Curves measured at 0 / 25 / 50 / 75 / 100% with linear timing: `translate-x` and `translate whole`
+are `0px | 2.5px | 5px | 7.5px | 10px`, exactly the old path's curve, and the compound case is
+**identical to the old path's** — so the migration changes no computed value, which is the bar it was
+given. 68/68 behaviour contexts, 35 unit tests in this file, and the CSS snapshot is unchanged because
+the frozen corpora carry no `translate` candidate (the effect is on sheets that use one).
+
+**A correction to this pass's own finding.** The spike that produced "the stop" declared `translate`'s
+leaves with **no canonicalizer**, and that was under-specified rather than blocked. A leaf cannot hold
+a keyword, so a family whose leaves accept arbitrary authored values must declare one: the leaf's
+canonicalizer is the constituent path's only validator, and without it a motion claims the property
+for a value the leaf drops — animating nothing while suppressing every other declaration of that
+property. `translate` therefore declares a **guard** (`lengthish`, and `lengthOnly` for z, which is a
+`<length>`): identity when the value is representable, `null` when it is not. With the guard declared,
+`translate` is typed end to end _without_ the gate change.
+
+The gate change stays, and for its own reason: one `null` for two facts is a conflation, and the
+states are genuinely three (`canonicalizeLeaf`). It is a no-op for the shipping family — byte-identical
+snapshot, 68/68 — and it removes the shape that would have the next reader believe a family with no
+canonicalizer had declined. What it is not is the enabler, and the record is corrected here rather
+than left standing.
+
+#### The architecture-3 spike, measured
+
+The question was whether one keyframe can own both the changing leaf and the property composition,
+so that there is one clock and no second animation whose only job is plumbing. Three shapes, the whole
+case list compiled against each with `pnpm bundle` per revision:
+
+```text
+A    what ships: composition pinned at both ends, the leaf written only at `to`
+A+   A with translate declared (D.2)
+B    A+ with the leaf pinned at `from` as well — architecture 3
+```
+
+| case                  | A+ curve                                       | B curve                                  |
+| --------------------- | ---------------------------------------------- | ---------------------------------------- |
+| `scale-x`             | `1 \| 2 1 \| 3 1 \| 4 1 \| 5 1`                | _identical_                              |
+| `scale whole`         | `1 \| 1.25 1.25 1.25 \| … \| 2 2 2`            | _identical_                              |
+| `scale whole + x`     | `1 \| 2.1875 1.25 1.25 \| 3.25 1.5 1.5 \| …`   | `1 \| 2 1.25 1.25 \| 3 1.5 1.5 \| …`     |
+| `translate-x`         | `0px \| 2.5px \| 5px \| 7.5px \| 10px`         | _identical_                              |
+| `translate whole`     | `0px \| 2.5px \| 5px \| 7.5px \| 10px`         | _identical_                              |
+| `translate whole + x` | `0px \| 9.375px \| 17.5px \| 24.375px \| 30px` | `0px \| 7.5px \| 15px \| 22.5px \| 30px` |
+| `declined + x`        | `1 \| 2 1 \| 3 1 \| 4 1 \| 5 1`                | _identical_                              |
+| `named duration`      | `1 \| 2 1 \| 3 1 \| 4 1 \| 5 1`                | _identical_                              |
+| reversed discovery    | both orders agree                              | both orders agree                        |
+
+Exactly two curves move, both compound, both from wrong to right — and the wrongness is measurable
+rather than aesthetic. A leaf animation's implicit `from` is the **underlying** value evaluated per
+frame, so when a second animation writes the same leaf that underlying is _that_ animation's
+interpolation, not the resting value: a `0 → 30px` constituent beside a `0 → 10px` whole composes to
+`40p − 10p²`, which is the `9.375 / 17.5 / 24.375` above. Pinning `from` at the registered identity
+removes the dependence and the line is straight. The lone cases are unaffected because there is
+nothing else writing their leaf, which is also why C never saw this.
+
+Cost and reach, measured:
+
+```text
+frame         from { scale: var(--jumi-scale); --jumi-scale-x: 1; }
+              to   { scale: var(--jumi-scale); --jumi-scale-x: 5; }
+bytes         +23 (one leaf) to +69 (three) per keyframe, 1.0–1.4% of a sheet
+animations    unchanged — same count, same names, same timelines
+timeline      unchanged — a scroll-driven typed motion is still one ScrollTimeline
+fill          unchanged — the pinned `from` is the resting value, so `none` still returns to rest
+gates         68/68 behaviour contexts, one snapshot re-record (the frozen corpora carry `scale`)
+```
+
+**The trade, which is a decision rather than a detail.** Pinning `from` at the registered initial
+means an element-level override of a _leaf_ — `--jumi-scale-x` set by the author — no longer sets the
+animation's starting point. Nothing in the suite asserts that behaviour today, and the documented
+override path is the property-level substrate, which the precedence triangle covers and which is
+untouched. But it is a choice the pin makes by construction, so it belongs in the record rather than
+in a footnote: architecture 3 pays for a straight compound curve with the leaf's participation in the
+substrate triangle.
+
+Not adopted here. The spike is the evidence for the ruling, and for `scale` the result is close to
+what already ships — two compound curves — so it is a decision about the shape every family will use
+rather than a repair to one.
