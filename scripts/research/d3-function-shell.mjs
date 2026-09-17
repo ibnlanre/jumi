@@ -71,6 +71,7 @@ const ARMS = [
     // animated only the axis, and a normalised axis makes that a no-op, which measured as a difference that
     // belonged to the fixture rather than to the representation.
     family: 'rotate3d (moving axis)',
+    kind: 'simultaneous',
     native: { from: 'rotate3d(0, 0, 1, 0deg)', to: 'rotate3d(1, 1, 0, 90deg)' },
     slot: '--jumi-d38-axis-x',
     syntax: '<number>',
@@ -101,6 +102,88 @@ const ARMS = [
     syntax: '<number>',
     shell: 'matrix3d(var(--jumi-d38-matrix-neg), 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)',
     leaf: { from: '1', to: '-1' },
+  },
+
+  /**
+   * **Simultaneous movement** — the compositional question, which is the one production has to answer.
+   *
+   * One argument reproducing native says the argument is an interpolation unit. It does **not** say two migrated
+   * arguments compose, and Jumi cannot find out later: every route compiles on its own, so a family cannot decide
+   * at runtime *"another constituent is on this element, use native instead"* — that is the element-context problem
+   * this track already refused. So a family enters the generic typed constituent path only if its arguments stay
+   * equivalent when they move together.
+   *
+   * `rotate3d (moving axis)` above is the known control. The matrix arms are here because one coefficient matching
+   * is not enough to call sixteen coefficients independent: the shear pair and, especially, the rotation-like pair
+   * are credible attempts to falsify separability, since a rotation is expressible in coefficients and native
+   * interpolation will keep the basis a unit vector where linear coefficients collapse it to zero at the midpoint.
+   */
+  {
+    family: 'scale3d (x + y)',
+    kind: 'simultaneous',
+    native: { from: 'scale3d(1, 1, 1)', to: 'scale3d(2, 3, 1)' },
+    slot: '--jumi-d38-s2-scale-x',
+    syntax: '<number>',
+    shell: 'scale3d(var(--jumi-d38-s2-scale-x), var(--jumi-d38-s2-scale-y), 1)',
+    leaf: { from: '1', to: '2' },
+    extra: [
+      { from: '1', slot: '--jumi-d38-s2-scale-y', syntax: '<number>', to: '3' },
+    ],
+  },
+  {
+    family: 'translate3d (x + y)',
+    kind: 'simultaneous',
+    native: {
+      from: 'translate3d(0px, 0px, 0px)',
+      to: 'translate3d(20px, 40px, 0px)',
+    },
+    slot: '--jumi-d38-s2-translate-x',
+    syntax: '<length>',
+    shell:
+      'translate3d(var(--jumi-d38-s2-translate-x), var(--jumi-d38-s2-translate-y), 0px)',
+    leaf: { from: '0px', to: '20px' },
+    extra: [
+      {
+        from: '0px',
+        slot: '--jumi-d38-s2-translate-y',
+        syntax: '<length>',
+        to: '40px',
+      },
+    ],
+  },
+  {
+    family: 'matrix3d (scale + shear)',
+    kind: 'simultaneous',
+    native: {
+      from: IDENTITY,
+      to: 'matrix3d(2, 0.5, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)',
+    },
+    slot: '--jumi-d38-s2-m11',
+    syntax: '<number>',
+    shell:
+      'matrix3d(var(--jumi-d38-s2-m11), var(--jumi-d38-s2-m12), 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)',
+    leaf: { from: '1', to: '2' },
+    extra: [
+      { from: '0', slot: '--jumi-d38-s2-m12', syntax: '<number>', to: '0.5' },
+    ],
+  },
+  {
+    family: 'matrix3d (rotation-like)',
+    kind: 'simultaneous',
+    native: {
+      from: IDENTITY,
+      to: 'matrix3d(0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)',
+    },
+    slot: '--jumi-d38-s2-r11',
+    syntax: '<number>',
+    shell:
+      'matrix3d(var(--jumi-d38-s2-r11), var(--jumi-d38-s2-r12), 0, 0, var(--jumi-d38-s2-r21), var(--jumi-d38-s2-r22), 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)',
+    leaf: { from: '1', to: '0' },
+    extra: [
+      { from: '0', slot: '--jumi-d38-s2-r12', syntax: '<number>', to: '1' },
+      { from: '0', slot: '--jumi-d38-s2-r21', syntax: '<number>', to: '-1' },
+      { from: '1', slot: '--jumi-d38-s2-r22', syntax: '<number>', to: '0' },
+    ],
   },
 ]
 
@@ -236,6 +319,7 @@ for (const arm of ARMS) {
     arm: arm.family,
     canarySeries,
     identical,
+    kind: arm.kind ?? 'single',
     liveCanary: live,
     nativeSeries,
     shell: arm.shell,
@@ -257,7 +341,7 @@ const truthy = value => (value ? 'yes' : 'no')
 
 for (const one of records)
   console.log(
-    `${one.arm.padEnd(26)} identical=${truthy(one.identical)} canary=${truthy(one.liveCanary)}  ${one.verdict}\n    native ${one.nativeSeries.join(' · ')}\n    typed  ${one.typedSeries.join(' · ')}`,
+    `${one.kind.padEnd(12)} ${one.arm.padEnd(26)} identical=${truthy(one.identical)} canary=${truthy(one.liveCanary)}  ${one.verdict}`,
   )
 
 console.log(`\nwritten to \`${path.relative(root, target)}\``)

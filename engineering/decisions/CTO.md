@@ -3625,3 +3625,68 @@ drop-shadow's arguments beside its blur are a second argument inside the functio
 
 **State.** No production code touched: the pass is `scripts/research/d3-function-shell.mjs`, its readings are
 `scripts/function-argument-series.json`. Gate 17/17, 498 unit tests, 87/87 behaviour arms, `tsc` clean.
+
+---
+
+## The compositional question: argument-safe is not compositionally safe, and the matrix cluster is falsified
+
+The single-argument result establishes one condition — **fixed siblings plus one changing argument** — and says
+nothing about two migrated arguments moving at once. That second question is the one production has to answer, because
+Jumi cannot discover class co-presence at compile time: every route compiles independently, and *"another constituent
+is on this element, use native instead"* is the element-context problem this track already refused. So the same
+differential was run with **two or more arguments moving simultaneously**, same endpoints, same timing, interior
+sampled:
+
+```text
+kind          arm                        identical  canary  verdict
+single        scale3d                    yes        live    same-series
+single        translate3d                yes        live    same-series
+single        rotate3d (fixed axis)      yes        live    same-series
+single        matrix3d (coefficient)     yes        live    same-series
+single        matrix3d (negative scale)  yes        live    same-series
+simultaneous  scale3d (x + y)            yes        live    same-series
+simultaneous  translate3d (x + y)        yes        live    same-series
+simultaneous  rotate3d (moving axis)     no         live    differs      ← known control
+simultaneous  matrix3d (scale + shear)   no         live    differs
+simultaneous  matrix3d (rotation-like)   no         live    differs
+```
+
+**One coefficient matching was not enough to call sixteen coefficients independent, and the matrix arms are where that
+came apart.** A rotation is expressible in coefficients, and the two paths treat it differently in the interior:
+
+```text
+rotation-like   native  0.92388, 0.382683, -0.382683, 0.92388   · 0.707107, 0.707107, …
+                typed   0.75, 0.25, -0.25, 0.75                 · 0.5, 0.5, …
+
+scale + shear   native  1.26302, 0.0774498, …, 0.99447          · 1.51931, 0.187035, …, 0.992736
+                typed   1.25, 0.125, …, 1                       · 1.5, 0.25, …, 1
+```
+
+Native keeps the basis a unit vector — it is rotating, which is what the endpoints mean — and per-coefficient
+interpolation collapses it to `0.5, 0.5` at the midpoint, a scale-dressed rotation. The shear pair diverges more
+quietly and just as really. Both share endpoints; only the interiors differ, which is exactly the shape a fixture
+that cannot see the difference would have missed.
+
+**So the families classify by interpolation semantics, and the criterion is compositional:**
+
+```text
+separable   scale3d · translate3d     one argument and several arguments alike reproduce native
+            → eligible for the generic typed constituent path
+
+coupled     rotate3d                  a fixed axis reproduces native; a turning axis beside a turning
+                                      angle does not → its constituents stay native
+
+falsified   matrix3d                  one coefficient and a negative scale reproduce native; two
+                                      coefficients do not → coefficients are not independent, and the
+                                      family cannot enter transparent per-argument execution
+```
+
+`matrix` is untested and inherits the doubt: the ruling was to include it once `matrix-3d` said which way this goes,
+and the direction is *falsified*, so the 2-D form is a separate measurement rather than an assumption.
+
+The durable criterion for production, and it is stronger than "arguments are interpolation units": **a function family
+is eligible for transparent constituent migration only if independently migrated arguments remain equivalent when
+combined.** That is decidable at research time, per family, which is the only time it can be decided.
+
+**State.** No production code moved. Gate 17/17, 498 unit tests, 87/87 behaviour arms, `tsc` clean; the readings are
+in `scripts/function-argument-series.json`.

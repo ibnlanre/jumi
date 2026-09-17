@@ -18,6 +18,7 @@
         "matrix(3, 0, 0, 1, 0, 0)"
       ],
       "identical": true,
+      "kind": "single",
       "liveCanary": true,
       "nativeSeries": [
         "matrix(1, 0, 0, 1, 0, 0)",
@@ -46,6 +47,7 @@
         "matrix(1, 0, 0, 1, 30, 0)"
       ],
       "identical": true,
+      "kind": "single",
       "liveCanary": true,
       "nativeSeries": [
         "matrix(1, 0, 0, 1, 0, 0)",
@@ -74,6 +76,7 @@
         "matrix(-0.707107, 0.707107, -0.707107, -0.707107, 0, 0)"
       ],
       "identical": true,
+      "kind": "single",
       "liveCanary": true,
       "nativeSeries": [
         "matrix(1, 0, 0, 1, 0, 0)",
@@ -102,6 +105,7 @@
         "matrix3d(0.692308, 0.461538, -0.5547, 0, 0.461538, 0.307692, 0.83205, 0, 0.5547, -0.83205, 0, 0, 0, 0, 0, 1)"
       ],
       "identical": false,
+      "kind": "simultaneous",
       "liveCanary": true,
       "nativeSeries": [
         "matrix(1, 0, 0, 1, 0, 0)",
@@ -130,6 +134,7 @@
         "matrix(3, 0, 0, 1, 0, 0)"
       ],
       "identical": true,
+      "kind": "single",
       "liveCanary": true,
       "nativeSeries": [
         "matrix(1, 0, 0, 1, 0, 0)",
@@ -158,6 +163,7 @@
         "matrix(-1.5, 0, 0, 1, 0, 0)"
       ],
       "identical": true,
+      "kind": "single",
       "liveCanary": true,
       "nativeSeries": [
         "matrix(1, 0, 0, 1, 0, 0)",
@@ -175,6 +181,122 @@
         "matrix(-1, 0, 0, 1, 0, 0)"
       ],
       "verdict": "same-series"
+    },
+    {
+      "arm": "scale3d (x + y)",
+      "canarySeries": [
+        "matrix(1, 0, 0, 1, 0, 0)",
+        "matrix(1.5, 0, 0, 1.5, 0, 0)",
+        "matrix(2, 0, 0, 2, 0, 0)",
+        "matrix(2.5, 0, 0, 2.5, 0, 0)",
+        "matrix(3, 0, 0, 3, 0, 0)"
+      ],
+      "identical": true,
+      "kind": "simultaneous",
+      "liveCanary": true,
+      "nativeSeries": [
+        "matrix(1, 0, 0, 1, 0, 0)",
+        "matrix(1.25, 0, 0, 1.5, 0, 0)",
+        "matrix(1.5, 0, 0, 2, 0, 0)",
+        "matrix(1.75, 0, 0, 2.5, 0, 0)",
+        "matrix(2, 0, 0, 3, 0, 0)"
+      ],
+      "shell": "scale3d(var(--jumi-d38-s2-scale-x), var(--jumi-d38-s2-scale-y), 1)",
+      "typedSeries": [
+        "matrix(1, 0, 0, 1, 0, 0)",
+        "matrix(1.25, 0, 0, 1.5, 0, 0)",
+        "matrix(1.5, 0, 0, 2, 0, 0)",
+        "matrix(1.75, 0, 0, 2.5, 0, 0)",
+        "matrix(2, 0, 0, 3, 0, 0)"
+      ],
+      "verdict": "same-series"
+    },
+    {
+      "arm": "translate3d (x + y)",
+      "canarySeries": [
+        "matrix(1, 0, 0, 1, 0, 0)",
+        "matrix(1, 0, 0, 1, 7.5, 10)",
+        "matrix(1, 0, 0, 1, 15, 20)",
+        "matrix(1, 0, 0, 1, 22.5, 30)",
+        "matrix(1, 0, 0, 1, 30, 40)"
+      ],
+      "identical": true,
+      "kind": "simultaneous",
+      "liveCanary": true,
+      "nativeSeries": [
+        "matrix(1, 0, 0, 1, 0, 0)",
+        "matrix(1, 0, 0, 1, 5, 10)",
+        "matrix(1, 0, 0, 1, 10, 20)",
+        "matrix(1, 0, 0, 1, 15, 30)",
+        "matrix(1, 0, 0, 1, 20, 40)"
+      ],
+      "shell": "translate3d(var(--jumi-d38-s2-translate-x), var(--jumi-d38-s2-translate-y), 0px)",
+      "typedSeries": [
+        "matrix(1, 0, 0, 1, 0, 0)",
+        "matrix(1, 0, 0, 1, 5, 10)",
+        "matrix(1, 0, 0, 1, 10, 20)",
+        "matrix(1, 0, 0, 1, 15, 30)",
+        "matrix(1, 0, 0, 1, 20, 40)"
+      ],
+      "verdict": "same-series"
+    },
+    {
+      "arm": "matrix3d (scale + shear)",
+      "canarySeries": [
+        "matrix(1, 0, 0, 1, 0, 0)",
+        "matrix(1.5, 0.125, 0, 1, 0, 0)",
+        "matrix(2, 0.25, 0, 1, 0, 0)",
+        "matrix(2.5, 0.375, 0, 1, 0, 0)",
+        "matrix(3, 0.5, 0, 1, 0, 0)"
+      ],
+      "identical": false,
+      "kind": "simultaneous",
+      "liveCanary": true,
+      "nativeSeries": [
+        "matrix(1, 0, 0, 1, 0, 0)",
+        "matrix(1.26302, 0.0774498, 0.00116765, 0.994472, 0, 0)",
+        "matrix(1.51931, 0.187035, 0.00185211, 0.992736, 0, 0)",
+        "matrix(1.76593, 0.328163, 0.00160531, 0.994642, 0, 0)",
+        "matrix(2, 0.5, 4.03903e-16, 1, 0, 0)"
+      ],
+      "shell": "matrix3d(var(--jumi-d38-s2-m11), var(--jumi-d38-s2-m12), 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)",
+      "typedSeries": [
+        "matrix(1, 0, 0, 1, 0, 0)",
+        "matrix(1.25, 0.125, 0, 1, 0, 0)",
+        "matrix(1.5, 0.25, 0, 1, 0, 0)",
+        "matrix(1.75, 0.375, 0, 1, 0, 0)",
+        "matrix(2, 0.5, 0, 1, 0, 0)"
+      ],
+      "verdict": "differs"
+    },
+    {
+      "arm": "matrix3d (rotation-like)",
+      "canarySeries": [
+        "matrix(1, 0, 0, 1, 0, 0)",
+        "matrix(0.75, 0.25, -0.25, 0.75, 0, 0)",
+        "matrix(0.5, 0.5, -0.5, 0.5, 0, 0)",
+        "matrix(0.25, 0.75, -0.75, 0.25, 0, 0)",
+        "matrix(0, 1, -1, 0, 0, 0)"
+      ],
+      "identical": false,
+      "kind": "simultaneous",
+      "liveCanary": true,
+      "nativeSeries": [
+        "matrix(1, 0, 0, 1, 0, 0)",
+        "matrix(0.92388, 0.382683, -0.382683, 0.92388, 0, 0)",
+        "matrix(0.707107, 0.707107, -0.707107, 0.707107, 0, 0)",
+        "matrix(0.382683, 0.92388, -0.92388, 0.382683, 0, 0)",
+        "matrix(2.22045e-16, 1, -1, 2.22045e-16, 0, 0)"
+      ],
+      "shell": "matrix3d(var(--jumi-d38-s2-r11), var(--jumi-d38-s2-r12), 0, 0, var(--jumi-d38-s2-r21), var(--jumi-d38-s2-r22), 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)",
+      "typedSeries": [
+        "matrix(1, 0, 0, 1, 0, 0)",
+        "matrix(0.75, 0.25, -0.25, 0.75, 0, 0)",
+        "matrix(0.5, 0.5, -0.5, 0.5, 0, 0)",
+        "matrix(0.25, 0.75, -0.75, 0.25, 0, 0)",
+        "matrix(0, 1, -1, 0, 0, 0)"
+      ],
+      "verdict": "differs"
     }
   ]
 }
