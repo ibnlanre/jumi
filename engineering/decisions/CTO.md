@@ -3151,3 +3151,99 @@ is debugging a phantom.
 **State.** Tip `1c4f133`. Nothing landed: `src/` is exactly `1c4f133`, restored by name. Gate 17/17, 489 unit tests,
 `tsc` clean. The two census refusals and the registry classification are the increment's real gate, and neither is a
 rewrite of the design.
+
+---
+
+## D.3.7 landed: the distinction named first, then the emission that needed it
+
+The ruling was to settle both refusals as **one** missing distinction before touching the emission, and to treat the
+failed landing as implementation feedback rather than as a deferral. Both corrections landed as their own increment
+(`0a48f0e`), green, with the emission untouched; the emission then landed on top of them and is now measured in a
+browser.
+
+### The two declarations, and what each one stopped pretending
+
+```text
+PUBLIC AUTHORING       x-edge · x-offset · y-edge · y-offset  →  candidates address these
+NORMALIZATION          TypedExecution.constituent             →  reads the declared surface
+INTERNAL EXECUTION     x-position · y-position                →  no candidate addresses these
+STATIC COMPOSITION     offset-anchor: var(x-position) var(y-position)
+```
+
+`TypedExecution.authoring` is the family's public authoring components — deliberately **not** `dependencies`, because
+after a reshape the composition reads the resolved ones and listing the authoring ones there would say the property is
+made of something it is not. Two consumers read it and they are why it is declared: the resolver's projection is
+exactly these slots (never a bag of nearby model slots), and the census counts them.
+
+`TypedLeaf.execution` marks a leaf that exists to be written by a frame. The census population became one stated rule
+— the composition graph plus the declared authoring surfaces minus the execution machinery — factored as `censusOf`, a
+pure function of its three inputs, so the rule is testable without moving the model underneath it. The evidence
+invariant was **narrowed, not relaxed**: a route means an author can enter through something, and an execution leaf
+cannot; it is evidenced through the public routes that generate it.
+
+### The emission, and the census accounting
+
+`offset-anchor`'s composition now reads the two resolved components; the two execution leaves exist with rests that
+are the resolved form of the authoring rests (`center` over `0` is `50%`); the family declares its four authoring
+components and a resolver; and the core takes a compound branch only where a family declares one, projecting exactly
+the declared surface.
+
+The census moved from 303 to **305**, and the movement is accounted for rather than accepted:
+
+```text
+value     106 → 108   the four authoring components arrive as pairs the family exposes
+keyword    99 → 101
+reshape    98 →  96   the two per-axis group pairs leave: the composition stopped composing them
+pairs     324 → 326   (four arrive, two execution leaves are refused, the graph itself unchanged)
+declared components 288 → 286   the two leaves are machinery, and machinery is not surface
+```
+
+### The measurement — five arms over the shipped build, in `behaviour-check.mjs` §19
+
+Not the spike: the real compiler, the shipped bundle.
+
+```text
+the composition composes the two resolved components                      ✓
+one definition writes both leaves                                        ✓
+`left` over a zero offset → 0% · untouched `center` → 50%                ✓
+the resting composition computes (motion applied, paused at zero)        ✓  — D.3.7 measured `auto`
+a component with no measured mapping takes the composed representation    ✓
+```
+
+The resting arm is the repair, and it is a browser claim: D.3.7's defect was `applied === bare`, meaning the
+emission's own declaration computed to what a bare element reads. With the motion applied and paused at zero the
+element now reads a position rather than `auto`.
+
+### What the measurement found, and it is not the resolver
+
+The per-axis group route (`animate-offset-anchor-x`, `-y`) is **inert**, measured:
+
+```text
+@keyframes jumi-offset-anchor-x { to { offset-anchor: var(--jumi-offset-anchor-x-position) var(--jumi-offset-anchor-y-position); } }
+```
+
+That is the same value at both stops. It follows from the reshape rather than from the resolver: `hookSlot` replaces
+the group's own leaves inside the attribute's composition, and the composition no longer names them, so there is
+nothing to replace and the frame writes the composition verbatim. The group candidates address a slot nothing reads.
+The arm states this so it cannot be mistaken for coverage, and the decision it opens — retire the two per-axis groups
+or map them onto the axes the resolver reads — belongs to you, because the group's own candidate cannot even carry a
+two-token value (`type: 'position'`), which is what made a `var()` decline unreachable through a class in the first
+place: the decline had to be measured on a route that compiles.
+
+Classification: **plumbing**, found by measurement, in a route the reshape made vestigial. It is not one of the six
+assumptions, and none of them was reopened.
+
+### Outstanding
+
+The validation pass has not been re-run against the reshaped family. The records that name `offset-anchor` still carry
+their pre-reshape verdicts, and the unit guard admits what shipped — which is why the tree is green — but the two
+authoring pairs the census now counts under `offset-anchor` have no records of their own yet. That, and the group
+decision above, are the increment's opening items.
+
+**Practice note, three times now:** the compound arms failed twice on their own fixtures — an element with no class on
+it, and a decline spelling that never compiled — and both read exactly like an emission that does not work. Read the
+fixture before the emission; the detail strings exist so a failure says which of the two it is.
+
+**State.** Corrections `0a48f0e`, emission `<landing>`. Gate 17/17, 496 unit tests, 87/87 behaviour arms, `tsc` clean.
+The six assumptions stand unreopened; the spike's measurements stand; the landing is in and measured, with two items
+open rather than deferred.

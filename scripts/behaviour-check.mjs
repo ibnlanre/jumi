@@ -2034,13 +2034,111 @@ const subject = [
   [
     'and every write of the property inside the motion is the bridge alone',
     typedArgumentProperties.length > 0 &&
-      typedArgumentProperties.every(value => value === 'var(--jumi-math-depth)'),
+      typedArgumentProperties.every(
+        value => value === 'var(--jumi-math-depth)',
+      ),
     `the motion writes math-depth as ${typedArgumentProperties.join(' | ') || 'nothing'}`,
   ],
 ]
 
 for (const [claim, ok, detail] of subject)
   if (!ok) failures.push(`subject: ${claim} — ${detail}`)
+
+/* ------------------------------------------------------------------------------------------------
+ * 19. A compound constituent resolves its authoring surface into execution, or declines the whole
+ *     route (added 2026-09-17, landing D.3.7).
+ * ------------------------------------------------------------------------------------------------ */
+
+// The family whose public components are authoring vocabulary rather than execution slots, and the first
+// whose composition had to change shape rather than gain a leaf. Measured on the **shipped** build, through
+// the real compiler, because the spike this was designed in is not the thing that ships: the arms are the
+// four readings the ruling named — the composition, the paired write, the resolved edge, and the decline —
+// plus the resting state, which is a browser claim rather than a text one.
+const compoundSheet = finalizeCss(
+  (await compiler(COMPOSITION_ENTRY, root)).build([
+    'animate-offset-anchor-x-edge-[left]',
+  ]),
+).css
+const compoundFrames =
+  /@keyframes jumi-offset-anchor-x-edge\s*\{([\s\S]*?)\n\}/.exec(
+    compoundSheet,
+  )?.[1] ?? ''
+
+const declinedSheet = finalizeCss(
+  (await compiler(COMPOSITION_ENTRY, root)).build([
+    'animate-offset-anchor-x-[left]',
+  ]),
+).css
+
+const declinedFrames =
+  /@keyframes jumi-offset-anchor-x\s*\{([\s\S]*?)\n\}/.exec(declinedSheet)?.[1] ?? ''
+
+const restingPage = await load(
+  compoundSheet,
+  '<div id="rest" class="animate-offset-anchor-x-edge-[left]"></div>',
+)
+// Read **with the motion applied and paused at zero**, which is the reading D.3.7 used to find the defect and
+// the only one that means anything here: with nothing applied, `offset-anchor` reads the property's own initial
+// value on every element in the library, so an unanimated element would have reported `auto` whether the
+// emission was right or not.
+const restingAnchor = await restingPage.evaluate(async () => {
+  const element = document.getElementById('rest')
+
+  element.getAnimations().forEach(animation => {
+    animation.pause()
+    animation.currentTime = 0
+  })
+
+  await new Promise(requestAnimationFrame)
+
+  return getComputedStyle(element).offsetAnchor
+})
+
+const compound = [
+  [
+    'the composition composes the two resolved components',
+    compoundSheet.includes(
+      '--jumi-offset-anchor: var(--jumi-offset-anchor-x-position) var(--jumi-offset-anchor-y-position)',
+    ),
+    'the property reads the pair the browser interpolates, not the four authoring tokens',
+  ],
+  [
+    'a compound constituent writes both leaves, from one definition',
+    compoundFrames.includes(
+      '--jumi-offset-anchor-x-position: var(--jumi-offset-anchor-x-position-100)',
+    ) &&
+      compoundFrames.includes(
+        '--jumi-offset-anchor-y-position: var(--jumi-offset-anchor-y-position-100)',
+      ),
+    'one keyframe assigns both axes, so a motion cannot move one and strand the other',
+  ],
+  [
+    'and the authored edge resolves into the component the browser interpolates',
+    compoundSheet.includes('--jumi-offset-anchor-x-position-100: 0%') &&
+      compoundSheet.includes('--jumi-offset-anchor-y-position-100: 50%'),
+    '`left` over a zero offset is `0%`, and the untouched `center` over a zero offset is `50%`',
+  ],
+  [
+    'a component with no measured mapping takes the composed representation',
+    /(^|\s)offset-anchor:/.test(declinedFrames) &&
+      !declinedFrames.includes('--jumi-offset-anchor-x-position:'),
+    // The per-axis group is authoring surface the resolver does not read, so its motion stays on the property.
+    // **Measured, and recorded as a finding rather than as a working route**: the frame writes the composition
+    // verbatim — `offset-anchor: var(--jumi-offset-anchor-x-position) var(--jumi-offset-anchor-y-position)` —
+    // which is the same value at both stops, because the composition no longer names the group's own leaves for
+    // `hookSlot` to replace. The group's motion is therefore inert, which is a property of the reshaped
+    // composition rather than of the resolver, and it is stated here so it cannot be mistaken for coverage.
+    `the declined motion writes ${declinedFrames.replaceAll('\n', ' ').trim()}`,
+  ],
+  [
+    'and the resting composition computes, where the four-token one did not',
+    restingAnchor !== 'auto' && restingAnchor.includes('50%'),
+    `the unanimated element reads \`offset-anchor: ${restingAnchor}\``,
+  ],
+]
+
+for (const [claim, ok, detail] of compound)
+  if (!ok) failures.push(`compound: ${claim} — ${detail}`)
 
 /* ------------------------------------------------------------------------------------
  * 17. A typed constituent definition is value-free, and shared by every authored value
@@ -2485,6 +2583,7 @@ const required =
   urls.length +
   typed.length +
   subject.length +
+  compound.length +
   reuse.length +
   chains.length
 const passing = required - failures.length

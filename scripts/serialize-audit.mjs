@@ -132,6 +132,27 @@ const registry = [
     'that an authored value may carry surrounding whitespace — the same assumption every authored value in the library makes, and the trim is the only thing done to the text',
   ),
   // ── the phrase grammar: the author's candidate, with its whitespace written out ───────────────
+  // ── the compound resolver: the authoring surface, read as text ───────────────────────────
+  tolerant(
+    'src/variables/typed-leaves.ts',
+    'isArithmetic',
+    "endsWith(')')",
+    'whether an authored component is arithmetic rather than a single token',
+    'that the closing parenthesis is the last character — and the walk beside it is there because that is not the same as the *first* one, which `calc(min(10px, 2%))` shows',
+  ),
+  tolerant(
+    'src/variables/typed-leaves.ts',
+    'isComponent',
+    'COMPONENT.test(text)',
+    'whether an authored component is one this family can carry into a frame',
+    'the component grammar the browser resolved for this family: a number with an optional unit or percentage, or arithmetic',
+  ),
+  safe(
+    'src/variables/typed-leaves.ts',
+    'typedExecutions',
+    'slots.includes(component)',
+    'whether the addressed component is one the family declares as its authoring surface',
+  ),
   tolerant(
     'src/core/index.ts',
     'parsePhrase',

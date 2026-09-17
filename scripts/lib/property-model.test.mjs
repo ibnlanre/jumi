@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 // Relative and explicit: the `@/` alias is a tsconfig path, and this reader is a plain Node module.
 import { propertyVariables } from '../../src/variables/property.ts'
-
 import {
   bucketOf,
   readCandidate,
@@ -184,25 +183,31 @@ describe('the candidate walk', () => {
 
   it('still reads the shapes the walk was written for', () => {
     // A whole candidate addresses the attribute and declares no part of its own.
-    expect(readCandidate(`
+    expect(
+      readCandidate(`
       fn: property('scale'),
-      type: 'number',`)).toEqual({
+      type: 'number',`),
+    ).toEqual({
       attribute: 'scale',
       parts: [],
       types: ['number'],
     })
 
     // `token(…)`'s second argument is an order rather than a parts list, so it addresses the attribute alone.
-    expect(readCandidate(`
-      fn: token('display', 'prepend'),`)).toEqual({
+    expect(
+      readCandidate(`
+      fn: token('display', 'prepend'),`),
+    ).toEqual({
       attribute: 'display',
       parts: [],
       types: [],
     })
 
     // An entry that addresses no property at all is not an error; it is a candidate with nothing to write.
-    expect(readCandidate(`
-      values: empty.number,`)).toEqual({
+    expect(
+      readCandidate(`
+      values: empty.number,`),
+    ).toEqual({
       attribute: null,
       parts: [],
       types: [],
@@ -307,7 +312,7 @@ describe('readExpressions', () => {
       ])
       .filter(([, value, read]) => value !== read)
 
-    expect(evaluated).toHaveLength(624)
+    expect(evaluated).toHaveLength(626)
     expect(differences).toEqual([])
   })
 

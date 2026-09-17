@@ -2,11 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import {
   applicationOf,
+  authoringPopulation,
   censusOf,
   censusPopulation,
   chainsOf,
   describe as describePair,
   descriptorOf,
+  executionLeaves,
   frameOf,
   liveOf,
   population,
@@ -152,7 +154,7 @@ describe('population coverage', () => {
   // drift into different populations. That drift is what this test exists to catch: the census's constituent
   // count and this pass's reach count were 303 and 294, because one reader evaluated the model while the other
   // read its source.
-  const pairs = population()
+  const pairs = censusPopulation()
   const described = pairs.map(one => ({
     ...describePair(one),
     machinery: bucketOf(one.parent, one.component) === 'machinery',
@@ -164,15 +166,21 @@ describe('population coverage', () => {
   const incomplete = reach.filter(one => one.status !== 'complete')
 
   it('walks the census population, as pairs', () => {
-    expect(pairs).toHaveLength(324)
+    // 326 rather than 324: `offset-anchor`'s reshape declared its four authoring components — they are pairs
+    // the family exposes and no longer pairs its composition reads — and its two execution leaves are not
+    // population at all, so four arrive and two are refused rather than the graph simply growing.
+    expect(pairs).toHaveLength(326)
     expect(new Set(pairs.map(one => one.parent)).size).toBe(104)
   })
 
   it('counts the census populations, machinery included', () => {
-    // The numbers the census asserts, computed here from the graph and the shared bucket: 21 machinery,
-    // 303 constituent. A pair count that agrees while the sets disagree is exactly what was possible before.
+    // The numbers the census asserts, computed here from the same rule: 21 machinery, 305 constituent. The
+    // movement from 303 is accounted for rather than accepted — the two `(offset-anchor, offset-anchor-x|y)`
+    // pairs were `reshape`, and they leave because the composition stopped composing the per-axis groups,
+    // which is the reshape doing what it says; the four authoring pairs arrive because the family now exposes
+    // them, which it always did through the groups' own pairs and now declares at the family as well.
     expect(machinery).toHaveLength(21)
-    expect(reach).toHaveLength(303)
+    expect(reach).toHaveLength(305)
   })
 
   it('counts completeness as exactly the declared representations, placed', () => {
@@ -183,9 +191,14 @@ describe('population coverage', () => {
     // Deriving the expectation rather than restating it is what keeps this honest across promotions. D.3.5
     // landed a batch and this test was a list of six names; the list would have had to grow by 26 lines and
     // the next batch by more, and each edit would have been the assertion agreeing with whatever was there.
-    const declared = readTypedLeaves()
+    // The **addressable** declarations. An execution leaf is a form the frames write rather than a surface a
+    // candidate addresses, so it has no route to be complete through: its absence from `complete` is the rule,
+    // not a defect, and asserting it here would demand an entrance no author has.
+    const declared = new Map(
+      [...readTypedLeaves()].filter(([, one]) => !one.execution),
+    )
     const placed = new Set(
-      population()
+      censusPopulation()
         .filter(one => bucketOf(one.parent, one.component) !== 'machinery')
         .map(one => one.component)
         .filter(component => declared.has(component)),
@@ -269,11 +282,16 @@ describe('the census population', () => {
     ).toHaveLength(1)
   })
 
-  it('is the graph while no family declares either relation', () => {
-    // The rule is inert until a family needs it, and that is asserted rather than assumed: with no authoring
-    // surface and no execution leaf declared, the census is exactly the composition graph it has always been,
-    // which is what makes the counts in `crosstab.test.mjs` a statement about the model rather than about this
-    // function. The increment that lands `offset-anchor` restates this identity with both halves non-empty.
-    expect(censusPopulation()).toEqual(population())
+  it('is the graph plus the declared surfaces, minus the machinery', () => {
+    // Both relations are declared now, so the identity is stated with both halves non-empty rather than as
+    // "the rule is inert". The numbers are the accounting: the four authoring pairs are new to the population,
+    // the two execution leaves are refused, and the graph itself is unchanged at 324.
+    expect(population()).toHaveLength(324)
+    expect(authoringPopulation()).toHaveLength(4)
+    expect([...executionLeaves()]).toEqual([
+      'offset-anchor-x-position',
+      'offset-anchor-y-position',
+    ])
+    expect(censusPopulation()).toHaveLength(326)
   })
 })

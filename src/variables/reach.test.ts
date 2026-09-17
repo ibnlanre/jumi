@@ -28,12 +28,18 @@ import {
  * *argument* of `translate3d(…)`, so one leaf participates two ways and a per-leaf verdict would have to
  * be wrong about one of them.
  *
- *   pairs            324
+ *   pairs            326
  *   machinery         21   parts of the `animation`/`transition`/`*-timeline` shorthands
- *   constituent      303   what reach is actually about
- *     reshape         97   ≈ 32%
- *     value          106   ≈ 35%
- *     keyword         99   ≈ 33%
+ *   constituent      305   what reach is actually about
+ *     reshape         96   ≈ 31%
+ *     value          108   ≈ 35%
+ *     keyword        101   ≈ 33%
+ *
+ * The counts moved by two when `offset-anchor` was reshaped, and the movement is the finding rather than noise:
+ * the composition stopped composing the two per-axis groups, whose pairs were `reshape` and leave — the reshape
+ * doing exactly what the bucket says it means — and the family's four authoring components arrive as pairs it
+ * exposes. The two execution leaves the composition now reads are refused rather than counted, because no
+ * candidate addresses them: four in, two out, and the same six components reached a different way.
  *
  * Those three are close to equal, and that is the finding. Reach is not "mostly easy values with a few
  * ugly cases" — it is **three comparably large architectural populations**, which fail or succeed for
@@ -146,8 +152,8 @@ const size = (name: string) => (buckets[name] ?? []).length
 describe("D.3's constituent census", () => {
   it('reads the surface off the vocabulary, not off a list kept here', () => {
     expect(parents).toHaveLength(104)
-    expect(components.size).toBe(288)
-    expect(pairs).toHaveLength(324)
+    expect(components.size).toBe(286)
+    expect(pairs).toHaveLength(326)
 
     // The source reader and the evaluated model must have the same parents, because one predicate now serves
     // a census that reads both. This is the assertion that the shared predicate is not standing in for a
@@ -168,10 +174,10 @@ describe("D.3's constituent census", () => {
     // finding rather than the exact counts.
     const constituent = pairs.length - size('machinery')
 
-    expect(constituent).toBe(303)
-    expect(size('reshape')).toBe(98)
-    expect(size('value')).toBe(106)
-    expect(size('keyword')).toBe(99)
+    expect(constituent).toBe(305)
+    expect(size('reshape')).toBe(96)
+    expect(size('value')).toBe(108)
+    expect(size('keyword')).toBe(101)
     expect(size('machinery')).toBe(21)
 
     // Each population is between a quarter and a half of the constituent surface — the statement that

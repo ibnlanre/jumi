@@ -2062,7 +2062,7 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-offset',
   },
   'offset-anchor': {
-    dependencies: ['offset-anchor-x', 'offset-anchor-y'],
+    dependencies: ['offset-anchor-x-position', 'offset-anchor-y-position'],
     value: offsetAnchor,
     variable: '--jumi-offset-anchor',
   },
@@ -2079,6 +2079,14 @@ export const propertyVariables: DependencyGraph = {
     value: '0',
     variable: '--jumi-offset-anchor-x-offset',
   },
+  // The two **execution** components. Nothing public addresses them: an author writes an edge or an offset, and
+  // the family's resolver turns the four of those into these two. They are what the frames animate, and their
+  // rest is the resolved form of the authoring rests — `center` over a `0` offset is `50%` — which is also what
+  // makes the resting composition valid where the four-token one computed to `auto`.
+  'offset-anchor-x-position': {
+    value: '50%',
+    variable: '--jumi-offset-anchor-x-position',
+  },
   'offset-anchor-y': {
     dependencies: ['offset-anchor-y-edge', 'offset-anchor-y-offset'],
     value: offsetAnchorY,
@@ -2091,6 +2099,10 @@ export const propertyVariables: DependencyGraph = {
   'offset-anchor-y-offset': {
     value: '0',
     variable: '--jumi-offset-anchor-y-offset',
+  },
+  'offset-anchor-y-position': {
+    value: '50%',
+    variable: '--jumi-offset-anchor-y-position',
   },
   'offset-distance': {
     value: '0',

@@ -312,6 +312,30 @@ export const typedLeaves: Partial<
       syntax: '<percentage>',
     },
   },
+  /**
+   * `offset-anchor`'s two **execution** leaves.
+   *
+   * Nothing public addresses them, and that is the family's design rather than a gap: an author writes an edge
+   * or an offset, and the resolver turns the four of those into these two. They are what the frames animate, so
+   * they are declared — a write to an unregistered property is discrete instead of interpolable — while being
+   * marked as machinery so nothing asks them for a route they cannot have.
+   *
+   * Their rest is the resolved form of the authoring rests rather than a new opinion: `center` over a `0` offset
+   * is `50%`, which is the same anchor, and it is also what makes the resting composition a value the property
+   * accepts where the four-token one computed to `auto`.
+   */
+  'offset-anchor': {
+    'offset-anchor-x-position': {
+      execution: true,
+      initialValue: '50%',
+      syntax: '<length-percentage>',
+    },
+    'offset-anchor-y-position': {
+      execution: true,
+      initialValue: '50%',
+      syntax: '<length-percentage>',
+    },
+  },
   'offset-position': {
     'offset-position-x-offset': {
       initialValue: '50%',
@@ -673,6 +697,152 @@ export const translateLeaves = (
  * is what makes a second family an addition rather than a copy: it says which leaf each component
  * of a whole value becomes, and a family that cannot say that does not get the execution model.
  */
+/**
+ * `offset-anchor`'s two execution components, and the authoring components they are resolved from.
+ *
+ * The normalization lives in `src/` rather than in `scripts/` because production cannot import a research book,
+ * and the prototype it was measured against stays where it was: a test compares the two rather than one calling
+ * the other, so a disagreement is a finding instead of a rename. The contract is the measured one — an edge plus
+ * an offset resolves to one component in the direction the edge grows, a `center` edge resolves only over a zero
+ * offset, and everything unresolved declines.
+ */
+const POSITION_X = 'offset-anchor-x-position'
+const POSITION_Y = 'offset-anchor-y-position'
+
+const AUTHORING = {
+  xEdge: 'offset-anchor-x-edge',
+  xOffset: 'offset-anchor-x-offset',
+  yEdge: 'offset-anchor-y-edge',
+  yOffset: 'offset-anchor-y-offset',
+} as const
+
+/** A component as written: a number with an optional unit or percentage. */
+const COMPONENT = /^[+-]?(?:\d+\.?\d*|\.\d+)(?:[a-z%]{1,4})?$/i
+
+/**
+ * Whether a component is arithmetic rather than a single token.
+ *
+ * Balanced rather than matched, because a `)` inside a nested call is not the end of this one: `calc(min(10px, 2%))`
+ * closes the outer call at its last character, and a reader that took the first `)` would carry a fragment into the
+ * frames.
+ */
+const isArithmetic = (text: string) => {
+  if (!/^calc\(/i.test(text) || !text.endsWith(')')) return false
+
+  let depth = 0
+
+  for (const char of text) {
+    if (char === '(') depth += 1
+    else if (char === ')') {
+      depth -= 1
+
+      if (depth === 0) return text.length > 5
+    }
+  }
+
+  return false
+}
+
+/** Whether a component is one this family can carry through to a frame. */
+const isComponent = (text: string) =>
+  COMPONENT.test(text) || isArithmetic(text)
+
+/** A value split at top-level spaces, so `calc(50% + 4px)` stays one component. */
+const components = (value: string) => {
+  const parts: string[] = []
+  let depth = 0
+  let part = ''
+
+  for (const char of String(value ?? '').trim()) {
+    if (char === '(') depth += 1
+    else if (char === ')') depth -= 1
+
+    if (/\s/.test(char) && depth === 0) {
+      if (part) parts.push(part)
+
+      part = ''
+
+      continue
+    }
+
+    part += char
+  }
+
+  if (part) parts.push(part)
+
+  return parts
+}
+
+/**
+ * One axis of authoring state as a resolved component, or `null` to decline.
+ *
+ * The measured contract, and every clause of it is a reading rather than a guess: an edge plus an offset offsets
+ * from that edge; a `center` edge is the anchor itself, which only a zero offset leaves alone; a zero offset is
+ * the edge's own percentage; and a logical or unknown edge declines, because `<position>`'s physical keywords are
+ * the only ones the browser resolved this way.
+ */
+export const axisPosition = (edge: string, offset: string): null | string => {
+  const component = String(offset ?? '').trim()
+
+  if (edge === 'center') return component === '0' ? '50%' : null
+  if (!isComponent(component)) return null
+
+  if (component === '0')
+    return { bottom: '100%', left: '0%', right: '100%', top: '0%' }[edge] ?? null
+
+  if (edge === 'left' || edge === 'top') return component
+  if (edge === 'right' || edge === 'bottom') return `calc(100% - ${component})`
+
+  return null
+}
+
+/**
+ * A whole authored position → the two execution components, or `null` to decline the whole route.
+ *
+ * Two components are read as a resolved pair or as a pair of edge keywords; four when each axis is an edge with
+ * its offset. Anything else declines rather than being interpreted — `var()` included, since a value nothing can
+ * resolve at build time is not a value that can be resolved by looking harder.
+ */
+export const positionComponents = (
+  value: string,
+): Array<[string, string]> | null => {
+  const parts = components(value)
+
+  if (parts.length === 2) {
+    const [first, second] = parts
+
+    if (isComponent(first) && isComponent(second))
+      return [
+        [POSITION_X, first],
+        [POSITION_Y, second],
+      ]
+
+    const x = { center: '50%', left: '0%', right: '100%' }[first]
+    const y = { bottom: '100%', center: '50%', top: '0%' }[second]
+
+    return x !== undefined && y !== undefined
+      ? [
+          [POSITION_X, x],
+          [POSITION_Y, y],
+        ]
+      : null
+  }
+
+  if (parts.length === 4) {
+    const x = axisPosition(parts[0], parts[1])
+    const y = axisPosition(parts[2], parts[3])
+
+    return x !== null && y !== null
+      ? [
+          [POSITION_X, x],
+          [POSITION_Y, y],
+        ]
+      : null
+  }
+
+  return null
+}
+
 export const typedExecutions: Partial<Record<PropertyType, TypedExecution>> = {
   scale: {
     whole: value => {
@@ -689,6 +859,55 @@ export const typedExecutions: Partial<Record<PropertyType, TypedExecution>> = {
   },
   translate: {
     whole: translateLeaves,
+  },
+  /**
+   * `offset-anchor` — the first **compound** family, and the reason the `constituent` facet exists.
+   *
+   * Its public components are authoring vocabulary: an edge is a keyword, an offset is a value, and neither is
+   * the thing the browser interpolates. Two resolved components are, and a motion assigns **both** or none of
+   * them — a typed x beside a native y is the half-typed state the decline exists to prevent.
+   */
+  'offset-anchor': {
+    authoring: [
+      'offset-anchor-x-edge',
+      'offset-anchor-x-offset',
+      'offset-anchor-y-edge',
+      'offset-anchor-y-offset',
+    ],
+    whole: value => positionComponents(value),
+    constituent: (component, _value, authoring) => {
+      // Only the four declared components are read, and only from authoring state. An absent slot declines: the
+      // projection is built from this family's own surface, so a missing key means the model does not declare it
+      // — and a default invented here would be a second opinion about the authoring grammar, which belongs to the
+      // resolver rather than to the caller.
+      const slots: readonly string[] = Object.values(AUTHORING)
+
+      if (!slots.includes(component)) return null
+
+      const read = (slot: string) => authoring[slot]
+      const xEdge = read(AUTHORING.xEdge)
+      const xOffset = read(AUTHORING.xOffset)
+      const yEdge = read(AUTHORING.yEdge)
+      const yOffset = read(AUTHORING.yOffset)
+
+      if (
+        xEdge === undefined ||
+        xOffset === undefined ||
+        yEdge === undefined ||
+        yOffset === undefined
+      )
+        return null
+
+      const x = axisPosition(xEdge, xOffset)
+      const y = axisPosition(yEdge, yOffset)
+
+      return x !== null && y !== null
+        ? [
+            [POSITION_X, x],
+            [POSITION_Y, y],
+          ]
+        : null
+    },
   },
 }
 

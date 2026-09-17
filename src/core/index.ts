@@ -1601,6 +1601,87 @@ export function createJumiModel({
            * states — not a typed leaf, no canonicalizer declared, canonicalizer declined — are
            * `canonicalizeLeaf`'s, so they cannot be read as one here.
            */
+          /**
+           * A family may declare a **compound** resolver: one whose public components are authoring vocabulary
+           * rather than the slots the browser interpolates.
+           *
+           * The branch is taken because the family declared a resolver, not because of anything about this
+           * candidate — a family that declares none does not enter here at all, and the simple path below is
+           * untouched for every one of them.
+           *
+           * The resolver reads the family's **declared authoring surface** and nothing else. The projection is
+           * exactly those slots, filled from the authored value where a candidate wrote one and the model's rest
+           * where none did — and a slot the model does not declare is left out, which the resolver reads as a
+           * decline rather than as a default. A bag of nearby model slots would be the same code with an
+           * unbounded contract: the resolver would be free to read a component its family never declared.
+           *
+           * `null` declines the **whole typed route**, not one leaf of it. The composed-property representation
+           * below is where an unresolved value goes, so an input nothing can resolve still animates the property
+           * the way it always did; what never happens is a partial assignment, which is a typed x beside a native
+           * y and exactly the half-typed state the decline exists to prevent.
+           */
+          const execution = typedExecutionOf(attribute)
+          const resolve = execution?.constituent
+
+          if (resolve) {
+            const projection: Record<string, string> = {}
+            let complete = true
+
+            for (const slot of execution?.authoring ?? []) {
+              const authored = variables[`--jumi-${slot}`]
+              const rest = propertyVariables[slot as PropertyType]?.value
+              const settled =
+                typeof authored === 'string'
+                  ? authored
+                  : slot === component
+                    ? String(value)
+                    : rest
+
+              if (typeof settled === 'string') projection[slot] = settled
+              else complete = false
+            }
+
+            const assignment = complete
+              ? resolve(component, String(value), projection)
+              : null
+
+            if (assignment !== null) {
+              const substrate = {
+                [attribute]: css(
+                  'var',
+                  propertyVariables[attribute as PropertyType].variable,
+                ),
+              }
+              const endpoints: CssInJs = {}
+              const leaves: CssInJs = { ...substrate }
+
+              // Both leaves in **one** definition, written from **one** substrate. A position is interpolated as
+              // a pair, and two definitions would be two motions free to disagree about which element they are
+              // animating — with the loser going silent rather than failing.
+              for (const [leaf, resolved] of assignment) {
+                const slot = cssEscape(`--jumi-${leaf}-100`)
+
+                endpoints[slot] = resolved
+                leaves[propertyVariables[leaf as PropertyType].variable] = css(
+                  'var',
+                  slot,
+                )
+              }
+
+              emitKeyframe(`jumi-${component}`, {
+                from: substrate,
+                to: leaves,
+              })
+              aggregateChanged()
+
+              return {
+                ...endpoints,
+                [nameVar]: `jumi-${component}`,
+                ...(modifier ? nameSlot(component, component, modifier) : {}),
+              }
+            }
+          }
+
           const declaration = typedLeafOf(attribute, component)
           const authored = String(variables[`--jumi-${component}`] ?? value)
           const canonical = canonicalizeLeaf(declaration, authored)

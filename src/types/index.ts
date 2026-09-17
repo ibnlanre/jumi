@@ -1153,6 +1153,10 @@ export type NonStandardPropertyType =
   | 'offset-anchor-x'
   | 'offset-anchor-x-edge'
   | 'offset-anchor-x-offset'
+  // The two **execution** components: what the frames animate for this family. Deliberately not part of the
+  // public class surface — an author writes an edge or an offset, and the resolver turns both into these.
+  | 'offset-anchor-x-position'
+  | 'offset-anchor-y-position'
   | 'offset-anchor-y'
   | 'offset-anchor-y-edge'
   | 'offset-anchor-y-offset'
