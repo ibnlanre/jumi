@@ -2066,12 +2066,15 @@ const compoundFrames =
 
 const declinedSheet = finalizeCss(
   (await compiler(COMPOSITION_ENTRY, root)).build([
-    'animate-offset-anchor-x-[left]',
+    'animate-offset-anchor-x-edge-[0:0px|100:40px]',
   ]),
 ).css
 
 const declinedFrames =
-  /@keyframes jumi-offset-anchor-x\s*\{([\s\S]*?)\n\}/.exec(declinedSheet)?.[1] ?? ''
+  /@keyframes\s+[\w-]+\s*\{([\s\S]*?)\n\}/.exec(declinedSheet)?.[1] ?? ''
+const declinedNames = [...declinedSheet.matchAll(/@keyframes\s+([\w-]+)/g)].map(
+  match => match[1],
+)
 
 const restingPage = await load(
   compoundSheet,
@@ -2119,16 +2122,16 @@ const compound = [
     '`left` over a zero offset is `0%`, and the untouched `center` over a zero offset is `50%`',
   ],
   [
-    'a component with no measured mapping takes the composed representation',
+    'a phrase spelling on an authoring component keeps the composed representation',
     /(^|\s)offset-anchor:/.test(declinedFrames) &&
       !declinedFrames.includes('--jumi-offset-anchor-x-position:'),
-    // The per-axis group is authoring surface the resolver does not read, so its motion stays on the property.
-    // **Measured, and recorded as a finding rather than as a working route**: the frame writes the composition
-    // verbatim — `offset-anchor: var(--jumi-offset-anchor-x-position) var(--jumi-offset-anchor-y-position)` —
-    // which is the same value at both stops, because the composition no longer names the group's own leaves for
-    // `hookSlot` to replace. The group's motion is therefore inert, which is a property of the reshaped
-    // composition rather than of the resolver, and it is stated here so it cannot be mistaken for coverage.
-    `the declined motion writes ${declinedFrames.replaceAll('\n', ' ').trim()}`,
+    // A multi-stop constituent phrase returns above the constituent branch — D.2's recorded constraint — so it
+    // never reaches the resolver, and the composed path then hooks the attribute's composition for a leaf the
+    // composition no longer names. **Measured, and recorded as a finding rather than as a working route**: the
+    // frame writes the composition verbatim, which is the same value at both stops, so a phrased motion on an
+    // authoring component is inert. The single-value spelling on the same component resolves through the
+    // resolver and moves, which is what the arms above measure; the two spellings differ and only one is wired.
+    `the phrased motion writes ${declinedFrames.replaceAll('\n', ' ').trim()} (keyframes: ${declinedNames.join(', ') || 'none'})`,
   ],
   [
     'and the resting composition computes, where the four-token one did not',

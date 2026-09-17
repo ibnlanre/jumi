@@ -342,28 +342,6 @@
       "verdict": "movable"
     },
     {
-      "candidate": "animate-offset-anchor-x-offset",
-      "component": "offset-anchor-x-offset",
-      "consumer": "offset-anchor",
-      "initialValue": "0",
-      "magnitudes": 1,
-      "parent": "offset-anchor-x",
-      "route": "offset-anchor-x/offset-anchor-x-offset@offset-anchor",
-      "syntax": "<length>",
-      "verdict": "reshape-required"
-    },
-    {
-      "candidate": "animate-offset-anchor-y-offset",
-      "component": "offset-anchor-y-offset",
-      "consumer": "offset-anchor",
-      "initialValue": "0",
-      "magnitudes": 1,
-      "parent": "offset-anchor-y",
-      "route": "offset-anchor-y/offset-anchor-y-offset@offset-anchor",
-      "syntax": "<length>",
-      "verdict": "reshape-required"
-    },
-    {
       "candidate": "animate-offset-position-x-offset",
       "component": "offset-position-x-offset",
       "consumer": "offset-position",

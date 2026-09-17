@@ -1862,11 +1862,12 @@ export const getMatchTween: GetMatchComponents = creator => {
       type: ['length', 'percentage', 'position', 'any'],
       values: theme('objectPosition', empty.auto),
     },
-    'animate-offset-anchor-x': {
-      fn: property('offset-anchor', ['offset-anchor-x']),
-      type: ['length', 'percentage', 'position'],
-      values: empty.position,
-    },
+    // `animate-offset-anchor-x` and `-y` were here, and they are gone. They were inert **before** the reshape and
+    // not because of it: measured against the parent commit, every spelling their grammar accepts -- a length, a
+    // percentage, a position keyword, a phrase -- read `offset-anchor: auto` at both ends of the motion, with the
+    // animation present and applied. The grammar is the reason: the group composes `edge offset`, two tokens,
+    // while the candidate accepted one. A route that cannot state the value it is named for is not a capability,
+    // so it was removed rather than given a meaning during the reshape.
     'animate-offset-anchor-x-edge': {
       fn: property('offset-anchor', ['offset-anchor-x-edge']),
       type: 'position',
@@ -1876,11 +1877,6 @@ export const getMatchTween: GetMatchComponents = creator => {
       fn: property('offset-anchor', ['offset-anchor-x-offset']),
       type: ['length', 'percentage'],
       values: percentage,
-    },
-    'animate-offset-anchor-y': {
-      fn: property('offset-anchor', ['offset-anchor-y']),
-      type: ['length', 'percentage', 'position'],
-      values: empty.position,
     },
     'animate-offset-anchor-y-edge': {
       fn: property('offset-anchor', ['offset-anchor-y-edge']),

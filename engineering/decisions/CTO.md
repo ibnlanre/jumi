@@ -3252,3 +3252,95 @@ and a docs reflow that are not this track's, and the commit was redone with only
 touched. Both facts are recorded here rather than in the entry, because the entry is history. Gate 17/17, 496 unit tests, 87/87 behaviour arms, `tsc` clean.
 The six assumptions stand unreopened; the spike's measurements stand; the landing is in and measured, with two items
 open rather than deferred.
+
+---
+
+## The historical differential: the group routes were already empty, so they retire
+
+The ruling was to falsify the **historical capability** of the actual `animate-offset-anchor-x` / `-y` candidates
+before choosing between mapping and retiring them, and to test only spellings their real grammar accepts.
+
+Run against both plugins — the parent of the reshape (`/tmp/jumi-pre`, worktree at `0a48f0e`, built by the same
+`bundle.mjs`) and the landed one — with the same eight spellings, reading `offset-anchor` on a real element with the
+motion applied and sampled at two instants:
+
+```text
+spelling                              before the reshape        after it
+animate-offset-anchor-x-[10px]        auto → auto      inert    auto → 50% 50%
+animate-offset-anchor-x-[25%]         auto → auto      inert    auto → 50% 50%
+animate-offset-anchor-x-[left]        auto → auto      inert    auto → 50% 50%
+animate-offset-anchor-x-[right]       auto → auto      inert    auto → 50% 50%
+animate-offset-anchor-x-[0:10px|100:50px]  auto → auto  inert    50% 50% → 50% 50%   inert
+animate-offset-anchor-y-[10px]        auto → auto      inert    auto → 50% 50%
+animate-offset-anchor-y-[top]         auto → auto      inert    auto → 50% 50%
+animate-offset-anchor-y-[0:10px|100:50px]  auto → auto  inert    50% 50% → 50% 50%   inert
+```
+
+**Before the reshape, every spelling is inert**: `frames=1`, so an animation exists and is applied, and `offset-anchor`
+reads `auto` — the property's own initial value, what an element with no motion reads — at both instants. No spelling
+the candidate accepts produces an observable value, let alone a motion.
+
+And the grammar is the reason rather than a coincidence. The group's composition is `edge offset` — **two** tokens —
+while its candidate declares `type: ['length', 'percentage', 'position']`, which is **one**. The value the candidate can
+carry is never a well-formed axis pair, so the route could not have expressed the compound it was named for. That is
+the ruling's second branch exactly: structurally present, functionally empty, and unable to state the intent through
+its own grammar.
+
+After the reshape the value spellings read `auto` at zero and `50% 50%` mid — the base composition being applied, not a
+motion — and the phrase spellings read `50% 50%` at both instants, which is §19's finding seen from the browser: the
+frame writes the composition verbatim, the same value at both stops.
+
+**Decision: retire.** `animate-offset-anchor-x` and `animate-offset-anchor-y` are removed as dead authoring surface
+rather than given a meaning during a reshape. A model route existing is not a public capability existing, and the
+measurement is what separates them.
+
+**Practice note, and it is the same note a third time.** The first run of this differential reported `frames=0` for
+every spelling on both builds, which reads exactly like "the routes were never wired". It was the fixture: `.css` read
+off the compiler instead of off its build. Then `.build()` on the right object, then a class on an element, then a
+spelling that never compiled. Four false readings in this track have now come from the measurement rather than from
+the emission, which is why every arm prints its own evidence.
+
+**State.** Tip `7725f99`. The differential is a temporary book (`scripts/research/anchor-group-history.tmp.mjs`), not
+committed; its readings are here. Next: remove the two candidates, re-run the census and the evidence against the
+reshaped family, and close D.3.7 on a green gate.
+
+---
+
+## The group routes are removed, and what removing them exposed
+
+`animate-offset-anchor-x` and `-y` are gone from `tween.ts`, with the measurement written where they were. The
+retirement was contained: the census reads compositions and a candidate is not a composition, so nothing moved —
+303 → 305 stands, 496 unit tests, 87/87 behaviour arms, gate 17/17.
+
+Re-running D.3 validation against the landed family refreshed the topology, and the refresh is itself a finding:
+
+```text
+records removed   offset-anchor-x/offset-anchor-x-offset@offset-anchor
+                  offset-anchor-y/offset-anchor-y-offset@offset-anchor
+records added     none
+```
+
+The two pre-reshape verdicts are gone, which is right — they described an emission that no longer exists. But the new
+authoring pairs have **no records at all**: `offset-anchor` appears nowhere in `validated-representations.json`. So the
+second closure step is half done, and the missing half is the one that would admit the family's public routes to
+evidence. That is open work, not a conclusion, and it is why this entry does not close D.3.7.
+
+Removing the group routes also made §19's decline fixture impossible — the class it named no longer exists — and its
+replacement measured something new. A multi-stop phrase on an authoring component
+(`animate-offset-anchor-x-edge-[0:0px|100:40px]`) emits **whole-property** frames named `jumi-offset-anchor-<id>`, and
+those frames write the composition verbatim: the same value at both stops. The single-value spelling on the same
+component resolves through the resolver and moves.
+
+So the family ships **one wired spelling and one inert one**, and the inert one is the spelling an author reaches for
+when they want a motion rather than an endpoint. It is asserted in §19 so it cannot pass for coverage, and it is left
+for a ruling: it is the same class as the group inertness — a hook with nothing in the composition left to replace —
+arriving through a different door.
+
+**Practice note, and the count is now five.** Both attempts at that fixture failed on the fixture: a phrase whose stops
+were keywords the candidate's `position` type does not carry, so nothing compiled; then a keyframe-name pattern that
+assumed the component's name where the phrase path names the attribute. The emission was never the suspect, and twice
+looked like it.
+
+**State.** Tip `4b2e030` plus this increment. Gate 17/17, 496 unit tests, 87/87 behaviour arms, `tsc` clean. D.3.7
+stays open on two measured items: the family's public routes carry no evidence records, and phrased motions on them
+are inert.
