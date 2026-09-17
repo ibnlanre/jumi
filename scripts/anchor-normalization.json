@@ -1,125 +1,169 @@
 {
-  "classes": [
+  "axis": [
     {
-      "class": "directly resolved",
-      "authoredFrom": "50% 50%",
-      "authoredTo": "20% 80%",
-      "computedFrom": "50% 50%",
-      "computedTo": "20% 80%",
-      "nativeKind": "interpolated",
-      "nativeSeries": [
-        "50% 50%",
-        "42.5% 57.5%",
-        "35% 65%",
-        "27.5% 72.5%",
-        "20% 80%"
+      "authored": [
+        "left 10px top 0",
+        "right 10px top 0"
       ],
-      "representable": true,
-      "representedSeries": [
-        "50% 50%",
-        "42.5% 57.5%",
-        "35% 65%",
-        "27.5% 72.5%",
-        "20% 80%"
+      "axis": "x",
+      "label": "x changes, y explicit and directional",
+      "resolved": [
+        "10px 0",
+        "calc(100% - 10px) 0"
       ],
-      "equivalent": true
+      "authoredInterpolates": true,
+      "authoredSeries": [
+        "calc(0% + 10px) 0px",
+        "calc(25% + 5px) 0px",
+        "50% 0px",
+        "calc(75% - 5px) 0px",
+        "calc(100% - 10px) 0px"
+      ],
+      "computedFrom": "10px 0px",
+      "computedTo": "calc(100% - 10px) 0px",
+      "reading": "both interpolate, so the short spelling was never the issue",
+      "resolvedInterpolates": true,
+      "resolvedSeries": [
+        "calc(0% + 10px) 0px",
+        "calc(25% + 5px) 0px",
+        "50% 0px",
+        "calc(75% - 5px) 0px",
+        "calc(100% - 10px) 0px"
+      ]
     },
     {
-      "class": "directly resolved",
-      "authoredFrom": "10px 20px",
-      "authoredTo": "30px 40px",
-      "computedFrom": "10px 20px",
-      "computedTo": "30px 40px",
-      "nativeKind": "interpolated",
-      "nativeSeries": [
-        "10px 20px",
-        "15px 25px",
-        "20px 30px",
-        "25px 35px",
-        "30px 40px"
+      "authored": [
+        "left 0 top 20px",
+        "left 0 bottom 10px"
       ],
-      "representable": true,
-      "representedSeries": [
-        "10px 20px",
-        "15px 25px",
-        "20px 30px",
-        "25px 35px",
-        "30px 40px"
+      "axis": "y",
+      "label": "y changes, x explicit and directional",
+      "resolved": [
+        "0 20px",
+        "0 calc(100% - 10px)"
       ],
-      "equivalent": true
+      "authoredInterpolates": true,
+      "authoredSeries": [
+        "0px calc(0% + 20px)",
+        "0px calc(25% + 12.5px)",
+        "0px calc(50% + 5px)",
+        "0px calc(75% - 2.5px)",
+        "0px calc(100% - 10px)"
+      ],
+      "computedFrom": "0px 20px",
+      "computedTo": "0px calc(100% - 10px)",
+      "reading": "both interpolate, so the short spelling was never the issue",
+      "resolvedInterpolates": true,
+      "resolvedSeries": [
+        "0px calc(0% + 20px)",
+        "0px calc(25% + 12.5px)",
+        "0px calc(50% + 5px)",
+        "0px calc(75% - 2.5px)",
+        "0px calc(100% - 10px)"
+      ]
     },
     {
-      "class": "physical edge-relative",
-      "authoredFrom": "left 10px",
-      "authoredTo": "right 10px",
+      "authored": [
+        "left 10px",
+        "right 10px"
+      ],
+      "axis": "x",
+      "label": "x changes, short spelling (y implicit at center)",
+      "resolved": [
+        "10px",
+        "calc(100% - 10px)"
+      ],
+      "authoredInterpolates": true,
+      "authoredSeries": [
+        "0% 10px",
+        "25% 10px",
+        "50% 10px",
+        "75% 10px",
+        "100% 10px"
+      ],
       "computedFrom": "0% 10px",
       "computedTo": "100% 10px",
-      "nativeKind": "interpolated",
-      "nativeSeries": [
-        "0% 10px",
-        "25% 10px",
-        "50% 10px",
-        "75% 10px",
-        "100% 10px"
-      ],
-      "representable": true,
-      "representedSeries": [
-        "0% 10px",
-        "25% 10px",
-        "50% 10px",
-        "75% 10px",
-        "100% 10px"
-      ],
-      "equivalent": true
+      "reading": "both interpolate, so the short spelling was never the issue",
+      "resolvedInterpolates": true,
+      "resolvedSeries": [
+        "calc(0% + 10px) 50%",
+        "calc(25% + 5px) 50%",
+        "50% 50%",
+        "calc(75% - 5px) 50%",
+        "calc(100% - 10px) 50%"
+      ]
     },
     {
-      "class": "physical edge-relative",
-      "authoredFrom": "left 10%",
-      "authoredTo": "right 25%",
-      "computedFrom": "0% 10%",
-      "computedTo": "100% 25%",
-      "nativeKind": "interpolated",
-      "nativeSeries": [
-        "0% 10%",
-        "25% 13.75%",
-        "50% 17.5%",
-        "75% 21.25%",
-        "100% 25%"
+      "authored": [
+        "top 20px",
+        "bottom 10px"
       ],
-      "representable": true,
-      "representedSeries": [
-        "0% 10%",
-        "25% 13.75%",
-        "50% 17.5%",
-        "75% 21.25%",
-        "100% 25%"
+      "axis": "y",
+      "label": "y changes, short spelling (x implicit at center)",
+      "resolved": [
+        "50% 20px",
+        "50% calc(100% - 10px)"
       ],
-      "equivalent": true
-    },
-    {
-      "class": "physical edge-relative",
-      "authoredFrom": "top 20px",
-      "authoredTo": "bottom 10px",
-      "computedFrom": "auto",
-      "computedTo": "auto",
-      "nativeKind": "discrete",
-      "nativeSeries": [
+      "authoredInterpolates": false,
+      "authoredSeries": [
         "auto",
         "auto",
         "auto",
         "auto",
         "auto"
       ],
-      "representable": false,
-      "representedSeries": [],
-      "equivalent": false
+      "computedFrom": "auto",
+      "computedTo": "auto",
+      "reading": "the authored spelling is discrete while the representation is not — a grammar-level cost, not a representation one",
+      "resolvedInterpolates": true,
+      "resolvedSeries": [
+        "50% calc(0% + 20px)",
+        "50% calc(25% + 12.5px)",
+        "50% calc(50% + 5px)",
+        "50% calc(75% - 2.5px)",
+        "50% calc(100% - 10px)"
+      ]
     },
     {
-      "class": "physical edge-relative",
-      "authoredFrom": "center",
+      "authored": [
+        "left 10px top 20px",
+        "right 10px bottom 20px"
+      ],
+      "axis": "both",
+      "label": "both change, explicit and directional",
+      "resolved": [
+        "10px 20px",
+        "calc(100% - 10px) calc(100% - 20px)"
+      ],
+      "authoredInterpolates": true,
+      "authoredSeries": [
+        "calc(0% + 10px) calc(0% + 20px)",
+        "calc(25% + 5px) calc(25% + 10px)",
+        "50% 50%",
+        "calc(75% - 5px) calc(75% - 10px)",
+        "calc(100% - 10px) calc(100% - 20px)"
+      ],
+      "computedFrom": "10px 20px",
+      "computedTo": "calc(100% - 10px) calc(100% - 20px)",
+      "reading": "both interpolate, so the short spelling was never the issue",
+      "resolvedInterpolates": true,
+      "resolvedSeries": [
+        "calc(0% + 10px) calc(0% + 20px)",
+        "calc(25% + 5px) calc(25% + 10px)",
+        "50% 50%",
+        "calc(75% - 5px) calc(75% - 10px)",
+        "calc(100% - 10px) calc(100% - 20px)"
+      ]
+    }
+  ],
+  "classes": [
+    {
+      "authoredFrom": "50% 50%",
       "authoredTo": "20% 80%",
+      "class": "directly resolved",
       "computedFrom": "50% 50%",
       "computedTo": "20% 80%",
+      "equivalent": true,
       "nativeKind": "interpolated",
       "nativeSeries": [
         "50% 50%",
@@ -135,15 +179,129 @@
         "35% 65%",
         "27.5% 72.5%",
         "20% 80%"
-      ],
-      "equivalent": true
+      ]
     },
     {
-      "class": "arithmetic / unresolved",
+      "authoredFrom": "10px 20px",
+      "authoredTo": "30px 40px",
+      "class": "directly resolved",
+      "computedFrom": "10px 20px",
+      "computedTo": "30px 40px",
+      "equivalent": true,
+      "nativeKind": "interpolated",
+      "nativeSeries": [
+        "10px 20px",
+        "15px 25px",
+        "20px 30px",
+        "25px 35px",
+        "30px 40px"
+      ],
+      "representable": true,
+      "representedSeries": [
+        "10px 20px",
+        "15px 25px",
+        "20px 30px",
+        "25px 35px",
+        "30px 40px"
+      ]
+    },
+    {
+      "authoredFrom": "left 10px",
+      "authoredTo": "right 10px",
+      "class": "physical edge-relative",
+      "computedFrom": "0% 10px",
+      "computedTo": "100% 10px",
+      "equivalent": true,
+      "nativeKind": "interpolated",
+      "nativeSeries": [
+        "0% 10px",
+        "25% 10px",
+        "50% 10px",
+        "75% 10px",
+        "100% 10px"
+      ],
+      "representable": true,
+      "representedSeries": [
+        "0% 10px",
+        "25% 10px",
+        "50% 10px",
+        "75% 10px",
+        "100% 10px"
+      ]
+    },
+    {
+      "authoredFrom": "left 10%",
+      "authoredTo": "right 25%",
+      "class": "physical edge-relative",
+      "computedFrom": "0% 10%",
+      "computedTo": "100% 25%",
+      "equivalent": true,
+      "nativeKind": "interpolated",
+      "nativeSeries": [
+        "0% 10%",
+        "25% 13.75%",
+        "50% 17.5%",
+        "75% 21.25%",
+        "100% 25%"
+      ],
+      "representable": true,
+      "representedSeries": [
+        "0% 10%",
+        "25% 13.75%",
+        "50% 17.5%",
+        "75% 21.25%",
+        "100% 25%"
+      ]
+    },
+    {
+      "authoredFrom": "top 20px",
+      "authoredTo": "bottom 10px",
+      "class": "physical edge-relative",
+      "computedFrom": "auto",
+      "computedTo": "auto",
+      "equivalent": false,
+      "nativeKind": "discrete",
+      "nativeSeries": [
+        "auto",
+        "auto",
+        "auto",
+        "auto",
+        "auto"
+      ],
+      "representable": false,
+      "representedSeries": []
+    },
+    {
+      "authoredFrom": "center",
+      "authoredTo": "20% 80%",
+      "class": "physical edge-relative",
+      "computedFrom": "50% 50%",
+      "computedTo": "20% 80%",
+      "equivalent": true,
+      "nativeKind": "interpolated",
+      "nativeSeries": [
+        "50% 50%",
+        "42.5% 57.5%",
+        "35% 65%",
+        "27.5% 72.5%",
+        "20% 80%"
+      ],
+      "representable": true,
+      "representedSeries": [
+        "50% 50%",
+        "42.5% 57.5%",
+        "35% 65%",
+        "27.5% 72.5%",
+        "20% 80%"
+      ]
+    },
+    {
       "authoredFrom": "calc(50% + 10px) calc(25% - 4px)",
       "authoredTo": "calc(20% + 2px) calc(80% + 8px)",
+      "class": "arithmetic / unresolved",
       "computedFrom": "calc(50% + 10px) calc(25% - 4px)",
       "computedTo": "calc(20% + 2px) calc(80% + 8px)",
+      "equivalent": true,
       "nativeKind": "interpolated",
       "nativeSeries": [
         "calc(50% + 10px) calc(25% - 4px)",
@@ -159,15 +317,15 @@
         "calc(35% + 6px) calc(52.5% + 2px)",
         "calc(27.5% + 4px) calc(66.25% + 5px)",
         "calc(20% + 2px) calc(80% + 8px)"
-      ],
-      "equivalent": true
+      ]
     },
     {
-      "class": "arithmetic / unresolved",
       "authoredFrom": "var(--ax) var(--ay)",
       "authoredTo": "var(--bx) var(--by)",
+      "class": "arithmetic / unresolved",
       "computedFrom": "30% 20%",
       "computedTo": "70% 60%",
+      "equivalent": true,
       "nativeKind": "interpolated",
       "nativeSeries": [
         "30% 20%",
@@ -183,15 +341,15 @@
         "50% 40%",
         "60% 50%",
         "70% 60%"
-      ],
-      "equivalent": true
+      ]
     },
     {
-      "class": "logical / grammar-sensitive",
       "authoredFrom": "start top",
       "authoredTo": "end bottom",
+      "class": "logical / grammar-sensitive",
       "computedFrom": "auto",
       "computedTo": "auto",
+      "equivalent": false,
       "nativeKind": "discrete",
       "nativeSeries": [
         "auto",
@@ -201,15 +359,15 @@
         "auto"
       ],
       "representable": false,
-      "representedSeries": [],
-      "equivalent": false
+      "representedSeries": []
     },
     {
-      "class": "logical / grammar-sensitive",
       "authoredFrom": "inline-start",
       "authoredTo": "inline-end",
+      "class": "logical / grammar-sensitive",
       "computedFrom": "auto",
       "computedTo": "auto",
+      "equivalent": false,
       "nativeKind": "discrete",
       "nativeSeries": [
         "auto",
@@ -219,14 +377,13 @@
         "auto"
       ],
       "representable": false,
-      "representedSeries": [],
-      "equivalent": false
+      "representedSeries": []
     }
   ],
   "controls": [
     {
-      "label": "offset leaves move under directional edges",
       "compose": "left var(--ox) top var(--oy)",
+      "label": "offset leaves move under directional edges",
       "leaves": [
         [
           "--ox",
@@ -243,6 +400,7 @@
         "left 10px top 20px",
         "left 30px top 40px"
       ],
+      "equal": true,
       "kind": "interpolated",
       "nativeSeries": [
         "10px 20px",
@@ -257,12 +415,11 @@
         "20px 30px",
         "25px 35px",
         "30px 40px"
-      ],
-      "equal": true
+      ]
     },
     {
-      "label": "edge leaf moves on its own",
       "compose": "var(--ex) 10px top 20px",
+      "label": "edge leaf moves on its own",
       "leaves": [
         [
           "--ex",
@@ -274,6 +431,7 @@
         "left 10px top 20px",
         "right 10px top 20px"
       ],
+      "equal": false,
       "kind": "discrete",
       "nativeSeries": [
         "calc(0% + 10px) 20px",
@@ -288,8 +446,7 @@
         "calc(100% - 10px) 20px",
         "calc(100% - 10px) 20px",
         "calc(100% - 10px) 20px"
-      ],
-      "equal": false
+      ]
     }
   ],
   "source": "D.3.7 · scripts/research/d3-anchor-normal.mjs"

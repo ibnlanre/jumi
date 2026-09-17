@@ -2440,3 +2440,69 @@ is declined or carried; and whether the resolved leaves keep the author's edge u
 
 **State.** New book `scripts/research/d3-anchor-normal.mjs` (`pnpm research:d3-anchor-normal`), evidence at
 `scripts/anchor-normalization.json`. No `src/` change, nothing promoted. 17/17 stages, 480 unit tests.
+
+
+## 2026-09-17 — D.3.7 · the y anomaly is the short spelling, and the representation is faithful on both axes
+
+### The ruling
+
+> **Pin the y-axis anomaly with explicit two-axis spellings and resolved controls. No design yet, no production
+> changes.** … isolate **axis asymmetry from syntax ambiguity**.
+
+Each arm is therefore a **pair**: the authored spelling against its already-resolved twin, differing in how the
+value is written and in nothing else — the same criterion the opening falsification used. Five arms, and the
+2×2 of "does the authored form interpolate / does the resolved twin interpolate" reads them all at once.
+
+### Measured
+
+```text
+                              authored                          computed                      interpolates
+x · explicit   left 10px top 0 → right 10px top 0               10px 0px → calc(100% - 10px) 0px   yes
+               twin 10px 0 → calc(100% - 10px) 0                — same series sample for sample      yes
+y · explicit   left 0 top 20px → left 0 bottom 10px             0px 20px → 0px calc(100% - 10px)   yes
+               twin 0 20px → 0 calc(100% - 10px)                — same series sample for sample      yes
+x · short      left 10px → right 10px                           0% 10px → 100% 10px                yes
+y · short      top 20px → bottom 10px                           auto → auto                        NO
+both · explicit left 10px top 20px → right 10px bottom 20px     10px 20px → calc(…) calc(…)        yes
+               twin 10px 20px → calc(100% - 10px) calc(…)       — same series sample for sample      yes
+```
+
+### The answer
+
+**It is not axis asymmetry.** With both axes explicit and directional, the y edge interpolates — and to the
+digit identically to its resolved twin, `0px calc(0% + 20px) · 0px calc(25% + 12.5px) · 0px calc(50% + 5px) ·
+0px calc(75% - 2.5px) · 0px calc(100% - 10px)`. The two-axis representation is faithful on **both** axes; the
+earlier anomaly was about the spelling, exactly as the ruling framed the alternatives.
+
+**And the short spelling is worse than ambiguous: `top 20px` is rejected outright** — it computes to `auto`, the
+same reading the D.3.5 measurement of `center 0 center 0` produced. Its x-axis counterpart is accepted but does
+not mean what it looks like: `left 10px` computes to `0% 10px`, which is *not* `left 10px` as one component with
+the other axis at centre — the arm and its twin are measuring different pairs, and their series differ
+accordingly. So the one-component spelling is not a way to say "edge plus offset on one axis" in this property.
+
+That is the actionable result for anyone designing the reshape: **normalization has to start from the explicit
+two-axis form.** That is the form whose authored and resolved series agree, on both axes and when both move.
+
+### The sentence narrowed, as ruled
+
+```text
+was      logical positions don't exist here
+now      the tested logical-position spellings are not accepted by `offset-anchor` in the measured browser
+```
+
+Same evidence, smaller claim — and the distinction is the one that matters, because "this property does not
+accept them" and "no browser accepts them" are different facts with different consequences.
+
+### Recorded, not designed
+
+The API asymmetry from the previous pass stands and the ruling's reading of it is the one to carry forward:
+an **offset** is value-bearing and can remain independently animatable; an **edge** is keyword-bearing and cannot
+remain an independently interpolable typed leaf. So edge utilities survive as *authoring controls that compose
+into the resolved axis*, not as motion subjects. Likewise the `var()` rule as stated: statically resolvable forms
+take the typed path, a source that depends on an unresolved `var()` declines to the native path — no dynamic
+normalization layer invented. Neither is a design decision taken here; both are what the measurements now
+permit.
+
+**State.** Book extended in place (`pnpm research:d3-anchor-normal`), evidence at
+`scripts/anchor-normalization.json`. No `src/` change, nothing promoted, no design recorded as decided.
+17/17 stages, 480 unit tests.

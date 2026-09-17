@@ -1,5 +1,4 @@
 import { writeFileSync } from 'node:fs'
-
 import { chromium } from 'playwright'
 
 import path from 'node:path'
@@ -32,6 +31,14 @@ import path from 'node:path'
  * utilities can remain independently meaningful once both feed one resolved axis. Two arms, because they have
  * different answers by construction — an offset is a value and can be registered, an edge keyword is not a
  * value at all.
+ *
+ * Section C pins the one arm the previous pass could not account for: `top 20px → bottom 10px` was discrete
+ * while its x-axis twin interpolated, and both compute to the same shape of pair. The question is whether that
+ * is an **axis** asymmetry or an **ambiguous short spelling** — `top 20px` alone leaves the other axis implicit
+ * at `center` — and the two are told apart by running each transition twice, once in the four-value form with
+ * the other axis explicit and directional, and once in the already-resolved spelling. Each arm therefore gets a
+ * twin, so "the authored grammar is discrete while the representation is not" is distinguishable from "this
+ * pair does not interpolate at all".
  *
  * Run: `pnpm research:d3-anchor-normal`.
  */
@@ -75,10 +82,10 @@ const CLASSES = [
 /** Section B: the existing constituents, and which of them can still move on their own. */
 const CONTROL = [
   {
-    label: 'offset leaves move under directional edges',
     // Static keywords, registered offsets: the four-value form is valid precisely because these edges are
     // directional, which is what the resting `center` cannot be.
     compose: 'left var(--ox) top var(--oy)',
+    label: 'offset leaves move under directional edges',
     leaves: [
       ['--ox', '10px', '30px'],
       ['--oy', '20px', '40px'],
@@ -86,9 +93,9 @@ const CONTROL = [
     native: ['left 10px top 20px', 'left 30px top 40px'],
   },
   {
-    label: 'edge leaf moves on its own',
     // An edge is a keyword, so it cannot be registered: this arm exists to show what that costs.
     compose: 'var(--ex) 10px top 20px',
+    label: 'edge leaf moves on its own',
     leaves: [['--ex', 'left', 'right']],
     native: ['left 10px top 20px', 'right 10px top 20px'],
   },
@@ -199,25 +206,28 @@ const represented = async (pairs, compose) => {
 
 /** One reading per instant of the wall, animations paused and stepped. */
 const read = async property => {
-  return page.evaluate(async ({ at, property }) => {
-    const node = document.querySelector('#e')
-    const animations = node.getAnimations()
+  return page.evaluate(
+    async ({ at, property }) => {
+      const node = document.querySelector('#e')
+      const animations = node.getAnimations()
 
-    animations.forEach(animation => animation.pause())
+      animations.forEach(animation => animation.pause())
 
-    const values = []
+      const values = []
 
-    for (const instant of at) {
-      animations.forEach(animation => {
-        animation.currentTime = instant
-      })
+      for (const instant of at) {
+        animations.forEach(animation => {
+          animation.currentTime = instant
+        })
 
-      await new Promise(resolve => requestAnimationFrame(resolve))
-      values.push(getComputedStyle(node).getPropertyValue(property).trim())
-    }
+        await new Promise(resolve => requestAnimationFrame(resolve))
+        values.push(getComputedStyle(node).getPropertyValue(property).trim())
+      }
 
-    return values
-  }, { at: WALL, property })
+      return values
+    },
+    { at: WALL, property },
+  )
 }
 
 const results = []
@@ -260,16 +270,16 @@ for (const group of CLASSES) {
       nativeDistinct > 2
 
     results.push({
-      class: group.label,
       authoredFrom: from,
       authoredTo: to,
+      class: group.label,
       computedFrom,
       computedTo,
+      equivalent,
       nativeKind: nativeDistinct <= 2 ? 'discrete' : 'interpolated',
       nativeSeries,
       representable,
       representedSeries,
-      equivalent,
     })
 
     // The fixture has to be able to see something before equality means anything: a computed form the reader
@@ -298,19 +308,23 @@ for (const arm of CONTROL) {
 
   controls.push({
     ...arm,
+    equal: series.join('|') === nativeSeries.join('|'),
     kind: distinct <= 2 ? 'discrete' : 'interpolated',
     nativeSeries,
     series,
-    equal: series.join('|') === nativeSeries.join('|'),
   })
 }
 
-console.log('native `offset-anchor` vs two registered <length-percentage> leaves\n')
+console.log(
+  'native `offset-anchor` vs two registered <length-percentage> leaves\n',
+)
 
 for (const one of results) {
   console.log(`── ${one.class}:  ${one.authoredFrom}  →  ${one.authoredTo}`)
   console.log(`   computed     ${one.computedFrom}  →  ${one.computedTo}`)
-  console.log(`   native       ${one.nativeSeries.join(' · ')}   (${one.nativeKind})`)
+  console.log(
+    `   native       ${one.nativeSeries.join(' · ')}   (${one.nativeKind})`,
+  )
   console.log(
     `   represented  ${one.representable ? one.representedSeries.join(' · ') : 'not attempted — the computed form is not a position'}`,
   )
@@ -325,7 +339,9 @@ console.log('independent constituent control:\n')
 for (const one of controls) {
   console.log(`── ${one.label}`)
   console.log(`   composed     offset-anchor: ${one.compose}`)
-  console.log(`   leaves       ${one.leaves.map(([name, from, to]) => `${name} ${from} → ${to}`).join(', ')}`)
+  console.log(
+    `   leaves       ${one.leaves.map(([name, from, to]) => `${name} ${from} → ${to}`).join(', ')}`,
+  )
   console.log(`   series       ${one.series.join(' · ')}   (${one.kind})`)
   console.log(`   native       ${one.nativeSeries.join(' · ')}`)
   console.log(`   equal        ${one.equal ? 'yes' : 'no'}`)
@@ -337,7 +353,11 @@ const byClass = new Map()
 for (const one of results)
   byClass.set(one.class, [
     ...(byClass.get(one.class) ?? []),
-    one.equivalent ? 'equivalent' : one.nativeKind === 'discrete' ? 'discrete natively' : 'differs',
+    one.equivalent
+      ? 'equivalent'
+      : one.nativeKind === 'discrete'
+        ? 'discrete natively'
+        : 'differs',
   ])
 
 console.log('the class table:')
@@ -351,6 +371,103 @@ for (const one of controls)
     `  ${one.label.padEnd(40)} ${one.equal ? 'preserves native motion' : 'does not reproduce native motion'} (${one.kind})`,
   )
 
+/**
+ * Section C: axis asymmetry or short-spelling ambiguity.
+ *
+ * Every arm states both spellings, so the pair `authored`/`resolved` is the experiment: they differ in how the
+ * value is written and in nothing else, which is the same criterion the opening falsification used. The
+ * previous pass could not account for `top 20px → bottom 10px` being discrete while its x-axis twin
+ * interpolated, and the discriminator is whether the four-value form — both axes explicit and directional —
+ * behaves differently from the short one, which leaves the other axis implicit at `center`.
+ */
+const AXIS = [
+  {
+    authored: ['left 10px top 0', 'right 10px top 0'],
+    axis: 'x',
+    label: 'x changes, y explicit and directional',
+    resolved: ['10px 0', 'calc(100% - 10px) 0'],
+  },
+  {
+    authored: ['left 0 top 20px', 'left 0 bottom 10px'],
+    axis: 'y',
+    label: 'y changes, x explicit and directional',
+    resolved: ['0 20px', '0 calc(100% - 10px)'],
+  },
+  {
+    authored: ['left 10px', 'right 10px'],
+    axis: 'x',
+    label: 'x changes, short spelling (y implicit at center)',
+    resolved: ['10px', 'calc(100% - 10px)'],
+  },
+  {
+    authored: ['top 20px', 'bottom 10px'],
+    axis: 'y',
+    label: 'y changes, short spelling (x implicit at center)',
+    resolved: ['50% 20px', '50% calc(100% - 10px)'],
+  },
+  {
+    authored: ['left 10px top 20px', 'right 10px bottom 20px'],
+    axis: 'both',
+    label: 'both change, explicit and directional',
+    resolved: ['10px 20px', 'calc(100% - 10px) calc(100% - 20px)'],
+  },
+]
+
+const axis = []
+
+for (const arm of AXIS) {
+  const authoredSeries = await native(arm.authored[0], arm.authored[1])
+  const resolvedSeries = await native(arm.resolved[0], arm.resolved[1])
+  const [computedFrom, computedTo] = [
+    await resting(arm.authored[0]),
+    await resting(arm.authored[1]),
+  ]
+  const authoredInterpolates = new Set(authoredSeries).size > 2
+  const resolvedInterpolates = new Set(resolvedSeries).size > 2
+
+  /**
+   * The reading, as one of four outcomes rather than a score. The third is the one that would matter most for
+   * the reshape: it would mean the resolved rule itself is wrong on that axis.
+   */
+  const reading =
+    !authoredInterpolates && resolvedInterpolates
+      ? 'the authored spelling is discrete while the representation is not — a grammar-level cost, not a representation one'
+      : authoredInterpolates && resolvedInterpolates
+        ? 'both interpolate, so the short spelling was never the issue'
+        : authoredInterpolates && !resolvedInterpolates
+          ? 'the representation is discrete where the authored form is not — the resolved rule is wrong'
+          : 'neither interpolates, so this pair is not a motion at all'
+
+  axis.push({
+    ...arm,
+    authoredInterpolates,
+    authoredSeries,
+    computedFrom,
+    computedTo,
+    reading,
+    resolvedInterpolates,
+    resolvedSeries,
+  })
+}
+
+console.log('\nthe axis / spelling matrix:\n')
+
+for (const one of axis) {
+  console.log(`── ${one.axis} · ${one.label}`)
+  console.log(`   authored     ${one.authored[0]}  →  ${one.authored[1]}`)
+  console.log(`   computed     ${one.computedFrom}  →  ${one.computedTo}`)
+  console.log(`   authored     ${one.authoredSeries.join(' · ')}`)
+  console.log(`   resolved     ${one.resolvedSeries.join(' · ')}`)
+  console.log(`   reading      ${one.reading}`)
+  console.log()
+}
+
+console.log('  authored interpolates   resolved interpolates   arms')
+for (const one of axis)
+  console.log(
+    `  ${String(one.authoredInterpolates).padEnd(23)} ${String(one.resolvedInterpolates).padEnd(22)} ${one.axis}: ${one.label}`,
+  )
+
 if (failures.length) {
   console.log('\n✗ arm defects:')
   for (const one of failures) console.log(`  ${one}`)
@@ -360,6 +477,7 @@ writeFileSync(
   path.join(process.cwd(), 'scripts', 'anchor-normalization.json'),
   `${JSON.stringify(
     {
+      axis,
       classes: results,
       controls,
       source: 'D.3.7 · scripts/research/d3-anchor-normal.mjs',
