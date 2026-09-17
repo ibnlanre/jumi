@@ -2939,3 +2939,64 @@ green, which is the standard this track has held throughout.
 
 **State.** `TypedExecution.constituent` declared in `src/variables/typed-leaves.ts`; no consumer, no emission
 change, nothing promoted. 17/17 stages, 489 unit tests.
+
+
+## 2026-09-17 — D.3.7 · deferred to one atomic incremental, and the two constraints for its call site
+
+### The ruling
+
+> **Keep the tree green. Don't start the atomic `offset-anchor` increment until there's enough room to finish it
+> properly.** … take the remaining reshape as one production increment and do not checkpoint a half-working
+> emission just to manufacture smaller commits.
+
+The dependency cycle is real and is the reason the split stops here:
+
+```text
+execution leaves need movable evidence
+movable evidence needs shipped execution
+shipped execution needs the leaves
+```
+
+`350c1f4` stands on its own because it establishes the execution **contract** without pretending the family
+implementation is done. Everything after it is semantically one change, and staging it would be inventing
+checkpoints around a single emission.
+
+### The order the increment will follow
+
+```text
+1  composition switches to resolved x/y execution leaves
+2  declare offset-anchor-x-position · offset-anchor-y-position, both <length-percentage>
+3  offset-anchor implements TypedExecution.constituent, from authoring context only, returning both axes or null
+4  core invokes the resolver **before** the simple leaf path, and only when the family declares one
+5  every typed frame writes both execution leaves
+6  rerun whole · compound · edge · offset · the decline cases · the resting-state repair
+7  refresh route evidence: reshape-required → movable where proven
+8  guard, census, snapshot, behavior, full gate
+```
+
+### Two constraints recorded for step 4, because they are easy to get wrong
+
+**The branch stays narrow.** The compound resolver is an escape hatch, not a new default:
+
+```text
+execution.constituent exists   → build authoring context → resolve compound execution
+otherwise                      → the existing canonicalizeLeaf path, unchanged
+```
+
+If it is written as "try the resolver first for every constituent", then simple families begin paying for — or
+depending on — context construction they never needed, and the escape hatch becomes the main abstraction. That is
+the failure mode to avoid, not a style preference.
+
+**The context is a defined projection, not a bag.** The signature is broad enough for future families, and the
+caller is still responsible for handing it a well-defined *authoring* state:
+
+```text
+context = { the family's own components — their authored values where this candidate wrote them,
+                                          their rests where it did not }
+```
+
+Not whatever model slots happen to be nearby. Together with the one-way rule already written into the facet, that
+keeps the layers as D.3.7 measured them: authoring state → normalizer → execution state, and never back.
+
+**State.** No change in this entry. `350c1f4` remains the tip of the track; `src/` is otherwise untouched, nothing
+is promoted, and the gate is 17/17 with 489 unit tests.
