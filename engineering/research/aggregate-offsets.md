@@ -9,11 +9,13 @@ non-zero:
 node scripts/research/aggregate-offsets.mjs        # 12 assertions — one element
 node scripts/research/cross-element-isolation.mjs  # 11 assertions — several elements
 node scripts/research/batching-eligibility.mjs     # 14 assertions — a real sheet vs a batched one
+node scripts/research/identity-collision.mjs       # 12 assertions — what a definition's identity can serve
 ```
 
-The third one compiles the shipped emitter and reads a real element, so it needs a bundle
-(`pnpm bundle && …`); it is the one that falsifies this note's original closing claim, and the last
-section says what replaces it.
+The last two compile the shipped emitter and read a real element, so they need a bundle
+(`pnpm bundle && …`). The third falsifies this note's original closing claim, and the fourth is the
+evidence for the identity correction in "The identity separation" — a definition's identity is only right
+if it can serve **every** value of the thing it names.
 
 The question they answer: **can one `@keyframes` definition per family serve many motions, with the
 authored values living outside it?** The definition would be identified by `(family, stop set)` and
@@ -125,13 +127,35 @@ its complete own stop data.
 ## The identity separation
 
 ```text
-definition identity   (family, stop set)                    value-free, stylesheet-global
+definition identity   (motion program shape, stop set)      value-free, stylesheet-global
 instance identity     (stop set, timing, ownership channel) element-local
 values                buckets                               element-local
 composition           property/leaf ownership               instance-local
 ```
 
-## Not decided: which arrangement is the production representation
+**Correction (2026-09-17).** This section said `(family, stop set)`, and that is the **aggregate's**
+identity rather than the general one. An aggregate definition owns the composite, so the family
+identifies it. A **per-leaf** definition necessarily names the leaf it writes — a body declaring
+`--jumi-translate-x` cannot serve `--jumi-translate-y` — so the ownership channel is part of the program
+shape. Carrying `(family, stop set)` into the general implementation would have ratified a defect rather
+than described a design: the emitted sheet **already** names a typed constituent's definition without a
+value (`jumi-scale-x`) while baking the value into its body, so two values of one constituent collide on
+that name. Measured, `scripts/research/identity-collision.mjs` (12 assertions):
+
+```text
+typed constituent      jumi-scale-x               body bakes `--jumi-scale-x: 5`   1 definition   [7] settles at `5 1`
+typed whole            jumi-scale-<hash(values)>  body bakes the leaves            2 definitions  correct
+legacy phrase          jumi-scale-<hash(values)>  body reads per-candidate slots   2 definitions  correct
+non-typed constituent  jumi-backdrop-filter       body reads its own channel       1 definition   correct
+```
+
+The two ends are the finding. A **value-free body under a value-free name** is what lets one definition
+serve every value, and the non-typed constituent path already ships that shape. A **value-bearing body
+under a value-free name** is the worst of both — the identity collides and the first candidate wins,
+order-dependently, with nothing failing. So "value-free" is a statement about the **body** first; a
+value-free name over a value-bearing body is a collision with extra steps.
+
+## Decided: per-leaf is the production representation
 
 ```text
 aggregate instance                     per-leaf instance
@@ -205,15 +229,38 @@ batched arrangement; it is in believing the sheet when only the element knows.
 
 The guarantee is **relative to the sheet, not to the element**. An element-level override of one
 constituent's rung (`--jumi-translate-x-animation-duration: 250ms` inline) diverges from the batched
-representation even under a sheet with no scoped controls at all — measured, and asserted. So the safe
-rule earns its safety by giving up the thing the architecture is otherwise built to allow, which is
-cascade-first per-constituent control.
+representation even under a sheet with no scoped controls at all — measured, and asserted.
 
-This tightens the fork rather than settling it:
+### Closed, not deferred
+
+That last measurement is not a caveat, it is the end of the route. It says the two surviving rules were
+the wrong thing to build on: "the sheet writes no constituent-addressable rung" is not semantic proof,
+it is proof about **what the compiler happened to see**. Jumi's control model is cascade-first, so a rung
+such as `--jumi-translate-x-animation-duration` is meaningful precisely because any CSS source can
+establish it — an inline style, an authored rule, a dynamically changed variable — whether or not a
+utility in the compiled sheet writes one. Per-leaf ownership stays live under all of them, because the
+timing chain is still resolved per constituent. A batched instance has already collapsed two clocks into
+one and cannot respond. That is an optimization changing observable behaviour under a supported part of
+the architecture:
+
+> **A compiler optimization may not erase an independently addressable cascade surface merely because
+> the current stylesheet does not exercise it.**
+
+So transparent aggregate batching is **closed**, not something to be careful about. The aggregate stays
+research evidence, and possibly a future **explicit semantic mode**; it does not choose the production
+representation. The fork is answered rather than left open:
 
 ```text
 value-free definition sharing     yes — one definition, many elements, different values and clocks
+value hashing                     unnecessary
+cross-element reuse               yes
 per-leaf instance                 the general semantic model
-aggregate batching                an optimization only, and only under a negative sheet-level proof
-sheet-level equality of writes    not sufficient
+aggregate batching                closed — no transparent form under cascade-first control
+sheet-level equality of writes    not sufficient, and not repairable
 ```
+
+The next production question is therefore no longer about batching. It is whether **value-free per-leaf
+definitions can replace authored-value-specific definitions without regressing phrases, whole+constituent
+ownership, segment timing, scroll/range, or the existing timing chain** — which is where D.2 now starts,
+with definition identity expressed as `(motion program shape, stop set)` so the ownership channel travels
+with it.

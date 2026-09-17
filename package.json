@@ -111,6 +111,7 @@
     "research:aggregate-offsets": "node scripts/research/aggregate-offsets.mjs",
     "research:batching-eligibility": "node scripts/research/batching-eligibility.mjs",
     "research:cross-element": "node scripts/research/cross-element-isolation.mjs",
+    "research:identity-collision": "node scripts/research/identity-collision.mjs",
     "candidate:diff": "node scripts/candidate-diff.mjs",
     "check": "node scripts/check.mjs",
     "check:only": "node scripts/check.mjs"

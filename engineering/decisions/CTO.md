@@ -380,3 +380,74 @@ than handing families two functions that could not change behaviour. The snapsho
 the 68 arms are unchanged, and `src/core/index.ts` no longer contains the `scale` token outside its
 comments. Phrase migration, nested composite recursion, filter/function reshape, transform
 decomposition and attribute-wide conflict policy are separate evidence tracks and were left alone.
+
+## 2026-09-17 — transparent aggregate batching is closed, and definition identity is split
+
+The offset-aggregate research asked whether one `@keyframes` could carry several constituents with the
+authored values living outside it in element-scoped buckets. The answer narrowed twice. Sheet-level
+equality of timing writes was proposed as proof that two constituents share a program, and then
+falsified: a sheet can write both component rungs identically while the element carries only one of the
+controls, so production resolves two clocks and a batched instance resolves one — measured at 250ms and
+500ms in `scripts/research/batching-eligibility.mjs`.
+
+Two negative existence claims survived that falsification, and they are the wrong thing to build on.
+"A sheet with no constituent-addressable rung" is not semantic proof; it is proof about what the
+compiler happened to see. Jumi's control model is cascade-first, so a constituent rung such as
+`--jumi-translate-x-animation-duration` is meaningful precisely because **any** CSS source can establish
+it — an inline style, an authored rule, a dynamically changed variable — whether or not a utility in the
+compiled sheet writes one. The per-leaf representation stays live under all of them because the timing
+chain is still resolved per constituent. A batched instance has already collapsed two clocks into one
+and cannot respond. That is an optimization changing observable behaviour under a supported part of the
+architecture, and being conservative about it would not repair it.
+
+The same round produced a second, independent finding on the path D.2 is about to build on, and it is
+what makes the identity correction load-bearing rather than terminological. A typed **constituent** emits
+its definition under a name that carries no value — `jumi-scale-x` — while the body bakes the authored
+value (`--jumi-scale-x: 5`). Two values of one constituent therefore collide on that name, and the first
+candidate compiled wins: `animate-scale-x-[5]` beside `animate-scale-x-[7]` gives one definition, and the
+`[7]` element settles at `5 1`; reverse the order and the `[5]` element settles at `7 1`. Measured, and
+uncovered — every existing arm uses one value per constituent. The non-typed constituent path does the
+opposite and always has: one value-free definition per channel (`jumi-backdrop-filter`, body reading
+`var(--jumi-backdrop-filter)`) serving every value correctly. So the target shape already ships, one path
+over, and the typed constituent is a value-free name over a value-bearing body.
+
+### Call
+
+> **Close transparent aggregate batching. The inline override arm proves that sheet-level absence cannot
+> establish semantic equality, because constituent timing rungs remain live cascade surfaces even when no
+> utility in the compiled sheet writes them. An optimization cannot erase that behaviour. Keep the
+> aggregate work as research evidence, and possibly as a future explicit semantic mode, but do not use it
+> to choose the production representation. Proceed with the per-leaf typed representation using
+> value-free bucket-driven keyframes. Revisit definition identity before implementation: `(family, stop
+set)` applies to aggregate definitions; a per-leaf definition must also include its ownership
+> channel/program shape. The next production question is no longer "can we batch?" It is: can value-free
+> per-leaf definitions replace authored-value-specific definitions without regressing phrases,
+> whole+constituent ownership, segment timing, scroll/range, or the existing timing chain?**
+
+Held to that, and the shape of what stands is worth stating plainly, because the detour cost real time
+and paid for itself:
+
+```text
+definition reuse     yes — one definition, many elements, different values and clocks
+value hashing        unnecessary
+cross-element reuse  yes
+automatic batching   no — closed, not merely deferred
+per-leaf ownership   the general semantic model
+cascade semantics    preserved
+```
+
+The identity correction is not cosmetic. Confirmed against the emitted sheet (`scripts/research/identity-collision.mjs`,
+12 assertions): a **typed constituent** today has a value-free name and a value-bearing body, which is
+exactly the combination that collides, so `(family, stop set)` read as "the name carries no value" would
+have ratified a defect. A per-leaf definition's identity must include its ownership channel — `jumi-scale-x`
+and `jumi-scale-y` are not the same definition and never can be, since a definition body names the leaf it
+writes. The whole-value path and the legacy phrase path are the ones that still hash values into the name
+(`jumi-scale-O` for `animate-scale-[2]`, `jumi-scale-P` for `[3]` — two definitions whose bodies differ only
+in the value they bake), and those are what a value-free identity would actually consolidate.
+
+Two smaller records, both from the same measurement: the legacy phrase path's duplication is **structural**
+rather than incidental — its bodies are already value-free and read per-candidate slots, so two definitions
+with the same stop set differ only in the slot names they read — and the typed constituent collision means
+the arm `[7]` settles at `7 1` belongs in `behaviour-check.mjs` once the typed body reads its slot instead of
+baking the value. Until that fix lands, the reading lives in the research book rather than in the gate, since
+a gate arm that fails cannot be landed.

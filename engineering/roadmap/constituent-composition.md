@@ -982,3 +982,97 @@ substrate triangle.
 Not adopted here. The spike is the evidence for the ruling, and for `scale` the result is close to
 what already ships — two compound curves — so it is a decision about the shape every family will use
 rather than a repair to one.
+
+### D.2 — re-pointed (2026-09-17): value-free definitions, and a defect found on the way
+
+The offset-aggregate detour set out to ask whether one keyframe could carry several constituents with
+their values outside it, and the question has been answered in the negative for the _instance_ case:
+transparent aggregate batching is **closed** (`decisions/CTO.md`, `research/aggregate-offsets.md`),
+because sheet-level absence cannot establish semantic equality while constituent timing rungs stay live
+cascade surfaces.
+
+What survives is the part that matters here, and it re-points D.2. The next production question is no
+longer "can we batch?" It is:
+
+> **Can value-free per-leaf definitions replace authored-value-specific definitions without regressing
+> phrases, whole+constituent ownership, segment timing, scroll/range, or the existing timing chain?**
+
+Definition identity is part of that question, and it has to be expressed as **`(motion program shape,
+stop set)`** rather than `(family, stop set)`: an aggregate definition owns the composite, so the family
+identifies it, but a per-leaf definition names the leaf it writes, so its ownership channel is part of
+the shape. `jumi-scale-x` and `jumi-scale-y` cannot be one definition.
+
+#### The defect that makes the identity question load-bearing
+
+Grounding that correction against the emitted sheet turned up a live defect on exactly this path. A
+**typed constituent** emits its definition under a name carrying no value and a body carrying the value:
+
+```text
+@keyframes jumi-scale-x {
+  from { scale: var(--jumi-scale); }
+  to   { scale: var(--jumi-scale); --jumi-scale-x: 5; }
+}
+```
+
+Two values of one constituent therefore collide on the name, and `emitKeyframe` is
+`if (seen.has(name)) return` — the first candidate compiled wins. Smallest reproduction:
+
+```bash
+pnpm bundle && node scripts/research/identity-collision.mjs
+```
+
+```text
+candidates  animate-scale-x-[5]  animate-scale-x-[7]        definitions 1: jumi-scale-x
+  animate-scale-x-[5]   jumi-scale-x → 5 1
+  animate-scale-x-[7]   jumi-scale-x → 5 1        ← should be 7 1
+
+reversed:   animate-scale-x-[7]  animate-scale-x-[5]        definitions 1: jumi-scale-x
+  animate-scale-x-[5]   jumi-scale-x → 7 1        ← should be 5 1
+  animate-scale-x-[7]   jumi-scale-x → 7 1
+```
+
+Silent, order-dependent, and uncovered: every existing arm — the 68 behaviour contexts and the unit
+suite — uses **one value per constituent**. `animate-translate-x-[10px]` beside `[30px]` behaves the same
+way, so it is not specific to `scale`.
+
+The contrast is what makes it a defect rather than a design choice. The **non-typed** constituent path
+does the opposite and always has:
+
+```text
+non-typed constituent   animate-backdrop-filter-blur-[5px]  +  [10px]
+  definitions 1: jumi-backdrop-filter
+  jumi-backdrop-filter: to { backdrop-filter: var(--jumi-backdrop-filter); }   ← value-free body
+  [5px]  → backdrop-filter: blur(5px)  …
+  [10px] → backdrop-filter: blur(10px) …                                       ← both correct
+```
+
+One value-free definition per ownership channel, serving every value. That is the target shape, already
+shipping one path over. So **"value-free" is a statement about the body first**: a value-free name over a
+value-bearing body is a collision with extra steps.
+
+Four paths, two values each, same stop set (`scripts/research/identity-collision.mjs`, 12 assertions):
+
+```text
+path                  identity                    body                        definitions   two values
+typed constituent     jumi-scale-x                value baked                 1             BROKEN
+typed whole           jumi-scale-<hash(values)>   value baked                 2             correct
+legacy phrase         jumi-scale-<hash(values)>   reads per-candidate slots   2             correct
+non-typed constituent jumi-backdrop-filter         value-free                  1             correct
+```
+
+Two consequences for D.2, both from that table:
+
+- **The typed constituent has to adopt the body contract its non-typed sibling already has** — read the
+  candidate's endpoint slot instead of baking the value. That converges the two paths and dissolves the
+  collision; it does not need buckets, since `--jumi-<component>-100` and its friends already exist for
+  the non-typed path.
+- **Value-specific definitions genuinely remain in the whole path and the legacy phrase path**, both of
+  which hash values into the name (`jumi-scale-O` for `animate-scale-[2]`, `jumi-scale-P` for `[3]` — two
+  definitions whose bodies differ only in the value they bake). And the phrase path's duplication is
+  _structural_ rather than incidental: its bodies are already value-free and read per-candidate slots, so
+  two definitions with the same stop set differ only in the slot names they read. That is the redundancy a
+  value-free identity removes, and it is the part of D.2 the research actually bears on.
+
+Not fixed here. It is a `src/core/index.ts` change on a path with a live release invariant beside it, and
+the arm that belongs in `behaviour-check.mjs` — `[7]` settles at `7 1` — cannot be landed while it fails.
+So the reading lives in the research book until the fix does.
