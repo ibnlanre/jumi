@@ -1,0 +1,180 @@
+{
+  "source": "scripts/research/d3-filter-shell.mjs",
+  "wall": [
+    0,
+    250,
+    500,
+    750,
+    1000
+  ],
+  "records": [
+    {
+      "identical": true,
+      "kind": "separability",
+      "native": [
+        "blur(0px) hue-rotate(0deg)",
+        "blur(2.5px) hue-rotate(22.5deg)",
+        "blur(5px) hue-rotate(45deg)",
+        "blur(7.5px) hue-rotate(67.5deg)",
+        "blur(10px) hue-rotate(90deg)"
+      ],
+      "property": "backdrop-filter",
+      "typed": [
+        "blur(0px) hue-rotate(0deg)",
+        "blur(2.5px) hue-rotate(22.5deg)",
+        "blur(5px) hue-rotate(45deg)",
+        "blur(7.5px) hue-rotate(67.5deg)",
+        "blur(10px) hue-rotate(90deg)"
+      ],
+      "verdict": "same-series",
+      "family": "backdrop-filter · blur + hue-rotate"
+    },
+    {
+      "identical": true,
+      "kind": "separability",
+      "native": [
+        "brightness(1) contrast(1)",
+        "brightness(1.25) contrast(0.875)",
+        "brightness(1.5) contrast(0.75)",
+        "brightness(1.75) contrast(0.625)",
+        "brightness(2) contrast(0.5)"
+      ],
+      "property": "backdrop-filter",
+      "typed": [
+        "brightness(1) contrast(1)",
+        "brightness(1.25) contrast(0.875)",
+        "brightness(1.5) contrast(0.75)",
+        "brightness(1.75) contrast(0.625)",
+        "brightness(2) contrast(0.5)"
+      ],
+      "verdict": "same-series",
+      "family": "backdrop-filter · brightness + contrast"
+    },
+    {
+      "identical": true,
+      "kind": "separability",
+      "native": [
+        "blur(0px) drop-shadow(rgb(0, 0, 0) 0px 0px 0px)",
+        "blur(2.5px) drop-shadow(rgb(0, 0, 0) 1px 1px 2px)",
+        "blur(5px) drop-shadow(rgb(0, 0, 0) 2px 2px 4px)",
+        "blur(7.5px) drop-shadow(rgb(0, 0, 0) 3px 3px 6px)",
+        "blur(10px) drop-shadow(rgb(0, 0, 0) 4px 4px 8px)"
+      ],
+      "property": "backdrop-filter",
+      "typed": [
+        "blur(0px) drop-shadow(rgb(0, 0, 0) 0px 0px 0px)",
+        "blur(2.5px) drop-shadow(rgb(0, 0, 0) 1px 1px 2px)",
+        "blur(5px) drop-shadow(rgb(0, 0, 0) 2px 2px 4px)",
+        "blur(7.5px) drop-shadow(rgb(0, 0, 0) 3px 3px 6px)",
+        "blur(10px) drop-shadow(rgb(0, 0, 0) 4px 4px 8px)"
+      ],
+      "verdict": "same-series",
+      "family": "backdrop-filter · blur + drop-shadow"
+    },
+    {
+      "identical": true,
+      "kind": "separability",
+      "native": [
+        "blur(0px) hue-rotate(0deg)",
+        "blur(2.5px) hue-rotate(22.5deg)",
+        "blur(5px) hue-rotate(45deg)",
+        "blur(7.5px) hue-rotate(67.5deg)",
+        "blur(10px) hue-rotate(90deg)"
+      ],
+      "property": "filter",
+      "typed": [
+        "blur(0px) hue-rotate(0deg)",
+        "blur(2.5px) hue-rotate(22.5deg)",
+        "blur(5px) hue-rotate(45deg)",
+        "blur(7.5px) hue-rotate(67.5deg)",
+        "blur(10px) hue-rotate(90deg)"
+      ],
+      "verdict": "same-series",
+      "family": "filter · blur + hue-rotate"
+    },
+    {
+      "identical": true,
+      "kind": "separability",
+      "native": [
+        "brightness(1) contrast(1)",
+        "brightness(1.25) contrast(0.875)",
+        "brightness(1.5) contrast(0.75)",
+        "brightness(1.75) contrast(0.625)",
+        "brightness(2) contrast(0.5)"
+      ],
+      "property": "filter",
+      "typed": [
+        "brightness(1) contrast(1)",
+        "brightness(1.25) contrast(0.875)",
+        "brightness(1.5) contrast(0.75)",
+        "brightness(1.75) contrast(0.625)",
+        "brightness(2) contrast(0.5)"
+      ],
+      "verdict": "same-series",
+      "family": "filter · brightness + contrast"
+    },
+    {
+      "identical": true,
+      "kind": "separability",
+      "native": [
+        "blur(0px) drop-shadow(rgb(0, 0, 0) 0px 0px 0px)",
+        "blur(2.5px) drop-shadow(rgb(0, 0, 0) 1px 1px 2px)",
+        "blur(5px) drop-shadow(rgb(0, 0, 0) 2px 2px 4px)",
+        "blur(7.5px) drop-shadow(rgb(0, 0, 0) 3px 3px 6px)",
+        "blur(10px) drop-shadow(rgb(0, 0, 0) 4px 4px 8px)"
+      ],
+      "property": "filter",
+      "typed": [
+        "blur(0px) drop-shadow(rgb(0, 0, 0) 0px 0px 0px)",
+        "blur(2.5px) drop-shadow(rgb(0, 0, 0) 1px 1px 2px)",
+        "blur(5px) drop-shadow(rgb(0, 0, 0) 2px 2px 4px)",
+        "blur(7.5px) drop-shadow(rgb(0, 0, 0) 3px 3px 6px)",
+        "blur(10px) drop-shadow(rgb(0, 0, 0) 4px 4px 8px)"
+      ],
+      "verdict": "same-series",
+      "family": "filter · blur + drop-shadow"
+    },
+    {
+      "equivalent": false,
+      "kind": "necessity",
+      "native": [
+        "blur(0px)",
+        "blur(2.5px)",
+        "blur(5px)",
+        "blur(7.5px)",
+        "blur(10px)"
+      ],
+      "property": "filter",
+      "shipped": [
+        "blur(0px) brightness(1) contrast(1) grayscale(0) hue-rotate(0deg) invert(0) saturate(1) sepia(0) opacity(1) drop-shadow(rgba(0, 0, 0, 0) 0px 0px 0px) opacity(1)",
+        "blur(2.5px) brightness(1) contrast(1) grayscale(0) hue-rotate(0deg) invert(0) saturate(1) sepia(0) opacity(1) drop-shadow(rgba(0, 0, 0, 0) 0px 0px 0px) opacity(1)",
+        "blur(5px) brightness(1) contrast(1) grayscale(0) hue-rotate(0deg) invert(0) saturate(1) sepia(0) opacity(1) drop-shadow(rgba(0, 0, 0, 0) 0px 0px 0px) opacity(1)",
+        "blur(7.5px) brightness(1) contrast(1) grayscale(0) hue-rotate(0deg) invert(0) saturate(1) sepia(0) opacity(1) drop-shadow(rgba(0, 0, 0, 0) 0px 0px 0px) opacity(1)",
+        "blur(10px) brightness(1) contrast(1) grayscale(0) hue-rotate(0deg) invert(0) saturate(1) sepia(0) opacity(1) drop-shadow(rgba(0, 0, 0, 0) 0px 0px 0px) opacity(1)"
+      ],
+      "verdict": "differs",
+      "family": "filter · blur alone"
+    },
+    {
+      "equivalent": false,
+      "kind": "necessity",
+      "native": [
+        "none",
+        "none",
+        "none",
+        "none",
+        "none"
+      ],
+      "property": "backdropFilter",
+      "shipped": [
+        "blur(0px) brightness(1) contrast(1) drop-shadow(rgba(0, 0, 0, 0) 0px 0px 0px) grayscale(0) hue-rotate(0deg) invert(0) opacity(1) saturate(1) sepia(0) opacity(1)",
+        "blur(2.5px) brightness(1) contrast(1) drop-shadow(rgba(0, 0, 0, 0) 0px 0px 0px) grayscale(0) hue-rotate(0deg) invert(0) opacity(1) saturate(1) sepia(0) opacity(1)",
+        "blur(5px) brightness(1) contrast(1) drop-shadow(rgba(0, 0, 0, 0) 0px 0px 0px) grayscale(0) hue-rotate(0deg) invert(0) opacity(1) saturate(1) sepia(0) opacity(1)",
+        "blur(7.5px) brightness(1) contrast(1) drop-shadow(rgba(0, 0, 0, 0) 0px 0px 0px) grayscale(0) hue-rotate(0deg) invert(0) opacity(1) saturate(1) sepia(0) opacity(1)",
+        "blur(10px) brightness(1) contrast(1) drop-shadow(rgba(0, 0, 0, 0) 0px 0px 0px) grayscale(0) hue-rotate(0deg) invert(0) opacity(1) saturate(1) sepia(0) opacity(1)"
+      ],
+      "verdict": "differs",
+      "family": "backdrop-filter · blur alone"
+    }
+  ]
+}

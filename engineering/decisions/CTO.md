@@ -3743,7 +3743,7 @@ one constituent matches native in isolation
 that constituent is safe to migrate
 ```
 
-Single-route evidence is admission for a *simple* constituent, where the route is the subject. For a function shell it
+Single-route evidence is admission for a _simple_ constituent, where the route is the subject. For a function shell it
 is not admission at all: the subject is the function's argument set moving together, so the record that admits a
 family has to be a **compositional** one. That is the shape the promotion increment will need — an arm naming the
 simultaneous combination, measured, in the place route evidence already lives.
@@ -3779,7 +3779,7 @@ So:
 **The shell half needs nothing.** Both families already own their shells statically in `src/composition` — that is
 what "static function shell" means here, and it is the D.2 representation, not a new one.
 
-**The constituent half has no route to promote.** The six components are typed under their *own* parents (`scale`,
+**The constituent half has no route to promote.** The six components are typed under their _own_ parents (`scale`,
 `translate`), whose leaves are `movable`; the pairs under the 3-D parents are `no-candidate`, because the only
 candidate near them addresses `transform` with the whole function rather than addressing the parent with a
 constituent. Declaring leaves under `scale-3d`/`translate-3d` would therefore be a census claim about a route that
@@ -3833,7 +3833,7 @@ B   animate-rotate-3d alone      identity → … → 0.853553, 0.146447, -0.5, 
 C   both                         rotation **and** translation, both varying at every sample
 ```
 
-**Coexistence already composes.** The C series carries the rotated basis *and* the translation in the same matrix at
+**Coexistence already composes.** The C series carries the rotated basis _and_ the translation in the same matrix at
 every instant — `matrix3d(0.990393, 0.00960736, …, 2.52402, 4.97598, 0.344874, 1)` — so the property-level route does
 **not** suppress the other participant. The D.2 contention shape is real in general and does not occur here: the
 frames' values are the composition itself, so the animation that wins the property still reads every slot the
@@ -3845,7 +3845,7 @@ That is the second branch of the ruling, measured rather than assumed:
 alone same, coexistence same → no production benefit; leave the route alone
 ```
 
-So **`animate-translate-3d` is not promoted.** D.3.8's separability is the reason the route *would* be safe to
+So **`animate-translate-3d` is not promoted.** D.3.8's separability is the reason the route _would_ be safe to
 migrate; it is not a reason to migrate it, because nothing is broken by leaving it native. `scale-3d` has no
 candidate, the six `(3d-parent, component)` pairs have no route, and none of the three is promoted.
 
@@ -3862,3 +3862,72 @@ members stay native as ruled.
 
 **State.** No production code moved, no scratch file left behind. Gate 17/17, 498 unit tests, 87/87 behaviour arms,
 `tsc` clean.
+
+---
+
+## D.3.8 closed, and the second production criterion recorded
+
+The closure is stronger than "nothing changed": the research **prevented a needless migration**. The line that
+separates the two is not safety but need:
+
+```text
+scale3d / translate3d   separable in interpolation terms
+rotate3d / matrix / matrix3d   coupled
+animate-translate-3d    already coexists with another transform participant → no contention → no benefit
+```
+
+So, alongside separability:
+
+```text
+transparent migration requires
+  1. semantic safety      the arguments remain native-equivalent when they move together
+  2. production necessity the shipped execution has a real defect or limitation the migration repairs
+```
+
+Absent either, the family is left alone. That is the correction to the instinct to maximise typed reach, and it is
+cheaper to state than to keep rediscovering.
+
+## The filter track opened under both gates
+
+**Gate A — separability. Both properties pass, independently measured, including the nested argument:**
+
+```text
+filter · blur + hue-rotate              same-series
+filter · brightness + contrast          same-series
+filter · blur + drop-shadow             same-series
+backdrop-filter · blur + hue-rotate     same-series
+backdrop-filter · brightness + contrast same-series
+backdrop-filter · blur + drop-shadow    same-series
+```
+
+The drop-shadow arms were the ones worth having, because its argument is itself compound — length, length, length,
+colour — and they say the argument boundary holds one level down as well as one level up. `filter` and
+`backdrop-filter` were measured separately and agree; shared machinery, but not shared evidence.
+
+**Gate B — necessity. Nothing is demonstrated, and the shipped series is informative:**
+
+```text
+filter · blur alone          shipped  blur(0px) → blur(2.5px) → … → blur(10px), the whole list explicit
+                             native   blur(0px) → … → blur(10px)
+backdrop-filter · blur alone shipped  blur(0px) → … → blur(10px), the whole list explicit
+                             native   none ×5   ← the reference is void, see below
+```
+
+The shipped `blur` interpolates **correctly**, and the difference from native is entirely that Jumi's composition
+spells out every filter argument at its resting value. That is a composition-shape difference, not a defect, and it is
+the same place `translate-3d` landed: a separable family with nothing to repair.
+
+The `backdrop-filter` native reference read `none` at every sample because the keyframe was written with the
+**camelCase** name — `backdropFilter` in CSS rather than `backdrop-filter` — so that comparison is void, and the
+shipped series is the only reading from it. And the first run of gate B measured zero animations on both properties
+because the probe element carried no class at all: the harness built its body from ids alone, so the shipped class was
+never on the element. Both defects were found by the arms' own liveness signals rather than by inspection — which is
+the tenth and eleventh fixture defect in this track, and the reason every arm prints its series.
+
+**What gate B does not yet cover, stated rather than implied:** one motion per property, `blur` alone. A defect could
+still hide in a multi-argument motion or in `drop-shadow`, where the arguments move together. Necessity is
+**undemonstrated, not refuted**, and the probe should be extended to the six gate-A combinations with native
+references that are proven live before any conclusion is drawn from them.
+
+**State.** No production code moved. Gate 17/17, 498 unit tests, 87/87 behaviour arms, `tsc` clean; gate A's readings
+are in `scripts/filter-shell-series.json`.
