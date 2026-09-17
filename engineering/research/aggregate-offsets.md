@@ -2,13 +2,18 @@
 
 _RESEARCH — measured, not shipped. Not a workstream, and not filed._
 
-Two executable books under `scripts/research/`. They are assertions, not tables, and both exit
+Three executable books under `scripts/research/`. They are assertions, not tables, and all three exit
 non-zero:
 
 ```bash
 node scripts/research/aggregate-offsets.mjs        # 12 assertions — one element
 node scripts/research/cross-element-isolation.mjs  # 11 assertions — several elements
+node scripts/research/batching-eligibility.mjs     # 14 assertions — a real sheet vs a batched one
 ```
+
+The third one compiles the shipped emitter and reads a real element, so it needs a bundle
+(`pnpm bundle && …`); it is the one that falsifies this note's original closing claim, and the last
+section says what replaces it.
 
 The question they answer: **can one `@keyframes` definition per family serve many motions, with the
 authored values living outside it?** The definition would be identified by `(family, stop set)` and
@@ -84,10 +89,11 @@ x {0,100} + y {50,100}   0px | 7.5px 12.5px  | 15px 25px    | 22.5px 22.5px | 30
 x 500ms + y 2000ms       0px | 30px 5px       | 30px 10px    | 30px 15px     | 30px 20px
 ```
 
-So an instance is an _ownership channel_, not merely a clock: one animated property per instance, and
-two instances may share a definition only when their whole timing program agrees — in which case they
-are one instance and the browser has to be told so exactly once (two identical activations are two
-instances; it does not dedupe).
+So an instance is an _ownership channel_, not merely a clock: one animated property per instance.
+Sharing a **definition** needs no agreement at all — finding 1 shares one across different elements
+and different clocks. What needs agreement is the **instance**: two motions can share one only when
+their whole timing program agrees, and then the browser has to be told so exactly once, because two
+identical activations are still two instances and it does not dedupe.
 
 ### 4. Element-local buckets are the isolation boundary
 
@@ -132,41 +138,82 @@ aggregate instance                     per-leaf instance
 owns the composite property            owns one leaf
 clean fallback semantics               cannot use a self-fallback
 batches several leaves into one clock   independent timing and stop sets
-only when stop set + timing align       always composable
+only under a sheet-level proof          always composable
 ```
 
 Both are measured. The aggregate is simpler where it applies and impossible where it does not; the
 per-leaf form is the general one and is what the typed path already does.
 
-## The next question, and its answer
+Both are measured. The aggregate is simpler where it applies and impossible where it does not; the
+per-leaf form is the general one and is what the typed path already does.
+
+## The next question, and the answer that does not survive
 
 > **Can Jumi determine, without element-context inference, when several constituents share the same
 > full timing program and therefore qualify for aggregate batching?**
 
-Measured, and the answer is **yes**, because the compiler already writes the evidence. A control
-writes its scope's variable and nothing else:
+An earlier version of this note answered **yes**, from sheet-level equality of timing writes: a scoped
+control writes its own component rung and nothing else, so if the sheet writes both components' rungs
+identically — and writes no other rung that only one of them reads — the pair must share a program.
+
+**That answer is falsified.** A third book, `scripts/research/batching-eligibility.mjs` (14
+assertions), compiles the real sheet and reads a real element. The sheet contains both constituents
+and **both** controls:
 
 ```text
-sheet                                       writes
-animate-translate-x-[5] + y-[7]             nothing at the component rung
-  + animation-duration-500/translate-x      --jumi-translate-x-animation-duration
-  + animation-duration-900/translate-y      --jumi-translate-y-animation-duration
+sheet     animate-translate-x-[30px]  animate-translate-y-[20px]
+          animation-duration-500/translate-x   animation-duration-500/translate-y
+
+element   animate-translate-x-[30px]  animate-translate-y-[20px]
+          animation-duration-500/translate-x              ← the y control is deliberately absent
 ```
 
-and each slot's chain reads a component rung, an attribute rung and a global rung. So two
-constituents qualify for batching exactly when
+Both component rungs in the sheet say `500ms`, so the criterion authorises batching. Production
+resolves two programs; the batched representation — one instance, the clock the pair shares — cannot
+represent that:
 
 ```text
-their stop sets are equal
-AND their modifiers/names are equal
-AND every rung of their timing chains is either unwritten in the sheet,
-    or written identically for both components
+production   500ms, 1000ms   0px | 24.0721px 8.17021px | 30px 16.0481px | 30px 20px | 30px 20px
+batched              500ms   0px | 24.0721px 16.0481px | 30px 20px      | 30px 20px | 30px 20px
 ```
 
-All three are sheet-level facts, including variant-prefixed controls: a control behind `hover:` still
-declares the component rung, so the pair is disqualified rather than conditionally batched. When a
-pair qualifies, coalescing needs no knowledge of which classes coexist, because both candidates write
-the **same activation variable** and the element gets one instance automatically.
+They disagree on `y` at 250ms and 500ms. The general statement is the one that keeps recurring here:
 
-That makes aggregate batching an **optimization over a per-leaf model**, not a replacement for it —
-and it is the shape worth taking into a decision record before any of it is emitted in production.
+> **presence of a candidate in the sheet is not presence of that candidate on this element.**
+
+Sheet symmetry is a _positive_ check, and a missing class breaks it silently; a `hover:` control makes
+it worse, since the element's carrying it is state-dependent and the two variant classes are
+textually symmetric while an element can carry either.
+
+### What replaces it: two negative existence claims
+
+Batching is safe when the sheet contains **no rung that can independently address either
+constituent** — or when the only rung written is one **both constituents read by construction**. Both
+survive element selection precisely because they are negative existence claims over the sheet, which
+a missing class cannot silently violate. Both are measured, and in each case production and the
+batched representation agree **exactly**:
+
+```text
+no constituent-addressable rung          both resolve 1s, the sheet default     production == batched
+attribute rung (…/translate)             both read it by construction, 500ms    production == batched
+```
+
+which is the conservative rule and the permissive one, and they are the whole of what is proven. The
+tempting case is also measured, and it is why the criterion looked right: **when the element does
+carry both controls**, production equals the batched representation exactly. The defect is not in the
+batched arrangement; it is in believing the sheet when only the element knows.
+
+The guarantee is **relative to the sheet, not to the element**. An element-level override of one
+constituent's rung (`--jumi-translate-x-animation-duration: 250ms` inline) diverges from the batched
+representation even under a sheet with no scoped controls at all — measured, and asserted. So the safe
+rule earns its safety by giving up the thing the architecture is otherwise built to allow, which is
+cascade-first per-constituent control.
+
+This tightens the fork rather than settling it:
+
+```text
+value-free definition sharing     yes — one definition, many elements, different values and clocks
+per-leaf instance                 the general semantic model
+aggregate batching                an optimization only, and only under a negative sheet-level proof
+sheet-level equality of writes    not sufficient
+```

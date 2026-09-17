@@ -67,7 +67,15 @@ export const sample = async (browser, { at, body, css, ids, property }) => {
           await new Promise(resolve => requestAnimationFrame(resolve))
           values.push(getComputedStyle(element)[name])
         }
-        out[id] = { instances: own.length, values }
+        out[id] = {
+          // The resolved clock of each instance, in creation order. Curve shape alone infers the
+          // timing program; this reads it, so "these are two programs" is an assertion.
+          durations: own.map(
+            animation => animation.effect.getTiming().duration,
+          ),
+          instances: own.length,
+          values,
+        }
       }
       return out
     },
