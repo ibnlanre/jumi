@@ -221,7 +221,19 @@ export const readCandidates = () => {
   const candidates = []
 
   for (const file of files) {
-    const text = fs.readFileSync(path.join(root, file), 'utf8')
+    /**
+     * Comments are removed **before** the structural walk rather than worked around inside it.
+     *
+     * `readCall` and `readParts` split on parentheses and quotes, so text a comment carries is structure to
+     * them: a stray `(` unbalanced the walk and an apostrophe opened a string that never closed, and in both
+     * cases the entry became unreadable — measured twice, and both times the symptom was `no candidate
+     * addresses the pair`, pointing nowhere near a comment. `readCompositions` has read its modules this way
+     * all along; this reader now does too, so there is one preprocessing rule rather than a bespoke workaround
+     * per reader.
+     */
+    const text = stripComments(
+      fs.readFileSync(path.join(root, file), 'utf8'),
+    )
 
     /**
      * Three candidate shapes address a property, and reading only the first was a **second** gap in
