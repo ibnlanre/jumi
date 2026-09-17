@@ -1085,3 +1085,81 @@ equivalence test in `scripts/lib/property-model.test.mjs`; `population`, `chainO
 `src/variables/reach.test.ts`; `scripts/research/d3-coverage.mjs` and its `package.json` entry; and these
 memories. No `src/` behaviour change and no emitted-CSS change — 17/17 stages, 79/79 behaviour, and **one**
 machinery set.
+
+## 2026-09-17 — D.3.5 pass two: projection, and nothing else
+
+### Call
+
+> **The next move should therefore be pass two, but only as projection. I would not run new browser
+> experiments yet.** Take the six complete descriptors and attach the already-established evidence […], and
+> explicitly allow `descriptor complete / classification unresolved` if evidence is insufficient for a
+> specific pair. At the same time, keep the proposed-only research results separate […] because those are
+> useful evidence about potential representations, but they should not silently count as model coverage
+> until their representation becomes declared. […] **Project behavioral classifications onto the
+> descriptor-complete population without creating new representations or new browser evidence.** […] One
+> thing I would preserve from this whole episode as a hard rule: **if two readers claim to describe the same
+> model, compare their exact structural outputs, not just their totals.**
+
+`pnpm research:d3-projection` measures nothing. No browser, no compile, no new representation, no new arm:
+every verdict is quoted from a book that landed, with the source, the representation it was measured under,
+and the scope of what was actually observed. The evidence lives in `scripts/lib/evidence.mjs` as **records,
+not verdicts**, and both this pass and the coverage pass quote it from there — a citation list that lives in
+two files is a list that will disagree with itself eventually.
+
+```text
+of the 303 pairs Jumi can describe structurally, 6 of 6 are behaviourally proven
+
+  scale / scale-x|y|z         movable   declared `<number> | <percentage>`  §16's five composition curves
+  translate / translate-x|y   movable   declared `<length-percentage>`      §17 + the D.2 landing record
+  translate / translate-z     movable   declared `<length>`, `lengthOnly`   the D.2 landing record
+```
+
+**The scope column is the honest part.** `§16`'s five curve arms are **scale's**; for translate the standing
+gate holds the *definition* contract (§17) and the curve equivalence is the D.2 landing record, not a
+standing arm. `translate-z` is a separate record because its declaration differs from its siblings' — a verdict
+belongs to the representation it was measured under, and a family is not a representation. Every record says
+which of the two kinds of evidence it is, so no row reads as "the gate holds this" when it does not.
+
+**The pair is the key, and getting that wrong was instructive.** The first registry was keyed by component, and
+the projection's own assertions caught it: it "covered" `(scale-3d, scale-x)` — a pair through a parent the
+arms never animate, and one with no candidate at all, so it is not even describable. A verdict measured through
+one parent says nothing about the same component through another; that is the same fact that made the pair the
+census unit in the first place, arriving from the other direction. The assertions now compare the coverage
+class and the projected set as **sets of pairs**, not as counts.
+
+**Proposals stay out of coverage, and are named as the workstream:**
+
+```text
+font/font-weight                                movable
+gap/column-gap                                  unresolved — `normal` cannot be held by `<length>`
+background-position-x/…-edge                    interpolation-unsafe — the shorthand wants an edge keyword
+background-position-x/…-offset                  movable
+border-bottom/border-bottom-width               fixture-unobservable
+```
+
+All five are pairs in the population, all five stop pass one on `no declared representation`, and none of
+them counts as coverage — the `proposed` class is never consulted by the projection. That is what makes the
+next decision a decision: **199 pairs await a representation, 98 await a candidate**, and candidate coverage
+without a justified representation only reaches the same dead end more often.
+
+`classification unresolved` is a value in the report rather than a gap, so a descriptor can be complete and
+behaviourally unproven without anything being invented to fill the row. The invariants that hold the pass
+together: coverage holds only declared representations; the proposed class is disjoint from them; the
+projection is total; and no record may answer for a pair whose descriptor is incomplete.
+
+**The rule this episode leaves behind, recorded as a rule** — it arrived as the reason D.3.5 pass one was held
+back, and it is cheaper to state than to rediscover:
+
+```text
+if two readers claim to describe the same model,
+compare their exact structural outputs, not just their totals
+```
+
+`30 vs 21` was the shape that could have looked harmless while poisoning every percentage downstream, and the
+assertion that now holds the line compares sets — the coverage class against the projected set as **pairs**, the
+source reader against the evaluated model **entry for entry** — rather than counts.
+
+**Not yet committed.** Working tree only: `scripts/lib/evidence.mjs` and its 8-test suite,
+`scripts/research/d3-projection.mjs` and its `package.json` entry, and `d3-coverage.mjs` now taking its
+citations from the registry. No `src/` behaviour change and no emitted-CSS change; 17/17 stages,
+79/79 behaviour, and no measurement was taken to produce any of it.

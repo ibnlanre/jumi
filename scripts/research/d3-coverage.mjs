@@ -1,4 +1,6 @@
 import { describe, population } from '../lib/observation.mjs'
+// Aliased: this file has its own `declared` — the set of components the model declares a representation for.
+import { declared as declaredEvidence, proposed } from '../lib/evidence.mjs'
 import { bucketOf } from '../lib/property-model.mjs'
 
 /**
@@ -47,60 +49,18 @@ import { bucketOf } from '../lib/property-model.mjs'
  */
 
 /**
- * The verdicts already on record, with the representation each was measured under and where it was measured.
- *
- * `declared` means the model carries the representation; `proposed` means a book justified one and measured
- * it, which is evidence about *that representation* and not yet model metadata.
+ * The citations come from the registry (`scripts/lib/evidence.mjs`), so this pass and the projection quote the
+ * same evidence from the same place — a citation list that lives in two files is a list that will disagree with
+ * itself eventually.
  */
-/** The population's buckets come from `bucketOf`, so this file keeps no copy of the rule. */
-const ON_RECORD = [
-  {
-    component: 'scale-x/y/z',
-    representation: 'declared — `<number> | <percentage>`, rests at `1`',
-    source: 'scripts/research/d2-acceptance.mjs',
-    verdict: 'movable',
-  },
-  {
-    component: 'translate-x/y/z',
-    representation:
-      'declared — `<length-percentage>` (`z`: `<length>`), rests at `0px`',
-    source: 'scripts/research/d2-acceptance.mjs',
-    verdict: 'movable',
-  },
-  {
-    component: 'font-weight',
-    representation: 'proposed — `<number>` (the engine reads `normal` = 400)',
-    source: 'scripts/research/d3-interpolation.mjs · arm A',
-    verdict: 'movable',
-  },
-  {
-    component: 'column-gap',
-    representation: "proposed — `<length>` at the candidate's own first frame",
-    source: 'scripts/research/d3-observation.mjs · arm B',
-    verdict: 'unresolved (the rest is `normal`, which `<length>` cannot hold)',
-  },
-  {
-    component: 'background-position-x-edge',
-    representation:
-      'proposed — `<length-percentage>` (the longhand reads `left` = `0%`)',
-    source: 'scripts/research/d3-observation.mjs · arm C',
-    verdict:
-      'interpolation-unsafe (the shorthand wants an edge keyword, not a percentage)',
-  },
-  {
-    component: 'background-position-x-offset',
-    representation: 'proposed — `<length-percentage>`',
-    source: 'scripts/research/d3-observation.mjs · arm C',
-    verdict: 'movable',
-  },
-  {
-    component: 'border-bottom-width',
-    representation:
-      'proposed — `<length>`; the fixture is blind at `border-style: none`',
-    source: 'scripts/research/d3-observation.mjs · arm D',
-    verdict: 'fixture-unobservable (no architectural verdict)',
-  },
-]
+const ON_RECORD = [...declaredEvidence, ...proposed].map(one => ({
+  component: one.pairs
+    .map(pair => `${pair.parent}/${pair.component}`)
+    .join(', '),
+  representation: one.representation,
+  source: one.source,
+  verdict: one.verdict,
+}))
 
 const pairs = population()
 const described = pairs.map(one => ({
