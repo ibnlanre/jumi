@@ -2728,3 +2728,83 @@ which is the first time in this track that has been true.
 **State.** New book `scripts/research/d3-anchor-edge.mjs` (`pnpm research:d3-anchor-edge`), evidence at
 `scripts/anchor-edge.json`. No `src/` change, nothing promoted, no API decision taken. 17/17 stages, 485 unit
 tests.
+
+
+## 2026-09-17 — D.3.7 · the production spike: four routes, mapped end to end
+
+### The ruling
+
+> **Model `offset-anchor` as two internal resolved `<length-percentage>` execution leaves, keep edge/offset
+> vocabulary at the authoring layer, normalize each public candidate into resolved-axis endpoints where
+> statically possible, and decline the entire typed route when normalization cannot be proven. Before shipping,
+> run one production-shaped spike across whole, compound, edge, and offset routes to prove the candidate-to-axis
+> mapping end to end.**
+
+### The design, as spiked
+
+```text
+authoring layer      x-edge · x-offset · y-edge · y-offset        (the public vocabulary, unchanged)
+                              ↓ normalization
+execution layer      --jumi-offset-anchor-x-position
+                     --jumi-offset-anchor-y-position              (both <length-percentage>, internal)
+
+offset-anchor: var(--jumi-offset-anchor-x-position) var(--jumi-offset-anchor-y-position)
+```
+
+No public class changes, and no branch names a property: the mapping is from an authored endpoint to a resolved
+component, and which component a route moves is a fact about the route rather than a lookup on its name.
+
+### The spike
+
+```text
+route                        public class (shipped, unchanged)     native series ≡ proposed    both axes
+whole position               animate-offset-anchor                 50% 50% · 42.5% 57.5% · …   yes
+x edge                       animate-offset-anchor-x-edge          0% 0% · 25% 0% · …          yes
+y offset                     animate-offset-anchor-y-offset        0% 10px · 0% 15px · …       yes
+x/y compound                 animate-offset-anchor-x               calc(0% + 10px) 0% · …      yes
+
+decline boundary   var(--x) var(--y) → declines, the whole route stays native
+                   center 20px       → declines, the whole route stays native
+resting state      today     center 0 center 0 → auto
+                   proposed  50% 50%             → 50% 50%
+```
+
+Four of four reproduce the native motion with **both axes assigned in every frame**, which is the "no half-typed
+execution" criterion asserted structurally rather than trusted.
+
+### The design fixes an invalidity, which is more than expected
+
+The model's composition computes to `auto` **today** — the `center 0 center 0` that D.3.5 measured, and the
+reason this track exists. Under the proposed emission the same resting state computes to `50% 50%`, because the
+execution layer composes resolved components and never keywords. So the reshape does not merely preserve the
+current behaviour: at rest it repairs a form the browser rejects.
+
+That also corrects the earlier projection's conclusion. It said a value-bearing route "preserves independent
+control **if the edges become directional**" — inferred from the four-value grammar needing `left|right` and
+`top|bottom`. The inference was about the *authoring* layer, and the execution layer never sees a keyword, so
+making the edges directional is **not** required. The spike is what settled it; the projection could only see the
+rejection.
+
+### The decline boundary is hard
+
+`var(--x) var(--y)` and `center 20px` both decline, and a decline takes the **whole route** back to the native
+path — no `x` typed beside a native `y`, and no best-effort substitution. Same all-or-nothing rule that kept
+`scale` honest.
+
+### What the spike cost, in its own defects
+
+Four, all in its plumbing and all reported as mismatches before they were understood: the endpoint arrays were
+passed as `from` and `to` whole, so all four arms compared the wrong pair; the whole route normalizes to a
+**pair**, not to one component, and its first run fed `50% 50%` into a single registration; which axis a route
+moves was assumed rather than declared; and `0%` against `0px` at the zero point is a serialization difference
+that the comparison had to treat as one value. None was a defect in the design, and each was caught by the
+spike's own guards rather than by a human reading the output.
+
+### What is owed before shipping
+
+The per-axis normalizer (`normalizeAxis`) has no contract tests of its own yet — the spike exercises it, but the
+pure contract is unwritten. And the production change itself is untouched: this is a spike plus its evidence.
+
+**State.** `scripts/lib/anchor.mjs` gained `normalizeAxis`; new book
+`scripts/research/d3-anchor-spike.mjs` (`pnpm research:d3-anchor-spike`), evidence at
+`scripts/anchor-spike.json`. No `src/` change, nothing promoted. 17/17 stages, 485 unit tests.

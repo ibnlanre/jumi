@@ -86,9 +86,39 @@ const components = value => {
 }
 
 const X_KEYWORD = { center: '50%', left: '0%', right: '100%' }
-const Y_KEYWORD = { center: '50%', top: '0%', bottom: '100%' }
+const Y_KEYWORD = { bottom: '100%', center: '50%', top: '0%' }
 
 /** An edge keyword plus an offset, resolved to one component. */
+/**
+ * One axis of the model's own authoring leaves, as a resolved component — or `null` to decline.
+ *
+ * This is the layer the candidate projection showed the **public surface** needs, and it is not the same
+ * question as `normalizeOffsetAnchor`. The four-value grammar rejects a `center` edge, which is exactly why the
+ * model's resting composition computes to `auto` today; but the proposed execution layer never composes
+ * keywords at all, so `center` is a fact about the *authoring* layer and it disappears here. That is why the
+ * resting state stops being invalid once normalization runs, rather than needing the edges to become
+ * directional — a correction to what the projection concluded.
+ *
+ * An offset of exactly `0` resolves to the edge's own percentage rather than to a `calc()`: both compute to the
+ * same value, and the measured arm for `left 0 top 0` reads `0px 0px`, so nothing is being smoothed over.
+ * `center` with a **non-zero** offset declines, because that arity is one this track has not established.
+ */
+export const normalizeAxis = (edge, offset) => {
+  const component = String(offset ?? '').trim()
+
+  if (edge === 'center') return component === '0' ? '50%' : null
+  if (!isComponent(component)) return null
+
+  if (component === '0')
+    return { bottom: '100%', left: '0%', right: '100%', top: '0%' }[edge] ?? null
+
+  if (edge === 'left' || edge === 'top') return component
+  if (edge === 'right' || edge === 'bottom')
+    return `calc(100% - ${component})`
+
+  return null
+}
+
 const fromEdge = (edge, offset) =>
   edge === 'left' || edge === 'top' ? offset : `calc(100% - ${offset})`
 
