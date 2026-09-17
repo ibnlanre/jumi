@@ -1523,6 +1523,26 @@ export function createJumiModel({
           const authored = String(variables[`--jumi-${component}`] ?? value)
           const canonical = canonicalizeLeaf(declaration, authored)
 
+          /**
+           * The candidate's **endpoint slot** — the element-local configuration surface both
+           * representations of this component read.
+           *
+           * It is what makes a definition reusable across authored values, and the name alone does
+           * not do that. Measured before this: the typed definition was already named for the
+           * component (`jumi-scale-x`, no value in the name) while its body baked the canonical
+           * value, so two authored values of one component collided on that name and the first
+           * candidate compiled won — `animate-scale-x-[5]` beside `[7]` produced one definition and
+           * both elements settled at `5 1`; reversed, both settled at `7 1`. Silent and
+           * order-dependent, because `emitKeyframe` is `if (seen.has(name)) return`.
+           *
+           * So **a value-free name is not deduplication**: what makes a definition serve every
+           * value is a value-free *body*. Reading the endpoint slot is convergence rather than a
+           * second mechanism — the composed-property representation below reads the same slot for
+           * the same reason.
+           */
+          const endpoint = cssEscape(`--jumi-${component}-100`)
+          const leaf = propertyVariables[component as PropertyType].variable
+
           if (canonical !== null) {
             const substrate = {
               [attribute]: css(
@@ -1534,25 +1554,26 @@ export function createJumiModel({
             // The same bridge as the whole path, and for the case it exists to fix: this
             // constituent is the motion that must win the property back from a declined whole's
             // keyframe, which writes the property rather than the leaves.
+            //
+            // The value is read, never baked, so this one definition serves every authored value of
+            // the component. The fallback is deliberately **absent** rather than the resting leaf: a
+            // frame animating `--jumi-scale-x` may not name `--jumi-scale-x` as the fallback of the
+            // value it assigns to it — that is a cycle, and it resolves through the registered
+            // initial value. The endpoint is written by the same rule that names the motion, so it
+            // is always present where this definition is active.
             emitKeyframe(`jumi-${component}`, {
               from: substrate,
-              to: {
-                ...substrate,
-                [propertyVariables[component as PropertyType].variable]:
-                  canonical,
-              },
+              to: { ...substrate, [leaf]: css('var', endpoint) },
             })
             aggregateChanged()
 
             return {
               ...substrate,
+              [endpoint]: canonical,
               [nameVar]: `jumi-${component}`,
               ...(modifier ? nameSlot(component, component, modifier) : {}),
             }
           }
-
-          const endpoint = cssEscape(`--jumi-${component}-100`)
-          const leaf = propertyVariables[component as PropertyType].variable
 
           /**
            * The frame hooks **only the owned component**.

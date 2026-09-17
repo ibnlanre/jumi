@@ -182,8 +182,8 @@
     --jumi-transition-behavior: normal;
     --jumi-transition: var(--jumi-transition-property) var(--jumi-transition-duration) var(--jumi-transition-timing-function) var(--jumi-transition-delay);
   }
-  .animate-scale-110,
-.animate-scale-y-\[0\.2\],
+  .animate-scale-y-\[0\.2\],
+.animate-scale-110,
 .animate-rotate-\[0\:0deg\|20\:-8deg\|100\:-8deg\]\/\[flick\],
 .animate-rotate-\[0\:0deg\|20\:0deg\|100\:8deg\]\/\[return\],
 .animate-opacity-\[0\:1\|50\:0\.5\|100\:1\],
@@ -322,15 +322,16 @@
   .invisible {
     visibility: hidden;
   }
+  .animate-scale-y-\[0\.2\] {
+    scale: var(--jumi-scale);
+    --jumi-scale-y-100: 0.2;
+    --jumi-scale-y-animation-name: jumi-scale-y;
+    --jumi-slot-scale-y: var(--jumi-scale-y-animation-name, var(--jumi-animation-name)) var(--jumi-scale-y-animation-duration, var(--jumi-scale-animation-duration, var(--jumi-animation-duration))) var(--jumi-scale-y-animation-timing-function, var(--jumi-scale-animation-timing-function, var(--jumi-animation-timing-function))) var(--jumi-scale-y-animation-delay, var(--jumi-scale-animation-delay, var(--jumi-animation-delay))) var(--jumi-scale-y-animation-iteration-count, var(--jumi-scale-animation-iteration-count, var(--jumi-animation-iteration-count))) var(--jumi-scale-y-animation-direction, var(--jumi-scale-animation-direction, var(--jumi-animation-direction))) var(--jumi-scale-y-animation-fill-mode, var(--jumi-scale-animation-fill-mode, var(--jumi-animation-fill-mode))) var(--jumi-scale-y-animation-play-state, var(--jumi-scale-animation-play-state, var(--jumi-animation-play-state)));
+  }
   .animate-scale-110 {
     --jumi-scale-d38-animation-name: jumi-scale-d38;
     scale: var(--jumi-scale);
     --jumi-slot-scale-d38: var(--jumi-scale-d38-animation-name, var(--jumi-animation-name)) var(--jumi-scale-animation-duration, var(--jumi-animation-duration)) var(--jumi-scale-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-scale-animation-delay, var(--jumi-animation-delay)) var(--jumi-scale-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-scale-animation-direction, var(--jumi-animation-direction)) var(--jumi-scale-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-scale-animation-play-state, var(--jumi-animation-play-state));
-  }
-  .animate-scale-y-\[0\.2\] {
-    scale: var(--jumi-scale);
-    --jumi-scale-y-animation-name: jumi-scale-y;
-    --jumi-slot-scale-y: var(--jumi-scale-y-animation-name, var(--jumi-animation-name)) var(--jumi-scale-y-animation-duration, var(--jumi-scale-animation-duration, var(--jumi-animation-duration))) var(--jumi-scale-y-animation-timing-function, var(--jumi-scale-animation-timing-function, var(--jumi-animation-timing-function))) var(--jumi-scale-y-animation-delay, var(--jumi-scale-animation-delay, var(--jumi-animation-delay))) var(--jumi-scale-y-animation-iteration-count, var(--jumi-scale-animation-iteration-count, var(--jumi-animation-iteration-count))) var(--jumi-scale-y-animation-direction, var(--jumi-scale-animation-direction, var(--jumi-animation-direction))) var(--jumi-scale-y-animation-fill-mode, var(--jumi-scale-animation-fill-mode, var(--jumi-animation-fill-mode))) var(--jumi-scale-y-animation-play-state, var(--jumi-scale-animation-play-state, var(--jumi-animation-play-state)));
   }
   .shadow-sm {
     --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
@@ -701,8 +702,8 @@
     --jumi-fade-in-animation-name: jumi-fade-in;
     --jumi-slot-fade-in: var(--jumi-fade-in-animation-name, var(--jumi-animation-name)) var(--jumi-fade-in-animation-duration, var(--jumi-animation-duration)) var(--jumi-fade-in-animation-timing-function, var(--jumi-animation-timing-function)) var(--jumi-fade-in-animation-delay, var(--jumi-animation-delay)) var(--jumi-fade-in-animation-iteration-count, var(--jumi-animation-iteration-count)) var(--jumi-fade-in-animation-direction, var(--jumi-animation-direction)) var(--jumi-fade-in-animation-fill-mode, var(--jumi-animation-fill-mode)) var(--jumi-fade-in-animation-play-state, var(--jumi-animation-play-state));
   }
-  .animate-scale-110,
-.animate-scale-y-\[0\.2\],
+  .animate-scale-y-\[0\.2\],
+.animate-scale-110,
 .animate-rotate-\[0\:0deg\|20\:-8deg\|100\:-8deg\]\/\[flick\],
 .animate-rotate-\[0\:0deg\|20\:0deg\|100\:8deg\]\/\[return\],
 .animate-opacity-\[0\:1\|50\:0\.5\|100\:1\],
@@ -1540,7 +1541,7 @@
   }
   to {
     scale: var(--jumi-scale);
-    --jumi-scale-y: 0.2;
+    --jumi-scale-y: var(--jumi-scale-y-100);
   }
 }
 @layer base {

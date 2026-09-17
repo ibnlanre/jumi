@@ -1,30 +1,37 @@
 /**
- * Definition identity, measured four ways — and the one path where the name went value-free before the
- * body did.
+ * Definition identity, measured four ways — what a definition's identity has to include for it to serve
+ * **every** value of the thing it is named for.
  *
  * The ruling this serves: keep value-free definitions and per-leaf ownership, but express the identity
  * as `(motion program shape, stop set)` rather than `(family, stop set)`, which is the aggregate's
- * shape and would be wrong to carry into the general implementation. The evidence for "before the body
- * did" is here, because the identity question is not only about how many definitions a sheet contains:
- * it is about whether a definition can serve **every** value of the thing it is named for.
+ * shape and would be wrong to carry into the general implementation. The identity question is not only
+ * how many definitions a sheet contains: it is whether one definition can serve every value.
  *
  * Four paths, two values each, same family and same stop set:
  *
- *   path                  name                        body            definitions   two values
- *   typed constituent     jumi-scale-x                value baked     1             BROKEN
- *   typed whole           jumi-scale-<hash(values)>   value baked     2             correct
- *   legacy phrase         jumi-scale-<hash(values)>   value-free      2             correct
- *   non-typed constituent jumi-backdrop-filter         value-free      1             correct
+ *   path                  name                        body                      definitions   two values
+ *   typed constituent     jumi-scale-x                reads its endpoint slot   1             correct
+ *   typed whole           jumi-scale-<hash(values)>   value baked               2             correct
+ *   legacy phrase         jumi-scale-<hash(values)>   reads per-candidate slots 2             correct
+ *   non-typed constituent jumi-backdrop-filter         value-free                1             correct
  *
- * The two ends are the finding. A **value-free body under a value-free name** is what makes one
- * definition serve every value — the non-typed constituent path already does it. A **value-bearing body
- * under a value-free name** is the worst of both: the identity collides and the first candidate wins, so
- * the second element silently animates to the first element's value, order-dependently. Measured below,
- * and uncovered by the gate — every existing arm uses one value per constituent.
+ * The first row is the repair (`a5…`), and it is the reason this file exists. It used to read:
  *
- * So these assertions describe a **defect**, and they invert when it is fixed. That inversion is the
- * point: `[7]` reading `7 1` is the arm that should be in `behaviour-check.mjs` once the typed body
- * reads its slot instead of baking the value, and until then this file is where the reading lives.
+ *   typed constituent     jumi-scale-x                value baked               1             BROKEN
+ *
+ * A **value-free name over a value-bearing body** is the worst of both: the identity collides and the
+ * first candidate compiled wins, so the second element silently animated to the first element's value —
+ * `animate-scale-x-[5]` beside `[7]` settled both at `5 1`, and reversed settled both at `7 1`. Silent,
+ * order-dependent, and uncovered, because every existing arm used one value per constituent.
+ *
+ * The two ends are the finding, stated as the thing to keep: a **value-free body** is what makes a
+ * definition serve every value (the non-typed constituent path always did it, and the typed constituent
+ * now converges on it), and **values in the name** is what a value-free identity would remove — which is
+ * the remaining D.2 scope, visible in the two rows that still hold two definitions for two values.
+ *
+ * The permanent guard for the repaired row is `behaviour-check.mjs` section 17, which asserts the same
+ * two halves in the gate. This book keeps the four-path contrast, including the falsification arm, so the
+ * *mechanism* stays measured rather than remembered.
  *
  * Run: `pnpm bundle && node scripts/research/identity-collision.mjs` (exits non-zero on failure).
  */
@@ -58,7 +65,7 @@ const body = (css, name) => {
 
 const browser = await chromium.launch()
 const book = createBook(
-  'definition identity — a value-free name over a value-bearing body',
+  'definition identity — what a definition must include to serve every value',
 )
 
 /**
@@ -83,9 +90,7 @@ const measure = async (candidates, pairs, property) => {
 
 const settled = (measurement, id) => measurement.page[id].values.at(-1)
 
-book.section(
-  'the typed constituent: a value-free name over a value-bearing body',
-)
+book.section('the typed constituent: a value-free name over a value-free body')
 
 const typedForward = await measure(
   ['animate-scale-x-[5]', 'animate-scale-x-[7]'],
@@ -112,22 +117,25 @@ book.check(
 )
 
 book.check(
-  'and its body carries the authored value',
-  /--jumi-scale-x:\s*5/.test(body(typedForward.css, 'jumi-scale-x')),
+  'and its body reads the candidate’s endpoint slot rather than a literal',
+  /--jumi-scale-x:\s*var\(--jumi-scale-x-100\)/.test(
+    body(typedForward.css, 'jumi-scale-x'),
+  ),
   body(typedForward.css, 'jumi-scale-x').replace(/\s+/g, ' ').slice(0, 120),
 )
 
 book.check(
-  'THE DEFECT: the second candidate animates to the first candidate’s value',
-  settled(typedForward, 'seven') === '5 1',
-  `[7] settled at ${settled(typedForward, 'seven')}`,
+  'so each element resolves its own value — the defect this replaced',
+  settled(typedForward, 'five') === '5 1' &&
+    settled(typedForward, 'seven') === '7 1',
+  `[5] settled at ${settled(typedForward, 'five')}, [7] at ${settled(typedForward, 'seven')}`,
 )
 
 book.check(
-  'and it is order-dependent — reversed, both settle at 7',
-  settled(typedReversed, 'five') === '7 1' &&
+  'and reversing candidate discovery changes nothing',
+  settled(typedReversed, 'five') === '5 1' &&
     settled(typedReversed, 'seven') === '7 1',
-  `[5] settled at ${settled(typedReversed, 'five')}, [7] at ${settled(typedReversed, 'seven')}`,
+  `reversed: [5] at ${settled(typedReversed, 'five')}, [7] at ${settled(typedReversed, 'seven')}`,
 )
 
 book.section(
@@ -190,7 +198,9 @@ book.check(
   'each body reads its own frame slots rather than a literal',
 )
 
-book.section('the non-typed constituent: the target shape, already shipping')
+book.section(
+  'the non-typed constituent: the shape the typed path now converges on',
+)
 
 const blurred = await measure(
   ['animate-backdrop-filter-blur-[5px]', 'animate-backdrop-filter-blur-[10px]'],

@@ -4,7 +4,7 @@
     "aggregateShare": 12,
     "aggregateWrites": 4,
     "animations": 1,
-    "bytes": 99660,
+    "bytes": 99709,
     "keyframes": 41,
     "media": 5,
     "properties": 107,
@@ -16,7 +16,7 @@
     "supports": 5,
     "transitions": 1,
     "publishEvents": 44,
-    "rawBytes": 967318,
+    "rawBytes": 967367,
     "stagingBytes": 924659,
     "colorValues": {
       "literal": 6,
@@ -24,7 +24,7 @@
     },
     "themeResolution": {
       "formula": 4,
-      "literal": 221,
+      "literal": 222,
       "token": 13
     }
   },
@@ -33,7 +33,7 @@
     "aggregateShare": 12,
     "aggregateWrites": 3,
     "animations": 1,
-    "bytes": 42549,
+    "bytes": 42598,
     "keyframes": 18,
     "media": 1,
     "properties": 61,
@@ -45,7 +45,7 @@
     "supports": 5,
     "transitions": 0,
     "publishEvents": 21,
-    "rawBytes": 223183,
+    "rawBytes": 223232,
     "stagingBytes": 204455,
     "colorValues": {
       "literal": 2,
@@ -53,7 +53,7 @@
     },
     "themeResolution": {
       "formula": 0,
-      "literal": 98,
+      "literal": 99,
       "token": 3
     }
   }

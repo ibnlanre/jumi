@@ -1015,11 +1015,8 @@ Grounding that correction against the emitted sheet turned up a live defect on e
 ```
 
 Two values of one constituent therefore collide on the name, and `emitKeyframe` is
-`if (seen.has(name)) return` — the first candidate compiled wins. Smallest reproduction:
-
-```bash
-pnpm bundle && node scripts/research/identity-collision.mjs
-```
+`if (seen.has(name)) return` — the first candidate compiled wins. As found (`identity-collision.mjs` now
+asserts the repaired behaviour, and the gate arm below is the invariant):
 
 ```text
 candidates  animate-scale-x-[5]  animate-scale-x-[7]        definitions 1: jumi-scale-x
@@ -1060,12 +1057,39 @@ legacy phrase         jumi-scale-<hash(values)>   reads per-candidate slots   2 
 non-typed constituent jumi-backdrop-filter         value-free                  1             correct
 ```
 
+#### The defect, repaired before D.2
+
+The ruling was to fix this **before** D.2 and as its own increment, and it is fixed. The typed constituent
+now reads the candidate's endpoint slot instead of baking the value, so the definition is genuinely
+value-free and one definition serves every authored value:
+
+```diff
+-emitKeyframe(`jumi-${component}`, { from: substrate, to: { ...substrate, [leaf]: canonical } })
++emitKeyframe(`jumi-${component}`, { from: substrate, to: { ...substrate, [leaf]: css('var', endpoint) } })
+```
+
+```text
+candidates  animate-scale-x-[5]  animate-scale-x-[7]        definitions 1: jumi-scale-x
+  animate-scale-x-[5]   jumi-scale-x → 5 1
+  animate-scale-x-[7]   jumi-scale-x → 7 1        ← was 5 1
+
+reversed:   animate-scale-x-[7]  animate-scale-x-[5]        definitions 1: jumi-scale-x
+  animate-scale-x-[5]   jumi-scale-x → 5 1        ← was 7 1
+  animate-scale-x-[7]   jumi-scale-x → 7 1
+```
+
+The permanent guard is `behaviour-check.mjs` section 17, which asserts **both halves** — one definition for
+two values (the reuse) and each element resolving its own (the correctness) — for `scale-x` and the
+`translate` prototype, in both candidate orders, plus a falsification arm that reconstructs the pre-fix
+shape by text. Re-hashing the value into the name would restore correctness by giving up the reuse, which
+is the move that section exists to refuse. `scripts/research/identity-collision.mjs` keeps the four-path
+contrast and the mechanism; the gate keeps the invariant.
+
 Two consequences for D.2, both from that table:
 
-- **The typed constituent has to adopt the body contract its non-typed sibling already has** — read the
-  candidate's endpoint slot instead of baking the value. That converges the two paths and dissolves the
-  collision; it does not need buckets, since `--jumi-<component>-100` and its friends already exist for
-  the non-typed path.
+- **Convergence, not invention.** The typed constituent took the body contract its non-typed sibling
+  already had — the endpoint slot both now read — so there is no second mechanism to carry into the family
+  work, and no buckets were needed, since `--jumi-<component>-100` and its friends already exist.
 - **Value-specific definitions genuinely remain in the whole path and the legacy phrase path**, both of
   which hash values into the name (`jumi-scale-O` for `animate-scale-[2]`, `jumi-scale-P` for `[3]` — two
   definitions whose bodies differ only in the value they bake). And the phrase path's duplication is
@@ -1073,6 +1097,7 @@ Two consequences for D.2, both from that table:
   two definitions with the same stop set differ only in the slot names they read. That is the redundancy a
   value-free identity removes, and it is the part of D.2 the research actually bears on.
 
-Not fixed here. It is a `src/core/index.ts` change on a path with a live release invariant beside it, and
-the arm that belongs in `behaviour-check.mjs` — `[7]` settles at `7 1` — cannot be landed while it fails.
-So the reading lives in the research book until the fix does.
+D.2 therefore resumes from a baseline where "typed constituent definitions are value-free and reusable
+across authored values" is independently true and independently gated, which is what makes the broader
+question askable: can that per-leaf model support the second family and the rest of the typed execution
+surface?

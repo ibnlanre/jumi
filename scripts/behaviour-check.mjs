@@ -1988,6 +1988,180 @@ const typed = [
 
 for (const [claim, ok] of typed) if (!ok) failures.push(`typed: ${claim}`)
 
+/* ------------------------------------------------------------------------------------
+ * 17. A typed constituent definition is value-free, and shared by every authored value
+ *     (added 2026-09-17).
+ * ---------------------------------------------------------------------------------- */
+
+// The defect this guards, found while grounding the definition-identity correction: a typed
+// constituent emitted a definition **named** for the component — `jumi-scale-x`, no value in the
+// name — over a body that **baked** the canonical value. `emitKeyframe` is
+// `if (seen.has(name)) return`, so two authored values of one component collided on that name and
+// the first candidate compiled won: `animate-scale-x-[5]` beside `[7]` produced one definition and
+// **both** elements settled at `5 1`; reversed, both settled at `7 1`. Silent and order-dependent,
+// and uncovered, because every arm above uses one value per constituent.
+//
+// The two halves have to be read together, or a regression that trades one for the other passes:
+// **one** definition (the reuse) and **each element resolving its own value** (the correctness).
+// Re-hashing the value into the name would restore correctness by giving up the reuse, which is the
+// trade the typed path exists to remove — and it is the move this section is here to refuse.
+const reusable = async ({ body, candidates, prefix, property, transform }) => {
+  const compiled = finalizeCss(
+    (await compiler(constituentEntry, root)).build(candidates),
+  ).css
+
+  const css = transform ? transform(compiled) : compiled
+
+  const page = await load(css, body)
+
+  const reading = await page.evaluate(
+    async ({ ids, prefix: startsWith, property: name }) => {
+      const out = {}
+
+      for (const id of ids) {
+        const element = document.getElementById(id)
+        const own = element
+          .getAnimations()
+          .filter(animation =>
+            (animation.animationName ?? '').startsWith(startsWith),
+          )
+
+        if (!own.length) {
+          out[id] = { names: [], values: [] }
+          continue
+        }
+
+        own.forEach(animation => animation.pause())
+
+        const duration = own[0].effect?.getTiming?.().duration ?? 0
+        const values = []
+
+        for (const share of [0, 0.5, 1]) {
+          own.forEach(animation => {
+            animation.currentTime = duration * share
+          })
+
+          await new Promise(resolve => requestAnimationFrame(resolve))
+
+          values.push(getComputedStyle(element)[name])
+        }
+
+        out[id] = {
+          names: own.map(animation => animation.animationName),
+          values,
+        }
+      }
+
+      return out
+    },
+    { ids: ['a', 'b'], prefix, property },
+  )
+
+  await page.close()
+
+  return { css, reading }
+}
+
+/** How many definitions the sheet declares for one name — the reuse half of the contract. */
+const definitionsOf = (css, name) =>
+  (css.match(new RegExp(`@keyframes ${name}\\b`, 'g')) ?? []).length
+
+/** Where an element settled — the correctness half. */
+const settledAt = (measured, id) => measured.reading[id].values.at(-1)
+
+const TWO_VALUES = (utility, first, second) =>
+  ['a', 'b']
+    .map(
+      (id, index) =>
+        `<div id="${id}" class="${index === 0 ? first : second}" style="animation-timing-function: linear"></div>`,
+    )
+    .join('')
+
+const scaleReuse = await reusable({
+  body: TWO_VALUES('scale-x', 'animate-scale-x-[5]', 'animate-scale-x-[7]'),
+  candidates: ['animate-scale-x-[5]', 'animate-scale-x-[7]'],
+  prefix: 'jumi-scale-x',
+  property: 'scale',
+})
+
+/**
+ * The pre-fix shape, reconstructed by text so the falsification tests this build rather than a
+ * remembered one — the same device `withoutFrameLookups` uses above. Baking the **first** candidate's
+ * endpoint back into the body is exactly what the shared definition used to contain, so the second
+ * element should stop resolving its own value.
+ */
+const bakedIntoBody = (css, leaf) => {
+  const baked = css.match(new RegExp(`--jumi-${leaf}-100:\\s*([^;]+);`))
+
+  if (!baked) return css
+
+  return css.replace(
+    new RegExp(`--jumi-${leaf}:\\s*var\\(--jumi-${leaf}-100\\)`, 'g'),
+    `--jumi-${leaf}: ${baked[1].trim()}`,
+  )
+}
+
+const scaleReuseBaked = await reusable({
+  body: TWO_VALUES('scale-x', 'animate-scale-x-[5]', 'animate-scale-x-[7]'),
+  candidates: ['animate-scale-x-[5]', 'animate-scale-x-[7]'],
+  prefix: 'jumi-scale-x',
+  property: 'scale',
+  transform: css => bakedIntoBody(css, 'scale-x'),
+})
+
+const scaleReuseReversed = await reusable({
+  body: TWO_VALUES('scale-x', 'animate-scale-x-[5]', 'animate-scale-x-[7]'),
+  candidates: ['animate-scale-x-[7]', 'animate-scale-x-[5]'],
+  prefix: 'jumi-scale-x',
+  property: 'scale',
+})
+
+const translateReuse = await reusable({
+  body: TWO_VALUES(
+    'translate-x',
+    'animate-translate-x-[10px]',
+    'animate-translate-x-[30px]',
+  ),
+  candidates: ['animate-translate-x-[10px]', 'animate-translate-x-[30px]'],
+  prefix: 'jumi-translate-x',
+  property: 'translate',
+})
+
+const reuse = [
+  [
+    'two authored values of one typed constituent share ONE definition',
+    definitionsOf(scaleReuse.css, 'jumi-scale-x') === 1,
+    `${definitionsOf(scaleReuse.css, 'jumi-scale-x')} definitions for jumi-scale-x`,
+  ],
+  [
+    'and each element resolves its own value',
+    settledAt(scaleReuse, 'a') === '5 1' &&
+      settledAt(scaleReuse, 'b') === '7 1',
+    `read ${settledAt(scaleReuse, 'a')} / ${settledAt(scaleReuse, 'b')}`,
+  ],
+  [
+    'and reversing candidate discovery changes nothing',
+    settledAt(scaleReuseReversed, 'a') === '5 1' &&
+      settledAt(scaleReuseReversed, 'b') === '7 1',
+    `read ${settledAt(scaleReuseReversed, 'a')} / ${settledAt(scaleReuseReversed, 'b')}`,
+  ],
+  [
+    'the same contract holds for the translate prototype',
+    definitionsOf(translateReuse.css, 'jumi-translate-x') === 1 &&
+      settledAt(translateReuse, 'a') === '10px' &&
+      settledAt(translateReuse, 'b') === '30px',
+    `${definitionsOf(translateReuse.css, 'jumi-translate-x')} definitions, read ${settledAt(translateReuse, 'a')} / ${settledAt(translateReuse, 'b')}`,
+  ],
+  [
+    'and the assertion can fail: baking the value back into the body collides',
+    definitionsOf(scaleReuseBaked.css, 'jumi-scale-x') === 1 &&
+      settledAt(scaleReuseBaked, 'b') === '5 1',
+    `read ${settledAt(scaleReuseBaked, 'a')} / ${settledAt(scaleReuseBaked, 'b')}`,
+  ],
+]
+
+for (const [claim, ok] of reuse) if (!ok) failures.push(`reuse: ${claim}`)
+
 await browser.close()
 
 /* ------------------------------------------------------------------------------------
@@ -2091,10 +2265,17 @@ for (const [claim, ok, detail] of typed)
     `    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`,
   )
 
+console.log('\n  typed constituent definition reuse')
+
+for (const [claim, ok, detail] of reuse)
+  console.log(
+    `    ${ok ? '✓' : '✗'} ${claim}${ok || !detail ? '' : ` — ${detail}`}`,
+  )
+
 // Every assertion above that can fail, so the summary line is the count it claims to be: the three
 // activation contexts, the pseudo substrate, the direct carriers, bare, applied, spacing, radius,
-// the three relationship-variant cases, non-inheritance, the six composed sets, and the five typed
-// composition curves section 16 adds.
+// the three relationship-variant cases, non-inheritance, the six composed sets, the five typed
+// composition curves section 16 adds, and the four definition-reuse arms section 17 adds.
 const required =
   contexts.length +
   utilities.length +
@@ -2106,7 +2287,8 @@ const required =
   origins.length +
   radius.length +
   urls.length +
-  typed.length
+  typed.length +
+  reuse.length
 const passing = required - failures.length
 
 console.log(`\n  ${passing}/${required} required contexts and carriers behave`)

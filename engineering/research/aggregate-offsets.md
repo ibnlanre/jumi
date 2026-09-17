@@ -143,16 +143,21 @@ value (`jumi-scale-x`) while baking the value into its body, so two values of on
 that name. Measured, `scripts/research/identity-collision.mjs` (12 assertions):
 
 ```text
-typed constituent      jumi-scale-x               body bakes `--jumi-scale-x: 5`   1 definition   [7] settles at `5 1`
-typed whole            jumi-scale-<hash(values)>  body bakes the leaves            2 definitions  correct
-legacy phrase          jumi-scale-<hash(values)>  body reads per-candidate slots   2 definitions  correct
-non-typed constituent  jumi-backdrop-filter       body reads its own channel       1 definition   correct
+typed constituent      jumi-scale-x               body reads the endpoint slot   1 definition   correct (repaired)
+typed whole            jumi-scale-<hash(values)>  body bakes the leaves          2 definitions  correct
+legacy phrase          jumi-scale-<hash(values)>  body reads per-candidate slots 2 definitions  correct
+non-typed constituent  jumi-backdrop-filter       body reads its own channel     1 definition   correct
 ```
 
+The first row was the defect and is now repaired (`decisions/CTO.md`, 2026-09-17): the body reads the
+candidate's endpoint slot, which is the same surface the non-typed path has always read, and the permanent
+guard is `behaviour-check.mjs` section 17.
+
 The two ends are the finding. A **value-free body under a value-free name** is what lets one definition
-serve every value, and the non-typed constituent path already ships that shape. A **value-bearing body
-under a value-free name** is the worst of both — the identity collides and the first candidate wins,
-order-dependently, with nothing failing. So "value-free" is a statement about the **body** first; a
+serve every value, and the non-typed constituent path already ships that shape — the typed constituent now
+converges on it. A **value-bearing body under a value-free name** is the worst of both — the identity
+collides and the first candidate wins, order-dependently, with nothing failing. So "value-free" is a
+statement about the **body** first; a
 value-free name over a value-bearing body is a collision with extra steps.
 
 ## Decided: per-leaf is the production representation

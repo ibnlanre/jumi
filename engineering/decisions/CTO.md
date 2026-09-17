@@ -451,3 +451,60 @@ with the same stop set differ only in the slot names they read — and the typed
 the arm `[7]` settles at `7 1` belongs in `behaviour-check.mjs` once the typed body reads its slot instead of
 baking the value. Until that fix lands, the reading lives in the research book rather than in the gate, since
 a gate arm that fails cannot be landed.
+
+## 2026-09-17 — the typed constituent body contract is repaired, and gated
+
+The collision was fixed first, as its own narrow correctness increment, before D.2 touches the same
+contract. The repair is convergence rather than invention: the typed constituent now reads the
+candidate's **endpoint slot** (`--jumi-scale-x-100`) instead of baking the canonical value into the
+`@keyframes` body — the same element-local surface the composed-property representation has always read
+for the same purpose:
+
+```diff
+-emitKeyframe(`jumi-${component}`, { from: substrate, to: { ...substrate, [leaf]: canonical } })
++emitKeyframe(`jumi-${component}`, { from: substrate, to: { ...substrate, [leaf]: css('var', endpoint) } })
+```
+
+so the returned rule carries the value (`--jumi-scale-x-100: 5`) and the shared definition reads it. One
+definition, every authored value, each element resolving its own. The fallback is deliberately **absent**
+rather than the resting leaf, because a frame animating `--jumi-scale-x` may not name `--jumi-scale-x` as
+the fallback of the value it assigns to it — that is the cycle measured in the cross-element research.
+
+The naming correction is recorded in the implementation comments rather than only here, because it is the
+part that is easy to get wrong twice:
+
+```text
+value-free name     insufficient
+value-free body     required
+```
+
+A stable-looking keyframe name is not deduplication while the body still holds candidate-specific data.
+
+### Call
+
+> **Land the collision repair first as a narrow correctness increment with its gate arm. Then resume D.2.
+> Do not combine the bug fix and the second-family migration into one change.**
+
+Held to that. `behaviour-check.mjs` section 17 is the permanent guard, and it asserts **both halves** so a
+regression that trades one for the other cannot pass: one definition for two authored values (the reuse)
+and each element resolving its own (the correctness). Re-hashing the value into the name would restore
+correctness by giving up the reuse, which is exactly the move the section exists to refuse. It covers
+`scale-x` and the `translate` prototype, and reversed candidate discovery. The section also carries its own
+falsification — the pre-fix shape reconstructed by text, the device section 15 already uses — so the guard
+tests this build rather than a remembered one: baking the first candidate's endpoint back into the body
+collapses the second element to `5 1`. 73/73 contexts and carriers behave.
+
+**The emitted output change is fully accounted for**, since a snapshot diff is where a repair like this
+should be challenged. Three of the four hunks are one thing: the two carriers swapped position in the
+sheet, which moves them in both aggregate selector lists as well. That is a property of the pipeline rather
+than of this change — a carrier rule's position follows its declaration set, and adding _any_ declaration to
+it flips the order, measured with a dummy declaration that reproduced the swap exactly. It is inert here:
+the two rules' declarations are disjoint except `scale: var(--jumi-scale)`, written to the identical value
+in both, which is also why all 68 pre-existing arms stay green. The fourth hunk is the intended
+substitution. Bytes 99660 → 99709, and `themeResolution.literal` 221 → 222 — the latter is exactly the new
+`--jumi-scale-y-100: 0.2` declaration, since that metric walks tween declaration values and not keyframe
+bodies.
+
+D.2 now starts from a baseline where "typed constituent definitions are value-free and reusable across
+authored values" is independently true and independently gated, which is what makes the broader question
+askable: can that per-leaf model support the second family and the rest of the typed execution surface?
