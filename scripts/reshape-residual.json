@@ -1,0 +1,707 @@
+{
+  "records": [
+    {
+      "candidates": 0,
+      "family": "animation",
+      "openPairs": [
+        "animation-delay"
+      ],
+      "pairCount": 1,
+      "pairs": [
+        "animation-delay"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 0
+    },
+    {
+      "candidates": 0,
+      "family": "animation-range",
+      "openPairs": [
+        "animation-range-start",
+        "animation-range-end"
+      ],
+      "pairCount": 2,
+      "pairs": [
+        "animation-range-start",
+        "animation-range-end"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 0
+    },
+    {
+      "candidates": 0,
+      "family": "animation-timeline",
+      "openPairs": [
+        "animation-timeline-scroll",
+        "animation-timeline-view"
+      ],
+      "pairCount": 2,
+      "pairs": [
+        "animation-timeline-scroll",
+        "animation-timeline-view"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 0
+    },
+    {
+      "candidates": 0,
+      "family": "animation-timeline-scroll",
+      "openPairs": [
+        "animation-timeline-scroller",
+        "animation-timeline-axis"
+      ],
+      "pairCount": 2,
+      "pairs": [
+        "animation-timeline-scroller",
+        "animation-timeline-axis"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 0
+    },
+    {
+      "candidates": 0,
+      "family": "animation-timeline-view",
+      "openPairs": [
+        "animation-timeline-axis",
+        "animation-timeline-inset"
+      ],
+      "pairCount": 2,
+      "pairs": [
+        "animation-timeline-axis",
+        "animation-timeline-inset"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 0
+    },
+    {
+      "candidates": 0,
+      "family": "backdrop-filter",
+      "openPairs": [],
+      "pairCount": 11,
+      "pairs": [
+        "backdrop-filter-blur",
+        "backdrop-filter-brightness",
+        "backdrop-filter-contrast",
+        "backdrop-filter-drop-shadow",
+        "backdrop-filter-grayscale",
+        "backdrop-filter-hue-rotate",
+        "backdrop-filter-invert",
+        "backdrop-filter-opacity",
+        "backdrop-filter-saturate",
+        "backdrop-filter-sepia",
+        "backdrop-filter-url"
+      ],
+      "production": "unchanged",
+      "reason": "separable in six combinations including nested drop-shadow; shipped execution is native-equivalent",
+      "research": "safe-no-need",
+      "routeCount": 0
+    },
+    {
+      "candidates": 0,
+      "family": "backdrop-filter-drop-shadow",
+      "openPairs": [],
+      "pairCount": 4,
+      "pairs": [
+        "backdrop-filter-drop-shadow-offset-x",
+        "backdrop-filter-drop-shadow-offset-y",
+        "backdrop-filter-drop-shadow-blur",
+        "backdrop-filter-drop-shadow-color"
+      ],
+      "production": "unchanged",
+      "reason": "the nested argument of a separable family, measured in both gates",
+      "research": "safe-no-need",
+      "routeCount": 0
+    },
+    {
+      "candidates": 3,
+      "family": "background",
+      "openPairs": [
+        "background-position",
+        "background-repeat",
+        "background-size"
+      ],
+      "pairCount": 3,
+      "pairs": [
+        "background-position",
+        "background-repeat",
+        "background-size"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 3
+    },
+    {
+      "candidates": 2,
+      "family": "background-position",
+      "openPairs": [
+        "background-position-x",
+        "background-position-y"
+      ],
+      "pairCount": 2,
+      "pairs": [
+        "background-position-x",
+        "background-position-y"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 2
+    },
+    {
+      "candidates": 0,
+      "family": "border-block",
+      "openPairs": [
+        "border-block-width"
+      ],
+      "pairCount": 1,
+      "pairs": [
+        "border-block-width"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 0
+    },
+    {
+      "candidates": 2,
+      "family": "border-image",
+      "openPairs": [
+        "border-image-outset",
+        "border-image-repeat"
+      ],
+      "pairCount": 2,
+      "pairs": [
+        "border-image-outset",
+        "border-image-repeat"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 2
+    },
+    {
+      "candidates": 0,
+      "family": "border-inline",
+      "openPairs": [
+        "border-inline-width"
+      ],
+      "pairCount": 1,
+      "pairs": [
+        "border-inline-width"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 0
+    },
+    {
+      "candidates": 0,
+      "family": "box-shadow",
+      "openPairs": [
+        "box-shadow-inset",
+        "box-shadow-outset"
+      ],
+      "pairCount": 2,
+      "pairs": [
+        "box-shadow-inset",
+        "box-shadow-outset"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 0
+    },
+    {
+      "candidates": 0,
+      "family": "filter",
+      "openPairs": [],
+      "pairCount": 11,
+      "pairs": [
+        "filter-blur",
+        "filter-brightness",
+        "filter-contrast",
+        "filter-grayscale",
+        "filter-hue-rotate",
+        "filter-invert",
+        "filter-saturate",
+        "filter-sepia",
+        "filter-opacity",
+        "filter-drop-shadow",
+        "filter-url"
+      ],
+      "production": "unchanged",
+      "reason": "separable in six combinations including nested drop-shadow; shipped execution is native-equivalent",
+      "research": "safe-no-need",
+      "routeCount": 0
+    },
+    {
+      "candidates": 0,
+      "family": "filter-drop-shadow",
+      "openPairs": [],
+      "pairCount": 4,
+      "pairs": [
+        "filter-drop-shadow-offset-x",
+        "filter-drop-shadow-offset-y",
+        "filter-drop-shadow-blur",
+        "filter-drop-shadow-color"
+      ],
+      "production": "unchanged",
+      "reason": "the nested argument of a separable family, measured as an argument and as part of a coexistence arm",
+      "research": "safe-no-need",
+      "routeCount": 0
+    },
+    {
+      "candidates": 0,
+      "family": "math-depth",
+      "openPairs": [],
+      "pairCount": 1,
+      "pairs": [
+        "math-depth-add"
+      ],
+      "production": "migrated",
+      "reason": "the function-argument reshape landed in D.3.6: static shell, typed argument, argument as the subject",
+      "research": "migrated",
+      "routeCount": 0
+    },
+    {
+      "candidates": 0,
+      "family": "matrix",
+      "openPairs": [],
+      "pairCount": 6,
+      "pairs": [
+        "matrix-a",
+        "matrix-b",
+        "matrix-c",
+        "matrix-d",
+        "matrix-tx",
+        "matrix-ty"
+      ],
+      "production": "native",
+      "reason": "coupled: the control passes and both adversarial simultaneous arms diverge",
+      "research": "coupled-native",
+      "routeCount": 0
+    },
+    {
+      "candidates": 0,
+      "family": "matrix-3d",
+      "openPairs": [],
+      "pairCount": 16,
+      "pairs": [
+        "matrix-a1",
+        "matrix-b1",
+        "matrix-c1",
+        "matrix-d1",
+        "matrix-a2",
+        "matrix-b2",
+        "matrix-c2",
+        "matrix-d2",
+        "matrix-a3",
+        "matrix-b3",
+        "matrix-c3",
+        "matrix-d3",
+        "matrix-a4",
+        "matrix-b4",
+        "matrix-c4",
+        "matrix-d4"
+      ],
+      "production": "native",
+      "reason": "coupled: two coefficients moving together diverge from native, and sixteen are not independent",
+      "research": "coupled-native",
+      "routeCount": 0
+    },
+    {
+      "candidates": 2,
+      "family": "object-position",
+      "openPairs": [
+        "object-position-x",
+        "object-position-y"
+      ],
+      "pairCount": 2,
+      "pairs": [
+        "object-position-x",
+        "object-position-y"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 2
+    },
+    {
+      "candidates": 2,
+      "family": "offset-position",
+      "openPairs": [
+        "offset-position-x",
+        "offset-position-y"
+      ],
+      "pairCount": 2,
+      "pairs": [
+        "offset-position-x",
+        "offset-position-y"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 2
+    },
+    {
+      "candidates": 0,
+      "family": "rotate-3d",
+      "openPairs": [],
+      "pairCount": 4,
+      "pairs": [
+        "rotate-x",
+        "rotate-y",
+        "rotate-z",
+        "rotate-angle"
+      ],
+      "production": "native",
+      "reason": "coupled: a fixed axis reproduces native, a turning axis beside a turning angle does not",
+      "research": "coupled-native",
+      "routeCount": 0
+    },
+    {
+      "candidates": 0,
+      "family": "scale-3d",
+      "openPairs": [],
+      "pairCount": 3,
+      "pairs": [
+        "scale-x",
+        "scale-y",
+        "scale-z"
+      ],
+      "production": "unchanged",
+      "reason": "separable (D.3.8, single and three-way); no candidate serves its constituents",
+      "research": "safe-no-need",
+      "routeCount": 0
+    },
+    {
+      "candidates": 2,
+      "family": "skew",
+      "openPairs": [
+        "skew-x",
+        "skew-y"
+      ],
+      "pairCount": 2,
+      "pairs": [
+        "skew-x",
+        "skew-y"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 2
+    },
+    {
+      "candidates": 1,
+      "family": "transform",
+      "openPairs": [
+        "perspective-3d",
+        "skew"
+      ],
+      "pairCount": 7,
+      "pairs": [
+        "perspective-3d",
+        "matrix",
+        "matrix-3d",
+        "rotate-3d",
+        "scale-3d",
+        "skew",
+        "translate-3d"
+      ],
+      "production": "unknown",
+      "reason": "5 of 7 pairs name a family that is already settled, so the family is open only for the rest",
+      "research": "unmeasured",
+      "routeCount": 1
+    },
+    {
+      "candidates": 0,
+      "family": "translate-3d",
+      "openPairs": [],
+      "pairCount": 3,
+      "pairs": [
+        "translate-x",
+        "translate-y",
+        "translate-z"
+      ],
+      "production": "unchanged",
+      "reason": "separable (D.3.8); co-existence with another transform participant already composes, so typed-whole migration repairs nothing",
+      "research": "safe-no-need",
+      "routeCount": 0
+    }
+  ],
+  "tally": {
+    "unmeasured": 15,
+    "safe-no-need": 6,
+    "migrated": 1,
+    "coupled-native": 3
+  },
+  "unmeasured": [
+    {
+      "candidates": 3,
+      "family": "background",
+      "openPairs": [
+        "background-position",
+        "background-repeat",
+        "background-size"
+      ],
+      "pairCount": 3,
+      "pairs": [
+        "background-position",
+        "background-repeat",
+        "background-size"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 3
+    },
+    {
+      "candidates": 2,
+      "family": "background-position",
+      "openPairs": [
+        "background-position-x",
+        "background-position-y"
+      ],
+      "pairCount": 2,
+      "pairs": [
+        "background-position-x",
+        "background-position-y"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 2
+    },
+    {
+      "candidates": 2,
+      "family": "border-image",
+      "openPairs": [
+        "border-image-outset",
+        "border-image-repeat"
+      ],
+      "pairCount": 2,
+      "pairs": [
+        "border-image-outset",
+        "border-image-repeat"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 2
+    },
+    {
+      "candidates": 2,
+      "family": "object-position",
+      "openPairs": [
+        "object-position-x",
+        "object-position-y"
+      ],
+      "pairCount": 2,
+      "pairs": [
+        "object-position-x",
+        "object-position-y"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 2
+    },
+    {
+      "candidates": 2,
+      "family": "offset-position",
+      "openPairs": [
+        "offset-position-x",
+        "offset-position-y"
+      ],
+      "pairCount": 2,
+      "pairs": [
+        "offset-position-x",
+        "offset-position-y"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 2
+    },
+    {
+      "candidates": 2,
+      "family": "skew",
+      "openPairs": [
+        "skew-x",
+        "skew-y"
+      ],
+      "pairCount": 2,
+      "pairs": [
+        "skew-x",
+        "skew-y"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 2
+    },
+    {
+      "candidates": 1,
+      "family": "transform",
+      "openPairs": [
+        "perspective-3d",
+        "skew"
+      ],
+      "pairCount": 7,
+      "pairs": [
+        "perspective-3d",
+        "matrix",
+        "matrix-3d",
+        "rotate-3d",
+        "scale-3d",
+        "skew",
+        "translate-3d"
+      ],
+      "production": "unknown",
+      "reason": "5 of 7 pairs name a family that is already settled, so the family is open only for the rest",
+      "research": "unmeasured",
+      "routeCount": 1
+    },
+    {
+      "candidates": 0,
+      "family": "animation-range",
+      "openPairs": [
+        "animation-range-start",
+        "animation-range-end"
+      ],
+      "pairCount": 2,
+      "pairs": [
+        "animation-range-start",
+        "animation-range-end"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 0
+    },
+    {
+      "candidates": 0,
+      "family": "animation-timeline",
+      "openPairs": [
+        "animation-timeline-scroll",
+        "animation-timeline-view"
+      ],
+      "pairCount": 2,
+      "pairs": [
+        "animation-timeline-scroll",
+        "animation-timeline-view"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 0
+    },
+    {
+      "candidates": 0,
+      "family": "animation-timeline-scroll",
+      "openPairs": [
+        "animation-timeline-scroller",
+        "animation-timeline-axis"
+      ],
+      "pairCount": 2,
+      "pairs": [
+        "animation-timeline-scroller",
+        "animation-timeline-axis"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 0
+    },
+    {
+      "candidates": 0,
+      "family": "animation-timeline-view",
+      "openPairs": [
+        "animation-timeline-axis",
+        "animation-timeline-inset"
+      ],
+      "pairCount": 2,
+      "pairs": [
+        "animation-timeline-axis",
+        "animation-timeline-inset"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 0
+    },
+    {
+      "candidates": 0,
+      "family": "box-shadow",
+      "openPairs": [
+        "box-shadow-inset",
+        "box-shadow-outset"
+      ],
+      "pairCount": 2,
+      "pairs": [
+        "box-shadow-inset",
+        "box-shadow-outset"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 0
+    },
+    {
+      "candidates": 0,
+      "family": "animation",
+      "openPairs": [
+        "animation-delay"
+      ],
+      "pairCount": 1,
+      "pairs": [
+        "animation-delay"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 0
+    },
+    {
+      "candidates": 0,
+      "family": "border-block",
+      "openPairs": [
+        "border-block-width"
+      ],
+      "pairCount": 1,
+      "pairs": [
+        "border-block-width"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 0
+    },
+    {
+      "candidates": 0,
+      "family": "border-inline",
+      "openPairs": [
+        "border-inline-width"
+      ],
+      "pairCount": 1,
+      "pairs": [
+        "border-inline-width"
+      ],
+      "production": "unknown",
+      "reason": "no pass has measured this family",
+      "research": "unmeasured",
+      "routeCount": 0
+    }
+  ]
+}
