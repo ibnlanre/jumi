@@ -2873,3 +2873,69 @@ reviewable change, rather than a half-applied emission nobody can evaluate.
 
 **State.** 9 contract tests in `scripts/lib/anchor.test.mjs`. No `src/` change, nothing promoted. 17/17 stages,
 489 unit tests.
+
+
+## 2026-09-17 — D.3.7 · the generic compound-constituent capability declares itself
+
+### The ruling's correction, accepted
+
+> **Do not land an abstraction literally shaped as "axis-pair."** … a public constituent may require
+> family-level normalization into a complete set of execution leaves. `offset-anchor` is the first consumer of
+> that capability, not the capability itself.
+
+So the typed execution model gains one optional facet, named for the shape and not the family:
+
+```ts
+constituent?: (
+  component: string,
+  value: string,
+  context: Record<string, string>,
+) => Array<[string, string]> | null
+```
+
+with the contract the ruling stated — the public component addressed, its authored endpoint, and enough
+**authoring** state to reconstruct the family's value, returning the complete execution-leaf assignment or
+`null` — and with the two boundaries written into it rather than left to the caller:
+
+```text
+all or nothing   one leaf of a set the family executes together is the half-typed state a decline exists to
+                 prevent, so a partial answer is treated as no answer
+one way          the context is authoring state (the family's components and their rests) and never execution
+                 state read back out — otherwise normalization depends on what was emitted last rather than
+                 on what the author wrote
+```
+
+The **simple path is untouched**, and deliberately: a constituent whose authored component *is* its execution
+leaf still resolves through the leaf's own canonicalizer, which is cheaper and already correct for most typed
+constituents. This facet is an escape hatch for the case D.3.7 falsified the universal rule with — where the
+public component and the interpolation component are not the same thing.
+
+### What landed, and what it is worth on its own
+
+The facet is declared and **inert**: nothing declares an implementation yet and nothing calls it, so the
+emission is byte-identical and all 17 stages pass. Landing it separately is not a half-applied change — it is the
+capability's own definition, reviewable without an emission moving underneath it.
+
+### The measured constraint that sequences the rest
+
+The remaining work cannot be split the way this step was, and the reason is a guard rather than a preference.
+`src/variables/typed-leaves.test.ts` refuses any declared leaf whose route the evidence records as anything but
+`movable`, and `offset-anchor-x/y@offset-anchor` is recorded as **`reshape-required`** — correctly, because the
+current emission is the thing that is wrong. So the execution leaves cannot be declared before the emission
+exists, and the emission cannot be validated before the leaves are declared:
+
+```text
+one atomic increment
+  composition          offset-anchor: var(x-position) var(y-position)
+  execution leaves     offset-anchor-x-position · offset-anchor-y-position  (<length-percentage>)
+  declaration          the two leaves, plus the constituent resolver for the family
+  core                 the constituent path calls it and emits BOTH axes in every frame, or declines
+  then                 snapshot re-record, census counts, four route arms against the shipped build,
+                       and the resting repair asserted (`center 0 center 0 → auto` becoming `50% 50%`)
+```
+
+Every step of that is scoped and nothing in it is undecided; what it is not is divisible while the tree stays
+green, which is the standard this track has held throughout.
+
+**State.** `TypedExecution.constituent` declared in `src/variables/typed-leaves.ts`; no consumer, no emission
+change, nothing promoted. 17/17 stages, 489 unit tests.

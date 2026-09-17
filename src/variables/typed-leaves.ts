@@ -556,6 +556,36 @@ export type TypedExecution = {
    * motion over one property contend for it and the loser goes silent.
    */
   whole: (value: string) => Array<[string, string]> | null
+
+  /**
+   * A **constituent** value → the complete set of execution leaves it assigns, or `null` to decline the route.
+   *
+   * A constituent already has a simple shape, and it stays: the authored component *is* the execution leaf, so
+   * its own canonicalizer is all the resolution it needs, and that path is cheaper and correct for most typed
+   * constituents. This facet is for the **compound** shape, which `offset-anchor` is the first family to prove
+   * exists — and it is declared here rather than as anything named for that family, because the shape is what
+   * was established, not the property that happened to demonstrate it. A future family whose three authoring
+   * components produce two interpolable leaves should need a declaration, not a core feature.
+   *
+   * The contract, deliberately general:
+   *
+   *   given the public component addressed, its authored endpoint, and enough **authoring** state to
+   *   reconstruct the family's value, return the complete execution-leaf assignment — or `null`, which declines
+   *   the entire typed route rather than a part of it.
+   *
+   * Two boundaries are load-bearing, and both were paid for elsewhere in D.3:
+   *
+   * - **All or nothing.** One leaf of a set the family executes together is the half-typed state a decline
+   *   exists to prevent, and the caller treats a partial answer as no answer.
+   * - **One way.** The context is authoring state — the family's own components and their rests — and never
+   *   execution state read back out. Handing a resolved value in as though it were authored would make the
+   *   normalization depend on what was emitted last rather than on what the author wrote.
+   */
+  constituent?: (
+    component: string,
+    value: string,
+    context: Record<string, string>,
+  ) => Array<[string, string]> | null
 }
 
 /**
