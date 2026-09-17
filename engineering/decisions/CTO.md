@@ -3034,3 +3034,31 @@ Also standing: `scripts/research/d3-probe.tmp.mjs` is untracked and not part of 
 
 **State.** No change in this entry. Tip `92ff539`, `src/` untouched since `350c1f4`, nothing promoted, gate 17/17
 with 489 unit tests.
+
+
+## 2026-09-17 — how a failure during the landing is classified
+
+Appended to the ledger above, because that entry says "a concrete implementation failure reopens one of the six"
+and does not say how to tell one. The ruling does, and the order matters — classify **before** touching
+architecture:
+
+```text
+plumbing defect            the intent is right and the code carrying it is wrong: a projection built from the
+                           wrong slots, an endpoint passed as the pair, a frame missing an axis
+                           → fix forward; the ledger is not in question
+
+evidence/guard mismatch    the emission is right and what records it disagrees: a route still marked
+                           `reshape-required` because the validation pass has not measured the new shape yet
+                           → refresh the evidence; still not the ledger
+
+actual assumption failure  one of the six does not hold against the implementation — measured, not felt
+                           → reopen that assumption, and only that one
+```
+
+The reason to classify first is visible in this track's own history: several confident "NO" verdicts during
+D.3.7's spike were plumbing — a pair passed where two endpoints were wanted — and each looked exactly like a
+design that did not work. Only the third category is evidence about the architecture; the first two are evidence
+about the code, and treating them as the same thing is how a working design gets reopened for no reason.
+
+**State.** No change in this entry. Tip `262526f`, `src/` untouched since `350c1f4`, nothing promoted, gate 17/17
+with 489 unit tests.
