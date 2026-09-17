@@ -3753,3 +3753,58 @@ a production increment of its own and is not part of this one: it needs the two 
 the shell owned statically by their compositions, and the compositional arm above as their evidence.
 
 **State.** No production code moved. Gate 17/17, 498 unit tests, 87/87 behaviour arms, `tsc` clean.
+
+---
+
+## The promotion survey: two of its three premises are already true, and the third is not where the ruling put it
+
+Before touching production I surveyed what the two families actually are, and the shape is different enough to
+record rather than implement.
+
+```text
+the shells are already static, and already the families' own
+  transform.ts   scale3d     = scale3d(var(--jumi-scale-x), var(--jumi-scale-y), var(--jumi-scale-z))
+                 translate3d = translate3d(var(--jumi-translate-x), …)
+  property.ts    'scale-3d'     dependencies ['scale-x','scale-y','scale-z'] value scale3d
+                 'translate-3d' dependencies ['translate-x','translate-y','translate-z'] value translate3d
+
+no candidate serves the six pairs as constituents
+  scale-3d/scale-x … translate-3d/translate-z   → no candidate, all six, measured with servingCandidates
+  animate-translate-3d → property('transform', [['translate-3d', args('translate3d')]])   whole-function
+  animate-scale-3d     → absent entirely
+```
+
+So:
+
+**The shell half needs nothing.** Both families already own their shells statically in `src/composition` — that is
+what "static function shell" means here, and it is the D.2 representation, not a new one.
+
+**The constituent half has no route to promote.** The six components are typed under their *own* parents (`scale`,
+`translate`), whose leaves are `movable`; the pairs under the 3-D parents are `no-candidate`, because the only
+candidate near them addresses `transform` with the whole function rather than addressing the parent with a
+constituent. Declaring leaves under `scale-3d`/`translate-3d` would therefore be a census claim about a route that
+does not exist — legal under D.3.7's rule, and inert for execution.
+
+**The one promotable route is `animate-translate-3d`**, the whole-function candidate, and typing it means a `whole`
+facet decomposing `translate3d(a, b, c)` into the three slots. Its justification is not separability — D.3.8 already
+settled that — but **co-existence**: today that route animates `transform` at the property level, and a constituent
+motion on the same element would be written into slots the property-level frames never read. That is the same
+contention D.2 recorded ("the native whole-property animation and a constituent motion over one property contend for
+it and the loser goes silent"), and it is **unmeasured here**. It is the measurement that should justify this
+increment, and it is cheap: one element carrying both classes, the constituent read through the shell.
+
+**And the survey cost two fixture defects, both mine, both the same mistake.** The first two measurements read
+`transform` on an element carrying `animate-scale-x-[0:1|100:2]` and reported `none` at every sample — because that
+phrase spelling writes the **`scale`** property's frames (`jumi-scale-1vrwYB`), and `scale` is not `transform`. The
+3-D shell lives inside `transform`'s composition and is only exercised by a candidate that addresses `transform`.
+That is six fixture defects in this track now, all of the same family: a measurement pointed at the wrong observable
+reads exactly like a mechanism that does not work.
+
+**Recommendation, and it is narrower than the ruling.** Promote `animate-translate-3d` to typed per-argument
+execution with a `whole` facet, gated on the co-existence measurement above; declare the six 3-D pairs as authors'
+surface only if a census claim without a route is wanted, and expect it to be inert; leave `scale-3d` alone
+otherwise, since it has no candidate at all. `rotate-3d`, `matrix` and `matrix-3d` stay coupled and untouched, as
+ruled.
+
+**State.** No production code moved and no scratch file left behind. Gate 17/17, 498 unit tests, 87/87 behaviour arms,
+`tsc` clean.
