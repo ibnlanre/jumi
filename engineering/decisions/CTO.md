@@ -2265,3 +2265,34 @@ that addresses nothing at all.
 **State.** 17/17 stages, 480 unit tests. Next: `offset-anchor`, starting from the browser grammar rather than
 from the current four-leaf vocabulary, with "two `<length-percentage>` axes" treated as the hypothesis to
 falsify rather than the answer.
+
+
+## 2026-09-17 — correction: only one of the two comment fixtures is a demonstrated arm
+
+The entry above claims that both fixture shapes were "checked against a walk with the stripping removed". That
+was written before the check was run, and the check disagrees. Appended rather than edited, because the log is
+append-only and a wrong claim is better corrected in the open than quietly reworded.
+
+Measured, with `readCandidate`'s strip bypassed:
+
+```text
+a comment carrying add(          the fixture FAILS — `attribute: null`, parts `[]`
+                                 exactly the fingerprint D.3.6 chased for two increments
+a comment carrying an apostrophe the fixture PASSES — a part's first quoted string is still found
+```
+
+So the parenthesis fixture is an arm for a measured failure; the apostrophe fixture is a guard for a shape that
+has to stay inert, and its own docstring now says so. Two further consequences worth stating plainly:
+
+**The apostrophe was never demonstrated to be a cause.** The comment that carried it was reworded a second time
+before the run that finally read correctly, so the correction was attributed to a change that was never
+isolated. The commit history does not support the inference the earlier entry made, and nothing else does
+either.
+
+**A quick reproduction is not a falsification.** Before doing the bypass properly, the same two texts were run
+through a hand-written walk, which reported the parenthesis case as failing and the apostrophe case as passing
+— and that is what the wrong claim was built on. The walk in the reader is two functions, an outer balanced
+read and a separate parts split, and modelling the first is not modelling the reader. The bypass is the
+falsification; the reproduction was an illustration.
+
+**State.** 17/17 stages, 480 unit tests.

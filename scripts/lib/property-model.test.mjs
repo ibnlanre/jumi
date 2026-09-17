@@ -143,13 +143,16 @@ describe('readCandidates', () => {
  */
 describe('the candidate walk', () => {
   /**
-   * The two shapes a comment can take that made an entry **unreadable**, both measured during D.3.6.
+   * What a comment can carry into an entry, and which of it is **demonstrated** to matter.
    *
-   * The walk splits on parentheses and quotes, so a comment is structure to it: a stray `(` leaves the call
-   * unclosed and an apostrophe opens a string that never closes. Both left the same fingerprint — the pair
-   * had no candidate, no route and no derivation, and nothing pointed at a comment. Those are the fixtures
-   * this walk exists to be pinned by, and they are the reason it is a pure function of the entry's text
-   * rather than a loop buried in a reader that only ever runs over fixed paths.
+   * The walk splits on parentheses and quotes, so a comment is structure to it. Bypassing the strip is how
+   * these are checked, and it separates them: the unbalanced parenthesis makes the whole entry unreadable —
+   * `attribute: null`, the fingerprint D.3.6 spent two increments chasing — while the apostrophe does not,
+   * because a part's first quoted string is still found. So the first is an arm for a measured failure and the
+   * second is a guard for a shape that has to stay inert.
+   *
+   * An earlier entry in the log claimed both were measured failures. That was an inference, and the bypass
+   * disproves it; the correction is appended there rather than edited in.
    */
   it('reads a part written below a comment carrying an unbalanced parenthesis', () => {
     const entry = `
