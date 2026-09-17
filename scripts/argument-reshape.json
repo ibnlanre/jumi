@@ -1,0 +1,299 @@
+{
+  "findings": [
+    {
+      "canary": [
+        "2",
+        "2",
+        "2",
+        "2",
+        "2"
+      ],
+      "consumer": "math-depth",
+      "emitted": [
+        "0",
+        "0",
+        "2",
+        "2",
+        "2"
+      ],
+      "leaf": "math-depth-add",
+      "magnitude": 0,
+      "parent": "math-depth",
+      "probe": "2",
+      "reshaped": [
+        "0",
+        "1",
+        "1",
+        "2",
+        "2"
+      ],
+      "rest": "0",
+      "shape": "phrase",
+      "shell": "add",
+      "syntax": "<integer>",
+      "note": "discrete as emitted (2 steps) and interpolated by the reshape (3)",
+      "outcome": "reshape-unlocks"
+    },
+    {
+      "canary": [
+        "7",
+        "7",
+        "7",
+        "7",
+        "7"
+      ],
+      "consumer": "math-depth",
+      "emitted": [
+        "0",
+        "0",
+        "7",
+        "7",
+        "7"
+      ],
+      "leaf": "math-depth-add",
+      "magnitude": 1,
+      "parent": "math-depth",
+      "probe": "7",
+      "reshaped": [
+        "0",
+        "2",
+        "4",
+        "5",
+        "7"
+      ],
+      "rest": "0",
+      "shape": "phrase",
+      "shell": "add",
+      "syntax": "<integer>",
+      "note": "discrete as emitted (2 steps) and interpolated by the reshape (5)",
+      "outcome": "reshape-unlocks"
+    }
+  ],
+  "source": "D.3.6 · scripts/research/d3-argument.mjs",
+  "survey": [
+    {
+      "leaf": "backdrop-filter-blur",
+      "shape": "phrase",
+      "shell": "blur",
+      "value": "css('blur', '0')",
+      "shapes": [
+        "leaf",
+        "phrase"
+      ]
+    },
+    {
+      "leaf": "backdrop-filter-brightness",
+      "shape": "phrase",
+      "shell": "brightness",
+      "value": "css('brightness', '1')",
+      "shapes": [
+        "leaf",
+        "phrase"
+      ]
+    },
+    {
+      "leaf": "backdrop-filter-contrast",
+      "shape": "phrase",
+      "shell": "contrast",
+      "value": "css('contrast', '1')",
+      "shapes": [
+        "leaf",
+        "phrase"
+      ]
+    },
+    {
+      "leaf": "backdrop-filter-drop-shadow",
+      "shape": "phrase",
+      "shell": "drop-shadow",
+      "shapes": [
+        "phrase"
+      ]
+    },
+    {
+      "leaf": "backdrop-filter-grayscale",
+      "shape": "phrase",
+      "shell": "grayscale",
+      "value": "css('grayscale', '0')",
+      "shapes": [
+        "leaf",
+        "phrase"
+      ]
+    },
+    {
+      "leaf": "backdrop-filter-hue-rotate",
+      "shape": "phrase",
+      "shell": "hue-rotate",
+      "value": "css('hue-rotate', '0deg')",
+      "shapes": [
+        "leaf",
+        "phrase"
+      ]
+    },
+    {
+      "leaf": "backdrop-filter-invert",
+      "shape": "phrase",
+      "shell": "invert",
+      "value": "css('invert', '0')",
+      "shapes": [
+        "leaf",
+        "phrase"
+      ]
+    },
+    {
+      "leaf": "backdrop-filter-opacity",
+      "shape": "phrase",
+      "shell": "opacity",
+      "value": "css('opacity', '1')",
+      "shapes": [
+        "leaf",
+        "phrase"
+      ]
+    },
+    {
+      "leaf": "backdrop-filter-saturate",
+      "shape": "phrase",
+      "shell": "saturate",
+      "value": "css('saturate', '1')",
+      "shapes": [
+        "leaf",
+        "phrase"
+      ]
+    },
+    {
+      "leaf": "backdrop-filter-sepia",
+      "shape": "phrase",
+      "shell": "sepia",
+      "value": "css('sepia', '0')",
+      "shapes": [
+        "leaf",
+        "phrase"
+      ]
+    },
+    {
+      "leaf": "backdrop-filter-url",
+      "shape": "phrase",
+      "shell": "url",
+      "value": "css('opacity', '1')",
+      "shapes": [
+        "leaf",
+        "phrase"
+      ]
+    },
+    {
+      "leaf": "filter-blur",
+      "shape": "phrase",
+      "shell": "blur",
+      "value": "css('blur', '0')",
+      "shapes": [
+        "leaf",
+        "phrase"
+      ]
+    },
+    {
+      "leaf": "filter-brightness",
+      "shape": "phrase",
+      "shell": "brightness",
+      "value": "css('brightness', '1')",
+      "shapes": [
+        "leaf",
+        "phrase"
+      ]
+    },
+    {
+      "leaf": "filter-contrast",
+      "shape": "phrase",
+      "shell": "contrast",
+      "value": "css('contrast', '1')",
+      "shapes": [
+        "leaf",
+        "phrase"
+      ]
+    },
+    {
+      "leaf": "filter-drop-shadow",
+      "shape": "phrase",
+      "shell": "drop-shadow",
+      "shapes": [
+        "phrase"
+      ]
+    },
+    {
+      "leaf": "filter-grayscale",
+      "shape": "phrase",
+      "shell": "grayscale",
+      "value": "css('grayscale', '0')",
+      "shapes": [
+        "leaf",
+        "phrase"
+      ]
+    },
+    {
+      "leaf": "filter-hue-rotate",
+      "shape": "phrase",
+      "shell": "hue-rotate",
+      "value": "css('hue-rotate', '0deg')",
+      "shapes": [
+        "leaf",
+        "phrase"
+      ]
+    },
+    {
+      "leaf": "filter-invert",
+      "shape": "phrase",
+      "shell": "invert",
+      "value": "css('invert', '0')",
+      "shapes": [
+        "leaf",
+        "phrase"
+      ]
+    },
+    {
+      "leaf": "filter-opacity",
+      "shape": "phrase",
+      "shell": "opacity",
+      "value": "css('opacity', '1')",
+      "shapes": [
+        "leaf",
+        "phrase"
+      ]
+    },
+    {
+      "leaf": "filter-saturate",
+      "shape": "phrase",
+      "shell": "saturate",
+      "value": "css('saturate', '1')",
+      "shapes": [
+        "leaf",
+        "phrase"
+      ]
+    },
+    {
+      "leaf": "filter-sepia",
+      "shape": "phrase",
+      "shell": "sepia",
+      "value": "css('sepia', '0')",
+      "shapes": [
+        "leaf",
+        "phrase"
+      ]
+    },
+    {
+      "leaf": "filter-url",
+      "shape": "phrase",
+      "shell": "url",
+      "value": "css('opacity', '1')",
+      "shapes": [
+        "leaf",
+        "phrase"
+      ]
+    },
+    {
+      "leaf": "math-depth-add",
+      "shape": "phrase",
+      "shell": "add",
+      "shapes": [
+        "phrase"
+      ]
+    }
+  ]
+}

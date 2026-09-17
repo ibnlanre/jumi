@@ -1688,3 +1688,164 @@ and, kept apart:       the five union-syntax routes of scale/translate are NOT u
 **State.** No composition patched, no production change: `src/` is untouched by this increment and the generated
 map is unchanged, so the rerun proof from the promotion still stands. 17/17 stages, 79/79 behaviour, 477 unit
 tests.
+
+
+## 2026-09-17 — D.3.6 · the function-argument reshape: the primitive works, and the subject it changes
+
+### The question
+
+> **Can Jumi represent and animate a typed argument inside a static function shell without introducing a
+> family-specific execution path?**
+
+`math-depth` is the proving case, chosen at ruling time because it is the smaller one: one function, one
+argument, one slot, and none of `<position>`'s grammar, axis semantics, logical directions, `calc()`,
+percentages or edge keywords mixed in. The secondary question was whether the shape generalises past the
+property that forced it.
+
+### The survey: 23 leaves, and two places the shell is written
+
+Structural, read from the model rather than remembered — a leaf's value can be wrapped in a function in two
+places, and searching only one of them would have missed the case this pass exists to prove:
+
+```text
+leaf shape      the entry's own rest is a call        variables/property.ts: value: css('blur', '0')
+phrase shape    the candidate's part wraps the value  properties/tween.ts: ['math-depth-add', value => css('add', value)]
+```
+
+```text
+filter-blur · filter-brightness · filter-contrast · filter-drop-shadow · filter-grayscale ·
+filter-hue-rotate · filter-invert · filter-opacity · filter-saturate · filter-sepia · filter-url
+backdrop-filter-{the same eleven}
+math-depth-add                     ← phrase shape alone; a rest-only survey finds nothing about it
+```
+
+`math-depth-add` is in the second shape only, which is the whole reason the survey reads both: the shell is
+invisible everywhere except the frames.
+
+### The fact that decides the repair: the emission animates the property, not the leaf
+
+```text
+what the class emits        --jumi-math-depth-add-sluPV-0:   add(0)
+                            --jumi-math-depth-add-sluPV-100: add(2)
+what the frames do          @keyframes jumi-math-depth-sluPV {
+                              0%   { math-depth: var(--jumi-math-depth-add-sluPV-0, var(--jumi-math-depth-add)) }
+                              100% { math-depth: var(--jumi-math-depth-add-sluPV-100, var(--jumi-math-depth-add)) }
+                            }
+```
+
+So the shell is written into the **property's** frame variables, the *subject* the frames animate is
+`math-depth` itself, and `math-depth` is not registered — which is why the series is a discrete flip rather
+than a series. Moving the shell inside those same frames changes nothing; the first version of the proposal
+assumed there was a declaration of the leaf to take the shell out of, and the emission answered that there is
+none.
+
+### The proposal, in full
+
+```css
+@property --jumi-math-depth-add { syntax: '<integer>'; inherits: false; initial-value: 0; }
+
+#e         { math-depth: add(var(--jumi-math-depth-add)); }   /* the composition owns the shell */
+@keyframes { from { --jumi-math-depth-add: 0 } to { --jumi-math-depth-add: 2 } }   /* the frames animate the argument */
+```
+
+One registration, one substitution, and the frames' **subject** moved from the property to the argument.
+Nothing else. No branch on the property's name, no table of functions, no family-specific execution path.
+
+### The measurement, against the shipped sheet
+
+The emitted arm is the real sheet and the real class, unchanged. The proposal arm is that same sheet plus
+exactly the three things above, all of them read out of the emission or the derivation: the syntax and rest
+from the derivation, the shell from the survey, the consumer's read from the composition as emitted.
+
+```text
+math-depth   0 -> 2    emitted  0 · 0 · 2 · 2 · 2     proposed  0 · 1 · 1 · 2 · 2     canary 2
+math-depth   0 -> 7    emitted  0 · 0 · 7 · 7 · 7     proposed  0 · 2 · 4 · 5 · 7     canary 7
+```
+
+The emission flips at the midpoint; the proposal interpolates, in the engine's own integer rounding (`0 → 7`
+over five samples is `0 · 1.75 · 3.5 · 5.25 · 7`, serialised rounded), with the endpoints unchanged. The
+canary pins the leaf to the far frame and reads the property: `2` and `7`, so the fixture can see the
+argument it is reporting on.
+
+### Two corrections this pass paid for, both in the harness
+
+**"Moving" is not one thing.** The first classification called the emitted arm `already-moving`, because it
+does move — in the two steps of a discrete flip. A discrete series is the two stops and nothing else; an
+interpolated one has values between them. The tally now separates the two, and treats *discrete in both
+arms* as an arm defect rather than a finding, alongside *endpoints moved*, which would be a different motion
+rather than the same one interpolated.
+
+**A pin is constant by construction.** The first canary asked for variation across the wall and therefore
+reported every working pin as blindness. What a canary has to establish is that the consumer *deviates from
+its unpinned reading* when the leaf is pinned — not that the pinned reading varies. And the fixture's
+element is part of the observable: `math-depth` applies to MathML, so the first run's `<div>` read the
+initial value whatever the frames said, and reported the pair `fixture-unobservable` for the fixture's
+shape rather than for the representation's.
+
+### What this says about the reshape machinery
+
+It needs one new capability and no new abstraction. The ruling states the primitive:
+
+> **For a shell-shaped constituent, the static composition owns the shell and the animation owns only the
+> independently interpolable argument.**
+
+which is the typed-leaf thesis rather than a departure from it, so no separate "function animation
+subsystem" is required. That consistency is structural: the 22 `filter` and `backdrop-filter` slots have the
+same shell in their frames, and their compositions already read the leaf — **the same execution
+transformation is structurally applicable to the 22 surveyed filter/backdrop-filter leaves; whether it is
+behaviorally equivalent remains unmeasured.**
+
+This pass measured only `math-depth-add`, because it is the only surveyed leaf the derivation currently
+plans for (`<integer>`, two magnitudes). The other 22 are **not** therefore `movable`, and this entry does
+not claim it: they are unmeasured, which is what the release rule says an unmeasured pair is.
+
+### The two origins of the shell are kept apart, deliberately
+
+The survey found the shell in two structural places — the entry's own rest (`value: css('blur', '0')`) and the
+candidate's part (`['math-depth-add', value => css('add', value)]`) — and the ruling's instruction is not to
+normalize them into "same source metadata": they say **where the shell's semantics currently live**. The
+eventual abstraction may unify *execution*, but the reader still has to prove the shell from whichever
+structural source owns it, or the model risks inventing a generic wrapper it never declared.
+
+So the invariant, as ruled:
+
+```text
+shell-shaped execution is available only when the model can structurally identify:
+
+  leaf · shell function · argument position · static consumer composition · typed representation
+
+no function-name guessing
+```
+
+### The ruling that follows
+
+> **Commit D.3.6. Before opening the offset-anchor reshape, run a very small second-family falsification of
+> the function-argument primitive using representative filter/backdrop-filter leaves. Do not classify or
+> migrate all 22. If the same generic subject relocation survives, implement the primitive generically,
+> rerun `math-depth-add` against production, and close the function-argument reshape track. Then move to
+> `offset-anchor`.**
+
+The falsification is the D.2-style test this track has used before: *does the same subject relocation work in
+a second family without changing core behaviour?* Two representatives, not a census — and the production
+shape it licenses is a detection, never a list:
+
+```text
+detect shell-shaped typed constituent → frame animates typed argument → composition retains shell
+
+not:  if math-depth …   /   if filter …
+```
+
+### The outstanding state, at route level
+
+```text
+measured this pass     math-depth-add · 2 routes · reshape-unlocks, endpoints preserved
+surveyed, unmeasured   the 22 filter/backdrop-filter slots — structurally applicable, behaviourally
+                       unproven; a second-family falsification is ruled next, on representatives only
+reshape-required       offset-anchor-x/y                             2 routes  (report recorded above)
+unresolved             rotate-x · rotate-y (no native baseline)      2 routes
+fixture-unobservable   rotate-z · mask-border-outset ×4              5 routes
+```
+
+**State.** No `src/` change, nothing promoted, no production decision: the pass writes
+`scripts/argument-reshape.json` and a survey, and the release rule is unchanged — evidence attaches to the
+route and representation that ships. 17/17 stages, 79/79 behaviour, 477 unit tests.
