@@ -19,8 +19,7 @@
           "25% 50%",
           "12.5% 50%",
           "0% 50%"
-        ],
-        "unblockedSeries": null
+        ]
       },
       "execution": {
         "assigned": [
@@ -56,8 +55,7 @@
           "50% 25%",
           "50% 12.5%",
           "50% 0%"
-        ],
-        "unblockedSeries": null
+        ]
       },
       "execution": {
         "assigned": [
@@ -73,86 +71,6 @@
       "representation": "resolved positional components",
       "route": "offset-anchor/offset-anchor-y-edge@offset-anchor",
       "verdict": "movable"
-    },
-    {
-      "authoring": {
-        "component": "offset-anchor-x-offset",
-        "context": [
-          "offset-anchor-x-edge",
-          "offset-anchor-y-edge",
-          "offset-anchor-y-offset"
-        ]
-      },
-      "condition": "declines, and no sibling authoring state unblocks it: the projection is built when this candidate compiles, from this candidate’s own slots, so another class cannot supply the edge the offset needs beside it",
-      "consumer": "offset-anchor",
-      "evidence": {
-        "book": "scripts/research/d3-authoring-routes.mjs",
-        "series": [
-          "auto",
-          "auto",
-          "auto",
-          "auto",
-          "auto"
-        ],
-        "unblockedSeries": [
-          "50% 50%",
-          "37.5% 50%",
-          "25% 50%",
-          "12.5% 50%",
-          "0% 50%"
-        ]
-      },
-      "execution": {
-        "assigned": [],
-        "leaves": [
-          "offset-anchor-x-position",
-          "offset-anchor-y-position"
-        ]
-      },
-      "parent": "offset-anchor",
-      "representation": "resolved positional components",
-      "route": "offset-anchor/offset-anchor-x-offset@offset-anchor",
-      "verdict": "declined"
-    },
-    {
-      "authoring": {
-        "component": "offset-anchor-y-offset",
-        "context": [
-          "offset-anchor-x-edge",
-          "offset-anchor-x-offset",
-          "offset-anchor-y-edge"
-        ]
-      },
-      "condition": "declines, and no sibling authoring state unblocks it: the projection is built when this candidate compiles, from this candidate’s own slots, so another class cannot supply the edge the offset needs beside it",
-      "consumer": "offset-anchor",
-      "evidence": {
-        "book": "scripts/research/d3-authoring-routes.mjs",
-        "series": [
-          "auto",
-          "auto",
-          "auto",
-          "auto",
-          "auto"
-        ],
-        "unblockedSeries": [
-          "50% 50%",
-          "50% 37.5%",
-          "50% 25%",
-          "50% 12.5%",
-          "50% 0%"
-        ]
-      },
-      "execution": {
-        "assigned": [],
-        "leaves": [
-          "offset-anchor-x-position",
-          "offset-anchor-y-position"
-        ]
-      },
-      "parent": "offset-anchor",
-      "representation": "resolved positional components",
-      "route": "offset-anchor/offset-anchor-y-offset@offset-anchor",
-      "verdict": "declined"
     }
   ]
 }

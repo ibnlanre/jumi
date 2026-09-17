@@ -24,7 +24,7 @@ import path from 'node:path'
 
 import * as compileLib from '../lib/compile.mjs'
 import * as cssLib from '../lib/css.mjs'
-import { readTypedExecutions } from '../lib/property-model.mjs'
+import { readCandidates, readTypedExecutions } from '../lib/property-model.mjs'
 
 const { compiler } = compileLib
 const finalizeCss = compileLib.finalizeCss ?? cssLib.finalizeCss
@@ -33,25 +33,40 @@ const root = path.resolve(import.meta.dirname, '..', '..')
 const FAMILY = 'offset-anchor'
 const ENTRY = `\n@import "tailwindcss" source(none);\n@plugin "${path.join(root, 'dist', 'index.js')}";\n`
 
-/** The value each component's grammar accepts as a probe, and the sibling state that unblocks an offset route. */
-const ROUTES = [
-  { component: 'offset-anchor-x-edge', probe: 'left' },
-  { component: 'offset-anchor-y-edge', probe: 'top' },
-  { component: 'offset-anchor-x-offset', probe: '10px' },
-  { component: 'offset-anchor-y-offset', probe: '10px' },
-]
-
 /**
- * The sibling state an offset route needs, and it is measured rather than declared: `axisPosition` refuses
- * `center` over a non-zero offset, so the route resolves only beside an edge that is not `center`.
+ * The value each component's grammar accepts, per axis. Declared rather than guessed: a component without one is an
+ * error rather than a default, because a probe invented here would measure a route the candidate never claimed.
  */
-const UNBLOCKS = {
-  'offset-anchor-x-offset': 'animate-offset-anchor-x-edge-[left]',
-  'offset-anchor-y-offset': 'animate-offset-anchor-y-edge-[top]',
+const PROBES = {
+  'offset-anchor-x-edge': 'left',
+  'offset-anchor-y-edge': 'top',
 }
 
 const surface = readTypedExecutions().get(FAMILY)?.authoring ?? []
 const LEAVES = ['offset-anchor-x-position', 'offset-anchor-y-position']
+
+/**
+ * The routes are **derived from the candidate table**, not listed, and that is the point of the book rather than a
+ * convenience: a route is an entrance an author can enter through, so a component no candidate addresses has no
+ * route to evidence. The two offset components are still authoring state — the resolver reads them, and the model
+ * declares them — and they are not routes, because their candidate was retired when measurement showed no
+ * invocation of it could ever move. Valid authoring state does not have to deserve an animation candidate.
+ */
+const addressed = new Set(
+  readCandidates()
+    .filter(one => one.attribute === FAMILY)
+    .flatMap(one => one.parts),
+)
+
+const ROUTES = surface
+  .filter(component => addressed.has(component))
+  .map(component => {
+    const probe = PROBES[component]
+
+    if (!probe) throw new Error(`no probe is declared for \`${component}\``)
+
+    return { component, probe }
+  })
 const series = async classes => {
   const css = finalizeCss((await compiler(ENTRY, root)).build(classes)).css
   const browser = await chromium.launch()
@@ -111,26 +126,16 @@ const leavesOf = (read, component) => {
 for (const { component, probe } of ROUTES) {
   const klass = `animate-${component}-[${probe}]`
   const resting = await series([klass])
-  const unblocked = UNBLOCKS[component]
-    ? await series([klass, UNBLOCKS[component]])
-    : null
   const moves = read => new Set(read.values).size > 1
-  const restingLeaves = leavesOf(resting, component)
-  const unblockedLeaves = unblocked ? leavesOf(unblocked, component) : []
+  const assigned = leavesOf(resting, component)
 
   /**
    * The verdict is decided by the **emitted assignment**, not by the series, and that is a correction the first
-   * run forced: the unblocked series for an offset route is dominated by the sibling edge route's motion, so a
-   * series can look like the offset route moving when it is the edge beside it. What a route proves is that it
-   * enters typed execution — both leaves written — and only then does the series say whether it moves.
+   * run forced: a series can be dominated by the frames of a class the reader did not name. What a route proves is
+   * that it enters typed execution — both leaves written — and only then does the series say whether it moves.
    */
   const verdict =
-    restingLeaves.length && moves(resting)
-      ? 'movable'
-      : unblockedLeaves.length
-        ? 'conditional'
-        : 'declined'
-  const assigned = verdict === 'conditional' ? unblockedLeaves : restingLeaves
+    assigned.length && moves(resting) ? 'movable' : 'declined'
 
   records.push({
     authoring: {
@@ -138,16 +143,13 @@ for (const { component, probe } of ROUTES) {
       context: surface.filter(one => one !== component),
     },
     condition:
-      verdict === 'conditional'
-        ? `resolves beside \`${UNBLOCKS[component]}\`; from the resting authoring state the route emits no execution assignment`
-        : verdict === 'declined'
-          ? 'declines, and no sibling authoring state unblocks it: the projection is built when this candidate compiles, from this candidate\u2019s own slots, so another class cannot supply the edge the offset needs beside it'
-          : null,
+      verdict === 'declined'
+        ? 'declines, and no sibling authoring state unblocks it: the projection is built when this candidate compiles, from this candidate\u2019s own slots'
+        : null,
     consumer: FAMILY,
     evidence: {
       book: 'scripts/research/d3-authoring-routes.mjs',
       series: resting.values,
-      unblockedSeries: unblocked?.values ?? null,
     },
     execution: { assigned, leaves: LEAVES },
     parent: FAMILY,
@@ -163,7 +165,7 @@ fs.writeFileSync(target, `${JSON.stringify({ records }, null, 2)}\n`)
 
 for (const one of records)
   console.log(
-    `${one.authoring.component.padEnd(26)} ${one.verdict.padEnd(11)} assigned=${one.execution.assigned.join('+') || 'none'}  ${one.evidence.series.join(' → ')}${one.evidence.unblockedSeries ? `   |  beside the sibling: ${one.evidence.unblockedSeries.join(' → ')}` : ''}`,
+    `${one.authoring.component.padEnd(26)} ${one.verdict.padEnd(11)} assigned=${one.execution.assigned.join('+') || 'none'}  ${one.evidence.series.join(' → ')}`,
   )
 
 console.log(`\nwritten to \`${path.relative(root, target)}\``)

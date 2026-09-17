@@ -641,25 +641,37 @@ const authoringEvidence: AuthoringEvidence = JSON.parse(
 )
 
 describe('authoring-route evidence', () => {
-  it('evidences every authoring component of a compound family, and nothing else', () => {
+  it('evidences every authoring component that has a route, and nothing else', () => {
     // The durable rule D.3.7 proved: a **simple** constituent is evidenced as one component to one leaf, and a
     // **compound** one is evidenced as an authoring component plus the sibling context its resolver reads,
-    // resolving to a complete execution assignment. The shapes are different because the things are different,
-    // and forcing the second into the first would hide the fact that makes it work.
-    const expected = Object.entries(typedExecutions).flatMap(
-      ([attribute, execution]) =>
-        execution.constituent
-          ? (execution.authoring ?? []).map(
-              component => `${attribute}/${component}`,
-            )
-          : [],
+    // resolving to a complete execution assignment.
+    //
+    // The expected set is read from the **candidate table** rather than from the authoring surface, and that is
+    // the last distinction this track forced: a route is an entrance an author can enter through, so a component
+    // no candidate addresses has no route to evidence — while remaining perfectly valid authoring state that the
+    // resolver reads and other classes may write. Valid authoring state does not have to deserve an animation
+    // candidate, and a record for a route nothing can invoke would be a memory rather than evidence.
+    const routes = Object.entries(typedExecutions).flatMap(
+      ([attribute, execution]) => {
+        if (!execution.constituent) return []
+
+        const addressed = new Set(
+          readCandidates()
+            .filter(one => one.attribute === attribute)
+            .flatMap(one => one.parts),
+        )
+
+        return (execution.authoring ?? [])
+          .filter(component => addressed.has(component))
+          .map(component => `${attribute}/${component}`)
+      },
     )
 
     expect(
       authoringEvidence.records
         .map(one => `${one.parent}/${one.authoring.component}`)
         .sort(),
-    ).toEqual(expected.sort())
+    ).toEqual(routes.sort())
   })
 
   it('resolves each one to the family’s complete assignment, or says it declines', () => {

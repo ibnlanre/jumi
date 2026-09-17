@@ -1873,20 +1873,18 @@ export const getMatchTween: GetMatchComponents = creator => {
       type: 'position',
       values: objectPosition,
     },
-    'animate-offset-anchor-x-offset': {
-      fn: property('offset-anchor', ['offset-anchor-x-offset']),
-      type: ['length', 'percentage'],
-      values: percentage,
-    },
+    // `animate-offset-anchor-x-offset` and `-y-offset` were here, and they are gone for the same reason the two
+    // groups went: measured, they have never represented a working motion and the reshape cannot make them one.
+    // The resolver needs the sibling edge beside the offset to resolve either, and an offset candidate carries
+    // only its own value — a projection is built when *that* candidate compiles, from *that* candidate's slots,
+    // so a second class on the element cannot supply the edge. `center` over a non-zero offset is refused by
+    // contract, and a route whose only invocation declines is dead authoring surface rather than a supported
+    // route with a verdict: **valid authoring state does not have to deserve an animation candidate**. The
+    // leaves remain model facts, because the resolver reads them.
     'animate-offset-anchor-y-edge': {
       fn: property('offset-anchor', ['offset-anchor-y-edge']),
       type: 'position',
       values: objectPosition,
-    },
-    'animate-offset-anchor-y-offset': {
-      fn: property('offset-anchor', ['offset-anchor-y-offset']),
-      type: ['length', 'percentage'],
-      values: percentage,
     },
     'animate-offset-distance': {
       fn: property('offset-distance'),

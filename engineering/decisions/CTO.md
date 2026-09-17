@@ -3452,3 +3452,38 @@ projects the second from the first, and the composition reads the second — one
 above. The six assumptions were never reopened; the one boundary that came close — D.3.6's rule that phrases bypass
 typed execution — was tested against the shipped behaviour and **upheld**, with a rejection added for the frame shape
 that measurement proved cannot move.
+
+---
+
+## Amendment, one notch: the offset routes are dead surface, not declined surface
+
+The closure above shipped four records, two of them `declined`, and that was the wrong shape for what the
+measurement found. A route with verdict `declined` is a **meaningful public capability** with unsupported forms that
+falls back safely. The offsets are not that:
+
+```text
+never produced meaningful motion before the reshape   auto ×5, measured against the parent
+cannot enter the execution model                      the resolver refuses `center` + non-zero offset
+cannot be unlocked by a sibling class                 the projection is built when *this* candidate compiles
+fallback produces no motion                           the same measurement, after
+```
+
+That is the category the two groups were in, found one step later — so the same rule applies, and
+`animate-offset-anchor-x-offset` and `-y-offset` are **retired**. The final public surface of the family is its two
+edges:
+
+```text
+x-edge → movable · y-edge → movable
+```
+
+and the evidence file no longer carries a record whose only truth is a permanent decline.
+
+**A constituent can be valid authoring state without deserving an animation candidate.** The two offset leaves stay in
+the model, stay in the family's declared authoring surface, and are still what the resolver reads — `center` over a
+zero offset is exactly how the edge routes resolve to `50%`. What they no longer have is a class claiming to be a
+motion. So the book now derives its routes from the **candidate table** rather than from the surface, which means a
+retired candidate's record disappears instead of being memorialised, and the guard's expected set is read the same
+way. Validity and addressability were never the same question; this is the increment that had to separate them.
+
+**State.** Gate 17/17, 498 unit tests, 87/87 behaviour arms, `tsc` clean, census 305 unchanged — candidates are not
+compositions, which is why this cleanup could be made without moving a single measured number.
