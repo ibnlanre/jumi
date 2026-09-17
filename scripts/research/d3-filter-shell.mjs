@@ -20,6 +20,7 @@ import path from 'node:path'
 
 import * as compileLib from '../lib/compile.mjs'
 import * as cssLib from '../lib/css.mjs'
+import { functionsOf, nativeSheet } from '../lib/frames.mjs'
 
 const { compiler } = compileLib
 const finalizeCss = compileLib.finalizeCss ?? cssLib.finalizeCss
@@ -166,55 +167,140 @@ for (const property of PROPERTIES) {
  * keyframe of the same motion. A discrete or absent series here is a defect the migration would repair; an
  * identical series is the `translate-3d` outcome, and means the family needs nothing.
  */
-const SHIPPED = [
+/**
+ * Gate B, on the shipped build, across **all six** combinations gate A used — the same motions, measured on the
+ * route that ships today rather than on a prototype.
+ *
+ * Each arm is three readings: the shipped classes together, a **live** native reference, and the reference's own
+ * liveness checked before anything is concluded from it. The comparison is per function rather than per string,
+ * because Jumi's composition materialises every resting filter argument — `blur(0px) brightness(1) contrast(1) …` —
+ * so a shipped series and a native two-function series can never be equal as text, and comparing them as text would
+ * report a defect that is only the composition being explicit.
+ *
+ * What is checked instead: the functions that **move** agree sample by sample, no function the native arm carries is
+ * missing from the shipped one, and their relative order is the same.
+ */
+const PROBES = [
   {
-    class: 'animate-filter-blur-[10px]',
-    family: 'filter · blur alone',
-    native: { from: 'blur(0px)', observed: 'filter', to: 'blur(10px)' },
+    classes: ['animate-filter-blur-[10px]', 'animate-filter-hue-rotate-[90deg]'],
+    moved: ['blur', 'hue-rotate'],
+    native: {
+      from: 'blur(0px) hue-rotate(0deg)',
+      to: 'blur(10px) hue-rotate(90deg)',
+    },
   },
   {
-    class: 'animate-backdrop-filter-blur-[10px]',
-    family: 'backdrop-filter · blur alone',
-    native: { from: 'blur(0px)', observed: 'backdropFilter', to: 'blur(10px)' },
+    classes: [
+      'animate-filter-brightness-[2]',
+      'animate-filter-contrast-[0.5]',
+    ],
+    moved: ['brightness', 'contrast'],
+    native: { from: 'brightness(1) contrast(1)', to: 'brightness(2) contrast(0.5)' },
+  },
+  {
+    classes: [
+      'animate-filter-blur-[10px]',
+      'animate-filter-drop-shadow-[4px_4px_8px]',
+    ],
+    moved: ['blur', 'drop-shadow'],
+    // The colour is written out on both ends. Leaving it off a `drop-shadow` does **not** mean "the same colour as
+    // the rest" — the browser resolves the omitted form to opaque black while Jumi's rest is transparent — and the
+    // first run of this arm reported that as a divergence at every sample where only the omission differed.
+    native: {
+      from: 'blur(0px) drop-shadow(rgba(0, 0, 0, 0) 0px 0px 0px)',
+      to: 'blur(10px) drop-shadow(rgb(0, 0, 0) 4px 4px 8px)',
+    },
+  },
+  {
+    classes: [
+      'animate-backdrop-filter-blur-[10px]',
+      'animate-backdrop-filter-hue-rotate-[90deg]',
+    ],
+    moved: ['blur', 'hue-rotate'],
+    native: {
+      from: 'blur(0px) hue-rotate(0deg)',
+      to: 'blur(10px) hue-rotate(90deg)',
+    },
+  },
+  {
+    classes: [
+      'animate-backdrop-filter-brightness-[2]',
+      'animate-backdrop-filter-contrast-[0.5]',
+    ],
+    moved: ['brightness', 'contrast'],
+    native: { from: 'brightness(1) contrast(1)', to: 'brightness(2) contrast(0.5)' },
+  },
+  {
+    classes: [
+      'animate-backdrop-filter-blur-[10px]',
+      'animate-backdrop-filter-drop-shadow-[4px_4px_8px]',
+    ],
+    moved: ['blur', 'drop-shadow'],
+    native: {
+      from: 'blur(0px) drop-shadow(rgba(0, 0, 0, 0) 0px 0px 0px)',
+      to: 'blur(10px) drop-shadow(rgb(0, 0, 0) 4px 4px 8px)',
+    },
   },
 ]
 
 const ENTRY = `\n@import "tailwindcss" source(none);\n@plugin "${path.join(root, 'dist', 'index.js')}";\n`
 
-for (const probe of SHIPPED) {
-  const emitted = finalizeCss((await compiler(ENTRY, root)).build([probe.class])).css
-  const name = `native-${slug(probe.family)}`
-  const css = `${emitted}\n@keyframes ${name} { from { ${probe.native.observed}: ${probe.native.from}; } to { ${probe.native.observed}: ${probe.native.to}; } }\n#${name} { animation: ${name} ${DURATION}ms linear both; }`
+for (const [index, probe] of PROBES.entries()) {
+  const observed = index < 3 ? 'filter' : 'backdropFilter'
+  const emitted = finalizeCss(
+    (await compiler(ENTRY, root)).build(probe.classes),
+  ).css
+  const reference = nativeSheet({ ...probe.native, id: `ref-${index}`, property: observed })
   const readings = await seriesOf(
     [
-      { css, name },
+      { css: `${emitted}\n${reference.css}`, name: reference.name },
       {
-        classes: [probe.class],
+        classes: probe.classes,
         css: `${emitted}\n#probe { animation-timing-function: linear; }`,
         name: 'probe',
       },
     ],
-    probe.native.observed,
+    observed,
   )
   const shipped = readings.probe.values
-  const native = readings[name].values
-  const element = readings.probe.animations
+  const native = readings[reference.name].values
+  const live = new Set(native).size > 1
+  const moving = new Set(shipped).size > 1
+  const disagree = shipped.findIndex((value, at) => {
+    const left = functionsOf(value)
+    const right = functionsOf(native[at])
+
+    // No function the reference carries may be missing, and every function that moves must agree.
+    if ([...right.keys()].some(name => !left.has(name))) return true
+
+    return probe.moved.some(name => left.get(name) !== right.get(name))
+  })
+  const order = probe.moved.every((name, at) => {
+    const names = probe.moved.filter(one =>
+      [...functionsOf(shipped[0]).keys()].includes(one),
+    )
+
+    return names[at] === probe.moved.filter(one =>
+      [...functionsOf(native[0]).keys()].includes(one),
+    )[at]
+  })
 
   records.push({
-    equivalent: shipped.every((value, at) => value === native[at]),
     kind: 'necessity',
+    family: `${observed} · ${probe.moved.join(' + ')}`,
+    moved: probe.moved,
     native,
-    property: probe.native.observed,
+    order,
+    property: observed,
     shipped,
-    verdict:
-      element === 0
+    verdict: !live
+      ? 'reference-dead'
+      : !moving
         ? 'no-motion'
-        : new Set(shipped).size < 3
-          ? 'discrete'
-          : shipped.every((value, at) => value === native[at])
-            ? 'already-equivalent'
-            : 'differs',
-    family: probe.family,
+        : disagree === -1
+          ? 'equivalent'
+          : 'diverges',
+    firstDisagreement: disagree === -1 ? null : disagree,
   })
 }
 
@@ -229,7 +315,7 @@ fs.writeFileSync(
 
 for (const one of records)
   console.log(
-    `${one.kind.padEnd(12)} ${one.family.padEnd(30)} ${one.verdict.padEnd(18)} ${one.identical ?? one.equivalent}\n    native  ${(one.native ?? []).join(' · ')}\n    subject ${(one.typed ?? one.shipped ?? []).join(' · ')}`,
+    `${one.kind.padEnd(12)} ${one.family.padEnd(34)} ${one.verdict}\n    native  ${(one.native ?? []).join(' · ')}\n    subject ${(one.typed ?? one.shipped ?? []).join(' · ')}`,
   )
 
 console.log(`\nwritten to \`${path.relative(root, target)}\``)

@@ -3931,3 +3931,57 @@ references that are proven live before any conclusion is drawn from them.
 
 **State.** No production code moved. Gate 17/17, 498 unit tests, 87/87 behaviour arms, `tsc` clean; gate A's readings
 are in `scripts/filter-shell-series.json`.
+
+---
+
+## Gate B extended to all six combinations: one divergence, classified as a fixture, and then no defect at all
+
+The probe now runs every gate-A combination on the **shipped** classes, against a **live** reference, comparing the
+property's computed value per function rather than per string — because Jumi's composition materialises every resting
+filter argument, so string equality is impossible by construction and comparing text would report the composition
+being explicit as a defect.
+
+```text
+filter           blur + hue-rotate        equivalent
+filter           brightness + contrast    equivalent
+filter           blur + drop-shadow       equivalent
+backdrop-filter  blur + hue-rotate        equivalent
+backdrop-filter  brightness + contrast    equivalent
+backdrop-filter  blur + drop-shadow       equivalent
+```
+
+**One arm diverged first, and the classification is the point.** Both `blur + drop-shadow` arms disagreed at every
+sample where only the reference differed:
+
+```text
+sample 0   native   drop-shadow(rgb(0, 0, 0) 0px 0px 0px)      ← opaque black, the browser's default for an omitted colour
+           shipped  drop-shadow(rgba(0, 0, 0, 0) 0px 0px 0px)   ← transparent, Jumi's resting colour
+sample 4   native   drop-shadow(rgb(0, 0, 0) 4px 4px 8px)
+           shipped  drop-shadow(rgb(0, 0, 0) 4px 4px 8px)      ← identical, and the motion matches at every stop
+```
+
+That is `fixture problem` in the ruling's taxonomy, and it is recorded as one: leaving the colour off a
+`drop-shadow` does not mean "whatever the rest is" — the browser resolves the omitted form to opaque black — so the
+reference was measuring a different motion at the resting end. Corrected, and re-run, all six are equivalent. The
+shipped route interpolates the nested arguments of a compound filter function exactly as the browser does.
+
+**So the second criterion fails, and the filter track closes with no production change:**
+
+```text
+gate A  separability   pass — six combinations, both properties, drop-shadow nested
+gate B  necessity      no defect — six shipped combinations, native-equivalent, live references
+→ no migration
+```
+
+That is a successful result, not a missed opportunity: `filter` and `backdrop-filter` are the second and third
+families this discipline has kept out of a rewrite they did not need.
+
+**And the harness now has its own guard**, which the ruling asked for: `scripts/lib/frames.mjs` holds the
+native-reference builder with the property name **converted rather than trusted**, and `frames.test.mjs` pins it —
+`backdropFilter` → `backdrop-filter` in the keyframe and never the JavaScript name, the rule and the keyframe named
+consistently, and the per-function reader that replaced string comparison. Eleven fixture defects in this track,
+several of them silent, is enough evidence that the measuring apparatus deserves the same treatment as the thing it
+measures.
+
+**State.** No production code moved. Gate 17/17, 498 unit tests, 87/87 behaviour arms, `tsc` clean; the readings are in
+`scripts/filter-shell-series.json`.
