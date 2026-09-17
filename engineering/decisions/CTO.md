@@ -2808,3 +2808,68 @@ pure contract is unwritten. And the production change itself is untouched: this 
 **State.** `scripts/lib/anchor.mjs` gained `normalizeAxis`; new book
 `scripts/research/d3-anchor-spike.mjs` (`pnpm research:d3-anchor-spike`), evidence at
 `scripts/anchor-spike.json`. No `src/` change, nothing promoted. 17/17 stages, 485 unit tests.
+
+
+## 2026-09-17 — D.3.7 · the per-axis contract pinned, and the one capability the production change needs
+
+### The ruling
+
+> **Add the `normalizeAxis` contract tests, then ship the resolved-axis reshape as one production increment.**
+> Keep the public API unchanged, the internal execution leaves private, typed execution all-or-nothing across
+> both axes, rerun the four route arms against the shipped build, and require the resting-state repair plus full
+> gate green before closing D.3.7.
+
+### The contract, pinned
+
+`normalizeAxis` now carries four tests beside `normalizeOffsetAnchor`'s five, and they are the ruled cases: a
+bare edge to its own percentage (`left → 0%`, `center → 50%`, `right → 100%`); an edge with an offset in the
+direction the edge grows (`left 10px → 10px`, `right 10px → calc(100% - 10px)`, `top 20px → 20px`,
+`bottom 20px → calc(100% - 20px)`); any length-percentage including arithmetic and percentages; and a decline
+for everything not established — `center` with a non-zero offset, a `var()`, logical spellings, a non-edge first
+argument, and both arguments absent. One test asserts the **shape** rather than a value, because it is the
+criterion the production design rests on: the function answers one component or nothing, so "every emitted frame
+carries both axes" is a property of the boundary rather than of care.
+
+### The reconstruction that must happen before `src/` moves
+
+The production change needs a capability the typed-execution declaration does not have, and this is worth
+establishing before writing any of it:
+
+```text
+canonicalizeLeaf(declaration, value)     sees ONE leaf's value — cannot see a sibling
+TypedExecution.whole(value)              sees a whole attribute value, and is consulted only for one
+
+an axis is (edge, offset)                → one resolved component
+and the all-or-nothing rule is           → both axes, or the route declines
+```
+
+Neither facet can express that. The constituent path calls `canonicalizeLeaf` at `src/core/index.ts:1606` for a
+single authored value, and `whole` is the whole-property path's facet — so a `center 0` x-axis is not something
+either can read, and the pair is exactly what the design needs to read. The increment therefore adds one
+**axis-pair** capability to the declaration rather than bending either existing facet, and the all-or-nothing
+rule lives there with it: a pair that produces one component and not the other returns nothing.
+
+### The increment, scoped
+
+```text
+src/composition/offset-anchor.ts      offset-anchor: var(x-position) var(y-position)
+src/variables/property.ts             the two internal <length-percentage> execution leaves
+src/variables/typed-leaves.ts         declare them, add the axis-pair capability
+src/core/index.ts                     the constituent path maps an authored endpoint through that capability
+                                      and emits BOTH axes in every frame, or declines the route
+then                                  snapshot re-record, census counts, the four route arms rerun against the
+                                      shipped build, and the resting-state repair asserted
+```
+
+The design is unchanged from the spike; what this establishes is *where* it attaches, which was the open question
+the ruling's "one production increment" left implicit.
+
+### Why it is not started in this entry
+
+It is a `src/` change with a snapshot and census consequence, and the four route arms have to be re-run against
+the shipped build to close it — the same shape as D.3.6's landing, which needed its own increment after the
+design was proven. Landing the contract tests and the attachment point first keeps the increment itself a single
+reviewable change, rather than a half-applied emission nobody can evaluate.
+
+**State.** 9 contract tests in `scripts/lib/anchor.test.mjs`. No `src/` change, nothing promoted. 17/17 stages,
+489 unit tests.

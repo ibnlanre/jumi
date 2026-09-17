@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { normalizeOffsetAnchor } from './anchor.mjs'
+import { normalizeAxis, normalizeOffsetAnchor } from './anchor.mjs'
 
 /**
  * The normalizer's contract, pinned as a pure function.
@@ -13,7 +13,10 @@ import { normalizeOffsetAnchor } from './anchor.mjs'
 describe('normalizeOffsetAnchor', () => {
   it('resolves the explicit edge form against the box', () => {
     // The four shapes the browser work proved, with the offset being the whole of what moves.
-    expect(normalizeOffsetAnchor('left 10px top 20px')).toEqual(['10px', '20px'])
+    expect(normalizeOffsetAnchor('left 10px top 20px')).toEqual([
+      '10px',
+      '20px',
+    ])
     expect(normalizeOffsetAnchor('right 10px bottom 20px')).toEqual([
       'calc(100% - 10px)',
       'calc(100% - 20px)',
@@ -69,5 +72,70 @@ describe('normalizeOffsetAnchor', () => {
     expect(normalizeOffsetAnchor('')).toBeNull()
     expect(normalizeOffsetAnchor('left')).toBeNull()
     expect(normalizeOffsetAnchor(undefined)).toBeNull()
+  })
+})
+
+/**
+ * The per-axis boundary, which is the one the production design rests on.
+ *
+ * The browser spike proves the mapping end to end; this pins the function that performs it, because a later
+ * widening here would show up in the spike as a route behaving differently without saying *why*. The offsets
+ * below are the model's own resting `0` wherever an edge is given alone, which is the state a lone edge
+ * candidate is normalized in.
+ */
+describe('normalizeAxis', () => {
+  it('resolves a bare edge to its own percentage', () => {
+    // The offset is `0`, and both spellings are the same value: the measured arm for `left 0 top 0` reads
+    // `0px 0px`, so nothing is being smoothed over by preferring the keyword's percentage.
+    expect(normalizeAxis('left', '0')).toBe('0%')
+    expect(normalizeAxis('center', '0')).toBe('50%')
+    expect(normalizeAxis('right', '0')).toBe('100%')
+    expect(normalizeAxis('top', '0')).toBe('0%')
+    expect(normalizeAxis('bottom', '0')).toBe('100%')
+  })
+
+  it('resolves an edge with an offset, in the direction the edge grows', () => {
+    expect(normalizeAxis('left', '10px')).toBe('10px')
+    expect(normalizeAxis('right', '10px')).toBe('calc(100% - 10px)')
+    expect(normalizeAxis('top', '20px')).toBe('20px')
+    expect(normalizeAxis('bottom', '20px')).toBe('calc(100% - 20px)')
+    // Any length-percentage, including arithmetic and percentages.
+    expect(normalizeAxis('left', '25%')).toBe('25%')
+    expect(normalizeAxis('top', 'calc(10px + 2em)')).toBe('calc(10px + 2em)')
+    expect(normalizeAxis('right', 'calc(50% - 4px)')).toBe(
+      'calc(100% - calc(50% - 4px))',
+    )
+  })
+
+  it('declines everything it has not established, as one component or nothing', () => {
+    // A `center` edge with an offset is an arity this track did not establish, even though the browser
+    // resolves it: the same conservative line the anchor normalizer holds.
+    expect(normalizeAxis('center', '20px')).toBeNull()
+    // A `var()` cannot be resolved at build time.
+    expect(normalizeAxis('left', 'var(--d)')).toBeNull()
+    // Logical spellings are not accepted by this property in the measured browser.
+    expect(normalizeAxis('start', '10px')).toBeNull()
+    expect(normalizeAxis('inline-start', '0')).toBeNull()
+    // And an edge that is not an edge at all.
+    expect(normalizeAxis('10px', '0')).toBeNull()
+    expect(normalizeAxis(undefined, '10px')).toBeNull()
+    expect(normalizeAxis('left', undefined)).toBeNull()
+    expect(normalizeAxis('left', '')).toBeNull()
+  })
+
+  it('answers one component or nothing, so a route can never be half-typed', () => {
+    // The criterion the production design requires: this function cannot return a partial assignment, which is
+    // what makes "every emitted frame carries both axes" a property of the boundary rather than of care.
+    const answers = [
+      ['left', '0'],
+      ['right', '10px'],
+      ['center', '0'],
+      ['center', '20px'],
+      ['left', 'var(--d)'],
+      ['start', '0'],
+    ].map(([edge, offset]) => normalizeAxis(edge, offset))
+
+    for (const answer of answers)
+      expect(answer === null || typeof answer === 'string').toBe(true)
   })
 })
