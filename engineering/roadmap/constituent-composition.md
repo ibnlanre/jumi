@@ -777,3 +777,115 @@ has no facet for a family with none      the answer the core branches on instead
 Falsified rather than assumed: dropping one leaf assignment from the `scale` facet fails two of them
 with the names it lost — `expected [ 'scale-x', 'scale-z' ] to deeply equal [ 'scale-x', 'scale-y',
 'scale-z' ]`.
+
+### D.2 — the second family, selected from the census before it is implemented
+
+The question is no longer "how do we generalize this?" but **does the abstraction survive a second
+family without acquiring family-specific exceptions in the core?**
+
+So the second family is chosen by structure, not by convenience, and the _requirements_ are written
+down before anything is added — because those requirements are D.2's falsifying criterion:
+
+```text
+typedLeaves entry        the family's leaves, with syntax, initial value, canonicalizer if any
+typedExecutions entry    whole(value) → the leaf assignments it sets, or null
+family tests             the six invariants are table-driven, so they already cover it
+core/index.ts            nothing — if it needs an `if (attribute === …)`, a bridge mode, a
+                         substrate mode or family-specific slot ordering, stop and inspect why
+```
+
+#### The census
+
+Every composite a candidate addresses as a part, read from `scripts/lib/property-model.mjs` joined to
+`compositionEdges` / `isFullyAddressable`. "Resting" is the leaf's declared value, which is what
+matters and is the criterion the last column turns on.
+
+| family                                                                       | leaves | resting                        | whole form | parts | why not                                                                                                                                  |
+| ---------------------------------------------------------------------------- | ------ | ------------------------------ | ---------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `gap`                                                                        | 2      | `0`, **`normal`**              | yes        | yes   | resting branch: `normal` is not in `<length-percentage>`                                                                                 |
+| `aspect-ratio`                                                               | 2      | **`auto`**, **`auto`**         | yes        | yes   | resting branch; and the grammar is `<ratio>`, not two scalars                                                                            |
+| `background-size`                                                            | 2      | **`auto`**, **`auto`**         | yes        | yes   | resting branch                                                                                                                           |
+| `background-repeat`                                                          | 2      | `repeat`                       | yes        | yes   | discrete leaves — keywords do not interpolate at all                                                                                     |
+| `overflow`                                                                   | 2      | `visible`                      | yes        | yes   | discrete leaves                                                                                                                          |
+| `border-block-width`, `border-inline-width`                                  | 2      | `medium`                       | **no**     | yes   | no whole-form candidate, so the whole path is unreachable                                                                                |
+| `outline`                                                                    | 3      | `currentColor`,`none`,`medium` | yes        | yes   | `outline-style` is discrete; the leaves are three unrelated types                                                                        |
+| **`translate`**                                                              | 3      | **`0px`, `0px`, `0px`**        | yes        | yes   | **passes**                                                                                                                               |
+| `text-shadow`                                                                | 4      | `0px`,`0px`,`0`,`currentColor` | yes        | yes   | a shadow list, not four scalars; a colour leaf                                                                                           |
+| `border-radius`                                                              | 4      | `0`, `0`, `0`, `0`             | yes        | yes   | the logical-corner machinery, and it would open conflict policy                                                                          |
+| `border-image-outset`                                                        | 4      | `0`, `0`, `0`, `0`             | yes        | yes   | `<length> \| <number>` branches mean _different things_ — a number is a multiple of the border width, so canonicalizing is not available |
+| `background-position`, `object-position`, `offset-anchor`, `offset-position` | 2      |                                | yes        | yes   | nested composite recursion — the leaves are themselves compositions                                                                      |
+| `transform`                                                                  | 7      |                                | yes        | yes   | nested, plus function-list ordering semantics                                                                                            |
+| `filter`, `backdrop-filter`                                                  | 11     |                                | yes        | yes   | function reshape, nested recursion, `fallback` edges                                                                                     |
+| `box-shadow`                                                                 | 2      |                                | yes        | yes   | `fallback` edges — not fully directly addressable                                                                                        |
+| `math-depth`                                                                 | 1      |                                | yes        | yes   | degenerate, discrete                                                                                                                     |
+| `hyphenate-limit-chars`                                                      | 3      |                                | yes        | yes   | not animatable                                                                                                                           |
+
+That table is where the selection was decided, and it also produced an eighth criterion the seven did
+not name, because it is a fact about the _leaf_ rather than the whole:
+
+> **A family is only typeable if every leaf's resting value is on the same interpolation branch as
+> the values the family animates to.** Registration gives a leaf its own computed value, and an
+> animation's implicit `from` is that resting value — so a resting value in a different branch steps
+> instead of blending, and no canonicalizer can fix it when the resting value is a keyword.
+
+That is what removes `gap` (resting `normal`), `aspect-ratio` and `background-size` (resting `auto`),
+and `border-block-width` (resting `medium`, besides having no whole form). `scale` passes it for the
+same reason it passes everything else: all three leaves rest at `1`, in the number branch.
+
+#### The selection: `translate`
+
+Smallest of the survivors, and informative in the two places that matter:
+
+- **A different whole-value rule.** `scale: 2` **repeats** the one value across all three components;
+  `translate: 10px` sets x and pads the rest with the identity — `[10px, 0, 0]`, not `[10px, 10px,
+10px]`. So the facet is genuinely family-shaped and the core cannot assume either rule.
+- **A family that needs no canonicalizer at all.** `<length-percentage>` is one interpolation branch,
+  so the authored value is already the canonical frame value.
+
+And one judgement call, flagged rather than buried: `translate` is one of the individual transform
+properties, so it is adjacent to the family the fifth criterion excludes. The criterion excludes
+`transform` because it is a _function list_ whose order the author can see and whose decomposition is
+not into independent leaves; `translate` is a single translation with no list and no author-visible
+order, so it passes — but it is the one place where "no transform ordering semantics" needed reading
+rather than applying.
+
+#### The stop: two entrances, not one
+
+The second family does **not** land with those three additions. Measured with `translate` declared —
+spike reverted, not committed:
+
+```text
+animate-translate-[10px]                 typed          100%:10px   75%:7.5px  50%:5px  25%:2.5px  0%:0px
+animate-translate-x-[10px]               composed       — it declines: no substrate rule, and the
+                                                        keyframe is the old composed form reading
+                                                        --jumi-translate-x-100
+both                                     broken        100%:30px  75%:26.25px  50%:25px  25%:26.25px  0%:30px
+```
+
+The whole path is complete without a canonicalizer — it writes the leaves and the bridge, and it pads
+correctly (`10px`, not `10px 10px`, which is what a repeat would have produced). The constituent path
+is not, and the reason is a **conflation** in the shared gate rather than anything about `translate`:
+
+```ts
+const canonical = declaration?.animationCanonicalizer?.(authored) ?? null
+if (canonical !== null) {
+  /* typed */
+}
+```
+
+`null` is read for two different facts — "this family declares no canonicalizer" and "the
+canonicalizer declined this value". For `scale` they never diverge, because every `scale` leaf
+declares one. A family whose leaves are a single branch does not need one, and under this gate its
+constituents silently stay on the composed path while its whole goes typed — and when both are
+present the two models contend for one property, exactly the boundary C.5 spent a pass on. The
+compound row above is that contention: the curve returns to its 100% value at 0%, so the motion never
+starts.
+
+So D.2 needs **one core change**, and it is a correction rather than a family hook: a declared leaf
+with no canonicalizer should mean _the authored value is the canonical value_, not _decline_. That is
+a one-line change to the gate that both paths read, and it is the kind of thing to rule on before it
+is made rather than after — it changes when a family enters the typed path, for every family,
+including the one already in production.
+
+Nothing else is needed: no family token in the core, no new bridge mode, no new substrate mode, no
+slot ordering.
