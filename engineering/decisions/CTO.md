@@ -2296,3 +2296,53 @@ read and a separate parts split, and modelling the first is not modelling the re
 falsification; the reproduction was an illustration.
 
 **State.** 17/17 stages, 480 unit tests.
+
+
+## 2026-09-17 — D.3.7 opens: the "two axes" hypothesis survives its own falsification
+
+> **D.3.7: `offset-anchor` interpolation-unit falsification, starting from native browser behavior, not Jumi's
+> current leaf vocabulary.**
+
+The pass is one experiment, and it was designed to **refute** the hypothesis rather than confirm it: four
+hand-written native arms, a canary that separates a resolved representation from a fixture that merely observes
+the same endpoints, and a criterion that only reads as evidence if the arms can disagree. No Jumi is involved —
+the claim under test is about the browser's grammar, and a pass that started from the four leaves would be
+answering a different question.
+
+### Measured
+
+```text
+authored                        computed                                        series
+50% 50% → 20% 80%               50% 50% → 20% 80%                               interpolated
+left top → right bottom         0% 0% → 100% 100%                               interpolated
+left 10px top 20px → …          10px 20px → calc(100% - 10px) calc(100% - 20px) interpolated
+center → 20% 80%                50% 50% → 20% 80%                               interpolated
+0% 0% → 100% 100%  (canary)     0% 0% → 100% 100%          the same series as the edge arm
+```
+
+The edge arm and its resolved spelling produce the **same series**, which is the criterion: they differ only in
+how the value is written, so equality means native interpolation happens in resolved space. The arms also
+disagree with each other — `50% 50% → 20% 80%` reads `50 · 42.5 · 35 · 27.5 · 20`, the edge arm reads
+`0 · 25 · 50 · 75 · 100` — so the fixture is not blind, and the equality above is evidence rather than a
+constant compared with itself. The intermediate frames of the third arm are the interesting ones:
+`calc(0% + 10px) · calc(25% + 5px) · 50% 50% · calc(75% - 5px) · calc(100% - 10px)`, which is one
+`<length-percentage>` per axis being interpolated, written out.
+
+### What this settles, and what it does not
+
+**Settled:** native `offset-anchor` already behaves as though its independently interpolable state is **two
+resolved positional components**. Edge keywords are *syntax, not semantics* — `left top` computes to `0% 0%`
+and animates identically to it. Edge-plus-offset is a *spelling of one resolved component* — `left 10px`
+computes to `10px`, and an intermediate frame is `calc(0% + 10px)`. And the grammar's rejection of the model's
+composition is therefore not evidence of a missing subject: `center 0 center 0` is rejected because it composes
+**four** values where the grammar admits **two**, which is the same shape of mistake as D.3.6's, one grammar
+further in.
+
+**Not settled, and deliberately not:** whether the reshape ships, and in what form. The hypothesis was the thing
+under test here; a surviving hypothesis is not a design. The candidates the measurement now makes concrete are
+`resolved-x` + `resolved-y`, and the open questions are the ones the earlier brief recorded — how percentages,
+`calc()` and `var()` normalize, whether logical positions survive, and whether an author's edge utilities stay
+independently animatable.
+
+**State.** New book `scripts/research/d3-anchor.mjs` (`pnpm research:d3-anchor`), evidence at
+`scripts/anchor-falsification.json`. No `src/` change, nothing promoted. 17/17 stages, 480 unit tests.

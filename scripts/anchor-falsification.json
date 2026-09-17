@@ -1,0 +1,97 @@
+{
+  "arms": [
+    {
+      "hypothesis": "a purely resolved pair",
+      "label": "resolved percentages",
+      "from": "50% 50%",
+      "to": "20% 80%",
+      "animations": 1,
+      "computedFrom": "50% 50%",
+      "computedTo": "20% 80%",
+      "distinct": 5,
+      "kind": "interpolated",
+      "series": [
+        "50% 50%",
+        "42.5% 57.5%",
+        "35% 65%",
+        "27.5% 72.5%",
+        "20% 80%"
+      ]
+    },
+    {
+      "hypothesis": "edges, which are relative to the box",
+      "label": "edge keywords",
+      "from": "left top",
+      "to": "right bottom",
+      "animations": 1,
+      "computedFrom": "0% 0%",
+      "computedTo": "100% 100%",
+      "distinct": 5,
+      "kind": "interpolated",
+      "series": [
+        "0% 0%",
+        "25% 25%",
+        "50% 50%",
+        "75% 75%",
+        "100% 100%"
+      ]
+    },
+    {
+      "hypothesis": "the form the model composes and the grammar rejects",
+      "label": "edge plus offset",
+      "from": "left 10px top 20px",
+      "to": "right 10px bottom 20px",
+      "animations": 1,
+      "computedFrom": "10px 20px",
+      "computedTo": "calc(100% - 10px) calc(100% - 20px)",
+      "distinct": 5,
+      "kind": "interpolated",
+      "series": [
+        "calc(0% + 10px) calc(0% + 20px)",
+        "calc(25% + 5px) calc(25% + 10px)",
+        "50% 50%",
+        "calc(75% - 5px) calc(75% - 10px)",
+        "calc(100% - 10px) calc(100% - 20px)"
+      ]
+    },
+    {
+      "hypothesis": "the shorthand centre against a resolved pair",
+      "label": "center to resolved",
+      "from": "center",
+      "to": "20% 80%",
+      "animations": 1,
+      "computedFrom": "50% 50%",
+      "computedTo": "20% 80%",
+      "distinct": 5,
+      "kind": "interpolated",
+      "series": [
+        "50% 50%",
+        "42.5% 57.5%",
+        "35% 65%",
+        "27.5% 72.5%",
+        "20% 80%"
+      ]
+    },
+    {
+      "hypothesis": "the resolved spelling of the edge arm above",
+      "label": "canary: edges spelled as percentages",
+      "from": "0% 0%",
+      "to": "100% 100%",
+      "animations": 1,
+      "computedFrom": "0% 0%",
+      "computedTo": "100% 100%",
+      "distinct": 5,
+      "kind": "interpolated",
+      "series": [
+        "0% 0%",
+        "25% 25%",
+        "50% 50%",
+        "75% 75%",
+        "100% 100%"
+      ]
+    }
+  ],
+  "canary": "canary: edges spelled as percentages",
+  "sameSeries": true,
+  "source": "D.3.7 · scripts/research/d3-anchor.mjs"
+}
