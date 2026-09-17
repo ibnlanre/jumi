@@ -575,3 +575,46 @@ artefact rather than a defect, so it is withdrawn from the narrative rather than
 baseline, and it is not filed.
 
 D.2 lands **after** this, with its own acceptance book and no timing-infrastructure change mixed in.
+
+## 2026-09-17 — D.2: the second family uses the mechanism without a branch of its own
+
+D.2 was re-pointed at the question the first family cannot answer: does the value-free per-leaf mechanism
+**generalize**, or did it work once? `translate` is the family that differs exactly where it can — a
+`<length-percentage>` leaf is one interpolation branch, so `translate` declares **no** animation
+canonicalizer, and a missing component takes the **identity** where `scale` repeats the first value
+(`translate: 10px` is `10px 0 0`; `scale: 2` is `2 2 2`). Both are declared in the family, not in core,
+which is what makes this a test of the extraction rather than of a second implementation.
+
+The answer is **yes, and it is the useful kind of yes**: the second family needed **no branch in core**.
+Asked of the source rather than of the browser, all six surfaces hold — `typedLeaves`, `typedExecutions`,
+`typedLeafOf`/`canonicalizeLeaf`, endpoint emission, definition naming, and whole decomposition — core's
+code contains no `'scale'` or `'translate'` literal, it reads the family declarations, and the whole
+decomposition lives in the family (`translateLeaves`), not in core.
+
+The acceptance set is `scripts/research/d2-acceptance.mjs` (`pnpm research:d2-acceptance`), and it tests the
+five surfaces a definition strategy breaks silently if it breaks anything: phrases, whole+constituent
+ownership, segment timing, scroll/range, and the timing chain — 14 assertions, all holding. It is derived
+from the **authored** frames rather than from remembered readings.
+
+Four of those assertions were corrected while grounding it, and each correction was a test-model fault
+rather than a relaxed criterion: one-slot timing was asserting two duration positions that could not exist
+(a single slot yields one position, so the expectation was unsatisfiable and read as a failure); the scroll
+arm sampled at share `0`, **outside** the authored `25% 75%` range, where the resting value is `none` by
+specification, and without forcing `linear` it measured the default `ease` curve (`26.0481px` at the
+midpoint of a `10px -> 30px` line instead of `20px`); the same arm raced the frame boundary, because a
+scroll-driven animation is updated **after** the `requestAnimationFrame` callbacks, so a read taken in the
+first callback after setting `scrollTop` sees the previous position and a freshly loaded page reads its
+resting value unless the wait is two frames; and the chain arm encoded the order that the repair above
+withdrew.
+
+The immediate value is negative evidence, and it is the strongest outcome available: D.2 did not surface a
+translate exception. It surfaced an unrelated coupling in the shared infrastructure — the instance-identity
+reader — which the previous entry repaired. A second-family test that finds nothing family-specific is
+what says the family abstraction is holding.
+
+### Call
+
+> **D.2 passes architecturally. Land its acceptance book as its own commit, with no timing-infrastructure
+> change mixed in. The family abstraction holds: the second family reuses the mechanism without a
+> branch of its own, and the one defect the test surfaced was in shared plumbing rather than in the
+> abstraction.**
