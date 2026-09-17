@@ -119,6 +119,7 @@
     "research:d3-projection": "node scripts/research/d3-projection.mjs",
     "research:d3-crosstab": "node scripts/research/d3-crosstab.mjs",
     "research:d3-derivation": "node scripts/research/d3-derivation.mjs",
+    "research:d3-validation": "node scripts/research/d3-validation.mjs",
     "research:identity-collision": "node scripts/research/identity-collision.mjs",
     "candidate:diff": "node scripts/candidate-diff.mjs",
     "check": "node scripts/check.mjs",

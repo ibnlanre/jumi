@@ -1294,3 +1294,124 @@ the 2 are keyword rests that belong to the observation protocol or to nothing.
 **Not yet committed.** Working tree only: `scripts/lib/derivation.mjs` with its 6-test suite,
 `scripts/research/d3-derivation.mjs`, and its `package.json` entry. No `src/` behaviour change, no emitted-CSS
 change, no representation declared, no browser reached; 17/17 stages, 79/79 behaviour.
+
+## 2026-09-17 — D.3.5's third pass: the 41 derived representations, validated in a browser
+
+### Call
+
+> **"Validate the 41 derived proposals by rule."** […] If we immediately write those 41 into `typedLeaves`, we
+> would turn a grammar inference into production semantics before proving that registration and interpolation
+> preserve the browser behavior. […] **"How many of the 41 mechanically derivable representations are also
+> behaviorally equivalent?"** […] I would leave the 29 ambiguous cases entirely alone for now. […] **Commit
+> the 72-pair derivation diagnostic unchanged. Do not promote the 41 into live typed metadata yet. Next, run
+> those 41 model-derived proposals through the established observation protocol, generated wherever possible.**
+
+`pnpm research:d3-validation` is that protocol, generated end to end: 41 pairs × 2 magnitudes = **82 arms**,
+41 Tailwind compiles, 42s, no hand-written fixture anywhere.
+
+### What each arm is made of
+
+Everything except one probe per syntax comes out of the emission — the rest the registration has to stand in
+for (`restOf`), the frame the motion goes to (`framesOf`), the surface the pair is read on and the wiring that
+hands the value there (`applicationOf`), and the slot the leaf actually is (`pinningOf`, which follows the
+sheet's own compositions rather than the first `var(` it sees). The probe is the arm's only authored input, and
+the test suite asserts each one is a value its own syntax admits *by the shape reader's judgement*, so an arm
+cannot test a representation against a value the representation does not cover.
+
+```text
+rest differential  →  native-vs-typed interpolation  →  contexts  →  verdict
+
+movable                31
+registration-unsafe     0
+interpolation-unsafe    1
+fixture-unobservable    5
+unresolved              2
+blocked-by-emission     2
+```
+
+**Every exclusion, with the measurement behind it:**
+
+```text
+no computed form        4   mask-border-outset/mask-border-outset-{top,right,bottom,left}
+                            Chromium computes nothing for `mask-border-*` — `''` with and without motion
+no native baseline      2   rotate/rotate-x, rotate/rotate-y
+                            `rotate: 0deg -> 2 0 1 0deg` is one form to the other and the engine declines,
+                            so there is nothing native to compare the typed arm against — the typed arm
+                            *does* move, and `unresolved` is the honest class for "nothing here decides it"
+constituent invisible   1   rotate/rotate-z
+                            scaling the z axis does not change `0 0 2 0deg` once normalised to `0deg`
+```
+
+**`blocked-by-emission` is a class of its own, added by the ruling, and it is outside the four census
+classes on purpose.** `offset-anchor-x/…-x-offset` and `offset-anchor-y/…-y-offset` were never tested:
+their application composes to `center 0 center 0`, which the property rejects, so the pair reads `auto` with
+the arm's declaration and with none at all. Production does not currently produce a valid consumer value
+for them — that is an emission defect with its own increment, and `unresolved` would have filed it inside a
+workstream that does not own it.
+
+**And one divergence that is not a representation finding at all.** `math-depth/math-depth-add` measures
+`interpolation-unsafe`, and the honest reading is larger than the verdict:
+
+```text
+resting leaf     0
+emitted motion   add(0) -> add(2)
+proposed syntax  <integer>
+```
+
+The moving thing is an argument inside `add(...)`, not the scalar leaf the resting value suggested — so the
+interpolation unit is **not** the leaf this pair was bucketed as. That is **reshape**, D.1's subject, and it is
+recorded here as a falsification of the census bucket rather than as a defect in the emission: *resting-value
+morphology alone cannot always identify the interpolation unit*. The test is the model's own `FUNCTION`
+pattern over the emitted frames, not a list of properties, so it generalises past `math-depth`.
+
+**`registration-unsafe` is 0 by construction, and that is a result rather than a gap.** The syntax came from
+the resting value's own shape, so the rest is inside the syntax the derivation proposed — and the reach gate's
+`registration-unsafe` belongs to the *keyword* population, where the rest is a keyword and the grammar is a
+promise. The pass measures the rest anyway: the emission's rest is read from the sheet rather than assumed from
+the model, and the two disagreeing is a reader defect it **fails** on rather than a finding it reports.
+
+### Four traps, each found by the arm disagreeing with itself
+
+- **A probe is also a class name.** `rgba(0, 0, 255, 0.5)` split into four class names, the element matched
+  nothing, every `var()` was invalid at computed-value time and the consumer fell back to its initial value —
+  so 24 arms reported invalid readings that agreed, five of them as `movable`. The `<color>` probe is
+  `#0000ff80` now, and the suite asserts no probe carries whitespace.
+- **A fixture that forgets the emitted sheet reads `none` and agrees.** The first run omitted it and produced
+  27 `movable` verdicts from two invalid readings each. Two arms that never moved are one reading, so it is now
+  a **hard failure**: a flat native series *with* an identical typed series exits non-zero.
+- **The one-value spelling makes the arm motionless.** `-[2]` sets the leaf's *live* slot to the target, so the
+  application's frame reference wins and the leaf drives nothing; the phrase form `-[0:<rest>|100:<probe>]`
+  keeps the live slot at its rest and is the only spelling under which the leaf is the source of truth.
+- **The report is part of the instrument.** The assembler returned an object per verdict while the tally
+  compared strings, so six exclusions printed as `[object Object]` and vanished from the counts — a smaller
+  population that looked like a result.
+
+### What this does not license
+
+Nothing is declared and nothing is promoted: `typedLeaves` is untouched, and `movable` here means the derived
+representation held at rest and through the motion, at both magnitudes, for the values the emission animates
+this pair to. An unsafe verdict belongs to **the tested representation**, not to the conceptual constituent
+forever. The two cases that are findings are not promotion candidates and not this workstream's work either:
+`math-depth-add` is a **reshape** misclassification, and `offset-anchor`'s application does not compute at all.
+
+### Next, in the ruling's order
+
+```text
+1. land the validation research book as its own commit          ✓ this increment
+2. land the gate/single-build-owner change separately           its own commit
+3. production increment: declare only the 31 movable pairs      guarded by evidence
+4. permanent gate: a declared typed pair must have a movable evidence record
+   for that exact pair and representation — so nobody later "rounds up"
+   a sibling because the family looks similar
+5. math-depth-add: falsified `value` bucket, moved toward reshape work
+6. offset-anchor x/y: reproduce the invalid composition, determine the intended
+   grammar, fix the emission, add a permanent behaviour arm, rerun validation
+```
+
+Steps 3 and 4 are one decision and two commits: the declaration, then the guard that makes the next
+declaration as expensive as this one. Steps 5 and 6 leave the D.3 path entirely — they are the two places this
+pass found real defects standing behind a representation question, and neither is fixed by choosing a syntax.
+
+**State at the time of writing.** Working tree only: `scripts/lib/validation.mjs` with its 16-test suite,
+`scripts/research/d3-validation.mjs`, and its `package.json` entry. No `src/` behaviour change, no emitted-CSS
+change, no representation declared; 17/17 stages, 79/79 behaviour.
