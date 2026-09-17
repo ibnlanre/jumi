@@ -3378,3 +3378,77 @@ measurement of the shipped build, not the prototype. D.3.7 closes on that, not b
 
 **State.** Gate 17/17, 496 unit tests, 87/87 behaviour arms, `tsc` clean; both scratch builds and the temporary
 differentials removed.
+
+---
+
+## D.3.7 closed: the authoring routes have evidence that describes what they are
+
+The four family-level authoring routes now carry records of their own, produced by a book that measures the **shipped
+build** (`scripts/research/d3-authoring-routes.mjs` → `scripts/authoring-route-evidence.json`), in a shape the old
+schema cannot express:
+
+```text
+route         offset-anchor/offset-anchor-x-edge@offset-anchor
+authoring     offset-anchor-x-edge, with x-offset · y-edge · y-offset beside it
+execution     offset-anchor-x-position + offset-anchor-y-position, both assigned
+representation  resolved positional components
+verdict       movable
+evidence      50% 50% → 37.5% 50% → 25% 50% → 12.5% 50% → 0% 50%
+```
+
+```text
+route         offset-anchor/offset-anchor-x-offset@offset-anchor
+verdict       declined
+evidence      auto ×5 — no execution assignment, and no sibling state unblocks it
+```
+
+The offsets are the finding the ruling anticipated, and the measurement came out **stronger** than the vocabulary it
+offered. `conditional` would have said "resolves under compatible sibling authoring state", but the shipped build has
+no such state: the projection is built when *this* candidate compiles, from *this* candidate's own slots, so a second
+class on the element cannot supply the edge the offset needs beside it. `center` over a non-zero offset is refused by
+contract, and the route that would have to resolve it carries only one of the two values. So the verdict is
+`declined`, with the reason recorded — which is the whole point of asking the question rather than asserting
+`movable` because the architecture permits it in principle.
+
+The records live in their **own** file rather than in `validated-representations.json`, and that is a decision rather
+than an oversight: the latter is regenerated wholesale by a pass whose schema is one component to one leaf, so
+hand-written compound records there would be silently dropped by the next run. The separation is the same one this
+track is about, applied to the evidence.
+
+**The durable rule, now proven by production rather than by architecture:**
+
+```text
+simple constituent evidence     authoring component → execution leaf
+compound constituent evidence   authoring component + sibling authoring context
+                                → complete execution-leaf assignment, or a stated decline
+```
+
+Two guard arms hold it: every authoring component of a family that declares a resolver has exactly one record, and
+each record resolves to that family's **complete** execution assignment or says it declines — a route that assigns one
+leaf while claiming to work is the half-typed state the decline exists to prevent.
+
+**Two measurement corrections, and both nearly overstated the result.** The first read searched the whole sheet for
+assigned leaves, so the sibling edge route's frames were counted as the offset route's, and the offsets came out
+`conditional` on the strength of somebody else's motion. The second matched the endpoint form (`--jumi-…-100:`) where
+the leaves are written through `var(--jumi-…-100)`, and then *every* route read `declined`, including the two whose
+series plainly move. Both are the same lesson as the rest of this track: the measurement is a fixture, and a fixture
+that is wrong looks exactly like an emission that is wrong.
+
+### The lesson this track exists to record
+
+```text
+authoring surface   what an author writes, and what a candidate addresses
+   ≠
+execution surface   what a frame assigns, and what the browser interpolates
+   ≠
+composition graph   what the property is made of
+```
+
+All three were one relation until D.3.7 needed them apart, and each now has its own declaration: `authoring` on the
+family, `execution: true` on the leaf, `dependencies` on the property. The census counts the first, the resolver
+projects the second from the first, and the composition reads the second — one direction, no readback.
+
+**D.3.7 is closed.** Gate 17/17, 498 unit tests, 87/87 behaviour arms, `tsc` clean. Census 305 with the accounting
+above. The six assumptions were never reopened; the one boundary that came close — D.3.6's rule that phrases bypass
+typed execution — was tested against the shipped behaviour and **upheld**, with a rejection added for the frame shape
+that measurement proved cannot move.

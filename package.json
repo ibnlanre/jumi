@@ -122,6 +122,7 @@
     "research:d3-validation": "node scripts/research/d3-validation.mjs",
     "research:d3-argument": "node scripts/research/d3-argument.mjs",
     "research:d3-anchor": "node scripts/research/d3-anchor.mjs",
+    "research:d3-authoring-routes": "node scripts/research/d3-authoring-routes.mjs",
     "research:d3-anchor-normal": "node scripts/research/d3-anchor-normal.mjs",
     "research:identity-collision": "node scripts/research/identity-collision.mjs",
     "candidate:diff": "node scripts/candidate-diff.mjs",

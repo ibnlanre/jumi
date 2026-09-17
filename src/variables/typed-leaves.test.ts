@@ -7,6 +7,10 @@ import { compositionEdges } from '@/variables/composition'
 import { propertyVariables } from '@/variables/property'
 
 import {
+  expressions,
+  readCandidates,
+} from '../../scripts/lib/property-model.mjs'
+import {
   addressableLeavesOf,
   authoringOf,
   canonicalizeLeaf,
@@ -21,8 +25,6 @@ import {
   typedLeaves,
   typedLeavesOf,
 } from './typed-leaves'
-
-import { expressions, readCandidates } from '../../scripts/lib/property-model.mjs'
 
 import path from 'node:path'
 
@@ -610,5 +612,84 @@ describe('typed execution declarations', () => {
     for (const attribute of Object.keys(typedExecutions) as PropertyType[])
       if (typedLeavesOf(attribute).some(([, one]) => isExecutionLeaf(one)))
         expect(authoringOf(attribute).length, attribute).toBeGreaterThan(0)
+  })
+})
+
+type AuthoringEvidence = {
+  records: Array<{
+    authoring: { component: string; context: string[] }
+    condition: null | string
+    consumer: string
+    execution: { assigned: string[]; leaves: string[] }
+    parent: string
+    representation: string
+    route: string
+    verdict: string
+  }>
+}
+
+const AUTHORING_EVIDENCE = path.resolve(
+  path.dirname(new URL(import.meta.url).pathname),
+  '..',
+  '..',
+  'scripts',
+  'authoring-route-evidence.json',
+)
+
+const authoringEvidence: AuthoringEvidence = JSON.parse(
+  readFileSync(AUTHORING_EVIDENCE, 'utf8'),
+)
+
+describe('authoring-route evidence', () => {
+  it('evidences every authoring component of a compound family, and nothing else', () => {
+    // The durable rule D.3.7 proved: a **simple** constituent is evidenced as one component to one leaf, and a
+    // **compound** one is evidenced as an authoring component plus the sibling context its resolver reads,
+    // resolving to a complete execution assignment. The shapes are different because the things are different,
+    // and forcing the second into the first would hide the fact that makes it work.
+    const expected = Object.entries(typedExecutions).flatMap(
+      ([attribute, execution]) =>
+        execution.constituent
+          ? (execution.authoring ?? []).map(
+              component => `${attribute}/${component}`,
+            )
+          : [],
+    )
+
+    expect(
+      authoringEvidence.records
+        .map(one => `${one.parent}/${one.authoring.component}`)
+        .sort(),
+    ).toEqual(expected.sort())
+  })
+
+  it('resolves each one to the family’s complete assignment, or says it declines', () => {
+    // Both halves or neither. A record claiming a route works while assigning one leaf describes the half-typed
+    // state the decline exists to prevent, and a declining route that assigns leaves is the same error with the
+    // polarity reversed.
+    for (const one of authoringEvidence.records) {
+      const leaves = typedLeavesOf(one.parent as PropertyType)
+        .filter(([, declaration]) => isExecutionLeaf(declaration))
+        .map(([leaf]) => leaf)
+        .sort()
+      const resolved = one.verdict === 'movable' || one.verdict === 'conditional'
+
+      expect([...one.execution.leaves].sort(), one.route).toEqual(leaves)
+      expect([...one.execution.assigned].sort(), one.route).toEqual(
+        resolved ? leaves : [],
+      )
+
+      // A verdict that is not unconditional carries its condition, because the record's whole job is to answer
+      // *under what authoring state* this public route enters typed execution — and the offsets are the case
+      // that makes the question real: their normalizer refuses `center` over a non-zero offset by contract.
+      if (one.verdict !== 'movable')
+        expect(one.condition, one.route).toBeTruthy()
+
+      // And the sibling context it names is the family's other authoring components, not a list kept here.
+      expect([...one.authoring.context].sort(), one.route).toEqual(
+        authoringOf(one.parent as PropertyType)
+          .filter(name => name !== one.authoring.component)
+          .sort(),
+      )
+    }
   })
 })
