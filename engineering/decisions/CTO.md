@@ -797,3 +797,138 @@ the first genuinely `movable` keyword pair, the other two stay `unresolved`, the
 in the book as traps. `scripts/research/d3-interpolation.mjs` + its `package.json` entry + three memories;
 17/17 stages, 79/79 behaviour. Nothing in `src/` or the emitted CSS is touched, so the shipped bytes and
 the behaviour book are unchanged — this increment classifies, it does not move execution.
+
+## 2026-09-17 — D.3.4: a pair does not name the surface that proves it
+
+### Call
+
+> **It is really: `(parent, component) → consumer surface → observation method → semantic context(s)`.** […]
+> **I'd rename that last category from `currently unobservable` to something like `fixture-unobservable`.
+> The property itself is observable; our current setup simply does not expose the constituent because
+> `border-style: none` collapses the width to `0px`. We should avoid letting a fixture limitation become a
+> semantic category.** […] **For used/layout-value comparisons, make the fixtures deliberately controlled.
+> Fixed container dimensions, fixed font size where relevant, no viewport-dependent values.** […]
+> **`movable` = justified typed representation + rest equivalence + interpolation equivalence + equivalence
+> across every relevant semantic context. Anything less remains `unresolved`, not `unsafe`.** […] **I would
+> also keep `background-position-x-edge` unresolved until the composed consumer test runs. Its current
+> failure is actually a useful warning that the vocabulary hierarchy and the browser observation hierarchy
+> are not necessarily the same thing.**
+
+> **Build the model-backed observation descriptor and prove one example from each observation class
+> end-to-end. Include semantic contexts where the browser gives a keyword context-dependent used meaning.
+> Do not expand the keyword census yet.**
+
+Then, on landing:
+
+> **Land D.3.4 unchanged as its own commit. Close the observation-protocol increment. Open D.3.5 as
+> population scaling: derive model-backed descriptors first, classify second, and never invent a consumer,
+> syntax, context, or observation method merely to avoid `unresolved`.**
+
+> **All three structural readings of the consumer have to agree: candidate table, composition graph, emitted
+> application. If they do not, the book stops instead of measuring something nearby. Keep that invariant.**
+
+> **An observation fixture must demonstrate that it can detect a known perturbation before its equality
+> result counts as evidence.**
+
+> **An unsafe verdict belongs to the tested representation, not automatically to the conceptual constituent
+> forever.** So enough identity is recorded with the verdict to know *what* failed: `background-position-x-edge`
+> under a percentage representation is `interpolation-unsafe`, which is not the claim that the edge can never
+> be typed in any form — a representation preserving the edge keyword semantics could change the answer.
+
+`pnpm research:d3-observation` (+ `scripts/lib/observation.mjs` and its 14 unit tests) builds the descriptor
+and runs one example per class. The descriptor has four fields, and three of them are the model's:
+
+```text
+pair              (parent, component) — the census unit
+consumer surface  the property the candidate hands the value to
+                  from the candidate table (`animate-column-gap` addresses `gap` with part `column-gap`)
+                  checked against the composition graph (reachable from the component by walking
+                  `dependencies` — the same relation the census counted its pairs from)
+                  checked against the emission (the declaration the emitted keyframe hands the value to)
+observation       computed · used-gap · border-box          declared per class
+contexts          the semantics the claim covers             declared per class
+```
+
+```text
+A  font-weight                  movable
+     pair `(font, font-weight)` whole · consumer `font-weight` · method `computed` · contexts text
+     native 400 · 475 · 550 · 625 · 700   typed 400 · 475 · 550 · 625 · 700
+
+B  column-gap                   unresolved — and the harm is in one context of three
+     pair `(gap, column-gap)` as a part of it · consumer `gap` · method `used-gap`
+     contexts flex + grid + multicol; container fixed at 600px, font at 16px, canary `column-gap: 20px`
+     flex     native `normal` used 0px    · typed `0px` used 0px    · canary 20px
+     grid     native `normal` used 0px    · typed `0px` used 0px    · canary 20px
+     multicol native `normal` used 298px  · typed `0px` used 290px  · canary 300px
+
+C  the slot decides — 1 of 2 halves of one pair moves the consumer
+     background-position-x-edge    registration-safe, interpolation-unsafe
+        leaf moves 0% → 100%, the model's composition moves with it, the consumer never leaves `0% 0%`
+     background-position-x-offset  movable
+        native 0% 0% · 5% 0% · 10% 0% · 15% 0% · 20% 0%   typed identical
+     pair `(background-position-x, background-position-x-edge)` · consumer `background-position`
+     the emission applies `background-position: var(--jumi-background-position-x) var(--jumi-background-position-y)`
+     and applies to `background-position-x` nothing — asked of the longhand, the composition is not a value
+
+D  border-bottom-width          fixture-unobservable — no execution verdict, in either direction
+     style none   `0px tall, computed 0px`
+     style solid  `3px tall, computed 3px`
+     the property was observable all along; the fixture was not
+```
+
+**C is the finding, and it is sharper than the differential could state it.** The composed consumer test ran,
+and it separates the two halves of one pair under one registration shape in one composition: the *edge* slot
+is `registration-safe, interpolation-unsafe` while the *offset* slot is `movable`. `left` is `0%` on the
+longhand — the gate measured that — so a `<length-percentage>` looks justified; inside the shorthand's
+four-value grammar the first value is an edge **keyword** and a percentage there is not a value, so the leaf
+moves, the composition moves, and the user-visible property does not. That is the class's whole content: the
+observation surface is what decides whether a representation is justified, and it is not the pair's name. It
+is also why D.3.5 cannot classify at family level, or from syntax alone — **the slot remains the unit**.
+
+**B is the other half of the same lesson, in the other direction.** The computed surface reports a
+difference in all three contexts; the used value diverges in one and is unchanged in two. A `used-gap`
+reading is only evidence if it can *see* a gap, so every context carries a canary (`column-gap: 20px`) — an
+observable that reads the same with and without one cannot distinguish `preserved` from `blind`. That is the
+gate's own `border-bottom-width` lesson arriving in a second class, and it is now a standing rule.
+
+**Three reader defects were found by getting them wrong, and each is unit-tested.** A first-match extractor
+read Tailwind's own `font-weight: bolder` before Jumi's application and reported that the emission never
+applies the property. A whole-value candidate writes both ends of its motion as `var(<frame>, var(<live>))`,
+so a fixture that applies the *frame* is measuring frame zero and calling it the rest — read as `0px tall`
+for a border that should be `3px`. Resolving to the live slot beneath a frame then leaked the wrapper's `)`,
+emitting `var(--jumi-border-bottom-width))`: an unbalanced pair in a declaration, which reads exactly like a
+property that never resolves. Three shapes of one mistake — reading the emission's *text* where its
+*structure* carries the meaning.
+
+**The durable verdict vocabulary**, five values, with the two `unsafe` classes deliberately not collapsed:
+
+```text
+movable                 justified representation, rest preserved, interpolation preserved,
+                        equivalence across every relevant semantic context
+registration-unsafe     typing already changes rest semantics
+interpolation-unsafe    rest survives, motion does not
+unresolved              no defensible typed syntax mapping yet
+fixture-unobservable    the fixture cannot see the constituent; no verdict, in either direction
+```
+
+`registration-unsafe ≠ interpolation-unsafe`: the first says the representation is wrong at rest, the second
+says it is wrong in motion, and they point at different rescues (a reshape versus different syntax). The
+book's longer phrase `registration-safe, interpolation-unsafe` is the same verdict as `interpolation-unsafe`
+with its precondition stated, and the precondition is what makes the divergence attributable to motion
+rather than to rest.
+
+**D.3.5 is two passes, not a loop over 99 pairs.** First derive the descriptor population — `pair`,
+`consumer`, `method`, `contexts`, typed representation — and mark anything the model cannot justify
+`unresolved-descriptor`, without guessing. Then classify only where the descriptor is complete.
+
+**Landed as D.3.4**, unchanged on the CTO's instruction: `scripts/lib/observation.mjs` (the descriptor and
+the emission readers), `scripts/lib/observation.test.mjs` (14 tests, including the three reader defects),
+`scripts/research/d3-observation.mjs`, the `research:d3-observation` entry, and three memories. No `src/` or
+emitted-CSS change; 17/17 stages, 79/79 behaviour.
+
+**The theme the three reader defects restate**, now spanning carriers, staging variables, emitted
+applications and research tooling:
+
+```text
+when structure carries meaning, do not recover it from serialized text
+```

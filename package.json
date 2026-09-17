@@ -114,6 +114,7 @@
     "research:d2-acceptance": "node scripts/research/d2-acceptance.mjs",
     "research:d3-reach": "node scripts/research/d3-reach.mjs",
     "research:d3-interpolation": "node scripts/research/d3-interpolation.mjs",
+    "research:d3-observation": "node scripts/research/d3-observation.mjs",
     "research:identity-collision": "node scripts/research/identity-collision.mjs",
     "candidate:diff": "node scripts/candidate-diff.mjs",
     "check": "node scripts/check.mjs",
