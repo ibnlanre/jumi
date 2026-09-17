@@ -3000,3 +3000,37 @@ keeps the layers as D.3.7 measured them: authoring state → normalizer → exec
 
 **State.** No change in this entry. `350c1f4` remains the tip of the track; `src/` is otherwise untouched, nothing
 is promoted, and the gate is 17/17 with 489 unit tests.
+
+
+## 2026-09-17 — the standing ledger for the `offset-anchor` landing
+
+The next session starts at step 1 of the queued plan. These are **fixed**, and the only thing that reopens any of
+them is a concrete implementation failure against it — not discomfort with the shape:
+
+```text
+two-axis subject                       the interpolable state is two resolved positional components
+static composition shell               the composition owns the splice; the motion owns the components
+authoring → execution only             context is authoring state, never execution state read back out
+whole-route decline on unresolved input   `null` takes the entire route back to the native path
+compound resolver only for declared families   reached when a family declares one, never a first attempt
+simple constituent path unchanged       the leaf-local canonicalizer stays the default
+```
+
+Three of those have measurement behind them rather than preference, which is why the reopen rule is phrased the way
+it is:
+
+```text
+two-axis subject          falsified-then-survived: the edge arm and its resolved spelling produce the same series
+static composition shell  D.3.6: moving the subject into the frames fixed a discrete flip; the shell cannot move
+authoring → execution     the one-way rule, which is what keeps `edge` an authoring input rather than a
+                          keyword-shaped execution subject
+```
+
+What is **not** fixed, and is deliberately left to the implementation: the resolver's exact signature, how the
+authoring projection is constructed, and where the execution leaves are named. Those are implementation choices
+inside the recorded boundaries.
+
+Also standing: `scripts/research/d3-probe.tmp.mjs` is untracked and not part of this track — leave it alone.
+
+**State.** No change in this entry. Tip `92ff539`, `src/` untouched since `350c1f4`, nothing promoted, gate 17/17
+with 489 unit tests.
