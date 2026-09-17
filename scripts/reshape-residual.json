@@ -3,6 +3,7 @@
     {
       "candidates": 0,
       "family": "animation",
+      "granularity": "none",
       "openPairs": [
         "animation-delay"
       ],
@@ -18,6 +19,7 @@
     {
       "candidates": 0,
       "family": "animation-range",
+      "granularity": "none",
       "openPairs": [
         "animation-range-start",
         "animation-range-end"
@@ -35,6 +37,7 @@
     {
       "candidates": 0,
       "family": "animation-timeline",
+      "granularity": "none",
       "openPairs": [
         "animation-timeline-scroll",
         "animation-timeline-view"
@@ -52,6 +55,7 @@
     {
       "candidates": 0,
       "family": "animation-timeline-scroll",
+      "granularity": "none",
       "openPairs": [
         "animation-timeline-scroller",
         "animation-timeline-axis"
@@ -69,6 +73,7 @@
     {
       "candidates": 0,
       "family": "animation-timeline-view",
+      "granularity": "none",
       "openPairs": [
         "animation-timeline-axis",
         "animation-timeline-inset"
@@ -86,6 +91,7 @@
     {
       "candidates": 0,
       "family": "backdrop-filter",
+      "granularity": "route",
       "openPairs": [],
       "pairCount": 11,
       "pairs": [
@@ -109,6 +115,7 @@
     {
       "candidates": 0,
       "family": "backdrop-filter-drop-shadow",
+      "granularity": "route",
       "openPairs": [],
       "pairCount": 4,
       "pairs": [
@@ -123,11 +130,11 @@
       "routeCount": 0
     },
     {
-      "candidates": 3,
+      "candidates": 2,
       "family": "background",
+      "granularity": "pair",
       "openPairs": [
         "background-position",
-        "background-repeat",
         "background-size"
       ],
       "pairCount": 3,
@@ -137,13 +144,14 @@
         "background-size"
       ],
       "production": "unknown",
-      "reason": "no pass has measured this family",
+      "reason": "1 of 3 pairs name a family that is already settled, so the family is open only for the rest",
       "research": "unmeasured",
-      "routeCount": 3
+      "routeCount": 2
     },
     {
       "candidates": 2,
       "family": "background-position",
+      "granularity": "none",
       "openPairs": [
         "background-position-x",
         "background-position-y"
@@ -161,6 +169,7 @@
     {
       "candidates": 0,
       "family": "border-block",
+      "granularity": "none",
       "openPairs": [
         "border-block-width"
       ],
@@ -176,6 +185,7 @@
     {
       "candidates": 2,
       "family": "border-image",
+      "granularity": "none",
       "openPairs": [
         "border-image-outset",
         "border-image-repeat"
@@ -193,6 +203,7 @@
     {
       "candidates": 0,
       "family": "border-inline",
+      "granularity": "none",
       "openPairs": [
         "border-inline-width"
       ],
@@ -208,6 +219,7 @@
     {
       "candidates": 0,
       "family": "box-shadow",
+      "granularity": "none",
       "openPairs": [
         "box-shadow-inset",
         "box-shadow-outset"
@@ -225,6 +237,7 @@
     {
       "candidates": 0,
       "family": "filter",
+      "granularity": "route",
       "openPairs": [],
       "pairCount": 11,
       "pairs": [
@@ -248,6 +261,7 @@
     {
       "candidates": 0,
       "family": "filter-drop-shadow",
+      "granularity": "route",
       "openPairs": [],
       "pairCount": 4,
       "pairs": [
@@ -264,6 +278,7 @@
     {
       "candidates": 0,
       "family": "math-depth",
+      "granularity": "family",
       "openPairs": [],
       "pairCount": 1,
       "pairs": [
@@ -277,6 +292,7 @@
     {
       "candidates": 0,
       "family": "matrix",
+      "granularity": "family",
       "openPairs": [],
       "pairCount": 6,
       "pairs": [
@@ -295,6 +311,7 @@
     {
       "candidates": 0,
       "family": "matrix-3d",
+      "granularity": "family",
       "openPairs": [],
       "pairCount": 16,
       "pairs": [
@@ -323,6 +340,7 @@
     {
       "candidates": 2,
       "family": "object-position",
+      "granularity": "none",
       "openPairs": [
         "object-position-x",
         "object-position-y"
@@ -340,6 +358,7 @@
     {
       "candidates": 2,
       "family": "offset-position",
+      "granularity": "none",
       "openPairs": [
         "offset-position-x",
         "offset-position-y"
@@ -357,6 +376,7 @@
     {
       "candidates": 0,
       "family": "rotate-3d",
+      "granularity": "family",
       "openPairs": [],
       "pairCount": 4,
       "pairs": [
@@ -373,6 +393,7 @@
     {
       "candidates": 0,
       "family": "scale-3d",
+      "granularity": "family",
       "openPairs": [],
       "pairCount": 3,
       "pairs": [
@@ -388,6 +409,7 @@
     {
       "candidates": 2,
       "family": "skew",
+      "granularity": "none",
       "openPairs": [
         "skew-x",
         "skew-y"
@@ -405,6 +427,7 @@
     {
       "candidates": 1,
       "family": "transform",
+      "granularity": "pair",
       "openPairs": [
         "perspective-3d",
         "skew"
@@ -427,6 +450,7 @@
     {
       "candidates": 0,
       "family": "translate-3d",
+      "granularity": "family",
       "openPairs": [],
       "pairCount": 3,
       "pairs": [
@@ -448,11 +472,11 @@
   },
   "unmeasured": [
     {
-      "candidates": 3,
+      "candidates": 2,
       "family": "background",
+      "granularity": "pair",
       "openPairs": [
         "background-position",
-        "background-repeat",
         "background-size"
       ],
       "pairCount": 3,
@@ -462,13 +486,14 @@
         "background-size"
       ],
       "production": "unknown",
-      "reason": "no pass has measured this family",
+      "reason": "1 of 3 pairs name a family that is already settled, so the family is open only for the rest",
       "research": "unmeasured",
-      "routeCount": 3
+      "routeCount": 2
     },
     {
       "candidates": 2,
       "family": "background-position",
+      "granularity": "none",
       "openPairs": [
         "background-position-x",
         "background-position-y"
@@ -486,6 +511,7 @@
     {
       "candidates": 2,
       "family": "border-image",
+      "granularity": "none",
       "openPairs": [
         "border-image-outset",
         "border-image-repeat"
@@ -503,6 +529,7 @@
     {
       "candidates": 2,
       "family": "object-position",
+      "granularity": "none",
       "openPairs": [
         "object-position-x",
         "object-position-y"
@@ -520,6 +547,7 @@
     {
       "candidates": 2,
       "family": "offset-position",
+      "granularity": "none",
       "openPairs": [
         "offset-position-x",
         "offset-position-y"
@@ -537,6 +565,7 @@
     {
       "candidates": 2,
       "family": "skew",
+      "granularity": "none",
       "openPairs": [
         "skew-x",
         "skew-y"
@@ -554,6 +583,7 @@
     {
       "candidates": 1,
       "family": "transform",
+      "granularity": "pair",
       "openPairs": [
         "perspective-3d",
         "skew"
@@ -576,6 +606,7 @@
     {
       "candidates": 0,
       "family": "animation-range",
+      "granularity": "none",
       "openPairs": [
         "animation-range-start",
         "animation-range-end"
@@ -593,6 +624,7 @@
     {
       "candidates": 0,
       "family": "animation-timeline",
+      "granularity": "none",
       "openPairs": [
         "animation-timeline-scroll",
         "animation-timeline-view"
@@ -610,6 +642,7 @@
     {
       "candidates": 0,
       "family": "animation-timeline-scroll",
+      "granularity": "none",
       "openPairs": [
         "animation-timeline-scroller",
         "animation-timeline-axis"
@@ -627,6 +660,7 @@
     {
       "candidates": 0,
       "family": "animation-timeline-view",
+      "granularity": "none",
       "openPairs": [
         "animation-timeline-axis",
         "animation-timeline-inset"
@@ -644,6 +678,7 @@
     {
       "candidates": 0,
       "family": "box-shadow",
+      "granularity": "none",
       "openPairs": [
         "box-shadow-inset",
         "box-shadow-outset"
@@ -661,6 +696,7 @@
     {
       "candidates": 0,
       "family": "animation",
+      "granularity": "none",
       "openPairs": [
         "animation-delay"
       ],
@@ -676,6 +712,7 @@
     {
       "candidates": 0,
       "family": "border-block",
+      "granularity": "none",
       "openPairs": [
         "border-block-width"
       ],
@@ -691,6 +728,7 @@
     {
       "candidates": 0,
       "family": "border-inline",
+      "granularity": "none",
       "openPairs": [
         "border-inline-width"
       ],

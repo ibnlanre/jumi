@@ -28,54 +28,70 @@ const root = path.resolve(import.meta.dirname, '..', '..')
  */
 const SETTLED = new Map([
   ['scale-3d', {
+    granularity: 'family',
     production: 'unchanged',
     reason: 'separable (D.3.8, single and three-way); no candidate serves its constituents',
     research: 'safe-no-need',
   }],
   ['translate-3d', {
+    granularity: 'family',
     production: 'unchanged',
     reason: 'separable (D.3.8); co-existence with another transform participant already composes, so typed-whole migration repairs nothing',
     research: 'safe-no-need',
   }],
   ['rotate-3d', {
+    granularity: 'family',
     production: 'native',
     reason: 'coupled: a fixed axis reproduces native, a turning axis beside a turning angle does not',
     research: 'coupled-native',
   }],
   ['matrix', {
+    granularity: 'family',
     production: 'native',
     reason: 'coupled: the control passes and both adversarial simultaneous arms diverge',
     research: 'coupled-native',
   }],
   ['matrix-3d', {
+    granularity: 'family',
     production: 'native',
     reason: 'coupled: two coefficients moving together diverge from native, and sixteen are not independent',
     research: 'coupled-native',
   }],
   ['filter', {
+    granularity: 'route',
     production: 'unchanged',
     reason: 'separable in six combinations including nested drop-shadow; shipped execution is native-equivalent',
     research: 'safe-no-need',
   }],
   ['backdrop-filter', {
+    granularity: 'route',
     production: 'unchanged',
     reason: 'separable in six combinations including nested drop-shadow; shipped execution is native-equivalent',
     research: 'safe-no-need',
   }],
   ['filter-drop-shadow', {
+    granularity: 'route',
     production: 'unchanged',
     reason: 'the nested argument of a separable family, measured as an argument and as part of a coexistence arm',
     research: 'safe-no-need',
   }],
   ['backdrop-filter-drop-shadow', {
+    granularity: 'route',
     production: 'unchanged',
     reason: 'the nested argument of a separable family, measured in both gates',
     research: 'safe-no-need',
   }],
   ['math-depth', {
+    granularity: 'family',
     production: 'migrated',
     reason: 'the function-argument reshape landed in D.3.6: static shell, typed argument, argument as the subject',
     research: 'migrated',
+  }],
+  ['background-repeat', {
+    granularity: 'route',
+    production: 'native',
+    reason: 'D.3.9 survey: the public route animates the longhand directly (attribute === component, no parts) and its grammar is `any` over the discrete keywords repeat/no-repeat/space/round — there is no interpolable subject to reshape',
+    research: 'keyword-discrete',
   }],
 ])
 
@@ -123,6 +139,13 @@ const ledger = families.map(family => {
   return {
     candidates: open.filter(one => servingCandidates(one).length > 0).length,
     family,
+    /**
+     * At what level the verdict was decided. `transform` is why the column exists: a family-level reading of it
+     * hides that five of its seven pairs are settled elsewhere, and `background` is the same shape one step on —
+     * its three pairs are served by candidates that address the *constituent longhands*, so a verdict about the
+     * parent says nothing about the routes that actually exist.
+     */
+    granularity: settled?.granularity ?? (open.length < pairs.length ? 'pair' : 'none'),
     openPairs: open.map(one => one.component),
     pairCount: pairs.length,
     pairs: pairs.map(one => one.component),
@@ -171,7 +194,7 @@ console.log(
 
 for (const one of ledger)
   console.log(
-    `${one.family.padEnd(28)} ${one.research.padEnd(20)} open=${String(one.openPairs.length).padEnd(3)} of=${String(one.pairCount).padEnd(3)} routes=${String(one.routeCount).padEnd(3)} candidates=${one.candidates}`,
+    `${one.family.padEnd(28)} ${one.research.padEnd(20)} ${one.granularity.padEnd(7)} open=${String(one.openPairs.length).padEnd(3)} of=${String(one.pairCount).padEnd(3)} routes=${String(one.routeCount).padEnd(3)} candidates=${one.candidates}`,
   )
 
 console.log('\nopen, ranked by reachable routes then open pairs:')

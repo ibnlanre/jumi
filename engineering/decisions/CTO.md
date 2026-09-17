@@ -4052,3 +4052,68 @@ three coupled families.
 **Correction, appended:** the entry above named `pnpm research:d3-residual` before registering it, so for one commit
 the book existed and the script it is addressed by did not. Registered now; the readings were always produced by the
 book itself and are unchanged.
+
+---
+
+## D.3.9 opened as classification: `background`'s three pairs are three different questions
+
+The survey, from the model rather than from the morphology — route, candidate grammar, resting value, shell,
+observable, and the execution path each route actually takes:
+
+```text
+pair                        route                       attribute            parts  types
+background/background-…     animate-background-position  background-position  []     position, percentage, length, any
+                            animate-background-size      background-size      []     length, percentage, any
+                            animate-background-repeat    background-repeat    []     any
+```
+
+**Every one of the three routes addresses the constituent longhand itself — `attribute === component`, no parts.** So
+the subject of the motion is the longhand, not the `background` shorthand, and there is no shorthand-owned execution
+path for a migration to repair. That is the ruling's closing hypothesis arriving first: these routes operate on their
+own longhands, so the parent's three pairs are not one execution problem and a parent-level verdict would be about a
+route nobody uses.
+
+The three constituents classify separately, as expected:
+
+```text
+background-position   positional, continuous, edges beside offsets per axis — its x/y sub-pairs are the real
+                      subject, and D.3.5 already declared typed <percentage> offset leaves for it
+background-size       dimensional with `auto` rests, so the grammar boundary (length ↔ percentage ↔ auto) is part
+                      of the question and must not be inferred from <length-percentage> morphology
+background-repeat     discrete keywords — repeat / no-repeat / space / round — with a grammar of `any`, so there is
+                      no interpolable subject to reshape at all
+```
+
+`background-repeat` is therefore recorded as **native** in the ledger under a status the vocabulary did not have:
+`keyword-discrete`, distinct from `coupled-native` because nothing is coupled — there is simply nothing to
+interpolate. Multilayer syntax is reachable through these routes (the `any` type admits a list by arbitrary value), and
+it is recorded as reachable rather than exercised: single-layer equality would not be sufficient for admission if the
+comma-separated form can arrive, but it cannot make a discrete keyword interpolable either.
+
+### The ledger gained the column the ruling asked for
+
+```text
+pair · route · morphology · decision status · decision granularity
+```
+
+`granularity` says at what level the verdict was decided — `family` for the wholesale ones, `route` for the filter
+families, `pair` where a family's children were settled individually. It immediately changed a rank: `background` went
+from three open pairs to two, because the survey retired `repeat` before any browser was opened. `transform` had
+already shown the same shape one level down.
+
+### What that leaves, and the pattern underneath it
+
+```text
+background            routes=2  open=2   background-position, background-size
+background-position   routes=2  open=2   background-position-x, background-position-y
+object-position       routes=2  open=2   object-position-x, object-position-y
+offset-position       routes=2  open=2   offset-position-x, offset-position-y
+```
+
+Four families now tie at two routes, and three of them are the **same shape**: an axis pair whose constituents are an
+edge beside an offset, with the offset already carrying a typed leaf from D.3.5. That is the cheap, high-leverage
+question left in the bucket — measure the shape once rather than the families three times — and it is the reason the
+rank ties are worth reading as a group instead of broken arbitrarily.
+
+**State.** No production code moved. Gate 17/17, 498 unit tests, 87/87 behaviour arms, `tsc` clean. The ledger is
+`scripts/reshape-residual.json`; `pnpm research:d3-residual` regenerates it.
