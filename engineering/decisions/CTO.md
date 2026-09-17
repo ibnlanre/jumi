@@ -3808,3 +3808,57 @@ ruled.
 
 **State.** No production code moved and no scratch file left behind. Gate 17/17, 498 unit tests, 87/87 behaviour arms,
 `tsc` clean.
+
+---
+
+## The co-existence measurement: there is no contention to repair, so the route is left alone
+
+The participant was chosen by architecture and proven before anything was measured, against the compiled sheet:
+
+```text
+transform = var(--jumi-perspective-3d) var(--jumi-matrix) var(--jumi-matrix-3d) var(--jumi-rotate-3d)
+            var(--jumi-scale-3d) var(--jumi-skew) var(--jumi-translate-3d)
+
+ok  the composition reads --jumi-translate-3d
+ok  the composition reads --jumi-rotate-3d
+ok  animate-rotate-3d writes --jumi-rotate-3d
+```
+
+`animate-rotate-3d` is the verified participant — a whole-function 3-D route whose emitted rule writes a slot that
+composition reads — and the observable is the **computed `transform`** throughout.
+
+```text
+A   animate-translate-3d alone   0 · (2.5, 5) · (5, 10) · (7.5, 15) · (10, 20)
+B   animate-rotate-3d alone      identity → … → 0.853553, 0.146447, -0.5, …
+C   both                         rotation **and** translation, both varying at every sample
+```
+
+**Coexistence already composes.** The C series carries the rotated basis *and* the translation in the same matrix at
+every instant — `matrix3d(0.990393, 0.00960736, …, 2.52402, 4.97598, 0.344874, 1)` — so the property-level route does
+**not** suppress the other participant. The D.2 contention shape is real in general and does not occur here: the
+frames' values are the composition itself, so the animation that wins the property still reads every slot the
+composition names, and the other route's contribution survives through its own slot.
+
+That is the second branch of the ruling, measured rather than assumed:
+
+```text
+alone same, coexistence same → no production benefit; leave the route alone
+```
+
+So **`animate-translate-3d` is not promoted.** D.3.8's separability is the reason the route *would* be safe to
+migrate; it is not a reason to migrate it, because nothing is broken by leaving it native. `scale-3d` has no
+candidate, the six `(3d-parent, component)` pairs have no route, and none of the three is promoted.
+
+**One arm came out void and is recorded as void.** The prototype's element was selected by `#proto` while the scenario
+ids are `A`…`PC`, so its reading is `none` with zero animations and the alone-equivalence comparison against `A`
+cannot be made from it. It is moot rather than loss: the prototype existed to test whether typed execution repairs
+contention, and there is no contention. Had coexistence failed, this arm would have had to be rebuilt before any
+conclusion — which is the ninth fixture defect of this track and the third to be caught only because the readings are
+printed rather than summarised.
+
+D.3.8 therefore closes with a research result and **no production change**, which is the correct outcome for a pass
+whose hypothesis was falsification: the cluster's separable members turned out to need nothing, and its coupled
+members stay native as ruled.
+
+**State.** No production code moved, no scratch file left behind. Gate 17/17, 498 unit tests, 87/87 behaviour arms,
+`tsc` clean.
