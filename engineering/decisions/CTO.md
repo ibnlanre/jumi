@@ -1315,7 +1315,7 @@ Everything except one probe per syntax comes out of the emission — the rest th
 for (`restOf`), the frame the motion goes to (`framesOf`), the surface the pair is read on and the wiring that
 hands the value there (`applicationOf`), and the slot the leaf actually is (`pinningOf`, which follows the
 sheet's own compositions rather than the first `var(` it sees). The probe is the arm's only authored input, and
-the test suite asserts each one is a value its own syntax admits *by the shape reader's judgement*, so an arm
+the test suite asserts each one is a value its own syntax admits _by the shape reader's judgement_, so an arm
 cannot test a representation against a value the representation does not cover.
 
 ```text
@@ -1360,13 +1360,13 @@ proposed syntax  <integer>
 
 The moving thing is an argument inside `add(...)`, not the scalar leaf the resting value suggested — so the
 interpolation unit is **not** the leaf this pair was bucketed as. That is **reshape**, D.1's subject, and it is
-recorded here as a falsification of the census bucket rather than as a defect in the emission: *resting-value
-morphology alone cannot always identify the interpolation unit*. The test is the model's own `FUNCTION`
+recorded here as a falsification of the census bucket rather than as a defect in the emission: _resting-value
+morphology alone cannot always identify the interpolation unit_. The test is the model's own `FUNCTION`
 pattern over the emitted frames, not a list of properties, so it generalises past `math-depth`.
 
 **`registration-unsafe` is 0 by construction, and that is a result rather than a gap.** The syntax came from
 the resting value's own shape, so the rest is inside the syntax the derivation proposed — and the reach gate's
-`registration-unsafe` belongs to the *keyword* population, where the rest is a keyword and the grammar is a
+`registration-unsafe` belongs to the _keyword_ population, where the rest is a keyword and the grammar is a
 promise. The pass measures the rest anyway: the emission's rest is read from the sheet rather than assumed from
 the model, and the two disagreeing is a reader defect it **fails** on rather than a finding it reports.
 
@@ -1378,8 +1378,8 @@ the model, and the two disagreeing is a reader defect it **fails** on rather tha
   `#0000ff80` now, and the suite asserts no probe carries whitespace.
 - **A fixture that forgets the emitted sheet reads `none` and agrees.** The first run omitted it and produced
   27 `movable` verdicts from two invalid readings each. Two arms that never moved are one reading, so it is now
-  a **hard failure**: a flat native series *with* an identical typed series exits non-zero.
-- **The one-value spelling makes the arm motionless.** `-[2]` sets the leaf's *live* slot to the target, so the
+  a **hard failure**: a flat native series _with_ an identical typed series exits non-zero.
+- **The one-value spelling makes the arm motionless.** `-[2]` sets the leaf's _live_ slot to the target, so the
   application's frame reference wins and the leaf drives nothing; the phrase form `-[0:<rest>|100:<probe>]`
   keeps the live slot at its rest and is the only spelling under which the leaf is the source of truth.
 - **The report is part of the instrument.** The assembler returned an object per verdict while the tally
@@ -1526,7 +1526,7 @@ in an object once one needs it. So the moment `background-position` joined `scal
 the general statement the file always needed.
 
 And the pass's population filter read `status !== 'unresolved-descriptor'`, which means "the model declares a
-representation for it" — so widening it to include declared pairs promptly *dropped* every pair that is still
+representation for it" — so widening it to include declared pairs promptly _dropped_ every pair that is still
 undecided, taking `mask-border-outset`, the rotate axes, `math-depth-add` and the two `offset-anchor` pairs out of
 a pass whose job is to keep deciding them. Measured: the population fell to 37 pairs and the tally lost every
 exclusion it had found. The filter is `reason !== 'no candidate addresses the pair'` — "the model serves it" is
@@ -1562,7 +1562,7 @@ undecided and uncommitted to any representation, as ruled.
 
 The pass-three entry above records `math-depth-add` as **`interpolation-unsafe`**, and that was the conclusion the
 measurement supported at the time: the registered leaf never left `0` while the property read `0 · 1 · 1 · 2 · 2`.
-That entry stands as written. This one corrects it, because later evidence changed the *reading* rather than the
+That entry stands as written. This one corrects it, because later evidence changed the _reading_ rather than the
 measurement:
 
 ```text
@@ -1622,7 +1622,7 @@ later diagnosis       the emission cannot be repaired locally: the model's inter
 superseding class     reshape-required
 ```
 
-The first two are still true. What changed is the diagnosis of *why* production was invalid, and that belongs to
+The first two are still true. What changed is the diagnosis of _why_ production was invalid, and that belongs to
 the representation model rather than to the emission — so `blocked-by-emission` leaves the live vocabulary and the
 finding stays here, which is what this log is for.
 
@@ -1689,7 +1689,6 @@ and, kept apart:       the five union-syntax routes of scale/translate are NOT u
 map is unchanged, so the rerun proof from the promotion still stands. 17/17 stages, 79/79 behaviour, 477 unit
 tests.
 
-
 ## 2026-09-17 — D.3.6 · the function-argument reshape: the primitive works, and the subject it changes
 
 ### The question
@@ -1733,7 +1732,7 @@ what the frames do          @keyframes jumi-math-depth-sluPV {
                             }
 ```
 
-So the shell is written into the **property's** frame variables, the *subject* the frames animate is
+So the shell is written into the **property's** frame variables, the _subject_ the frames animate is
 `math-depth` itself, and `math-depth` is not registered — which is why the series is a discrete flip rather
 than a series. Moving the shell inside those same frames changes nothing; the first version of the proposal
 assumed there was a declaration of the leaf to take the shell out of, and the emission answered that there is
@@ -1742,10 +1741,23 @@ none.
 ### The proposal, in full
 
 ```css
-@property --jumi-math-depth-add { syntax: '<integer>'; inherits: false; initial-value: 0; }
+@property --jumi-math-depth-add {
+  syntax: '<integer>';
+  inherits: false;
+  initial-value: 0;
+}
 
-#e         { math-depth: add(var(--jumi-math-depth-add)); }   /* the composition owns the shell */
-@keyframes { from { --jumi-math-depth-add: 0 } to { --jumi-math-depth-add: 2 } }   /* the frames animate the argument */
+#e {
+  math-depth: add(var(--jumi-math-depth-add));
+} /* the composition owns the shell */
+@keyframes {
+  from {
+    --jumi-math-depth-add: 0;
+  }
+  to {
+    --jumi-math-depth-add: 2;
+  }
+} /* the frames animate the argument */
 ```
 
 One registration, one substitution, and the frames' **subject** moved from the property to the argument.
@@ -1771,13 +1783,13 @@ argument it is reporting on.
 
 **"Moving" is not one thing.** The first classification called the emitted arm `already-moving`, because it
 does move — in the two steps of a discrete flip. A discrete series is the two stops and nothing else; an
-interpolated one has values between them. The tally now separates the two, and treats *discrete in both
-arms* as an arm defect rather than a finding, alongside *endpoints moved*, which would be a different motion
+interpolated one has values between them. The tally now separates the two, and treats _discrete in both
+arms_ as an arm defect rather than a finding, alongside _endpoints moved_, which would be a different motion
 rather than the same one interpolated.
 
 **A pin is constant by construction.** The first canary asked for variation across the wall and therefore
-reported every working pin as blindness. What a canary has to establish is that the consumer *deviates from
-its unpinned reading* when the leaf is pinned — not that the pinned reading varies. And the fixture's
+reported every working pin as blindness. What a canary has to establish is that the consumer _deviates from
+its unpinned reading_ when the leaf is pinned — not that the pinned reading varies. And the fixture's
 element is part of the observable: `math-depth` applies to MathML, so the first run's `<div>` read the
 initial value whatever the frames said, and reported the pair `fixture-unobservable` for the fixture's
 shape rather than for the representation's.
@@ -1804,7 +1816,7 @@ not claim it: they are unmeasured, which is what the release rule says an unmeas
 The survey found the shell in two structural places — the entry's own rest (`value: css('blur', '0')`) and the
 candidate's part (`['math-depth-add', value => css('add', value)]`) — and the ruling's instruction is not to
 normalize them into "same source metadata": they say **where the shell's semantics currently live**. The
-eventual abstraction may unify *execution*, but the reader still has to prove the shell from whichever
+eventual abstraction may unify _execution_, but the reader still has to prove the shell from whichever
 structural source owns it, or the model risks inventing a generic wrapper it never declared.
 
 So the invariant, as ruled:
@@ -1825,8 +1837,8 @@ no function-name guessing
 > rerun `math-depth-add` against production, and close the function-argument reshape track. Then move to
 > `offset-anchor`.**
 
-The falsification is the D.2-style test this track has used before: *does the same subject relocation work in
-a second family without changing core behaviour?* Two representatives, not a census — and the production
+The falsification is the D.2-style test this track has used before: _does the same subject relocation work in
+a second family without changing core behaviour?_ Two representatives, not a census — and the production
 shape it licenses is a detection, never a list:
 
 ```text
@@ -1850,7 +1862,6 @@ fixture-unobservable   rotate-z · mask-border-outset ×4              5 routes
 `scripts/argument-reshape.json` and a survey, and the release rule is unchanged — evidence attaches to the
 route and representation that ships. 17/17 stages, 79/79 behaviour, 477 unit tests.
 
-
 ## 2026-09-17 — D.3.6's second family: the primitive survives, and the two origins need different repairs
 
 ### The ruling
@@ -1861,8 +1872,8 @@ route and representation that ships. 17/17 stages, 79/79 behaviour, 477 unit tes
 > rerun `math-depth-add` against production, and close the function-argument reshape track. Then move to
 > `offset-anchor`.**
 
-D.3.6 is `817ba21`, with the entry above narrowed as ruled: the 22 leaves are *structurally applicable*,
-*behaviourally unproven*.
+D.3.6 is `817ba21`, with the entry above narrowed as ruled: the 22 leaves are _structurally applicable_,
+_behaviourally unproven_.
 
 ### The falsification, and what "small" was held to
 
@@ -1872,7 +1883,7 @@ different (`<angle>` rather than `<length>`, so a different type, unit family an
 classification of the remaining 19.
 
 Every input is structurally identified, per the ruling's invariant — **leaf · shell function · argument
-position · static consumer composition · typed representation** — or the arm is *refused* rather than
+position · static consumer composition · typed representation** — or the arm is _refused_ rather than
 estimated: the shell from the survey, the argument position from the shell's own rest (and refused when the
 call does not take exactly one argument, which is how `drop-shadow(…)` stays out), the syntax from the
 candidate's single declared type through the derivation's own `SYNTAX_OF` table rather than a second copy of
@@ -1889,8 +1900,8 @@ filter ← filter-hue-rotate        [<angle>]    0deg → 45deg  equivalent, 5 d
 ```
 
 **Equivalent** is the strongest result this test can produce: the same series sample for sample, with the
-emission's shape changed and the motion unchanged. So the answer to *does the same subject relocation work in
-a second family without changing core behaviour* is yes, and the D.2-style family test passes.
+emission's shape changed and the motion unchanged. So the answer to _does the same subject relocation work in
+a second family without changing core behaviour_ is yes, and the D.2-style family test passes.
 
 The one thing that is **not** the same as `math-depth`, and it is the reason both origins had to be kept
 apart rather than normalized:
@@ -1912,21 +1923,21 @@ The leaf-origin leaves write the shell into their own **rest** and into their cl
 and those the proposal's element rule cannot override because they are different properties from the
 consumer. Measured: with the shell left written, pinning the leaf to `20px` made the composition read
 `blur(20px)` as one filter and `20px` as the next, so the whole declaration voided and `filter` computed to
-`none`. The repair therefore has to **strip the shell from every write of the leaf** (rest *and* frame
-variables) and put it on the *read* inside the composition — where the phrase-origin case needs nothing
+`none`. The repair therefore has to **strip the shell from every write of the leaf** (rest _and_ frame
+variables) and put it on the _read_ inside the composition — where the phrase-origin case needs nothing
 stripped, because its shell sits in frames the element rule already overrides. One transformation, two
 origins, and the ruling's warning not to normalize them was load-bearing.
 
 ### Two harness corrections this increment paid for
 
 **Easing must be held equal in both arms.** The emitted arm's animation carries the phrase's own easing while
-the proposal's frames are written `linear`, so the first comparable run reported a *difference* that was only
+the proposal's frames are written `linear`, so the first comparable run reported a _difference_ that was only
 the easing — `0 · 8.17 · 16.05 · 19.21 · 20` against `0 · 5 · 10 · 15 · 20` for a `blur` nobody disputed. With
 `animation-timing-function: linear` forced on the element in both arms, equality became a statement about the
 representation and nothing else.
 
 **A refusal must say what it refused on.** The first version asked the property table for the leaf's rest and
-got the *source text* (`css('blur', '0')`), so all three representatives were refused as "the shell does not
+got the _source text_ (`css('blur', '0')`), so all three representatives were refused as "the shell does not
 take exactly one argument" when nothing had been read at all. The resolved rest comes from the derivation.
 
 ### State
@@ -1936,3 +1947,287 @@ licenses next is the generic implementation — detect a shell-shaped typed cons
 retain the shell in the composition — followed by `math-depth-add` rerun against production, then the close
 of the track, then `offset-anchor`. Nothing in `src/` changed in this increment and nothing was promoted:
 17/17 stages, 79/79 behaviour, 477 unit tests.
+
+
+## 2026-09-17 — the generic implementation, attempted: the composition half lands, the subject half is gated
+
+### The ruling
+
+> **Implement the function-argument primitive generically, but do not globally apply it to the 23 surveyed
+> leaves. Activate it only where route-specific evidence licenses promotion, starting with `math-depth-add`.
+> Rerun `math-depth-add` against the shipped implementation and close D.3.6 if it reproduces the measured
+> series. Leave the structurally applicable but unmeasured filter/backdrop leaves unchanged.**
+
+### What was attempted, and the two halves it turned out to have
+
+The primitive needs two things, and the machinery already had the second one. `core/index.ts`'s **typed
+constituent** path emits `emitKeyframe('jumi-<component>', { from: substrate, to: { ...substrate, [leaf]:
+var(--jumi-<component>-100) } })` with `substrate = { [attribute]: var(--jumi-<attribute>) }` — so the frames
+animate the leaf and re-assert the composition, which is exactly D.3.6's proposal. The change therefore
+looked declarative: make the composition own the shell, make the authored value the bare argument, and declare
+the leaf. No branch on a property name, no table of function names — the shell is read off the composition,
+which is where it now lives.
+
+```diff
+  src/composition/math-depth.ts   css('var', '--jumi-math-depth-add')  →  css('add', 'var(--jumi-math-depth-add)')
+  src/properties/tween.ts         ['math-depth-add', value => css('add', value)]  →  ['math-depth-add', value => value]
+  src/variables/typed-leaves.ts   'math-depth': { 'math-depth-add': { animationCanonicalizer: integerOnly,
+                                    initialValue: '0', syntax: '<integer>' } }
+```
+
+**The composition half works, and that is measured.** The emitted sheet becomes
+
+```text
+--jumi-math-depth-add-sluPV-0: 0            the frame values are bare
+--jumi-math-depth-add-sluPV-100: 2
+--jumi-math-depth: add(var(--jumi-math-depth-add))                          the composition owns the shell
+@keyframes … { math-depth: add(var(--jumi-math-depth-add-sluPV-0, var(--jumi-math-depth-add))) }
+```
+
+i.e. D.3.6's shape *minus the subject relocation*: the frames still animate `math-depth` through the slot
+machinery (`@keyframes jumi-math-depth-sluPV`, not `jumi-math-depth-add`), so the series is still the discrete
+flip — measured `0 · 0 · 2 · 2 · 2` where the proposal is `0 · 1 · 1 · 2 · 2`.
+
+**The subject half did not engage.** The typed-constituent branch is guarded by
+
+```ts
+if (component && isFullyAddressable(attribute))
+```
+
+and for this pair it did not admit, so the emission stayed on the composed path. `isFullyAddressable` is
+`edges.every(edge => edge.addressable)` over edges derived from the composition; for `math-depth` the single
+edge is `math-depth-add`, read through `add(var(--jumi-math-depth-add))`, which `readSlots` should still find
+as a bare read and classify `direct`. That expectation is **not** what the emission shows, so the refusal is
+either in that derivation or in the branch's other inputs (`typedLeafOf`, `canonicalizeLeaf`) — and it was not
+localised within the increment.
+
+Also corrected on the way: a part written as a bare string is not assignable to `PropertyPart`, which requires
+the `[PropertyType, (value: string) => string]` pair. The honest spelling is the **identity** transform, since
+the shell is gone from the value rather than respelled there.
+
+### Why it was reverted rather than left standing
+
+The change is not shippable in that state: the emission differs while the motion does not, so it would move
+`css-snapshot`, the unit tests that pin the composition, and every downstream consumer of `math-depth`'s
+frames — for a series that is still discrete. `types`, `unit` and `css` failed exactly as they should, and the
+three `src/` files were restored by name (`git restore`, never a blanket discard). The gate is green at 17/17
+and `src/` is unchanged from `627f8d6`.
+
+What survives is the half that is worth not re-deriving: **the composition spelling is sufficient to make the
+shell static, and the typed-constituent machinery is already the primitive** — the remaining work is finding
+the admission test that refused, with `isFullyAddressable('math-depth')` and its `edgesOf` derivation as the
+first suspect and the branch's other inputs as the second.
+
+**State.** No `src/` change, nothing promoted, nothing staged. 17/17 stages, 79/79 behaviour, 477 unit tests.
+
+
+## 2026-09-17 — the admission gate, diagnosed: no predicate refuses, the phrase spelling does
+
+### The ruling
+
+> **Pick up at the admission test. … The next increment should be diagnostic only … Print/assert each one
+> independently before changing production code again. The key question is: which exact predicate prevents the
+> already-existing typed-constituent path from admitting `math-depth-add`? … If the diagnosis instead reveals
+> that enabling `math-depth-add` requires weakening `isFullyAddressable` in a way that accidentally admits
+> other shell-shaped leaves, stop there.**
+
+### The diagnostic, one predicate at a time
+
+A throwaway test printed each input rather than inferring the answer from the emitted keyframe name. With the
+composition spelling `add(var(--jumi-math-depth-add))` and the leaf declared:
+
+```text
+propertyVariables['math-depth'].value                 "add(var(--jumi-math-depth-add))"
+readSlots(that value)                                 [{"fallback":"","name":"--jumi-math-depth-add"}]
+isDirectlyAddressable('math-depth', 'math-depth-add') true
+isFullyAddressable('math-depth')                      true          (and 'filter' is false, as it should be)
+typedLeafOf('math-depth', 'math-depth-add')           {"initialValue":"0","syntax":"<integer>"}
+canonicalizeLeaf(declaration, '0' | '2' | '7')        "0" | "2" | "7"
+```
+
+**Every predicate admits.** The suspected architectural correction — that the addressability taxonomy treats a
+function-wrapped read as non-direct and is therefore too coarse for typed arguments — is *not* what is
+happening: `readSlots` finds the read inside `add(...)`, calls it bare, and the edge is already `direct`. So
+nothing needed weakening, and the ruling's stop condition is not triggered.
+
+### What actually refused: the authored spelling, not a predicate
+
+A candidate whose value carries **frames** — `animate-math-depth-add-[0:0|100:2]`, the spelling D.3.5 and D.3.6
+both use — takes the phrase branch and **returns** from it, above `register(attribute)`, above
+`if (!parts.length)`, above the `component && isFullyAddressable(attribute)` branch. The typed-constituent path
+is not *refused* by that spelling; it is **unreachable** from it. That is the constraint D.2 already recorded as
+open — *multi-stop constituent phrases decline typed execution and keep the old composed representation* — and
+it is the reason two increments of measurement saw the composed path: the arms were authored in a form the
+representation it selects cannot be reached from.
+
+The phrase spelling is not wrong for what it was for: it exists so a composed representation's *frames* can be
+read per stop. It is the wrong instrument for asking what the typed representation does, and D.3.5 chose it for
+a reason that did not survive the reshape — the one-value spelling set the leaf's *live* slot and left the leaf
+driving nothing *under the composed path*, which is exactly the situation the typed path replaces.
+
+### Acceptance, measured against the shipped build
+
+With the three declarative changes and the **value** spelling:
+
+```text
+--jumi-math-depth: add(var(--jumi-math-depth-add))       the composition owns the shell
+@property --jumi-math-depth-add                            the argument is registered as <integer>
+@keyframes jumi-math-depth-add {                          the frames animate the argument
+  --jumi-math-depth-add: var(--jumi-math-depth-add-100)
+  math-depth: var(--jumi-math-depth)                      and re-assert the composition
+}
+
+animate-math-depth-add-[2]:  0 · 1 · 1 · 2 · 2            D.3.6 proposed  0 · 1 · 1 · 2 · 2
+animate-math-depth-add-[7]:  0 · 2 · 4 · 5 · 7            D.3.6 proposed  0 · 2 · 4 · 5 · 7
+```
+
+No property-name branch, no function-name table, no change to the admission rule, and the 22 filter/backdrop
+leaves do not opt in (they are undeclared, and `isFullyAddressable('filter')` stays false).
+
+### Why it is not landed yet, and what landing needs
+
+The three declarative lines are written, measured, and were reverted again — not because the mechanism is in
+doubt but because the emission change is the *first* one that the census and the evidence registry have to
+absorb, and three things follow from it:
+
+```text
+census morphology     (math-depth, math-depth-add) moves value → reshape, because a shell-shaped composition
+                      is read as one: asserted counts 107/99/97 become 106/99/98
+evidence registry     scripts/validated-representations.json still records math-depth-add@math-depth as
+                      reshape-required, so the promotion guard refuses the declaration until the validation
+                      pass measures with the representation the model now selects
+snapshot              scripts/css-snapshot re-recorded for the new composition
+```
+
+`types` and `lint` pass with the change; `unit` and `css` fail on exactly those three, and each failure names
+its own repair. That is bookkeeping with a known shape rather than an unsolved question, but it is a second
+increment, and a half-landed emission is worse than none — so `src/` is restored by name and the gate is green
+at 17/17.
+
+**State.** No `src/` change, nothing promoted, nothing staged. The primitive is proven end to end against the
+shipped build and the only remaining work is the bookkeeping above, then `offset-anchor`.
+
+
+## 2026-09-17 — the landing attempted: the pass is tied to the representation it was built on, in three places
+
+### The ruling
+
+> **Go. Take it as one production increment and close D.3.6 if the rerun matches.** … 1. reapply the three
+> production changes … 2. update the validation arm to exercise the representation through the single-value
+> spelling that actually selects it … 3. rerun against production … 4. only if the production series reproduces
+> … change the route evidence … 5. let the declaration guard admit … 6. update census morphology … 7.
+> re-record the CSS snapshot … 8. full gate.
+
+Steps 1–4 are done and the series reproduces. The rerun does **not** yet produce the route evidence, and the
+reason is more specific than expected: the validation pass is built on the **composed** representation in three
+places, and the shell pair falls outside all three. Each was measured.
+
+### Where the pass is tied, and what each measurement showed
+
+```text
+the arm's spelling        the phrase form returns from the phrase branch above the constituent branch, so it
+                          measures the composed representation — this was known and is what step 2 corrects
+
+the frame reader          a typed constituent writes no `0` stop: its keyframe is `from: <substrate>` with the
+                          leaf named only at `to`, so `framesOf` threw `the sheet carries no 0 frame`
+                          → fixed by synthesising the first stop from the component's resting declaration,
+                            gated on the sheet actually registering the component (a composed pair with no
+                            `0` frame must keep failing loudly). Measured: 8 → 36 movable records restored.
+
+the population filter     `plans()` filters on `bucketOf(parent, component) === 'value'`, and a shell-shaped
+                          composition is read as `reshape` — the very move step 6 makes. So the moment the
+                          census is truthful about this pair, the pass stops seeing it at all: measured, the
+                          route left `reshape-required` and then vanished from the tally entirely (50 arms,
+                          36 movable, and no `math-depth` row).
+```
+
+Two mistakes were made and corrected on the way, both worth recording because they are the same mistake in
+different clothes — **widening a gate past the fact that justifies it**: first the value spelling was applied
+to every *declared* leaf (36 validated routes fell to **8**, because a declared leaf whose composition is a
+plain var-list reads perfectly well through the phrase form and always has), then it was narrowed to the
+**shape** that actually forces it — the composition matching `^[a-z][a-z0-9-]*\(\s*var\(--jumi-<component>\)\s*\)$`,
+which is `math-depth` and nothing else today.
+
+### The correct landing order, which the rerun establishes
+
+The census move is not step 6; it is **step 1**, because the pass's population is defined by morphology:
+
+```text
+1  census morphology           value 107 → 106, reshape 97 → 98   (the model becoming truthful: the
+                              interpolation unit lives inside a shell, so the pair is `reshape`)
+2  the population filter       a pair the model declares a representation for belongs to the pass whatever
+                              its morphology — `bucketOf === 'value'` was the workstream's own filter, and
+                              it silently dropped the pair the moment the morphology changed
+3  the spelling gate           confined to the shell shape, with the record naming which spelling ran
+4  rerun → route evidence      reshape-required → movable for `math-depth-add@math-depth`
+5  the guard admits            from the refreshed route
+6  the regression arm           the frame writes `--jumi-math-depth-add` and re-asserts `math-depth` only as
+                              the bridge — structural, so a future regression onto the composed subject is
+                              caught even if sampled behaviour happens to look right
+7  snapshot, then the gate
+```
+
+### What is not in question
+
+The production change works and is measured twice against the shipped build: `@keyframes jumi-math-depth-add`,
+the composition owning `add(...)`, the leaf series `0 · 1 · 1 · 2 · 2` and `0 · 2 · 4 · 5 · 7` — D.3.6's
+proposal exactly — with no property-name branch, no function-name table, no change to admission, and the 22
+filter/backdrop leaves untouched. `isFullyAddressable` was never the obstacle and is not weakened.
+
+**State.** `src/` and `scripts/lib/validation.mjs` restored by name; no `src/` change, nothing promoted,
+nothing staged. 17/17 stages, 79/79 behaviour, 477 unit tests. The remaining work is the seven steps above,
+and it is bookkeeping with a measured order rather than an open question.
+
+
+## 2026-09-17 — D.3.6 closed: the function-argument reshape, shipped
+
+> **Function-argument reshape required no new animation subsystem and no weaker admission rule. The existing
+> typed-constituent path was already the correct execution primitive; the missing work was making the model own
+> the shell, selecting that representation through the correct candidate spelling, and teaching validation not
+> to confuse discovery morphology with execution eligibility.**
+
+### What shipped
+
+```text
+src/composition/math-depth.ts   add(var(--jumi-math-depth-add))     the composition owns the shell
+src/properties/tween.ts         ['math-depth-add', value => value]  the authored value is the argument
+src/variables/typed-leaves.ts   'math-depth' family, <integer>, initial 0, guarded by integerOnly
+```
+
+which is what makes the emission `@keyframes jumi-math-depth-add` with the leaf in the frames and the
+property written only as the bridge — no branch on a property name, no table of function names, and the 22
+`filter`/`backdrop-filter` leaves untouched because they carry no evidence and are therefore not declared.
+
+### The seven steps, in the order the rerun established
+
+```text
+1  census morphology      value 107 → 106, reshape 97 → 98 — the model becoming truthful about where the
+                          interpolation unit lives
+2  validator population   membership is the representation the model proposes or declares, NOT the census
+                          bucket: `bucketOf === 'value'` was how this workstream was discovered, and
+                          encoding discovery as eligibility is how a successful reshape falls out of its own
+                          validator
+3  the arm's spelling     shape-driven, and recorded: `phrase` for a plain var-list, `value` for a shell,
+                          because only one of the two can reach the typed representation through a shell
+4  framesOf               a typed constituent writes no `0` stop; the first stop is synthesised from the
+                          component's resting declaration, gated on the sheet REGISTERING it
+5  the rerun              math-depth/math-depth-add@math-depth → movable, 36 → 37 records
+6  the guard              admits the declaration from that route, unchanged
+7  snapshot, gate         17/17, 477 unit tests, 79/79 behaviour
+```
+
+### Two traps found in the reader, both worth remembering
+
+A candidate entry is read by walking **parentheses and quotes**, so a comment inside a part list can make the
+whole entry unreadable: a bare `add(` in a comment unbalanced the walk, and an apostrophe in ("entry's") opened
+a string that never closed. Both were measured the same way — the pair lost its candidate, its route and its
+derivation, and the symptom was `no candidate addresses the pair` rather than anything pointing at a comment.
+
+### What D.3.6 leaves behind
+
+The phrase spelling still declines typed execution, by D.2's constraint and not by accident; that is now
+recorded as a property of two real entrance spellings rather than as a gap, and the evidence record carries the
+spelling it was proven through. The 22 filter/backdrop leaves remain structurally eligible and unpromoted.
+
+**Next:** the structural regression arm the ruling asked for (the frame writes the leaf, the property is
+bridge-only), then `offset-anchor`.

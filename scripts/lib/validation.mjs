@@ -1,6 +1,11 @@
 import { derive } from './derivation.mjs'
 import { describe, population, servingCandidates } from './observation.mjs'
-import { bucketOf, readCandidates, readTypedLeaves } from './property-model.mjs'
+import {
+  bucketOf,
+  readCandidates,
+  readExpressions,
+  readTypedLeaves,
+} from './property-model.mjs'
 
 /**
  * D.3.5 · the third pass: **validating a derived representation in a browser**.
@@ -122,6 +127,21 @@ export const routesOf = pair =>
  * whole value has no class spelling naming this component's value, and inventing one would be authoring the
  * fixture this pass exists to avoid. That is `unresolved`, and it names the route rather than dropping it.
  */
+/**
+ * Whether a pair's composition wraps its **sole read of the component** in a function call.
+ *
+ * `math-depth` composes `add(var(--jumi-math-depth-add))`, so the read is the argument of a shell and the
+ * frames cannot carry the leaf's value the way a plain var-list's frames do. This is a fact about the
+ * composition text — the model's own statement of where the shell lives — and never a list of property names.
+ * Two consumers need it and they must agree: the **arm's spelling**, because only one spelling can select the
+ * typed representation through a shell; and the **population**, because the same shape is what makes a pair
+ * this pass's business once its morphology moves.
+ */
+const isShelled = (parent, component) =>
+  new RegExp(
+    `^[a-z][a-z0-9-]*\\(\\s*var\\(--jumi-${component}\\)\\s*\\)$`,
+  ).test(readExpressions().get(parent) ?? '')
+
 export const planFor = (derivation, magnitude = 0, route) => {
   const { component, parent } = derivation.pair
   const pair = `${parent}/${component}`
@@ -210,21 +230,43 @@ export const planFor = (derivation, magnitude = 0, route) => {
       status: 'unresolved',
     }
 
+  /**
+   * The authored spelling has to be the one that **selects the representation the model ships**, and for a
+   * shell-shaped composition only one of them can.
+   *
+   * A frames-carrying phrase returns from the phrase branch *above* the constituent branch — D.2's recorded
+   * constraint ("multi-stop constituent phrases decline typed execution") — so a phrase would measure the
+   * composed representation while reporting on the typed one, which is exactly the mistake the D.3.6 arms
+   * made for two increments. The gate is the **shape**, not the declaration: widening it to every declared
+   * leaf was measured and rejected, because 36 validated routes fell to 8 — a declared leaf whose composition
+   * is a plain var-list reads perfectly well through the phrase form and always has.
+   *
+   * Both spellings are real, and the record names which one ran, so neither reading has to be inferred.
+   */
+  const shelled = isShelled(parent, component)
+
   return {
     candidate: at.candidate,
     component,
     consumer: at.consumer,
-    klass: `${at.candidate}-[0:${derivation.rest}|100:${probe}]`,
+    klass: shelled
+      ? `${at.candidate}-[${probe}]`
+      : `${at.candidate}-[0:${derivation.rest}|100:${probe}]`,
     magnitude,
     pair,
     parent,
     probe,
-    // The model's resting value, which the sheet is asserted against rather than trusted to agree with.
-    rest: derivation.rest,
+    // The model's resting value, which the sheet is asserted against rather than trusted to agree with — read
+    // from the declaration where the shell makes the frames unable to write a `0` stop at all.
+    rest: shelled && declared ? declared.initialValue : derivation.rest,
     // The evidence identity: a pair **and** the family it is executed through. `(parent, component)` alone was
     // the unit that could describe most cases and not all — the four corners are the first batch where a pair
     // is reached through two families that are not interchangeable.
     route: routeOf(pair, at.consumer),
+    // Which spelling proved this route, recorded so a later reader never has to infer it: a `value` record was
+    // exercised through the candidate that selects typed execution, a `phrase` record through the one that
+    // reads a composed representation stop by stop.
+    spelling: shelled ? 'value' : 'phrase',
     status: 'planned',
     syntax,
   }
@@ -246,7 +288,25 @@ export const plans = () => {
 
   return (
     population()
-      .filter(one => bucketOf(one.parent, one.component) === 'value')
+      /**
+       * Membership is **the representation the model proposes or declares**, not the census bucket.
+       *
+       * `value` morphology is how this workstream was *discovered* — it is where a derived representation
+       * already looked plausible — and encoding discovery as membership is how a successful reshape would fall
+       * out of its own validator: the moment `math-depth-add` became truthfully `reshape` (the composition owns
+       * the shell, so the interpolation unit lives inside it), a `bucketOf === 'value'` filter dropped it
+       * entirely. Measured: the route left `reshape-required` and then vanished from the tally.
+       *
+       * So a pair belongs here when the census's `value` reading says so, **or** the model declares a
+       * representation for its component, **or** its composition is shell-shaped — the three ways a pair has a
+       * representation this pass is responsible for keeping true.
+       */
+      .filter(
+        one =>
+          bucketOf(one.parent, one.component) === 'value' ||
+          declared.has(one.component) ||
+          isShelled(one.parent, one.component),
+      )
       // "The model serves it through a candidate", not "the model declares a representation for it": the second
       // reading is `status === 'complete'`, and filtering on `unresolved-descriptor` instead dropped exactly the
       // pairs that are still undecided — `mask-border-outset`'s four, the rotate axes, `math-depth-add` and the
@@ -362,9 +422,37 @@ export const framesOf = (css, component) => {
 
   const first = frames.find(one => one.stop === 0)
 
-  if (!first)
-    throw new Error(`the sheet carries no \`0\` frame for --jumi-${component}`)
+  /**
+   * A **typed constituent** writes no `0` stop, and that is the representation rather than a missing read.
+   *
+   * Its keyframe is `from: <substrate>` with the leaf named only at `to`, so the leaf's value at the start of
+   * the motion is the element's own — the value the composition rests at, which the sheet declares beside the
+   * component's registration. The endpoint it does write is the far stop.
+   *
+   * The synthesis is gated on the sheet actually **registering** the component, which is the proof that typed
+   * execution is in play rather than a rest to fall back on: a composed pair with no `0` frame is a dead read
+   * and must keep failing loudly rather than be repaired here.
+   */
+  if (!first) {
+    const typed = new RegExp(`@property --jumi-${component}\\s*\\{`).test(css)
+    const resting = new RegExp(`--jumi-${component}:\\s*([^;]+);`).exec(css)
+    const value = resting?.[1]?.trim()
 
+    if (typed && value && frames.length)
+      return {
+        far: farOf(frames, component),
+        first: { stop: 0, value },
+        stops: frames,
+      }
+
+    throw new Error(`the sheet carries no \`0\` frame for --jumi-${component}`)
+  }
+
+  return { far: farOf(frames, component), first, stops: frames }
+}
+
+/** The last stop the sheet writes, which is the stop the motion is authored to. */
+const farOf = (frames, component) => {
   const far = frames
     .filter(one => one.stop > 0)
     .sort((one, two) => two.stop - one.stop)[0]
@@ -372,7 +460,7 @@ export const framesOf = (css, component) => {
   if (!far)
     throw new Error(`the sheet carries one frame for --jumi-${component}`)
 
-  return { far, first, stops: frames }
+  return far
 }
 
 /**

@@ -133,6 +133,17 @@ export const lengthOnly = (value: string): null | string => {
  * Every leaf named here must be a leaf of the family it is declared under: a typed registration on a
  * name that is not part of the composition is a registration nothing reads.
  */
+/**
+ * An argument that must be an integer: identity where the value is one, `null` where it is not.
+ *
+ * The same shape `lengthish` and `lengthOnly` already are, and for the same reason: a leaf's canonicalizer is
+ * the constituent path's only validator, so a leaf whose grammar admits values it cannot hold has to declare
+ * one. `<integer>` declines `2.5`, and without this guard the authored value would be discarded in favour of
+ * the registered initial instead of falling through to the representation the model already had.
+ */
+export const integerOnly = (value: string): null | string =>
+  /^[+-]?\d+$/.test(value.trim()) ? value.trim() : null
+
 export const typedLeaves: Partial<
   Record<PropertyType, Record<string, TypedLeaf>>
 > = {
@@ -257,6 +268,26 @@ export const typedLeaves: Partial<
     'column-rule-color': {
       initialValue: 'currentColor',
       syntax: '<color>',
+    },
+  },
+  'math-depth': {
+    /**
+     * The first **shell-shaped** leaf to be typed — D.3.6's proving case.
+     *
+     * The shell is not declared here and must not be: it is read off the composition, which now spells
+     * `add(var(--jumi-math-depth-add))`, so the model already says where the function is and what its sole
+     * argument is. All this declaration adds is what the argument *is* — a bare integer — which is the one
+     * fact the composition cannot state.
+     *
+     * It is declared alone, and the 22 surveyed `filter`/`backdrop-filter` leaves are not, because the two
+     * have different evidence: `math-depth-add`'s relocation repairs a discrete flip, while theirs was
+     * measured motion-preserving with representability as its only benefit. Structural resemblance is not
+     * evidence, so this map stays the gate rather than a list of everything that matches the shape.
+     */
+    'math-depth-add': {
+      animationCanonicalizer: integerOnly,
+      initialValue: '0',
+      syntax: '<integer>',
     },
   },
   'object-position': {

@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
+import { propertyVariables } from '@/variables/property'
+
 import {
   bucketOf,
   readPropertyEntries,
 } from '../../scripts/lib/property-model.mjs'
-
-import { propertyVariables } from '@/variables/property'
 
 /**
  * D.3 · reach — the constituent surface, and where typing it stops.
@@ -24,7 +24,7 @@ import { propertyVariables } from '@/variables/property'
  *   machinery         21   parts of the `animation`/`transition`/`*-timeline` shorthands
  *   constituent      303   what reach is actually about
  *     reshape         97   ≈ 32%
- *     value          107   ≈ 35%
+ *     value          106   ≈ 35%
  *     keyword         99   ≈ 33%
  *
  * Those three are close to equal, and that is the finding. Reach is not "mostly easy values with a few
@@ -128,13 +128,13 @@ describe("D.3's constituent census", () => {
 
   it('splits the surface by what moving a place would need', () => {
     // Reported over the **constituent** pairs, because machinery is not reach at all: three populations
-    // of 97 / 107 / 99 against a denominator of 303 is ≈ 32% / 35% / 33%, and the near-equality is the
+    // of 98 / 106 / 99 against a denominator of 303 is ≈ 32% / 35% / 33%, and the near-equality is the
     // finding rather than the exact counts.
     const constituent = pairs.length - size('machinery')
 
     expect(constituent).toBe(303)
-    expect(size('reshape')).toBe(97)
-    expect(size('value')).toBe(107)
+    expect(size('reshape')).toBe(98)
+    expect(size('value')).toBe(106)
     expect(size('keyword')).toBe(99)
     expect(size('machinery')).toBe(21)
 

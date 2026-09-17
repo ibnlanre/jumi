@@ -1735,7 +1735,16 @@ export const getMatchTween: GetMatchComponents = creator => {
     },
     'animate-math-depth-add': {
       fn: property('math-depth', [
-        ['math-depth-add', value => css('add', value)],
+        // The shell lives in the composition, so the authored value is the argument itself and this
+        // transform is the **identity** — not a second spelling of the shell. Wrapping the authored value,
+        // the spelling until D.3.6, put the shell inside the value the frames carried, so the animated
+        // subject was the property and the motion was a discrete flip.
+        //
+        // Written plainly, without punctuation the reader tracks: it walks parentheses and quotes to find
+        // the parts of an entry, so an unbalanced parenthesis or a stray apostrophe in a comment makes the
+        // whole entry unreadable. Measured: this comment cost the pair its candidate, its route and its
+        // derivation until it was reworded.
+        ['math-depth-add', value => value],
       ]),
       supportsNegativeValues: true,
       type: 'integer',

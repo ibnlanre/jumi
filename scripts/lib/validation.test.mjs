@@ -55,7 +55,7 @@ describe('the probe', () => {
 })
 
 describe('the plan', () => {
-  test('every pair with a representation in play plans, and every plan is a phrase with the model rest', () => {
+  test('every pair with a representation in play plans, and every plan is spelled for its representation', () => {
     // The population is the derivation workstream *plus* the pairs promoted out of it, so the assertion is about
     // the shape of every plan rather than about how many pairs the workstream happens to hold today: a
     // promotion must not require editing this test, only the evidence it is checked against.
@@ -67,8 +67,20 @@ describe('the plan', () => {
     for (const plan of planned) {
       if (plan.status !== 'planned') continue
 
+      /**
+       * Two spellings, and the plan says which one proved it.
+       *
+       * A `phrase` plan carries the model's own resting value as its first stop, so the arm exercises the
+       * composed representation stop by stop. A `value` plan is a **shell-shaped** constituent: the frames
+       * cannot carry the leaf's value at all, and only the one-value spelling reaches the typed
+       * representation — which is what makes `spelling` part of the record rather than something a later
+       * reader has to infer from the class name.
+       */
+      expect(['phrase', 'value']).toContain(plan.spelling)
       expect(plan.klass).toBe(
-        `${plan.candidate}-[0:${plan.rest}|100:${plan.probe}]`,
+        plan.spelling === 'value'
+          ? `${plan.candidate}-[${plan.probe}]`
+          : `${plan.candidate}-[0:${plan.rest}|100:${plan.probe}]`,
       )
       expect(plan.syntax in PROBES).toBe(true)
     }

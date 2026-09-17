@@ -317,7 +317,7 @@
       "parent": "math-depth",
       "route": "math-depth/math-depth-add@math-depth",
       "syntax": "<integer>",
-      "verdict": "reshape-required"
+      "verdict": "movable"
     },
     {
       "candidate": "animate-object-position-x-offset",

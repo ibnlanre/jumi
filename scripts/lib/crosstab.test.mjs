@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { declaredPairs } from './evidence.mjs'
 import { crossTab, MORPHOLOGIES, STATUSES } from './crosstab.mjs'
+import { declaredPairs } from './evidence.mjs'
 
 /**
  * The tab's invariants, and one that is worth more than the rest.
@@ -41,7 +41,7 @@ describe('the descriptor × morphology tab', () => {
     // whose columns disagreed would be a second reading of the vocabulary — the drift the pair key and the one
     // predicate exist to make impossible.
     expect(MORPHOLOGIES.map(name => table.columnTotal(name))).toEqual([
-      107, 99, 97,
+      106, 99, 98,
     ])
   })
 

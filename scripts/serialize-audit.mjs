@@ -123,6 +123,14 @@ const inferred = (file, symbol, contains, recovers, structural) => ({
 })
 
 const registry = [
+  // ── the typed-argument guard: reads the authored value as text, and trims it ─────────────────
+  tolerant(
+    'src/variables/typed-leaves.ts',
+    'integerOnly',
+    '.test(value.trim())',
+    'whether the authored argument is an integer, and the integer itself',
+    'that an authored value may carry surrounding whitespace — the same assumption every authored value in the library makes, and the trim is the only thing done to the text',
+  ),
   // ── the phrase grammar: the author's candidate, with its whitespace written out ───────────────
   tolerant(
     'src/core/index.ts',
