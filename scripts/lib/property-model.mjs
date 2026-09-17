@@ -440,7 +440,7 @@ const resolverFor = (locals, label) => {
           `\`${text}\` is neither a literal nor declared in ${label}`,
         )
 
-      return resolve(body, new Set([...seen, text]))
+      return resolve(body, new Set([text, ...seen]))
     }
 
     throw new Error(`unknown composition shape in ${label}: \`${text}\``)
@@ -545,7 +545,11 @@ export const readExpressions = () => {
  */
 const readBareEntries = (text, indent) => {
   const entries = []
-  const open = new RegExp(`^ {${indent}}([\\w-]+): \\{$`, 'gm')
+  // Quoted **or** unquoted, and the alternation is not defensive: prettier's `quoteProps: consistent` quotes
+  // every key in an object once a single key needs quoting, so `scale` is written `'scale'` the moment a family
+  // like `background-position` joins it. A reader that only accepted the bare form silently returned zero leaves
+  // when D.3.5's batch landed — the map was fine and the reader could no longer see it.
+  const open = new RegExp(`^ {${indent}}(?:'([\\w-]+)'|([\\w-]+)): \\{$`, 'gm')
   const starts = [...text.matchAll(open)]
 
   for (let index = 0; index < starts.length; index += 1) {
@@ -554,7 +558,7 @@ const readBareEntries = (text, indent) => {
 
     entries.push({
       body: text.slice(start.index + start[0].length, end),
-      name: start[1],
+      name: start[1] ?? start[2],
     })
   }
 

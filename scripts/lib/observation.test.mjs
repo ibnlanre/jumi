@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 
-import { bucketOf } from './property-model.mjs'
 import {
   applicationOf,
   chainsOf,
@@ -10,6 +9,7 @@ import {
   liveOf,
   population,
 } from './observation.mjs'
+import { bucketOf, readTypedLeaves } from './property-model.mjs'
 
 describe('liveOf', () => {
   it('resolves a frame wrapper to the live slot beneath it', () => {
@@ -174,18 +174,26 @@ describe('population coverage', () => {
   })
 
   it('counts completeness as exactly the declared representations, placed', () => {
-    // The shape assertion rather than the number: a family that declares leaves and lands in the population
-    // makes every one of its pairs complete, and a declaration that no pair can place is a defect.
-    expect(new Set(complete.map(one => one.component))).toEqual(
-      new Set([
-        'scale-x',
-        'scale-y',
-        'scale-z',
-        'translate-x',
-        'translate-y',
-        'translate-z',
-      ]),
+    // The shape assertion rather than the number, because the number is a record of a batch: a component the
+    // model declares a representation for and the population places makes every one of its pairs complete, and
+    // a declaration no pair can place is a defect — a registration nothing would ever read.
+    //
+    // Deriving the expectation rather than restating it is what keeps this honest across promotions. D.3.5
+    // landed a batch and this test was a list of six names; the list would have had to grow by 26 lines and
+    // the next batch by more, and each edit would have been the assertion agreeing with whatever was there.
+    const declared = readTypedLeaves()
+    const placed = new Set(
+      population()
+        .filter(one => bucketOf(one.parent, one.component) !== 'machinery')
+        .map(one => one.component)
+        .filter(component => declared.has(component)),
     )
+
+    expect(new Set(complete.map(one => one.component))).toEqual(placed)
+    expect(
+      [...declared.keys()].filter(component => !placed.has(component)),
+      'these components are declared but no pair in the population places them',
+    ).toEqual([])
   })
 
   it('records a reason wherever it stops', () => {

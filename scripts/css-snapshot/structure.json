@@ -4,10 +4,10 @@
     "aggregateShare": 12,
     "aggregateWrites": 4,
     "animations": 1,
-    "bytes": 99709,
+    "bytes": 101193,
     "keyframes": 41,
     "media": 5,
-    "properties": 107,
+    "properties": 120,
     "protocol": {
       "staging": 0
     },
@@ -16,27 +16,27 @@
     "supports": 5,
     "transitions": 1,
     "publishEvents": 44,
-    "rawBytes": 986859,
+    "rawBytes": 988343,
     "stagingBytes": 944151,
     "colorValues": {
       "literal": 6,
-      "token": 7
+      "token": 6
     },
     "themeResolution": {
       "formula": 4,
       "literal": 222,
-      "token": 13
+      "token": 12
     }
   },
   "carrierVariant": {
     "aggregateBytes": 4990,
-    "aggregateShare": 12,
+    "aggregateShare": 11,
     "aggregateWrites": 3,
     "animations": 1,
-    "bytes": 42598,
+    "bytes": 43851,
     "keyframes": 18,
     "media": 1,
-    "properties": 61,
+    "properties": 72,
     "protocol": {
       "staging": 0
     },
@@ -45,7 +45,7 @@
     "supports": 5,
     "transitions": 0,
     "publishEvents": 21,
-    "rawBytes": 227385,
+    "rawBytes": 228638,
     "stagingBytes": 208608,
     "colorValues": {
       "literal": 2,

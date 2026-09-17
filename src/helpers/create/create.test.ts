@@ -726,11 +726,22 @@ describe('animation-name registration', () => {
       name.replace(/^--jumi-(.+)-animation-name$/, '--jumi-slot-$1'),
     )
 
+    // And a third kind: a **typed leaf** the family declares, which is registered because the family was
+    // brought into the build rather than because a slot arrived. `rotate-angle` was promoted in D.3.5's batch,
+    // so a stylesheet that mentions `rotate` at all now acquires its registration — which is the whole point of
+    // declaring it, and the reason its syntax and initial value are asserted in `typed-leaves.test.ts` against
+    // the measurement that admitted it.
+    const typed = ['--jumi-rotate-angle']
+
     expect(
       Object.keys(utilities)
         .filter(name => name.startsWith('@property'))
         .sort(),
-    ).toEqual([...expected, ...hoisted].sort().map(name => `@property ${name}`))
+    ).toEqual(
+      [...expected, ...hoisted, ...typed]
+        .sort()
+        .map(name => `@property ${name}`),
+    )
 
     expect(utilities[`@property --jumi-opacity-${id}-animation-name`]).toEqual({
       inherits: 'false',

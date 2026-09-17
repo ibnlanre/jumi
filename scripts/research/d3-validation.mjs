@@ -346,20 +346,26 @@ for (const plan of plans()) {
 await browser.close()
 
 /**
- * The pair's verdict, over its magnitudes.
+ * The **route's** verdict, over its magnitudes.
  *
- * A context that renders the same as the one before it adds nothing and says so; the pair's verdict is the
- * most informative of the exercised arms, so a representation that holds at one magnitude and not another
- * reports the failure rather than the average.
+ * A context that renders the same as the one before it adds nothing and says so; the route's verdict is the most
+ * informative of the exercised arms, so a representation that holds at one magnitude and not another reports the
+ * failure rather than the average.
+ *
+ * Grouped by route rather than by pair, which is the correction the ruling made: `(parent, component)` collapsed
+ * the four corners' two registrations into one, so the map that came out of it had three corners under
+ * `border-radius` and one under its own property — an artefact of candidate order, and a half-typed motion for
+ * whichever route lost.
  */
-const pairs = []
+const routes = []
 
 for (const arm of arms) {
   if (!arm.plan) continue
 
-  const existing = pairs.find(one => one.pair === arm.plan.pair)
+  const existing = routes.find(one => one.route === arm.plan.route)
 
-  if (!existing) pairs.push({ arms: [arm], pair: arm.plan.pair })
+  if (!existing)
+    routes.push({ arms: [arm], pair: arm.plan.pair, route: arm.plan.route })
   else existing.arms.push(arm)
 }
 const order = [
@@ -379,7 +385,7 @@ const order = [
  * a second context — the representation was asked the same question twice — so it says `not exercised` rather
  * than counting as a second confirmation. That is the same discipline as the canary one level up.
  */
-for (const one of pairs) {
+for (const one of routes) {
   const reference = one.arms[0]?.farReading
 
   for (const arm of one.arms)
@@ -389,7 +395,7 @@ for (const one of pairs) {
         : 'not exercised'
 }
 
-const forPair = one => {
+const forRoute = one => {
   const exercised = one.arms.filter(
     arm =>
       arm.context === 'exercised' &&
@@ -407,7 +413,7 @@ const forPair = one => {
   )
 }
 
-const counted = pairs.map(one => ({ ...one, verdict: forPair(one) }))
+const counted = routes.map(one => ({ ...one, verdict: forRoute(one) }))
 const tally = verdict =>
   counted.filter(one => one.verdict.verdict === verdict).length
 
@@ -416,23 +422,28 @@ const causes = [
   ...new Set(counted.map(one => one.verdict.cause).filter(cause => cause)),
 ].map(cause => ({
   cause,
-  pairs: counted
+  routes: counted
     .filter(one => one.verdict.cause === cause)
-    .map(one => one.pair),
+    .map(one => one.route),
 }))
 
 /**
- * The evidence, as the standing guard has to read it: one record per pair.
+ * The evidence, as the standing guard has to read it: **one record per route**.
  *
- * `syntax` and `initialValue` are the two fields a declaration can be compared against exactly, which is why
- * they are here rather than only in the printed report. The file is data written by a research book and read by
- * a unit test; nothing in `src/` imports it, and production never depends on the pass that produced it.
+ * `syntax` and `initialValue` are the two fields a declaration can be compared against exactly, and
+ * `consumer` is the third: a declaration is keyed `(family, leaf)`, so the evidence has to say which family it
+ * admits a declaration under. A pair reached through two families gets two records, and that is the whole
+ * correction — the first version keyed a record by the pair and took the first serving candidate, which is how
+ * the generated map ended up with three corners under `border-radius` and one under its own property.
+ *
+ * The file is data written by a research book and read by a unit test; nothing in `src/` imports it, and
+ * production never depends on the pass that produced it.
  */
 writeFileSync(
   EVIDENCE,
   `${JSON.stringify(
     {
-      pairs: counted
+      routes: counted
         .map(one => ({
           candidate: one.verdict.plan.candidate,
           component: one.verdict.plan.component,
@@ -441,14 +452,11 @@ writeFileSync(
           magnitudes: one.arms.filter(arm => arm.context === 'exercised')
             .length,
           parent: one.verdict.plan.parent,
+          route: one.route,
           syntax: one.verdict.plan.syntax,
           verdict: one.verdict.verdict,
         }))
-        .sort((left, right) =>
-          `${left.parent}/${left.component}`.localeCompare(
-            `${right.parent}/${right.component}`,
-          ),
-        ),
+        .sort((left, right) => left.route.localeCompare(right.route)),
       source: 'scripts/research/d3-validation.mjs',
     },
     null,
@@ -460,8 +468,9 @@ console.log(
   [
     'D.3.5 · derived-representation validation (pass three: 41 proposals, generated arms)',
     '',
-    `${arms.length} arms over ${pairs.length} pairs — the derivation proposed, the browser decided`,
-    `${arms.filter(arm => arm.context === 'not exercised').length} of them a second magnitude that rendered the same as the first, and said so`,
+    `${arms.length} arms over ${routes.length} routes of ${new Set(routes.map(one => one.pair)).size} pairs — the derivation proposed, the browser decided`,
+    `${[...new Set(routes.map(one => one.pair))].filter(pair => routes.filter(one => one.pair === pair).length > 1).length} of those pairs reachable by more than one route, each measured on its own`,
+    `${arms.filter(arm => arm.context === 'not exercised').length} arms a second magnitude that rendered the same as the first, and said so`,
     '',
     ...counted.map(one => {
       const arm = one.verdict
@@ -471,7 +480,7 @@ console.log(
           : ''
 
       return (
-        `  ${pad(one.pair, 44)}${pad(arm.verdict, 22)}${arm.reason ? `${arm.reason}` : `rest \`${arm.rest?.without}\` preserved`}` +
+        `  ${pad(one.route, 62)}${pad(arm.verdict, 22)}${arm.reason ? `${arm.reason}` : `rest \`${arm.rest?.without}\` preserved`}` +
         numbers
       )
     }),
@@ -496,7 +505,8 @@ console.log(
     '  disagreeing is a reader defect this pass fails on rather than a finding it reports.',
     ...causes.map(
       one =>
-        `  ${one.cause}:\n` + one.pairs.map(pair => `    ${pair}`).join('\n'),
+        `  ${one.cause}:\n` +
+        one.routes.map(route => `    ${route}`).join('\n'),
     ),
     '',
     `evidence recorded at \`${path.relative(root, EVIDENCE)}\` — ${counted.filter(one => one.verdict.verdict === 'movable').length} movable record(s), which is what a declaration has to name to be admitted`,

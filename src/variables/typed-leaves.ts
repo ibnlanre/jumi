@@ -136,7 +136,162 @@ export const lengthOnly = (value: string): null | string => {
 export const typedLeaves: Partial<
   Record<PropertyType, Record<string, TypedLeaf>>
 > = {
-  scale: {
+  /**
+   * The D.3.5 batch: **30 declarations from 35 validated routes**, plus the six that were declared before it.
+   *
+   * The batch's leaves were derived from two model facts (the resting shape and the candidate's declared
+   * grammar) and then measured **route by route** — rest first, then native against typed interpolation at two
+   * authored magnitudes — and only the `movable` routes are here. `scripts/validated-representations.json` holds
+   * the evidence, one record per route, and `typed-leaves.test.ts` asserts this map against it exactly: every
+   * leaf declared here names a `movable` record for that family, representation and initial value, every
+   * `movable` route is declared, and neither set can grow without the other.
+   *
+   * A **route** is why this is not one declaration per pair. A registration is looked up through the attribute
+   * the *candidate* animates, and a pair can be served by more than one candidate: `animate-border-left-radius`
+   * addresses `border-radius` with `border-bottom-left-radius` as one of its parts, while
+   * `animate-border-bottom-left-radius` addresses the corner's own property. The four corners are the only pairs
+   * in this batch with two routes, and they are declared under both — keying a leaf on one route leaves the
+   * other half-typed, one leaf interpolating and its sibling not, which is a silent failure rather than a loud
+   * one.
+   *
+   * Anything absent is absent by design, and each absence is a record with a verdict: `math-depth-add`'s
+   * interpolation unit is an argument inside `add(...)` rather than the leaf its rest suggested (reshape work),
+   * `offset-anchor-x/y`'s application does not compute at all (an emission defect), the rotate axes and
+   * `mask-border-outset` are undecided, and the five union-syntax routes of `scale` and `translate` are refused
+   * by this pass because a union is not one probe — those six leaves are the pre-existing declarations above,
+   * carried by their own landing records rather than by this batch.
+   */
+  'background-color': {
+    'background-color': {
+      initialValue: 'transparent',
+      syntax: '<color>',
+    },
+  },
+  'background-position': {
+    'background-position-x-offset': {
+      initialValue: '0%',
+      syntax: '<percentage>',
+    },
+    'background-position-y-offset': {
+      initialValue: '0%',
+      syntax: '<percentage>',
+    },
+  },
+  'border-block-color': {
+    'border-block-color': {
+      initialValue: 'currentColor',
+      syntax: '<color>',
+    },
+  },
+  'border-bottom-left-radius': {
+    'border-bottom-left-radius': {
+      initialValue: '0',
+      syntax: '<length>',
+    },
+  },
+  'border-bottom-right-radius': {
+    'border-bottom-right-radius': {
+      initialValue: '0',
+      syntax: '<length>',
+    },
+  },
+  'border-color': {
+    'border-color': {
+      initialValue: 'currentColor',
+      syntax: '<color>',
+    },
+  },
+  'border-radius': {
+    'border-bottom-left-radius': {
+      initialValue: '0',
+      syntax: '<length>',
+    },
+    'border-bottom-right-radius': {
+      initialValue: '0',
+      syntax: '<length>',
+    },
+    'border-top-left-radius': {
+      initialValue: '0',
+      syntax: '<length>',
+    },
+    'border-top-right-radius': {
+      initialValue: '0',
+      syntax: '<length>',
+    },
+  },
+  'border-top-left-radius': {
+    'border-top-left-radius': {
+      initialValue: '0',
+      syntax: '<length>',
+    },
+  },
+  'border-top-right-radius': {
+    'border-top-right-radius': {
+      initialValue: '0',
+      syntax: '<length>',
+    },
+  },
+  'box-shadow': {
+    'box-shadow-blur': {
+      initialValue: '0',
+      syntax: '<length>',
+    },
+    'box-shadow-color': {
+      initialValue: 'transparent',
+      syntax: '<color>',
+    },
+    'box-shadow-offset-x': {
+      initialValue: '0',
+      syntax: '<length>',
+    },
+    'box-shadow-offset-y': {
+      initialValue: '0',
+      syntax: '<length>',
+    },
+    'box-shadow-spread': {
+      initialValue: '0',
+      syntax: '<length>',
+    },
+  },
+  'column-rule-color': {
+    'column-rule-color': {
+      initialValue: 'currentColor',
+      syntax: '<color>',
+    },
+  },
+  'object-position': {
+    'object-position-x-offset': {
+      initialValue: '50%',
+      syntax: '<percentage>',
+    },
+    'object-position-y-offset': {
+      initialValue: '50%',
+      syntax: '<percentage>',
+    },
+  },
+  'offset-position': {
+    'offset-position-x-offset': {
+      initialValue: '50%',
+      syntax: '<percentage>',
+    },
+    'offset-position-y-offset': {
+      initialValue: '50%',
+      syntax: '<percentage>',
+    },
+  },
+  'outline': {
+    'outline-color': {
+      initialValue: 'currentColor',
+      syntax: '<color>',
+    },
+  },
+  'rotate': {
+    'rotate-angle': {
+      initialValue: '0deg',
+      syntax: '<angle>',
+    },
+  },
+  'scale': {
     'scale-x': {
       animationCanonicalizer: scaleFactorToNumber,
       initialValue: '1',
@@ -153,7 +308,31 @@ export const typedLeaves: Partial<
       syntax: '<number> | <percentage>',
     },
   },
-  translate: {
+  'text-shadow': {
+    'text-shadow-blur-radius': {
+      initialValue: '0',
+      syntax: '<length>',
+    },
+    'text-shadow-color': {
+      initialValue: 'currentColor',
+      syntax: '<color>',
+    },
+    'text-shadow-offset-x': {
+      initialValue: '0px',
+      syntax: '<length>',
+    },
+    'text-shadow-offset-y': {
+      initialValue: '0px',
+      syntax: '<length>',
+    },
+  },
+  'transform-origin': {
+    'transform-origin-z': {
+      initialValue: '0px',
+      syntax: '<length>',
+    },
+  },
+  'translate': {
     'translate-x': {
       animationCanonicalizer: lengthish,
       initialValue: '0px',

@@ -1467,3 +1467,91 @@ this is inert; it exists now so the promotion commit needs no research edit of i
 
 **State.** 41 records · 31 `movable` · 18 tests in `validation.test.mjs`. No `src/` behaviour change, no emitted-CSS
 change, no declaration; 17/17 stages, 79/79 behaviour.
+
+## 2026-09-17 — D.3.5's promotion, and the route as part of the evidence identity
+
+### Call
+
+> **"Do not merely duplicate the four corner declarations under every serving attribute. Change the research and
+> promotion model so route is part of the evidence identity, then regenerate the declarations from that model."**
+> […] **"per-route validation, 30 resulting declarations, guard keyed by route."** […] **"for every promoted
+> (parent, component) pair: every serving route that can execute that pair must either have matching movable
+> evidence and receive the declaration, OR carry an explicit non-promotion reason."**
+
+That is what landed. The evidence record is keyed `(parent, component, consumer)` — a **route** — and the map is
+generated from it rather than from a pair's first serving candidate.
+
+### What the collapse was
+
+`describe()` took the first result of `servingCandidates`, which was indistinguishable from "the only one" while
+every pair had one route. The four `border-radius` corners are the first batch where that is false: each is served
+both through the shorthand (`animate-border-left-radius`, attribute `border-radius`, the corner as a part) and
+through its own property (`animate-border-bottom-left-radius`). Which one came first is alphabetical order, and it
+put three corners under `border-radius` and the fourth under its own property — an asymmetry with no architectural
+meaning.
+
+**The consequence was not cosmetic.** `animate-border-left-radius` addresses `border-radius` with
+`border-bottom-left-radius` **and** `border-top-left-radius` as parts. Registering the first and not the second
+leaves one motion half-typed: one leaf interpolating, its sibling stepping, and the property reading a composition
+whose two halves disagree. A registration keyed on one route is a silent failure waiting for the other route to be
+used.
+
+### What changed
+
+```text
+plans()        one plan per route, not per pair        41 pairs → 51 routes
+artifact       one record per route, with consumer     51 records
+declarations   generated from movable routes           36 leaves over 19 families
+               of which the batch is 30 — the four corners under both families
+guard          keyed (pair, consumer, syntax, initial) exact, both directions
+```
+
+The guard is the part worth stating precisely, because it is what the ruling asked for rather than what was easy:
+
+- every `movable` route admits a declaration **under that consumer**, with **that syntax** and **that initial
+  value** — so an edit after the fact to something the browser never saw fails;
+- a key whose records include any non-`movable` route is **refused**: one registration serves every route through
+  it, so it is only as good as its worst one;
+- a route the pass could not decide (other than through a refused probe) must be **undeclared**, named rather than
+  counted;
+- and the pass itself refuses to run quietly past a route: its population is built from `routesOf`, so a serving
+  attribute that has no record cannot exist — a future pair with three routes gets three measurements or three
+  written reasons.
+
+### Two defects the correction exposed, both real
+
+`readBareEntries` only accepted **unquoted** family keys, and prettier's `quoteProps: consistent` quotes every key
+in an object once one needs it. So the moment `background-position` joined `scale`, the reader silently returned
+**zero** leaves — the map was correct and the reader could no longer see it. It accepts both forms now, which is
+the general statement the file always needed.
+
+And the pass's population filter read `status !== 'unresolved-descriptor'`, which means "the model declares a
+representation for it" — so widening it to include declared pairs promptly *dropped* every pair that is still
+undecided, taking `mask-border-outset`, the rotate axes, `math-depth-add` and the two `offset-anchor` pairs out of
+a pass whose job is to keep deciding them. Measured: the population fell to 37 pairs and the tally lost every
+exclusion it had found. The filter is `reason !== 'no candidate addresses the pair'` — "the model serves it" is
+what a validation pass needs, not "the model has already decided it".
+
+### The rerun
+
+`pnpm research:d3-validation` now registers the **declared** metadata when the model carries it, so the run
+measures what shipped rather than what was proposed, and a declaration that disagrees with the proposal is a
+failure rather than a second measurement. After the promotion the rerun produced a **byte-identical**
+`scripts/validated-representations.json` — 36 `movable` routes of 51, the same five `fixture-unobservable`
+(`mask-border-outset` ×4, `rotate-z`), the same two `unresolved` (the rotate axes), the same two
+`blocked-by-emission` (`offset-anchor` ×2) and the same one `reshape-required` (`math-depth-add`).
+
+```text
+51 routes over 47 pairs
+
+movable                36   of which the batch's 35 admit 30 declarations
+registration-unsafe     0   by construction, and measured anyway
+fixture-unobservable    5   mask-border-outset ×4 · rotate-z
+unresolved              7   rotate-x/y (no native baseline) · 5 union routes this pass cannot probe
+blocked-by-emission     2   offset-anchor x/y
+reshape-required        1   math-depth-add
+```
+
+**State.** 17/17 stages, 79/79 behaviour, 477 unit tests, the emission snapshot re-recorded (one registration
+added: the fourth corner under its own family). `math-depth-add`, `offset-anchor` and the rotate axes remain
+undecided and uncommitted to any representation, as ruled.

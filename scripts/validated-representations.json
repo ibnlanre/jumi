@@ -1,5 +1,5 @@
 {
-  "pairs": [
+  "routes": [
     {
       "candidate": "animate-background-position-x-offset",
       "component": "background-position-x-offset",
@@ -7,6 +7,7 @@
       "initialValue": "0%",
       "magnitudes": 2,
       "parent": "background-position-x",
+      "route": "background-position-x/background-position-x-offset@background-position",
       "syntax": "<percentage>",
       "verdict": "movable"
     },
@@ -17,6 +18,7 @@
       "initialValue": "0%",
       "magnitudes": 2,
       "parent": "background-position-y",
+      "route": "background-position-y/background-position-y-offset@background-position",
       "syntax": "<percentage>",
       "verdict": "movable"
     },
@@ -27,6 +29,7 @@
       "initialValue": "transparent",
       "magnitudes": 2,
       "parent": "background",
+      "route": "background/background-color@background-color",
       "syntax": "<color>",
       "verdict": "movable"
     },
@@ -37,6 +40,7 @@
       "initialValue": "currentColor",
       "magnitudes": 2,
       "parent": "border-block",
+      "route": "border-block/border-block-color@border-block-color",
       "syntax": "<color>",
       "verdict": "movable"
     },
@@ -47,6 +51,29 @@
       "initialValue": "0",
       "magnitudes": 2,
       "parent": "border-radius",
+      "route": "border-radius/border-bottom-left-radius@border-bottom-left-radius",
+      "syntax": "<length>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-border-bottom-radius",
+      "component": "border-bottom-left-radius",
+      "consumer": "border-radius",
+      "initialValue": "0",
+      "magnitudes": 2,
+      "parent": "border-radius",
+      "route": "border-radius/border-bottom-left-radius@border-radius",
+      "syntax": "<length>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-border-bottom-right-radius",
+      "component": "border-bottom-right-radius",
+      "consumer": "border-bottom-right-radius",
+      "initialValue": "0",
+      "magnitudes": 2,
+      "parent": "border-radius",
+      "route": "border-radius/border-bottom-right-radius@border-bottom-right-radius",
       "syntax": "<length>",
       "verdict": "movable"
     },
@@ -57,6 +84,7 @@
       "initialValue": "0",
       "magnitudes": 2,
       "parent": "border-radius",
+      "route": "border-radius/border-bottom-right-radius@border-radius",
       "syntax": "<length>",
       "verdict": "movable"
     },
@@ -67,6 +95,18 @@
       "initialValue": "0",
       "magnitudes": 2,
       "parent": "border-radius",
+      "route": "border-radius/border-top-left-radius@border-radius",
+      "syntax": "<length>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-border-top-left-radius",
+      "component": "border-top-left-radius",
+      "consumer": "border-top-left-radius",
+      "initialValue": "0",
+      "magnitudes": 2,
+      "parent": "border-radius",
+      "route": "border-radius/border-top-left-radius@border-top-left-radius",
       "syntax": "<length>",
       "verdict": "movable"
     },
@@ -77,6 +117,18 @@
       "initialValue": "0",
       "magnitudes": 2,
       "parent": "border-radius",
+      "route": "border-radius/border-top-right-radius@border-radius",
+      "syntax": "<length>",
+      "verdict": "movable"
+    },
+    {
+      "candidate": "animate-border-top-right-radius",
+      "component": "border-top-right-radius",
+      "consumer": "border-top-right-radius",
+      "initialValue": "0",
+      "magnitudes": 2,
+      "parent": "border-radius",
+      "route": "border-radius/border-top-right-radius@border-top-right-radius",
       "syntax": "<length>",
       "verdict": "movable"
     },
@@ -87,6 +139,7 @@
       "initialValue": "currentColor",
       "magnitudes": 2,
       "parent": "border",
+      "route": "border/border-color@border-color",
       "syntax": "<color>",
       "verdict": "movable"
     },
@@ -97,6 +150,7 @@
       "initialValue": "0",
       "magnitudes": 2,
       "parent": "box-shadow-inset",
+      "route": "box-shadow-inset/box-shadow-blur@box-shadow",
       "syntax": "<length>",
       "verdict": "movable"
     },
@@ -107,6 +161,7 @@
       "initialValue": "transparent",
       "magnitudes": 2,
       "parent": "box-shadow-inset",
+      "route": "box-shadow-inset/box-shadow-color@box-shadow",
       "syntax": "<color>",
       "verdict": "movable"
     },
@@ -117,6 +172,7 @@
       "initialValue": "0",
       "magnitudes": 2,
       "parent": "box-shadow-inset",
+      "route": "box-shadow-inset/box-shadow-offset-x@box-shadow",
       "syntax": "<length>",
       "verdict": "movable"
     },
@@ -127,6 +183,7 @@
       "initialValue": "0",
       "magnitudes": 2,
       "parent": "box-shadow-inset",
+      "route": "box-shadow-inset/box-shadow-offset-y@box-shadow",
       "syntax": "<length>",
       "verdict": "movable"
     },
@@ -137,6 +194,7 @@
       "initialValue": "0",
       "magnitudes": 2,
       "parent": "box-shadow-inset",
+      "route": "box-shadow-inset/box-shadow-spread@box-shadow",
       "syntax": "<length>",
       "verdict": "movable"
     },
@@ -147,6 +205,7 @@
       "initialValue": "0",
       "magnitudes": 2,
       "parent": "box-shadow-outset",
+      "route": "box-shadow-outset/box-shadow-blur@box-shadow",
       "syntax": "<length>",
       "verdict": "movable"
     },
@@ -157,6 +216,7 @@
       "initialValue": "transparent",
       "magnitudes": 2,
       "parent": "box-shadow-outset",
+      "route": "box-shadow-outset/box-shadow-color@box-shadow",
       "syntax": "<color>",
       "verdict": "movable"
     },
@@ -167,6 +227,7 @@
       "initialValue": "0",
       "magnitudes": 2,
       "parent": "box-shadow-outset",
+      "route": "box-shadow-outset/box-shadow-offset-x@box-shadow",
       "syntax": "<length>",
       "verdict": "movable"
     },
@@ -177,6 +238,7 @@
       "initialValue": "0",
       "magnitudes": 2,
       "parent": "box-shadow-outset",
+      "route": "box-shadow-outset/box-shadow-offset-y@box-shadow",
       "syntax": "<length>",
       "verdict": "movable"
     },
@@ -187,6 +249,7 @@
       "initialValue": "0",
       "magnitudes": 2,
       "parent": "box-shadow-outset",
+      "route": "box-shadow-outset/box-shadow-spread@box-shadow",
       "syntax": "<length>",
       "verdict": "movable"
     },
@@ -197,6 +260,7 @@
       "initialValue": "currentColor",
       "magnitudes": 2,
       "parent": "column-rule",
+      "route": "column-rule/column-rule-color@column-rule-color",
       "syntax": "<color>",
       "verdict": "movable"
     },
@@ -207,6 +271,7 @@
       "initialValue": "0",
       "magnitudes": 1,
       "parent": "mask-border-outset",
+      "route": "mask-border-outset/mask-border-outset-bottom@mask-border-outset",
       "syntax": "<length>",
       "verdict": "fixture-unobservable"
     },
@@ -217,6 +282,7 @@
       "initialValue": "0",
       "magnitudes": 1,
       "parent": "mask-border-outset",
+      "route": "mask-border-outset/mask-border-outset-left@mask-border-outset",
       "syntax": "<length>",
       "verdict": "fixture-unobservable"
     },
@@ -227,6 +293,7 @@
       "initialValue": "0",
       "magnitudes": 1,
       "parent": "mask-border-outset",
+      "route": "mask-border-outset/mask-border-outset-right@mask-border-outset",
       "syntax": "<length>",
       "verdict": "fixture-unobservable"
     },
@@ -237,6 +304,7 @@
       "initialValue": "0",
       "magnitudes": 1,
       "parent": "mask-border-outset",
+      "route": "mask-border-outset/mask-border-outset-top@mask-border-outset",
       "syntax": "<length>",
       "verdict": "fixture-unobservable"
     },
@@ -247,6 +315,7 @@
       "initialValue": "0",
       "magnitudes": 2,
       "parent": "math-depth",
+      "route": "math-depth/math-depth-add@math-depth",
       "syntax": "<integer>",
       "verdict": "reshape-required"
     },
@@ -257,6 +326,7 @@
       "initialValue": "50%",
       "magnitudes": 2,
       "parent": "object-position-x",
+      "route": "object-position-x/object-position-x-offset@object-position",
       "syntax": "<percentage>",
       "verdict": "movable"
     },
@@ -267,6 +337,7 @@
       "initialValue": "50%",
       "magnitudes": 2,
       "parent": "object-position-y",
+      "route": "object-position-y/object-position-y-offset@object-position",
       "syntax": "<percentage>",
       "verdict": "movable"
     },
@@ -277,6 +348,7 @@
       "initialValue": "0",
       "magnitudes": 1,
       "parent": "offset-anchor-x",
+      "route": "offset-anchor-x/offset-anchor-x-offset@offset-anchor",
       "syntax": "<length>",
       "verdict": "blocked-by-emission"
     },
@@ -287,6 +359,7 @@
       "initialValue": "0",
       "magnitudes": 1,
       "parent": "offset-anchor-y",
+      "route": "offset-anchor-y/offset-anchor-y-offset@offset-anchor",
       "syntax": "<length>",
       "verdict": "blocked-by-emission"
     },
@@ -297,6 +370,7 @@
       "initialValue": "50%",
       "magnitudes": 2,
       "parent": "offset-position-x",
+      "route": "offset-position-x/offset-position-x-offset@offset-position",
       "syntax": "<percentage>",
       "verdict": "movable"
     },
@@ -307,6 +381,7 @@
       "initialValue": "50%",
       "magnitudes": 2,
       "parent": "offset-position-y",
+      "route": "offset-position-y/offset-position-y-offset@offset-position",
       "syntax": "<percentage>",
       "verdict": "movable"
     },
@@ -317,6 +392,7 @@
       "initialValue": "currentColor",
       "magnitudes": 2,
       "parent": "outline",
+      "route": "outline/outline-color@outline",
       "syntax": "<color>",
       "verdict": "movable"
     },
@@ -327,6 +403,7 @@
       "initialValue": "0deg",
       "magnitudes": 2,
       "parent": "rotate",
+      "route": "rotate/rotate-angle@rotate",
       "syntax": "<angle>",
       "verdict": "movable"
     },
@@ -337,6 +414,7 @@
       "initialValue": "0",
       "magnitudes": 2,
       "parent": "rotate",
+      "route": "rotate/rotate-x@rotate",
       "syntax": "<number>",
       "verdict": "unresolved"
     },
@@ -347,6 +425,7 @@
       "initialValue": "0",
       "magnitudes": 2,
       "parent": "rotate",
+      "route": "rotate/rotate-y@rotate",
       "syntax": "<number>",
       "verdict": "unresolved"
     },
@@ -357,8 +436,24 @@
       "initialValue": "1",
       "magnitudes": 1,
       "parent": "rotate",
+      "route": "rotate/rotate-z@rotate",
       "syntax": "<number>",
       "verdict": "fixture-unobservable"
+    },
+    {
+      "magnitudes": 0,
+      "route": "scale/scale-x@scale",
+      "verdict": "unresolved"
+    },
+    {
+      "magnitudes": 0,
+      "route": "scale/scale-y@scale",
+      "verdict": "unresolved"
+    },
+    {
+      "magnitudes": 0,
+      "route": "scale/scale-z@scale",
+      "verdict": "unresolved"
     },
     {
       "candidate": "animate-text-shadow-blur",
@@ -367,6 +462,7 @@
       "initialValue": "0",
       "magnitudes": 2,
       "parent": "text-shadow",
+      "route": "text-shadow/text-shadow-blur-radius@text-shadow",
       "syntax": "<length>",
       "verdict": "movable"
     },
@@ -377,6 +473,7 @@
       "initialValue": "currentColor",
       "magnitudes": 2,
       "parent": "text-shadow",
+      "route": "text-shadow/text-shadow-color@text-shadow",
       "syntax": "<color>",
       "verdict": "movable"
     },
@@ -387,6 +484,7 @@
       "initialValue": "0px",
       "magnitudes": 2,
       "parent": "text-shadow",
+      "route": "text-shadow/text-shadow-offset-x@text-shadow",
       "syntax": "<length>",
       "verdict": "movable"
     },
@@ -397,6 +495,7 @@
       "initialValue": "0px",
       "magnitudes": 2,
       "parent": "text-shadow",
+      "route": "text-shadow/text-shadow-offset-y@text-shadow",
       "syntax": "<length>",
       "verdict": "movable"
     },
@@ -407,6 +506,28 @@
       "initialValue": "0px",
       "magnitudes": 2,
       "parent": "transform-origin",
+      "route": "transform-origin/transform-origin-z@transform-origin",
+      "syntax": "<length>",
+      "verdict": "movable"
+    },
+    {
+      "magnitudes": 0,
+      "route": "translate/translate-x@translate",
+      "verdict": "unresolved"
+    },
+    {
+      "magnitudes": 0,
+      "route": "translate/translate-y@translate",
+      "verdict": "unresolved"
+    },
+    {
+      "candidate": "animate-translate-z",
+      "component": "translate-z",
+      "consumer": "translate",
+      "initialValue": "0px",
+      "magnitudes": 2,
+      "parent": "translate",
+      "route": "translate/translate-z@translate",
       "syntax": "<length>",
       "verdict": "movable"
     }

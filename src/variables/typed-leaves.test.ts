@@ -1,5 +1,6 @@
 import type { PropertyType } from '@/types'
 
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
 import { compositionEdges } from '@/variables/composition'
@@ -17,6 +18,122 @@ import {
   typedLeaves,
   typedLeavesOf,
 } from './typed-leaves'
+
+import path from 'node:path'
+
+/**
+ * The evidence D.3.5 measured, and the guard that ties a declaration to it.
+ *
+ * A typed declaration changes what ships: a leaf in `typedLeaves` is registered with a real grammar, so its
+ * resting value has to survive that grammar and its frames have to interpolate the way the property does. Both
+ * were measured, per pair, by `scripts/research/d3-validation.mjs` — and the record it wrote is the *only* thing
+ * that admits a declaration. Nothing in `src/` imports this file at runtime; the pass that produced it is a
+ * research book, and production depends on the data rather than on the run.
+ *
+ * The guard is exact on the two fields a declaration can be compared against without interpretation:
+ *
+ *   pair          the record names **that** parent and component, so a sibling cannot be rounded up
+ *   representation the declared `syntax` and `initialValue` are the ones that were measured
+ *
+ * One asymmetry is deliberate, and it is where a naive guard would be wrong. A declaration is keyed
+ * `(family, leaf)` while a pair is keyed `(parent, component)`, so one leaf can serve two validated routes —
+ * `box-shadow`'s five leaves serve the inset and the outset pairs alike. The declaration is therefore only
+ * admitted when **every** record through it is `movable`: one registration serves both routes, so it is only as
+ * good as its worst one.
+ */
+type Evidence = {
+  routes: Array<{
+    candidate: string
+    component: string
+    consumer: string
+    initialValue: string
+    magnitudes: number
+    parent: string
+    route: string
+    syntax: string
+    verdict: string
+  }>
+}
+
+const EVIDENCE = path.resolve(
+  path.dirname(new URL(import.meta.url).pathname),
+  '..',
+  '..',
+  'scripts',
+  'validated-representations.json',
+)
+
+const evidence: Evidence = JSON.parse(readFileSync(EVIDENCE, 'utf8'))
+
+/** The identity a declaration and its evidence share: a leaf, and the family it is executed through. */
+const keyOf = (one: { component: string; consumer: string }) =>
+  `${one.consumer}\u0000${one.component}`
+
+const declaredLeaf = (consumer: string, component: string) =>
+  typedLeaves[consumer as PropertyType]?.[component]
+
+describe('a typed declaration is admitted by evidence and by nothing else', () => {
+  const validated = evidence.routes.filter(one => one.verdict === 'movable')
+
+  it('declares every route the validation measured as movable, with its representation', () => {
+    // Forward, and exact: a `movable` record admits a declaration under **that family**, with **that syntax**
+    // and **that initial value**. This is the assertion that fails when a declaration is edited after the fact
+    // to something the browser never saw.
+    for (const one of validated) {
+      const leaf = declaredLeaf(one.consumer, one.component)
+
+      expect(
+        leaf,
+        `${one.route} is validated \`movable\` but not declared under \`${one.consumer}\``,
+      ).toBeDefined()
+      expect(leaf?.syntax).toBe(one.syntax)
+      expect(leaf?.initialValue).toBe(one.initialValue)
+    }
+  })
+
+  it('refuses a declaration any of whose routes is undecided', () => {
+    // A declaration is keyed `(family, leaf)` while a route is a pair *through* a family, so one declaration can
+    // serve more than one pair — `box-shadow`'s five leaves serve the inset and the outset routes alike. One
+    // registration serves both, so it is only as good as its worst route.
+    const verdicts = new Map<string, string[]>()
+
+    for (const one of evidence.routes)
+      verdicts.set(keyOf(one), [
+        ...(verdicts.get(keyOf(one)) ?? []),
+        one.verdict,
+      ])
+
+    for (const [key, records] of verdicts) {
+      const [consumer, component] = key.split('\u0000')
+
+      if (!declaredLeaf(consumer, component)) continue
+
+      // A key whose records are all `movable` is the batch's business. A key with **no** `movable` record is
+      // not: the six leaves declared before this pass have their evidence in the landing registry, and this
+      // pass refuses their union syntaxes because a union is not one probe. What the guard must never allow is
+      // a key where *some* route is movable and another is not — that is a promotion one route short.
+      if (!records.includes('movable')) continue
+
+      expect(
+        records,
+        `\`${consumer}\`/\`${component}\` is declared while one of its routes is not movable`,
+      ).toEqual(records.map(() => 'movable'))
+    }
+  })
+
+  it('leaves the routes the pass could not decide undeclared', () => {
+    // Named rather than counted, because these are the findings of that pass and a future edit that "rounds up"
+    // one of them should fail here rather than in a report nobody reads.
+    for (const one of evidence.routes.filter(
+      record => record.verdict !== 'movable',
+    ))
+      if (one.verdict !== 'unresolved')
+        expect(
+          declaredLeaf(one.consumer, one.component),
+          `${one.route} is ${one.verdict} and must not be declared`,
+        ).toBeUndefined()
+  })
+})
 
 describe('typed leaf declarations', () => {
   it('declares the three scale leaves as numbers-or-percentages resting at one', () => {
@@ -36,30 +153,59 @@ describe('typed leaf declarations', () => {
     ])
   })
 
-  it('names only leaves that are dependencies of the family', () => {
-    // A typed registration on a name the composition does not read is a registration nothing
-    // reads — and it would publish an `@property` block for a variable no rule ever sets.
-    for (const [attribute, leaves] of Object.entries(typedLeaves)) {
-      const dependencies = compositionEdges.get(attribute as PropertyType) ?? []
+  it('names only leaves the family reads, at any depth, or the family itself', () => {
+    // Three shapes, and the runtime has one lookup for all of them — `typedLeavesOf(attribute)`, where the
+    // attribute is the property the *candidate* animates.
+    //
+    //   composed   the family composes the leaf directly (`scale` reads `scale-x`; `border-radius` reads its
+    //              four corners), so the registration is read by a rule the family emits.
+    //   nested     the family reaches it through another composition (`background-position` reads
+    //              `background-position-x`, which reads `background-position-x-offset`), which is why the
+    //              test walks rather than looking one edge deep — a rule two levels down still reads the leaf.
+    //   whole      the family **is** the property the candidate animates (`animate-background-color` addresses
+    //              `background-color`, and the emission applies the leaf directly), so the leaf name and the
+    //              family name are the same string and there is no composition edge to point at.
+    //
+    // The failure mode is the same in all three and is what this guards: an `@property` block nothing reads — a
+    // registration published for a variable no rule ever sets, which is silent and permanent.
+    //
+    // Every edge is followed, whatever its kind, and that is the correction this promotion forced: the kinds
+    // describe *how* a dependency is addressed — `direct`, `composite`, `fallback` — which is a different
+    // question from whether it is read. `box-shadow` reaches its five leaves only through
+    // `var(--jumi-box-shadow-inset, var(--jumi-box-shadow-outset))`, and `background-position` reaches its
+    // offsets through `background-position-x`; both are read, and a registration on either leaf is read with
+    // them. `edgesOf` enumerates `dependencies`, so every name this walk reaches is a dependency of something —
+    // which is exactly the invariant the original test stated in one edge's worth of prose.
+    //
+    // The other half of that intent, "a `composite` leaf is a routing problem this increment does not solve", is
+    // asserted by the sibling test below: a leaf that is itself a composition is rejected outright, so a
+    // composite can be a *path* through this walk but never a declaration.
+    const reachable = (attribute: PropertyType) => {
+      const seen = new Set<string>()
+      const queue: PropertyType[] = [attribute]
 
-      for (const leaf of Object.keys(leaves ?? {}))
-        expect(dependencies.map(one => one.dependency)).toContain(leaf)
+      while (queue.length) {
+        for (const edge of compositionEdges.get(queue.shift()!) ?? []) {
+          if (seen.has(edge.dependency)) continue
+
+          seen.add(edge.dependency)
+          queue.push(edge.dependency as PropertyType)
+        }
+      }
+
+      return seen
     }
-  })
 
-  it('names only leaves that the family reads directly', () => {
-    // Typed registration is what makes a leaf interpolable *on its own*, which only means
-    // something for a leaf the composition reaches as a bare read. A `fallback` leaf reads a
-    // value the constituent model does not own, and a `composite` leaf is a routing problem this
-    // increment does not solve.
     for (const [attribute, leaves] of Object.entries(typedLeaves)) {
-      const edges = compositionEdges.get(attribute as PropertyType) ?? []
+      const composed = reachable(attribute as PropertyType)
 
       for (const leaf of Object.keys(leaves ?? {})) {
-        const edge = edges.find(one => one.dependency === leaf)
+        if (leaf === attribute) continue
 
-        expect(edge?.kind).toBe('direct')
-        expect(edge?.addressable).toBe(true)
+        expect(
+          composed.has(leaf),
+          `\`${attribute}\` declares \`${leaf}\`, which it does not read through direct composition`,
+        ).toBe(true)
       }
     }
   })
@@ -76,7 +222,7 @@ describe('typed leaf declarations', () => {
 
   it('answers an empty list for a family that declares none', () => {
     // The overwhelming majority, and the answer a consumer must handle.
-    expect(typedLeavesOf('rotate')).toEqual([])
+    expect(typedLeavesOf('gap')).toEqual([])
     expect(typedLeavesOf('not-a-property' as PropertyType)).toEqual([])
   })
 })

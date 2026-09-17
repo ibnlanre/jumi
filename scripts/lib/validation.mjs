@@ -1,6 +1,6 @@
-import { derivations } from './derivation.mjs'
-import { describe } from './observation.mjs'
-import { readCandidates } from './property-model.mjs'
+import { derive } from './derivation.mjs'
+import { describe, population, servingCandidates } from './observation.mjs'
+import { bucketOf, readCandidates, readTypedLeaves } from './property-model.mjs'
 
 /**
  * D.3.5 · the third pass: **validating a derived representation in a browser**.
@@ -87,39 +87,96 @@ export const PROBES = {
 }
 
 /**
- * One pair's arm plan, as far as the model carries it.
+ * Every **route** by which the model can execute one pair: the attribute a serving candidate addresses it
+ * through, with the candidate that spells it.
  *
- * Refused rather than approximated, with the reason: a pair whose candidate addresses the *parent's* whole
- * value has no class spelling that names this component's value, and inventing one would be authoring the
- * fixture this pass exists to avoid. That is `unresolved`, and it names the pair rather than dropping it.
+ * A pair can be reached by more than one public motion — `animate-border-left-radius` addresses `border-radius`
+ * with `border-bottom-left-radius` as one of its parts, and `animate-border-bottom-left-radius` addresses the
+ * corner's own property — and those are **not equivalent compiler entrances**: the leaf's registration has to be
+ * available under the family *that candidate* looks it up through, so a declaration keyed on one route leaves
+ * the other half-typed.
+ *
+ * This is the dimension candidate ordering used to collapse silently. `describe()` takes the first serving
+ * candidate, which was indistinguishable from "the only one" until a family arrived with a shorthand, a side
+ * shorthand and a corner longhand all touching one constituent. Measured: exactly four pairs in the batch — the
+ * four `border-radius` corners — have two routes, and the arbitrary 3+1 split of their declarations in the first
+ * generated map was nothing but alphabetical order.
  */
-export const planFor = (derivation, magnitude = 0) => {
+export const routesOf = pair =>
+  [...new Set(servingCandidates(pair).map(one => one.attribute))]
+    .sort()
+    .map(consumer => ({
+      candidate: servingCandidates(pair).find(one => one.attribute === consumer)
+        .name,
+      consumer,
+    }))
+
+/**
+ * One **route's** arm plan, as far as the model carries it.
+ *
+ * Keyed by `(pair, consumer)` rather than by the pair, because that is the identity a declaration and its
+ * evidence share. Refused rather than approximated, with the reason: a candidate that addresses the *parent's*
+ * whole value has no class spelling naming this component's value, and inventing one would be authoring the
+ * fixture this pass exists to avoid. That is `unresolved`, and it names the route rather than dropping it.
+ */
+export const planFor = (derivation, magnitude = 0, route) => {
   const { component, parent } = derivation.pair
   const pair = `${parent}/${component}`
+  const declared = readTypedLeaves().get(component)
+  // `plans()` passes **every** route the model serves this pair through; a caller that passes none gets the
+  // first, which is the pre-route behaviour and is enough for a question about one pair — the collapse only
+  // mattered where a promotion reads the answer as "the" family.
+  const at = route ??
+    routesOf(derivation.pair)[0] ?? {
+      candidate: undefined,
+      consumer: undefined,
+    }
 
-  if (derivation.outcome !== 'mechanically derivable')
+  if (!at.consumer)
+    return {
+      pair,
+      reason:
+        'the model serves this pair through no attribute this pass can read',
+      route: pair,
+      status: 'unresolved',
+    }
+
+  // A pair the model **declares** is in this pass's population even though the derivation no longer speaks about
+  // it: promotion removes a pair from the *workstream* (`derivations()` filters on "the model declares no
+  // representation") while leaving it exactly what this pass exists to re-measure. Without this the rerun the
+  // ruling asked for would validate only the pairs nobody has promoted — measured: the population fell from 41
+  // to 10 the moment the 31 landed, and the evidence record shrank with it.
+  if (derivation.outcome !== 'mechanically derivable' && !declared)
     return {
       pair,
       reason: `the derivation outcome is \`${derivation.outcome}\`, not a proposal`,
+      route: routeOf(pair, at.consumer),
       status: 'unresolved',
     }
 
-  if (derivation.proposal.length !== 1)
+  if (!declared && derivation.proposal.length !== 1)
     return {
       pair,
       reason: `the proposal is a union (\`${derivation.proposal.join(' | ')}\`) and an arm registers one syntax`,
+      route: routeOf(pair, at.consumer),
       status: 'unresolved',
     }
 
-  const descriptor = describe(derivation.pair)
-  const entry = readCandidates().find(one => one.name === descriptor.candidate)
-  const syntax = derivation.proposal[0]
+  const entry = readCandidates().find(one => one.name === at.candidate)
+  const syntax = declared?.syntax ?? derivation.proposal[0]
   const probes = PROBES[syntax]
+
+  // A declaration that disagrees with the derivation is the **evidence guard's** business, not a reason to refuse
+  // a plan: the pass's job is to measure what shipped, and the guard compares the record it writes against the
+  // declaration field by field. Refusing here instead dismissed the three `scale` leaves and the two `translate`
+  // ones, whose declarations predate this derivation and were justified by their own measurement — the derived
+  // proposal for `scale-x` is `<number>` where the model has always declared a union.
 
   if (!probes)
     return {
       pair,
       reason: `no probe is declared for \`${syntax}\``,
+      route: routeOf(pair, at.consumer),
       status: 'unresolved',
     }
 
@@ -134,8 +191,9 @@ export const planFor = (derivation, magnitude = 0) => {
     return {
       pair,
       reason:
-        `\`${descriptor.candidate}\` addresses \`${entry?.attribute ?? 'nothing'}\` as a whole, so a class ` +
+        `\`${at.candidate}\` addresses \`${entry?.attribute ?? 'nothing'}\` as a whole, so a class ` +
         `carrying it names the parent's value and not this component's`,
+      route: routeOf(pair, at.consumer),
       status: 'unresolved',
     }
 
@@ -145,34 +203,84 @@ export const planFor = (derivation, magnitude = 0) => {
     return {
       pair,
       reason: `no magnitude ${magnitude} for \`${syntax}\``,
+      route: routeOf(pair, at.consumer),
       status: 'unresolved',
     }
 
   return {
-    candidate: descriptor.candidate,
+    candidate: at.candidate,
     component,
-    consumer: descriptor.consumer,
-    klass: `${descriptor.candidate}-[0:${derivation.rest}|100:${probe}]`,
+    consumer: at.consumer,
+    klass: `${at.candidate}-[0:${derivation.rest}|100:${probe}]`,
     magnitude,
     pair,
     parent,
     probe,
     // The model's resting value, which the sheet is asserted against rather than trusted to agree with.
     rest: derivation.rest,
+    // The evidence identity: a pair **and** the family it is executed through. `(parent, component)` alone was
+    // the unit that could describe most cases and not all — the four corners are the first batch where a pair
+    // is reached through two families that are not interchangeable.
+    route: routeOf(pair, at.consumer),
     status: 'planned',
     syntax,
   }
 }
 
-/** Every derivable pair, planned once per declared magnitude — so a pair is never silently dropped. */
-export const plans = () =>
-  derivations()
-    .filter(one => one.outcome === 'mechanically derivable')
-    .flatMap(derivation =>
-      (PROBES[derivation.proposal[0]] ?? [null]).map((_, magnitude) =>
-        planFor(derivation, magnitude),
-      ),
-    )
+/** How one route is named in a report and in the evidence record. */
+export const routeOf = (pair, consumer) => `${pair}@${consumer}`
+
+/**
+ * Every pair this pass can speak about, planned once per declared magnitude — so a pair is never silently
+ * dropped.
+ *
+ * The population is the derivation workstream **plus the pairs promoted out of it**: a pair the model declares a
+ * representation for is still a pair whose representation has to keep holding, and the rerun after a promotion is
+ * the only thing that checks the shipped metadata rather than the proposal.
+ */
+export const plans = () => {
+  const declared = readTypedLeaves()
+
+  return (
+    population()
+      .filter(one => bucketOf(one.parent, one.component) === 'value')
+      // "The model serves it through a candidate", not "the model declares a representation for it": the second
+      // reading is `status === 'complete'`, and filtering on `unresolved-descriptor` instead dropped exactly the
+      // pairs that are still undecided — `mask-border-outset`'s four, the rotate axes, `math-depth-add` and the
+      // two `offset-anchor` pairs — from a pass whose whole job is to keep deciding them. Measured: the population
+      // fell to 37 pairs and the tally lost every exclusion it had found.
+      .filter(one => describe(one).reason !== 'no candidate addresses the pair')
+      .filter(one => {
+        // The population is read from the census directly rather than from `derivations()`, and that is the
+        // correction a promotion forced: `derivations()` answers "what does the model not yet declare", so the 31
+        // pairs left it the moment they were declared — and the rerun stopped measuring exactly the pairs it
+        // exists to re-measure. Measured: the population fell from 41 pairs to 10.
+        const derivation = derive(one)
+
+        return (
+          derivation.outcome === 'mechanically derivable' ||
+          declared.has(one.component)
+        )
+      })
+      .map(one => derive(one))
+      .flatMap(derivation =>
+        (PROBES[proposalOf(derivation)] ?? [null]).flatMap((_, magnitude) =>
+          // One plan per **route**, not per pair: a pair the model can execute two ways has two registrations to
+          // check, and measuring only the first is how the generated map came out with three corners under
+          // `border-radius` and one under its own property.
+          (routesOf(derivation.pair).length
+            ? routesOf(derivation.pair)
+            : [{ candidate: undefined, consumer: undefined }]
+          ).map(route => planFor(derivation, magnitude, route)),
+        ),
+      )
+  )
+}
+
+/** The syntax an arm will register: the model's when it declares one, the derivation's otherwise. */
+const proposalOf = derivation =>
+  readTypedLeaves().get(derivation.pair.component)?.syntax ??
+  derivation.proposal[0]
 
 /**
  * Every `--jumi-*` name an expression ends up depending on, through the sheet's own declarations.

@@ -55,16 +55,18 @@ describe('the probe', () => {
 })
 
 describe('the plan', () => {
-  test('every derivable pair plans, and every plan is a phrase with the model rest', () => {
+  test('every pair with a representation in play plans, and every plan is a phrase with the model rest', () => {
+    // The population is the derivation workstream *plus* the pairs promoted out of it, so the assertion is about
+    // the shape of every plan rather than about how many pairs the workstream happens to hold today: a
+    // promotion must not require editing this test, only the evidence it is checked against.
     const planned = plans()
 
-    expect(derivable.length).toBeGreaterThan(0)
-    expect(planned.filter(one => one.status === 'planned').length).toBe(
-      derivable.length * 2,
-    )
+    expect(planned.length).toBeGreaterThan(0)
+    expect(planned.some(one => one.status === 'planned')).toBe(true)
 
     for (const plan of planned) {
-      expect(plan.status).toBe('planned')
+      if (plan.status !== 'planned') continue
+
       expect(plan.klass).toBe(
         `${plan.candidate}-[0:${plan.rest}|100:${plan.probe}]`,
       )
