@@ -699,3 +699,101 @@ whole normalization / decomposition   ≠   leaf animation canonicalization
 
 Landed as the census increment: `src/variables/reach.test.ts` for the morphology and
 `pnpm research:d3-reach` for the gate. 17/17 stages, 79/79 behaviour.
+
+## 2026-09-17 — the interpolation differential runs on three shapes, and starts with two fixture defects
+
+### Call
+
+> **One thing I would be strict about: the interpolation differential should compare against the native
+> parent property behavior, not just check that the typed leaf itself interpolates smoothly. Otherwise
+> you can accidentally prove the custom property is continuous while still changing the parent's
+> semantics. […] I'd also avoid trying to classify all 99 keyword pairs in one pass. Take a
+> representative set across distinct semantic shapes first.**
+
+> **Do not try to resolve B or C before landing the increment. The book has done its job by proving that
+> the first interpolation criterion itself has different observability requirements.** […] **Keep the
+> other two unresolved. Next, classify the observation surface required for equivalence before expanding
+> the keyword population.**
+
+The four shapes named were an alias with a numeric equivalent, a sentinel with none, a keyword inside a
+multi-part grammar, and a keyword whose computed value depends on sibling state. Three are asked here;
+the fourth is the gate's `border-bottom-width` arm, which cannot be observed at rest at all and so is
+recorded rather than decided (`pnpm research:d3-reach`, `not exercised`).
+
+`pnpm research:d3-interpolation` holds the animation, steps it across a fixed wall, and reads the
+**computed parent property** in both arms — native, and typed-driving-the-emission's-own-application:
+
+```text
+A  font-weight                  movable
+     rest `normal` = 400 · far `bold` = 700 (engine's numbers)
+     slot `--jumi-font-weight-eBE` applied by `var(--jumi-font-weight-eBE)` · candidates normal
+     native 400 · 475 · 550 · 625 · 700
+     typed  400 · 475 · 550 · 625 · 700
+
+B  column-gap (rests at normal)  unresolved
+     computed `normal` in both, but it RENDERS 0px in flex and 630px in columns — no context-free typed
+     rest can stand in for it
+
+C  background-position-x-edge   unresolved
+     rest `left` = 0% · far `right` = 100% (engine's readings)
+     longhand: `background-position-x: 100%` reads 100%, but `100% 0%` reads 0% — the pair is dropped,
+     not honoured
+     shorthand: `background-position: left 0% top 0%` reads 0% 0% (its own initial is `50% 50%`) —
+     honoured there, and that is a different parent
+     leaf   0% · 25% · 50% · 75% · 100%
+     parent 0% · 0% · 0% · 0% · 0%
+```
+
+**The strict version of the question found two fixture defects that the loose version would have
+published as results.** Reading a declaration out of the sheet with a first-match regex read a *staging
+name* — `--jumi-staging-animations---jumi-background-position-x` contains the declaration it stages — so
+the fixture wrote `0%` where the model's pair belonged and the typed arm read a constant. That is a
+textbook `registration-safe, interpolation-unsafe`, and it was nothing of the kind. The extractor now
+selects the candidate containing the slot under test and throws when none does. The second: arm A's
+registration was aimed at an unversioned slot name, when the emission's keyframes hand the property to a
+**versioned** one (`--jumi-font-weight-eBE`). Both are in the book as comments and in the measurement
+traps, because both are ways for a differential to manufacture the verdict it is looking for.
+
+What each verdict now rests on:
+
+- **`movable` (A)** is a curve identity, not a resemblance — five samples, `400 · 475 · 550 · 625 · 700`
+  in both arms, with the rest and the endpoint numbers **read from the engine** (`normal` = `400`,
+  `bold` = `700`) and the slot and application **read from the emission**. An arm that states `400`
+  itself would be testing its own arithmetic.
+- **`unresolved` (B)** is a reason, not a refusal: `normal` is context-dependent, so no context-free
+  typed rest can stand in for it. Measured as the rendered gap, because the computed value is `normal`
+  in both containers.
+- **`unresolved` (C)** is a boundary the engine drew, not one inferred from the text: the model's
+  composition for `background-position-x` is a **pair**, and the longhand drops it (`100% 0%` → `0%`).
+  The leaf interpolates `0% → 100%` and the parent never moves. The pair *is* honoured by the shorthand
+  the model composes above it, which is a **different parent** — measured so the boundary is a reading
+  rather than an attribution, and deliberately not asked to a verdict here.
+
+**The finding that outlives the three verdicts: an observability class.** The result is not "one movable,
+2 unresolved" — it is that a keyword case can stay unresolved for two *different* reasons, and neither is
+a failure of typed execution. So the relation the census unit needs is not only `(parent, component)`:
+
+```text
+(parent, component)  →  effective CSS observation surface
+
+computed-value observable        font-weight
+used-value / layout observable   column-gap (normal)
+composed-property observable     background-position-x-edge — real consumer `background-position`
+currently unobservable           the border-width fixture, until its family state shows the value
+```
+
+`font-weight → font-weight` is easy. `background-position-x-edge → background-position` is **not** the
+longhand the component is named after, and that mapping has to come from the model's composition
+structure rather than from guessing CSS property names. For the used-value class the consequence is
+sharper still: comparing `getComputedStyle(el).columnGap` **cannot** establish behavioural equivalence
+between two contexts that both compute to `normal` and render `0px` and `630px`. That surface has to be
+measured geometrically (child B's start minus child A's end).
+
+**`unresolved ≠ unsafe`** is unchanged, and worth restating where it is easy to lose: only a measured
+divergence earns `unsafe`.
+
+**Landed as the interpolation increment**, committed unchanged on the CTO's instruction: `font-weight` is
+the first genuinely `movable` keyword pair, the other two stay `unresolved`, the two fixture defects stay
+in the book as traps. `scripts/research/d3-interpolation.mjs` + its `package.json` entry + three memories;
+17/17 stages, 79/79 behaviour. Nothing in `src/` or the emitted CSS is touched, so the shipped bytes and
+the behaviour book are unchanged — this increment classifies, it does not move execution.
