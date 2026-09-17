@@ -2346,3 +2346,97 @@ independently animatable.
 
 **State.** New book `scripts/research/d3-anchor.mjs` (`pnpm research:d3-anchor`), evidence at
 `scripts/anchor-falsification.json`. No `src/` change, nothing promoted. 17/17 stages, 480 unit tests.
+
+
+## 2026-09-17 — D.3.7 · normalizability measured: what the two-axis subject can and cannot carry
+
+### The ruling, and the sentence it corrects first
+
+> **Keep D.3.7 open. Next, test whether the surviving two-axis subject is actually representable as two
+> `<length-percentage>` typed leaves across physical edges, percentages, `calc()`, `var()`, and any accepted
+> logical-position forms. Separately measure whether the current edge and offset utilities can remain
+> independently meaningful once both feed one resolved axis.**
+
+The correction is accepted and the earlier entry stands as written, with its claim narrowed here:
+
+```text
+was      "Edge keywords are syntax, not semantics"
+now      for the tested physical-position forms, edge spellings resolve to the same interpolable x/y state
+         as their computed <length-percentage> equivalents
+```
+
+Logical positions, unresolved values and author-time constructs were out of scope until measured. Two of those
+three are now measured, and the third turns out not to exist in this property.
+
+### The class table
+
+```text
+class                        arms                                              outcome
+directly resolved            50% 50% → 20% 80% · 10px 20px → 30px 40px       equivalent, equivalent
+physical edge-relative       left 10px → right 10px · left 10% → right 25%    equivalent, equivalent,
+                             top 20px → bottom 10px · center → 20% 80%        discrete natively, equivalent
+arithmetic / unresolved      calc(…) pair · var(…) pair                       equivalent, equivalent
+logical / grammar-sensitive  start top → end bottom · inline-start → …       discrete natively, discrete
+                                                                             natively
+```
+
+Each `equivalent` means the native series and the two registered `<length-percentage>` leaves produce the
+**same series sample for sample** — the arithmetic arm to the digit:
+
+```text
+native       calc(50% + 10px) calc(25% - 4px) · calc(42.5% + 8px) · … · calc(20% + 2px)
+represented  calc(50% + 10px) calc(25% - 4px) · calc(42.5% + 8px) · … · calc(20% + 2px)
+```
+
+### The four answers
+
+**`calc()` is carryable.** A registered `<length-percentage>` holds the exact computed arithmetic form and
+interpolates it identically, so the resolved leaf's natural syntax is confirmed rather than assumed.
+
+**`var()` is equivalent *and* statically undecidable — the distinction the ruling anticipated.** The arm reads
+`30% 20% → 70% 60%` and the leaves reproduce it exactly. But those computed forms are the *browser's*
+substitution: Jumi reads source at build time and cannot generalise `var(--ax)` into `30%`. So the class
+splits the way it was predicted to: **statically normalizable** (`calc()`, keywords, literals) versus
+**dynamically composed** (`var()`), and a `var()`-authored anchor can only be typed if something else supplies
+the resolved value.
+
+**Logical positions do not exist here.** `start top` and `inline-start` both compute to `auto` — the property
+does not accept them — so that class is empty rather than unresolved. Worth recording as a measurement, because
+"unsupported" and "unsupported by this property" look identical from the model's side.
+
+**One arm is discrete natively and is not explained by this pass.** `top 20px → bottom 10px` does not
+interpolate, while its x-axis twin `left 10px → right 10px` does, and the two arms compute to the same shape of
+pair (`20px` against `calc(100% - 10px)`). That is a real browser behaviour this pass measured but did not
+account for, and it is the first thing the next increment should pin — either it is a y-axis quirk, or the
+`center` on the untouched axis interacts, and the two answers differ for the reshape.
+
+### The independent-control question, answered
+
+```text
+offset leaves move under directional edges   offset-anchor: left var(--ox) top var(--oy)
+  leaves --ox 10px → 30px, --oy 20px → 40px
+  series 10px 20px · 15px 25px · 20px 30px · 25px 35px · 30px 40px
+  native 10px 20px · 15px 25px · 20px 30px · 25px 35px · 30px 40px      preserves native motion
+
+edge leaf moves on its own                   offset-anchor: var(--ex) 10px top 20px
+  leaves --ex left → right
+  series 10px 20px · 10px 20px · calc(100% - 10px) 20px · …             discrete
+  native calc(0% + 10px) 20px · calc(25% + 5px) 20px · 50% 20px · …     does not reproduce it
+```
+
+So the two utilities are **not** symmetrical, and the asymmetry is what decides the API. An **offset** is a
+value, so it can be registered and stays independently animatable — and the four-value form accepts it, because
+`left var(--ox) top var(--oy)` uses *directional* edges, which is exactly what the resting `center` cannot be.
+An **edge** is a keyword, not a value: it cannot be registered, so animating one is discrete, and it moves
+continuously only through the resolved spelling it normalizes to. Independent edge motion is therefore not a
+capability that survives the reshape; independent offset motion is.
+
+### What is still open
+
+Not the design, and deliberately: the arms above establish representability and the API constraint, not an
+implementation. Open before anything ships — the unexplained discrete y-axis arm; how a `var()`-authored anchor
+is declined or carried; and whether the resolved leaves keep the author's edge utilities meaningful as
+*authoring controls that compose into one axis* rather than as independently animated leaves.
+
+**State.** New book `scripts/research/d3-anchor-normal.mjs` (`pnpm research:d3-anchor-normal`), evidence at
+`scripts/anchor-normalization.json`. No `src/` change, nothing promoted. 17/17 stages, 480 unit tests.

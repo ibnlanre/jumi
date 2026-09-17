@@ -1,0 +1,296 @@
+{
+  "classes": [
+    {
+      "class": "directly resolved",
+      "authoredFrom": "50% 50%",
+      "authoredTo": "20% 80%",
+      "computedFrom": "50% 50%",
+      "computedTo": "20% 80%",
+      "nativeKind": "interpolated",
+      "nativeSeries": [
+        "50% 50%",
+        "42.5% 57.5%",
+        "35% 65%",
+        "27.5% 72.5%",
+        "20% 80%"
+      ],
+      "representable": true,
+      "representedSeries": [
+        "50% 50%",
+        "42.5% 57.5%",
+        "35% 65%",
+        "27.5% 72.5%",
+        "20% 80%"
+      ],
+      "equivalent": true
+    },
+    {
+      "class": "directly resolved",
+      "authoredFrom": "10px 20px",
+      "authoredTo": "30px 40px",
+      "computedFrom": "10px 20px",
+      "computedTo": "30px 40px",
+      "nativeKind": "interpolated",
+      "nativeSeries": [
+        "10px 20px",
+        "15px 25px",
+        "20px 30px",
+        "25px 35px",
+        "30px 40px"
+      ],
+      "representable": true,
+      "representedSeries": [
+        "10px 20px",
+        "15px 25px",
+        "20px 30px",
+        "25px 35px",
+        "30px 40px"
+      ],
+      "equivalent": true
+    },
+    {
+      "class": "physical edge-relative",
+      "authoredFrom": "left 10px",
+      "authoredTo": "right 10px",
+      "computedFrom": "0% 10px",
+      "computedTo": "100% 10px",
+      "nativeKind": "interpolated",
+      "nativeSeries": [
+        "0% 10px",
+        "25% 10px",
+        "50% 10px",
+        "75% 10px",
+        "100% 10px"
+      ],
+      "representable": true,
+      "representedSeries": [
+        "0% 10px",
+        "25% 10px",
+        "50% 10px",
+        "75% 10px",
+        "100% 10px"
+      ],
+      "equivalent": true
+    },
+    {
+      "class": "physical edge-relative",
+      "authoredFrom": "left 10%",
+      "authoredTo": "right 25%",
+      "computedFrom": "0% 10%",
+      "computedTo": "100% 25%",
+      "nativeKind": "interpolated",
+      "nativeSeries": [
+        "0% 10%",
+        "25% 13.75%",
+        "50% 17.5%",
+        "75% 21.25%",
+        "100% 25%"
+      ],
+      "representable": true,
+      "representedSeries": [
+        "0% 10%",
+        "25% 13.75%",
+        "50% 17.5%",
+        "75% 21.25%",
+        "100% 25%"
+      ],
+      "equivalent": true
+    },
+    {
+      "class": "physical edge-relative",
+      "authoredFrom": "top 20px",
+      "authoredTo": "bottom 10px",
+      "computedFrom": "auto",
+      "computedTo": "auto",
+      "nativeKind": "discrete",
+      "nativeSeries": [
+        "auto",
+        "auto",
+        "auto",
+        "auto",
+        "auto"
+      ],
+      "representable": false,
+      "representedSeries": [],
+      "equivalent": false
+    },
+    {
+      "class": "physical edge-relative",
+      "authoredFrom": "center",
+      "authoredTo": "20% 80%",
+      "computedFrom": "50% 50%",
+      "computedTo": "20% 80%",
+      "nativeKind": "interpolated",
+      "nativeSeries": [
+        "50% 50%",
+        "42.5% 57.5%",
+        "35% 65%",
+        "27.5% 72.5%",
+        "20% 80%"
+      ],
+      "representable": true,
+      "representedSeries": [
+        "50% 50%",
+        "42.5% 57.5%",
+        "35% 65%",
+        "27.5% 72.5%",
+        "20% 80%"
+      ],
+      "equivalent": true
+    },
+    {
+      "class": "arithmetic / unresolved",
+      "authoredFrom": "calc(50% + 10px) calc(25% - 4px)",
+      "authoredTo": "calc(20% + 2px) calc(80% + 8px)",
+      "computedFrom": "calc(50% + 10px) calc(25% - 4px)",
+      "computedTo": "calc(20% + 2px) calc(80% + 8px)",
+      "nativeKind": "interpolated",
+      "nativeSeries": [
+        "calc(50% + 10px) calc(25% - 4px)",
+        "calc(42.5% + 8px) calc(38.75% - 1px)",
+        "calc(35% + 6px) calc(52.5% + 2px)",
+        "calc(27.5% + 4px) calc(66.25% + 5px)",
+        "calc(20% + 2px) calc(80% + 8px)"
+      ],
+      "representable": true,
+      "representedSeries": [
+        "calc(50% + 10px) calc(25% - 4px)",
+        "calc(42.5% + 8px) calc(38.75% - 1px)",
+        "calc(35% + 6px) calc(52.5% + 2px)",
+        "calc(27.5% + 4px) calc(66.25% + 5px)",
+        "calc(20% + 2px) calc(80% + 8px)"
+      ],
+      "equivalent": true
+    },
+    {
+      "class": "arithmetic / unresolved",
+      "authoredFrom": "var(--ax) var(--ay)",
+      "authoredTo": "var(--bx) var(--by)",
+      "computedFrom": "30% 20%",
+      "computedTo": "70% 60%",
+      "nativeKind": "interpolated",
+      "nativeSeries": [
+        "30% 20%",
+        "40% 30%",
+        "50% 40%",
+        "60% 50%",
+        "70% 60%"
+      ],
+      "representable": true,
+      "representedSeries": [
+        "30% 20%",
+        "40% 30%",
+        "50% 40%",
+        "60% 50%",
+        "70% 60%"
+      ],
+      "equivalent": true
+    },
+    {
+      "class": "logical / grammar-sensitive",
+      "authoredFrom": "start top",
+      "authoredTo": "end bottom",
+      "computedFrom": "auto",
+      "computedTo": "auto",
+      "nativeKind": "discrete",
+      "nativeSeries": [
+        "auto",
+        "auto",
+        "auto",
+        "auto",
+        "auto"
+      ],
+      "representable": false,
+      "representedSeries": [],
+      "equivalent": false
+    },
+    {
+      "class": "logical / grammar-sensitive",
+      "authoredFrom": "inline-start",
+      "authoredTo": "inline-end",
+      "computedFrom": "auto",
+      "computedTo": "auto",
+      "nativeKind": "discrete",
+      "nativeSeries": [
+        "auto",
+        "auto",
+        "auto",
+        "auto",
+        "auto"
+      ],
+      "representable": false,
+      "representedSeries": [],
+      "equivalent": false
+    }
+  ],
+  "controls": [
+    {
+      "label": "offset leaves move under directional edges",
+      "compose": "left var(--ox) top var(--oy)",
+      "leaves": [
+        [
+          "--ox",
+          "10px",
+          "30px"
+        ],
+        [
+          "--oy",
+          "20px",
+          "40px"
+        ]
+      ],
+      "native": [
+        "left 10px top 20px",
+        "left 30px top 40px"
+      ],
+      "kind": "interpolated",
+      "nativeSeries": [
+        "10px 20px",
+        "15px 25px",
+        "20px 30px",
+        "25px 35px",
+        "30px 40px"
+      ],
+      "series": [
+        "10px 20px",
+        "15px 25px",
+        "20px 30px",
+        "25px 35px",
+        "30px 40px"
+      ],
+      "equal": true
+    },
+    {
+      "label": "edge leaf moves on its own",
+      "compose": "var(--ex) 10px top 20px",
+      "leaves": [
+        [
+          "--ex",
+          "left",
+          "right"
+        ]
+      ],
+      "native": [
+        "left 10px top 20px",
+        "right 10px top 20px"
+      ],
+      "kind": "discrete",
+      "nativeSeries": [
+        "calc(0% + 10px) 20px",
+        "calc(25% + 5px) 20px",
+        "50% 20px",
+        "calc(75% - 5px) 20px",
+        "calc(100% - 10px) 20px"
+      ],
+      "series": [
+        "10px 20px",
+        "10px 20px",
+        "calc(100% - 10px) 20px",
+        "calc(100% - 10px) 20px",
+        "calc(100% - 10px) 20px"
+      ],
+      "equal": false
+    }
+  ],
+  "source": "D.3.7 · scripts/research/d3-anchor-normal.mjs"
+}
