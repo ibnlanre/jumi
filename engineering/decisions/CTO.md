@@ -1315,7 +1315,7 @@ Everything except one probe per syntax comes out of the emission — the rest th
 for (`restOf`), the frame the motion goes to (`framesOf`), the surface the pair is read on and the wiring that
 hands the value there (`applicationOf`), and the slot the leaf actually is (`pinningOf`, which follows the
 sheet's own compositions rather than the first `var(` it sees). The probe is the arm's only authored input, and
-the test suite asserts each one is a value its own syntax admits _by the shape reader's judgement_, so an arm
+the test suite asserts each one is a value its own syntax admits *by the shape reader's judgement*, so an arm
 cannot test a representation against a value the representation does not cover.
 
 ```text
@@ -1360,13 +1360,13 @@ proposed syntax  <integer>
 
 The moving thing is an argument inside `add(...)`, not the scalar leaf the resting value suggested — so the
 interpolation unit is **not** the leaf this pair was bucketed as. That is **reshape**, D.1's subject, and it is
-recorded here as a falsification of the census bucket rather than as a defect in the emission: _resting-value
-morphology alone cannot always identify the interpolation unit_. The test is the model's own `FUNCTION`
+recorded here as a falsification of the census bucket rather than as a defect in the emission: *resting-value
+morphology alone cannot always identify the interpolation unit*. The test is the model's own `FUNCTION`
 pattern over the emitted frames, not a list of properties, so it generalises past `math-depth`.
 
 **`registration-unsafe` is 0 by construction, and that is a result rather than a gap.** The syntax came from
 the resting value's own shape, so the rest is inside the syntax the derivation proposed — and the reach gate's
-`registration-unsafe` belongs to the _keyword_ population, where the rest is a keyword and the grammar is a
+`registration-unsafe` belongs to the *keyword* population, where the rest is a keyword and the grammar is a
 promise. The pass measures the rest anyway: the emission's rest is read from the sheet rather than assumed from
 the model, and the two disagreeing is a reader defect it **fails** on rather than a finding it reports.
 
@@ -1378,8 +1378,8 @@ the model, and the two disagreeing is a reader defect it **fails** on rather tha
   `#0000ff80` now, and the suite asserts no probe carries whitespace.
 - **A fixture that forgets the emitted sheet reads `none` and agrees.** The first run omitted it and produced
   27 `movable` verdicts from two invalid readings each. Two arms that never moved are one reading, so it is now
-  a **hard failure**: a flat native series _with_ an identical typed series exits non-zero.
-- **The one-value spelling makes the arm motionless.** `-[2]` sets the leaf's _live_ slot to the target, so the
+  a **hard failure**: a flat native series *with* an identical typed series exits non-zero.
+- **The one-value spelling makes the arm motionless.** `-[2]` sets the leaf's *live* slot to the target, so the
   application's frame reference wins and the leaf drives nothing; the phrase form `-[0:<rest>|100:<probe>]`
   keeps the live slot at its rest and is the only spelling under which the leaf is the source of truth.
 - **The report is part of the instrument.** The assembler returned an object per verdict while the tally
@@ -1555,3 +1555,47 @@ reshape-required        1   math-depth-add
 **State.** 17/17 stages, 79/79 behaviour, 477 unit tests, the emission snapshot re-recorded (one registration
 added: the fourth corner under its own family). `math-depth-add`, `offset-anchor` and the rotate axes remain
 undecided and uncommitted to any representation, as ruled.
+
+## 2026-09-17 — correction to D.3.5's validation: `math-depth-add` is reshape-required
+
+### Superseded
+
+The pass-three entry above records `math-depth-add` as **`interpolation-unsafe`**, and that was the conclusion the
+measurement supported at the time: the registered leaf never left `0` while the property read `0 · 1 · 1 · 2 · 2`.
+That entry stands as written. This one corrects it, because later evidence changed the *reading* rather than the
+measurement:
+
+```text
+resting leaf     0
+emitted motion   add(0) -> add(2)
+proposed syntax  <integer>
+
+old reading    the typed representation interpolates incorrectly
+actual reading the representation was aimed at the wrong unit
+               — the moving thing is an argument inside `add(...)`, not the scalar leaf
+               → reshape-required
+```
+
+`reshape-required` is a class of its own and is decided **before** the interpolation differential — after the canary
+and after the rest, before the series are compared — because a unit the syntax cannot name makes "does it interpolate
+the same?" the wrong question rather than a failed one. Two tests pin the precedence, including that a rest which
+does not survive the registration is still `registration-unsafe` whatever the unit turns out to be.
+
+The general statement, which is why this is a class rather than a note beside the old verdict: **a resting value's
+morphology cannot always identify the interpolation unit.** The test is structural — the model's own `FUNCTION`
+pattern over the emitted frames — so the next pair of this shape is found without anyone remembering `math-depth`.
+
+### And one distinction this log has to keep
+
+A pass reports only what **it** established. `unresolved` in a validation report means "this probe strategy could not
+decide it", and it must never be read as "the declaration has no evidence":
+
+```text
+validation-pass result   unresolved for this probe strategy   the five union-syntax routes of `scale`/`translate`
+standing evidence        proven elsewhere                     their landing records in `scripts/lib/evidence.mjs`
+production eligibility   yes, from the standing evidence      the declarations those records admit
+```
+
+The registry is the authority for the production decision; a research pass is not. The five union routes are the case
+that makes this concrete — this pass cannot probe a union with a single value, and their declarations are carried by
+their own landing records rather than by this batch, which is what the promotion's guard asserts.
