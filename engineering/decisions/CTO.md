@@ -3062,3 +3062,92 @@ about the code, and treating them as the same thing is how a working design gets
 
 **State.** No change in this entry. Tip `262526f`, `src/` untouched since `350c1f4`, nothing promoted, gate 17/17
 with 489 unit tests.
+
+---
+
+## The D.3.7 landing was attempted, built, and reverted — two censuses refuse it
+
+Ruling: *"Begin the atomic D.3.7 `offset-anchor` production landing now."* It was begun, and the whole emission was
+written. It compiled and bundled — `bundle`, `types` and `lint` all passed — and it was reverted at the end of the
+session, because two things it depends on are decisions rather than edits, and neither had been made.
+
+This is the fourth deferral of this increment, so the entry is written to be the *reason* the next attempt starts
+further along: the code is described below closely enough to be re-applied, and the two refusals are named.
+
+### What was written, and that it built
+
+1. `src/composition/offset-anchor.ts` — the composition composes the two resolved slots,
+   `var(--jumi-offset-anchor-x-position) var(--jumi-offset-anchor-y-position)`, instead of the four authoring tokens.
+2. `src/variables/property.ts` — `'offset-anchor-x-position'` and `'-y-position'`, two `value` entries with
+   `variable: '--jumi-…'`, and the top-level pair's `dependencies` pointing at them.
+3. `src/variables/typed-leaves.ts` — the `TypedExecution.constituent` facet takes
+   `authoring: (slot: string) => null | string`; the `offset-anchor` family declares `whole: positionComponents` and a
+   `constituent` resolver that reads the four authoring slots, resolves each axis, and returns both leaves or `null`;
+   the normalization (`axisPosition`, `positionComponents`, `components`) lives in `src/` because production cannot
+   import a research book, and it is the same contract the prototype implemented.
+4. `src/core/index.ts` — before the simple typed-leaf path, `if (execution?.constituent)` resolves the assignment,
+   and on a complete one emits **one** definition with **both** leaves from **one** substrate, returning both
+   endpoint slots. `null` falls through to the composed-property representation — the whole-route decline, unchanged.
+5. `src/types/index.ts` — the two execution components named in `PropertyType`.
+
+`bundle`, `prepare`, `types` and `lint` pass with all of that in place. The refusal is at `unit` and `css`.
+
+### Refusal one — the authoring-state source is a population act, not an edit
+
+The resolver has to read the family's own authoring state at build time. The obvious source is the model's slot map
+for the attribute, which is built from the attribute's dependency closure — and the four authoring components were not
+in that closure, because the composition no longer reads them. Adding them so the resolver can read them moved the
+census, measurably:
+
+```text
+constituent population   307   (was 303)
+buckets                  value 110 · keyword 101 · reshape 96   (was 106 · 99 · 98)
+```
+
+Four new `(offset-anchor, …)` pairs, and two existing pairs re-classified. **The closure is the population**, so
+widening it to feed a resolver is not an implementation detail — it changes what the census counts. That is the
+finding, and it is a boundary rather than a defect: the call-site constraint says the resolver's context is *exactly
+the components the resolver needs*, and this measurement is what says those components must be **declared as an
+authoring surface** rather than smuggled in as dependencies of the resolved family. Classification: not an
+assumption failure — none of the six was contradicted.
+
+### Refusal two — the evidence model has no representation for an internal execution leaf
+
+`names only leaves the family declares, and every one of them` fails: the two execution leaves are declared but no
+candidate route addresses them, and they never will, because they are the thing the frames animate rather than
+something an author writes. The evidence model equates *declared* with *addressed*.
+
+This is the evidence/guard class — but it is **not** yet a refresh, because a refresh is only honest after the
+emission has been observed. The emission was never measured in a browser this session: the gate stops at `unit`
+before `behaviour` runs, so §18's subject section — the three arms that read the composition shell, the leaf write
+through the endpoint slot, and the `math-depth` slot — did not run against the new emission. So this is recorded as
+an **open decision about the evidence model** (what an internal execution leaf is, in the vocabulary of routes),
+not as a refreshed record of a verified emission.
+
+### What is still proven, and what is not in question
+
+The spike stands: normalizer reconstructions 7/7 identical, spike routes 4/4 identical, edge motion surviving as
+authoring identity executed as the resolved axis. Nothing in this attempt contradicted any of the six assumptions.
+The two call-site constraints hold as written and were followed — the compound branch is taken because the family
+*declares* a resolver, and every family that declares none reaches the simple path unchanged.
+
+### The next attempt starts here
+
+Two decisions, then the same code:
+
+1. Give the resolver a declared authoring surface — a place for authored edge/offset state that the census counts
+   deliberately rather than as a side effect of a dependency list.
+2. Decide what an execution leaf is in the evidence vocabulary — an internal leaf with its own record kind, or a
+   route asserted against the family that owns it. Then §18 runs against the real emission.
+
+Then re-apply the five files above, classify the two rewrite lines in the css registry (mechanical), re-run the
+production-shaped cases, refresh the census, and take the gate.
+
+**Practice note, measured twice:** two of this session's edits reported success and had not applied — a duplicate
+`'offset-anchor'` block in `typedLeaves`, and the facet's signature still carrying the old parameter. Both look like
+implementation errors and are not. Read the region back after editing it; the cost is one command and the alternative
+is debugging a phantom.
+
+**State.** Tip `1c4f133`. Nothing landed: `src/` is exactly `1c4f133`, restored by name. Gate 17/17, 489 unit tests,
+`tsc` clean. The two census refusals and the registry classification are the increment's real gate, and neither is a
+rewrite of the design.
