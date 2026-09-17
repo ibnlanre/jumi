@@ -187,9 +187,10 @@ describe('the verdict', () => {
 
     expect(unknown.verdict).toBe('fixture-unobservable')
     expect(unknown.cause).toBe('no computed form')
-    // A pair whose emission produces no valid value is not a D.3 finding: the representation was never
-    // tested. The ruling put it in its own class rather than folding it into `unresolved`.
-    expect(neverComputed.verdict).toBe('blocked-by-emission')
+    // An application that computes to what a bare element reads was never a property fact: the emission does not
+    // produce a valid value for the pair, and the ruling moved that finding into the reshape track — the leaves
+    // decompose a grammar along boundaries the browser does not recognise.
+    expect(neverComputed.verdict).toBe('reshape-required')
     expect(neverComputed.cause).toBe('the emission produces no valid value')
   })
 

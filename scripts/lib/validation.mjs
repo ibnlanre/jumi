@@ -48,16 +48,19 @@ export const VERDICTS = [
   'interpolation-unsafe',
   'unresolved',
   'fixture-unobservable',
-  // Added by the ruling on this pass, and deliberately outside the four census classes: the
-  // representation was **never tested**, because production does not currently produce a valid consumer
-  // value for the pair. Calling that `unresolved` or `fixture-unobservable` would file a defect in the
-  // emission under the D.3 workstream it does not belong to.
-  'blocked-by-emission',
-  // Also the ruling's, and also outside the four: the arm did run, and what it falsified was the pair's
-  // **morphology** rather than its interpolation. `math-depth-add`'s emission moves `add(0)` -> `add(2)`,
-  // so the interpolation unit is an argument inside the call and not the scalar leaf the resting value
-  // suggested. Calling that `interpolation-unsafe` would claim we proved a typed representation
-  // interpolates incorrectly when what we proved is that the representation was aimed at the wrong unit.
+  // Outside the four census classes, and there are two causes of it — both a statement about *what* should have
+  // been interpolated rather than about the representation that was proposed for it:
+  //
+  //   `math-depth-add`   the emission moves `add(0)` -> `add(2)`, so the unit is an argument inside the call and
+  //                      not the scalar leaf its rest suggested
+  //   `offset-anchor`    the emission's application does not compute at all, and cannot be repaired locally:
+  //                      `<position>` will not take two edge-plus-offset pairs (`center 0 center 0` is
+  //                      rejected), so the family's four leaves decompose a grammar along boundaries the
+  //                      browser does not recognise
+  //
+  // The second entered this log as `blocked-by-emission`, which was right at the time and is preserved there —
+  // it correctly said the representation was never tested because production produced no valid consumer value.
+  // What changed is the diagnosis of *why*, and that belongs to the representation model.
   'reshape-required',
 ]
 
@@ -421,9 +424,10 @@ export const verdictOf = ({
         cause: 'the emission produces no valid value',
         reason:
           `the arm's own declaration computes to \`${applied}\`, which is what \`${property}\` reads with no ` +
-          `motion applied at all: the emission's application does not compute on this element, so neither the ` +
-          `native nor the typed path can be judged through it`,
-        verdict: 'blocked-by-emission',
+          `motion applied at all: the emission's application does not compute, so neither the native nor the ` +
+          `typed path can be judged through it — and it cannot be repaired by composing the same leaves another ` +
+          `way, because the grammar the family composes does not recognise this decomposition`,
+        verdict: 'reshape-required',
       }
 
     return {

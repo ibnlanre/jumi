@@ -54,10 +54,12 @@ import path from 'node:path'
  *   model's own `FUNCTION` pattern rather than from a list of properties, so the finding generalises past
  *   `math-depth`.
  *
- *   `offset-anchor-x/y` are `blocked-by-emission`: their application composes to `center 0 center 0`, which the
- *   property rejects, so the pair reads `auto` with the arm's declaration and with none at all. The
- *   representation was never tested — production does not produce a valid consumer value — and filing that as
- *   `unresolved` would put an emission defect inside the D.3 workstream that does not own it.
+ *   `offset-anchor-x/y` are the other cause of `reshape-required`, and they entered the log as
+ *   `blocked-by-emission`: their application composes to `center 0 center 0`, which the property rejects, so the
+ *   pair reads `auto` with the arm's declaration and with none at all. That was right at the time — the
+ *   representation was never tested because production produced no valid consumer value — and what changed is the
+ *   diagnosis of *why*: `<position>` will not take two edge-plus-offset pairs, so no local repair of the emission
+ *   expresses this decomposition and the family belongs to the reshape track.
  *
  * Run: `pnpm research:d3-validation` (exits non-zero only on an arm defect, never on a verdict).
  */
@@ -372,7 +374,6 @@ const order = [
   'registration-unsafe',
   'reshape-required',
   'interpolation-unsafe',
-  'blocked-by-emission',
   'fixture-unobservable',
   'unresolved',
   'movable',
@@ -491,7 +492,6 @@ console.log(
     `  interpolation-unsafe   ${tally('interpolation-unsafe')}`,
     `  fixture-unobservable   ${tally('fixture-unobservable')}`,
     `  unresolved             ${tally('unresolved')}`,
-    `  blocked-by-emission    ${tally('blocked-by-emission')}`,
     `  reshape-required       ${tally('reshape-required')}`,
     '',
     // A zero that is a result rather than a gap, said in as many words: the syntax was derived from the resting
@@ -515,9 +515,9 @@ console.log(
     'the motion, under every magnitude this pass exercised, for the values the emission animates this pair',
     'to — and once the model declares a component these arms register **that** metadata, so the run measures',
     'what shipped rather than what was proposed.',
-    '`blocked-by-emission` and `reshape-required` are outside the four census classes on purpose: in the first',
-    'the representation was never tested, and in the second what a rest cannot reveal is that the thing that',
-    'moves is not the leaf.',
+    '`reshape-required` is outside the four census classes on purpose, and it has two causes: a unit a resting',
+    'value cannot reveal (an argument inside `add(...)`), and an emission whose application does not compute',
+    'because the family decomposes a grammar along boundaries the browser does not recognise.',
   ].join('\n'),
 )
 

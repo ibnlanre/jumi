@@ -1599,3 +1599,92 @@ production eligibility   yes, from the standing evidence      the declarations t
 The registry is the authority for the production decision; a research pass is not. The five union routes are the case
 that makes this concrete — this pass cannot probe a union with a single value, and their declarations are carried by
 their own landing records rather than by this batch, which is what the promotion's guard asserts.
+
+## 2026-09-17 — `offset-anchor` moves to the reshape track, and D.3's whole lesson in one line
+
+### Ruling
+
+> **Reclassify `offset-anchor` from `blocked-by-emission` to `reshape-required`. Preserve the earlier
+> blocked-by-emission finding as historical evidence, because it correctly identified that validation could not
+> proceed. Do not patch the current composition. Open a reshape investigation around the actual `<position>`
+> interpolation unit, likely one resolved positional value per axis rather than independent edge and offset
+> leaves.**
+
+### The history, preserved
+
+```text
+initial finding       blocked-by-emission
+                      the representation was never tested, because production produced no valid consumer value
+
+later diagnosis       the emission cannot be repaired locally: the model's interpolation units do not correspond
+                      to `CSS <position>`'s structure
+
+superseding class     reshape-required
+```
+
+The first two are still true. What changed is the diagnosis of *why* production was invalid, and that belongs to
+the representation model rather than to the emission — so `blocked-by-emission` leaves the live vocabulary and the
+finding stays here, which is what this log is for.
+
+### The measurement behind the reclassification
+
+```text
+the emission composes    offset-anchor: var(--jumi-offset-anchor-x) var(--jumi-offset-anchor-y)
+each axis composes       --jumi-offset-anchor-x: var(--jumi-offset-anchor-x-edge) var(--jumi-offset-anchor-x-offset)
+their rests              `center 0` and `center 0`   →   the property reads `center 0 center 0`
+
+offset-anchor: center 0 center 0   → discarded, the property falls to its initial `auto`
+offset-anchor: center 0            → `50% 0px`        one axis alone is a whole position
+offset-anchor: left 0 top 0        → `0px 0px`        the four-value form wants left/right and top/bottom
+offset-anchor: center top          → `50% 0%`
+```
+
+`<position>`'s four-value form is `[left|right] <length-percentage> [top|bottom] <length-percentage>`, so `center`
+is not permitted in it — and the two axes concatenate into that form whenever both carry an offset from a `center`
+edge, which is the family's own rest. The decomposition is not wrong about the values; it is wrong about the
+**unit**: an "edge plus offset" pair is already a whole position expression, so joining two of them asks the grammar
+for something it does not have.
+
+Two repairs were considered and rejected, and both are recorded rather than lost: **compose one axis only** gives a
+value the engine accepts (`center 0`) and silently drops the y axis, and a composition is a static string that
+cannot choose its spelling by the values its leaves hold; **make the resting edge directional** (`left 0 top 0` is
+accepted) changes what an author's edge utility means, which is a semantics decision and not a correctness fix.
+
+### The reshape the family needs, as a brief
+
+Not implemented, and deliberately not patched around. The promising direction is that each axis resolves to **one
+position component** before animation — `x-position` and `y-position`, each a valid positional value — with the
+property composing those two directly:
+
+```text
+left + 20px      → 20px
+right + 20px     → calc(100% - 20px)
+center           → 50%
+top + 10px       → 10px
+bottom + 10px    → calc(100% - 10px)
+```
+
+and the questions that need answering before anything moves: can every edge/offset combination be normalised
+without changing native semantics; what happens to percentages, `calc()`, `var()` and logical positions; is
+`center + offset` a real authoring concept or one the existing model invented; and should edge utilities stay
+independently animatable, or does edge+offset become one compound positional channel.
+
+### And the lesson this is one instance of
+
+> **A composition graph can be structurally valid in Jumi while still decomposing a native CSS grammar along
+> boundaries the browser does not recognise.**
+
+### The outstanding state, at route level
+
+```text
+reshape-required       math-depth-add · offset-anchor-x/y           3 routes
+unresolved             rotate-x · rotate-y (no native baseline)     2 routes
+fixture-unobservable   rotate-z · mask-border-outset ×4             5 routes
+and, kept apart:       the five union-syntax routes of scale/translate are NOT undecided —
+                       this pass cannot probe a union with one value, and their declarations
+                       are carried by their landing records
+```
+
+**State.** No composition patched, no production change: `src/` is untouched by this increment and the generated
+map is unchanged, so the rerun proof from the promotion still stands. 17/17 stages, 79/79 behaviour, 477 unit
+tests.

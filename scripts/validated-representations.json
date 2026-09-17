@@ -350,7 +350,7 @@
       "parent": "offset-anchor-x",
       "route": "offset-anchor-x/offset-anchor-x-offset@offset-anchor",
       "syntax": "<length>",
-      "verdict": "blocked-by-emission"
+      "verdict": "reshape-required"
     },
     {
       "candidate": "animate-offset-anchor-y-offset",
@@ -361,7 +361,7 @@
       "parent": "offset-anchor-y",
       "route": "offset-anchor-y/offset-anchor-y-offset@offset-anchor",
       "syntax": "<length>",
-      "verdict": "blocked-by-emission"
+      "verdict": "reshape-required"
     },
     {
       "candidate": "animate-offset-position-x-offset",
