@@ -2,9 +2,14 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { chromium } from 'playwright'
 
 import { compiler, finalizeCss, root } from '../lib/compile.mjs'
-import { applicationOf } from '../lib/observation.mjs'
-import { FUNCTION, readPropertyEntries } from '../lib/property-model.mjs'
-import { plans } from '../lib/validation.mjs'
+import { SYNTAX_OF, derive } from '../lib/derivation.mjs'
+import { applicationOf, population } from '../lib/observation.mjs'
+import {
+  FUNCTION,
+  readCandidates,
+  readPropertyEntries,
+} from '../lib/property-model.mjs'
+import { PROBES, plans, routesOf } from '../lib/validation.mjs'
 
 import path from 'node:path'
 
@@ -149,11 +154,19 @@ const shellSurvey = () => {
   )
 }
 
-/** The consumer's computed value at each instant of a held wall, on one element carrying the class. */
+/**
+ * The consumer's computed value at each instant of a held wall, on one element carrying the class.
+ *
+ * Both arms are forced to `linear`, and that is a correction the second family paid for: the emitted arm's
+ * animation carries the phrase's own easing while the proposal's frames are written `linear`, so the two
+ * series differed in the *easing* rather than in the representation — `0 · 8.17 · 16.05 · 19.21 · 20` against
+ * `0 · 5 · 10 · 15 · 20` for a `blur` that no one disputed. With the easing held equal the arms differ only
+ * in what is under test, which is the same discipline D.3.5's curve arms follow.
+ */
 const series = (klass, property, style, tag = 'div') =>
   page
     .setContent(
-      `<style>${style}</style><${tag} id="e" class="${klass}">x</${tag}>`,
+      `<style>${style}\n#e { animation-timing-function: linear; }</style><${tag} id="e" class="${klass}">x</${tag}>`,
     )
     .then(() =>
       page.evaluate(
@@ -208,25 +221,125 @@ const reshaped = (
   { application, consumer, leaf, probe, rest, shell, syntax },
 ) => {
   const name = `jumi-${leaf}-reshaped`
+  const escaped = leaf.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+  /**
+   * Every **write** of the leaf, and of any frame variable the leaf's slot owns, loses the shell — the leaf
+   * has to hold the bare argument.
+   *
+   * This is the edit the first version of this function did not make, and the second family is what showed it
+   * was needed: `math-depth`'s shell lives in the frames of the *property*, which the element rule overrides,
+   * so leaving it there was harmless. `filter`'s shell lives in the leaf's own **rest** and in its class's
+   * frame variables, and those the element rule cannot override — they are different properties. Measured:
+   * pinning the leaf to `20px` with the shell still written into it left the composition reading
+   * `blur(20px)` as one filter and `20px` as the next, so the whole declaration voided and `filter` computed
+   * to `none`.
+   */
+  const writes = new RegExp(
+    `(--jumi-${escaped}[\\w-]*:\\s*)${shell}\\(([^;{}]*)\\)`,
+    'g',
+  )
+  const existing = new RegExp(`@property --jumi-${escaped}\\s*\\{[^}]*\\}`, 'g')
   const registration = `\n@property --jumi-${leaf} {\n  syntax: '${syntax}';\n  inherits: false;\n  initial-value: ${rest};\n}\n`
   const frames = `\n@keyframes ${name} {\n  from { --jumi-${leaf}: ${rest}; }\n  to { --jumi-${leaf}: ${probe}; }\n}\n`
-  const element = `\n#e {\n  ${consumer}: ${shell}(${application});\n  animation: ${name} ${DURATION}ms linear both;\n}\n`
+
+  // The shell wraps the **leaf's read inside the composition**, never the composition itself. Wrapping the
+  // application whole produces `blur(var(--a) var(--b) …)` — one filter whose argument is a filter list — and
+  // the declaration voids: measured, `filter` read `none` in both arms.
+  const read = `var(--jumi-${leaf})`
+  const element = `\n#e {\n  ${consumer}: ${application.split(read).join(`${shell}(${read})`)};\n  animation: ${name} ${DURATION}ms linear both;\n}\n`
 
   return {
-    css: `${sheet}${registration}${frames}${element}`,
-    // A proposal is only a proposal if the emission reads the leaf where the shell can wrap it, and if the
-    // frames carry a value the leaf's own syntax admits. Both are asked of the text rather than assumed.
+    css: `${sheet.replace(existing, '').replace(writes, '$1$2')}${registration}${frames}${element}`,
+    // A proposal is only a proposal if the emission reads the leaf where the shell can wrap it, if it writes
+    // the shell into something that can be stripped, and if the frames carry a value the leaf's syntax admits.
     edited:
-      application !== '' &&
+      application.includes(read) &&
       rest !== '' &&
       probe !== '' &&
       probe !== rest &&
-      sheet.includes(`var(--jumi-${leaf})`),
+      writes.test(sheet),
   }
 }
 
 const browser = await chromium.launch()
 const page = await browser.newPage()
+
+/**
+ * The shell's single argument, or `null` when the call does not take exactly one.
+ *
+ * This is the **argument position** the invariant asks the model to identify structurally — read off the
+ * entry's own rest rather than assumed from a function-name table. A top-level comma means the shell takes a
+ * list, and a list is not one independently interpolable subject: `drop-shadow(…)` is the case this refuses,
+ * and refusing it is the honest answer rather than treating the whole list as one argument.
+ */
+const argumentOf = (value, shell) => {
+  if (!shell || !value.startsWith(`${shell}(`) || !value.endsWith(')')) return null
+
+  const inner = value.slice(shell.length + 1, -1).trim()
+
+  if (inner === '') return null
+
+  let depth = 0
+
+  for (const char of inner) {
+    if (char === '(') depth += 1
+    else if (char === ')') depth -= 1
+    else if (char === ',' && depth === 0) return null
+  }
+
+  return inner
+}
+
+/**
+ * The verdict for one pair of arms, in one place — because the second-family question **is** whether this
+ * judgement applies unchanged, and a copy of it per family would answer a different question.
+ */
+const judge = ({ emitted, moved, pinned, probe }) => {
+  if (pinned.values[0] === moved.values[0])
+    return {
+      note: `pinning the leaf to \`${probe}\` leaves the consumer at \`${moved.values[0]}\`, so this fixture cannot see the argument`,
+      outcome: 'fixture-unobservable',
+    }
+
+  // "Moving" is not one thing, and the first classification could not tell the two apart: these emissions
+  // *do* move, in the two steps of a discrete flip (`0 · 0 · 2 · 2 · 2`), which is the very defect the pass
+  // exists for. A discrete series has the two stops and nothing else; an interpolated one has values between.
+  const distinct = values => new Set(values).size
+  const emittedSteps = distinct(emitted.values)
+  const reshapedSteps = distinct(moved.values)
+  const last = values => values[values.length - 1]
+
+  if (reshapedSteps <= 2 && emittedSteps <= 2)
+    return {
+      failure: `the emission is discrete (${emitted.values.join(' · ')}) and the reshape is too (${moved.values.join(' · ')}), so the proposal changed nothing`,
+    }
+
+  if (
+    moved.values[0] !== emitted.values[0] ||
+    last(moved.values) !== last(emitted.values)
+  )
+    return {
+      failure: `the reshape moves the endpoints (${emitted.values.join(' · ')} becomes ${moved.values.join(' · ')}), which is a different motion rather than the same one interpolated`,
+    }
+
+  // The strongest result the second-family test can produce, and the one the ruling asks for: the same
+  // series, sample for sample, with the trajectory's *shape* changed and its motion unchanged. Easing is held
+  // equal in both arms, so equality here is a statement about the representation and nothing else.
+  if (emitted.values.join('|') === moved.values.join('|'))
+    return {
+      note: `the same series in both arms (${emittedSteps} distinct), so the relocation is motion-preserving`,
+      outcome: 'equivalent',
+    }
+
+  return {
+    note:
+      emittedSteps <= 2
+        ? `discrete as emitted (${emittedSteps} step${emittedSteps === 1 ? '' : 's'}) and interpolated by the reshape (${reshapedSteps})`
+        : `interpolated as emitted (${emittedSteps} steps); the reshape keeps the same endpoints (${reshapedSteps})`,
+    outcome: emittedSteps <= 2 ? 'reshape-unlocks' : 'already-interpolating',
+  }
+}
 
 const survey = shellSurvey()
 const byLeaf = new Map(survey.map(one => [one.leaf, one]))
@@ -285,6 +398,7 @@ for (const plan of plans()) {
   const emitted = await series(plan.klass, plan.consumer, sheet, tag)
   const moved = await series(plan.klass, plan.consumer, proposal.css, tag)
 
+
   // The canary: pin the leaf to the far frame and ask whether the consumer *deviates* from its unpinned
   // reading. A pin holds the animation off, so it is constant by construction — the first version of this
   // test asked for variation over the wall and so reported every working pin as blindness. What it has to
@@ -298,43 +412,135 @@ for (const plan of plans()) {
     tag,
   )
 
-  if (pinned.values[0] === moved.values[0])
+  const verdict = judge({
+    emitted,
+    moved,
+    pinned,
+    probe: plan.probe,
+  })
+
+  if (verdict.failure)
+    failures.push(`${plan.component}: ${verdict.failure}`)
+  else
     findings.push({
       ...recordOf(plan, one, { emitted, moved, pinned }),
-      note: `pinning the leaf to \`${plan.probe}\` leaves the consumer at \`${moved.values[0]}\`, so this fixture cannot see the argument`,
-      outcome: 'fixture-unobservable',
+      ...verdict,
     })
-  else {
-    // "Moving" is not one thing, and the first classification could not tell the two apart: this emission
-    // *does* move, in the two steps of a discrete flip (`0 · 0 · 2 · 2 · 2`), which is the very defect the
-    // pair is in this pass for. A discrete series has the two stops and nothing else; an interpolated one has
-    // values between them.
-    const distinct = values => new Set(values).size
-    const emittedSteps = distinct(emitted.values)
-    const reshapedSteps = distinct(moved.values)
-    const last = values => values[values.length - 1]
-    const sameEnds =
-      moved.values[0] === emitted.values[0] &&
-      last(moved.values) === last(emitted.values)
+}
 
-    if (reshapedSteps <= 2 && emittedSteps <= 2)
-      failures.push(
-        `${plan.component}: the emission is discrete (${emitted.values.join(' · ')}) and the reshape is too (${moved.values.join(' · ')}), so the proposal changed nothing`,
-      )
-    else if (!sameEnds)
-      failures.push(
-        `${plan.component}: the reshape moves the endpoints (${emitted.values.join(' · ')} becomes ${moved.values.join(' · ')}), which is a different motion rather than the same one interpolated`,
-      )
-    else
-      findings.push({
-        ...recordOf(plan, one, { emitted, moved, pinned }),
-        note:
-          emittedSteps <= 2
-            ? `discrete as emitted (${emittedSteps} step${emittedSteps === 1 ? '' : 's'}) and interpolated by the reshape (${reshapedSteps})`
-            : `interpolated as emitted (${emittedSteps} steps); the reshape keeps the same endpoints (${reshapedSteps})`,
-        outcome:
-          emittedSteps <= 2 ? 'reshape-unlocks' : 'already-interpolating',
-      })
+/**
+ * D.3.6's second-family falsification, in the ruling's own terms: *does the same subject relocation work in a
+ * second family without changing core behaviour?*
+ *
+ * Two representatives, not a census — `filter-blur` and its `backdrop-filter` twin, plus one whose grammar is
+ * materially different (`filter-hue-rotate` is an `<angle>`, so the argument's type, its unit family and its
+ * probe are all different from `blur`'s). Everything the arms need is **structurally identified or the arm is
+ * refused**: the shell from the survey, the argument position from the shell's own rest, the syntax from the
+ * candidate's single declared type through the derivation's own `SYNTAX_OF` table (one copy, so it cannot
+ * drift), the consumer from the pair's own route, the composition from the emission, and the two stops from
+ * the shared `PROBES`. The judgement is `judge` — the same function the `math-depth` arms ran through, which
+ * is what makes this a test of the primitive rather than of a copy of it.
+ *
+ * Note where the shell has to move *from* here: unlike `math-depth`, these entries write the shell into the
+ * leaf's **rest** (`value: css('blur', '0')`) while the composition already reads the leaf bare, so the
+ * proposal has to take the shell out of the emission and put it into the composition. Two origins, one
+ * transformation — and the origins are reported separately rather than normalized, per the ruling.
+ */
+const REPRESENTATIVES = [
+  'filter-blur',
+  'backdrop-filter-blur',
+  'filter-hue-rotate',
+]
+
+const representatives = []
+const candidates = readCandidates()
+
+for (const leaf of REPRESENTATIVES) {
+  const one = byLeaf.get(leaf)
+  const pair = population().find(entry => entry.component === leaf)
+  const route = pair ? routesOf(pair)[0] : null
+  const types = candidates.find(entry => (entry.parts ?? []).includes(leaf))
+    ?.types ?? []
+  const syntaxes = [
+    ...new Set(types.map(type => SYNTAX_OF[type]).filter(Boolean)),
+  ]
+  // The leaf's resolved rest comes from the derivation, not from the property table: that reader returns the
+  // **source text** for a helper-composed entry (`css('blur', '0')`), and asking a source string to begin with
+  // a shell is how the first version of this line refused all three representatives — a refusal that read as
+  // "the shell takes more than one argument" when nothing had been read at all.
+  const rest = argumentOf(pair ? derive(pair).rest : '', one?.shell ?? '')
+  const probe = (PROBES[syntaxes[0]] ?? [])[0] ?? null
+
+  const refused =
+    !one
+      ? 'the survey does not know this leaf'
+      : !pair
+        ? 'no pair in the population'
+        : !route
+          ? 'no serving candidate'
+          : rest === null
+            ? `the shell \`${one.shell}\` does not take exactly one argument`
+            : syntaxes.length !== 1
+              ? `the candidate's grammar is ${JSON.stringify(types)} and an arm registers one syntax`
+              : probe === null
+                ? `no probe is declared for \`${syntaxes[0]}\``
+                : null
+
+  if (refused) {
+    representatives.push({ leaf, outcome: 'refused', note: refused })
+
+    continue
+  }
+
+  const klass = `${route.candidate}-[0:${rest}|100:${probe}]`
+  const sheet = await compile([klass])
+  const { application } = applicationOf(sheet, route.consumer)
+  const proposal = reshaped(sheet, {
+    application,
+    consumer: route.consumer,
+    leaf,
+    probe,
+    rest,
+    shell: one.shell,
+    syntax: syntaxes[0],
+  })
+  const tag = ELEMENT_OF[route.consumer] ?? 'div'
+  const emitted = await series(klass, route.consumer, sheet, tag)
+  const moved = await series(klass, route.consumer, proposal.css, tag)
+  const pinned = await series(
+    klass,
+    route.consumer,
+    `${proposal.css}\n#e { --jumi-${leaf}: ${probe}; animation: none; }`,
+    tag,
+  )
+  const record = {
+    canary: pinned.values,
+    consumer: route.consumer,
+    emitted: emitted.values,
+    leaf,
+    parent: pair.parent,
+    probe,
+    reshaped: moved.values,
+    rest,
+    shape: one.shapes.join('+'),
+    shell: one.shell,
+    syntax: syntaxes[0],
+  }
+
+  // The same two guards the `math-depth` arm carries, for the same reasons: the survey must be describing
+  // *this* emission, and a proposal that made no edit would leave the arms identical while reporting a
+  // difference it never produced.
+  if (!new RegExp(`\\b${one.shell}\\(`).test(sheet))
+    failures.push(
+      `${leaf}: the survey reports a \`${one.shell}\` shell, but the emission never writes one`,
+    )
+  else if (!proposal.edited)
+    failures.push(`${leaf}: the reshaped sheet made no edit, so the arms are identical`)
+  else {
+    const verdict = judge({ emitted, moved, pinned, probe })
+
+    if (verdict.failure) failures.push(`${leaf}: ${verdict.failure}`)
+    else representatives.push({ ...record, ...verdict })
   }
 }
 
@@ -373,6 +579,14 @@ for (const one of findings)
     `  ${pad(one.parent, 26)} ${pad(`[${one.syntax}]`, 12)} ${pad(one.outcome, 17)} ${one.note}`,
   )
 
+console.log(
+  `\nthe second-family falsification: ${representatives.length} arm(s) of ${REPRESENTATIVES.length} representatives`,
+)
+for (const one of representatives)
+  console.log(
+    `  ${pad(`${one.parent ?? '—'} ← ${one.leaf}`, 44)} ${pad(one.syntax ? `[${one.syntax}]` : '', 12)} ${pad(one.outcome, 17)} ${one.note}`,
+  )
+
 if (failures.length) {
   console.log('\n✗ arm defects:')
   for (const one of failures) console.log(`  ${one}`)
@@ -380,7 +594,7 @@ if (failures.length) {
 
 writeFileSync(
   path.join(root, 'scripts', 'argument-reshape.json'),
-  `${JSON.stringify({ findings, source: 'D.3.6 · scripts/research/d3-argument.mjs', survey }, null, 2)}\n`,
+  `${JSON.stringify({ findings, representatives, source: 'D.3.6 · scripts/research/d3-argument.mjs', survey }, null, 2)}\n`,
 )
 
 await browser.close()

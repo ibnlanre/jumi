@@ -1849,3 +1849,90 @@ fixture-unobservable   rotate-z · mask-border-outset ×4              5 routes
 **State.** No `src/` change, nothing promoted, no production decision: the pass writes
 `scripts/argument-reshape.json` and a survey, and the release rule is unchanged — evidence attaches to the
 route and representation that ships. 17/17 stages, 79/79 behaviour, 477 unit tests.
+
+
+## 2026-09-17 — D.3.6's second family: the primitive survives, and the two origins need different repairs
+
+### The ruling
+
+> **Commit D.3.6. Before opening the offset-anchor reshape, run a very small second-family falsification of
+> the function-argument primitive using representative filter/backdrop-filter leaves. Do not classify or
+> migrate all 22. If the same generic subject relocation survives, implement the primitive generically,
+> rerun `math-depth-add` against production, and close the function-argument reshape track. Then move to
+> `offset-anchor`.**
+
+D.3.6 is `817ba21`, with the entry above narrowed as ruled: the 22 leaves are *structurally applicable*,
+*behaviourally unproven*.
+
+### The falsification, and what "small" was held to
+
+Three representatives, chosen by the ruling's own criteria rather than for convenience: `filter-blur` and its
+`backdrop-filter` twin for family independence, and `filter-hue-rotate` because its grammar is materially
+different (`<angle>` rather than `<length>`, so a different type, unit family and probe). No census, no
+classification of the remaining 19.
+
+Every input is structurally identified, per the ruling's invariant — **leaf · shell function · argument
+position · static consumer composition · typed representation** — or the arm is *refused* rather than
+estimated: the shell from the survey, the argument position from the shell's own rest (and refused when the
+call does not take exactly one argument, which is how `drop-shadow(…)` stays out), the syntax from the
+candidate's single declared type through the derivation's own `SYNTAX_OF` table rather than a second copy of
+it, the consumer from the pair's own route, the composition from the emission, and the two stops from the
+shared `PROBES`. The judgement is the **same `judge`** the `math-depth` arms ran through — which is the
+difference between testing a primitive and testing a copy of it. All three identified; none refused.
+
+### The measurement
+
+```text
+filter ← filter-blur              [<length>]   0 → 20px    equivalent, 5 distinct samples
+backdrop-filter ← …-blur          [<length>]   0 → 20px    equivalent, 5 distinct samples
+filter ← filter-hue-rotate        [<angle>]    0deg → 45deg  equivalent, 5 distinct samples
+```
+
+**Equivalent** is the strongest result this test can produce: the same series sample for sample, with the
+emission's shape changed and the motion unchanged. So the answer to *does the same subject relocation work in
+a second family without changing core behaviour* is yes, and the D.2-style family test passes.
+
+The one thing that is **not** the same as `math-depth`, and it is the reason both origins had to be kept
+apart rather than normalized:
+
+```text
+math-depth-add   shell in the PROPERTY's frames     property unregistered  → discrete  → the relocation UNLOCKS
+filter-blur      shell in the LEAF's own value       property unregistered? no —
+                 …and the property's frames interpolate natively          → equivalent
+```
+
+For the filters the property already interpolates between two shell-carrying values, so the relocation
+repairs no motion. What it changes is **representability**: the leaf becomes a bare typed argument the
+derivation can name and the release rule can promote. That is the benefit for the 22, and it is a smaller
+claim than "the reshape fixes them".
+
+### The two origins really do need different repairs — measured, not reasoned
+
+The leaf-origin leaves write the shell into their own **rest** and into their class's **frame variables**,
+and those the proposal's element rule cannot override because they are different properties from the
+consumer. Measured: with the shell left written, pinning the leaf to `20px` made the composition read
+`blur(20px)` as one filter and `20px` as the next, so the whole declaration voided and `filter` computed to
+`none`. The repair therefore has to **strip the shell from every write of the leaf** (rest *and* frame
+variables) and put it on the *read* inside the composition — where the phrase-origin case needs nothing
+stripped, because its shell sits in frames the element rule already overrides. One transformation, two
+origins, and the ruling's warning not to normalize them was load-bearing.
+
+### Two harness corrections this increment paid for
+
+**Easing must be held equal in both arms.** The emitted arm's animation carries the phrase's own easing while
+the proposal's frames are written `linear`, so the first comparable run reported a *difference* that was only
+the easing — `0 · 8.17 · 16.05 · 19.21 · 20` against `0 · 5 · 10 · 15 · 20` for a `blur` nobody disputed. With
+`animation-timing-function: linear` forced on the element in both arms, equality became a statement about the
+representation and nothing else.
+
+**A refusal must say what it refused on.** The first version asked the property table for the leaf's rest and
+got the *source text* (`css('blur', '0')`), so all three representatives were refused as "the shell does not
+take exactly one argument" when nothing had been read at all. The resolved rest comes from the derivation.
+
+### State
+
+The primitive is proven on two families, with no property-name branch and one `judge`. What the ruling
+licenses next is the generic implementation — detect a shell-shaped typed constituent, animate the argument,
+retain the shell in the composition — followed by `math-depth-add` rerun against production, then the close
+of the track, then `offset-anchor`. Nothing in `src/` changed in this increment and nothing was promoted:
+17/17 stages, 79/79 behaviour, 477 unit tests.
