@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
+import { bucketOf } from './property-model.mjs'
 import {
   applicationOf,
   chainsOf,
+  describe as describePair,
   descriptorOf,
   frameOf,
   liveOf,
+  population,
 } from './observation.mjs'
 
 describe('liveOf', () => {
@@ -138,5 +141,80 @@ describe('chainsOf and descriptorOf', () => {
         method: 'used-gap',
       }),
     ).toThrow(/not reachable/)
+  })
+})
+
+describe('population coverage', () => {
+  // The census's unit and its totals, restated here because this pass derives them from the graph rather than
+  // reading them off `reach.test.ts` — and the buckets come from the **shared** predicate, so the two cannot
+  // drift into different populations. That drift is what this test exists to catch: the census's constituent
+  // count and this pass's reach count were 303 and 294, because one reader evaluated the model while the other
+  // read its source.
+  const pairs = population()
+  const described = pairs.map(one => ({
+    ...describePair(one),
+    machinery: bucketOf(one.parent, one.component) === 'machinery',
+  }))
+
+  const machinery = described.filter(one => one.machinery)
+  const reach = described.filter(one => !one.machinery)
+  const complete = reach.filter(one => one.status === 'complete')
+  const incomplete = reach.filter(one => one.status !== 'complete')
+
+  it('walks the census population, as pairs', () => {
+    expect(pairs).toHaveLength(324)
+    expect(new Set(pairs.map(one => one.parent)).size).toBe(104)
+  })
+
+  it('counts the census populations, machinery included', () => {
+    // The numbers the census asserts, computed here from the graph and the shared bucket: 21 machinery,
+    // 303 constituent. A pair count that agrees while the sets disagree is exactly what was possible before.
+    expect(machinery).toHaveLength(21)
+    expect(reach).toHaveLength(303)
+  })
+
+  it('counts completeness as exactly the declared representations, placed', () => {
+    // The shape assertion rather than the number: a family that declares leaves and lands in the population
+    // makes every one of its pairs complete, and a declaration that no pair can place is a defect.
+    expect(new Set(complete.map(one => one.component))).toEqual(
+      new Set([
+        'scale-x',
+        'scale-y',
+        'scale-z',
+        'translate-x',
+        'translate-y',
+        'translate-z',
+      ]),
+    )
+  })
+
+  it('records a reason wherever it stops', () => {
+    expect(incomplete.length).toBeGreaterThan(0)
+
+    for (const one of incomplete)
+      expect(one.reason, `${one.parent}/${one.component}`).toBeTruthy()
+
+    expect(new Set(incomplete.map(one => one.reason))).toEqual(
+      new Set([
+        'no candidate addresses the pair',
+        'the model declares no representation for the component',
+      ]),
+    )
+  })
+
+  it('scopes a candidate to the pair it actually serves', () => {
+    // `scale-x` is composed by `scale` and by `scale-3d`, and `animate-scale-x` addresses `scale` — so one of
+    // those pairs is served and the other is not. Selecting by component alone made the second look like a
+    // broken descriptor instead of an unserved one.
+    const served = described.find(
+      one => one.component === 'scale-x' && one.parent === 'scale',
+    )
+    const other = described.find(
+      one => one.component === 'scale-x' && one.parent === 'scale-3d',
+    )
+
+    expect(served.status).toBe('complete')
+    expect(other.status).toBe('unresolved-descriptor')
+    expect(other.reason).toBe('no candidate addresses the pair')
   })
 })

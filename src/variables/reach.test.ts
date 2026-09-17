@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
+import {
+  bucketOf,
+  readPropertyEntries,
+} from '../../scripts/lib/property-model.mjs'
+
 import { propertyVariables } from '@/variables/property'
 
 /**
@@ -61,86 +66,44 @@ import { propertyVariables } from '@/variables/property'
  *     **model or the family** for a justified typed representation, then runs the gate — and then the
  *     second differential, interpolation equivalence, which is what would finally license `movable`.
  */
-const FUNCTION = /^[a-z][a-z0-9-]*\(/
-const MACHINERY = /^(animation|transition|scroll-timeline|view-timeline)/
-const COLOUR = /^(transparent|currentcolor|black|white|red|blue|green|grey|gray)$/i
-
-/** The parenthesis depth a component's slot sits at inside a composed value. */
-const depthOf = (expression: string, leaf: string) => {
-  const at = expression.indexOf(`var(--jumi-${leaf})`)
-
-  if (at < 0) return null
-
-  let depth = 0
-
-  for (const char of expression.slice(0, at)) {
-    if (char === '(') depth += 1
-    if (char === ')') depth -= 1
-  }
-
-  return depth
-}
-
+/**
+ * The bucket for one pair comes from the **shared** predicate (`scripts/lib/property-model.mjs`), which reads
+ * the model's source and resolves each composition the way the plugin evaluates it.
+ *
+ * It used to be a second copy here, and the two copies disagreed on the representation rather than on the
+ * rule: this file evaluated the model and saw `scroll(var(--jumi-animation-timeline-axis) var(…))`, while a
+ * source reader saw the identifier `animationTimelineScroll`, so the depth test could not fire and nine
+ * reshapes were counted as machinery — `324 - 30 = 294` "reach" against this file's `324 - 21 = 303`. Two
+ * readers, one model, two populations. One predicate is what makes that impossible, and the counts below are
+ * the evidence that the source reader reproduces the evaluated model rather than replacing it.
+ */
 const parents = Object.entries(propertyVariables).filter(
   ([, entry]) => (entry.dependencies?.length ?? 0) > 0,
 )
 
-const components = new Set(parents.flatMap(([, entry]) => entry.dependencies ?? []))
+// The same parents, read from the source: a disagreement here would mean the reader and the module have
+// parted company, and the pair-by-pair bucket assertions below are computed from the source either way.
+const sourceParents = readPropertyEntries().filter(entry => entry.composite)
 
-const machineryParents = new Set(
-  parents.filter(([parent]) => MACHINERY.test(parent)).map(([parent]) => parent),
+const components = new Set(
+  parents.flatMap(([, entry]) => entry.dependencies ?? []),
 )
-
-const restingOf = (leaf: string) => {
-  const entry = propertyVariables[leaf as keyof typeof propertyVariables]
-
-  return entry ? String(entry.value) : ''
-}
-
-const bucketOf = (
-  parent: string,
-  leaf: string,
-): 'keyword' | 'machinery' | 'reshape' | 'value' => {
-  const resting = restingOf(leaf)
-
-  // A leaf whose own value is a function is a reshape wherever it is used: `blur(0)` is not a value the
-  // property can take, it is an argument the composition supplies the function for.
-  if (FUNCTION.test(resting)) return 'reshape'
-
-  // A resting value that references slots is a composition in its own right — `box-shadow-inset`, whose
-  // value is `inset var(…) var(…)`. Its leaves are the ones the reshape has to reach, and the census's
-  // own residual records them as unreachable for the same reason.
-  if (resting.includes('var(--jumi-')) return 'reshape'
-
-  // **The unit is the pair, not the leaf**, and the difference is measured: `translate-x` is a bare
-  // component of `translate` and an *argument* of `translate3d(…)`, so it is reachable through one parent
-  // and not the other. A per-leaf verdict would have to be wrong about one of them.
-  const expression = String(
-    propertyVariables[parent as keyof typeof propertyVariables]?.value ?? '',
-  )
-  const depth = depthOf(expression, leaf)
-
-  if (depth !== null && depth > 0) return 'reshape'
-
-  if (MACHINERY.test(parent)) return 'machinery'
-
-  if (/^[a-z]+$/.test(resting) && !COLOUR.test(resting)) return 'keyword'
-
-  return 'value'
-}
 
 const pairs = parents.flatMap(([parent, entry]) =>
-  (entry.dependencies ?? []).map(leaf => ({ bucket: bucketOf(parent, leaf), leaf, parent })),
+  (entry.dependencies ?? []).map(leaf => ({
+    bucket: bucketOf(parent, leaf),
+    leaf,
+    parent,
+  })),
 )
 
-const buckets = pairs.reduce<Record<string, Array<{ leaf: string; parent: string }>>>(
-  (acc, one) => {
-    acc[one.bucket] = [...(acc[one.bucket] ?? []), one]
+const buckets = pairs.reduce<
+  Record<string, Array<{ leaf: string; parent: string }>>
+>((acc, one) => {
+  acc[one.bucket] = [...(acc[one.bucket] ?? []), one]
 
-    return acc
-  },
-  {},
-)
+  return acc
+}, {})
 
 const size = (name: string) => (buckets[name] ?? []).length
 
@@ -149,6 +112,13 @@ describe("D.3's constituent census", () => {
     expect(parents).toHaveLength(104)
     expect(components.size).toBe(288)
     expect(pairs).toHaveLength(324)
+
+    // The source reader and the evaluated model must have the same parents, because one predicate now serves
+    // a census that reads both. This is the assertion that the shared predicate is not standing in for a
+    // different model: same parents, and — through the bucket counts below — the same buckets.
+    expect(sourceParents.map(entry => entry.slot).sort()).toEqual(
+      parents.map(([parent]) => parent).sort(),
+    )
 
     // Every bucket together is the surface, and no pair is in two of them.
     expect(
@@ -191,9 +161,9 @@ describe("D.3's constituent census", () => {
 
     // The keyword bucket, whose members `d3-reach.mjs` reads in the browser: `left` survives a typed
     // registration, `auto` and `normal` do not. A bucket of candidates, not a verdict.
-    expect(bucketOf('background-position-x', 'background-position-x-edge')).toBe(
-      'keyword',
-    )
+    expect(
+      bucketOf('background-position-x', 'background-position-x-edge'),
+    ).toBe('keyword')
     expect(bucketOf('gap', 'column-gap')).toBe('keyword')
     expect(bucketOf('aspect-ratio', 'aspect-ratio-width')).toBe('keyword')
     expect(bucketOf('background-size', 'background-size-width')).toBe('keyword')

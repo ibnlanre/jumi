@@ -932,3 +932,156 @@ applications and research tooling:
 ```text
 when structure carries meaning, do not recover it from serialized text
 ```
+
+## 2026-09-17 — D.3.5 opens on coverage, not classification
+
+### Call
+
+> **Scale the protocol, not the guesses.** […] The next useful milestone is not "all 99 keywords classified".
+> It is something like descriptor coverage — `complete` / `unresolved-descriptor` — and classification
+> coverage — `movable` / `registration-unsafe` / `interpolation-unsafe` / `unresolved` /
+> `fixture-unobservable`. That will tell us whether the bottleneck is actually browser behavior, missing model
+> metadata, or observation design. […] **If a large chunk lands in `unresolved-descriptor`, that is still a
+> useful result. It means the model itself does not yet contain enough semantics to justify automated
+> migration.** […] I'd also keep the unit exactly as it is now:
+> `(parent, component, representation, consumer, contexts)`.
+
+Pass one derives and stops. `pnpm research:d3-coverage` asks the **model** what it can justify for every
+census pair — a class that addresses it, the consumer that class hands the value to through *this* pair's
+chain, and the typed leaf the model declares — and records where it stops and why. No browser, no compile, no
+verdict: a pass that derived and classified together is the one that starts inventing things to avoid an
+empty cell.
+
+```text
+pairs (the census unit)                        324
+  machinery — reported, not counted as reach    30
+  reach                                        294
+    descriptor complete                          6
+    unresolved-descriptor                      288
+      the model declares no representation for the component   199
+      no candidate addresses the pair                            89
+
+descriptor coverage, in full — what the model can already carry:
+  scale / scale-x        animate-scale-x        → `scale`      [<number> | <percentage>]
+  scale / scale-y        animate-scale-y        → `scale`      [<number> | <percentage>]
+  scale / scale-z        animate-scale-z        → `scale`      [<number> | <percentage>]
+  translate / translate-x  animate-translate-x  → `translate`  [<length-percentage>]
+  translate / translate-y  animate-translate-y  → `translate`  [<length-percentage>]
+  translate / translate-z  animate-translate-z  → `translate`  [<length>]
+```
+
+**The bottleneck, read off the reasons: missing model metadata first (199), candidate coverage second (89),
+and browser behaviour not yet — nothing measured has ever stopped at the engine.** That is the answer the
+coverage pass exists to give, and it inverts the intuition the census invited: the keyword population is not
+blocked by what the browser will refuse, it is blocked by what the model has not yet said.
+
+Completeness is *exactly* the declared-representation set restricted to served pairs, and that is asserted
+rather than counted — `scripts/lib/observation.test.mjs` holds that a declared leaf whose pairs are not all
+complete is a defect, so the pass keeps telling the truth as families are typed instead of needing its
+numbers updated.
+
+**Classification coverage is a citation list, not a re-measurement.** Pass two classifies; anything a landed
+book already measured is quoted with its source and with the representation it was measured under, because a
+verdict belongs to that representation and not to the constituent forever:
+
+```text
+scale-x/y/z          movable                declared `<number> | <percentage>`      d2-acceptance.mjs
+translate-x/y/z      movable                declared `<length-percentage>`          d2-acceptance.mjs
+font-weight          movable                proposed `<number>`                     d3-interpolation.mjs A
+column-gap           unresolved             proposed `<length>`                     d3-observation.mjs B
+background-position-x-edge    interpolation-unsafe   proposed `<length-percentage>`  d3-observation.mjs C
+background-position-x-offset  movable                proposed `<length-percentage>`  d3-observation.mjs C
+border-bottom-width  fixture-unobservable    proposed `<length>`                     d3-observation.mjs D
+```
+
+**Two findings about the population itself came out of deriving it.** A component can be composed by *two*
+parents and a candidate serves one of them: `scale-x` is composed by `scale` and by `scale-3d`, and
+`animate-scale-x` addresses `scale` — so `(scale, scale-x)` is complete and `(scale-3d, scale-x)` has no
+candidate. Selecting by component alone made the second look like a broken descriptor instead of an unserved
+pair, which is a different finding and a different piece of work. And 20 pairs are served at *two* levels at
+once; the nearest surface is taken as the motion's, and the alternative is recorded rather than dropped,
+because a pair served twice is a fact the classification pass has to know.
+
+**A reader limitation, recorded rather than reconciled.** This pass counts 30 machinery pairs by the parent
+rule while the census reports 21, because the census's `reshape` check runs first and reads a *composed*
+expression where this reader sees the identifier a composition module exports (`value: animationTimelineScroll`
+— `property-model.mjs` reads the source, not the evaluated value). The difference is a property of the reader,
+not a correction of the census, and it is written down here so the next reader does not rediscover it as a
+discrepancy.
+
+## 2026-09-17 — D.3.5 pass one lands, over one population
+
+### Call
+
+> **I would not land this exact D.3.5 pass yet.** The blocker is the unresolved 30 vs 21 machinery-pairs
+> discrepancy, because it changes the denominator: the census has `324 - 21 = 303` constituent pairs and the
+> D.3.5 reader had `324 - 30 = 294` reach pairs. **D.3.5 is supposed to scale the census. It should not
+> silently operate over a different population, even if we understand roughly why.** […] **Make the D.3.5
+> reader consume the same structural notion of machinery as `reach.test.ts`. Do not make one reader imitate
+> the other's serialized output. Extract or share the structural predicate if possible.** We want
+> `population() constituent count === census constituent count === 303`, and ideally **the exact set of
+> machinery (parent, component) pairs matches between the census and descriptor reader** — not merely
+> `21 === 21`, because that prevents two wrong classifications from cancelling numerically. […] **Do not
+> change any descriptor verdict merely to make the totals agree.** […] Say **at population scale, the
+> immediate bottleneck is model metadata and candidate coverage; most pairs do not yet reach the
+> browser-classification stage** — and call pass two **classification projection for complete descriptors**,
+> so that `descriptor completeness ≠ behavioral classification` stays visible.
+
+**The disagreement was about the representation, not the rule.** The census evaluated the model and saw
+`scroll(var(--jumi-animation-timeline-axis) var(--jumi-animation-timeline-scroller))`; a Node reader read the
+source and saw the identifier `animationTimelineScroll`. The bucket order puts the reshape tests first, so the
+depth test could not fire and **nine** pairs were counted as machinery:
+
+```text
+animation/animation-delay                      (a resting value that is itself a composition)
+animation-range/animation-range-start|end
+animation-timeline/animation-timeline-scroll|view
+animation-timeline-scroll/animation-timeline-scroller|axis
+animation-timeline-view/animation-timeline-axis|inset
+```
+
+Two readers, one model, two populations, each self-consistent.
+
+**The fix is a structural resolver, not a shared number.** `scripts/lib/property-model.mjs` resolves a
+composition module to the expression it builds — `css('fn'[, value[, fallback]])`, `join([…], 'separator')`
+with the helper's space default, identifiers resolved within their own module, comments stripped
+structurally before parsing, and an unknown shape **throwing** rather than returning something plausible. One
+predicate, `bucketOf`, is consumed by the census and by the coverage reader, so there is no second copy to
+drift.
+
+**And the reader is pinned against the model it reads.** `scripts/lib/property-model.test.mjs` asserts that
+**every one of the 624 entries resolves to exactly the value the plugin evaluates** — `String(entry.value)`
+against `readExpressions().get(slot)`, entry for entry. That is stronger than sharing a predicate: it makes
+the whole class of disagreement unrepresentable, whichever door it comes back through. The census keeps its
+own numbers (324 / 21 / 303 / 97 / 107 / 99) and now also asserts that the source reader's parent set equals
+the evaluated model's.
+
+```text
+pairs (the census unit)                        324
+  machinery — reported, not counted as reach    21   the census's own 21, from the shared predicate
+  constituent (reach)                          303   the census's own 303
+    descriptor complete                          6
+    unresolved-descriptor                      297
+      the model declares no representation for the component   199
+      no candidate addresses the pair                            98
+```
+
+**The bottleneck, in the CTO's phrasing, with the record it rests on:** at population scale the immediate
+bottleneck is model metadata and candidate coverage — most pairs do not yet reach the browser-classification
+stage. Browser behaviour has already been the limit *where a representation was proposed*: the
+`background-position-x-edge` slot is `interpolation-unsafe` under a percentage, `column-gap` is
+context-dependent, and the six complete descriptors were decided there.
+
+**No verdict changed to make the totals agree.** The nine pairs moved *upward into the census's own reach*,
+exactly as the census had always counted them; the sub-counts moved because the population did (199/98 rather
+than 199/89) and are not treated as durable — the assertions hold the *shape* (completeness is exactly the
+declared-representation set restricted to served pairs, every incomplete pair carries a reason), so they keep
+telling the truth as families are typed.
+
+**Landed as D.3.5 pass one**, committed once the sets agreed: the composition resolver, `readExpressions`,
+`readTypedLeaves` and `bucketOf` in `scripts/lib/property-model.mjs` with its declaration file; the
+equivalence test in `scripts/lib/property-model.test.mjs`; `population`, `chainOf`, `servingCandidates` and
+`describe` in `scripts/lib/observation.mjs`; the shared predicate and the population assertions in
+`src/variables/reach.test.ts`; `scripts/research/d3-coverage.mjs` and its `package.json` entry; and these
+memories. No `src/` behaviour change and no emitted-CSS change — 17/17 stages, 79/79 behaviour, and **one**
+machinery set.

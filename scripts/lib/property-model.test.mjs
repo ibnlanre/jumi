@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
-import { readCandidates, readPropertyEntries } from './property-model.mjs'
+// Relative and explicit: the `@/` alias is a tsconfig path, and this reader is a plain Node module.
+import { propertyVariables } from '../../src/variables/property.ts'
+
+import {
+  bucketOf,
+  readCandidates,
+  readExpressions,
+  readPropertyEntries,
+} from './property-model.mjs'
 
 /**
  * The bug these pin, because it produced plausible numbers rather than an error.
@@ -202,5 +210,45 @@ describe('readPropertyEntries', () => {
     const blur = entries.find(entry => entry.slot === 'filter-blur')
 
     expect(blur.value).toBe("css('blur', '0')")
+  })
+})
+
+/**
+ * The reader and the model have to be the same model.
+ *
+ * `readPropertyEntries().value` is the *source* text, so an entry whose composition comes from a module reads
+ * as the identifier that names it (`animationTimelineScroll`) rather than as the expression the plugin
+ * evaluates. Two readers disagreed exactly there, and neither was wrong about its own representation: the
+ * census saw `scroll(var(--jumi-animation-timeline-axis) var(…))` and a source reader saw an identifier, so a
+ * depth test could not fire and nine reshapes were counted as machinery — `324 - 30 = 294` "reach" against the
+ * census's `324 - 21 = 303`. The comparison below is what makes that unrepresentable: **every entry's resolved
+ * expression equals the value the plugin evaluates**, entry for entry.
+ */
+describe('readExpressions', () => {
+  it('resolves every entry to the value the plugin evaluates', () => {
+    const expressions = readExpressions()
+    const evaluated = Object.entries(propertyVariables)
+
+    const differences = evaluated
+      .map(([slot, entry]) => [
+        slot,
+        String(entry.value),
+        expressions.get(slot),
+      ])
+      .filter(([, value, read]) => value !== read)
+
+    expect(evaluated).toHaveLength(624)
+    expect(differences).toEqual([])
+  })
+
+  it('resolves a composition rather than returning its name', () => {
+    // The shape of the defect, at one entry: a nested composition reads as an expression with the slot inside
+    // a function call, which is what makes the census's depth test meaningful.
+    expect(readExpressions().get('animation-timeline-scroll')).toBe(
+      'scroll(var(--jumi-animation-timeline-axis) var(--jumi-animation-timeline-scroller))',
+    )
+    expect(bucketOf('animation-timeline-view', 'animation-timeline-axis')).toBe(
+      'reshape',
+    )
   })
 })

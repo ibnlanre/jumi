@@ -34,11 +34,16 @@
  * constituent at all is a broken fixture, not a finding about the property (`fixture-unobservable`, which
  * is why that verdict names the fixture rather than the semantics).
  */
-import { readCandidates, readPropertyEntries } from './property-model.mjs'
+import {
+  readCandidates,
+  readPropertyEntries,
+  readTypedLeaves,
+} from './property-model.mjs'
 import { varReferences } from './var-references.mjs'
 
 const ENTRIES = readPropertyEntries()
 const CANDIDATES = readCandidates()
+const TYPED = readTypedLeaves()
 
 /**
  * Every composition chain above one slot: the entries that declare this slot in their `dependencies`,
@@ -104,6 +109,94 @@ export const descriptorOf = ({ candidate, component, method, contexts }) => {
     method,
     parent,
     parts: entry.parts,
+  }
+}
+
+/**
+ * The census population: every `(parent, component)` pair the graph composes.
+ *
+ * Derived rather than restated, so it is the same relation the census counted and the same one the
+ * descriptor walks upward. A leaf no composite reads has no pair — which is why `font-weight`, measured as
+ * its own parent in the observation book, is not a member of this population.
+ */
+export const population = () => {
+  const pairs = []
+
+  for (const parent of ENTRIES)
+    for (const component of parent.deps)
+      pairs.push({ component, parent: parent.slot })
+
+  return pairs
+}
+
+/**
+ * The candidates that address a pair, nearest surface first.
+ *
+ * Scoped by the **pair's own** chain, not by the component alone, because a component can be composed by
+ * two parents and a candidate serves one of them: `scale-x` is composed by `scale` *and* by `scale-3d`, and
+ * `animate-scale-x` addresses `scale` — so it serves `(scale, scale-x)` and not `(scale-3d, scale-x)`, whose
+ * chain runs to `transform`. Selecting by component alone made the second pair look like a broken descriptor
+ * instead of an unserved one, which is a different finding and a different piece of work.
+ *
+ * A whole candidate (`parts` empty) addresses the property itself, so it serves the component under any
+ * composition that reads it.
+ */
+export const servingCandidates = ({ component, parent }) => {
+  const chain = [
+    component,
+    ...(chainsOf(component).find(names => names[0] === parent) ?? []),
+  ]
+
+  return CANDIDATES.filter(
+    candidate =>
+      candidate.attribute &&
+      chain.includes(candidate.attribute) &&
+      (candidate.parts.includes(component) ||
+        (!candidate.parts.length && candidate.attribute === component)),
+  )
+}
+
+/** The chain of one pair: the component, then the compositions above it **through its own parent**. */
+export const chainOf = ({ component, parent }) => [
+  component,
+  ...(chainsOf(component).find(names => names[0] === parent) ?? []),
+]
+
+/**
+ * One pair's descriptor as far as the **model** can carry it, with the reason it stops when it cannot.
+ *
+ * No browser and no compile: coverage is a statement about what the model contains, and asking the engine
+ * would answer a different question. *Where* a pair stops is the finding — no candidate addressing this
+ * pair, or no representation the model declares for its component — and the two point at different work.
+ */
+export const describe = pair => {
+  const chain = chainOf(pair)
+  const candidates = servingCandidates(pair)
+
+  if (!candidates.length)
+    return {
+      ...pair,
+      chain,
+      reason: 'no candidate addresses the pair',
+      status: 'unresolved-descriptor',
+    }
+
+  const [candidate, ...others] = candidates
+  const representation = TYPED.get(pair.component) ?? null
+
+  return {
+    ...pair,
+    // The nearest surface is the one the motion is authored against; the rest are recorded rather than
+    // dropped, because a pair served at two levels is a fact the classification pass has to know.
+    alternatives: others.map(one => one.name),
+    candidate: candidate.name,
+    chain,
+    consumer: candidate.attribute,
+    reason: representation
+      ? null
+      : 'the model declares no representation for the component',
+    representation,
+    status: representation ? 'complete' : 'unresolved-descriptor',
   }
 }
 
