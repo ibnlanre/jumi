@@ -2122,16 +2122,16 @@ const compound = [
     '`left` over a zero offset is `0%`, and the untouched `center` over a zero offset is `50%`',
   ],
   [
-    'a phrase spelling on an authoring component keeps the composed representation',
-    /(^|\s)offset-anchor:/.test(declinedFrames) &&
-      !declinedFrames.includes('--jumi-offset-anchor-x-position:'),
-    // A multi-stop constituent phrase returns above the constituent branch — D.2's recorded constraint — so it
-    // never reaches the resolver, and the composed path then hooks the attribute's composition for a leaf the
-    // composition no longer names. **Measured, and recorded as a finding rather than as a working route**: the
-    // frame writes the composition verbatim, which is the same value at both stops, so a phrased motion on an
-    // authoring component is inert. The single-value spelling on the same component resolves through the
-    // resolver and moves, which is what the arms above measure; the two spellings differ and only one is wired.
-    `the phrased motion writes ${declinedFrames.replaceAll('\n', ' ').trim()} (keyframes: ${declinedNames.join(', ') || 'none'})`,
+    'a phrase spelling on an authoring component emits no motion at all',
+    declinedNames.length === 0,
+    // The phrase entrance is **rejected**, not given a meaning. A multi-stop phrase returns above the constituent
+    // branch — D.2's recorded constraint — so it never reaches the resolver, and the composed path's hook finds
+    // nothing in the composition to replace. Measured against the parent of the reshape, this spelling was inert
+    // there too, so there was no motion to preserve; and a frame that writes the same value at every stop is not
+    // a motion, so it is not emitted. The single-value spelling on the same component **does** emit, which the
+    // arms above measure — the two spellings differ, and that difference is now visible in the CSS rather than
+    // only in a browser reading.
+    `the phrased class emits ${declinedNames.length ? declinedNames.join(', ') : 'no keyframes'}`,
   ],
   [
     'and the resting composition computes, where the four-token one did not',

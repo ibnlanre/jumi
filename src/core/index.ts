@@ -1452,40 +1452,88 @@ export function createJumiModel({
           instances.set(key, id)
           registerName(`--jumi-${attribute}-${id}-animation-name`)
           recordComponents(key, parts)
-          emitKeyframe(
-            `jumi-${attribute}-${id}`,
-            phraseKeyframe(
-              attribute,
-              // Every part a property the browser resolves on its own — and only then — makes this a
-              // frame of properties rather than of one composed value. A mixed phrase (one of these
-              // beside a component of a shorthand) is not a shape any candidate declares today, and it
-              // falls through to the composition rather than guessing.
-              parts.length &&
-                parts.every(part =>
-                  independentProperties.has(
-                    Array.isArray(part) ? part[0] : part,
-                  ),
-                )
-                ? parts.map(part => (Array.isArray(part) ? part[0] : part))
-                : null,
-              id,
-              frameList,
-              // Did this phrase write the attribute's own frame key? With no parts it writes
-              // `--jumi-${attribute}-${id}-${offset}` and nothing else, so yes. With parts it writes the
-              // parts' keys — and a part that *is* the attribute (`animate-border-block-color` declares
-              // `color('border-block-color', ['border-block-color'])` in `src/properties/tween.ts`) means
-              // the part key and the attribute key are the same name, so the read is this frame's only
-              // possible consumer.
-              //
-              // The narrowing is the whole of the difference: `!parts.length` alone left that second
-              // case reading nothing at all, measured as one of the candidates whose frame value was
-              // written and never read.
-              !parts.length ||
-                parts.some(
-                  part => (Array.isArray(part) ? part[0] : part) === attribute,
-                ),
-            ),
+
+          // Every part a property the browser resolves on its own — and only then — makes this a frame of
+          // properties rather than of one composed value. A mixed phrase (one of these beside a component of a
+          // shorthand) is not a shape any candidate declares today, and it falls through to the composition
+          // rather than guessing.
+          const asProperties =
+            parts.length > 0 &&
+            parts.every(part =>
+              independentProperties.has(Array.isArray(part) ? part[0] : part),
+            )
+
+          /**
+           * A constituent phrase whose parts the composition does not name is **not emitted**, and that is a
+           * rejection rather than a repair.
+           *
+           * A frame's value is the attribute's composition with the addressed component hooked into it, and the
+           * hook needs the composition to read that component. Where it does not, the frame writes the
+           * composition **verbatim** — the same value at every stop, a motion that moves nothing while claiming
+           * to be one. That is what a reshape leaves behind when a family's public components stop appearing in
+           * its composition, and it is the phrase half of the same finding the single-value path already
+           * rejects.
+           *
+           * Measured against the parent of the reshape, these spellings were already inert there, so there is no
+           * motion to preserve and none is invented: the route is removed. A phrase addressing the **whole**
+           * attribute is untouched — it writes its own key through `writesOuterFrame` and moves as it always
+           * did — and so is every constituent whose family still names it.
+           */
+          const composition = String(propertyVariables[attribute].value ?? '')
+          const outer = css('var', `--jumi-${attribute}`)
+          // Whether this phrase writes the attribute's **own** frame key, which is the call's own rule: with no
+          // parts it writes that key and nothing else, and with parts it writes the parts' keys — except where a
+          // part *is* the attribute, which `src/properties/tween.ts` declares for `border-block-color` and its
+          // siblings. A frame that writes the attribute's key moves whatever the composition says.
+          const writesOuter =
+            parts.length === 0 ||
+            parts.some(
+              part => (Array.isArray(part) ? part[0] : part) === attribute,
+            )
+          // The **exact** test rather than a pattern: the frame value is built by the same function the frames
+          // are, so a frame that comes out equal to the composition is one where the hook found nothing and the
+          // outer read did not fire — which is the only shape that cannot move. Matching the composition's text
+          // against a part's name was tried first and skipped phrases that do move: a hook can be written
+          // `url(var(--jumi-filter-url))`, through a versioned slot, or nested in a fallback, and none of those
+          // is a substring test.
+          const moves = frameList.some(
+            ({ offset }) =>
+              propertyKeyframeValue(
+                attribute,
+                `${id}-${offset}`,
+                outer,
+                writesOuter,
+              ) !== composition,
           )
+          const frameable = parts.length === 0 || asProperties || moves
+
+          if (frameable)
+            emitKeyframe(
+              `jumi-${attribute}-${id}`,
+              phraseKeyframe(
+                attribute,
+                asProperties
+                  ? parts.map(part => (Array.isArray(part) ? part[0] : part))
+                  : null,
+                id,
+                frameList,
+                // Did this phrase write the attribute's own frame key? With no parts it writes
+                // `--jumi-${attribute}-${id}-${offset}` and nothing else, so yes. With parts it writes the
+                // parts' keys — and a part that *is* the attribute (`animate-border-block-color` declares
+                // `color('border-block-color', ['border-block-color'])` in `src/properties/tween.ts`) means
+                // the part key and the attribute key are the same name, so the read is this frame's only
+                // possible consumer.
+                //
+                // The narrowing is the whole of the difference: `!parts.length` alone left that second
+                // case reading nothing at all, measured as one of the candidates whose frame value was
+                // written and never read.
+                !parts.length ||
+                  parts.some(
+                    part =>
+                      (Array.isArray(part) ? part[0] : part) === attribute,
+                  ),
+              ),
+            )
           aggregateChanged()
 
           // `animate-opacity-[0:0|100:1]/reveal` names this slot, so a control — or your own CSS —
@@ -1748,23 +1796,38 @@ export function createJumiModel({
            * nothing writes: a dead read, and the exact class this session has already paid for
            * twice.
            */
-          emitKeyframe(`jumi-${component}`, {
-            to: independent
-              ? Object.fromEntries(
-                  independent.map(property => [
-                    property,
-                    css('var', `--jumi-${property}`),
-                  ]),
-                )
-              : {
-                  [attribute]: hookSlot(
-                    propertyVariables[attribute].value,
-                    leaf,
-                    cssEscape(`${leaf}-100`),
-                  ),
-                },
-          })
-          aggregateChanged()
+          const hook = propertyVariables[attribute].value
+          const hooked = independent
+            ? Object.fromEntries(
+                independent.map(property => [
+                  property,
+                  css('var', `--jumi-${property}`),
+                ]),
+              )
+            : { [attribute]: hookSlot(hook, leaf, cssEscape(`${leaf}-100`)) }
+
+          /**
+           * A frame whose hook finds nothing is **not emitted**, and that is a rejection rather than a repair.
+           *
+           * The hook is the only thing that makes this motion move: it replaces the component's read inside the
+           * composition with the endpoint the animation writes. Where the composition does not name the component
+           * at all, `hookSlot` has nothing to replace, and the frame it would emit writes the composition
+           * **verbatim** — the same value at every stop, a motion that moves nothing while claiming to be one.
+           *
+           * What reaches this is exactly what a reshape leaves behind: a public component that stopped appearing
+           * in its family's composition. Both cases were measured against the parent of the reshape and both were
+           * already inert there — the per-axis groups, and a multi-stop phrase on any component of such a family,
+           * which returns above the constituent branch and so never reaches the resolver. Which is why the answer
+           * is to remove the route rather than give it a meaning now: there is no motion to preserve.
+           *
+           * `independent` is exempt on purpose — there the frame names the properties themselves and no hook is
+           * involved. The endpoint and the substrate are still written either way: the rule above establishes the
+           * motion, and withdrawing them would change what a sibling motion reads.
+           */
+          if (independent || hooked[attribute] !== hook) {
+            emitKeyframe(`jumi-${component}`, { to: hooked })
+            aggregateChanged()
+          }
 
           return {
             // Both, not either: the endpoint is what the animation reads, and the resting leaf is

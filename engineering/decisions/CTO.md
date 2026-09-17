@@ -1948,7 +1948,6 @@ retain the shell in the composition — followed by `math-depth-add` rerun again
 of the track, then `offset-anchor`. Nothing in `src/` changed in this increment and nothing was promoted:
 17/17 stages, 79/79 behaviour, 477 unit tests.
 
-
 ## 2026-09-17 — the generic implementation, attempted: the composition half lands, the subject half is gated
 
 ### The ruling
@@ -1984,7 +1983,7 @@ which is where it now lives.
 @keyframes … { math-depth: add(var(--jumi-math-depth-add-sluPV-0, var(--jumi-math-depth-add))) }
 ```
 
-i.e. D.3.6's shape *minus the subject relocation*: the frames still animate `math-depth` through the slot
+i.e. D.3.6's shape _minus the subject relocation_: the frames still animate `math-depth` through the slot
 machinery (`@keyframes jumi-math-depth-sluPV`, not `jumi-math-depth-add`), so the series is still the discrete
 flip — measured `0 · 0 · 2 · 2 · 2` where the proposal is `0 · 1 · 1 · 2 · 2`.
 
@@ -2020,7 +2019,6 @@ first suspect and the branch's other inputs as the second.
 
 **State.** No `src/` change, nothing promoted, nothing staged. 17/17 stages, 79/79 behaviour, 477 unit tests.
 
-
 ## 2026-09-17 — the admission gate, diagnosed: no predicate refuses, the phrase spelling does
 
 ### The ruling
@@ -2046,7 +2044,7 @@ canonicalizeLeaf(declaration, '0' | '2' | '7')        "0" | "2" | "7"
 ```
 
 **Every predicate admits.** The suspected architectural correction — that the addressability taxonomy treats a
-function-wrapped read as non-direct and is therefore too coarse for typed arguments — is *not* what is
+function-wrapped read as non-direct and is therefore too coarse for typed arguments — is _not_ what is
 happening: `readSlots` finds the read inside `add(...)`, calls it bare, and the edge is already `direct`. So
 nothing needed weakening, and the ruling's stop condition is not triggered.
 
@@ -2055,15 +2053,15 @@ nothing needed weakening, and the ruling's stop condition is not triggered.
 A candidate whose value carries **frames** — `animate-math-depth-add-[0:0|100:2]`, the spelling D.3.5 and D.3.6
 both use — takes the phrase branch and **returns** from it, above `register(attribute)`, above
 `if (!parts.length)`, above the `component && isFullyAddressable(attribute)` branch. The typed-constituent path
-is not *refused* by that spelling; it is **unreachable** from it. That is the constraint D.2 already recorded as
-open — *multi-stop constituent phrases decline typed execution and keep the old composed representation* — and
+is not _refused_ by that spelling; it is **unreachable** from it. That is the constraint D.2 already recorded as
+open — _multi-stop constituent phrases decline typed execution and keep the old composed representation_ — and
 it is the reason two increments of measurement saw the composed path: the arms were authored in a form the
 representation it selects cannot be reached from.
 
-The phrase spelling is not wrong for what it was for: it exists so a composed representation's *frames* can be
+The phrase spelling is not wrong for what it was for: it exists so a composed representation's _frames_ can be
 read per stop. It is the wrong instrument for asking what the typed representation does, and D.3.5 chose it for
-a reason that did not survive the reshape — the one-value spelling set the leaf's *live* slot and left the leaf
-driving nothing *under the composed path*, which is exactly the situation the typed path replaces.
+a reason that did not survive the reshape — the one-value spelling set the leaf's _live_ slot and left the leaf
+driving nothing _under the composed path_, which is exactly the situation the typed path replaces.
 
 ### Acceptance, measured against the shipped build
 
@@ -2087,7 +2085,7 @@ leaves do not opt in (they are undeclared, and `isFullyAddressable('filter')` st
 ### Why it is not landed yet, and what landing needs
 
 The three declarative lines are written, measured, and were reverted again — not because the mechanism is in
-doubt but because the emission change is the *first* one that the census and the evidence registry have to
+doubt but because the emission change is the _first_ one that the census and the evidence registry have to
 absorb, and three things follow from it:
 
 ```text
@@ -2106,7 +2104,6 @@ at 17/17.
 
 **State.** No `src/` change, nothing promoted, nothing staged. The primitive is proven end to end against the
 shipped build and the only remaining work is the bookkeeping above, then `offset-anchor`.
-
 
 ## 2026-09-17 — the landing attempted: the pass is tied to the representation it was built on, in three places
 
@@ -2143,7 +2140,7 @@ the population filter     `plans()` filters on `bucketOf(parent, component) === 
 
 Two mistakes were made and corrected on the way, both worth recording because they are the same mistake in
 different clothes — **widening a gate past the fact that justifies it**: first the value spelling was applied
-to every *declared* leaf (36 validated routes fell to **8**, because a declared leaf whose composition is a
+to every _declared_ leaf (36 validated routes fell to **8**, because a declared leaf whose composition is a
 plain var-list reads perfectly well through the phrase form and always has), then it was narrowed to the
 **shape** that actually forces it — the composition matching `^[a-z][a-z0-9-]*\(\s*var\(--jumi-<component>\)\s*\)$`,
 which is `math-depth` and nothing else today.
@@ -2177,7 +2174,6 @@ filter/backdrop leaves untouched. `isFullyAddressable` was never the obstacle an
 **State.** `src/` and `scripts/lib/validation.mjs` restored by name; no `src/` change, nothing promoted,
 nothing staged. 17/17 stages, 79/79 behaviour, 477 unit tests. The remaining work is the seven steps above,
 and it is bookkeeping with a measured order rather than an open question.
-
 
 ## 2026-09-17 — D.3.6 closed: the function-argument reshape, shipped
 
@@ -2232,7 +2228,6 @@ spelling it was proven through. The 22 filter/backdrop leaves remain structurall
 **Next:** the structural regression arm the ruling asked for (the frame writes the leaf, the property is
 bridge-only), then `offset-anchor`.
 
-
 ## 2026-09-17 — the reader hardening closed: the walk is a pure function, and its two failure modes are pinned
 
 ### The ruling
@@ -2253,7 +2248,7 @@ a comment carrying an apostrophe
   the un-stripped walk closes: false | quote open at end: true     ← both cases
 ```
 
-Both fixtures are checked against a walk with the stripping removed, so their claim is that the *bug* is
+Both fixtures are checked against a walk with the stripping removed, so their claim is that the _bug_ is
 unreachable, not merely that the fix is present. And their fingerprint is the one worth remembering: neither
 produced an error. The pair simply had no candidate, no route and no derivation — which is a silent loss of
 reach, and the reason the failure mode was preserved in prose for a session before it could be pinned in code.
@@ -2265,7 +2260,6 @@ that addresses nothing at all.
 **State.** 17/17 stages, 480 unit tests. Next: `offset-anchor`, starting from the browser grammar rather than
 from the current four-leaf vocabulary, with "two `<length-percentage>` axes" treated as the hypothesis to
 falsify rather than the answer.
-
 
 ## 2026-09-17 — correction: only one of the two comment fixtures is a demonstrated arm
 
@@ -2296,7 +2290,6 @@ read and a separate parts split, and modelling the first is not modelling the re
 falsification; the reproduction was an illustration.
 
 **State.** 17/17 stages, 480 unit tests.
-
 
 ## 2026-09-17 — D.3.7 opens: the "two axes" hypothesis survives its own falsification
 
@@ -2331,8 +2324,8 @@ constant compared with itself. The intermediate frames of the third arm are the 
 ### What this settles, and what it does not
 
 **Settled:** native `offset-anchor` already behaves as though its independently interpolable state is **two
-resolved positional components**. Edge keywords are *syntax, not semantics* — `left top` computes to `0% 0%`
-and animates identically to it. Edge-plus-offset is a *spelling of one resolved component* — `left 10px`
+resolved positional components**. Edge keywords are _syntax, not semantics_ — `left top` computes to `0% 0%`
+and animates identically to it. Edge-plus-offset is a _spelling of one resolved component_ — `left 10px`
 computes to `10px`, and an intermediate frame is `calc(0% + 10px)`. And the grammar's rejection of the model's
 composition is therefore not evidence of a missing subject: `center 0 center 0` is rejected because it composes
 **four** values where the grammar admits **two**, which is the same shape of mistake as D.3.6's, one grammar
@@ -2346,7 +2339,6 @@ independently animatable.
 
 **State.** New book `scripts/research/d3-anchor.mjs` (`pnpm research:d3-anchor`), evidence at
 `scripts/anchor-falsification.json`. No `src/` change, nothing promoted. 17/17 stages, 480 unit tests.
-
 
 ## 2026-09-17 — D.3.7 · normalizability measured: what the two-axis subject can and cannot carry
 
@@ -2393,8 +2385,8 @@ represented  calc(50% + 10px) calc(25% - 4px) · calc(42.5% + 8px) · … · cal
 **`calc()` is carryable.** A registered `<length-percentage>` holds the exact computed arithmetic form and
 interpolates it identically, so the resolved leaf's natural syntax is confirmed rather than assumed.
 
-**`var()` is equivalent *and* statically undecidable — the distinction the ruling anticipated.** The arm reads
-`30% 20% → 70% 60%` and the leaves reproduce it exactly. But those computed forms are the *browser's*
+**`var()` is equivalent _and_ statically undecidable — the distinction the ruling anticipated.** The arm reads
+`30% 20% → 70% 60%` and the leaves reproduce it exactly. But those computed forms are the _browser's_
 substitution: Jumi reads source at build time and cannot generalise `var(--ax)` into `30%`. So the class
 splits the way it was predicted to: **statically normalizable** (`calc()`, keywords, literals) versus
 **dynamically composed** (`var()`), and a `var()`-authored anchor can only be typed if something else supplies
@@ -2426,7 +2418,7 @@ edge leaf moves on its own                   offset-anchor: var(--ex) 10px top 2
 
 So the two utilities are **not** symmetrical, and the asymmetry is what decides the API. An **offset** is a
 value, so it can be registered and stays independently animatable — and the four-value form accepts it, because
-`left var(--ox) top var(--oy)` uses *directional* edges, which is exactly what the resting `center` cannot be.
+`left var(--ox) top var(--oy)` uses _directional_ edges, which is exactly what the resting `center` cannot be.
 An **edge** is a keyword, not a value: it cannot be registered, so animating one is discrete, and it moves
 continuously only through the resolved spelling it normalizes to. Independent edge motion is therefore not a
 capability that survives the reshape; independent offset motion is.
@@ -2436,11 +2428,10 @@ capability that survives the reshape; independent offset motion is.
 Not the design, and deliberately: the arms above establish representability and the API constraint, not an
 implementation. Open before anything ships — the unexplained discrete y-axis arm; how a `var()`-authored anchor
 is declined or carried; and whether the resolved leaves keep the author's edge utilities meaningful as
-*authoring controls that compose into one axis* rather than as independently animated leaves.
+_authoring controls that compose into one axis_ rather than as independently animated leaves.
 
 **State.** New book `scripts/research/d3-anchor-normal.mjs` (`pnpm research:d3-anchor-normal`), evidence at
 `scripts/anchor-normalization.json`. No `src/` change, nothing promoted. 17/17 stages, 480 unit tests.
-
 
 ## 2026-09-17 — D.3.7 · the y anomaly is the short spelling, and the representation is faithful on both axes
 
@@ -2476,7 +2467,7 @@ earlier anomaly was about the spelling, exactly as the ruling framed the alterna
 
 **And the short spelling is worse than ambiguous: `top 20px` is rejected outright** — it computes to `auto`, the
 same reading the D.3.5 measurement of `center 0 center 0` produced. Its x-axis counterpart is accepted but does
-not mean what it looks like: `left 10px` computes to `0% 10px`, which is *not* `left 10px` as one component with
+not mean what it looks like: `left 10px` computes to `0% 10px`, which is _not_ `left 10px` as one component with
 the other axis at centre — the arm and its twin are measuring different pairs, and their series differ
 accordingly. So the one-component spelling is not a way to say "edge plus offset on one axis" in this property.
 
@@ -2497,8 +2488,8 @@ accept them" and "no browser accepts them" are different facts with different co
 
 The API asymmetry from the previous pass stands and the ruling's reading of it is the one to carry forward:
 an **offset** is value-bearing and can remain independently animatable; an **edge** is keyword-bearing and cannot
-remain an independently interpolable typed leaf. So edge utilities survive as *authoring controls that compose
-into the resolved axis*, not as motion subjects. Likewise the `var()` rule as stated: statically resolvable forms
+remain an independently interpolable typed leaf. So edge utilities survive as _authoring controls that compose
+into the resolved axis_, not as motion subjects. Likewise the `var()` rule as stated: statically resolvable forms
 take the typed path, a source that depends on an unresolved `var()` declines to the native path — no dynamic
 normalization layer invented. Neither is a design decision taken here; both are what the measurements now
 permit.
@@ -2506,7 +2497,6 @@ permit.
 **State.** Book extended in place (`pnpm research:d3-anchor-normal`), evidence at
 `scripts/anchor-normalization.json`. No `src/` change, nothing promoted, no design recorded as decided.
 17/17 stages, 480 unit tests.
-
 
 ## 2026-09-17 — D.3.7 · the normalizer: a declining prototype, differentialled end to end
 
@@ -2562,7 +2552,7 @@ browser resolves `center` to `50% 50%`, `center 20px` to `50% 20px`, and `20px c
 are not forms it rejects; they are arities this track has not established, and the ruling's instruction was to
 decline rather than interpret. `top 20px` and `start top` are different in kind — the browser computes `auto`,
 so there is nothing to normalize — and `left 10px` is the instructive one: it is accepted, and it computes to
-`0% 10px`, which is *not* "left plus 10px with the other axis at centre". Reading position syntax by intuition
+`0% 10px`, which is _not_ "left plus 10px with the other axis at centre". Reading position syntax by intuition
 would have produced exactly the wrong value here.
 
 ### What this establishes
@@ -2580,7 +2570,6 @@ until the representation is asked to carry real candidates rather than fixtures.
 `scripts/research/d3-anchor-normalizer.mjs` (`pnpm research:d3-anchor-normalizer`), evidence at
 `scripts/anchor-normalizer.json`. No `src/` change, nothing promoted, no API decision taken.
 17/17 stages, 485 unit tests.
-
 
 ## 2026-09-17 — D.3.7 · the candidate projection: what the existing surface survives
 
@@ -2651,7 +2640,7 @@ is what the evidence now supports, and the production reshape is still unwritten
 ### What the pass cost, in its own defects
 
 Three, all in the projection rather than the model, and all worth naming because each produced a confident wrong
-answer: the whole-property test read the *attribute*, which every leaf candidate also addresses, so six candidates
+answer: the whole-property test read the _attribute_, which every leaf candidate also addresses, so six candidates
 were reported as the seventh; the composition was resolved one level deep, leaving `offsetAnchorX` in the form;
 and the resting-state map included the intermediate slots, whose source values are those same identifiers, so the
 substitution never reached a value.
@@ -2659,7 +2648,6 @@ substitution never reached a value.
 **State.** New book `scripts/research/d3-anchor-candidates.mjs` (`pnpm research:d3-anchor-candidates`), evidence
 at `scripts/anchor-candidates.json`. No `src/` change, nothing promoted, no API rewrite. 17/17 stages, 485 unit
 tests.
-
 
 ## 2026-09-17 — D.3.7 · edge motion survives: authoring identity is not interpolation identity
 
@@ -2690,7 +2678,7 @@ y edge, pinned x                                    native ≡ executed        y
 
 Both arms reproduce the native transition sample for sample, so **an edge-addressed motion can be executed as the
 resolved axis**. The candidate keeps its independent authoring identity — an author still writes a motion that
-addresses an edge — while the *subject the frames animate* is the resolved component. That is the same
+addresses an edge — while the _subject the frames animate_ is the resolved component. That is the same
 distinction `math-depth-add` established one track earlier, where the author addresses `add(2)` and the frames
 animate the integer argument.
 
@@ -2728,7 +2716,6 @@ which is the first time in this track that has been true.
 **State.** New book `scripts/research/d3-anchor-edge.mjs` (`pnpm research:d3-anchor-edge`), evidence at
 `scripts/anchor-edge.json`. No `src/` change, nothing promoted, no API decision taken. 17/17 stages, 485 unit
 tests.
-
 
 ## 2026-09-17 — D.3.7 · the production spike: four routes, mapped end to end
 
@@ -2781,7 +2768,7 @@ current behaviour: at rest it repairs a form the browser rejects.
 
 That also corrects the earlier projection's conclusion. It said a value-bearing route "preserves independent
 control **if the edges become directional**" — inferred from the four-value grammar needing `left|right` and
-`top|bottom`. The inference was about the *authoring* layer, and the execution layer never sees a keyword, so
+`top|bottom`. The inference was about the _authoring_ layer, and the execution layer never sees a keyword, so
 making the edges directional is **not** required. The spike is what settled it; the projection could only see the
 rejection.
 
@@ -2808,7 +2795,6 @@ pure contract is unwritten. And the production change itself is untouched: this 
 **State.** `scripts/lib/anchor.mjs` gained `normalizeAxis`; new book
 `scripts/research/d3-anchor-spike.mjs` (`pnpm research:d3-anchor-spike`), evidence at
 `scripts/anchor-spike.json`. No `src/` change, nothing promoted. 17/17 stages, 485 unit tests.
-
 
 ## 2026-09-17 — D.3.7 · the per-axis contract pinned, and the one capability the production change needs
 
@@ -2861,7 +2847,7 @@ then                                  snapshot re-record, census counts, the fou
                                       shipped build, and the resting-state repair asserted
 ```
 
-The design is unchanged from the spike; what this establishes is *where* it attaches, which was the open question
+The design is unchanged from the spike; what this establishes is _where_ it attaches, which was the open question
 the ruling's "one production increment" left implicit.
 
 ### Why it is not started in this entry
@@ -2873,7 +2859,6 @@ reviewable change, rather than a half-applied emission nobody can evaluate.
 
 **State.** 9 contract tests in `scripts/lib/anchor.test.mjs`. No `src/` change, nothing promoted. 17/17 stages,
 489 unit tests.
-
 
 ## 2026-09-17 — D.3.7 · the generic compound-constituent capability declares itself
 
@@ -2905,7 +2890,7 @@ one way          the context is authoring state (the family's components and the
                  on what the author wrote
 ```
 
-The **simple path is untouched**, and deliberately: a constituent whose authored component *is* its execution
+The **simple path is untouched**, and deliberately: a constituent whose authored component _is_ its execution
 leaf still resolves through the leaf's own canonicalizer, which is cheaper and already correct for most typed
 constituents. This facet is an escape hatch for the case D.3.7 falsified the universal rule with — where the
 public component and the interpolation component are not the same thing.
@@ -2939,7 +2924,6 @@ green, which is the standard this track has held throughout.
 
 **State.** `TypedExecution.constituent` declared in `src/variables/typed-leaves.ts`; no consumer, no emission
 change, nothing promoted. 17/17 stages, 489 unit tests.
-
 
 ## 2026-09-17 — D.3.7 · deferred to one atomic incremental, and the two constraints for its call site
 
@@ -2988,7 +2972,7 @@ depending on — context construction they never needed, and the escape hatch be
 the failure mode to avoid, not a style preference.
 
 **The context is a defined projection, not a bag.** The signature is broad enough for future families, and the
-caller is still responsible for handing it a well-defined *authoring* state:
+caller is still responsible for handing it a well-defined _authoring_ state:
 
 ```text
 context = { the family's own components — their authored values where this candidate wrote them,
@@ -3000,7 +2984,6 @@ keeps the layers as D.3.7 measured them: authoring state → normalizer → exec
 
 **State.** No change in this entry. `350c1f4` remains the tip of the track; `src/` is otherwise untouched, nothing
 is promoted, and the gate is 17/17 with 489 unit tests.
-
 
 ## 2026-09-17 — the standing ledger for the `offset-anchor` landing
 
@@ -3035,7 +3018,6 @@ Also standing: `scripts/research/d3-probe.tmp.mjs` is untracked and not part of 
 **State.** No change in this entry. Tip `92ff539`, `src/` untouched since `350c1f4`, nothing promoted, gate 17/17
 with 489 unit tests.
 
-
 ## 2026-09-17 — how a failure during the landing is classified
 
 Appended to the ledger above, because that entry says "a concrete implementation failure reopens one of the six"
@@ -3067,11 +3049,11 @@ with 489 unit tests.
 
 ## The D.3.7 landing was attempted, built, and reverted — two censuses refuse it
 
-Ruling: *"Begin the atomic D.3.7 `offset-anchor` production landing now."* It was begun, and the whole emission was
+Ruling: _"Begin the atomic D.3.7 `offset-anchor` production landing now."_ It was begun, and the whole emission was
 written. It compiled and bundled — `bundle`, `types` and `lint` all passed — and it was reverted at the end of the
 session, because two things it depends on are decisions rather than edits, and neither had been made.
 
-This is the fourth deferral of this increment, so the entry is written to be the *reason* the next attempt starts
+This is the fourth deferral of this increment, so the entry is written to be the _reason_ the next attempt starts
 further along: the code is described below closely enough to be re-applied, and the two refusals are named.
 
 ### What was written, and that it built
@@ -3106,8 +3088,8 @@ buckets                  value 110 · keyword 101 · reshape 96   (was 106 · 99
 
 Four new `(offset-anchor, …)` pairs, and two existing pairs re-classified. **The closure is the population**, so
 widening it to feed a resolver is not an implementation detail — it changes what the census counts. That is the
-finding, and it is a boundary rather than a defect: the call-site constraint says the resolver's context is *exactly
-the components the resolver needs*, and this measurement is what says those components must be **declared as an
+finding, and it is a boundary rather than a defect: the call-site constraint says the resolver's context is _exactly
+the components the resolver needs_, and this measurement is what says those components must be **declared as an
 authoring surface** rather than smuggled in as dependencies of the resolved family. Classification: not an
 assumption failure — none of the six was contradicted.
 
@@ -3115,7 +3097,7 @@ assumption failure — none of the six was contradicted.
 
 `names only leaves the family declares, and every one of them` fails: the two execution leaves are declared but no
 candidate route addresses them, and they never will, because they are the thing the frames animate rather than
-something an author writes. The evidence model equates *declared* with *addressed*.
+something an author writes. The evidence model equates _declared_ with _addressed_.
 
 This is the evidence/guard class — but it is **not** yet a refresh, because a refresh is only honest after the
 emission has been observed. The emission was never measured in a browser this session: the gate stops at `unit`
@@ -3129,7 +3111,7 @@ not as a refreshed record of a verified emission.
 The spike stands: normalizer reconstructions 7/7 identical, spike routes 4/4 identical, edge motion surviving as
 authoring identity executed as the resolved axis. Nothing in this attempt contradicted any of the six assumptions.
 The two call-site constraints hold as written and were followed — the compound branch is taken because the family
-*declares* a resolver, and every family that declares none reaches the simple path unchanged.
+_declares_ a resolver, and every family that declares none reaches the simple path unchanged.
 
 ### The next attempt starts here
 
@@ -3344,3 +3326,55 @@ looked like it.
 **State.** Tip `4b2e030` plus this increment. Gate 17/17, 496 unit tests, 87/87 behaviour arms, `tsc` clean. D.3.7
 stays open on two measured items: the family's public routes carry no evidence records, and phrased motions on them
 are inert.
+
+---
+
+## The phrase question: the differential says the entrance was never a capability, so it is rejected
+
+The ruling asked for the same historical differential on the **component** phrase routes before deciding whether to
+preserve them by extending the compound resolver to phrase stops. Run against the parent of the reshape and the landed
+build, eight spellings, sampled as a series at five instants:
+
+```text
+spelling                                  before the reshape      after it
+animate-offset-anchor-x-edge-[left]       auto ×5        inert    50% 50% → … → 0% 50%     MOVES
+animate-offset-anchor-y-edge-[top]        auto ×5        inert    50% 50% → … → 50% 0%     MOVES
+animate-offset-anchor-x-offset-[10px]     auto ×5        inert    auto → auto → 50% 50% (constant)
+animate-offset-anchor-x-edge-[0:left|100:right]        auto ×5   inert   50% 50% ×5    inert
+animate-offset-anchor-x-edge-[0:0px|100:40px]          auto ×5   inert   50% 50% ×5    inert
+animate-offset-anchor-x-offset-[0:10px|100:40px]       auto ×5   inert   50% 50% ×5    inert
+animate-offset-anchor-y-edge-[0:top|100:bottom]        auto ×5   inert   50% 50% ×5    inert
+animate-offset-anchor-y-offset-[0:10px|100:40px]       auto ×5   inert   50% 50% ×5    inert
+```
+
+**Before the reshape every spelling was inert**, value and phrase alike — the whole property was invalid then, which is
+the D.3.7 finding itself. After it, the value spellings move and they move correctly: `x-edge-[left]` walks the x
+position from `50%` to `0%` with y untouched, and its y twin does the mirror. The offsets decline by contract rather
+than by defect (`center` over a non-zero offset has no resolved position, which is the measured rule), and the phrase
+spellings are constant.
+
+So the branch is the first one, and the conclusion is **not** to extend the resolver to phrase stops. D.3.6's boundary
+therefore stands unamended, and it stands *with evidence*: the phrase entrance on a component of a compound family was
+not a working capability that the reshape broke, so there is nothing to preserve and no semantics to invent. The phrase
+half of the amendment the ruling sketched is not taken.
+
+**Rejected rather than left inert.** A frame whose value comes out equal to the composition cannot move anything: it
+writes the same value at every stop. That shape is now not emitted, in both places it can arise — the constituent path,
+where the hook finds nothing in the composition, and the phrase path, where the frame is built the same way. The frame's
+own values are compared against the composition rather than matched by pattern, and that distinction is measured: the
+first attempt tested whether the composition's text contained the part's name, which skipped phrases that *do* move —
+`filter` and `backdrop-filter` reach their part through `url(var(--jumi-filter-url))` — and two behaviour arms caught it
+immediately. The predicate is now the exact one, made by the same function the frames are.
+
+What this deliberately does not touch: a phrase addressing the **whole** attribute writes its own frame key and moves as
+before, and every constituent whose family still names it in the composition is unaffected. §19's arm now asserts the
+rejection in the CSS rather than in a browser reading — the phrased class emits **no keyframes at all**, where the
+single-value spelling on the same component emits and moves.
+
+**Still open, and it is the last item.** The four new family-level authoring pairs need evidence records that describe
+the representation they **execute through** — the authoring component and its sibling context, mapped to two execution
+leaves — rather than pretending they are typed leaves with routes of their own. The record shape should quote §19's
+measurement of the shipped build, not the prototype. D.3.7 closes on that, not before.
+
+**State.** Gate 17/17, 496 unit tests, 87/87 behaviour arms, `tsc` clean; both scratch builds and the temporary
+differentials removed.

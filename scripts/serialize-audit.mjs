@@ -142,7 +142,7 @@ const registry = [
   ),
   tolerant(
     'src/variables/typed-leaves.ts',
-    'isComponent',
+    'isArithmetic',
     'COMPONENT.test(text)',
     'whether an authored component is one this family can carry into a frame',
     'the component grammar the browser resolved for this family: a number with an optional unit or percentage, or arithmetic',
