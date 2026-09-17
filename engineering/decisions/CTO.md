@@ -3571,3 +3571,57 @@ The last two sub-cases are the generalizing question this cluster actually poses
 **can one component be typed under two parents without a declaration per parent?** That is a question about the
 registry's key, decidable in one experiment, and it sits inside the largest cluster in the bucket — which is why the
 3D cluster is still the recommendation for the next target.
+
+---
+
+## D.3.8 opened as falsification: function-argument shape ≠ argument-level interpolation
+
+The premise to reject first is that "argument inside a function" is a *structural resemblance* to D.3.6 rather than
+evidence that the argument is the browser's interpolation unit. So this pass measures the two routes against each
+other — native whole-function motion, and a static shell whose argument is a registered typed leaf — and requires
+the `transform` computed value to agree **sample for sample** at five instants. No production change, nothing
+promoted, `matrix` left for after `matrix-3d` said which way this goes.
+
+The canary is a perturbed far endpoint: move it and the observable must follow. That is a correction rather than the
+first design, and the reason is worth keeping — the first canary was the same typed sheet **without** the
+`@property` registration, on the theory that an unregistered slot substitutes discretely. It cannot work:
+`@property` is a **document-global** registration, so a second sheet in the same page cannot un-register it, and
+five of six arms reported `fixture-blind` at a fixture that was never blind.
+
+```text
+arm                        identical  canary  verdict
+scale3d                    yes        live    same-series
+translate3d                yes        live    same-series
+rotate3d (fixed axis)      yes        live    same-series
+matrix3d (coefficient)     yes        live    same-series
+matrix3d (negative scale)  yes        live    same-series
+rotate3d (moving axis)     no         live    differs
+```
+
+**The abstraction holds for functions whose arguments are themselves interpolation units, and fails where arguments
+participate jointly in the function's own semantics.** The boundary is not "rotate3d is bad": a *fixed* axis with a
+turning angle reproduces native exactly. It is that a turning axis beside a turning angle is one subject to the
+engine and several to the proposal:
+
+```text
+native  0.96194, 0.0380602, -0.270598 · 0.853553, 0.146447, -0.5    symmetric throughout
+typed   0.9308, 0.35307, -0.0946233   · 0.804738, 0.505879, -0.310617   asymmetric at 25%
+```
+
+Both move, both share the endpoints, and the interiors differ — the per-argument path normalises a linearly
+interpolated axis, which is a different rotation from the one the engine interpolates as a pair.
+
+**One prediction was wrong and is recorded as wrong.** `matrix3d` interpolating a scale through `1 → 0 → -1` was
+expected to diverge, on the reasoning that native interpolation decomposes the matrix and normalises the scale.
+Measured, it is linear in the coefficient (`1 · 0.5 · 0 · -0.5 · -1`) and identical. The decomposition coincided
+here, which is the useful form of the result: the adversarial arm that *did* split is the joint one, and it split
+for the reason the abstraction predicted rather than for the reason this one anticipated.
+
+**So the 32-pair cluster is not one migration class.** It splits by interpolation semantics rather than by
+morphology: `scale-3d`, `translate-3d` and the `matrix`/`matrix-3d` coefficients have independently interpolable
+arguments and can take the typed shell path; a motion whose arguments move *together* — `rotate-3d` with a turning
+axis — is one subject and stays native. Filters remain the next cluster, and the question there is now sharper:
+drop-shadow's arguments beside its blur are a second argument inside the function.
+
+**State.** No production code touched: the pass is `scripts/research/d3-function-shell.mjs`, its readings are
+`scripts/function-argument-series.json`. Gate 17/17, 498 unit tests, 87/87 behaviour arms, `tsc` clean.
