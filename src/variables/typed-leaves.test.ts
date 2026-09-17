@@ -265,12 +265,38 @@ describe('typed execution declarations', () => {
       const declared = typedLeavesOf(attribute as PropertyType).map(
         ([leaf]) => leaf,
       )
-      const assigned = execution.whole('2 3 4') ?? []
+      const names = (execution.whole('2 3 4') ?? []).map(([leaf]) => leaf)
 
-      for (const [leaf] of assigned)
+      for (const leaf of names)
         expect(declared, `${attribute}: ${leaf}`).toContain(leaf)
 
-      expect([...assigned.map(([leaf]) => leaf)].sort()).toEqual(declared)
+      // Compared as a **set**, so this arm answers exactly one question — which leaves are named.
+      // Cardinality is the next arm, and the two have to be separable: a repeated name passes this
+      // one and has to fail that one.
+      expect([...new Set(names)].sort()).toEqual(declared)
+    }
+  })
+
+  it('returns each leaf exactly once', () => {
+    // The facet returns an **ordered sequence of declarations**, not a record, so a repeated leaf is
+    // expressible — and a repeated leaf is silent rather than malformed: the later assignment wins,
+    // the earlier value never reaches a frame, and the result still names only declared leaves and
+    // still represents every one of them.
+    //
+    // Measured, with `scale-x` returned twice and all three leaves still present: the arm above
+    // **passes**, because every name is declared and the set of names is still the declared set. Only
+    // this arm rejects it. The value arm at the top of this block also rejects that duplicate, but
+    // only because it pins `scale`'s literal output — a second family would have no such arm, and
+    // would carry the duplicate silently. That is the gap this closes.
+    //
+    // The array stays an array on purpose. It is compiler output in emission order, and a record
+    // would push object-key semantics into that output to buy a guarantee one test states outright.
+    for (const [attribute, execution] of Object.entries(typedExecutions)) {
+      const names = (execution.whole('2 3 4') ?? []).map(([leaf]) => leaf)
+
+      expect(new Set(names).size, `${attribute}: ${names.join(', ')}`).toBe(
+        names.length,
+      )
     }
   })
 
