@@ -1215,3 +1215,82 @@ half of it is the candidate table.
 **Not yet committed.** Working tree only: `scripts/lib/crosstab.mjs` with its 5-test suite,
 `scripts/research/d3-crosstab.mjs`, and its `package.json` entry. No `src/` behaviour change, no emitted-CSS
 change, and no representation declared; 17/17 stages, 79/79 behaviour.
+
+## 2026-09-17 — D.3.5's derivation: 41 of 72 value pairs close under one rule
+
+### Call
+
+> **After the cross-tab lands, I would choose `no-representation × value` as the next workstream. Not because
+> it is the largest block. […] I would choose it because it has the highest chance of producing a reusable
+> rule.** […] The next increment should be diagnostic again […] **whether a typed syntax can be derived
+> mechanically** — and if yes, which syntax. […] **But do not infer from the resting string alone. The
+> candidate grammar has to agree, otherwise we repeat the exact mistake D.3 has been designed to avoid.** […]
+> **No browser classification yet. First prove whether the representation itself can be derived.**
+
+`pnpm research:d3-derivation` does exactly that, over the 72 `no-representation × value` pairs, using two
+things the model already carries: the leaf's **resting value** and the **grammar of the candidate that serves
+it** (`readCandidates().types`). The rule is their agreement, and the agreement is an **assertion** — a
+proposal may only name types its candidate declares, so the mistake the ruling warns about cannot pass the
+suite.
+
+```text
+the workstream: 72 pairs (no-representation × value)
+
+  mechanically derivable     41   every type has a spelling and one admits the rest — the rule closes
+  ambiguous grammar          29   a type with no spelling, or two families at once — a decision
+  needs normalization         0   the rest would have to be canonicalised into the grammar
+  no defensible rule          2   the rest is a keyword no type holds
+```
+
+**The rule needs one mapping, and the model already demonstrates it**: `length → <length>`, `percentage →
+<percentage>`, `number → <number>`, `integer → <integer>`, `angle → <angle>`, `color → <color>` — six of the
+candidate vocabulary's eight names. `scale`'s existing declaration (`<number> | <percentage>`) is the worked
+example of the mapping and of the one union the spec treats as a single grammar. The two names left over are
+the whole cause of one ambiguity class: **`any` would be `syntax: "*"`, which is permissive and does not
+interpolate, and `<position>` is not a syntax component at all.**
+
+```text
+mechanically derivable — the proposals, by syntax
+  <length>      22   box-shadow's offsets and blur, border-radius corners, text-shadow offsets, …
+  <color>        8   background-color, border-color, outline-color, box-shadow-color, …
+  <percentage>   6   the `-offset` halves of background-position, object-position, offset-position
+  <number>       3   rotate-x/y/z
+  <integer>      1   math-depth-add
+  <angle>        1   rotate-angle
+
+ambiguous grammar — each one a decision, not a derivation
+  23  `any` is in the candidate's grammar (margin, padding, flex-grow, gap's row half, …)
+   4  `<number> | <length>` is two families: the model records for `border-image-outset` that a number there
+      is a multiple of the border width, so the two spellings are not one grammar
+   2  `<position>` is not a syntax component (transform-origin-x/y)
+
+no defensible rule — named, not summarised
+  background/background-clip    rest `border-box`   background/background-origin   rest `padding-box`
+```
+
+**Two shapes the rule had to be taught, and both came out of the data rather than from the string.** A bare
+integer literal is a `<number>` *and* an `<integer>`, and `0` is a `<length>` too — so the *shape* answers with
+every reading it can support and the *grammar* decides which one is meant. That is the ruling's rule made
+operational: `0` under `[length | percentage | any]` and `0` under `[number | length]` are the same string and
+different derivations. And a union of two families is not a derivation even when every name has a spelling: the
+same text means different things in each branch, which the model records for `border-image-outset` and which
+`typed-leaves.ts` records for unions generally ("a union interpolates only between two spellings of the
+**same** component").
+
+**The `needs normalization` bucket is empty, and that is a result.** Every resting value that fits its grammar
+fits it as written; the ones that do not fit cannot be written as a syntax at all. The bucket stays in the
+table, at zero, because it is the one that would open if a resting value were re-expressible in the grammar by
+a canonical transform — `scale`'s `scaleFactorToNumber` is the mechanism, and nothing in this cell needs it.
+
+**What this does not license.** A derived syntax is a **proposal**, not a verdict: it still has to pass the
+observation protocol — rest, then interpolation, then every relevant context — before anything moves. The
+descriptor and the classification remain two passes, which is the whole reason this one is allowed to be a
+diagnostic.
+
+**The next decision, with both sides counted.** The 41 are one rule away from being model metadata; the 29 are
+a *narrowing* decision the model cannot make for us (do the `margin`/`padding` motions stop accepting `any`?);
+the 2 are keyword rests that belong to the observation protocol or to nothing.
+
+**Not yet committed.** Working tree only: `scripts/lib/derivation.mjs` with its 6-test suite,
+`scripts/research/d3-derivation.mjs`, and its `package.json` entry. No `src/` behaviour change, no emitted-CSS
+change, no representation declared, no browser reached; 17/17 stages, 79/79 behaviour.
