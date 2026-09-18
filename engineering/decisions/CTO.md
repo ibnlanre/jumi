@@ -4552,6 +4552,66 @@ edge-changing positions alike — instead of introducing a second architecture f
 — the same five classes proved here, in production, with the shell static and multilayer still on the whole-property
 path.
 
+## The spike, encoded and withdrawn: the landing is an increment, and its surface is now measured
+
+The spike was written to the ruling's specification and taken to the point where the model answered back. It is
+reverted rather than half-landed, and the tree is green — but the attempt produced the one thing a spike is for: the
+**measured surface of the landing**, which is what the next attempt starts from instead of rediscovering.
+
+What was encoded, exactly as ruled:
+
+```text
+authoring   x-edge + x-offset, y-edge + y-offset      (unchanged, and the offset leaves were not widened)
+execution   x-position / y-position <length-percentage>   (private, execution: true, rests resolved from authoring)
+resolver    axis route  → axisEndpoint(value) → axisPosition(edge, offset) → one resolved leaf
+            edge/offset route → authoring state → the same normalization
+bypass      no `whole` declared, so the whole and multilayer routes keep property-level execution
+```
+
+and the model answered with eight failures, none of them a mystery:
+
+```text
+TypedExecution.whole is REQUIRED
+  → a family cannot omit the whole resolver, so the bypass needs an explicit `whole: () => null` or an optional
+    facet. A one-line decision, but a type-level one that the spike should not make silently.
+
+census 326 → 330 pairs, 305 → 309 constituents, buckets 108/101/96 → 110/103/96
+  → exactly four pairs arrive: (background-position, background-position-{x,y}-{edge,offset}), the authoring surface
+    this family now declares. The same shape D.3.7 recorded when four authoring pairs arrived there — a declared
+    consequence, and the numbers belong in the assertions with the reason written beside them.
+
+guards that need an argument, not a number
+  names only leaves the family reads, at any depth
+    → the offset leaves stop being read by the composition and become authoring vocabulary the resolver consumes.
+      They are still correctly declared; the guard's notion of "read" does not yet include "declared as authoring".
+  names only leaves the family declares, and every one of them · returns each leaf exactly once
+    → the execution declaration's authoring list names components that are not typed leaves of the family
+      (`background-position-x` and its edge and offset), so the guard's assumption that authoring entries are
+      declared leaves does not hold for this shape.
+  evidences every authoring component that has a route, and nothing else — 8 against 2
+    → declaring six authoring components for this family demands route evidence for each of them, and the axis and
+      edge/offset routes have never been measured. This is the honest cost of the authoring surface, and it is
+      evidence to gather rather than a count to move.
+  reaches a shorthand the component is two compositions below
+    → the reach test's depth changed with the composition, and a structural expectation has to be re-derived.
+  says complete exactly where the registry says proven — 36 against 38
+    → the completeness guard follows the population, so it moves with the census and has to be reconciled with it.
+```
+
+That is the finding: **the `background-position` landing is not a declaration plus a composition, it is a declaration,
+a composition, four census numbers, two guard widenings that each need their own argument, route evidence for six
+authoring components, and the structural-plus-browser proof the ruling requires.** Each of those is small; several of
+them are decisions rather than edits, and the two guard widenings are exactly the kind of thing this track has
+established must be argued rather than absorbed — the widening fiasco is the precedent.
+
+Withdrawing it keeps every invariant intact and leaves the next attempt with its surface measured: the browser
+semantics are already proven by the falsification, the design is written down here, and the failing assertions are a
+checklist rather than a surprise.
+
+**State.** No production change; the offset-leaf declaration is untouched, and `src/composition/background-position.ts`
+and `src/variables/property.ts` are byte-identical to what they were before the attempt. Gate 17/17, 505 unit tests,
+`tsc` clean.
+
 **State.** No production behaviour changed. Gate 17/17, 505 unit tests, `tsc` clean, and
 `scripts/validated-representations.json` is byte-identical to what the previous pass recorded — the differential and
 its series are the only new artifacts.
