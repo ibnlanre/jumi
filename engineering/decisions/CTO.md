@@ -4879,6 +4879,59 @@ from that; they do not lead it.
 registry declarations, the counts that follow, the changed reach chain pinned as topology, the structural proof, the
 browser matrix, the gate, and one commit.
 
+## D.3.9 closed: `background-position` resolved-axis migration
+
+```text
+commit        096ea5f
+gate          17/17 · 506/506 unit tests · tsc clean · lint and types clean
+
+public authoring   unchanged — every route spelling, and the offset leaves, untouched
+private execution  background-position-x-position · background-position-y-position   <length-percentage>
+axis routes        → the addressed axis's resolved leaf, one per route
+whole / multilayer → the existing property-level path, entered because the family declares no `whole`
+```
+
+Gate B measured six axis routes inert; on the rebuilt emission all six are **movable** and each assigns exactly its own
+axis's resolved leaf, `offset-anchor`'s two records unchanged. The endpoint classes no offset leaf could carry — lengths,
+mixed units, `calc()`, an edge that changes — are covered by the differential that admitted the resolved subject.
+
+### The `typed-leaves.ts` baggage, inspected rather than footnoted
+
+`git diff eb1a791..096ea5f -- src/variables/typed-leaves.ts` (the session's pre-landing base) contains 13 hunks, and
+every one of them maps to this migration:
+
+```text
+the two resolved execution leaves · the assignment contract · `whole` made optional
+`axisEndpoint`, `AXIS_PREFIX`, `axisOf` · the family's resolver and authoring surface
+```
+
+What is *not* the migration is three normalisations, and they carry no semantics:
+
+```text
+`typedExecutions` keys sorted        assigns · authoring · constituent · whole
+                                     background-position < offset-anchor < scale < translate
+`scale` and `translate` quoted       bare keys to `'scale'` / `'translate'`
+two lines reflowed                   `isComponent`, and the edge-rest map
+```
+
+All three are the lint/prepare autofix's canonical form — the bodies of `scale`, `translate` and `offset-anchor` are
+unchanged — and the gate reproduces them. **No cleanup commit**: there is no unrelated functional hunk to restore, and
+rewriting a verified commit boundary to remove a key sort would be the wrong trade.
+
+### Stopping D.3
+
+The remaining reshape census is research backlog, not release debt. The framework has now supported this class of
+migration end to end, and the next work should come from a product or release need rather than from completing a research
+percentage.
+
+The process rule this episode earned, recorded because it cost four days to learn:
+
+> **Once the browser semantics, the execution model and the production repair are proven, switch from research mode to
+> implementation mode, and require a behavioural contradiction before reopening architecture.**
+
+Two failures are *not* that: a failing census count, and a guard whose ontology predates the model. Both are plumbing,
+and both should be fixed forward and reported after.
+
 **State.** No production behaviour changed. Gate 17/17, 505 unit tests, `tsc` clean, and
 `scripts/validated-representations.json` is byte-identical to what the previous pass recorded — the differential and
 its series are the only new artifacts.
