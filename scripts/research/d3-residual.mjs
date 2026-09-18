@@ -51,10 +51,49 @@ const SETTLED = new Map([
     'background-position',
     {
       granularity: 'route',
-      production: 'defective',
+      production: 'migrated',
       reason:
-        'Gate B: partial-composition invalidity — the single-axis route emits whole-property keyframes whose sibling arm falls back to the two-token axis slot, so a lone axis composes a three-token <position> that is dropped at computed-value time and moves nothing; the pair route is native-equivalent',
-      research: 'migration-required',
+        'D.3.9 (096ea5f): resolved-axis execution — each axis route writes a private <length-percentage> leaf, the property reads the resolved pair, whole and multilayer keep property-level execution; six routes inert before, six movable after',
+      research: 'migrated',
+    },
+  ],
+  [
+    'skew',
+    {
+      granularity: 'family',
+      production: 'native',
+      reason:
+        'Gate B: interpolates to the named matrix, linearly and exactly (tan of the angle) — separable and unnecessary',
+      research: 'safe-no-need',
+    },
+  ],
+  [
+    'border-image',
+    {
+      granularity: 'route',
+      production: 'native',
+      reason:
+        'Gate B and Gate A with a native reference: every single-value route (number and length) is sample-for-sample native; multi-value spellings emit nothing, which is route reach rather than interpolation',
+      research: 'safe-no-need',
+    },
+  ],
+  [
+    'background-size',
+    {
+      granularity: 'pair',
+      production: 'native',
+      reason:
+        'Gate B with a native reference: the percentage and auto spellings are sample-for-sample native, so the discrete auto flip is what the property does rather than what the route fails to do',
+      research: 'safe-no-need',
+    },
+  ],
+  [
+    'perspective-3d',
+    {
+      granularity: 'pair',
+      production: 'native',
+      reason: 'Gate 0: no candidate addresses it — there is no route to migrate',
+      research: 'no-candidate',
     },
   ],
   [

@@ -1,20 +1,9 @@
 {
-  "source": "scripts/research/d3-outset-size.mjs",
-  "wall": [
-    0,
-    250,
-    500,
-    750,
-    1000
-  ],
   "records": [
     {
       "checks": {
-        "failed": [
-          "the shipped class emitted an animation",
-          "the shipped route moved"
-        ],
-        "ok": false
+        "failed": [],
+        "ok": true
       },
       "kind": "length → length",
       "klass": "animate-border-image-outset-[8px]",
@@ -29,20 +18,17 @@
       "shipped": [
         "0",
         "0",
-        "0",
-        "0",
-        "0"
+        "8px",
+        "8px",
+        "8px"
       ],
       "to": "8px",
-      "verdict": "unearned: the shipped class emitted an animation; the shipped route moved"
+      "verdict": "equivalent"
     },
     {
       "checks": {
-        "failed": [
-          "the shipped class emitted an animation",
-          "the shipped route moved"
-        ],
-        "ok": false
+        "failed": [],
+        "ok": true
       },
       "kind": "length → length (nonzero)",
       "klass": "animate-border-image-outset-[16px]",
@@ -57,20 +43,17 @@
       "shipped": [
         "0",
         "0",
-        "0",
-        "0",
-        "0"
+        "16px",
+        "16px",
+        "16px"
       ],
       "to": "16px",
-      "verdict": "unearned: the shipped class emitted an animation; the shipped route moved"
+      "verdict": "equivalent"
     },
     {
       "checks": {
-        "failed": [
-          "the shipped class emitted an animation",
-          "the shipped route moved"
-        ],
-        "ok": false
+        "failed": [],
+        "ok": true
       },
       "kind": "number → number",
       "klass": "animate-border-image-outset-[2]",
@@ -84,13 +67,13 @@
       "rest": "0",
       "shipped": [
         "0",
-        "0",
-        "0",
-        "0",
-        "0"
+        "0.817021",
+        "1.60481",
+        "1.92092",
+        "2"
       ],
       "to": "2",
-      "verdict": "unearned: the shipped class emitted an animation; the shipped route moved"
+      "verdict": "equivalent"
     },
     {
       "checks": {
@@ -178,11 +161,8 @@
     },
     {
       "checks": {
-        "failed": [
-          "the shipped class emitted an animation",
-          "the shipped route moved"
-        ],
-        "ok": false
+        "failed": [],
+        "ok": true
       },
       "kind": "size: auto → percentage",
       "klass": "animate-background-size-[50%_auto]",
@@ -197,20 +177,17 @@
       "shipped": [
         "auto",
         "auto",
-        "auto",
-        "auto",
-        "auto"
+        "50% auto",
+        "50% auto",
+        "50% auto"
       ],
       "to": "50% auto",
-      "verdict": "unearned: the shipped class emitted an animation; the shipped route moved"
+      "verdict": "equivalent"
     },
     {
       "checks": {
-        "failed": [
-          "the shipped class emitted an animation",
-          "the shipped route moved"
-        ],
-        "ok": false
+        "failed": [],
+        "ok": true
       },
       "kind": "size: percentage → percentage",
       "klass": "animate-background-size-[50%_50%]",
@@ -225,12 +202,20 @@
       "shipped": [
         "auto",
         "auto",
-        "auto",
-        "auto",
-        "auto"
+        "50% 50%",
+        "50% 50%",
+        "50% 50%"
       ],
       "to": "50% 50%",
-      "verdict": "unearned: the shipped class emitted an animation; the shipped route moved"
+      "verdict": "equivalent"
     }
+  ],
+  "source": "scripts/research/d3-outset-size.mjs",
+  "wall": [
+    0,
+    250,
+    500,
+    750,
+    1000
   ]
 }

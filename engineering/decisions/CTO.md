@@ -5009,3 +5009,49 @@ guessed.
 **State.** No production change. Gate A's answer for `border-image-outset` is `native/property execution is correct
 where it runs` — the whole-property path is what native does, and the components are not independently interpolable
 across types.
+
+## Fixture defect 20, fixed, and the sweep's four families settled without a defect
+
+The book that measured `border-image-outset` never applied the shipped class to the probe element: `readBoth` rendered
+`<div id="probe">` bare, so **every shipped arm read a resting value**, the liveness guard fired on all but the first,
+and the one arm that appeared to agree was agreeing by coincidence. That is the same defect class as fixture 19 — a
+verdict about the fixture wearing the clothes of a verdict about the route — and it invalidated the `[8px]` claim I
+recorded one commit earlier. Fixed by applying the class, and the readings are now real:
+
+```text
+border-image-outset  [8px]               shipped 0 · 0 · 8px · 8px · 8px          native identical   equivalent
+                     [16px]              shipped 0 · 0 · 16px · 16px · 16px       native identical   equivalent
+                     [2]                 shipped 0 · .817 · 1.605 · 1.921 · 2      native identical   equivalent
+                     [2_10px] …          no animation emitted at all                                 no route
+background-size      [50%_auto]          shipped auto · auto · 50% auto · …        native identical   equivalent
+                     [50%_50%]           shipped auto · auto · 50% 50% · …         native identical   equivalent
+```
+
+Three things fall out, and all three are classifications rather than defects:
+
+- **The `[8px]` versus `[16px]` asymmetry does not exist.** Both are accepted; the difference was the missing class in
+  the fixture, not a grammar boundary. No parser or candidate bug to chase.
+- **`background-size` is native-equivalent**, including the `auto → 50% auto` flip: native flips discretely there too,
+  so the discrete step is what the property does rather than what the route fails to do. `safe-no-need`, settled with a
+  native reference as the ruling required.
+- **Multi-value spellings emit nothing.** `[2_10px]`, `[2_10px_4px_20px]` and `[10px_2]` produce no animation, while
+  the single-value spellings do. That is **route reach**, not interpolation: this route admits one value, so a list is
+  a Gate 0 `no-candidate` for these spellings rather than a defect in execution.
+
+### The sweep, closed
+
+```text
+decision      family                reason
+safe-no-need  skew                  interpolates to the named matrix, linearly and exactly (tan of the angle)
+safe-no-need  border-image          every single-value route is sample-for-sample native; lists have no route
+safe-no-need  background            `background-size` spellings are sample-for-sample native, discrete `auto` included
+keyword-      border-image-repeat   a keyword flipping discretely, which is what native does with a keyword
+discrete
+no-candidate  transform             `perspective-3d` has no candidate at all
+no-candidate  the routes=0 families  animation-range · animation-timeline (+2 scroll) · box-shadow-inset/outset ·
+                                    border-block-width · border-inline · animation-delay
+```
+
+**No defect in the residual queue.** `border-image-outset`'s withdrawn verdict was the last one, and it was withdrawn
+by a native reference rather than by argument — which is the third time in this sweep that a browser reading falsified
+an assumption cheaply.

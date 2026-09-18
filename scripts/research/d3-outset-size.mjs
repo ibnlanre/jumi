@@ -17,13 +17,15 @@
  * Run: `node scripts/research/d3-outset-size.mjs` (exits non-zero only on a fixture defect, never on a finding).
  */
 import { chromium } from 'playwright'
+
+import { nativeSheet } from '../lib/frames.mjs'
+import { earned } from '../lib/sources.mjs'
+
 import fs from 'node:fs'
 import path from 'node:path'
 
 import * as compileLib from '../lib/compile.mjs'
 import * as cssLib from '../lib/css.mjs'
-import { nativeSheet } from '../lib/frames.mjs'
-import { earned } from '../lib/sources.mjs'
 
 const { compiler } = compileLib
 const finalizeCss = compileLib.finalizeCss ?? cssLib.finalizeCss
@@ -37,14 +39,46 @@ const ENTRY = `\n@import "tailwindcss" source(none);\n@plugin "${path.join(root,
  * a native reference has to interpolate to for the comparison to be about the route rather than about two motions.
  */
 const TARGETS = [
-  { kind: 'length → length', klass: 'animate-border-image-outset-[8px]', to: '8px' },
-  { kind: 'length → length (nonzero)', klass: 'animate-border-image-outset-[16px]', to: '16px' },
-  { kind: 'number → number', klass: 'animate-border-image-outset-[2]', to: '2' },
-  { kind: 'list, 2 values', klass: 'animate-border-image-outset-[2_10px]', to: '2 10px' },
-  { kind: 'list, 4 values', klass: 'animate-border-image-outset-[2_10px_4px_20px]', to: '2 10px 4px 20px' },
-  { kind: 'mixed, number ↔ length', klass: 'animate-border-image-outset-[10px_2]', to: '10px 2' },
-  { kind: 'size: auto → percentage', klass: 'animate-background-size-[50%_auto]', to: '50% auto' },
-  { kind: 'size: percentage → percentage', klass: 'animate-background-size-[50%_50%]', to: '50% 50%' },
+  {
+    kind: 'length → length',
+    klass: 'animate-border-image-outset-[8px]',
+    to: '8px',
+  },
+  {
+    kind: 'length → length (nonzero)',
+    klass: 'animate-border-image-outset-[16px]',
+    to: '16px',
+  },
+  {
+    kind: 'number → number',
+    klass: 'animate-border-image-outset-[2]',
+    to: '2',
+  },
+  {
+    kind: 'list, 2 values',
+    klass: 'animate-border-image-outset-[2_10px]',
+    to: '2 10px',
+  },
+  {
+    kind: 'list, 4 values',
+    klass: 'animate-border-image-outset-[2_10px_4px_20px]',
+    to: '2 10px 4px 20px',
+  },
+  {
+    kind: 'mixed, number ↔ length',
+    klass: 'animate-border-image-outset-[10px_2]',
+    to: '10px 2',
+  },
+  {
+    kind: 'size: auto → percentage',
+    klass: 'animate-background-size-[50%_auto]',
+    to: '50% auto',
+  },
+  {
+    kind: 'size: percentage → percentage',
+    klass: 'animate-background-size-[50%_50%]',
+    to: '50% 50%',
+  },
 ]
 
 const OUTSET = 'borderImageOutset'
@@ -55,12 +89,18 @@ const observableOf = klass =>
 
 const browser = await chromium.launch()
 
-const readBoth = async css => {
+/**
+ * Both elements on one page, and the **shipped class on the probe** — which the first version of this book omitted,
+ * so every shipped arm read a resting value and reported `unearned` while the native side moved. A fixture that
+ * forgets to apply the class it is measuring is the same defect class as one that reads a resting declaration as a
+ * target: it produces a verdict about the fixture and presents it as a verdict about the route.
+ */
+const readBoth = async (css, klass) => {
   const page = await browser.newPage()
 
   await page.setContent(
     `<!doctype html><html><head><style>${css}</style></head><body>` +
-      `<div id="probe"></div><div id="native"></div></body></html>`,
+      `<div id="probe" class="${klass}"></div><div id="native"></div></body></html>`,
   )
 
   const out = await page.evaluate(
@@ -113,7 +153,7 @@ for (const target of TARGETS) {
     /--jumi-animation-timing-function:\s*([^;]+);/.exec(shipped)?.[1]?.trim() ??
     'linear'
 
-  const restRead = await readBoth(`${shipped}\n#native { animation: none }`)
+  const restRead = await readBoth(`${shipped}\n#native { animation: none }`, target.klass)
   const rest = restRead.series[0][0][slot]
 
   const reference = nativeSheet({
@@ -124,13 +164,19 @@ for (const target of TARGETS) {
     to: target.to,
   })
 
-  const read = await readBoth(`${shipped}\n${reference.css}`)
+  const read = await readBoth(`${shipped}\n${reference.css}`, target.klass)
   const shippedSeries = read.series.map(one => one[0][slot])
   const nativeSeries = read.series.map(one => one[1][slot])
 
   const checks = earned([
-    { check: 'the shipped class emitted an animation', ok: read.animations[0] > 0 },
-    { check: 'the native arm emitted an animation', ok: read.animations[1] > 0 },
+    {
+      check: 'the shipped class emitted an animation',
+      ok: read.animations[0] > 0,
+    },
+    {
+      check: 'the native arm emitted an animation',
+      ok: read.animations[1] > 0,
+    },
     { check: 'the native arm moved', ok: moved(nativeSeries) },
     { check: 'the shipped route moved', ok: moved(shippedSeries) },
   ])
@@ -159,7 +205,7 @@ const target = path.join(root, 'scripts', 'outset-size-series.json')
 
 fs.writeFileSync(
   target,
-  `${JSON.stringify({ source: 'scripts/research/d3-outset-size.mjs', wall: WALL, records }, null, 2)}\n`,
+  `${JSON.stringify({ records, source: 'scripts/research/d3-outset-size.mjs', wall: WALL }, null, 2)}\n`,
 )
 
 for (const one of records) {
