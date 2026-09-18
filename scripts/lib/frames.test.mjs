@@ -45,6 +45,27 @@ describe('the native-reference builder', () => {
     expect(sheet.css).toContain(`@keyframes ${sheet.name}`)
     expect(sheet.css).toContain(`#${sheet.name} {`)
   })
+
+  /**
+   * The twelfth fixture defect: the reference walked `linear` while the plugin's default is `ease`, so a route that
+   * interpolated correctly was reported as `differs` on the shape of its curve. An arm comparing two curves has to
+   * be able to say which curve it is judging against — and the default has to stay what the earlier tracks measured,
+   * or their results change under them.
+   */
+  it('carries the timing function it is compared against', () => {
+    const sheet = nativeSheet({
+      easing: 'ease',
+      from: '0% 0%',
+      property: 'backgroundPosition',
+      to: '40% 0%',
+    })
+
+    expect(sheet.css).toContain('animation: native-background-position 1000ms ease both')
+    expect(
+      nativeSheet({ from: '0% 0%', property: 'backgroundPosition', to: '40% 0%' })
+        .css,
+    ).toContain('1000ms linear both')
+  })
 })
 
 describe('reading a computed filter list', () => {

@@ -1,0 +1,330 @@
+{
+  "source": "scripts/research/d3-position-necessity.mjs",
+  "wall": [
+    0,
+    250,
+    500,
+    750,
+    1000
+  ],
+  "records": [
+    {
+      "checks": {
+        "failed": [
+          "the shipped route moved"
+        ],
+        "ok": false
+      },
+      "classes": [
+        "animate-background-position-x-[0:0%|100:40%]"
+      ],
+      "condition": "x only",
+      "easing": "ease",
+      "mechanism": {
+        "declaration": "background-position: var(--jumi-background-position-x-UqNgw-100, var(--jumi-background-position-x)) var(--jumi-background-position-y-UqNgw-100, var(--jumi-background-position-y))",
+        "computed": "0% 0%"
+      },
+      "property": "background-position",
+      "resting": "0% 0%",
+      "reference": [
+        "0% 0%",
+        "16.3404% 0%",
+        "32.0961% 0%",
+        "38.4184% 0%",
+        "40% 0%"
+      ],
+      "shipped": [
+        "0% 0%",
+        "0% 0%",
+        "0% 0%",
+        "0% 0%",
+        "0% 0%"
+      ],
+      "verdict": "route-inert"
+    },
+    {
+      "checks": {
+        "failed": [
+          "the shipped route moved"
+        ],
+        "ok": false
+      },
+      "classes": [
+        "animate-background-position-y-[0:0%|100:40%]"
+      ],
+      "condition": "y only",
+      "easing": "ease",
+      "mechanism": {
+        "declaration": "background-position: var(--jumi-background-position-x-UqNgw-100, var(--jumi-background-position-x)) var(--jumi-background-position-y-UqNgw-100, var(--jumi-background-position-y))",
+        "computed": "0% 0%"
+      },
+      "property": "background-position",
+      "resting": "0% 0%",
+      "reference": [
+        "0% 0%",
+        "0% 16.3404%",
+        "0% 32.0961%",
+        "0% 38.4184%",
+        "0% 40%"
+      ],
+      "shipped": [
+        "0% 0%",
+        "0% 0%",
+        "0% 0%",
+        "0% 0%",
+        "0% 0%"
+      ],
+      "verdict": "route-inert"
+    },
+    {
+      "checks": {
+        "failed": [],
+        "ok": true
+      },
+      "classes": [
+        "animate-background-position-x-[0:0%|100:40%]",
+        "animate-background-position-y-[0:0%|100:40%]"
+      ],
+      "condition": "x + y",
+      "easing": "ease",
+      "mechanism": {
+        "declaration": "background-position: var(--jumi-background-position-x-UqNgw-100, var(--jumi-background-position-x)) var(--jumi-background-position-y-UqNgw-100, var(--jumi-background-position-y))",
+        "computed": "40% 40%"
+      },
+      "property": "background-position",
+      "resting": "0% 0%",
+      "reference": [
+        "0% 0%",
+        "16.3404% 16.3404%",
+        "32.0961% 32.0961%",
+        "38.4184% 38.4184%",
+        "40% 40%"
+      ],
+      "shipped": [
+        "0% 0%",
+        "16.3404% 16.3404%",
+        "32.0961% 32.0961%",
+        "38.4184% 38.4184%",
+        "40% 40%"
+      ],
+      "verdict": "equivalent"
+    },
+    {
+      "checks": {
+        "failed": [
+          "the shipped route moved"
+        ],
+        "ok": false
+      },
+      "classes": [
+        "animate-object-position-x-[0:0%|100:40%]"
+      ],
+      "condition": "x only",
+      "easing": "ease",
+      "mechanism": {
+        "declaration": "object-position: var(--jumi-object-position-x-UqNgw-100, var(--jumi-object-position-x)) var(--jumi-object-position-y-UqNgw-100, var(--jumi-object-position-y))",
+        "computed": "50% 50%"
+      },
+      "property": "object-position",
+      "resting": "50% 50%",
+      "reference": [
+        "50% 50%",
+        "66.3404% 50%",
+        "82.0961% 50%",
+        "88.4184% 50%",
+        "90% 50%"
+      ],
+      "shipped": [
+        "50% 50%",
+        "50% 50%",
+        "50% 50%",
+        "50% 50%",
+        "50% 50%"
+      ],
+      "verdict": "route-inert"
+    },
+    {
+      "checks": {
+        "failed": [
+          "the shipped route moved"
+        ],
+        "ok": false
+      },
+      "classes": [
+        "animate-object-position-y-[0:0%|100:40%]"
+      ],
+      "condition": "y only",
+      "easing": "ease",
+      "mechanism": {
+        "declaration": "object-position: var(--jumi-object-position-x-UqNgw-100, var(--jumi-object-position-x)) var(--jumi-object-position-y-UqNgw-100, var(--jumi-object-position-y))",
+        "computed": "50% 50%"
+      },
+      "property": "object-position",
+      "resting": "50% 50%",
+      "reference": [
+        "50% 50%",
+        "50% 66.3404%",
+        "50% 82.0961%",
+        "50% 88.4184%",
+        "50% 90%"
+      ],
+      "shipped": [
+        "50% 50%",
+        "50% 50%",
+        "50% 50%",
+        "50% 50%",
+        "50% 50%"
+      ],
+      "verdict": "route-inert"
+    },
+    {
+      "checks": {
+        "failed": [],
+        "ok": true
+      },
+      "classes": [
+        "animate-object-position-x-[0:0%|100:40%]",
+        "animate-object-position-y-[0:0%|100:40%]"
+      ],
+      "condition": "x + y",
+      "easing": "ease",
+      "mechanism": {
+        "declaration": "object-position: var(--jumi-object-position-x-UqNgw-100, var(--jumi-object-position-x)) var(--jumi-object-position-y-UqNgw-100, var(--jumi-object-position-y))",
+        "computed": "40% 40%"
+      },
+      "property": "object-position",
+      "resting": "0% 0%",
+      "reference": [
+        "0% 0%",
+        "16.3404% 16.3404%",
+        "32.0961% 32.0961%",
+        "38.4184% 38.4184%",
+        "40% 40%"
+      ],
+      "shipped": [
+        "0% 0%",
+        "16.3404% 16.3404%",
+        "32.0961% 32.0961%",
+        "38.4184% 38.4184%",
+        "40% 40%"
+      ],
+      "verdict": "equivalent"
+    },
+    {
+      "checks": {
+        "failed": [
+          "the shipped route moved"
+        ],
+        "ok": false
+      },
+      "classes": [
+        "animate-offset-position-x-[0:0%|100:40%]"
+      ],
+      "condition": "x only",
+      "easing": "ease",
+      "mechanism": {
+        "declaration": "offset-position: var(--jumi-offset-position-x-UqNgw-100, var(--jumi-offset-position-x)) var(--jumi-offset-position-y-UqNgw-100, var(--jumi-offset-position-y))",
+        "computed": "normal"
+      },
+      "property": "offset-position",
+      "resting": "normal",
+      "reference": [
+        "50% 50%",
+        "66.3404% 50%",
+        "82.0961% 50%",
+        "88.4184% 50%",
+        "90% 50%"
+      ],
+      "shipped": [
+        "normal",
+        "normal",
+        "normal",
+        "normal",
+        "normal"
+      ],
+      "verdict": "route-inert"
+    },
+    {
+      "checks": {
+        "failed": [
+          "the shipped route moved"
+        ],
+        "ok": false
+      },
+      "classes": [
+        "animate-offset-position-y-[0:0%|100:40%]"
+      ],
+      "condition": "y only",
+      "easing": "ease",
+      "mechanism": {
+        "declaration": "offset-position: var(--jumi-offset-position-x-UqNgw-100, var(--jumi-offset-position-x)) var(--jumi-offset-position-y-UqNgw-100, var(--jumi-offset-position-y))",
+        "computed": "normal"
+      },
+      "property": "offset-position",
+      "resting": "normal",
+      "reference": [
+        "50% 50%",
+        "50% 66.3404%",
+        "50% 82.0961%",
+        "50% 88.4184%",
+        "50% 90%"
+      ],
+      "shipped": [
+        "normal",
+        "normal",
+        "normal",
+        "normal",
+        "normal"
+      ],
+      "verdict": "route-inert"
+    },
+    {
+      "checks": {
+        "failed": [],
+        "ok": true
+      },
+      "classes": [
+        "animate-offset-position-x-[0:0%|100:40%]",
+        "animate-offset-position-y-[0:0%|100:40%]"
+      ],
+      "condition": "x + y",
+      "easing": "ease",
+      "mechanism": {
+        "declaration": "offset-position: var(--jumi-offset-position-x-UqNgw-100, var(--jumi-offset-position-x)) var(--jumi-offset-position-y-UqNgw-100, var(--jumi-offset-position-y))",
+        "computed": "40% 40%"
+      },
+      "property": "offset-position",
+      "resting": "0% 0%",
+      "reference": [
+        "0% 0%",
+        "16.3404% 16.3404%",
+        "32.0961% 32.0961%",
+        "38.4184% 38.4184%",
+        "40% 40%"
+      ],
+      "shipped": [
+        "0% 0%",
+        "16.3404% 16.3404%",
+        "32.0961% 32.0961%",
+        "38.4184% 38.4184%",
+        "40% 40%"
+      ],
+      "verdict": "equivalent"
+    },
+    {
+      "condition": "x only",
+      "property": "background-size",
+      "verdict": "no-route"
+    },
+    {
+      "condition": "y only",
+      "property": "background-size",
+      "verdict": "no-route"
+    },
+    {
+      "condition": "x + y",
+      "property": "background-size",
+      "verdict": "no-route"
+    }
+  ]
+}

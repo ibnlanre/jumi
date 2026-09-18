@@ -4219,3 +4219,85 @@ separately, per property, which is the ruling's ordering — and `background-siz
 
 **State.** No production code moved. Gate 17/17, 498 unit tests, 87/87 behaviour arms, `tsc` clean; the readings are in
 `scripts/position-axis-series.json`.
+
+## Gate B, per property: all three routes are inert on a single axis, and the mechanism is the axis slot's arity
+
+The ruling asked for Gate B independently for `background-position`, `object-position` and `offset-position` — x only,
+y only, and simultaneous x + y on the shipped build, liveness guards first, `background-position` scoped to
+single-layer, `offset-position` to authored positional state, and `background-size` kept separate.
+
+The answer is the same shape three times, and it is not a pass:
+
+```text
+background-position   x only   route-inert    shipped 0% 0% · 0% 0% · 0% 0% · 0% 0% · 0% 0%
+object-position       x only   route-inert    shipped 50% 50% · 50% 50% · 50% 50% · 50% 50% · 50% 50%
+offset-position       x only   route-inert    shipped normal · normal · normal · normal · normal
+background-position   y only   route-inert
+object-position       y only   route-inert
+offset-position       y only   route-inert
+background-position   x + y    equivalent     0% 0% · 16.3404% 16.3404% · … · 40% 40%
+object-position       x + y    equivalent     0% 0% · 16.3404% 16.3404% · … · 40% 40%
+offset-position       x + y    equivalent     0% 0% · 16.3404% 16.3404% · … · 40% 40%
+background-size       x / y / x + y   no-route
+```
+
+**A single axis authored alone moves nothing, on all three properties; the pair is native-equivalent.** The arms are
+not unearned: the class emitted an animation, and the reference moved. `route-inert` is the verdict the guard was
+built to be able to say.
+
+### The mechanism, measured rather than inferred
+
+The keyframe's own declaration was lifted out of the emission and applied as a **plain declaration** to an element
+carrying the same class, with the animation switched off — so no animation machinery is involved in what follows:
+
+```css
+background-position: var(--jumi-background-position-x-UqNgw-100, var(--jumi-background-position-x))
+                     var(--jumi-background-position-y-UqNgw-100, var(--jumi-background-position-y));
+```
+
+```text
+single-axis arm   computes to `0% 0%` / `50% 50%` / `normal`   — the property's resting value
+pair arm          computes to `40% 40%`                        — the moved value
+```
+
+and the variables that feed it, read from the same element:
+
+```text
+--jumi-background-position-x-UqNgw-100   40%          defined by the x route
+--jumi-background-position-y-UqNgw-100   (absent)     the sibling arm the route does not carry
+--jumi-background-position-x            left 0%       the axis slot: edge + offset, two tokens
+--jumi-background-position-y            top 0%        the same, and this is the fallback that fires
+```
+
+So the stop substitutes to `40% top 0%` — **three** tokens, where `<position>` in its three-value form requires the
+edge keyword first. The declaration is invalid at computed-value time, is dropped, and the property falls to its
+resting value at every instant: the animation runs and moves nothing. In the pair arm both arm variables exist, both
+stops are single tokens, the position is the valid `40% 40%`, and motion appears.
+
+**Classification — `whole-list ownership/contention`.** The per-axis candidate does not write a leaf: it emits a
+**whole-property** keyframe whose per-axis arms fall back to the axis *slot*, which is itself two tokens. One axis
+therefore cannot be authored without its sibling, and authoring one alone produces a silently invalid declaration
+rather than an error. It is not an ordering defect (no layer or order is involved), not nested coupling (nothing is
+nested), and not a fixture problem — the isolation above runs with no animation present, and a page that authors only
+`animate-background-position-x-*` is exactly the fixture.
+
+**Gate B therefore passes for all three**, and the migration has a defect to repair that Gate A's eligibility did not
+imply: under per-leaf typed execution an axis writes its own leaf and the slot's arity stops being part of the
+composed value. `background-size` was asked to stay separate and did — no per-axis route exists for it at all.
+
+### Two fixture defects, both caught by the guards rather than by reading the table
+
+15. **The reference walked a different curve than the route it judged.** `nativeSheet` hard-coded `linear` while the
+    plugin's default is `--jumi-animation-timing-function: ease`, so every correctly interpolating arm reported
+    `differs` — three findings that were the curve, at 0.4085 progress where `ease` puts it. The timing function is
+    now a parameter, read **from the emission** so the comparison follows the plugin, and pinned by a unit test that
+    also holds the old default for the tracks that measured against it.
+16. **`offset-position` cannot report a resting value.** Chromium reports its used value as the keyword `normal`
+    whenever no animation sets it, so the rest read produced no numbers, the reference's endpoints became empty, and
+    every arm reported itself. The property is now seated in the authored state the ruling scoped it to, used as a
+    fallback **only where a resting read is unavailable** — the pair arm keeps its shipped starting value, which is
+    what makes its comparison a comparison.
+
+**State.** No production code moved. Gate 17/17, 505 unit tests, 87/87 behaviour arms, `tsc` clean. The ledger carries
+the three routes as `migration-required` at route granularity, and the readings are in
+`scripts/position-necessity-series.json`.

@@ -126,6 +126,7 @@
     "research:d3-function-shell": "node scripts/research/d3-function-shell.mjs",
     "research:d3-residual": "node scripts/research/d3-residual.mjs",
     "research:d3-anchor-normal": "node scripts/research/d3-anchor-normal.mjs",
+    "research:d3-position-necessity": "node scripts/research/d3-position-necessity.mjs",
     "research:identity-collision": "node scripts/research/identity-collision.mjs",
     "candidate:diff": "node scripts/candidate-diff.mjs",
     "check": "node scripts/check.mjs",

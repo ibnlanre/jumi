@@ -28,15 +28,26 @@ export const cssNameOf = name => {
  * One native arm: a hand-written keyframe that animates the property between two whole values, on the element the
  * id names. No plugin is involved — this is the browser's own interpolation, which is the reference everything else
  * is a claim about.
+ *
+ * The timing function is a parameter because assuming `linear` produced a false finding: the plugin's default is
+ * `ease`, so a `linear` reference walks a different curve and every correctly interpolating route reads as
+ * `differs`. An arm that compares curves has to state which curve it is comparing against.
  */
-export const nativeSheet = ({ classes = [], from, id, property, to }) => {
+export const nativeSheet = ({
+  classes = [],
+  easing = 'linear',
+  from,
+  id,
+  property,
+  to,
+}) => {
   const name = id ?? `native-${cssNameOf(property)}`
   const property_name = cssNameOf(property)
 
   return {
     classes,
     css: `@keyframes ${name} { from { ${property_name}: ${from}; } to { ${property_name}: ${to}; } }
-#${name} { animation: ${name} ${DURATION}ms linear both; }`,
+#${name} { animation: ${name} ${DURATION}ms ${easing} both; }`,
     name,
     property: property_name,
   }

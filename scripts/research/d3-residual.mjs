@@ -93,6 +93,24 @@ const SETTLED = new Map([
     reason: 'D.3.9 survey: the public route animates the longhand directly (attribute === component, no parts) and its grammar is `any` over the discrete keywords repeat/no-repeat/space/round — there is no interpolable subject to reshape',
     research: 'keyword-discrete',
   }],
+  ['background-position', {
+    granularity: 'route',
+    production: 'defective',
+    reason: 'Gate B: the single-axis route emits whole-property keyframes whose sibling arm falls back to the two-token axis slot, so a lone axis composes a three-token <position> that is dropped at computed-value time and moves nothing; the pair route is native-equivalent',
+    research: 'migration-required',
+  }],
+  ['object-position', {
+    granularity: 'route',
+    production: 'defective',
+    reason: 'Gate B: same shape as `background-position` — inert alone on both axes, native-equivalent when the pair is authored, with the same `0% 0%`-for-a-dropped-declaration signature',
+    research: 'migration-required',
+  }],
+  ['offset-position', {
+    granularity: 'route',
+    production: 'defective',
+    reason: 'Gate B: same shape again, seated in an authored positional state because its resting read is the keyword `normal`; inert alone on both axes, native-equivalent as a pair',
+    research: 'migration-required',
+  }],
 ])
 
 /** Verdicts already recorded per route, so a family the pass could not observe says so instead of looking open. */
