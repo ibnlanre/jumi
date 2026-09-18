@@ -1,6 +1,6 @@
-import { describe, population } from '../lib/observation.mjs'
 // Aliased: this file has its own `declared` — the set of components the model declares a representation for.
 import { declared as declaredEvidence, proposed } from '../lib/evidence.mjs'
+import { describe, population } from '../lib/observation.mjs'
 import { bucketOf } from '../lib/property-model.mjs'
 
 /**

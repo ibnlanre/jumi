@@ -6,8 +6,8 @@ import {
   authoringPopulation,
   censusOf,
   censusPopulation,
-  chainsOf,
   chainOf,
+  chainsOf,
   describe as describePair,
   descriptorOf,
   executionLeaves,
@@ -196,7 +196,7 @@ describe('population coverage', () => {
     // 326 rather than 324: `offset-anchor`'s reshape declared its four authoring components — they are pairs
     // the family exposes and no longer pairs its composition reads — and its two execution leaves are not
     // population at all, so four arrive and two are refused rather than the graph simply growing.
-    expect(pairs).toHaveLength(330)
+    expect(pairs).toHaveLength(338)
     expect(new Set(pairs.map(one => one.parent)).size).toBe(104)
   })
 
@@ -207,7 +207,7 @@ describe('population coverage', () => {
     // which is the reshape doing what it says; the four authoring pairs arrive because the family now exposes
     // them, which it always did through the groups' own pairs and now declares at the family as well.
     expect(machinery).toHaveLength(21)
-    expect(reach).toHaveLength(309)
+    expect(reach).toHaveLength(317)
   })
 
   it('counts completeness as exactly the declared representations, placed', () => {
@@ -321,16 +321,24 @@ describe('the census population', () => {
 
   it('is the graph plus the declared surfaces, minus the machinery', () => {
     // Both relations are declared now, so the identity is stated with both halves non-empty rather than as
-    // "the rule is inert". The numbers are the accounting: the four authoring pairs are new to the population,
-    // the two execution leaves are refused, and the graph itself is unchanged at 324.
+    // "the rule is inert". The numbers are the accounting: the authoring pairs are new to the population, the
+    // execution leaves are refused (one per axis rather than one per route), and the graph is unchanged at 324.
+    //
+    // D.3.11 moved this from 10 to 22 by migrating `object-position` and `offset-position`, each of which declares
+    // the same six authoring components `background-position` does. 324 + (22 - 8) = 338 is the census, and that is
+    // the identity rather than a coincidence: the population plus the declared surfaces, minus the machinery.
     expect(population()).toHaveLength(324)
-    expect(authoringPopulation()).toHaveLength(10)
+    expect(authoringPopulation()).toHaveLength(22)
     expect([...executionLeaves()]).toEqual([
       'background-position-x-position',
       'background-position-y-position',
+      'object-position-x-position',
+      'object-position-y-position',
       'offset-anchor-x-position',
       'offset-anchor-y-position',
+      'offset-position-x-position',
+      'offset-position-y-position',
     ])
-    expect(censusPopulation()).toHaveLength(330)
+    expect(censusPopulation()).toHaveLength(338)
   })
 })

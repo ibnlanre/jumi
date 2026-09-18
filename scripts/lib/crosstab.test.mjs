@@ -16,7 +16,7 @@ describe('the descriptor × morphology tab', () => {
   const table = crossTab()
 
   it('holds the constituent population, machinery excluded', () => {
-    expect(table.constituents).toBe(309)
+    expect(table.constituents).toBe(317)
   })
 
   it('places every constituent pair exactly once', () => {
@@ -41,7 +41,7 @@ describe('the descriptor × morphology tab', () => {
     // whose columns disagreed would be a second reading of the vocabulary — the drift the pair key and the one
     // predicate exist to make impossible.
     expect(MORPHOLOGIES.map(name => table.columnTotal(name))).toEqual([
-      110, 103, 96,
+      114, 107, 96,
     ])
   })
 

@@ -89,7 +89,7 @@ export const PROBES = {
   '<angle>': ['45deg', '0.5turn'],
   // Space-free, and that is a requirement rather than a style: the probe ends up inside a *class attribute*
   // as well as inside a selector, so `rgba(0, 0, 255, 0.5)` splits into four class names and the element
-  // silently matches nothing. Measured — that is exactly how the second magnitude of every colour arm read
+  // silently matches none of them. Measured — that is exactly how the second magnitude of every colour arm read
   // `none` on its first run, with the emission and the representation both entirely innocent.
   '<color>': ['#ff0000', '#0000ff80'],
   '<integer>': ['2', '7'],

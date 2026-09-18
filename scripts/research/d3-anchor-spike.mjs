@@ -1,5 +1,4 @@
 import { writeFileSync } from 'node:fs'
-
 import { chromium } from 'playwright'
 
 import { normalizeAxis, normalizeOffsetAnchor } from '../lib/anchor.mjs'
@@ -36,43 +35,46 @@ import path from 'node:path'
 const WALL = [0, 250, 500, 750, 1000]
 
 /** The two execution leaves, named for what they are rather than for what an author writes. */
-const AXIS = { x: '--jumi-offset-anchor-x-position', y: '--jumi-offset-anchor-y-position' }
+const AXIS = {
+  x: '--jumi-offset-anchor-x-position',
+  y: '--jumi-offset-anchor-y-position',
+}
 
 const ROUTES = [
   {
     authored: ['50% 50%', '20% 80%'],
     klass: 'animate-offset-anchor',
     label: 'whole position',
-    normalize: value => normalizeOffsetAnchor(value),
     native: ['50% 50%', '20% 80%'],
+    normalize: value => normalizeOffsetAnchor(value),
   },
   {
     authored: ['left', 'right'],
     context: { xOffset: '0', yEdge: 'top', yOffset: '0' },
     klass: 'animate-offset-anchor-x-edge',
     label: 'x edge',
-    normalize: value => normalizeAxis(value, '0'),
     native: ['left 0 top 0', 'right 0 top 0'],
+    normalize: value => normalizeAxis(value, '0'),
   },
   {
     authored: ['10px', '30px'],
     context: { xEdge: 'left', xOffset: '0', yEdge: 'top' },
     klass: 'animate-offset-anchor-y-offset',
     label: 'y offset',
-    normalize: value => (value === '10px' ? value : value),
     native: ['left 0 top 10px', 'left 0 top 30px'],
+    normalize: value => (value === '10px' ? value : value),
   },
   {
     authored: ['left 10px', 'right 10px'],
     context: { yEdge: 'top', yOffset: '0' },
     klass: 'animate-offset-anchor-x',
     label: 'x/y compound',
+    native: ['left 10px top 0', 'right 10px top 0'],
     normalize: value => {
       const [edge, offset] = value.split(' ')
 
       return normalizeAxis(edge, offset)
     },
-    native: ['left 10px top 0', 'right 10px top 0'],
   },
 ]
 
@@ -94,7 +96,9 @@ const read = () =>
       })
 
       await new Promise(resolve => requestAnimationFrame(resolve))
-      values.push(getComputedStyle(node).getPropertyValue('offset-anchor').trim())
+      values.push(
+        getComputedStyle(node).getPropertyValue('offset-anchor').trim(),
+      )
     }
 
     return values
@@ -163,7 +167,7 @@ for (const route of ROUTES) {
   // Which axis a route moves is a fact about the route, not a convention, and the whole route normalizes to a
   // **pair** rather than to one component. Both were wrong in the first two runs of this spike, which reported
   // four mismatches that were entirely its own.
-  const moves = { 'x edge': 'x', 'x/y compound': 'x', 'y offset': 'y' }
+  const moves = { 'x/y compound': 'x', 'x edge': 'x', 'y offset': 'y' }
   const pair = route.label === 'whole position' ? endpoints : null
   const x = pair
     ? [pair[0][0], pair[1][0]]
@@ -194,12 +198,12 @@ for (const route of ROUTES) {
 
   routes.push({
     axes: { x, y },
+    bothAxes,
     equal,
     klass: route.klass,
     label: route.label,
     native: route.native,
     nativeSeries,
-    bothAxes,
     series,
   })
 
@@ -209,10 +213,14 @@ for (const route of ROUTES) {
     )
 
   if (!bothAxes)
-    failures.push(`${route.label}: the emission assigned one axis without the other`)
+    failures.push(
+      `${route.label}: the emission assigned one axis without the other`,
+    )
 
   if (new Set(nativeSeries).size <= 2)
-    failures.push(`${route.label}: the native arm does not interpolate, so nothing was compared`)
+    failures.push(
+      `${route.label}: the native arm does not interpolate, so nothing was compared`,
+    )
 }
 
 /** The decline boundary, and the resting-state correction, both measured. */
@@ -231,16 +239,22 @@ console.log('D.3.7 production spike · one representative per public route\n')
 for (const one of routes) {
   console.log(`── ${one.label}   (${one.klass}, unchanged)`)
   console.log(`   native       ${one.native[0]}  →  ${one.native[1]}`)
-  console.log(`   axes         x ${one.axes.x[0]} → ${one.axes.x[1]}   y ${one.axes.y[0]} → ${one.axes.y[1]}`)
+  console.log(
+    `   axes         x ${one.axes.x[0]} → ${one.axes.x[1]}   y ${one.axes.y[0]} → ${one.axes.y[1]}`,
+  )
   console.log(`   native       ${one.nativeSeries.join(' · ')}`)
   console.log(`   proposed     ${one.series.join(' · ')}`)
-  console.log(`   identical    ${one.equal ? 'yes' : 'NO'}      both axes assigned: ${one.bothAxes ? 'yes' : 'no'}`)
+  console.log(
+    `   identical    ${one.equal ? 'yes' : 'NO'}      both axes assigned: ${one.bothAxes ? 'yes' : 'no'}`,
+  )
   console.log()
 }
 
 console.log('the decline boundary:')
 for (const [value, result] of declines)
-  console.log(`  ${value.padEnd(20)} → ${result === null ? 'declines, so the whole route stays native' : `ACCEPTED ${result}`}`)
+  console.log(
+    `  ${value.padEnd(20)} → ${result === null ? 'declines, so the whole route stays native' : `ACCEPTED ${result}`}`,
+  )
 
 console.log('\nthe resting state:')
 console.log(`  today      center 0 center 0   → ${restingToday}`)
@@ -248,14 +262,19 @@ console.log(`  proposed   50% 50%             → ${restingProposed}`)
 console.log()
 
 for (const [value, result] of declines)
-  if (result !== null) failures.push(`${value}: the normalizer accepted a form it must decline`)
+  if (result !== null)
+    failures.push(`${value}: the normalizer accepted a form it must decline`)
 
 if (restingProposed === 'auto')
-  failures.push('the proposed resting composition does not compute, so the design is invalid at rest')
+  failures.push(
+    'the proposed resting composition does not compute, so the design is invalid at rest',
+  )
 
 const passed = routes.filter(one => one.equal && one.bothAxes).length
 
-console.log(`${passed}/${routes.length} routes reproduce native motion with both axes assigned`)
+console.log(
+  `${passed}/${routes.length} routes reproduce native motion with both axes assigned`,
+)
 
 if (failures.length) {
   console.log('\n✗ spike defects:')

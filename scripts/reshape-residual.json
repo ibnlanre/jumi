@@ -13,7 +13,7 @@
       ],
       "production": "unknown",
       "reason": "no pass has measured this family",
-      "research": "unmeasured",
+      "research": "no-candidate",
       "routeCount": 0
     },
     {
@@ -31,7 +31,7 @@
       ],
       "production": "unknown",
       "reason": "no pass has measured this family",
-      "research": "unmeasured",
+      "research": "no-candidate",
       "routeCount": 0
     },
     {
@@ -49,7 +49,7 @@
       ],
       "production": "unknown",
       "reason": "no pass has measured this family",
-      "research": "unmeasured",
+      "research": "no-candidate",
       "routeCount": 0
     },
     {
@@ -67,7 +67,7 @@
       ],
       "production": "unknown",
       "reason": "no pass has measured this family",
-      "research": "unmeasured",
+      "research": "no-candidate",
       "routeCount": 0
     },
     {
@@ -85,7 +85,7 @@
       ],
       "production": "unknown",
       "reason": "no pass has measured this family",
-      "research": "unmeasured",
+      "research": "no-candidate",
       "routeCount": 0
     },
     {
@@ -130,13 +130,10 @@
       "routeCount": 0
     },
     {
-      "candidates": 2,
+      "candidates": 0,
       "family": "background",
       "granularity": "pair",
-      "openPairs": [
-        "background-position",
-        "background-size"
-      ],
+      "openPairs": [],
       "pairCount": 3,
       "pairs": [
         "background-position",
@@ -144,27 +141,24 @@
         "background-size"
       ],
       "production": "unknown",
-      "reason": "1 of 3 pairs name a family that is already settled, so the family is open only for the rest",
-      "research": "unmeasured",
-      "routeCount": 2
+      "reason": "3 of 3 pairs name a family that is already settled, so the family is open only for the rest",
+      "research": "no-candidate",
+      "routeCount": 0
     },
     {
-      "candidates": 2,
+      "candidates": 0,
       "family": "background-position",
-      "granularity": "none",
-      "openPairs": [
-        "background-position-x",
-        "background-position-y"
-      ],
+      "granularity": "route",
+      "openPairs": [],
       "pairCount": 2,
       "pairs": [
         "background-position-x",
         "background-position-y"
       ],
-      "production": "unknown",
-      "reason": "no pass has measured this family",
-      "research": "unmeasured",
-      "routeCount": 2
+      "production": "migrated",
+      "reason": "D.3.9 (096ea5f): resolved-axis execution — each axis route writes a private <length-percentage> leaf, the property reads the resolved pair, whole and multilayer keep property-level execution; six routes inert before, six movable after",
+      "research": "migrated",
+      "routeCount": 0
     },
     {
       "candidates": 0,
@@ -179,26 +173,23 @@
       ],
       "production": "unknown",
       "reason": "no pass has measured this family",
-      "research": "unmeasured",
+      "research": "no-candidate",
       "routeCount": 0
     },
     {
-      "candidates": 2,
+      "candidates": 0,
       "family": "border-image",
-      "granularity": "none",
-      "openPairs": [
-        "border-image-outset",
-        "border-image-repeat"
-      ],
+      "granularity": "route",
+      "openPairs": [],
       "pairCount": 2,
       "pairs": [
         "border-image-outset",
         "border-image-repeat"
       ],
-      "production": "unknown",
-      "reason": "no pass has measured this family",
-      "research": "unmeasured",
-      "routeCount": 2
+      "production": "native",
+      "reason": "Gate B and Gate A with a native reference: every single-value route (number and length) is sample-for-sample native; multi-value spellings emit nothing, which is route reach rather than interpolation",
+      "research": "safe-no-need",
+      "routeCount": 0
     },
     {
       "candidates": 0,
@@ -213,7 +204,7 @@
       ],
       "production": "unknown",
       "reason": "no pass has measured this family",
-      "research": "unmeasured",
+      "research": "no-candidate",
       "routeCount": 0
     },
     {
@@ -231,7 +222,7 @@
       ],
       "production": "unknown",
       "reason": "no pass has measured this family",
-      "research": "unmeasured",
+      "research": "no-candidate",
       "routeCount": 0
     },
     {
@@ -338,40 +329,34 @@
       "routeCount": 0
     },
     {
-      "candidates": 2,
+      "candidates": 0,
       "family": "object-position",
-      "granularity": "none",
-      "openPairs": [
-        "object-position-x",
-        "object-position-y"
-      ],
+      "granularity": "route",
+      "openPairs": [],
       "pairCount": 2,
       "pairs": [
         "object-position-x",
         "object-position-y"
       ],
-      "production": "unknown",
-      "reason": "no pass has measured this family",
-      "research": "unmeasured",
-      "routeCount": 2
+      "production": "migrated",
+      "reason": "D.3.11: resolved-axis execution, the same repair as `background-position` — each axis route writes a private <length-percentage> leaf and the property reads the resolved pair. Six routes: four movable (x, y, and both offsets) and the two edge routes equivalent-no-op, their endpoint `calc(100% - 50%)` native-equal to the resting `50%`, proved against a native reference that is flat where the discriminating control moves",
+      "research": "migrated",
+      "routeCount": 0
     },
     {
-      "candidates": 2,
+      "candidates": 0,
       "family": "offset-position",
-      "granularity": "none",
-      "openPairs": [
-        "offset-position-x",
-        "offset-position-y"
-      ],
+      "granularity": "route",
+      "openPairs": [],
       "pairCount": 2,
       "pairs": [
         "offset-position-x",
         "offset-position-y"
       ],
-      "production": "unknown",
-      "reason": "no pass has measured this family",
-      "research": "unmeasured",
-      "routeCount": 2
+      "production": "migrated",
+      "reason": "D.3.11: resolved-axis execution again, with the same split — four movable routes and two equivalent-no-op edge routes. `normal` survives because the constituent path compiles no unconditional declaration, so an unauthored value is never asserted over",
+      "research": "migrated",
+      "routeCount": 0
     },
     {
       "candidates": 0,
@@ -407,31 +392,25 @@
       "routeCount": 0
     },
     {
-      "candidates": 2,
+      "candidates": 0,
       "family": "skew",
-      "granularity": "none",
-      "openPairs": [
-        "skew-x",
-        "skew-y"
-      ],
+      "granularity": "family",
+      "openPairs": [],
       "pairCount": 2,
       "pairs": [
         "skew-x",
         "skew-y"
       ],
-      "production": "unknown",
-      "reason": "no pass has measured this family",
-      "research": "unmeasured",
-      "routeCount": 2
+      "production": "native",
+      "reason": "Gate B: interpolates to the named matrix, linearly and exactly (tan of the angle) — separable and unnecessary",
+      "research": "safe-no-need",
+      "routeCount": 0
     },
     {
-      "candidates": 1,
+      "candidates": 0,
       "family": "transform",
       "granularity": "pair",
-      "openPairs": [
-        "perspective-3d",
-        "skew"
-      ],
+      "openPairs": [],
       "pairCount": 7,
       "pairs": [
         "perspective-3d",
@@ -443,9 +422,9 @@
         "translate-3d"
       ],
       "production": "unknown",
-      "reason": "5 of 7 pairs name a family that is already settled, so the family is open only for the rest",
-      "research": "unmeasured",
-      "routeCount": 1
+      "reason": "7 of 7 pairs name a family that is already settled, so the family is open only for the rest",
+      "research": "no-candidate",
+      "routeCount": 0
     },
     {
       "candidates": 0,
@@ -465,281 +444,10 @@
     }
   ],
   "tally": {
-    "unmeasured": 15,
-    "safe-no-need": 6,
-    "migrated": 1,
+    "no-candidate": 10,
+    "safe-no-need": 8,
+    "migrated": 4,
     "coupled-native": 3
   },
-  "unmeasured": [
-    {
-      "candidates": 2,
-      "family": "background",
-      "granularity": "pair",
-      "openPairs": [
-        "background-position",
-        "background-size"
-      ],
-      "pairCount": 3,
-      "pairs": [
-        "background-position",
-        "background-repeat",
-        "background-size"
-      ],
-      "production": "unknown",
-      "reason": "1 of 3 pairs name a family that is already settled, so the family is open only for the rest",
-      "research": "unmeasured",
-      "routeCount": 2
-    },
-    {
-      "candidates": 2,
-      "family": "background-position",
-      "granularity": "none",
-      "openPairs": [
-        "background-position-x",
-        "background-position-y"
-      ],
-      "pairCount": 2,
-      "pairs": [
-        "background-position-x",
-        "background-position-y"
-      ],
-      "production": "unknown",
-      "reason": "no pass has measured this family",
-      "research": "unmeasured",
-      "routeCount": 2
-    },
-    {
-      "candidates": 2,
-      "family": "border-image",
-      "granularity": "none",
-      "openPairs": [
-        "border-image-outset",
-        "border-image-repeat"
-      ],
-      "pairCount": 2,
-      "pairs": [
-        "border-image-outset",
-        "border-image-repeat"
-      ],
-      "production": "unknown",
-      "reason": "no pass has measured this family",
-      "research": "unmeasured",
-      "routeCount": 2
-    },
-    {
-      "candidates": 2,
-      "family": "object-position",
-      "granularity": "none",
-      "openPairs": [
-        "object-position-x",
-        "object-position-y"
-      ],
-      "pairCount": 2,
-      "pairs": [
-        "object-position-x",
-        "object-position-y"
-      ],
-      "production": "unknown",
-      "reason": "no pass has measured this family",
-      "research": "unmeasured",
-      "routeCount": 2
-    },
-    {
-      "candidates": 2,
-      "family": "offset-position",
-      "granularity": "none",
-      "openPairs": [
-        "offset-position-x",
-        "offset-position-y"
-      ],
-      "pairCount": 2,
-      "pairs": [
-        "offset-position-x",
-        "offset-position-y"
-      ],
-      "production": "unknown",
-      "reason": "no pass has measured this family",
-      "research": "unmeasured",
-      "routeCount": 2
-    },
-    {
-      "candidates": 2,
-      "family": "skew",
-      "granularity": "none",
-      "openPairs": [
-        "skew-x",
-        "skew-y"
-      ],
-      "pairCount": 2,
-      "pairs": [
-        "skew-x",
-        "skew-y"
-      ],
-      "production": "unknown",
-      "reason": "no pass has measured this family",
-      "research": "unmeasured",
-      "routeCount": 2
-    },
-    {
-      "candidates": 1,
-      "family": "transform",
-      "granularity": "pair",
-      "openPairs": [
-        "perspective-3d",
-        "skew"
-      ],
-      "pairCount": 7,
-      "pairs": [
-        "perspective-3d",
-        "matrix",
-        "matrix-3d",
-        "rotate-3d",
-        "scale-3d",
-        "skew",
-        "translate-3d"
-      ],
-      "production": "unknown",
-      "reason": "5 of 7 pairs name a family that is already settled, so the family is open only for the rest",
-      "research": "unmeasured",
-      "routeCount": 1
-    },
-    {
-      "candidates": 0,
-      "family": "animation-range",
-      "granularity": "none",
-      "openPairs": [
-        "animation-range-start",
-        "animation-range-end"
-      ],
-      "pairCount": 2,
-      "pairs": [
-        "animation-range-start",
-        "animation-range-end"
-      ],
-      "production": "unknown",
-      "reason": "no pass has measured this family",
-      "research": "unmeasured",
-      "routeCount": 0
-    },
-    {
-      "candidates": 0,
-      "family": "animation-timeline",
-      "granularity": "none",
-      "openPairs": [
-        "animation-timeline-scroll",
-        "animation-timeline-view"
-      ],
-      "pairCount": 2,
-      "pairs": [
-        "animation-timeline-scroll",
-        "animation-timeline-view"
-      ],
-      "production": "unknown",
-      "reason": "no pass has measured this family",
-      "research": "unmeasured",
-      "routeCount": 0
-    },
-    {
-      "candidates": 0,
-      "family": "animation-timeline-scroll",
-      "granularity": "none",
-      "openPairs": [
-        "animation-timeline-scroller",
-        "animation-timeline-axis"
-      ],
-      "pairCount": 2,
-      "pairs": [
-        "animation-timeline-scroller",
-        "animation-timeline-axis"
-      ],
-      "production": "unknown",
-      "reason": "no pass has measured this family",
-      "research": "unmeasured",
-      "routeCount": 0
-    },
-    {
-      "candidates": 0,
-      "family": "animation-timeline-view",
-      "granularity": "none",
-      "openPairs": [
-        "animation-timeline-axis",
-        "animation-timeline-inset"
-      ],
-      "pairCount": 2,
-      "pairs": [
-        "animation-timeline-axis",
-        "animation-timeline-inset"
-      ],
-      "production": "unknown",
-      "reason": "no pass has measured this family",
-      "research": "unmeasured",
-      "routeCount": 0
-    },
-    {
-      "candidates": 0,
-      "family": "box-shadow",
-      "granularity": "none",
-      "openPairs": [
-        "box-shadow-inset",
-        "box-shadow-outset"
-      ],
-      "pairCount": 2,
-      "pairs": [
-        "box-shadow-inset",
-        "box-shadow-outset"
-      ],
-      "production": "unknown",
-      "reason": "no pass has measured this family",
-      "research": "unmeasured",
-      "routeCount": 0
-    },
-    {
-      "candidates": 0,
-      "family": "animation",
-      "granularity": "none",
-      "openPairs": [
-        "animation-delay"
-      ],
-      "pairCount": 1,
-      "pairs": [
-        "animation-delay"
-      ],
-      "production": "unknown",
-      "reason": "no pass has measured this family",
-      "research": "unmeasured",
-      "routeCount": 0
-    },
-    {
-      "candidates": 0,
-      "family": "border-block",
-      "granularity": "none",
-      "openPairs": [
-        "border-block-width"
-      ],
-      "pairCount": 1,
-      "pairs": [
-        "border-block-width"
-      ],
-      "production": "unknown",
-      "reason": "no pass has measured this family",
-      "research": "unmeasured",
-      "routeCount": 0
-    },
-    {
-      "candidates": 0,
-      "family": "border-inline",
-      "granularity": "none",
-      "openPairs": [
-        "border-inline-width"
-      ],
-      "pairCount": 1,
-      "pairs": [
-        "border-inline-width"
-      ],
-      "production": "unknown",
-      "reason": "no pass has measured this family",
-      "research": "unmeasured",
-      "routeCount": 0
-    }
-  ]
+  "unmeasured": []
 }

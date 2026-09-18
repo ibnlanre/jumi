@@ -324,35 +324,27 @@ const seriesOf = async sheets => {
  */
 const EXTRA_ARMS = [
   {
+    extra: [
+      { from: '1', slot: '--jumi-d38-s3-scale-y', syntax: '<number>', to: '3' },
+      {
+        from: '1',
+        slot: '--jumi-d38-s3-scale-z',
+        syntax: '<number>',
+        to: '0.5',
+      },
+    ],
     // **All three** components, because the criterion is family-level separability: the strongest realistic
     // combination has to survive, not merely `x + y`.
     family: 'scale3d (x + y + z)',
     kind: 'simultaneous',
+    leaf: { from: '1', to: '2' },
     native: { from: 'scale3d(1, 1, 1)', to: 'scale3d(2, 3, 0.5)' },
-    slot: '--jumi-d38-s3-scale-x',
-    syntax: '<number>',
     shell:
       'scale3d(var(--jumi-d38-s3-scale-x), var(--jumi-d38-s3-scale-y), var(--jumi-d38-s3-scale-z))',
-    leaf: { from: '1', to: '2' },
-    extra: [
-      { from: '1', slot: '--jumi-d38-s3-scale-y', syntax: '<number>', to: '3' },
-      { from: '1', slot: '--jumi-d38-s3-scale-z', syntax: '<number>', to: '0.5' },
-    ],
+    slot: '--jumi-d38-s3-scale-x',
+    syntax: '<number>',
   },
   {
-    // The richest grammar the candidates carry — `<length>` and `<percentage>` side by side — because a difference
-    // that only appears when two units are interpolated together is the kind this pass exists to find.
-    family: 'translate3d (x + y + z, mixed)',
-    kind: 'simultaneous',
-    native: {
-      from: 'translate3d(0%, 0px, 0px)',
-      to: 'translate3d(50%, 40px, 20px)',
-    },
-    slot: '--jumi-d38-s3-translate-x',
-    syntax: '<length-percentage>',
-    shell:
-      'translate3d(var(--jumi-d38-s3-translate-x), var(--jumi-d38-s3-translate-y), var(--jumi-d38-s3-translate-z))',
-    leaf: { from: '0%', to: '50%' },
     extra: [
       {
         from: '0px',
@@ -367,43 +359,56 @@ const EXTRA_ARMS = [
         to: '20px',
       },
     ],
+    // The richest grammar the candidates carry — `<length>` and `<percentage>` side by side — because a difference
+    // that only appears when two units are interpolated together is the kind this pass exists to find.
+    family: 'translate3d (x + y + z, mixed)',
+    kind: 'simultaneous',
+    leaf: { from: '0%', to: '50%' },
+    native: {
+      from: 'translate3d(0%, 0px, 0px)',
+      to: 'translate3d(50%, 40px, 20px)',
+    },
+    shell:
+      'translate3d(var(--jumi-d38-s3-translate-x), var(--jumi-d38-s3-translate-y), var(--jumi-d38-s3-translate-z))',
+    slot: '--jumi-d38-s3-translate-x',
+    syntax: '<length-percentage>',
   },
   {
     // `matrix` is measured **independently**: `matrix3d` being falsified is a reason to distrust it, not evidence
     // about the 2-D function, which has its own decomposition. Three arms — the control and both adversarial shapes.
     family: 'matrix (coefficient)',
+    leaf: { from: '1', to: '2' },
     native: { from: IDENTITY2, to: 'matrix(2, 0, 0, 1, 0, 0)' },
+    shell: 'matrix(var(--jumi-d38-m2-a), 0, 0, 1, 0, 0)',
     slot: '--jumi-d38-m2-a',
     syntax: '<number>',
-    shell: 'matrix(var(--jumi-d38-m2-a), 0, 0, 1, 0, 0)',
-    leaf: { from: '1', to: '2' },
   },
   {
-    family: 'matrix (scale + shear)',
-    kind: 'simultaneous',
-    native: { from: IDENTITY2, to: 'matrix(2, 0.5, 0, 1, 0, 0)' },
-    slot: '--jumi-d38-m2-sa',
-    syntax: '<number>',
-    shell: 'matrix(var(--jumi-d38-m2-sa), var(--jumi-d38-m2-sb), 0, 1, 0, 0)',
-    leaf: { from: '1', to: '2' },
     extra: [
       { from: '0', slot: '--jumi-d38-m2-sb', syntax: '<number>', to: '0.5' },
     ],
+    family: 'matrix (scale + shear)',
+    kind: 'simultaneous',
+    leaf: { from: '1', to: '2' },
+    native: { from: IDENTITY2, to: 'matrix(2, 0.5, 0, 1, 0, 0)' },
+    shell: 'matrix(var(--jumi-d38-m2-sa), var(--jumi-d38-m2-sb), 0, 1, 0, 0)',
+    slot: '--jumi-d38-m2-sa',
+    syntax: '<number>',
   },
   {
-    family: 'matrix (rotation-like)',
-    kind: 'simultaneous',
-    native: { from: IDENTITY2, to: 'matrix(0, 1, -1, 0, 0, 0)' },
-    slot: '--jumi-d38-m2-r1',
-    syntax: '<number>',
-    shell:
-      'matrix(var(--jumi-d38-m2-r1), var(--jumi-d38-m2-r2), var(--jumi-d38-m2-r3), var(--jumi-d38-m2-r4), 0, 0)',
-    leaf: { from: '1', to: '0' },
     extra: [
       { from: '0', slot: '--jumi-d38-m2-r2', syntax: '<number>', to: '1' },
       { from: '0', slot: '--jumi-d38-m2-r3', syntax: '<number>', to: '-1' },
       { from: '1', slot: '--jumi-d38-m2-r4', syntax: '<number>', to: '0' },
     ],
+    family: 'matrix (rotation-like)',
+    kind: 'simultaneous',
+    leaf: { from: '1', to: '0' },
+    native: { from: IDENTITY2, to: 'matrix(0, 1, -1, 0, 0, 0)' },
+    shell:
+      'matrix(var(--jumi-d38-m2-r1), var(--jumi-d38-m2-r2), var(--jumi-d38-m2-r3), var(--jumi-d38-m2-r4), 0, 0)',
+    slot: '--jumi-d38-m2-r1',
+    syntax: '<number>',
   },
 ]
 
@@ -466,7 +471,7 @@ const target = path.join(root, 'scripts', 'function-argument-series.json')
 
 fs.writeFileSync(
   target,
-  `${JSON.stringify({ families, source: 'scripts/research/d3-function-shell.mjs', wall: WALL, records }, null, 2)}\n`,
+  `${JSON.stringify({ families, records, source: 'scripts/research/d3-function-shell.mjs', wall: WALL }, null, 2)}\n`,
 )
 
 const truthy = value => (value ? 'yes' : 'no')

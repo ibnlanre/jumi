@@ -25,14 +25,16 @@
  * Run: `pnpm research:d3-position-necessity` (exits non-zero only on an arm defect, never on a finding).
  */
 import { chromium } from 'playwright'
+
+import { cssNameOf, nativeSheet } from '../lib/frames.mjs'
+import { readCandidates } from '../lib/property-model.mjs'
+import { earned } from '../lib/sources.mjs'
+
 import fs from 'node:fs'
 import path from 'node:path'
 
 import * as compileLib from '../lib/compile.mjs'
 import * as cssLib from '../lib/css.mjs'
-import { cssNameOf, nativeSheet } from '../lib/frames.mjs'
-import { earned } from '../lib/sources.mjs'
-import { readCandidates } from '../lib/property-model.mjs'
 
 const { compiler } = compileLib
 const finalizeCss = compileLib.finalizeCss ?? cssLib.finalizeCss
@@ -41,7 +43,12 @@ const root = path.resolve(import.meta.dirname, '..', '..')
 const WALL = [0, 250, 500, 750, 1000]
 const ENTRY = `\n@import "tailwindcss" source(none);\n@plugin "${path.join(root, 'dist', 'index.js')}";\n`
 
-const PROPERTIES = ['background-position', 'object-position', 'offset-position', 'background-size']
+const PROPERTIES = [
+  'background-position',
+  'object-position',
+  'offset-position',
+  'background-size',
+]
 const CONDITIONS = [
   { axis: 0, name: 'x only', part: 'x' },
   { axis: 1, name: 'y only', part: 'y' },
@@ -51,7 +58,8 @@ const CONDITIONS = [
 /** The authored positional state `offset-position` is seated in, because its resting read is `normal`. */
 const SEATED = { 'offset-position': ['50%', '50%'] }
 
-const attributeOf = attribute => attribute.replace(/-([a-z])/g, (_, one) => one.toUpperCase())
+const attributeOf = attribute =>
+  attribute.replace(/-([a-z])/g, (_, one) => one.toUpperCase())
 const table = new Map(readCandidates().map(one => [one.name, one]))
 
 const browser = await chromium.launch()
@@ -111,7 +119,7 @@ const readSeries = async (css, sheets, property) => {
 }
 
 /** The numbers in a computed position or size, so two series can be compared on the axis that moved. */
-const numbersOf = value => (String(value).match(/-?[\d.]+%?/g) ?? [])
+const numbersOf = value => String(value).match(/-?[\d.]+%?/g) ?? []
 
 const records = []
 
@@ -143,8 +151,9 @@ for (const attribute of PROPERTIES) {
      * different curve than the route it is judging reports the curve, not the route.
      */
     const easing =
-      /--jumi-animation-timing-function:\s*([^;]+);/.exec(shipped)?.[1]?.trim() ??
-      'linear'
+      /--jumi-animation-timing-function:\s*([^;]+);/
+        .exec(shipped)?.[1]
+        ?.trim() ?? 'linear'
 
     /**
      * `offset-position` rests at `normal`, which does not interpolate with a length, and Chromium reports the used
@@ -190,10 +199,7 @@ for (const attribute of PROPERTIES) {
 
     const readings = await readSeries(
       `${shipped}\n${seating}\n${reference.css}`,
-      [
-        { classes, id: 'probe' },
-        { id: reference.name },
-      ],
+      [{ classes, id: 'probe' }, { id: reference.name }],
       observed,
     )
     const shippedSeries = readings.probe.series
@@ -222,9 +228,9 @@ for (const attribute of PROPERTIES) {
      * the emission rather than a timing artefact, which is what the classification has to rest on.
      */
     const keyframe = /@keyframes[^{]+\{([\s\S]*?)\n\}/.exec(shipped)?.[1] ?? ''
-    const stop = [
-      ...keyframe.matchAll(/([a-z-]+):\s*([^;]+);/g),
-    ].filter(one => one[1] === cssNameOf(observed)).at(-1)
+    const stop = [...keyframe.matchAll(/([a-z-]+):\s*([^;]+);/g)]
+      .filter(one => one[1] === cssNameOf(observed))
+      .at(-1)
     const isolated = stop
       ? await readSeries(
           `${shipped}\n#isolated { animation: none; ${stop[1]}: ${stop[2]}; }\n`,
@@ -233,10 +239,12 @@ for (const attribute of PROPERTIES) {
         )
       : null
     const mechanism = stop
-      ? { declaration: `${stop[1]}: ${stop[2].trim()}`, computed: isolated.isolated.series[0] }
+      ? {
+          computed: isolated.isolated.series[0],
+          declaration: `${stop[1]}: ${stop[2].trim()}`,
+        }
       : null
-    const movedAxis = offset =>
-      numbersOf(shippedSeries[offset]).slice(0, 2)
+    const movedAxis = offset => numbersOf(shippedSeries[offset]).slice(0, 2)
     const referenceAxis = offset =>
       numbersOf(referenceSeries[offset]).slice(0, 2)
     const agrees = shippedSeries.every((_, at) => {
@@ -255,8 +263,8 @@ for (const attribute of PROPERTIES) {
       easing,
       mechanism,
       property: attribute,
-      resting: restRead.probe.series[0],
       reference: referenceSeries,
+      resting: restRead.probe.series[0],
       shipped: shippedSeries,
       verdict:
         !emitted || !referenceMoved
@@ -276,7 +284,7 @@ const target = path.join(root, 'scripts', 'position-necessity-series.json')
 
 fs.writeFileSync(
   target,
-  `${JSON.stringify({ source: 'scripts/research/d3-position-necessity.mjs', wall: WALL, records }, null, 2)}\n`,
+  `${JSON.stringify({ records, source: 'scripts/research/d3-position-necessity.mjs', wall: WALL }, null, 2)}\n`,
 )
 
 for (const one of records) {
@@ -290,7 +298,9 @@ for (const one of records) {
     )
 
   if (one.mechanism)
-    console.log(`    mechanism \`${one.mechanism.declaration}\` → ${one.mechanism.computed}`)
+    console.log(
+      `    mechanism \`${one.mechanism.declaration}\` → ${one.mechanism.computed}`,
+    )
 }
 
 console.log(`\nwritten to \`${path.relative(root, target)}\``)

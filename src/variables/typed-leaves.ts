@@ -331,9 +331,25 @@ export const typedLeaves: Partial<
       initialValue: '50%',
       syntax: '<percentage>',
     },
+    /**
+     * The two **resolved axis** execution leaves, and the concrete rests are this family's own semantics: the property
+     * rests at `50% 50%` whether or not anything authors a position, so the shell asserts what the browser already
+     * computes. That is the difference from `offset-position`, whose rest is a keyword and whose assertion therefore has
+     * to stay route-owned.
+     */
+    'object-position-x-position': {
+      execution: true,
+      initialValue: '50%',
+      syntax: '<length-percentage>',
+    },
     'object-position-y-offset': {
       initialValue: '50%',
       syntax: '<percentage>',
+    },
+    'object-position-y-position': {
+      execution: true,
+      initialValue: '50%',
+      syntax: '<length-percentage>',
     },
   },
   /**
@@ -365,9 +381,29 @@ export const typedLeaves: Partial<
       initialValue: '50%',
       syntax: '<percentage>',
     },
+    /**
+     * The two **resolved axis** execution leaves, and the family's keyword rest survives them untouched.
+     *
+     * A registered leaf always has a value, so the concern was that a resolved pair asserted family-wide would turn an
+     * untouched `offset-position` from `normal` into a concrete position. Measured against the **compiled** output, that
+     * was never the architecture: this property is declared only inside the frames an authored route emits, so an
+     * element with no route carries no declaration and the browser keeps its own `normal`. The rule holds in general —
+     * a registered leaf changes observable semantics only where compiled CSS actually asserts the property — and the
+     * authority for it is the emission, not a hand-written reproduction.
+     */
+    'offset-position-x-position': {
+      execution: true,
+      initialValue: '50%',
+      syntax: '<length-percentage>',
+    },
     'offset-position-y-offset': {
       initialValue: '50%',
       syntax: '<percentage>',
+    },
+    'offset-position-y-position': {
+      execution: true,
+      initialValue: '50%',
+      syntax: '<length-percentage>',
     },
   },
   'outline': {
@@ -845,16 +881,30 @@ export const axisPosition = (edge: string, offset: string): null | string => {
   return null
 }
 
-/** The axis prefixes a positional family's public components are named on. */
-const AXIS_PREFIX = {
-  x: 'background-position-x',
-  y: 'background-position-y',
-} as const
+/**
+ * The axis prefixes each positional family's public components are named on.
+ *
+ * One table and three consumers, which is the threshold rather than a rule: the families address the same six
+ * components on their own prefixes and differ only in what their rests mean, so the mapping is data instead of a
+ * function per family. Nothing wider — each family still declares its own resolver and its own execution leaves.
+ */
+const AXIS_PREFIX: Record<string, { x: string; y: string }> = {
+  'background-position': {
+    x: 'background-position-x',
+    y: 'background-position-y',
+  },
+  'object-position': { x: 'object-position-x', y: 'object-position-y' },
+  'offset-position': { x: 'offset-position-x', y: 'offset-position-y' },
+}
 
-/** Which axis a public position component addresses, or `null` for a component that addresses neither. */
-const axisOf = (component: string): 'x' | 'y' | null => {
+/** Which axis a public position component addresses **within a family**, or `null` to decline it. */
+const axisOf = (family: string, component: string): 'x' | 'y' | null => {
+  const prefixes = AXIS_PREFIX[family]
+
+  if (!prefixes) return null
+
   for (const axis of ['x', 'y'] as const) {
-    const prefix = AXIS_PREFIX[axis]
+    const prefix = prefixes[axis]
 
     if (
       component === prefix ||
@@ -986,9 +1036,11 @@ export const typedExecutions: Partial<Record<PropertyType, TypedExecution>> = {
      * names is the complete assignment that route requires.
      */
     assigns: component => {
-      const axis = axisOf(component)
+      const axis = axisOf('background-position', component)
 
-      return axis ? [`${AXIS_PREFIX[axis]}-position`] : []
+      return axis
+        ? [`${AXIS_PREFIX['background-position'][axis]}-position`]
+        : []
     },
     authoring: [
       'background-position-x',
@@ -999,11 +1051,11 @@ export const typedExecutions: Partial<Record<PropertyType, TypedExecution>> = {
       'background-position-y-offset',
     ],
     constituent: (component, value, authoring) => {
-      const axis = axisOf(component)
+      const axis = axisOf('background-position', component)
 
       if (!axis) return null
 
-      const prefix = AXIS_PREFIX[axis]
+      const prefix = AXIS_PREFIX['background-position'][axis]
 
       /**
        * Two entrances, one normalization. The axis route carries its endpoint in the authored value; an edge or an
@@ -1018,6 +1070,45 @@ export const typedExecutions: Partial<Record<PropertyType, TypedExecution>> = {
 
       // The measured clauses decide the resolved component, and they decline what they cannot read: an unknown
       // edge, a `center` over a non-zero offset, a `var()` nothing can resolve at build time.
+      const resolved = axisPosition(edge, offset)
+
+      return resolved === null ? null : [[`${prefix}-position`, resolved]]
+    },
+  },
+  /**
+   * `object-position` — the same resolved-axis repair, and its rests are concrete.
+   *
+   * The property rests at `50% 50%` whether or not anything authors a position, so the resolved pair asserts what the
+   * browser already computes and the family's resting semantics survive the migration unchanged. Nothing else about
+   * the shape differs from `background-position`: authoring stays edge and offset, execution is one resolved leaf per
+   * moving axis, and the whole route keeps its property-level execution because no `whole` is declared.
+   */
+  'object-position': {
+    assigns: component => {
+      const axis = axisOf('object-position', component)
+
+      return axis ? [`${AXIS_PREFIX['object-position'][axis]}-position`] : []
+    },
+    authoring: [
+      'object-position-x',
+      'object-position-x-edge',
+      'object-position-x-offset',
+      'object-position-y',
+      'object-position-y-edge',
+      'object-position-y-offset',
+    ],
+    constituent: (component, value, authoring) => {
+      const axis = axisOf('object-position', component)
+
+      if (!axis) return null
+
+      const prefix = AXIS_PREFIX['object-position'][axis]
+      const endpoint = component === prefix ? axisEndpoint(axis, value) : null
+      const edge = endpoint ? endpoint.edge : authoring[`${prefix}-edge`]
+      const offset = endpoint ? endpoint.offset : authoring[`${prefix}-offset`]
+
+      if (edge === undefined || offset === undefined) return null
+
       const resolved = axisPosition(edge, offset)
 
       return resolved === null ? null : [[`${prefix}-position`, resolved]]
@@ -1072,6 +1163,47 @@ export const typedExecutions: Partial<Record<PropertyType, TypedExecution>> = {
         : null
     },
     whole: value => positionComponents(value),
+  },
+  /**
+   * `offset-position` — the same repair, with the one family-specific fact that made it a question.
+   *
+   * Its resting value is the keyword `normal`, and a registered `<length-percentage>` leaf always holds a value, so a
+   * resolved pair asserted *family-wide* would have turned an untouched element into a concrete position. Measured
+   * against the **compiled** output rather than a hand-written reproduction, that was never the architecture: this
+   * property is declared only inside the frames an authored route emits, so an element carrying no route carries no
+   * declaration and the browser keeps its own `normal`. The leaves are therefore ordinary resolved leaves, and the
+   * route-owned assertion is the invariant the proof pins.
+   */
+  'offset-position': {
+    assigns: component => {
+      const axis = axisOf('offset-position', component)
+
+      return axis ? [`${AXIS_PREFIX['offset-position'][axis]}-position`] : []
+    },
+    authoring: [
+      'offset-position-x',
+      'offset-position-x-edge',
+      'offset-position-x-offset',
+      'offset-position-y',
+      'offset-position-y-edge',
+      'offset-position-y-offset',
+    ],
+    constituent: (component, value, authoring) => {
+      const axis = axisOf('offset-position', component)
+
+      if (!axis) return null
+
+      const prefix = AXIS_PREFIX['offset-position'][axis]
+      const endpoint = component === prefix ? axisEndpoint(axis, value) : null
+      const edge = endpoint ? endpoint.edge : authoring[`${prefix}-edge`]
+      const offset = endpoint ? endpoint.offset : authoring[`${prefix}-offset`]
+
+      if (edge === undefined || offset === undefined) return null
+
+      const resolved = axisPosition(edge, offset)
+
+      return resolved === null ? null : [[`${prefix}-position`, resolved]]
+    },
   },
   'scale': {
     whole: value => {

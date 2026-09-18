@@ -2,14 +2,14 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { chromium } from 'playwright'
 
 import { compiler, finalizeCss, root } from '../lib/compile.mjs'
-import { SYNTAX_OF, derive } from '../lib/derivation.mjs'
+import { derive, SYNTAX_OF } from '../lib/derivation.mjs'
 import { applicationOf, population } from '../lib/observation.mjs'
 import {
   FUNCTION,
   readCandidates,
   readPropertyEntries,
 } from '../lib/property-model.mjs'
-import { PROBES, plans, routesOf } from '../lib/validation.mjs'
+import { plans, PROBES, routesOf } from '../lib/validation.mjs'
 
 import path from 'node:path'
 
@@ -274,7 +274,8 @@ const page = await browser.newPage()
  * and refusing it is the honest answer rather than treating the whole list as one argument.
  */
 const argumentOf = (value, shell) => {
-  if (!shell || !value.startsWith(`${shell}(`) || !value.endsWith(')')) return null
+  if (!shell || !value.startsWith(`${shell}(`) || !value.endsWith(')'))
+    return null
 
   const inner = value.slice(shell.length + 1, -1).trim()
 
@@ -398,7 +399,6 @@ for (const plan of plans()) {
   const emitted = await series(plan.klass, plan.consumer, sheet, tag)
   const moved = await series(plan.klass, plan.consumer, proposal.css, tag)
 
-
   // The canary: pin the leaf to the far frame and ask whether the consumer *deviates* from its unpinned
   // reading. A pin holds the animation off, so it is constant by construction — the first version of this
   // test asked for variation over the wall and so reported every working pin as blindness. What it has to
@@ -419,8 +419,7 @@ for (const plan of plans()) {
     probe: plan.probe,
   })
 
-  if (verdict.failure)
-    failures.push(`${plan.component}: ${verdict.failure}`)
+  if (verdict.failure) failures.push(`${plan.component}: ${verdict.failure}`)
   else
     findings.push({
       ...recordOf(plan, one, { emitted, moved, pinned }),
@@ -459,8 +458,8 @@ for (const leaf of REPRESENTATIVES) {
   const one = byLeaf.get(leaf)
   const pair = population().find(entry => entry.component === leaf)
   const route = pair ? routesOf(pair)[0] : null
-  const types = candidates.find(entry => (entry.parts ?? []).includes(leaf))
-    ?.types ?? []
+  const types =
+    candidates.find(entry => (entry.parts ?? []).includes(leaf))?.types ?? []
   const syntaxes = [
     ...new Set(types.map(type => SYNTAX_OF[type]).filter(Boolean)),
   ]
@@ -471,23 +470,22 @@ for (const leaf of REPRESENTATIVES) {
   const rest = argumentOf(pair ? derive(pair).rest : '', one?.shell ?? '')
   const probe = (PROBES[syntaxes[0]] ?? [])[0] ?? null
 
-  const refused =
-    !one
-      ? 'the survey does not know this leaf'
-      : !pair
-        ? 'no pair in the population'
-        : !route
-          ? 'no serving candidate'
-          : rest === null
-            ? `the shell \`${one.shell}\` does not take exactly one argument`
-            : syntaxes.length !== 1
-              ? `the candidate's grammar is ${JSON.stringify(types)} and an arm registers one syntax`
-              : probe === null
-                ? `no probe is declared for \`${syntaxes[0]}\``
-                : null
+  const refused = !one
+    ? 'the survey does not know this leaf'
+    : !pair
+      ? 'no pair in the population'
+      : !route
+        ? 'no serving candidate'
+        : rest === null
+          ? `the shell \`${one.shell}\` does not take exactly one argument`
+          : syntaxes.length !== 1
+            ? `the candidate's grammar is ${JSON.stringify(types)} and an arm registers one syntax`
+            : probe === null
+              ? `no probe is declared for \`${syntaxes[0]}\``
+              : null
 
   if (refused) {
-    representatives.push({ leaf, outcome: 'refused', note: refused })
+    representatives.push({ leaf, note: refused, outcome: 'refused' })
 
     continue
   }
@@ -535,7 +533,9 @@ for (const leaf of REPRESENTATIVES) {
       `${leaf}: the survey reports a \`${one.shell}\` shell, but the emission never writes one`,
     )
   else if (!proposal.edited)
-    failures.push(`${leaf}: the reshaped sheet made no edit, so the arms are identical`)
+    failures.push(
+      `${leaf}: the reshaped sheet made no edit, so the arms are identical`,
+    )
   else {
     const verdict = judge({ emitted, moved, pinned, probe })
 

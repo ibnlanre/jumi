@@ -110,11 +110,12 @@ export const normalizeAxis = (edge, offset) => {
   if (!isComponent(component)) return null
 
   if (component === '0')
-    return { bottom: '100%', left: '0%', right: '100%', top: '0%' }[edge] ?? null
+    return (
+      { bottom: '100%', left: '0%', right: '100%', top: '0%' }[edge] ?? null
+    )
 
   if (edge === 'left' || edge === 'top') return component
-  if (edge === 'right' || edge === 'bottom')
-    return `calc(100% - ${component})`
+  if (edge === 'right' || edge === 'bottom') return `calc(100% - ${component})`
 
   return null
 }

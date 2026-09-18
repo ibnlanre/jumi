@@ -20,12 +20,14 @@
  * Run: `node scripts/research/d3-gate-b-sweep.mjs` (exits non-zero only on a fixture defect, never on a finding).
  */
 import { chromium } from 'playwright'
+
+import { earned } from '../lib/sources.mjs'
+
 import fs from 'node:fs'
 import path from 'node:path'
 
 import * as compileLib from '../lib/compile.mjs'
 import * as cssLib from '../lib/css.mjs'
-import { earned } from '../lib/sources.mjs'
 
 const { compiler } = compileLib
 const finalizeCss = compileLib.finalizeCss ?? cssLib.finalizeCss
@@ -36,15 +38,25 @@ const ENTRY = `\n@import "tailwindcss" source(none);\n@plugin "${path.join(root,
 
 /** The observable per family, and the exercise value per component. */
 const OBSERVABLE = {
-  background: 'backgroundSize',
+  'background': 'backgroundSize',
   'border-image': 'borderImageOutset',
-  skew: 'transform',
-  transform: 'perspective',
+  'skew': 'transform',
+  'transform': 'perspective',
 }
 
 const TARGETS = [
-  { component: 'skew-x', family: 'skew', observable: 'transform', probe: '30deg' },
-  { component: 'skew-y', family: 'skew', observable: 'transform', probe: '20deg' },
+  {
+    component: 'skew-x',
+    family: 'skew',
+    observable: 'transform',
+    probe: '30deg',
+  },
+  {
+    component: 'skew-y',
+    family: 'skew',
+    observable: 'transform',
+    probe: '20deg',
+  },
   {
     component: 'border-image-outset',
     family: 'border-image',
@@ -131,7 +143,10 @@ for (const target of TARGETS) {
 
   const checks = earned([
     { check: 'the shipped class emitted an animation', ok: emitted },
-    { check: 'the declared value is not the resting value', ok: reading.declared !== 'none' },
+    {
+      check: 'the declared value is not the resting value',
+      ok: reading.declared !== 'none',
+    },
   ])
 
   /**
@@ -162,7 +177,7 @@ const target = path.join(root, 'scripts', 'gate-b-sweep-series.json')
 
 fs.writeFileSync(
   target,
-  `${JSON.stringify({ source: 'scripts/research/d3-gate-b-sweep.mjs', wall: WALL, records }, null, 2)}\n`,
+  `${JSON.stringify({ records, source: 'scripts/research/d3-gate-b-sweep.mjs', wall: WALL }, null, 2)}\n`,
 )
 
 for (const one of records) {

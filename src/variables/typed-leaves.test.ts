@@ -786,7 +786,9 @@ describe('authoring-route evidence', () => {
         .map(([leaf]) => leaf)
         .sort()
       const resolved =
-        one.verdict === 'movable' || one.verdict === 'conditional'
+        one.verdict === 'movable' ||
+        one.verdict === 'conditional' ||
+        one.verdict === 'equivalent-no-op'
       const execution = typedExecutionOf(one.parent as PropertyType)!
       const required = execution.assigns?.(one.authoring.component) ?? []
 
@@ -799,6 +801,10 @@ describe('authoring-route evidence', () => {
        * execution is unsafe there; a positional axis requires its own one because Gate A and the shipped route
        * measurements established axis independence. And a declined route writes **none** of its required set —
        * otherwise a route could half-emit, decline later, and leave execution machinery behind.
+       *
+       * `equivalent-no-op` sits with the resolved verdicts and not with the declines, which is the whole point of
+       * the name: the route executes and publishes exactly its contracted leaf, and the endpoints it resolves to
+       * are equal under its own native semantics. It is not a decline, so it may not write nothing.
        */
       expect(required.length, one.route).toBeGreaterThan(0)
       expect(

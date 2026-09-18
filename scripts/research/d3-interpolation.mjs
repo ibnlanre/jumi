@@ -164,13 +164,13 @@ const computedOf = (page, property, declarations) =>
     )
     .then(() =>
       page.evaluate(
-        ({ property, count }) =>
+        ({ count, property }) =>
           Array.from({ length: count }, (_, index) =>
             getComputedStyle(document.getElementById(`q${index}`))
               .getPropertyValue(property)
               .trim(),
           ),
-        { property, count: declarations.length },
+        { count: declarations.length, property },
       ),
     )
 
@@ -278,8 +278,8 @@ const computedOf = (page, property, declarations) =>
     }
 
     return {
-      computed: getComputedStyle(document.getElementById('f1')).columnGap,
       columns: gap('c1', 'c2'),
+      computed: getComputedStyle(document.getElementById('f1')).columnGap,
       flex: gap('f1', 'f2'),
     }
   })

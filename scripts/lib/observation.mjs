@@ -137,10 +137,10 @@ export const descriptorOf = ({ candidate, component, contexts, method }) => {
     component,
     consumer: entry.attribute,
     contexts,
-    reach: composed ? 'composition' : 'authoring',
     method,
     parent,
     parts: entry.parts,
+    reach: composed ? 'composition' : 'authoring',
   }
 }
 

@@ -23,10 +23,11 @@
  * Run: `node scripts/research/d3-offset-leaf.mjs` (exits non-zero only on a fixture defect, never on a finding).
  */
 import { chromium } from 'playwright'
-import fs from 'node:fs'
-import path from 'node:path'
 
 import { earned } from '../lib/sources.mjs'
+
+import fs from 'node:fs'
+import path from 'node:path'
 
 const root = path.resolve(import.meta.dirname, '..', '..')
 const WALL = [0, 250, 500, 750, 1000]
@@ -101,7 +102,9 @@ const readBoth = async css => {
 
   const out = await page.evaluate(
     async ({ wall }) => {
-      const elements = ['native', 'typed'].map(id => document.getElementById(id))
+      const elements = ['native', 'typed'].map(id =>
+        document.getElementById(id),
+      )
       const own = elements.map(element => element.getAnimations())
       const series = []
 
@@ -146,7 +149,8 @@ for (const pair of PAIRS) {
     { check: 'the leaf arm moved', ok: moved(typedSeries) },
     {
       check: 'the x component is the one that moves',
-      ok: moved(nativeSeries.map(one => componentsOf(one)[0])) &&
+      ok:
+        moved(nativeSeries.map(one => componentsOf(one)[0])) &&
         moved(typedSeries.map(one => componentsOf(one)[0])),
     },
     {
@@ -179,7 +183,9 @@ await browser.close()
  * probably not worth encoding unless the public API already distinguishes them.
  */
 const equivalent = records.filter(one => one.verdict === 'equivalent')
-const homogeneous = records.filter(one => one.kind === 'lengths' || one.kind === 'percentages')
+const homogeneous = records.filter(
+  one => one.kind === 'lengths' || one.kind === 'percentages',
+)
 const crossings = records.filter(one => one.kind.includes('→'))
 const homogeneousPass = homogeneous.every(one => one.verdict === 'equivalent')
 
@@ -195,11 +201,13 @@ const target = path.join(root, 'scripts', 'offset-leaf-series.json')
 
 fs.writeFileSync(
   target,
-  `${JSON.stringify({ outcome, source: 'scripts/research/d3-offset-leaf.mjs', wall: WALL, records }, null, 2)}\n`,
+  `${JSON.stringify({ outcome, records, source: 'scripts/research/d3-offset-leaf.mjs', wall: WALL }, null, 2)}\n`,
 )
 
 for (const one of records) {
-  console.log(`${one.kind.padEnd(18)} ${(`${one.from} → ${one.to}`).padEnd(34)} ${one.verdict}`)
+  console.log(
+    `${one.kind.padEnd(18)} ${`${one.from} → ${one.to}`.padEnd(34)} ${one.verdict}`,
+  )
 
   if (one.verdict !== 'equivalent')
     console.log(

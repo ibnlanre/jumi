@@ -236,6 +236,292 @@
     },
     {
       "authoring": {
+        "component": "object-position-x",
+        "context": [
+          "object-position-x-edge",
+          "object-position-x-offset",
+          "object-position-y",
+          "object-position-y-edge",
+          "object-position-y-offset"
+        ]
+      },
+      "condition": null,
+      "consumer": "object-position",
+      "evidence": {
+        "book": "scripts/research/d3-authoring-routes.mjs",
+        "probe": "40%",
+        "series": [
+          "50% 50%",
+          "47.5% 50%",
+          "45% 50%",
+          "42.5% 50%",
+          "40% 50%"
+        ]
+      },
+      "execution": {
+        "assigned": [
+          "object-position-x-position"
+        ],
+        "leaves": [
+          "object-position-x-position",
+          "object-position-y-position"
+        ]
+      },
+      "family": "object-position",
+      "parent": "object-position",
+      "representation": "resolved positional components",
+      "route": "object-position/object-position-x@object-position",
+      "verdict": "movable"
+    },
+    {
+      "authoring": {
+        "component": "object-position-x-edge",
+        "context": [
+          "object-position-x",
+          "object-position-x-offset",
+          "object-position-y",
+          "object-position-y-edge",
+          "object-position-y-offset"
+        ]
+      },
+      "condition": "executes and publishes object-position-x-position, and the endpoint it publishes is calc(100% - 50%) — a value native-equal to the position the route already rests at, so the endpoints are equal at every sample. The reference proves it rather than asserting it: the edge-with-its-offset spelling of that position is flat (50% 50% → right 50% top 50%: 50% 50% → 50% 50% → 50% 50% → 50% 50% → 50% 50%), while the control that spells the same edges without their offsets moves (left 50% → right 50%: 0% 50% → 25% 50% → 50% 50% → 75% 50% → 100% 50%) — in a two-value position the second component binds the other axis, so the control is what makes the flat reading admissible. Executed, contracted leaf published, native-equivalent: not a decline, and not an unobservable fixture, because the fixture answered the question.",
+      "consumer": "object-position",
+      "evidence": {
+        "book": "scripts/research/d3-authoring-routes.mjs",
+        "native": {
+          "control": {
+            "from": "left 50%",
+            "series": [
+              "0% 50%",
+              "25% 50%",
+              "50% 50%",
+              "75% 50%",
+              "100% 50%"
+            ],
+            "to": "right 50%",
+            "turns": "moves"
+          },
+          "equivalent": {
+            "from": "50% 50%",
+            "series": [
+              "50% 50%",
+              "50% 50%",
+              "50% 50%",
+              "50% 50%",
+              "50% 50%"
+            ],
+            "to": "right 50% top 50%",
+            "turns": "flat"
+          }
+        },
+        "probe": "right",
+        "series": [
+          "50% 50%",
+          "50% 50%",
+          "50% 50%",
+          "50% 50%",
+          "50% 50%"
+        ]
+      },
+      "execution": {
+        "assigned": [
+          "object-position-x-position"
+        ],
+        "leaves": [
+          "object-position-x-position",
+          "object-position-y-position"
+        ]
+      },
+      "family": "object-position",
+      "parent": "object-position",
+      "representation": "resolved positional components",
+      "route": "object-position/object-position-x-edge@object-position",
+      "verdict": "equivalent-no-op"
+    },
+    {
+      "authoring": {
+        "component": "object-position-x-offset",
+        "context": [
+          "object-position-x",
+          "object-position-x-edge",
+          "object-position-y",
+          "object-position-y-edge",
+          "object-position-y-offset"
+        ]
+      },
+      "condition": null,
+      "consumer": "object-position",
+      "evidence": {
+        "book": "scripts/research/d3-authoring-routes.mjs",
+        "probe": "10%",
+        "series": [
+          "50% 50%",
+          "40% 50%",
+          "30% 50%",
+          "20% 50%",
+          "10% 50%"
+        ]
+      },
+      "execution": {
+        "assigned": [
+          "object-position-x-position"
+        ],
+        "leaves": [
+          "object-position-x-position",
+          "object-position-y-position"
+        ]
+      },
+      "family": "object-position",
+      "parent": "object-position",
+      "representation": "resolved positional components",
+      "route": "object-position/object-position-x-offset@object-position",
+      "verdict": "movable"
+    },
+    {
+      "authoring": {
+        "component": "object-position-y",
+        "context": [
+          "object-position-x",
+          "object-position-x-edge",
+          "object-position-x-offset",
+          "object-position-y-edge",
+          "object-position-y-offset"
+        ]
+      },
+      "condition": null,
+      "consumer": "object-position",
+      "evidence": {
+        "book": "scripts/research/d3-authoring-routes.mjs",
+        "probe": "40%",
+        "series": [
+          "50% 50%",
+          "50% 47.5%",
+          "50% 45%",
+          "50% 42.5%",
+          "50% 40%"
+        ]
+      },
+      "execution": {
+        "assigned": [
+          "object-position-y-position"
+        ],
+        "leaves": [
+          "object-position-x-position",
+          "object-position-y-position"
+        ]
+      },
+      "family": "object-position",
+      "parent": "object-position",
+      "representation": "resolved positional components",
+      "route": "object-position/object-position-y@object-position",
+      "verdict": "movable"
+    },
+    {
+      "authoring": {
+        "component": "object-position-y-edge",
+        "context": [
+          "object-position-x",
+          "object-position-x-edge",
+          "object-position-x-offset",
+          "object-position-y",
+          "object-position-y-offset"
+        ]
+      },
+      "condition": "executes and publishes object-position-y-position, and the endpoint it publishes is calc(100% - 50%) — a value native-equal to the position the route already rests at, so the endpoints are equal at every sample. The reference proves it rather than asserting it: the edge-with-its-offset spelling of that position is flat (50% 50% → left 50% bottom 50%: 50% 50% → 50% 50% → 50% 50% → 50% 50% → 50% 50%), while the control that spells the same edges without their offsets moves (50% top → 50% bottom: 50% 0% → 50% 25% → 50% 50% → 50% 75% → 50% 100%) — in a two-value position the second component binds the other axis, so the control is what makes the flat reading admissible. Executed, contracted leaf published, native-equivalent: not a decline, and not an unobservable fixture, because the fixture answered the question.",
+      "consumer": "object-position",
+      "evidence": {
+        "book": "scripts/research/d3-authoring-routes.mjs",
+        "native": {
+          "control": {
+            "from": "50% top",
+            "series": [
+              "50% 0%",
+              "50% 25%",
+              "50% 50%",
+              "50% 75%",
+              "50% 100%"
+            ],
+            "to": "50% bottom",
+            "turns": "moves"
+          },
+          "equivalent": {
+            "from": "50% 50%",
+            "series": [
+              "50% 50%",
+              "50% 50%",
+              "50% 50%",
+              "50% 50%",
+              "50% 50%"
+            ],
+            "to": "left 50% bottom 50%",
+            "turns": "flat"
+          }
+        },
+        "probe": "bottom",
+        "series": [
+          "50% 50%",
+          "50% 50%",
+          "50% 50%",
+          "50% 50%",
+          "50% 50%"
+        ]
+      },
+      "execution": {
+        "assigned": [
+          "object-position-y-position"
+        ],
+        "leaves": [
+          "object-position-x-position",
+          "object-position-y-position"
+        ]
+      },
+      "family": "object-position",
+      "parent": "object-position",
+      "representation": "resolved positional components",
+      "route": "object-position/object-position-y-edge@object-position",
+      "verdict": "equivalent-no-op"
+    },
+    {
+      "authoring": {
+        "component": "object-position-y-offset",
+        "context": [
+          "object-position-x",
+          "object-position-x-edge",
+          "object-position-x-offset",
+          "object-position-y",
+          "object-position-y-edge"
+        ]
+      },
+      "condition": null,
+      "consumer": "object-position",
+      "evidence": {
+        "book": "scripts/research/d3-authoring-routes.mjs",
+        "probe": "10%",
+        "series": [
+          "50% 50%",
+          "50% 40%",
+          "50% 30%",
+          "50% 20%",
+          "50% 10%"
+        ]
+      },
+      "execution": {
+        "assigned": [
+          "object-position-y-position"
+        ],
+        "leaves": [
+          "object-position-x-position",
+          "object-position-y-position"
+        ]
+      },
+      "family": "object-position",
+      "parent": "object-position",
+      "representation": "resolved positional components",
+      "route": "object-position/object-position-y-offset@object-position",
+      "verdict": "movable"
+    },
+    {
+      "authoring": {
         "component": "offset-anchor-x-edge",
         "context": [
           "offset-anchor-x-offset",
@@ -308,6 +594,292 @@
       "parent": "offset-anchor",
       "representation": "resolved positional components",
       "route": "offset-anchor/offset-anchor-y-edge@offset-anchor",
+      "verdict": "movable"
+    },
+    {
+      "authoring": {
+        "component": "offset-position-x",
+        "context": [
+          "offset-position-x-edge",
+          "offset-position-x-offset",
+          "offset-position-y",
+          "offset-position-y-edge",
+          "offset-position-y-offset"
+        ]
+      },
+      "condition": null,
+      "consumer": "offset-position",
+      "evidence": {
+        "book": "scripts/research/d3-authoring-routes.mjs",
+        "probe": "40%",
+        "series": [
+          "50% 50%",
+          "47.5% 50%",
+          "45% 50%",
+          "42.5% 50%",
+          "40% 50%"
+        ]
+      },
+      "execution": {
+        "assigned": [
+          "offset-position-x-position"
+        ],
+        "leaves": [
+          "offset-position-x-position",
+          "offset-position-y-position"
+        ]
+      },
+      "family": "offset-position",
+      "parent": "offset-position",
+      "representation": "resolved positional components",
+      "route": "offset-position/offset-position-x@offset-position",
+      "verdict": "movable"
+    },
+    {
+      "authoring": {
+        "component": "offset-position-x-edge",
+        "context": [
+          "offset-position-x",
+          "offset-position-x-offset",
+          "offset-position-y",
+          "offset-position-y-edge",
+          "offset-position-y-offset"
+        ]
+      },
+      "condition": "executes and publishes offset-position-x-position, and the endpoint it publishes is calc(100% - 50%) — a value native-equal to the position the route already rests at, so the endpoints are equal at every sample. The reference proves it rather than asserting it: the edge-with-its-offset spelling of that position is flat (50% 50% → right 50% top 50%: 50% 50% → 50% 50% → 50% 50% → 50% 50% → 50% 50%), while the control that spells the same edges without their offsets moves (left 50% → right 50%: 0% 50% → 25% 50% → 50% 50% → 75% 50% → 100% 50%) — in a two-value position the second component binds the other axis, so the control is what makes the flat reading admissible. Executed, contracted leaf published, native-equivalent: not a decline, and not an unobservable fixture, because the fixture answered the question.",
+      "consumer": "offset-position",
+      "evidence": {
+        "book": "scripts/research/d3-authoring-routes.mjs",
+        "native": {
+          "control": {
+            "from": "left 50%",
+            "series": [
+              "0% 50%",
+              "25% 50%",
+              "50% 50%",
+              "75% 50%",
+              "100% 50%"
+            ],
+            "to": "right 50%",
+            "turns": "moves"
+          },
+          "equivalent": {
+            "from": "50% 50%",
+            "series": [
+              "50% 50%",
+              "50% 50%",
+              "50% 50%",
+              "50% 50%",
+              "50% 50%"
+            ],
+            "to": "right 50% top 50%",
+            "turns": "flat"
+          }
+        },
+        "probe": "right",
+        "series": [
+          "50% 50%",
+          "50% 50%",
+          "50% 50%",
+          "50% 50%",
+          "50% 50%"
+        ]
+      },
+      "execution": {
+        "assigned": [
+          "offset-position-x-position"
+        ],
+        "leaves": [
+          "offset-position-x-position",
+          "offset-position-y-position"
+        ]
+      },
+      "family": "offset-position",
+      "parent": "offset-position",
+      "representation": "resolved positional components",
+      "route": "offset-position/offset-position-x-edge@offset-position",
+      "verdict": "equivalent-no-op"
+    },
+    {
+      "authoring": {
+        "component": "offset-position-x-offset",
+        "context": [
+          "offset-position-x",
+          "offset-position-x-edge",
+          "offset-position-y",
+          "offset-position-y-edge",
+          "offset-position-y-offset"
+        ]
+      },
+      "condition": null,
+      "consumer": "offset-position",
+      "evidence": {
+        "book": "scripts/research/d3-authoring-routes.mjs",
+        "probe": "10%",
+        "series": [
+          "50% 50%",
+          "40% 50%",
+          "30% 50%",
+          "20% 50%",
+          "10% 50%"
+        ]
+      },
+      "execution": {
+        "assigned": [
+          "offset-position-x-position"
+        ],
+        "leaves": [
+          "offset-position-x-position",
+          "offset-position-y-position"
+        ]
+      },
+      "family": "offset-position",
+      "parent": "offset-position",
+      "representation": "resolved positional components",
+      "route": "offset-position/offset-position-x-offset@offset-position",
+      "verdict": "movable"
+    },
+    {
+      "authoring": {
+        "component": "offset-position-y",
+        "context": [
+          "offset-position-x",
+          "offset-position-x-edge",
+          "offset-position-x-offset",
+          "offset-position-y-edge",
+          "offset-position-y-offset"
+        ]
+      },
+      "condition": null,
+      "consumer": "offset-position",
+      "evidence": {
+        "book": "scripts/research/d3-authoring-routes.mjs",
+        "probe": "40%",
+        "series": [
+          "50% 50%",
+          "50% 47.5%",
+          "50% 45%",
+          "50% 42.5%",
+          "50% 40%"
+        ]
+      },
+      "execution": {
+        "assigned": [
+          "offset-position-y-position"
+        ],
+        "leaves": [
+          "offset-position-x-position",
+          "offset-position-y-position"
+        ]
+      },
+      "family": "offset-position",
+      "parent": "offset-position",
+      "representation": "resolved positional components",
+      "route": "offset-position/offset-position-y@offset-position",
+      "verdict": "movable"
+    },
+    {
+      "authoring": {
+        "component": "offset-position-y-edge",
+        "context": [
+          "offset-position-x",
+          "offset-position-x-edge",
+          "offset-position-x-offset",
+          "offset-position-y",
+          "offset-position-y-offset"
+        ]
+      },
+      "condition": "executes and publishes offset-position-y-position, and the endpoint it publishes is calc(100% - 50%) — a value native-equal to the position the route already rests at, so the endpoints are equal at every sample. The reference proves it rather than asserting it: the edge-with-its-offset spelling of that position is flat (50% 50% → left 50% bottom 50%: 50% 50% → 50% 50% → 50% 50% → 50% 50% → 50% 50%), while the control that spells the same edges without their offsets moves (50% top → 50% bottom: 50% 0% → 50% 25% → 50% 50% → 50% 75% → 50% 100%) — in a two-value position the second component binds the other axis, so the control is what makes the flat reading admissible. Executed, contracted leaf published, native-equivalent: not a decline, and not an unobservable fixture, because the fixture answered the question.",
+      "consumer": "offset-position",
+      "evidence": {
+        "book": "scripts/research/d3-authoring-routes.mjs",
+        "native": {
+          "control": {
+            "from": "50% top",
+            "series": [
+              "50% 0%",
+              "50% 25%",
+              "50% 50%",
+              "50% 75%",
+              "50% 100%"
+            ],
+            "to": "50% bottom",
+            "turns": "moves"
+          },
+          "equivalent": {
+            "from": "50% 50%",
+            "series": [
+              "50% 50%",
+              "50% 50%",
+              "50% 50%",
+              "50% 50%",
+              "50% 50%"
+            ],
+            "to": "left 50% bottom 50%",
+            "turns": "flat"
+          }
+        },
+        "probe": "bottom",
+        "series": [
+          "50% 50%",
+          "50% 50%",
+          "50% 50%",
+          "50% 50%",
+          "50% 50%"
+        ]
+      },
+      "execution": {
+        "assigned": [
+          "offset-position-y-position"
+        ],
+        "leaves": [
+          "offset-position-x-position",
+          "offset-position-y-position"
+        ]
+      },
+      "family": "offset-position",
+      "parent": "offset-position",
+      "representation": "resolved positional components",
+      "route": "offset-position/offset-position-y-edge@offset-position",
+      "verdict": "equivalent-no-op"
+    },
+    {
+      "authoring": {
+        "component": "offset-position-y-offset",
+        "context": [
+          "offset-position-x",
+          "offset-position-x-edge",
+          "offset-position-x-offset",
+          "offset-position-y",
+          "offset-position-y-edge"
+        ]
+      },
+      "condition": null,
+      "consumer": "offset-position",
+      "evidence": {
+        "book": "scripts/research/d3-authoring-routes.mjs",
+        "probe": "10%",
+        "series": [
+          "50% 50%",
+          "50% 40%",
+          "50% 30%",
+          "50% 20%",
+          "50% 10%"
+        ]
+      },
+      "execution": {
+        "assigned": [
+          "offset-position-y-position"
+        ],
+        "leaves": [
+          "offset-position-x-position",
+          "offset-position-y-position"
+        ]
+      },
+      "family": "offset-position",
+      "parent": "offset-position",
+      "representation": "resolved positional components",
+      "route": "offset-position/offset-position-y-offset@offset-position",
       "verdict": "movable"
     }
   ]

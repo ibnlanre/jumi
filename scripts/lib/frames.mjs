@@ -74,10 +74,22 @@ export const probeMarkup = (klass, id = 'probe') =>
  * verdict therefore has no way to construct one half without the other, and a book that only reads the shipped side
  * can report a reading but not a verdict.
  */
-export const gateBArm = ({ easing = 'linear', klass, property, rest, target }) => ({
+export const gateBArm = ({
+  easing = 'linear',
+  klass,
+  property,
+  rest,
+  target,
+}) => ({
   klass,
   markup: probeMarkup(klass),
-  reference: nativeSheet({ easing, from: rest, id: 'native', property, to: target }),
+  reference: nativeSheet({
+    easing,
+    from: rest,
+    id: 'native',
+    property,
+    to: target,
+  }),
 })
 
 /**

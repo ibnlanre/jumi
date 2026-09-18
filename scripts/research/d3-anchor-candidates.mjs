@@ -1,9 +1,12 @@
 import { writeFileSync } from 'node:fs'
-
 import { chromium } from 'playwright'
 
 import { normalizeOffsetAnchor } from '../lib/anchor.mjs'
-import { readCandidates, readExpressions, readPropertyEntries } from '../lib/property-model.mjs'
+import {
+  readCandidates,
+  readExpressions,
+  readPropertyEntries,
+} from '../lib/property-model.mjs'
 
 import path from 'node:path'
 
@@ -139,7 +142,11 @@ for (const candidate of candidates) {
   // reported six candidates as the seventh.
   if (!candidate.parts.length) {
     // A whole candidate addresses the property itself, so both probes are authored values rather than a leaf.
-    for (const authored of ['left 10px top 20px', '20% 80%', 'var(--x) var(--y)']) {
+    for (const authored of [
+      'left 10px top 20px',
+      '20% 80%',
+      'var(--x) var(--y)',
+    ]) {
       const normalized = normalizeOffsetAnchor(authored)
 
       projection.push({
@@ -204,10 +211,10 @@ for (const candidate of candidates) {
         : role === 'keyword-bearing'
           ? 'cannot preserve independent animation — a keyword is not a registrable value, and the browser series is discrete'
           : role === 'compound'
-          ? alsoDirectional
-            ? 'requires compound normalization — it is several components, and it composes only as an explicit two-axis form'
-            : 'requires compound normalization — it is several components, and neither the rest nor the value composes'
-          : 'unclassified',
+            ? alsoDirectional
+              ? 'requires compound normalization — it is several components, and it composes only as an explicit two-axis form'
+              : 'requires compound normalization — it is several components, and neither the rest nor the value composes'
+            : 'unclassified',
   })
 }
 
@@ -227,9 +234,7 @@ const resting = async value => {
 }
 
 const series = async (defines, css) => {
-  await page.setContent(
-    `<style>${defines}\n${css}</style><div id="e">x</div>`,
-  )
+  await page.setContent(`<style>${defines}\n${css}</style><div id="e">x</div>`)
 
   return page.evaluate(async at => {
     const node = document.querySelector('#e')
@@ -245,7 +250,9 @@ const series = async (defines, css) => {
       })
 
       await new Promise(resolve => requestAnimationFrame(resolve))
-      values.push(getComputedStyle(node).getPropertyValue('offset-anchor').trim())
+      values.push(
+        getComputedStyle(node).getPropertyValue('offset-anchor').trim(),
+      )
     }
 
     return values
@@ -310,7 +317,9 @@ console.log('\nthe projection:\n')
 
 for (const one of projection) {
   console.log(`── ${one.candidate}   (role: ${one.role})`)
-  console.log(`   authored     ${one.authored}${one.rest === null ? '' : `   over a rest of ${one.rest}`}`)
+  console.log(
+    `   authored     ${one.authored}${one.rest === null ? '' : `   over a rest of ${one.rest}`}`,
+  )
   if (one.composed) console.log(`   composed     ${one.composed}`)
   console.log(
     `   normalized   ${one.normalized ? one.normalized.join('  ') : 'declines'}`,
@@ -336,7 +345,9 @@ const failures = []
 
 for (const one of projection)
   if (one.verdict === 'unclassified')
-    failures.push(`${one.candidate}: the projection could not classify this candidate`)
+    failures.push(
+      `${one.candidate}: the projection could not classify this candidate`,
+    )
 
 for (const one of arms)
   if (!one.reading) failures.push(`${one.label}: the arm read nothing`)
@@ -344,7 +355,9 @@ for (const one of arms)
 const preserved = projection.filter(one =>
   one.verdict.startsWith('preserves'),
 ).length
-const declined = projection.filter(one => one.verdict.startsWith('declines')).length
+const declined = projection.filter(one =>
+  one.verdict.startsWith('declines'),
+).length
 
 console.log(
   `${projection.length} candidate projections: ${preserved} preserve independent control, ${declined} decline safely, ${projection.length - preserved - declined} require compound normalization or lose their current semantics`,

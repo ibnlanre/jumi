@@ -83,7 +83,9 @@ export const resolveWith = (attribute, values) => {
 
     if (values.has(name)) return values.get(name)
 
-    return value.replace(/var\(--jumi-([\w-]+)\)/g, (_, ref) => build(ref, depth + 1))
+    return value.replace(/var\(--jumi-([\w-]+)\)/g, (_, ref) =>
+      build(ref, depth + 1),
+    )
   }
 
   return build(attribute)
@@ -100,8 +102,7 @@ export const resolveWith = (attribute, values) => {
  */
 export const resolveToLeaves = attribute => {
   const table = modelExpressions()
-  const isLeaf = name =>
-    !String(table.get(name) ?? '').includes('var(--jumi-')
+  const isLeaf = name => !String(table.get(name) ?? '').includes('var(--jumi-')
 
   const build = (name, depth = 0) => {
     if (depth > 6) return ''

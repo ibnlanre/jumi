@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { cssNameOf, functionsOf, gateBArm, nativeSheet } from './frames.mjs'
+import { cssNameOf, functionsOf, nativeSheet } from './frames.mjs'
 
 /**
  * The harness's own guard.

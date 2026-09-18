@@ -427,7 +427,7 @@ const withoutPartsLink = (css, { inline = true, register = true } = {}) => {
 
     if (!fill) return
 
-    fills.push({ prop: node.prop, bytes: node.toString().length + 1 })
+    fills.push({ bytes: node.toString().length + 1, prop: node.prop })
     node.remove()
   })
 
@@ -457,7 +457,7 @@ const withoutPartsLink = (css, { inline = true, register = true } = {}) => {
       document.walkAtRules('property', atRule => {
         if (atRule.params.trim() !== prop) return
 
-        registrations.push({ prop, bytes: atRule.toString().length + 1 })
+        registrations.push({ bytes: atRule.toString().length + 1, prop })
         atRule.remove()
       })
 

@@ -1,5 +1,4 @@
 import { writeFileSync } from 'node:fs'
-
 import { chromium } from 'playwright'
 
 import path from 'node:path'
@@ -40,36 +39,36 @@ const WALL = [0, 250, 500, 750, 1000]
 
 const ARMS = [
   {
+    from: '50% 50%',
     hypothesis: 'a purely resolved pair',
     label: 'resolved percentages',
-    from: '50% 50%',
     to: '20% 80%',
   },
   {
+    from: 'left top',
     hypothesis: 'edges, which are relative to the box',
     label: 'edge keywords',
-    from: 'left top',
     to: 'right bottom',
   },
   {
+    from: 'left 10px top 20px',
     hypothesis: 'the form the model composes and the grammar rejects',
     label: 'edge plus offset',
-    from: 'left 10px top 20px',
     to: 'right 10px bottom 20px',
   },
   {
+    from: 'center',
     hypothesis: 'the shorthand centre against a resolved pair',
     label: 'center to resolved',
-    from: 'center',
     to: '20% 80%',
   },
 ]
 
 /** The resolved spelling of the edge arm, so equal series are evidence rather than coincidence. */
 const CANARY = {
+  from: '0% 0%',
   hypothesis: 'the resolved spelling of the edge arm above',
   label: 'canary: edges spelled as percentages',
-  from: '0% 0%',
   to: '100% 100%',
 }
 

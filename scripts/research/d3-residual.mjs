@@ -141,20 +141,20 @@ const SETTLED = new Map([
     'object-position',
     {
       granularity: 'route',
-      production: 'defective',
+      production: 'migrated',
       reason:
-        'Gate B: partial-composition invalidity — same shape as `background-position`; inert alone on both axes, native-equivalent when the pair is authored, with the same `0% 0%`-for-a-dropped-declaration signature',
-      research: 'migration-required',
+        'D.3.11: resolved-axis execution, the same repair as `background-position` — each axis route writes a private <length-percentage> leaf and the property reads the resolved pair. Six routes: four movable (x, y, and both offsets) and the two edge routes equivalent-no-op, their endpoint `calc(100% - 50%)` native-equal to the resting `50%`, proved against a native reference that is flat where the discriminating control moves',
+      research: 'migrated',
     },
   ],
   [
     'offset-position',
     {
       granularity: 'route',
-      production: 'defective',
+      production: 'migrated',
       reason:
-        'Gate B: partial-composition invalidity — same shape again, seated in an authored positional state because its resting read is the keyword `normal`; inert alone on both axes, native-equivalent as a pair, and `normal` stays `normal` outside authored motion',
-      research: 'migration-required',
+        'D.3.11: resolved-axis execution again, with the same split — four movable routes and two equivalent-no-op edge routes. `normal` survives because the constituent path compiles no unconditional declaration, so an unauthored value is never asserted over',
+      research: 'migrated',
     },
   ],
   [

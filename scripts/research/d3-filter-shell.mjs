@@ -15,12 +15,14 @@
  * Run: `pnpm research:d3-filter-shell` (exits non-zero only on an arm defect, never on a finding).
  */
 import { chromium } from 'playwright'
+
+import { functionsOf, nativeSheet } from '../lib/frames.mjs'
+
 import fs from 'node:fs'
 import path from 'node:path'
 
 import * as compileLib from '../lib/compile.mjs'
 import * as cssLib from '../lib/css.mjs'
-import { functionsOf, nativeSheet } from '../lib/frames.mjs'
 
 const { compiler } = compileLib
 const finalizeCss = compileLib.finalizeCss ?? cssLib.finalizeCss
@@ -39,7 +41,10 @@ const DURATION = 1000
 const COMBOS = [
   {
     family: 'blur + hue-rotate',
-    native: { from: 'blur(0) hue-rotate(0deg)', to: 'blur(10px) hue-rotate(90deg)' },
+    native: {
+      from: 'blur(0) hue-rotate(0deg)',
+      to: 'blur(10px) hue-rotate(90deg)',
+    },
     shell: 'blur(var(--a)) hue-rotate(var(--b))',
     slots: [
       { from: '0', slot: '--a', syntax: '<length>', to: '10px' },
@@ -48,7 +53,10 @@ const COMBOS = [
   },
   {
     family: 'brightness + contrast',
-    native: { from: 'brightness(1) contrast(1)', to: 'brightness(2) contrast(0.5)' },
+    native: {
+      from: 'brightness(1) contrast(1)',
+      to: 'brightness(2) contrast(0.5)',
+    },
     shell: 'brightness(var(--a)) contrast(var(--b))',
     slots: [
       { from: '1', slot: '--a', syntax: '<number>', to: '2' },
@@ -95,7 +103,7 @@ const seriesOf = async (sheets, observed) => {
   )
 
   const readings = await page.evaluate(
-    async ({ ids, observed: property, wall, duration }) => {
+    async ({ duration, ids, observed: property, wall }) => {
       const out = {}
 
       for (const id of ids) {
@@ -119,7 +127,12 @@ const seriesOf = async (sheets, observed) => {
 
       return out
     },
-    { duration: DURATION, ids: sheets.map(one => one.name), observed, wall: WALL },
+    {
+      duration: DURATION,
+      ids: sheets.map(one => one.name),
+      observed,
+      wall: WALL,
+    },
   )
 
   await page.close()
@@ -148,16 +161,22 @@ for (const property of PROPERTIES) {
 
     const nativeSeries = readings[native].values
     const typedSeries = readings[typed].values
-    const identical = nativeSeries.every((value, at) => value === typedSeries[at])
+    const identical = nativeSeries.every(
+      (value, at) => value === typedSeries[at],
+    )
 
     records.push({
+      family: `${property.name} · ${combo.family}`,
       identical,
       kind: 'separability',
       native: nativeSeries,
       property: property.name,
       typed: typedSeries,
-      verdict: !new Set(nativeSeries).size ? 'fixture-inert' : identical ? 'same-series' : 'differs',
-      family: `${property.name} · ${combo.family}`,
+      verdict: !new Set(nativeSeries).size
+        ? 'fixture-inert'
+        : identical
+          ? 'same-series'
+          : 'differs',
     })
   }
 }
@@ -182,7 +201,10 @@ for (const property of PROPERTIES) {
  */
 const PROBES = [
   {
-    classes: ['animate-filter-blur-[10px]', 'animate-filter-hue-rotate-[90deg]'],
+    classes: [
+      'animate-filter-blur-[10px]',
+      'animate-filter-hue-rotate-[90deg]',
+    ],
     moved: ['blur', 'hue-rotate'],
     native: {
       from: 'blur(0px) hue-rotate(0deg)',
@@ -190,12 +212,12 @@ const PROBES = [
     },
   },
   {
-    classes: [
-      'animate-filter-brightness-[2]',
-      'animate-filter-contrast-[0.5]',
-    ],
+    classes: ['animate-filter-brightness-[2]', 'animate-filter-contrast-[0.5]'],
     moved: ['brightness', 'contrast'],
-    native: { from: 'brightness(1) contrast(1)', to: 'brightness(2) contrast(0.5)' },
+    native: {
+      from: 'brightness(1) contrast(1)',
+      to: 'brightness(2) contrast(0.5)',
+    },
   },
   {
     classes: [
@@ -228,7 +250,10 @@ const PROBES = [
       'animate-backdrop-filter-contrast-[0.5]',
     ],
     moved: ['brightness', 'contrast'],
-    native: { from: 'brightness(1) contrast(1)', to: 'brightness(2) contrast(0.5)' },
+    native: {
+      from: 'brightness(1) contrast(1)',
+      to: 'brightness(2) contrast(0.5)',
+    },
   },
   {
     classes: [
@@ -250,7 +275,11 @@ for (const [index, probe] of PROBES.entries()) {
   const emitted = finalizeCss(
     (await compiler(ENTRY, root)).build(probe.classes),
   ).css
-  const reference = nativeSheet({ ...probe.native, id: `ref-${index}`, property: observed })
+  const reference = nativeSheet({
+    ...probe.native,
+    id: `ref-${index}`,
+    property: observed,
+  })
   const readings = await seriesOf(
     [
       { css: `${emitted}\n${reference.css}`, name: reference.name },
@@ -280,14 +309,18 @@ for (const [index, probe] of PROBES.entries()) {
       [...functionsOf(shipped[0]).keys()].includes(one),
     )
 
-    return names[at] === probe.moved.filter(one =>
-      [...functionsOf(native[0]).keys()].includes(one),
-    )[at]
+    return (
+      names[at] ===
+      probe.moved.filter(one =>
+        [...functionsOf(native[0]).keys()].includes(one),
+      )[at]
+    )
   })
 
   records.push({
-    kind: 'necessity',
     family: `${observed} · ${probe.moved.join(' + ')}`,
+    firstDisagreement: disagree === -1 ? null : disagree,
+    kind: 'necessity',
     moved: probe.moved,
     native,
     order,
@@ -300,7 +333,6 @@ for (const [index, probe] of PROBES.entries()) {
         : disagree === -1
           ? 'equivalent'
           : 'diverges',
-    firstDisagreement: disagree === -1 ? null : disagree,
   })
 }
 
@@ -310,7 +342,7 @@ const target = path.join(root, 'scripts', 'filter-shell-series.json')
 
 fs.writeFileSync(
   target,
-  `${JSON.stringify({ source: 'scripts/research/d3-filter-shell.mjs', wall: WALL, records }, null, 2)}\n`,
+  `${JSON.stringify({ records, source: 'scripts/research/d3-filter-shell.mjs', wall: WALL }, null, 2)}\n`,
 )
 
 for (const one of records)

@@ -5062,10 +5062,24 @@ The ruling reserved one stop, and a single arm reaches it. `background-position`
 resting value is a keyword:
 
 ```css
-@property --probe-x { syntax: "<length-percentage>"; inherits: false; initial-value: 0px; }
-@property --probe-y { syntax: "<length-percentage>"; inherits: false; initial-value: 0px; }
-#shell    { offset-position: var(--probe-x) var(--probe-y); }
-#authored { offset-position: var(--probe-x) var(--probe-y); --probe-x: 40%; --probe-y: 50%; }
+@property --probe-x {
+  syntax: '<length-percentage>';
+  inherits: false;
+  initial-value: 0px;
+}
+@property --probe-y {
+  syntax: '<length-percentage>';
+  inherits: false;
+  initial-value: 0px;
+}
+#shell {
+  offset-position: var(--probe-x) var(--probe-y);
+}
+#authored {
+  offset-position: var(--probe-x) var(--probe-y);
+  --probe-x: 40%;
+  --probe-y: 50%;
+}
 ```
 
 ```text
@@ -5073,7 +5087,7 @@ nothing authored       base   normal        shell   0px 0px        ← the subst
 authored               authored 40% 50%     ← the shell is correct once state exists
 ```
 
-**`normal` becomes `0px 0px`.** A registered `<length-percentage>` leaf is always *defined* — its registration supplies
+**`normal` becomes `0px 0px`.** A registered `<length-percentage>` leaf is always _defined_ — its registration supplies
 an initial value, so the `var()` fallback that would have preserved `normal` can never apply — and the shell therefore
 asserts a concrete position on every element that never authored one. That is precisely the boundary:
 
@@ -5087,7 +5101,7 @@ The shape that would satisfy it is a **route-scoped shell**: the property declar
 rather than by the base composition, so an untouched element keeps the browser's own `normal` and only a route that
 authors positional state brings the resolved pair into being. The compound branch already emits a per-candidate
 substrate, so that is reachable — but it is a second mechanism, and inventing it to rescue a family whose six routes
-were only *measured* inert is exactly the kind of thing this track has learned to ask about first.
+were only _measured_ inert is exactly the kind of thing this track has learned to ask about first.
 
 **`object-position` is unaffected**, and that is the useful half of the comparison: its rests are concrete (`50%`), so
 the shell asserts what the browser already computes, and it can migrate exactly as `background-position` did. Its
@@ -5096,3 +5110,99 @@ Gate B verdict is the same defect, its Gate A prototype the same equivalence, an
 
 **State.** No production change. `offset-position` stops here pending a ruling on whether the route-scoped shell is
 worth building for it; `object-position` has no such obstacle.
+
+---
+
+## D.3.11 — the two positional families migrate, and `equivalent-no-op` earns its name
+
+**Ruling applied.** Option A: the D.3.7 projection contract is unchanged. A candidate's projection is built from its
+own slot and the model's rests, so sibling authoring state stays invisible by construction — and the route book now
+applies the authoring class **alone**, with no support arm, because an arm that supplied sibling state would be
+measuring the harness. `object-position` and `offset-position` both migrated on the resolved-axis shape: one private
+`<length-percentage>` execution leaf per axis, the property reading the resolved pair, authoring staying edge and
+offset.
+
+**`equivalent-no-op`, defined so it cannot become a bucket.** All six clauses are required, and the last two are what
+keep it from being a euphemism for "we could not tell":
+
+```text
+equivalent-no-op
+→ route executed
+→ actual assignment == declared contract exactly
+→ emitted animation path exists
+→ observable endpoints are equal
+→ native reference is equally flat
+→ condition explains why
+```
+
+It is distinct from `declined` (no execution, writes none) and from `fixture-unobservable` (the harness cannot
+discriminate). The guard treats it with the resolved verdicts rather than the declines: `movable` and
+`equivalent-no-op` both assert `assignment == contract`; `declined` asserts the route writes **none**.
+
+**The premise was falsified, and the falsification is the finding.** The reference was first written
+`left 50%` → `right 50%`, on the reading that both spellings name the midpoint. Measured, it **moves**:
+
+```text
+left 50%   →  0% 50%
+right 50%  →  100% 50%     sample for sample: 0% 50% → 25% 50% → 50% 50% → 75% 50% → 100% 50%
+```
+
+The reading is not about the route, it is about the spelling. In a two-value `<position>` the second component binds
+the **other** axis, so `right 50%` is x at the right edge over a zero offset and y at 50%; the edge *plus its offset*
+needs the four-value form. This is fixture defect 17's confusion, so the arm was rebuilt to commit no defect:
+
+```text
+equivalent   50% 50% → right 50% top 50%      flat     the edge-with-its-offset spelling of the same position
+control      left 50% → right 50%             moves    the same edges without their offsets
+```
+
+The **control is what makes the flat reading admissible**. An arm whose reference cannot move proves nothing — that
+is the same void comparison the camelCase reference produced, where every arm agreed with itself. `equivalent-no-op`
+is therefore only available when `equivalent` is flat **and** `control` moves.
+
+**What the route actually does**, read from the emitted declaration rather than inferred from the flat series:
+
+```text
+--jumi-object-position-x-position-100: calc(100% - 50%);      edge `right` over the resting offset `50%`
+```
+
+`axisPosition('right', '50%')` = `calc(100% - 50%)` = the position the route already rests at. So the route executes,
+publishes exactly its contracted leaf, and legitimately resolves to its own resting value — native-equivalent under
+its own semantics, which is the ruling's conclusion reached by measurement rather than by algebra.
+
+**Fixture defect 22** (sibling of the camelCase defect): *a reference written in a spelling that means something
+else*. Both defects produce a clean-looking reading rather than an error, and both were caught by asking what the
+reference's own value was rather than whether it agreed with the shipped arm.
+
+**Registry reconciliation, read from the guard rather than inventoried.** The completeness arm named exactly four
+pairs the population places and the registry did not: `object-position` and `offset-position` each contributing their
+two offset components under the property surface. They are `scoped` entries, in the class the guards consume, not
+`compound` ones — the guard decides the class, not a preference for symmetry with `background-position`.
+
+**Counts moved, sets first.** `authoringPopulation()` 10 → 22 (two families × six authoring components);
+`readExpressions()` 628 → 632 (four new execution leaves). `324 + (22 - 8) = 338` is the census identity, not a
+coincidence.
+
+**`normal` holds, verified rather than assumed.** Both invariants were measured on the compiled sheet: the constituent
+path for `offset-position` emits the real property **only inside `@keyframes`** (2 declarations, 0 outside), so an
+element that authors nothing computes the browser's own `normal`; the base rule asserts only custom properties
+(`--jumi-offset-position`, `--jumi-offset-position-x-position`). The first reading of this claimed one unconditional
+declaration, and the claim was mine, not the product's: the scanner had matched the substring `offset-position:` inside
+`--jumi-offset-position:`. **A probe defect wearing the clothes of a product defect** — the same family as 15–21.
+
+**Terminal state.**
+
+```text
+no-candidate 10 · safe-no-need 8 · migrated 4 · coupled-native 3     migration-required 0 · unmeasured 0
+full gate    17/17 green (bundle, prepare, types, lint, unit, theme, css, phrase, incremental, behaviour,
+             view-transition, scroll-driven, vite, postcss, legacy, stories, studio)
+route book   16 movable · 4 equivalent-no-op · fixture-unobservable absent
+```
+
+**`fixture-unobservable` disappeared from the family by being answered, not by being renamed.** For these four routes
+the fixture was never incapable of answering the question; the answer is "executed, and native-equivalent".
+
+**Process rule made permanent:** before every mutation, read the exact block being edited **from the current working
+tree**. Four failed edits this session were anchored on remembered text rather than read text, and every one of them
+cost a batch. Prettier, prior edits and parallel track changes have already shown why "I wrote this code" is not an
+answer.

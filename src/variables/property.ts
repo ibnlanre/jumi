@@ -2038,7 +2038,7 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-object-fit',
   },
   'object-position': {
-    dependencies: ['object-position-x', 'object-position-y'],
+    dependencies: ['object-position-x-position', 'object-position-y-position'],
     value: objectPosition,
     variable: '--jumi-object-position',
   },
@@ -2055,6 +2055,10 @@ export const propertyVariables: DependencyGraph = {
     value: '50%',
     variable: '--jumi-object-position-x-offset',
   },
+  'object-position-x-position': {
+    value: '50%',
+    variable: '--jumi-object-position-x-position',
+  },
   'object-position-y': {
     dependencies: ['object-position-y-edge', 'object-position-y-offset'],
     value: objectPositionY,
@@ -2067,6 +2071,10 @@ export const propertyVariables: DependencyGraph = {
   'object-position-y-offset': {
     value: '50%',
     variable: '--jumi-object-position-y-offset',
+  },
+  'object-position-y-position': {
+    value: '50%',
+    variable: '--jumi-object-position-y-position',
   },
   'offset': {
     value: 'none',
@@ -2124,7 +2132,7 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-offset-path',
   },
   'offset-position': {
-    dependencies: ['offset-position-x', 'offset-position-y'],
+    dependencies: ['offset-position-x-position', 'offset-position-y-position'],
     value: offsePosition,
     variable: '--jumi-offset-position',
   },
@@ -2141,6 +2149,10 @@ export const propertyVariables: DependencyGraph = {
     value: '50%',
     variable: '--jumi-offset-position-x-offset',
   },
+  'offset-position-x-position': {
+    value: '50%',
+    variable: '--jumi-offset-position-x-position',
+  },
   'offset-position-y': {
     dependencies: ['offset-position-y-edge', 'offset-position-y-offset'],
     value: offsetPositionY,
@@ -2153,6 +2165,10 @@ export const propertyVariables: DependencyGraph = {
   'offset-position-y-offset': {
     value: '50%',
     variable: '--jumi-offset-position-y-offset',
+  },
+  'offset-position-y-position': {
+    value: '50%',
+    variable: '--jumi-offset-position-y-position',
   },
   'offset-rotate': {
     value: 'auto',

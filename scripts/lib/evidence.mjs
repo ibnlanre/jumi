@@ -251,13 +251,26 @@ export const scoped = [
   { component: 'background-position-y-offset', parent: 'background-position' },
   // The same two leaves under the axis that composes them. The tab places a pair by the surface its candidate
   // addresses, and after the reshape that surface serves both keys, so both identities are named rather than one.
-  { component: 'background-position-x-offset', parent: 'background-position-x' },
-  { component: 'background-position-y-offset', parent: 'background-position-y' },
+  {
+    component: 'background-position-x-offset',
+    parent: 'background-position-x',
+  },
+  {
+    component: 'background-position-y-offset',
+    parent: 'background-position-y',
+  },
   // And the two **edge** components under the axis, for the same reason: their authoring identity is the property
   // and their composition identity is the axis, the tab places them under the axis, and the registry named only the
   // property. Named here rather than left to the compound class, which carries one parent per entry.
   { component: 'background-position-x-edge', parent: 'background-position-x' },
   { component: 'background-position-y-edge', parent: 'background-position-y' },
+  // D.3.11: the same relation for the two families that migrated with the same shape. Their offset components are
+  // addressed by candidates whose surface is the property, so the population places the pair under the property too,
+  // and the registry has to name it here — the pairs, not the families, are what this class counts.
+  { component: 'object-position-x-offset', parent: 'object-position' },
+  { component: 'object-position-y-offset', parent: 'object-position' },
+  { component: 'offset-position-x-offset', parent: 'offset-position' },
+  { component: 'offset-position-y-offset', parent: 'offset-position' },
 ]
 
 /**

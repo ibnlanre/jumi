@@ -1,5 +1,4 @@
 import { writeFileSync } from 'node:fs'
-
 import { chromium } from 'playwright'
 
 import path from 'node:path'
@@ -103,7 +102,9 @@ const read = () =>
       })
 
       await new Promise(resolve => requestAnimationFrame(resolve))
-      values.push(getComputedStyle(node).getPropertyValue('offset-anchor').trim())
+      values.push(
+        getComputedStyle(node).getPropertyValue('offset-anchor').trim(),
+      )
     }
 
     return values
@@ -146,7 +147,7 @@ const resolved = async pairs => {
 const mapping = []
 
 for (const [value, why] of MAPPING)
-  mapping.push({ computed: await resting(value), why, value })
+  mapping.push({ computed: await resting(value), value, why })
 
 const arms = []
 const failures = []
@@ -223,7 +224,9 @@ writeFileSync(
   `${JSON.stringify(
     {
       arms,
-      conclusion: allEqual ? 'edge-addressed motion executes as the resolved axis' : 'edge motion cannot be executed as the resolved axis',
+      conclusion: allEqual
+        ? 'edge-addressed motion executes as the resolved axis'
+        : 'edge motion cannot be executed as the resolved axis',
       mapping,
       source: 'D.3.7 · scripts/research/d3-anchor-edge.mjs',
     },

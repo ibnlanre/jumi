@@ -211,10 +211,10 @@ const moved = values => values[0] !== values[values.length - 1]
     const typed = `#e { animation: none; ${descriptor.consumer}: ${composition}; }`
 
     const versions = {
-      native: `${fixture(context)}\n#e { ${descriptor.consumer}: ${rest}; }`,
-      untyped: `${sheet}\n${fixture(context)}\n${typed}`,
-      registered: `${registration}\n${sheet}\n${fixture(context)}\n${typed}`,
       canary: `${fixture(context)}\n#e { ${descriptor.consumer}: 20px; }`,
+      native: `${fixture(context)}\n#e { ${descriptor.consumer}: ${rest}; }`,
+      registered: `${registration}\n${sheet}\n${fixture(context)}\n${typed}`,
+      untyped: `${sheet}\n${fixture(context)}\n${typed}`,
     }
 
     const reading = {}

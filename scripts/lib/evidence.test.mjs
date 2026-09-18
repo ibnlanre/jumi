@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  compoundComponents,
   coverage,
   declared,
   project,
   promoted,
   proposed,
-  compoundComponents,
   recordFor,
 } from './evidence.mjs'
 import { describe as describePair, population } from './observation.mjs'

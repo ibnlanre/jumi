@@ -21,13 +21,15 @@
  * Run: `node scripts/research/d3-fallback-arms.mjs` (exits non-zero only on a fixture defect, never on a finding).
  */
 import { chromium } from 'playwright'
+
+import { nativeSheet } from '../lib/frames.mjs'
+import { earned } from '../lib/sources.mjs'
+
 import fs from 'node:fs'
 import path from 'node:path'
 
 import * as compileLib from '../lib/compile.mjs'
 import * as cssLib from '../lib/css.mjs'
-import { nativeSheet } from '../lib/frames.mjs'
-import { earned } from '../lib/sources.mjs'
 
 const { compiler } = compileLib
 const finalizeCss = compileLib.finalizeCss ?? cssLib.finalizeCss
@@ -86,7 +88,10 @@ const readBoth = async (css, ids) => {
 
   await page.setContent(
     `<!doctype html><html><head><style>${css}</style></head><body>${ids
-      .map(one => `<div id="${one.id}" class="${(one.classes ?? []).join(' ')}"></div>`)
+      .map(
+        one =>
+          `<div id="${one.id}" class="${(one.classes ?? []).join(' ')}"></div>`,
+      )
       .join('')}</body></html>`,
   )
 
@@ -125,8 +130,12 @@ const moved = values => new Set(values).size > 1
 const records = []
 
 for (const arm of ARMS) {
-  const shipped = finalizeCss((await compiler(ENTRY, root)).build([arm.klass])).css
-  const restRead = await readBoth(`${shipped}`, [{ classes: [arm.klass], id: 'probe' }])
+  const shipped = finalizeCss(
+    (await compiler(ENTRY, root)).build([arm.klass]),
+  ).css
+  const restRead = await readBoth(`${shipped}`, [
+    { classes: [arm.klass], id: 'probe' },
+  ])
   const rest = restRead.series[0][0]
 
   /**
@@ -152,10 +161,14 @@ for (const arm of ARMS) {
    * moved. An arm whose route is inert has not misattributed anything: it has measured an inert route, and reading
    * that as a wrong-axis arm would hide the finding behind a fixture complaint.
    */
-  const component = offset => shippedSeries.map(one => componentsOf(one)[offset])
+  const component = offset =>
+    shippedSeries.map(one => componentsOf(one)[offset])
   const shippedMoved = moved(shippedSeries)
   const liveness = earned([
-    { check: 'the shipped class emitted an animation', ok: read.animations[0] > 0 },
+    {
+      check: 'the shipped class emitted an animation',
+      ok: read.animations[0] > 0,
+    },
     { check: 'the reference moved', ok: moved(referenceSeries) },
   ])
 
@@ -175,14 +188,16 @@ for (const arm of ARMS) {
       ])
     : null
 
-  const agrees = shippedSeries.every((value, at) => value === referenceSeries[at])
+  const agrees = shippedSeries.every(
+    (value, at) => value === referenceSeries[at],
+  )
 
   records.push({
     attribution,
     axis: arm.axis,
     checks: liveness,
-    klass: arm.klass,
     kind: arm.kind,
+    klass: arm.klass,
     reference: referenceSeries,
     shipped: shippedSeries,
     verdict: !liveness.ok
@@ -203,7 +218,7 @@ const target = path.join(root, 'scripts', 'fallback-arms-series.json')
 
 fs.writeFileSync(
   target,
-  `${JSON.stringify({ source: 'scripts/research/d3-fallback-arms.mjs', wall: WALL, records }, null, 2)}\n`,
+  `${JSON.stringify({ records, source: 'scripts/research/d3-fallback-arms.mjs', wall: WALL }, null, 2)}\n`,
 )
 
 for (const one of records) {

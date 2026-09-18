@@ -1,10 +1,11 @@
 import { css } from '@/helpers/css'
 import { join } from '@/helpers/join'
 
+/** The property reads the **resolved** axis leaves; edge and offset stay authoring vocabulary. */
 export const objectPosition = join(
   [
-    css('var', '--jumi-object-position-x'),
-    css('var', '--jumi-object-position-y'),
+    css('var', '--jumi-object-position-x-position'),
+    css('var', '--jumi-object-position-y-position'),
   ],
   ' ',
 )

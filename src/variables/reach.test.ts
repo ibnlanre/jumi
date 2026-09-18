@@ -151,7 +151,7 @@ describe("D.3's constituent census", () => {
   it('reads the surface off the vocabulary, not off a list kept here', () => {
     expect(parents).toHaveLength(104)
     expect(components.size).toBe(286)
-    expect(pairs).toHaveLength(330)
+    expect(pairs).toHaveLength(338)
 
     // The source reader and the evaluated model must have the same parents, because one predicate now serves
     // a census that reads both. This is the assertion that the shared predicate is not standing in for a
@@ -172,10 +172,10 @@ describe("D.3's constituent census", () => {
     // finding rather than the exact counts.
     const constituent = pairs.length - size('machinery')
 
-    expect(constituent).toBe(309)
+    expect(constituent).toBe(317)
     expect(size('reshape')).toBe(96)
-    expect(size('value')).toBe(110)
-    expect(size('keyword')).toBe(103)
+    expect(size('value')).toBe(114)
+    expect(size('keyword')).toBe(107)
     expect(size('machinery')).toBe(21)
 
     // Each population is between a quarter and a half of the constituent surface — the statement that

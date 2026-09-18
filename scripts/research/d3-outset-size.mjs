@@ -153,7 +153,10 @@ for (const target of TARGETS) {
     /--jumi-animation-timing-function:\s*([^;]+);/.exec(shipped)?.[1]?.trim() ??
     'linear'
 
-  const restRead = await readBoth(`${shipped}\n#native { animation: none }`, target.klass)
+  const restRead = await readBoth(
+    `${shipped}\n#native { animation: none }`,
+    target.klass,
+  )
   const rest = restRead.series[0][0][slot]
 
   const reference = nativeSheet({

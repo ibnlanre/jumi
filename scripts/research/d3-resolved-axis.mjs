@@ -23,11 +23,12 @@
  * Run: `node scripts/research/d3-resolved-axis.mjs` (exits non-zero only on a fixture defect, never on a finding).
  */
 import { chromium } from 'playwright'
-import fs from 'node:fs'
-import path from 'node:path'
 
 import { nativeSheet } from '../lib/frames.mjs'
 import { earned } from '../lib/sources.mjs'
+
+import fs from 'node:fs'
+import path from 'node:path'
 
 const root = path.resolve(import.meta.dirname, '..', '..')
 const WALL = [0, 250, 500, 750, 1000]
@@ -48,7 +49,9 @@ const axisPosition = (edge, offset) => {
 
   if (edge === 'center') return component === '0' ? '50%' : null
   if (component === '0')
-    return { bottom: '100%', left: '0%', right: '100%', top: '0%' }[edge] ?? null
+    return (
+      { bottom: '100%', left: '0%', right: '100%', top: '0%' }[edge] ?? null
+    )
   if (edge === 'left' || edge === 'top') return component
   if (edge === 'right' || edge === 'bottom') return `calc(100% - ${component})`
 
@@ -112,7 +115,9 @@ const readBoth = async css => {
 
   const out = await page.evaluate(
     async ({ wall }) => {
-      const elements = ['native', 'resolved'].map(id => document.getElementById(id))
+      const elements = ['native', 'resolved'].map(id =>
+        document.getElementById(id),
+      )
       const own = elements.map(element => element.getAnimations())
       const series = []
 
@@ -193,13 +198,16 @@ for (const pair of PAIRS) {
         {
           check: 'the y component holds',
           ok:
-            new Set(referenceSeries.map(one => componentsOf(one)[1])).size === 1 &&
+            new Set(referenceSeries.map(one => componentsOf(one)[1])).size ===
+              1 &&
             new Set(resolvedSeries.map(one => componentsOf(one)[1])).size === 1,
         },
       ])
     : null
 
-  const agrees = referenceSeries.every((value, at) => value === resolvedSeries[at])
+  const agrees = referenceSeries.every(
+    (value, at) => value === resolvedSeries[at],
+  )
 
   records.push({
     attribution,
@@ -222,29 +230,31 @@ for (const pair of PAIRS) {
 await browser.close()
 
 const equivalent = records.filter(one => one.verdict === 'equivalent')
-const outcome =
-  records.every(one => one.verdict === 'equivalent')
-    ? 'resolved-axis-reproduces-native'
-    : equivalent.length
-      ? 'partial'
-      : 'falsified'
+const outcome = records.every(one => one.verdict === 'equivalent')
+  ? 'resolved-axis-reproduces-native'
+  : equivalent.length
+    ? 'partial'
+    : 'falsified'
 
 const target = path.join(root, 'scripts', 'resolved-axis-series.json')
 
 fs.writeFileSync(
   target,
-  `${JSON.stringify({ outcome, source: 'scripts/research/d3-resolved-axis.mjs', wall: WALL, records }, null, 2)}\n`,
+  `${JSON.stringify({ outcome, records, source: 'scripts/research/d3-resolved-axis.mjs', wall: WALL }, null, 2)}\n`,
 )
 
 for (const one of records) {
-  console.log(`${one.kind.padEnd(22)} ${(one.resolvedEndpoints ?? '—').padEnd(30)} ${one.verdict}`)
+  console.log(
+    `${one.kind.padEnd(22)} ${(one.resolvedEndpoints ?? '—').padEnd(30)} ${one.verdict}`,
+  )
 
   if (one.verdict !== 'equivalent' && one.reference)
     console.log(
       `    native   ${one.reference.join(' · ')}\n    resolved ${one.resolved.join(' · ')}`,
     )
 
-  if (one.checks && !one.checks.ok) console.log(`    ${one.checks.failed.join('; ')}`)
+  if (one.checks && !one.checks.ok)
+    console.log(`    ${one.checks.failed.join('; ')}`)
   if (one.attribution && !one.attribution.ok)
     console.log(`    ${one.attribution.failed.join('; ')}`)
 }

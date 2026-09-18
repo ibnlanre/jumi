@@ -59,35 +59,36 @@ describe('the plan', () => {
     'every pair with a representation in play plans, and every plan is spelled for its representation',
     { timeout: 30_000 },
     () => {
-    // The population is the derivation workstream *plus* the pairs promoted out of it, so the assertion is about
-    // the shape of every plan rather than about how many pairs the workstream happens to hold today: a
-    // promotion must not require editing this test, only the evidence it is checked against.
-    const planned = plans()
+      // The population is the derivation workstream *plus* the pairs promoted out of it, so the assertion is about
+      // the shape of every plan rather than about how many pairs the workstream happens to hold today: a
+      // promotion must not require editing this test, only the evidence it is checked against.
+      const planned = plans()
 
-    expect(planned.length).toBeGreaterThan(0)
-    expect(planned.some(one => one.status === 'planned')).toBe(true)
+      expect(planned.length).toBeGreaterThan(0)
+      expect(planned.some(one => one.status === 'planned')).toBe(true)
 
-    for (const plan of planned) {
-      if (plan.status !== 'planned') continue
+      for (const plan of planned) {
+        if (plan.status !== 'planned') continue
 
-      /**
-       * Two spellings, and the plan says which one proved it.
-       *
-       * A `phrase` plan carries the model's own resting value as its first stop, so the arm exercises the
-       * composed representation stop by stop. A `value` plan is a **shell-shaped** constituent: the frames
-       * cannot carry the leaf's value at all, and only the one-value spelling reaches the typed
-       * representation — which is what makes `spelling` part of the record rather than something a later
-       * reader has to infer from the class name.
-       */
-      expect(['phrase', 'value']).toContain(plan.spelling)
-      expect(plan.klass).toBe(
-        plan.spelling === 'value'
-          ? `${plan.candidate}-[${plan.probe}]`
-          : `${plan.candidate}-[0:${plan.rest}|100:${plan.probe}]`,
-      )
-      expect(plan.syntax in PROBES).toBe(true)
-    }
-  })
+        /**
+         * Two spellings, and the plan says which one proved it.
+         *
+         * A `phrase` plan carries the model's own resting value as its first stop, so the arm exercises the
+         * composed representation stop by stop. A `value` plan is a **shell-shaped** constituent: the frames
+         * cannot carry the leaf's value at all, and only the one-value spelling reaches the typed
+         * representation — which is what makes `spelling` part of the record rather than something a later
+         * reader has to infer from the class name.
+         */
+        expect(['phrase', 'value']).toContain(plan.spelling)
+        expect(plan.klass).toBe(
+          plan.spelling === 'value'
+            ? `${plan.candidate}-[${plan.probe}]`
+            : `${plan.candidate}-[0:${plan.rest}|100:${plan.probe}]`,
+        )
+        expect(plan.syntax in PROBES).toBe(true)
+      }
+    },
+  )
 
   test('a pair is refused with a reason rather than dropped', () => {
     // A pair whose outcome is not a derivation, planned anyway: the refusal has to name the outcome, because

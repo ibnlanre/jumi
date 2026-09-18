@@ -1,5 +1,4 @@
 import { writeFileSync } from 'node:fs'
-
 import { chromium } from 'playwright'
 
 import { normalizeOffsetAnchor } from '../lib/anchor.mjs'
@@ -107,7 +106,9 @@ const series = async (from, to) => {
       })
 
       await new Promise(resolve => requestAnimationFrame(resolve))
-      values.push(getComputedStyle(node).getPropertyValue('offset-anchor').trim())
+      values.push(
+        getComputedStyle(node).getPropertyValue('offset-anchor').trim(),
+      )
     }
 
     return values
@@ -169,7 +170,9 @@ for (const [value, why] of DECLINED)
     value,
   })
 
-console.log('D.3.7 normalizer · what the browser accepts, and what the normalizer does with it\n')
+console.log(
+  'D.3.7 normalizer · what the browser accepts, and what the normalizer does with it\n',
+)
 
 console.log('the arities, decided by the browser:')
 for (const one of arities)
@@ -188,7 +191,9 @@ for (const one of accepted) {
     continue
   }
 
-  console.log(`   reconstructed  ${one.reconstructedFrom}   →   ${one.reconstructedTo}`)
+  console.log(
+    `   reconstructed  ${one.reconstructedFrom}   →   ${one.reconstructedTo}`,
+  )
   console.log(`   authored       ${one.authoredSeries.join(' · ')}`)
   console.log(`   reconstructed  ${one.reconstructedSeries.join(' · ')}`)
   console.log(`   identical      ${one.equal ? 'yes' : 'NO'}`)
@@ -209,18 +214,27 @@ const failures = []
 
 for (const one of accepted)
   if (one.normalized && !one.equal)
-    failures.push(`${one.from} → ${one.to}: the reconstruction does not reproduce the authored series`)
+    failures.push(
+      `${one.from} → ${one.to}: the reconstruction does not reproduce the authored series`,
+    )
 
 for (const one of accepted)
   if (!one.normalized) failures.push(`${one.from} → ${one.to}: ${one.reason}`)
 
 for (const one of declined)
   if (one.normalized)
-    failures.push(`${one.value}: the normalizer accepted a form it must decline`)
+    failures.push(
+      `${one.value}: the normalizer accepted a form it must decline`,
+    )
 
 for (const one of accepted)
-  if (one.normalized && one.authoredSeries.every(value => value === one.authoredSeries[0]))
-    failures.push(`${one.from} → ${one.to}: the authored pair does not interpolate, so nothing was compared`)
+  if (
+    one.normalized &&
+    one.authoredSeries.every(value => value === one.authoredSeries[0])
+  )
+    failures.push(
+      `${one.from} → ${one.to}: the authored pair does not interpolate, so nothing was compared`,
+    )
 
 console.log(
   `\n${accepted.filter(one => one.equal).length}/${accepted.length} accepted arms reconstruct identically; ${declined.length} forms declined`,

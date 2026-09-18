@@ -130,7 +130,7 @@ for (const arm of ARMS) {
 
   const read = async sheet =>
     page.evaluate(
-      async ({ property, sheet: style, classes: klass, nodeStyle }) => {
+      async ({ classes: klass, nodeStyle, property, sheet: style }) => {
         const node = document.createElement('div')
         node.id = 'e'
         node.className = klass
@@ -151,7 +151,7 @@ for (const arm of ARMS) {
 
         return value.trim()
       },
-      { classes, property: arm.property, sheet, nodeStyle: arm.style },
+      { classes, nodeStyle: arm.style, property: arm.property, sheet },
     )
 
   const without = await read(css)
@@ -184,7 +184,9 @@ for (const arm of ARMS) {
 await browser.close()
 
 if (failures.length) {
-  console.error(`\n✗ ${failures.length} of ${ARMS.length - undecided} arms disagree:\n`)
+  console.error(
+    `\n✗ ${failures.length} of ${ARMS.length - undecided} arms disagree:\n`,
+  )
   for (const failure of failures) console.error(`  ${failure}`)
   process.exit(1)
 }

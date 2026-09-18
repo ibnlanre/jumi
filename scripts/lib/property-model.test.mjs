@@ -312,7 +312,10 @@ describe('readExpressions', () => {
       ])
       .filter(([, value, read]) => value !== read)
 
-    expect(evaluated).toHaveLength(628)
+    // 632 is 628 plus the four positional execution leaves D.3.11 declared — `object-position` and
+    // `offset-position`, one leaf per axis. The number is a record of the leaf registry; what the assertion is
+    // for is the line below it, which holds every entry to the value the plugin evaluates.
+    expect(evaluated).toHaveLength(632)
     expect(differences).toEqual([])
   })
 

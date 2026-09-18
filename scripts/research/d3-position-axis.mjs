@@ -22,11 +22,7 @@
  * Run: `pnpm research:d3-position-axis` (exits non-zero only on an arm defect, never on a finding).
  */
 import { chromium } from 'playwright'
-import fs from 'node:fs'
-import path from 'node:path'
 
-import * as compileLib from '../lib/compile.mjs'
-import * as cssLib from '../lib/css.mjs'
 import { DURATION, nativeSheet } from '../lib/frames.mjs'
 import {
   earned,
@@ -37,6 +33,12 @@ import {
   resolveWith,
 } from '../lib/sources.mjs'
 
+import fs from 'node:fs'
+import path from 'node:path'
+
+import * as compileLib from '../lib/compile.mjs'
+import * as cssLib from '../lib/css.mjs'
+
 const { compiler } = compileLib
 const finalizeCss = compileLib.finalizeCss ?? cssLib.finalizeCss
 
@@ -45,9 +47,21 @@ const WALL = [0, 250, 500, 750, 1000]
 const ENTRY = `\n@import "tailwindcss" source(none);\n@plugin "${path.join(root, 'dist', 'index.js')}";\n`
 
 const TARGETS = [
-  { attribute: 'background-position', depth: 'full', route: 'animate-background-position-[50%_50%]' },
-  { attribute: 'object-position', depth: 'corroboration', route: 'animate-object-position-[50%_50%]' },
-  { attribute: 'offset-position', depth: 'corroboration', route: 'animate-offset-position-[50%_50%]' },
+  {
+    attribute: 'background-position',
+    depth: 'full',
+    route: 'animate-background-position-[50%_50%]',
+  },
+  {
+    attribute: 'object-position',
+    depth: 'corroboration',
+    route: 'animate-object-position-[50%_50%]',
+  },
+  {
+    attribute: 'offset-position',
+    depth: 'corroboration',
+    route: 'animate-offset-position-[50%_50%]',
+  },
 ]
 
 const observedOf = attribute =>
@@ -109,9 +123,9 @@ for (const target of TARGETS) {
   const leaves = modelLeaves(target.attribute).filter(one =>
     one.name.endsWith('-offset'),
   )
-  const emitted = new RegExp(
-    `--jumi-${target.attribute}:\\s*([^;]+);`,
-  ).exec(css)?.[1]
+  const emitted = new RegExp(`--jumi-${target.attribute}:\\s*([^;]+);`).exec(
+    css,
+  )?.[1]
 
   /**
    * The prototype's property value is the composition **resolved to its leaves**, not the shipped two-level form.
@@ -130,9 +144,7 @@ for (const target of TARGETS) {
    * absent; they are defined here from the model's own rests, which is the structural source doing the job it has.
    */
   const reads = [
-    ...new Set(
-      [...shell.matchAll(/--jumi-([\w-]+)/g)].map(match => match[1]),
-    ),
+    ...new Set([...shell.matchAll(/--jumi-([\w-]+)/g)].map(match => match[1])),
   ]
   const edgeDefinitions = reads
     .filter(name => !name.endsWith('-offset'))
@@ -227,7 +239,7 @@ const target = path.join(root, 'scripts', 'position-axis-series.json')
 
 fs.writeFileSync(
   target,
-  `${JSON.stringify({ source: 'scripts/research/d3-position-axis.mjs', wall: WALL, records }, null, 2)}\n`,
+  `${JSON.stringify({ records, source: 'scripts/research/d3-position-axis.mjs', wall: WALL }, null, 2)}\n`,
 )
 
 for (const one of records) {
