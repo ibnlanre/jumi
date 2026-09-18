@@ -1,0 +1,62 @@
+{
+  "source": "scripts/research/d3-fallback-arms.mjs",
+  "wall": [
+    0,
+    250,
+    500,
+    750,
+    1000
+  ],
+  "records": [
+    {
+      "attribution": null,
+      "axis": 0,
+      "checks": {
+        "failed": [],
+        "ok": true
+      },
+      "klass": "animate-background-position-x-[0%|40px]",
+      "kind": "same-edge length",
+      "reference": [
+        "0% 0%",
+        "calc(0% + 10px) 0%",
+        "calc(0% + 20px) 0%",
+        "calc(0% + 30px) 0%",
+        "calc(0% + 40px) 0%"
+      ],
+      "shipped": [
+        "0% 0%",
+        "0% 0%",
+        "0% 0%",
+        "0% 0%",
+        "0% 0%"
+      ],
+      "verdict": "inert"
+    },
+    {
+      "attribution": null,
+      "axis": 0,
+      "checks": {
+        "failed": [],
+        "ok": true
+      },
+      "klass": "animate-background-position-x-[0%|right_40%]",
+      "kind": "edge-changing",
+      "reference": [
+        "0% 0%",
+        "15% 0%",
+        "30% 0%",
+        "45% 0%",
+        "60% 0%"
+      ],
+      "shipped": [
+        "0% 0%",
+        "0% 0%",
+        "0% 0%",
+        "0% 0%",
+        "0% 0%"
+      ],
+      "verdict": "inert"
+    }
+  ]
+}

@@ -4442,6 +4442,58 @@ One consequence lands now, and it is the ruling's own boundary: with the leaf st
 is **unrepresentable** rather than invalid, so the axis resolver declines it and the shipped whole-property route
 keeps it. That is the `native-preserved` case, not an error case.
 
+## Correction, accepted: the fallback is `unrepresented`, not `native-preserved` — and it is inert
+
+That last sentence was wrong, and the correction is the ruling's: Gate B proved the shipped single-axis route can be
+inert through partial-composition invalidity, so falling back to it is only `native-preserved` **if that declined
+spelling has been separately measured to move**. Nobody had measured it. It is measured now, and the answer is the
+one the ruling suspected.
+
+```text
+same-edge length    animate-background-position-x-[0%|40px]        inert   animation exists, property never moves
+                    native reference 0% 0% · calc(0% + 10px) 0% · … · calc(0% + 40px) 0%
+edge-changing       animate-background-position-x-[0%|right_40%]   inert   animation exists, property never moves
+                    native reference 0% 0% · 15% 0% · 30% 0% · 45% 0% · 60% 0%
+```
+
+Both arms passed liveness — the animation exists and the reference moves — so these are findings rather than fixtures.
+Neither class is `native-preserved`; both are **inert**, and **declining to the shipped whole-property route is not a
+production strategy for either of them**.
+
+Three consequences, recorded now and not acted on beyond naming them:
+
+1. The `<length-percentage>` widening is not a coverage improvement. Length routes are **broken today**, so the
+   migration has to own them rather than fall back to them, and the widening moves from improvement to prerequisite.
+2. The edge-changing class cannot be repaired by an offset leaf under **any** syntax: its motion lives in the edge,
+   a keyword. If it is to be repaired it needs the resolved-component shape (`offset-anchor`'s execution leaves,
+   which animate a resolved `<length-percentage>` rather than an edge and an offset) — and that is a question of its
+   own, with its own measurement, not something to fold into this migration.
+3. Multilayer is unaffected: it routes through the whole property by construction and stays there.
+
+The vocabulary this entry uses, per the ruling: `typed-eligible`, `unrepresented`, `edge-changing`, `multilayer` —
+and `native-preserved` is reserved for a spelling a browser has been seen to preserve.
+
+### A standing rule, from fixture defect 17
+
+> **For positional grammar, never infer axis ownership from a visually plausible spelling. Assert which computed
+> component actually moved.**
+
+Seventeen defects is enough evidence for the rule, and it is now enforced rather than remembered: the offset-leaf
+differential and these fallback arms both name the component they measure, hold the sibling, and fail as
+`misattributed` when the wrong one moves.
+
+### A guard-shape lesson from this pass
+
+The first version of these arms put the component assertion in the same list as liveness, so an inert route reported
+`unearned` — a fixture complaint about a measurement that was sound, hiding the finding behind it. Liveness and
+attribution are different questions, and **"nothing moved" must not share a verdict with "the wrong thing moved"**:
+the first is a finding about the route, the second is a defect in the arm. They are separate checks with separate
+verdicts now, and the distinction is what let the two inert results be read rather than dismissed.
+
+**State.** No production change. Gate 17/17, 505 unit tests, `tsc` clean; the readings are in
+`scripts/fallback-arms-series.json`, and the percentage-only `background-position` spike — a plumbing proof, not the
+complete landing — is unaffected by this finding and remains next.
+
 **State.** No production behaviour changed. Gate 17/17, 505 unit tests, `tsc` clean, and
 `scripts/validated-representations.json` is byte-identical to what the previous pass recorded — the differential and
 its series are the only new artifacts.
