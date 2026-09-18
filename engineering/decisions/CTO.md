@@ -4382,3 +4382,66 @@ rest was itself the measured defect, nothing here motivates moving it.
 Once x only, y only and x + y pass against the shipped build for `background-position`, `object-position` and
 `offset-position` are corroborated with one shipped arm each — and the ledger moves all three from
 `migration-required` to `migrated`.
+
+## The offset-leaf admission differential: the widening is admitted, and adopting it is not free
+
+The ruling asked for one small browser measurement before choosing between widening the positional offset leaf and
+declining lengths. `scripts/research/d3-offset-leaf.mjs` is that measurement: same subject, both edges held, native
+property against a registered `<length-percentage>` leaf, one timing function on both sides, liveness guarded on both
+arms before anything is compared.
+
+```text
+lengths              10px → 40px                       equivalent   10px 0% · 17.5px 0% · 25px 0% · 32.5px 0% · 40px 0%
+percentages          10% → 40%                         equivalent   10% 0% · 17.5% 0% · 25% 0% · 32.5% 0% · 40% 0%
+length → percentage  10px → 40%                        equivalent   calc(0% + 10px) · calc(10% + 7.5px) · … · 40%
+percentage → length  10% → 40px                        equivalent   10% · calc(7.5% + 10px) · … · calc(0% + 40px)
+arithmetic           calc(10% + 5px) → calc(40% - 5px)  equivalent   calc(10% + 5px) · calc(17.5% + 2.5px) · … · 25% · …
+```
+
+The crossings are byte-identical, `calc()` blend for `calc()` blend, which is the strongest form the answer could
+have taken: the leaf and the property live in the same interpolation space, so the widening does not change the
+motion, it only stops the route from being unrepresentable. **Outcome: `widen-to-length-percentage`.**
+
+### Fixture defect 17: the arm animated the wrong axis and agreed with itself
+
+The first run wrote both arms as `background-position: left <offset>` — read as *x edge plus offset*. It is not:
+that is `<position>`'s **two-value** form, so `left` is the x component and the offset lands on **y**. Both arms
+animated y, agreed exactly, and reported `equivalent` for a question that was not asked. Caught by reading the
+series rather than the verdict — the moving component was the second one, and the intended subject was the first.
+
+The subject is now named in the four-value form the shell actually emits (`left <offset> top 0%`), and the arm
+asserts that **the x component is the one that moves while y stays at its rest**, so the trap reports itself rather
+than reading as a pass. Two fixes paid for by the same lesson the earlier passes kept re-learning: a comparison is
+only as good as the agreement that the compared thing is the thing in question.
+
+### Adoption is deferred, because widening the declaration is not a local edit
+
+The widening was applied to the three families' offset leaves, and reverted the same hour. What it did, measured:
+
+```text
+declaration widened to <length-percentage>
+  → the probe table has no <length-percentage> entry
+  → those six routes read `unresolved`, magnitudes 0 — evidence *downgraded*, not extended
+  → and the admission guard could not see it: it asserts over `movable` records only, so losing one is invisible
+the shape reader has no <length-percentage> entry either
+  → the probe guard refuses the new probe: `20px` reads as ["length"], and no syntax admits that pair
+adding both entries
+  → the six return as `movable` at the widened syntax, and 8 more arms run
+  → but 5 further records fall from `movable` (2 magnitudes) to `unresolved` (1): under the widened representation
+    a second magnitude is lost for pairs whose evidence currently rests on the narrower probe
+  → two registry/population guards disagree (38 pairs against a population of 28)
+```
+
+So the declaration stays `<percentage>` for now, the differential stays as the admission evidence, and the adoption
+is its own increment with three named conditions: a probe for the widened syntax, the shape reader's entry for it,
+and an explanation for the five records — measured, not assumed. This is recorded rather than absorbed because the
+alternative was a half-working emission: the widened declaration made the six routes *look* fine in the unit suite
+while the registry had in fact lost them.
+
+One consequence lands now, and it is the ruling's own boundary: with the leaf still `<percentage>`, a `length` offset
+is **unrepresentable** rather than invalid, so the axis resolver declines it and the shipped whole-property route
+keeps it. That is the `native-preserved` case, not an error case.
+
+**State.** No production behaviour changed. Gate 17/17, 505 unit tests, `tsc` clean, and
+`scripts/validated-representations.json` is byte-identical to what the previous pass recorded — the differential and
+its series are the only new artifacts.

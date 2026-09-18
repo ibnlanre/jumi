@@ -1,0 +1,133 @@
+{
+  "outcome": "widen-to-length-percentage",
+  "source": "scripts/research/d3-offset-leaf.mjs",
+  "wall": [
+    0,
+    250,
+    500,
+    750,
+    1000
+  ],
+  "records": [
+    {
+      "checks": {
+        "failed": [],
+        "ok": true
+      },
+      "from": "10px",
+      "kind": "lengths",
+      "native": [
+        "10px 0%",
+        "17.5px 0%",
+        "25px 0%",
+        "32.5px 0%",
+        "40px 0%"
+      ],
+      "to": "40px",
+      "typed": [
+        "10px 0%",
+        "17.5px 0%",
+        "25px 0%",
+        "32.5px 0%",
+        "40px 0%"
+      ],
+      "verdict": "equivalent"
+    },
+    {
+      "checks": {
+        "failed": [],
+        "ok": true
+      },
+      "from": "10%",
+      "kind": "percentages",
+      "native": [
+        "10% 0%",
+        "17.5% 0%",
+        "25% 0%",
+        "32.5% 0%",
+        "40% 0%"
+      ],
+      "to": "40%",
+      "typed": [
+        "10% 0%",
+        "17.5% 0%",
+        "25% 0%",
+        "32.5% 0%",
+        "40% 0%"
+      ],
+      "verdict": "equivalent"
+    },
+    {
+      "checks": {
+        "failed": [],
+        "ok": true
+      },
+      "from": "10px",
+      "kind": "length → percentage",
+      "native": [
+        "calc(0% + 10px) 0%",
+        "calc(10% + 7.5px) 0%",
+        "calc(20% + 5px) 0%",
+        "calc(30% + 2.5px) 0%",
+        "40% 0%"
+      ],
+      "to": "40%",
+      "typed": [
+        "calc(0% + 10px) 0%",
+        "calc(10% + 7.5px) 0%",
+        "calc(20% + 5px) 0%",
+        "calc(30% + 2.5px) 0%",
+        "40% 0%"
+      ],
+      "verdict": "equivalent"
+    },
+    {
+      "checks": {
+        "failed": [],
+        "ok": true
+      },
+      "from": "10%",
+      "kind": "percentage → length",
+      "native": [
+        "10% 0%",
+        "calc(7.5% + 10px) 0%",
+        "calc(5% + 20px) 0%",
+        "calc(2.5% + 30px) 0%",
+        "calc(0% + 40px) 0%"
+      ],
+      "to": "40px",
+      "typed": [
+        "10% 0%",
+        "calc(7.5% + 10px) 0%",
+        "calc(5% + 20px) 0%",
+        "calc(2.5% + 30px) 0%",
+        "calc(0% + 40px) 0%"
+      ],
+      "verdict": "equivalent"
+    },
+    {
+      "checks": {
+        "failed": [],
+        "ok": true
+      },
+      "from": "calc(10% + 5px)",
+      "kind": "arithmetic",
+      "native": [
+        "calc(10% + 5px) 0%",
+        "calc(17.5% + 2.5px) 0%",
+        "25% 0%",
+        "calc(32.5% - 2.5px) 0%",
+        "calc(40% - 5px) 0%"
+      ],
+      "to": "calc(40% - 5px)",
+      "typed": [
+        "calc(10% + 5px) 0%",
+        "calc(17.5% + 2.5px) 0%",
+        "25% 0%",
+        "calc(32.5% - 2.5px) 0%",
+        "calc(40% - 5px) 0%"
+      ],
+      "verdict": "equivalent"
+    }
+  ]
+}
