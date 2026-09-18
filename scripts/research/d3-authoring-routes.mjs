@@ -19,55 +19,90 @@
  * leaf cannot be moving the ones it claims.
  */
 import { chromium } from 'playwright'
+
+import {
+  readCandidates,
+  readTypedExecutions,
+  readTypedLeaves,
+} from '../lib/property-model.mjs'
+
 import fs from 'node:fs'
 import path from 'node:path'
 
 import * as compileLib from '../lib/compile.mjs'
 import * as cssLib from '../lib/css.mjs'
-import { readCandidates, readTypedExecutions } from '../lib/property-model.mjs'
 
 const { compiler } = compileLib
 const finalizeCss = compileLib.finalizeCss ?? cssLib.finalizeCss
 
 const root = path.resolve(import.meta.dirname, '..', '..')
-const FAMILY = 'offset-anchor'
-const ENTRY = `\n@import "tailwindcss" source(none);\n@plugin "${path.join(root, 'dist', 'index.js')}";\n`
+/** The property a family is observed through, derived from its own name — the one conversion this book makes. */
+const observableOf = family =>
+  family.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())
 
 /**
- * The value each component's grammar accepts, per axis. Declared rather than guessed: a component without one is an
- * error rather than a default, because a probe invented here would measure a route the candidate never claimed.
+ * The value each addressed component is animated to, and the only authored input in this book.
+ *
+ * Small and explicit on purpose: a probe is a value the component's grammar accepts, and never a statement about
+ * what the route means — the resolver is the authority on that. An edge is probed with the **opposite** edge, an
+ * offset with a component away from its rest, and a compound axis with a concrete position, so every probe is both
+ * a value the candidate accepts and a value the resting state does not already hold.
+ *
+ * A component with no probe is an error rather than a default, because a probe invented here would measure a route
+ * the candidate never claimed.
  */
 const PROBES = {
+  'background-position-x': '40%',
+  'background-position-x-edge': 'right',
+  'background-position-x-offset': '10%',
+  'background-position-y': '40%',
+  'background-position-y-edge': 'bottom',
+  'background-position-y-offset': '10%',
   'offset-anchor-x-edge': 'left',
   'offset-anchor-y-edge': 'top',
 }
 
-const surface = readTypedExecutions().get(FAMILY)?.authoring ?? []
-const LEAVES = ['offset-anchor-x-position', 'offset-anchor-y-position']
-
 /**
- * The routes are **derived from the candidate table**, not listed, and that is the point of the book rather than a
- * convenience: a route is an entrance an author can enter through, so a component no candidate addresses has no
- * route to evidence. The two offset components are still authoring state — the resolver reads them, and the model
- * declares them — and they are not routes, because their candidate was retired when measurement showed no
- * invocation of it could ever move. Valid authoring state does not have to deserve an animation candidate.
+ * The **compound families** and the routes each owes evidence for, both derived from the model.
+ *
+ * A family is compound when it declares an authoring surface, because execution is resolved *out of* that state — a
+ * family with a resolver has one and a family without has none. A route exists when a **candidate addresses** the
+ * component, which is an entrance an author can enter through; a component no candidate addresses has no route to
+ * evidence while remaining perfectly valid authoring state, which is the distinction that retired `offset-anchor`'s
+ * offset candidates without retiring its offset components.
+ *
+ * The execution leaves come from the family's own declaration, so nothing here is keyed on a family's name and a
+ * family added tomorrow owes its evidence without this book being edited. The workbook started as `offset-anchor`'s
+ * and that is the correction: a harness narrower than the model it verifies cannot be trusted to say the model is
+ * wrong.
  */
-const addressed = new Set(
-  readCandidates()
-    .filter(one => one.attribute === FAMILY)
-    .flatMap(one => one.parts),
-)
+const FAMILIES = [...readTypedExecutions()]
+  .filter(([, execution]) => (execution.authoring ?? []).length > 0)
+  .map(([family, execution]) => {
+    const leaves = [...readTypedLeaves()]
+      .filter(([, one]) => one.execution && one.family === family)
+      .map(([leaf]) => leaf)
+      .sort()
+    const addressed = new Set(
+      readCandidates()
+        .filter(one => one.attribute === family)
+        .flatMap(one => one.parts),
+    )
+    const routes = (execution.authoring ?? [])
+      .filter(component => addressed.has(component))
+      .map(component => {
+        const probe = PROBES[component]
 
-const ROUTES = surface
-  .filter(component => addressed.has(component))
-  .map(component => {
-    const probe = PROBES[component]
+        if (!probe) throw new Error(`no probe is declared for \`${component}\``)
 
-    if (!probe) throw new Error(`no probe is declared for \`${component}\``)
+        return { component, family, leaves, probe }
+      })
 
-    return { component, probe }
+    return { family, leaves, routes, surface: execution.authoring ?? [] }
   })
-const series = async classes => {
+const ENTRY = `\n@import "tailwindcss" source(none);\n@plugin "${path.join(root, 'dist', 'index.js')}";\n`
+
+const series = async (classes, observable) => {
   const css = finalizeCss((await compiler(ENTRY, root)).build(classes)).css
   const browser = await chromium.launch()
   const page = await browser.newPage()
@@ -78,25 +113,28 @@ const series = async classes => {
       `</body></html>`,
   )
 
-  const values = await page.evaluate(async () => {
-    const element = document.getElementById('probe')
-    const own = element.getAnimations()
-    const duration = own[0]?.effect?.getTiming?.().duration ?? 0
-    const out = []
+  const values = await page.evaluate(
+    async ({ observable: property }) => {
+      const element = document.getElementById('probe')
+      const own = element.getAnimations()
+      const duration = own[0]?.effect?.getTiming?.().duration ?? 0
+      const out = []
 
-    for (const fraction of [0, 0.25, 0.5, 0.75, 1]) {
-      own.forEach(animation => {
-        animation.pause()
-        animation.currentTime = duration * fraction
-      })
+      for (const fraction of [0, 0.25, 0.5, 0.75, 1]) {
+        own.forEach(animation => {
+          animation.pause()
+          animation.currentTime = duration * fraction
+        })
 
-      await new Promise(requestAnimationFrame)
+        await new Promise(requestAnimationFrame)
 
-      out.push(getComputedStyle(element).offsetAnchor)
-    }
+        out.push(getComputedStyle(element)[property])
+      }
 
-    return out
-  })
+      return out
+    },
+    { observable },
+  )
 
   await browser.close()
 
@@ -106,58 +144,56 @@ const series = async classes => {
 const records = []
 
 /**
- * The leaves a route **itself** assigns, read from its own keyframe.
+ * The execution leaves a route's **own emitted definition** publishes an endpoint for.
  *
- * Scoped rather than searched sheet-wide, and the first run of this book proved why: with the sibling class present the
- * sheet carries the sibling's frames too, and a sheet-wide search reported the offset routes as assigning leaves that
- * the edge route beside them had written.
+ * Structural rather than textual, and the distinction is a correction this book paid for: the compound branch
+ * publishes exactly one endpoint slot per leaf it assigns (`--jumi-<leaf>-100`), so the set of published slots *is*
+ * the assignment — read from declarations the compiler emitted rather than recovered from the shape of a keyframes
+ * block by a wider regex. The earlier version searched the frames text and, with a sibling class in the sheet,
+ * credited the offset routes with leaves the edge route beside them had written. This one asks the sheet that
+ * carries one class, which is the fixture's own guarantee.
  */
-const leavesOf = (read, component) => {
-  const frames =
-    new RegExp(`@keyframes jumi-${component}\\s*\\{([\\s\\S]*?)\\n\\}`).exec(
-      read.css,
-    )?.[1] ?? ''
+const leavesOf = (read, leaves) =>
+  leaves.filter(leaf => read.css.includes(`--jumi-${leaf}-100`))
 
-  return [
-    ...frames.matchAll(/--jumi-(offset-anchor-[xy]-position):/g),
-  ].map(match => match[1])
-}
+for (const { family, leaves, routes, surface } of FAMILIES)
+  for (const { component, probe } of routes) {
+    const klass = `animate-${component}-[${probe}]`
+    const resting = await series([klass], observableOf(family))
+    const moves = read => new Set(read.values).size > 1
+    const assigned = leavesOf(resting, leaves)
 
-for (const { component, probe } of ROUTES) {
-  const klass = `animate-${component}-[${probe}]`
-  const resting = await series([klass])
-  const moves = read => new Set(read.values).size > 1
-  const assigned = leavesOf(resting, component)
+    /**
+     * The verdict is decided by the **emitted assignment**, not by the series, and that is a correction the first
+     * run forced: a series can be dominated by the frames of a class the reader did not name. What a route proves is
+     * that it enters typed execution — it publishes an endpoint for an execution leaf — and only then does the
+     * series say whether it moves.
+     */
+    const verdict = assigned.length && moves(resting) ? 'movable' : 'declined'
 
-  /**
-   * The verdict is decided by the **emitted assignment**, not by the series, and that is a correction the first
-   * run forced: a series can be dominated by the frames of a class the reader did not name. What a route proves is
-   * that it enters typed execution — both leaves written — and only then does the series say whether it moves.
-   */
-  const verdict =
-    assigned.length && moves(resting) ? 'movable' : 'declined'
-
-  records.push({
-    authoring: {
-      component,
-      context: surface.filter(one => one !== component),
-    },
-    condition:
-      verdict === 'declined'
-        ? 'declines, and no sibling authoring state unblocks it: the projection is built when this candidate compiles, from this candidate\u2019s own slots'
-        : null,
-    consumer: FAMILY,
-    evidence: {
-      book: 'scripts/research/d3-authoring-routes.mjs',
-      series: resting.values,
-    },
-    execution: { assigned, leaves: LEAVES },
-    parent: FAMILY,
-    representation: 'resolved positional components',
-    route: `${FAMILY}/${component}@${FAMILY}`,
-    verdict,
-  })
-}
+    records.push({
+      authoring: {
+        component,
+        context: surface.filter(one => one !== component),
+      },
+      condition:
+        verdict === 'declined'
+          ? 'declines, and no sibling authoring state unblocks it: the projection is built when this candidate compiles, from this candidate\u2019s own slots'
+          : null,
+      consumer: family,
+      evidence: {
+        book: 'scripts/research/d3-authoring-routes.mjs',
+        probe,
+        series: resting.values,
+      },
+      execution: { assigned, leaves },
+      family,
+      parent: family,
+      representation: 'resolved positional components',
+      route: `${family}/${component}@${family}`,
+      verdict,
+    })
+  }
 
 const target = path.join(root, 'scripts', 'authoring-route-evidence.json')
 

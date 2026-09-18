@@ -312,7 +312,7 @@ describe('readExpressions', () => {
       ])
       .filter(([, value, read]) => value !== read)
 
-    expect(evaluated).toHaveLength(626)
+    expect(evaluated).toHaveLength(628)
     expect(differences).toEqual([])
   })
 

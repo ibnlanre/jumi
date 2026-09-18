@@ -195,9 +195,33 @@ export const typedLeaves: Partial<
       initialValue: '0%',
       syntax: '<percentage>',
     },
+    /**
+     * The two **resolved axis** execution leaves — the subject the browser interpolates, private to the machinery.
+     *
+     * Gate B measured the shipped single-axis route inert, and the fallback arms measured that its sibling classes
+     * are inert too, so there was no working route to fall back to. Neither class could have been carried by the
+     * offset leaf either: it represents the same-edge subset, and an edge-changing motion under no syntax at all.
+     *
+     * The resolved component carries all of them at once, which `scripts/research/d3-resolved-axis.mjs` measured
+     * against the property itself — same-edge percentages, same-edge lengths, mixed units, `calc()` and an
+     * edge-changing pair, all five equivalent sample for sample.
+     *
+     * The rests are the resolved form of the authoring rests rather than a new opinion — `left` over `0%` is `0%` —
+     * so the property rests exactly where it rested before.
+     */
+    'background-position-x-position': {
+      execution: true,
+      initialValue: '0%',
+      syntax: '<length-percentage>',
+    },
     'background-position-y-offset': {
       initialValue: '0%',
       syntax: '<percentage>',
+    },
+    'background-position-y-position': {
+      execution: true,
+      initialValue: '0%',
+      syntax: '<length-percentage>',
     },
   },
   'border-block-color': {
@@ -600,6 +624,22 @@ export const scaleLeafEndpoints = (
  */
 export type TypedExecution = {
   /**
+   * The **assignment contract**: the execution leaves one addressed public component is required to own.
+   *
+   * Declared rather than inferred, and separate from the resolver on purpose. "Complete" applies to this set — the
+   * subset a public entrance must atomically own — and not to the family's execution surface, which is every subject
+   * the family may animate. The two were accidentally the same while `offset-anchor` was the only compound family,
+   * and a guard that asserted `family execution set == route execution set` as universal is the invariant D.3.9
+   * falsified: Gate A and the shipped route measurements established that a positional axis interpolates
+   * independently, so an axis route's complete assignment is one leaf while `offset-anchor`'s is both.
+   *
+   * The contract is not derived from resolution, and not from naming either — `offset-anchor` proves naming does not
+   * determine cardinality. A guard that read completeness out of whatever the resolver returned would be measuring
+   * the answer against itself; keeping the two separately testable is the whole reason this is a second facet.
+   */
+  assigns?: (component: string) => readonly string[]
+
+  /**
    * The family's **authoring surface**: the public components it exposes, and the set the resolver's projection
    * is built from.
    *
@@ -805,6 +845,65 @@ export const axisPosition = (edge: string, offset: string): null | string => {
   return null
 }
 
+/** The axis prefixes a positional family's public components are named on. */
+const AXIS_PREFIX = {
+  x: 'background-position-x',
+  y: 'background-position-y',
+} as const
+
+/** Which axis a public position component addresses, or `null` for a component that addresses neither. */
+const axisOf = (component: string): 'x' | 'y' | null => {
+  for (const axis of ['x', 'y'] as const) {
+    const prefix = AXIS_PREFIX[axis]
+
+    if (
+      component === prefix ||
+      component === `${prefix}-edge` ||
+      component === `${prefix}-offset`
+    )
+      return axis
+  }
+
+  return null
+}
+
+/**
+ * One axis endpoint as authoring state, or `null` to decline.
+ *
+ * The public axis routes are not "the offset": `src/properties/tween.ts` admits `position`, `percentage`, `length`
+ * and `any`, so an author may write `[40%]`, `[10px]`, `[calc(100%-2rem)]`, `[right_40%]` or `[var(--x)]` against
+ * one route. What execution needs from any of them is the edge the endpoint sits on and the offset beside it, and the
+ * clauses are the measured ones — a bare component sits off the axis's own start edge, a keyword is the edge itself
+ * over a zero offset, an edge followed by its offset is that pair, and everything else declines rather than being
+ * interpreted.
+ */
+export const axisEndpoint = (
+  axis: 'x' | 'y',
+  value: string,
+): null | { edge: string; offset: string } => {
+  const [start, end] = axis === 'x' ? ['left', 'right'] : ['top', 'bottom']
+  const keywords: readonly string[] = [start, end, 'center']
+  const parts = components(value)
+
+  if (parts.length === 1) {
+    const [only] = parts as [string]
+
+    if (isComponent(only)) return { edge: start as string, offset: only }
+
+    return keywords.includes(only) ? { edge: only, offset: '0' } : null
+  }
+
+  if (parts.length === 2) {
+    const [edge, offset] = parts as [string, string]
+
+    return keywords.includes(edge) && isComponent(offset)
+      ? { edge, offset }
+      : null
+  }
+
+  return null
+}
+
 /**
  * A whole authored position → the two execution components, or `null` to decline the whole route.
  *
@@ -854,6 +953,77 @@ export const positionComponents = (
 
 export const typedExecutions: Partial<Record<PropertyType, TypedExecution>> = {
   /**
+   * `background-position`'s **resolved axis** execution — the subject the browser actually interpolates.
+   *
+   * Gate B measured the shipped single-axis route inert: it emits a whole-property frame whose sibling arm falls
+   * back to the two-token axis slot, so a lone axis composes an invalid `<position>` and the declaration is dropped.
+   * The fallback arms then measured that a same-edge length and an edge-changing position are inert as well, so
+   * there was no working route to fall back to — and the offset leaf could not have carried either one, since it
+   * represents the same-edge subset and an edge-changing motion under no syntax at all.
+   *
+   * What the browser does interpolate is the resolved component, measured against the property itself in
+   * `scripts/research/d3-resolved-axis.mjs` and again on the shipped emission by the arms this migration added.
+   * So authoring stays edge and offset, execution is one resolved leaf per moving axis, and the mapping runs one
+   * way: the leaf is populated from authoring state rather than falling back into it. A registered leaf bridged with
+   * `var(--leaf, var(--axis))` would be the two-way shape this exists to avoid, and its initial value makes that
+   * fallback the wrong mechanism besides.
+   *
+   * One leaf per route, not two: Gate A established that a positional axis interpolates independently while the
+   * sibling stays statically composed, so an x route writes resolved x and leaves y to the composition. The
+   * `offset-anchor` requirement — both execution leaves or none — is that family's contract and is not inherited.
+   *
+   * **The axis components are read as addresses, not as projection state**, which is the distinction the authoring
+   * minimality guard forced the moment this was declared: the resolver receives the addressed component and its
+   * authored value, and consults the projection only for the edge and offset of the axis that component names.
+   *
+   * No `whole` is declared, and its absence is the bypass rather than a strategy that declines: whole and multilayer
+   * candidates keep their property-level execution, and a comma-separated value never reaches this resolver.
+   */
+  'background-position': {
+    /**
+     * One leaf per addressed route, which is this family's contract and not a relaxation of `offset-anchor`'s: a
+     * positional axis interpolates independently while its sibling stays statically composed, so the axis a route
+     * names is the complete assignment that route requires.
+     */
+    assigns: component => {
+      const axis = axisOf(component)
+
+      return axis ? [`${AXIS_PREFIX[axis]}-position`] : []
+    },
+    authoring: [
+      'background-position-x',
+      'background-position-x-edge',
+      'background-position-x-offset',
+      'background-position-y',
+      'background-position-y-edge',
+      'background-position-y-offset',
+    ],
+    constituent: (component, value, authoring) => {
+      const axis = axisOf(component)
+
+      if (!axis) return null
+
+      const prefix = AXIS_PREFIX[axis]
+
+      /**
+       * Two entrances, one normalization. The axis route carries its endpoint in the authored value; an edge or an
+       * offset route carries it in the authoring state the projection settled. An endpoint the normalizer cannot
+       * read declines, and so does the route.
+       */
+      const endpoint = component === prefix ? axisEndpoint(axis, value) : null
+      const edge = endpoint ? endpoint.edge : authoring[`${prefix}-edge`]
+      const offset = endpoint ? endpoint.offset : authoring[`${prefix}-offset`]
+
+      if (edge === undefined || offset === undefined) return null
+
+      // The measured clauses decide the resolved component, and they decline what they cannot read: an unknown
+      // edge, a `center` over a non-zero offset, a `var()` nothing can resolve at build time.
+      const resolved = axisPosition(edge, offset)
+
+      return resolved === null ? null : [[`${prefix}-position`, resolved]]
+    },
+  },
+  /**
    * `offset-anchor` — the first **compound** family, and the reason the `constituent` facet exists.
    *
    * Its public components are authoring vocabulary: an edge is a keyword, an offset is a value, and neither is
@@ -861,6 +1031,7 @@ export const typedExecutions: Partial<Record<PropertyType, TypedExecution>> = {
    * them — a typed x beside a native y is the half-typed state the decline exists to prevent.
    */
   'offset-anchor': {
+    assigns: () => [POSITION_X, POSITION_Y],
     authoring: [
       'offset-anchor-x-edge',
       'offset-anchor-x-offset',

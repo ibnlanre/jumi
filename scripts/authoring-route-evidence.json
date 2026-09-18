@@ -2,6 +2,240 @@
   "records": [
     {
       "authoring": {
+        "component": "background-position-x",
+        "context": [
+          "background-position-x-edge",
+          "background-position-x-offset",
+          "background-position-y",
+          "background-position-y-edge",
+          "background-position-y-offset"
+        ]
+      },
+      "condition": null,
+      "consumer": "background-position",
+      "evidence": {
+        "book": "scripts/research/d3-authoring-routes.mjs",
+        "probe": "40%",
+        "series": [
+          "0% 0%",
+          "10% 0%",
+          "20% 0%",
+          "30% 0%",
+          "40% 0%"
+        ]
+      },
+      "execution": {
+        "assigned": [
+          "background-position-x-position"
+        ],
+        "leaves": [
+          "background-position-x-position",
+          "background-position-y-position"
+        ]
+      },
+      "family": "background-position",
+      "parent": "background-position",
+      "representation": "resolved positional components",
+      "route": "background-position/background-position-x@background-position",
+      "verdict": "movable"
+    },
+    {
+      "authoring": {
+        "component": "background-position-x-edge",
+        "context": [
+          "background-position-x",
+          "background-position-x-offset",
+          "background-position-y",
+          "background-position-y-edge",
+          "background-position-y-offset"
+        ]
+      },
+      "condition": null,
+      "consumer": "background-position",
+      "evidence": {
+        "book": "scripts/research/d3-authoring-routes.mjs",
+        "probe": "right",
+        "series": [
+          "0% 0%",
+          "25% 0%",
+          "50% 0%",
+          "75% 0%",
+          "100% 0%"
+        ]
+      },
+      "execution": {
+        "assigned": [
+          "background-position-x-position"
+        ],
+        "leaves": [
+          "background-position-x-position",
+          "background-position-y-position"
+        ]
+      },
+      "family": "background-position",
+      "parent": "background-position",
+      "representation": "resolved positional components",
+      "route": "background-position/background-position-x-edge@background-position",
+      "verdict": "movable"
+    },
+    {
+      "authoring": {
+        "component": "background-position-x-offset",
+        "context": [
+          "background-position-x",
+          "background-position-x-edge",
+          "background-position-y",
+          "background-position-y-edge",
+          "background-position-y-offset"
+        ]
+      },
+      "condition": null,
+      "consumer": "background-position",
+      "evidence": {
+        "book": "scripts/research/d3-authoring-routes.mjs",
+        "probe": "10%",
+        "series": [
+          "0% 0%",
+          "2.5% 0%",
+          "5% 0%",
+          "7.5% 0%",
+          "10% 0%"
+        ]
+      },
+      "execution": {
+        "assigned": [
+          "background-position-x-position"
+        ],
+        "leaves": [
+          "background-position-x-position",
+          "background-position-y-position"
+        ]
+      },
+      "family": "background-position",
+      "parent": "background-position",
+      "representation": "resolved positional components",
+      "route": "background-position/background-position-x-offset@background-position",
+      "verdict": "movable"
+    },
+    {
+      "authoring": {
+        "component": "background-position-y",
+        "context": [
+          "background-position-x",
+          "background-position-x-edge",
+          "background-position-x-offset",
+          "background-position-y-edge",
+          "background-position-y-offset"
+        ]
+      },
+      "condition": null,
+      "consumer": "background-position",
+      "evidence": {
+        "book": "scripts/research/d3-authoring-routes.mjs",
+        "probe": "40%",
+        "series": [
+          "0% 0%",
+          "0% 10%",
+          "0% 20%",
+          "0% 30%",
+          "0% 40%"
+        ]
+      },
+      "execution": {
+        "assigned": [
+          "background-position-y-position"
+        ],
+        "leaves": [
+          "background-position-x-position",
+          "background-position-y-position"
+        ]
+      },
+      "family": "background-position",
+      "parent": "background-position",
+      "representation": "resolved positional components",
+      "route": "background-position/background-position-y@background-position",
+      "verdict": "movable"
+    },
+    {
+      "authoring": {
+        "component": "background-position-y-edge",
+        "context": [
+          "background-position-x",
+          "background-position-x-edge",
+          "background-position-x-offset",
+          "background-position-y",
+          "background-position-y-offset"
+        ]
+      },
+      "condition": null,
+      "consumer": "background-position",
+      "evidence": {
+        "book": "scripts/research/d3-authoring-routes.mjs",
+        "probe": "bottom",
+        "series": [
+          "0% 0%",
+          "0% 25%",
+          "0% 50%",
+          "0% 75%",
+          "0% 100%"
+        ]
+      },
+      "execution": {
+        "assigned": [
+          "background-position-y-position"
+        ],
+        "leaves": [
+          "background-position-x-position",
+          "background-position-y-position"
+        ]
+      },
+      "family": "background-position",
+      "parent": "background-position",
+      "representation": "resolved positional components",
+      "route": "background-position/background-position-y-edge@background-position",
+      "verdict": "movable"
+    },
+    {
+      "authoring": {
+        "component": "background-position-y-offset",
+        "context": [
+          "background-position-x",
+          "background-position-x-edge",
+          "background-position-x-offset",
+          "background-position-y",
+          "background-position-y-edge"
+        ]
+      },
+      "condition": null,
+      "consumer": "background-position",
+      "evidence": {
+        "book": "scripts/research/d3-authoring-routes.mjs",
+        "probe": "10%",
+        "series": [
+          "0% 0%",
+          "0% 2.5%",
+          "0% 5%",
+          "0% 7.5%",
+          "0% 10%"
+        ]
+      },
+      "execution": {
+        "assigned": [
+          "background-position-y-position"
+        ],
+        "leaves": [
+          "background-position-x-position",
+          "background-position-y-position"
+        ]
+      },
+      "family": "background-position",
+      "parent": "background-position",
+      "representation": "resolved positional components",
+      "route": "background-position/background-position-y-offset@background-position",
+      "verdict": "movable"
+    },
+    {
+      "authoring": {
         "component": "offset-anchor-x-edge",
         "context": [
           "offset-anchor-x-offset",
@@ -13,6 +247,7 @@
       "consumer": "offset-anchor",
       "evidence": {
         "book": "scripts/research/d3-authoring-routes.mjs",
+        "probe": "left",
         "series": [
           "50% 50%",
           "37.5% 50%",
@@ -31,6 +266,7 @@
           "offset-anchor-y-position"
         ]
       },
+      "family": "offset-anchor",
       "parent": "offset-anchor",
       "representation": "resolved positional components",
       "route": "offset-anchor/offset-anchor-x-edge@offset-anchor",
@@ -49,6 +285,7 @@
       "consumer": "offset-anchor",
       "evidence": {
         "book": "scripts/research/d3-authoring-routes.mjs",
+        "probe": "top",
         "series": [
           "50% 50%",
           "50% 37.5%",
@@ -67,6 +304,7 @@
           "offset-anchor-y-position"
         ]
       },
+      "family": "offset-anchor",
       "parent": "offset-anchor",
       "representation": "resolved positional components",
       "route": "offset-anchor/offset-anchor-y-edge@offset-anchor",

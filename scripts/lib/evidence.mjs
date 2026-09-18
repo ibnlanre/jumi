@@ -76,6 +76,52 @@ export const declared = [
 ]
 
 /**
+ * The **compound** representations: pairs that are not typed leaves themselves, and have a proven execution
+ * representation instead.
+ *
+ * A third class beside `declared` and `proposed`, and the difference is that it is checkable rather than asserted.
+ * The entry names the **route** and the **execution leaves**; the verdict is derived from the measured record rather
+ * than restated here, because a duplicated verdict is a second reading of one measurement and the two are free to
+ * drift. The chain of proof is therefore explicit at every link:
+ *
+ *   population pair → this declaration → the measured public route → the execution assignment it measured
+ *                   → the typed execution leaf, which is where the representation finally lands
+ *
+ * The pair is not a leaf. Saying so was the point: the two axis components of `background-position` are authoring
+ * vocabulary a candidate addresses, and what represents them is the resolved leaf their resolver writes.
+ */
+export const compound = [
+  {
+    component: 'background-position-x',
+    execution: ['background-position-x-position'],
+    parent: 'background-position',
+    route: 'background-position/background-position-x@background-position',
+  },
+  {
+    component: 'background-position-x-edge',
+    execution: ['background-position-x-position'],
+    parent: 'background-position',
+    route: 'background-position/background-position-x-edge@background-position',
+  },
+  {
+    component: 'background-position-y',
+    execution: ['background-position-y-position'],
+    parent: 'background-position',
+    route: 'background-position/background-position-y@background-position',
+  },
+  {
+    component: 'background-position-y-edge',
+    execution: ['background-position-y-position'],
+    parent: 'background-position',
+    route: 'background-position/background-position-y-edge@background-position',
+  },
+]
+
+/** The components a compound declaration represents, for a consumer that asks which pairs the class places. */
+export const compoundComponents = () =>
+  new Set(compound.map(one => one.component))
+
+/**
  * Evidence measured under a representation a **book proposed**.
  *
  * None of these is model coverage, and the projection must not count them as such. They are the *workstream*
@@ -184,9 +230,47 @@ export const project = descriptors =>
         }
   })
 
-/** Every **pair** the coverage class names — distinct, because a class is a set of relationships and not of routes. */
-export const declaredPairs = () => {
-  const pairs = coverage().flatMap(one => one.pairs)
+/**
+ * The pairs a **declared representation** is addressed under the property's own authoring surface.
+ *
+ * Explicit, and scoped to `background-position` on purpose. The same component has two legitimate pair identities
+ * here and they describe different relations rather than duplicating one:
+ *
+ *   (background-position-x, background-position-x-offset)   the axis composes the leaf — direct representation
+ *   (background-position, background-position-x-offset)     the public route addresses it through the property's
+ *                                                           authoring surface, represented through the resolved-axis
+ *                                                           execution
+ *
+ * The second relation is real and measured: a candidate addresses the component there, the route is measured, and
+ * its assignment is the resolved leaf. Writing it down as four entries is cheaper and clearer than a facility for
+ * "the same component under several parents", and that facility should wait for a second family that needs it —
+ * this track has grown enough ontology by generalising one consumer at a time.
+ */
+export const scoped = [
+  { component: 'background-position-x-offset', parent: 'background-position' },
+  { component: 'background-position-y-offset', parent: 'background-position' },
+  // The same two leaves under the axis that composes them. The tab places a pair by the surface its candidate
+  // addresses, and after the reshape that surface serves both keys, so both identities are named rather than one.
+  { component: 'background-position-x-offset', parent: 'background-position-x' },
+  { component: 'background-position-y-offset', parent: 'background-position-y' },
+  // And the two **edge** components under the axis, for the same reason: their authoring identity is the property
+  // and their composition identity is the axis, the tab places them under the axis, and the registry named only the
+  // property. Named here rather than left to the compound class, which carries one parent per entry.
+  { component: 'background-position-x-edge', parent: 'background-position-x' },
+  { component: 'background-position-y-edge', parent: 'background-position-y' },
+]
+
+/**
+ * Everything the registry can call **proven**: direct coverage, the property-scoped authoring pairs, and the
+ * compound representations. Three classes, one aggregate for a consumer that genuinely wants "all represented
+ * pairs" — while each class keeps its own meaning, so a consumer that needs one of them can ask for it.
+ */
+export const provenPairs = () => {
+  const pairs = [
+    ...coverage().flatMap(one => one.pairs),
+    ...scoped.map(one => pairOf(one.parent, one.component)),
+    ...compound.map(one => pairOf(one.parent, one.component)),
+  ]
   const seen = new Set()
 
   return pairs.filter(one => {
@@ -198,6 +282,9 @@ export const declaredPairs = () => {
     return true
   })
 }
+
+/** The previous name, kept as an alias while its consumers are explicit about which class they need. */
+export const declaredPairs = provenPairs
 
 /**
  * The proposals whose pair the model also declares — the intersection that must stay empty, because a proposal

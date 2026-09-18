@@ -4647,7 +4647,7 @@ routes       evidence is owed exactly where a candidate addresses the component 
 ```
 
 The permissive repair would have been a single broad guard accepting any of the three, which is the shape the ruling
-named and refused. Membership is asked as a question about *which* surface, and each surface's stronger property is
+named and refused. Membership is asked as a question about _which_ surface, and each surface's stronger property is
 asked by its own arm — so membership alone cannot pass: a declared leaf that is nominally "authoring" still has to be
 in a minimal projection the resolver actually reads.
 
@@ -4681,7 +4681,7 @@ suppressed.
 
 **State.** Model correction only; no emission change. Gate 17/17, 506 unit tests, `tsc` clean. The next attempt at the
 resolved-axis migration owes exactly one thing its guard does not yet have — authoring-route evidence for the six
-components, which is owed precisely *because* all six have public candidates — and then the structural and browser
+components, which is owed precisely _because_ all six have public candidates — and then the structural and browser
 proof the ruling requires.
 
 ## The reapplication: the new guard fired on its first live declaration, and it was half right
@@ -4695,7 +4695,7 @@ returns — the projection is not minimal
 ```
 
 That is the minimality arm, firing on its first live declaration. **It was right about the operationalisation and
-wrong about the model.** `background-position`'s axis components *are* read — as the **address** the resolver is
+wrong about the model.** `background-position`'s axis components _are_ read — as the **address** the resolver is
 called for, never as projection state. The resolver consults them through its `component` argument, so perturbing the
 projection could not move its answer, and an arm that only knew the state role would have failed a declaration that is
 exactly correct.
@@ -4707,7 +4707,7 @@ as state    the projection settles it and the resolver's answer moves with it
 as address  it is the component a public route names, so its own authored value is the input
 ```
 
-A bag entry that happens to be addressable still fails, because as an address it must answer probes *differently* —
+A bag entry that happens to be addressable still fails, because as an address it must answer probes _differently_ —
 a slot nothing reads answers every probe identically and changes nothing when dropped. So the corrected model
 immediately taught its own guard a distinction it had been missing, which is the outcome the correction existed to
 produce.
@@ -4733,6 +4733,151 @@ not an intermediate state this track accepts.
 **State.** Withdrawn again, cleanly: `src/variables/property.ts` and `src/composition/background-position.ts` are
 byte-identical to their committed form, and the offset-leaf declaration is untouched. Gate 17/17, 506 unit tests,
 `tsc` clean. What is new and kept: the strengthened minimality guard, and this checklist.
+
+## The landing, in flight: artifacts held, and the six records are owed for a reason the guard states exactly
+
+Per the ruling, the migration is reapplied and **held** — no further reverts, one commit when the tree is green. This
+entry is written in flight so the next pass starts from the state rather than from a reconstruction.
+
+Held in the working tree, uncommitted:
+
+```text
+declaration   resolved x/y <length-percentage> execution leaves, six authoring components, no whole strategy
+              (the axis components are read as addresses — which the minimality guard forced into the comment)
+composition   static resolved x/y shell; whole/multilayer untouched
+resolver      axisEndpoint → axisPosition → one resolved leaf per addressed route; projection read only for
+              the edge and offset of the axis the addressed component names
+model         property dependencies moved to the resolved leaves; two leaf entries; two names in the type union
+```
+
+### Step 6 is the live blocker, and the guard names the exact set
+
+The route-evidence guard fails with both sets printed, and they settle the question the ruling asked to leave to
+measurement:
+
+```text
+evidence has    offset-anchor/offset-anchor-x-edge · offset-anchor/offset-anchor-y-edge
+the table wants those two +
+                background-position/background-position-x · -x-edge · -x-offset
+                background-position/background-position-y · -y-edge · -y-offset
+```
+
+So the six records are owed _because all six components are addressed by real candidates_ — the guard derives that
+from the candidate table, not from the authoring surface. The evidence book is the remaining work and it is not a
+parameter away: `scripts/research/d3-authoring-routes.mjs` is written for one family (`FAMILY = 'offset-anchor'`, a
+two-entry probe map, hard-coded leaf names, and a frames regex keyed on `offset-anchor-[xy]-position`). It has to
+become compound-family-generic — iterating the families that declare a resolver, taking each addressed authoring
+component with a kind-appropriate probe, and reading the family's execution leaves from the model — before any of the
+six verdicts can be a measurement rather than an assumption. The verdicts stay the shipped behaviour's to decide;
+`movable` is not owed to a component merely for being declared.
+
+### The rest of the checklist, with the values already known
+
+```text
+census       326 → 330 pairs · 305 → 309 constituents · [108, 101, 96] → [110, 103, 96]   (+4 authoring)
+expectations src/variables/reach.test.ts 154 · 175 · the doc comment's numbers
+             scripts/lib/crosstab.test.mjs 19 · 44 · completeness (36 against 38)
+             scripts/lib/observation.test.mjs 172 · 183 · 295 · completeness Set (30 against 32)
+structural   the reach chain changes shape — `background-position-x-edge` now reaches `background` through the
+             authoring surface, because the composition no longer reads the axis slot. The set members are
+             checked before the expectation is replaced, per the ruling: model truth → evidence → expectation.
+proof        browser: same-edge % · length · mixed · calc() · edge-changing · x+y, attribution guarded
+             structural: constituent frame writes the resolved leaf, does not write `background-position`,
+             shell static, multilayer unchanged
+```
+
+**State, stated plainly: the tree is red and uncommitted, by the ruling's own discipline rather than by accident.**
+Gate is green on everything except the enumerated checklist; nothing is half-emitted, because the emission is complete
+and what is missing is its evidence and its expectations.
+
+## The harness is now as general as the model, and the six routes are measured
+
+`scripts/research/d3-authoring-routes.mjs` is no longer an `offset-anchor` book. Families, routes, execution leaves,
+observable and assignment all come from the model — compound families from a declared authoring surface, routes from
+**candidate presence**, leaves from the family's own declaration, and the observable from the family's name by one
+mechanical conversion. Nothing is keyed on a family's name, so a family added tomorrow owes its evidence without the
+book being edited.
+
+The frame regex is gone rather than widened, which is what the ruling asked for: the compound branch publishes one
+endpoint slot per leaf it assigns (`--jumi-<leaf>-100`), so **the set of published slots is the assignment** — read
+from declarations the compiler emitted instead of recovered from the shape of a keyframes block. That was the earlier
+defect's root: searching frames text credited a route with leaves its sibling had written.
+
+Measured on the shipped emission, after rebuilding the bundle:
+
+```text
+background-position-x          movable   assigned=background-position-x-position   0% 0% → 10% 0% → … → 40% 0%
+background-position-x-edge     movable   assigned=background-position-x-position   0% 0% → 25% 0% → … → 100% 0%
+background-position-x-offset   movable   assigned=background-position-x-position   0% 0% → 2.5% 0% → … → 10% 0%
+background-position-y           movable   assigned=background-position-y-position   0% 0% → 0% 10% → … → 0% 40%
+background-position-y-edge     movable   assigned=background-position-y-position   0% 0% → 0% 25% → … → 0% 100%
+background-position-y-offset   movable   assigned=background-position-y-position   0% 0% → 0% 2.5% → … → 0% 10%
+offset-anchor-x-edge           movable   assigned=both offset-anchor positions     50% 50% → … → 0% 50%
+offset-anchor-y-edge           movable   assigned=both offset-anchor positions     50% 50% → … → 50% 0%
+```
+
+Three things are established by that table rather than assumed. The axis routes **move**, where Gate B measured them
+inert: the defect this migration exists to repair is repaired, on the shipped build. Each `background-position` route
+assigns **exactly one** leaf — its own axis's — which is Gate A's independence holding in production rather than in a
+prototype. And `offset-anchor`'s two records are unchanged, so the generality did not cost the family it was written
+for.
+
+### Two consequences the measurement surfaced
+
+**Fixture defect 18 — a book that measures "the shipped build" can measure a stale one.** The first run of the
+generalized book reported all six routes `declined` with `assigned=none`, while four of their series moved: the bundle
+still predated the migration, so the book measured the old emission and would have reported a false finding in the
+same shape as a true one. The run order is `bundle` then book, and a harness whose premise is "the shipped build"
+owes that premise an assertion rather than a convention.
+
+**The both-or-neither guard needs the D.3.7 refinement.** `resolves each one to the family's complete assignment`
+asserts that a movable route assigns the family's whole execution set — true for `offset-anchor`, whose partial x/y
+assignment is unsafe, and false for these six, whose one-leaf assignment _is_ the complete assignment their route
+requires. The guard has to say what the resolver's contract already says: the complete assignment **required by the
+addressed route**, which here is one leaf.
+
+**State.** Unchanged in kind: artifacts held, tree red only on the enumerated checklist, no revert. The six route
+records are now measured and written, which was the last piece of evidence the landing was waiting on.
+
+## The assignment contract, and the two members the registry is missing
+
+The route-assignment guard is in and passes against the measured records. `TypedExecution.assigns(component)` is a
+**second facet**, declared independently of resolution, so completeness is compared against a contract rather than
+read out of the answer:
+
+```text
+offset-anchor        assigns → { x-position, y-position }    both axes, each surviving route (D.3.7: partial
+                                                             family execution is unsafe)
+background-position  assigns → the addressed axis's leaf      one per route (Gate A, and the shipped measurements)
+```
+
+with four conditions asserted: the contract is non-empty, its leaves are execution leaves the family owns, a movable
+route's measured assignment equals it exactly, and a declined route writes **none** of it.
+
+### Sets before counts: the registry, not the number
+
+Following the ruling's order surfaced _which_ members move rather than how many, and the answer is a real model gap
+rather than a count:
+
+```text
+crosstab   complete (from the tab)  38      proven (from the registry)  36
+observation complete                 32      placed (declared ∩ population)  30
+```
+
+The two members are `(background-position, background-position-x)` and `(background-position, background-position-y)`
+— the **compound axis components**. The population places them, because the family declares them as authoring surface
+and a public candidate addresses each; the registry does not name them, because `declaredPairs()` is built from
+`coverage()` — `[...declared, ...validated()]`, a declared list plus the validated leaf records — and neither source
+knows that a compound authoring component is represented at all. Its representation is the **resolved leaf its
+resolver writes**, which the route records now measure.
+
+So the reconciliation is on the registry side and it is a declaration rather than a derived guess: two entries naming
+those components, their resolved representation, and the measured route record as their evidence. The counts follow
+from that; they do not lead it.
+
+**State.** Artifacts held, no revert, red only on the enumerated checklist. Remaining in the ruling's order: those two
+registry declarations, the counts that follow, the changed reach chain pinned as topology, the structural proof, the
+browser matrix, the gate, and one commit.
 
 **State.** No production behaviour changed. Gate 17/17, 505 unit tests, `tsc` clean, and
 `scripts/validated-representations.json` is byte-identical to what the previous pass recorded — the differential and

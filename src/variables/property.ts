@@ -430,7 +430,10 @@ export const propertyVariables: DependencyGraph = {
     variable: '--jumi-background-origin',
   },
   'background-position': {
-    dependencies: ['background-position-x', 'background-position-y'],
+    dependencies: [
+      'background-position-x-position',
+      'background-position-y-position',
+    ],
     value: backgroundPosition,
     variable: '--jumi-background-position',
   },
@@ -450,6 +453,10 @@ export const propertyVariables: DependencyGraph = {
     value: '0%',
     variable: '--jumi-background-position-x-offset',
   },
+  'background-position-x-position': {
+    value: '0%',
+    variable: '--jumi-background-position-x-position',
+  },
   'background-position-y': {
     dependencies: [
       'background-position-y-edge',
@@ -465,6 +472,10 @@ export const propertyVariables: DependencyGraph = {
   'background-position-y-offset': {
     value: '0%',
     variable: '--jumi-background-position-y-offset',
+  },
+  'background-position-y-position': {
+    value: '0%',
+    variable: '--jumi-background-position-y-position',
   },
   'background-repeat': {
     dependencies: ['background-repeat-x', 'background-repeat-y'],

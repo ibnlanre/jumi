@@ -1,3 +1,4 @@
+import { compound } from './evidence.mjs'
 /**
  * What must be observed to prove that a `(parent, component)` pair can move onto typed execution.
  *
@@ -44,7 +45,15 @@ import { varReferences } from './var-references.mjs'
 
 const ENTRIES = readPropertyEntries()
 const CANDIDATES = readCandidates()
-const TYPED = readTypedLeaves()
+const TYPED = new Map([
+  ...readTypedLeaves(),
+  /**
+   * A **compound** authoring component is represented too, through the execution leaf its resolver writes — the
+   * registry declares that as its own class, and the descriptor's question ("does the model declare a
+   * representation for this component?") has the same answer for it as for a typed leaf: yes, one leaf.
+   */
+  ...compound.map(one => [one.component, one.execution[0]]),
+])
 
 /**
  * Every composition chain above one slot: the entries that declare this slot in their `dependencies`,
@@ -96,9 +105,30 @@ export const descriptorOf = ({ candidate, component, contexts, method }) => {
   ]
   const addressable = new Set([component, ...chain])
 
-  if (!addressable.has(entry.attribute))
+  /**
+   * Two channels, and they are different relations rather than two readings of one.
+   *
+   *   **composition**  the graph reaches the candidate's attribute from the component
+   *   **authoring**    the candidate's attribute is a compound family that declares this component as authoring
+   *                    state, and this candidate is a **serving** candidate for it
+   *
+   * The second arm is deliberately narrow: a declared authoring surface does not make everything in it reachable,
+   * and a family that declares a resolver does not reach a component it never names. What it says is exactly what
+   * the model states — `background-position` declares the offset as authoring vocabulary, a public candidate
+   * addresses it there, and the family's resolver executes it — and nothing wider.
+   *
+   * Keeping them separate matters because `background-position` deliberately stopped composing the axis slot. A
+   * chain that forced it back would undo the distinction this migration exists to keep, so the relation is recorded
+   * rather than synthesised.
+   */
+  const composed = addressable.has(entry.attribute)
+  const authored =
+    !composed &&
+    servingCandidates({ component, parent }).some(one => one.name === candidate)
+
+  if (!composed && !authored)
     throw new Error(
-      `\`${candidate}\` addresses \`${entry.attribute}\`, which is not reachable from \`${component}\` through composition (${chain.join(' -> ')})`,
+      `\`${candidate}\` addresses \`${entry.attribute}\`, which is reachable from \`${component}\` by neither composition (${chain.join(' -> ')}) nor its authoring surface`,
     )
 
   return {
@@ -107,6 +137,7 @@ export const descriptorOf = ({ candidate, component, contexts, method }) => {
     component,
     consumer: entry.attribute,
     contexts,
+    reach: composed ? 'composition' : 'authoring',
     method,
     parent,
     parts: entry.parts,
@@ -206,16 +237,42 @@ export const censusPopulation = () =>
  * A whole candidate (`parts` empty) addresses the property itself, so it serves the component under any
  * composition that reads it.
  */
+/**
+ * The attribute-level surfaces a pair can be addressed through.
+ *
+ * Its own parent, and any **compound family that declares that parent as authoring state** — which is the relation
+ * the model states rather than one a chain can find. The candidate that carries `background-position-x-offset` is
+ * keyed on `background-position`, because the public route names the property and the offset is a part of it; after
+ * the reshape nothing *composes* the axis attribute any more, so a chain from the leaf stops at the axis and the
+ * pair read as unaddressed while its route exists and is measured. Reading the authoring declaration is the smallest
+ * correct answer: it is the model's own statement of who holds these components.
+ */
+const AUTHORING = new Map(
+  [...readTypedExecutions()].map(([family, execution]) => [
+    family,
+    execution.authoring ?? [],
+  ]),
+)
+
+const surfacesOf = parent => [
+  parent,
+  ...[...AUTHORING]
+    .filter(([, surface]) => surface.includes(parent))
+    .map(([family]) => family),
+]
+
 export const servingCandidates = ({ component, parent }) => {
   const chain = [
     component,
     ...(chainsOf(component).find(names => names[0] === parent) ?? []),
   ]
+  const surfaces = surfacesOf(parent)
 
   return CANDIDATES.filter(
     candidate =>
       candidate.attribute &&
-      chain.includes(candidate.attribute) &&
+      (chain.includes(candidate.attribute) ||
+        surfaces.includes(candidate.attribute)) &&
       (candidate.parts.includes(component) ||
         (!candidate.parts.length && candidate.attribute === component)),
   )

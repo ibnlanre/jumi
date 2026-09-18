@@ -130,9 +130,7 @@ const surface = [
 // Counted once per pair, and never an execution leaf: both rules are the ones
 // `scripts/lib/observation.mjs`'s `censusOf` applies, and the counts below are asserted in both files.
 const pairs = [
-  ...new Map(
-    surface.map(one => [`${one.parent}/${one.leaf}`, one]),
-  ).values(),
+  ...new Map(surface.map(one => [`${one.parent}/${one.leaf}`, one])).values(),
 ]
   .filter(one => !executionLeaves.has(one.leaf))
   .map(one => ({ bucket: bucketOf(one.parent, one.leaf), ...one }))
@@ -153,7 +151,7 @@ describe("D.3's constituent census", () => {
   it('reads the surface off the vocabulary, not off a list kept here', () => {
     expect(parents).toHaveLength(104)
     expect(components.size).toBe(286)
-    expect(pairs).toHaveLength(326)
+    expect(pairs).toHaveLength(330)
 
     // The source reader and the evaluated model must have the same parents, because one predicate now serves
     // a census that reads both. This is the assertion that the shared predicate is not standing in for a
@@ -174,10 +172,10 @@ describe("D.3's constituent census", () => {
     // finding rather than the exact counts.
     const constituent = pairs.length - size('machinery')
 
-    expect(constituent).toBe(305)
+    expect(constituent).toBe(309)
     expect(size('reshape')).toBe(96)
-    expect(size('value')).toBe(108)
-    expect(size('keyword')).toBe(101)
+    expect(size('value')).toBe(110)
+    expect(size('keyword')).toBe(103)
     expect(size('machinery')).toBe(21)
 
     // Each population is between a quarter and a half of the constituent surface — the statement that
@@ -194,7 +192,9 @@ describe("D.3's constituent census", () => {
     // surface. An execution leaf is the opposite — it has no entrance, so it was never census population.
     for (const one of authoringPairs())
       expect(
-        pairs.some(pair => pair.leaf === one.component && pair.parent === one.parent),
+        pairs.some(
+          pair => pair.leaf === one.component && pair.parent === one.parent,
+        ),
         `${one.parent}/${one.component}`,
       ).toBe(true)
 

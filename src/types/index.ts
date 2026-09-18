@@ -1051,8 +1051,10 @@ export type NonStandardPropertyType =
   | 'backdrop-filter-url'
   | 'background-position-x-edge'
   | 'background-position-x-offset'
+  | 'background-position-x-position'
   | 'background-position-y-edge'
   | 'background-position-y-offset'
+  | 'background-position-y-position'
   | 'background-repeat-x'
   | 'background-repeat-y'
   | 'background-size-height'
@@ -1156,10 +1158,10 @@ export type NonStandardPropertyType =
   // The two **execution** components: what the frames animate for this family. Deliberately not part of the
   // public class surface — an author writes an edge or an offset, and the resolver turns both into these.
   | 'offset-anchor-x-position'
-  | 'offset-anchor-y-position'
   | 'offset-anchor-y'
   | 'offset-anchor-y-edge'
   | 'offset-anchor-y-offset'
+  | 'offset-anchor-y-position'
   | 'offset-position-x'
   | 'offset-position-x-edge'
   | 'offset-position-x-offset'

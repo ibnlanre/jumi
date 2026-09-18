@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  coverage,
   declared,
-  declaredPairs,
   project,
   promoted,
   proposed,
+  compoundComponents,
   recordFor,
 } from './evidence.mjs'
 import { describe as describePair, population } from './observation.mjs'
@@ -23,12 +24,17 @@ describe('the evidence registry', () => {
   const leaves = readTypedLeaves()
 
   it('holds only declared representations in the coverage class', () => {
-    // Every component in the coverage class must be a representation the model actually declares. Otherwise
+    // Every component in the **coverage** class must be a representation the model actually declares. Otherwise
     // the projection would report `movable` for a pair whose descriptor is `unresolved-descriptor`, which is
     // exactly the conflation pass one and pass two are kept apart to prevent.
-    const undeclared = declaredPairs().filter(
-      pair => !leaves.has(pair.component),
-    )
+    //
+    // Stated over `coverage()` **alone**, which is the direct-representation class. The property-scoped pairs and
+    // the compound class name other relations — a declared leaf under a second parent, and an authoring component
+    // represented through a resolver — and asking them to satisfy a leaf-shaped invariant was the caller reading
+    // the wrong set rather than the entries being wrong.
+    const undeclared = coverage()
+      .flatMap(one => one.pairs)
+      .filter(pair => !leaves.has(pair.component))
 
     expect(undeclared).toEqual([])
   })
@@ -124,8 +130,22 @@ describe('the evidence registry', () => {
     // answer is `movable`. The batch that landed in D.3.5 is 31 of those pairs and the three D.2 families are
     // the rest — but the assertion is the relation, so a later promotion does not have to edit it.
     expect(complete.length).toBeGreaterThan(0)
+
+    // Stated over the **directly represented** pairs, which are the ones the coverage class answers. A compound
+    // pair is proven by its **route** record instead — a measured public route and the execution leaf it assigns —
+    // a different class of evidence, asserted by the authoring-route guard, so counting it as unanswered here would
+    // be reading one class through another.
+    const direct = complete.filter(
+      one => !compoundComponents().has(one.component),
+    )
+
+    // The relation is stated over the **directly represented** pairs, which are the ones the coverage class
+    // answers. A compound pair is proven by its **route** record — a measured public route and the execution leaf
+    // it assigns — which is a different class of evidence, asserted by the authoring-route guard rather than by
+    // this projection, so counting it here as unanswered would be reading one class through another.
+
     expect(
-      project(complete).filter(one => one.verdict === 'movable'),
-    ).toHaveLength(complete.length)
+      project(direct).filter(one => one.verdict === 'movable'),
+    ).toHaveLength(direct.length)
   })
 })

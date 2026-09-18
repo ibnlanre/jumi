@@ -220,7 +220,9 @@ describe('typed leaf declarations', () => {
         if (leaf === attribute) continue
 
         expect(
-          composed.has(leaf) || authoring.has(leaf) || isExecutionLeaf(declaration),
+          composed.has(leaf) ||
+            authoring.has(leaf) ||
+            isExecutionLeaf(declaration),
           `\`${attribute}\` declares \`${leaf}\`, which belongs to none of its surfaces: not read by its composition, not named by its authoring projection, and not execution machinery`,
         ).toBe(true)
       }
@@ -654,15 +656,29 @@ describe('typed execution declarations', () => {
       // Kind-appropriate defaults, from the one convention the model has: an `-edge` slot holds a keyword and
       // everything else holds a component. Restating the convention here is deliberate — the arm has to be able
       // to build a projection without asking the resolver what it wants.
-      const defaultOf = (slot: string) => (slot.endsWith('-edge') ? 'left' : '10%')
-      const probes = ['left', 'right', 'center', 'top', 'bottom', '0', '10%', '20px']
+      const defaultOf = (slot: string) =>
+        slot.endsWith('-edge') ? 'left' : '10%'
+      const probes = [
+        'left',
+        'right',
+        'center',
+        'top',
+        'bottom',
+        '0',
+        '10%',
+        '20px',
+      ]
 
       /** Every answer the resolver gives for a projection, across the family's own entrances. */
-      const defaults = Object.fromEntries(slots.map(one => [one, defaultOf(one)]))
+      const defaults = Object.fromEntries(
+        slots.map(one => [one, defaultOf(one)]),
+      )
       const answers = (projection: Record<string, string>) =>
         slots
           .flatMap(slot =>
-            probes.map(probe => JSON.stringify(resolve(slot, probe, projection))),
+            probes.map(probe =>
+              JSON.stringify(resolve(slot, probe, projection)),
+            ),
           )
           .join('|')
 
@@ -771,10 +787,26 @@ describe('authoring-route evidence', () => {
         .sort()
       const resolved =
         one.verdict === 'movable' || one.verdict === 'conditional'
+      const execution = typedExecutionOf(one.parent as PropertyType)!
+      const required = execution.assigns?.(one.authoring.component) ?? []
 
-      expect([...one.execution.leaves].sort(), one.route).toEqual(leaves)
+      /**
+       * The **contract** is declared and the **answer** is measured, and they are compared rather than the answer
+       * compared with itself: reading completeness out of what the resolver returned would make this tautological,
+       * which is why `assigns` is a second facet rather than a field of the resolution.
+       *
+       * "Complete" applies to the required set. `offset-anchor` requires both leaves because partial family
+       * execution is unsafe there; a positional axis requires its own one because Gate A and the shipped route
+       * measurements established axis independence. And a declined route writes **none** of its required set —
+       * otherwise a route could half-emit, decline later, and leave execution machinery behind.
+       */
+      expect(required.length, one.route).toBeGreaterThan(0)
+      expect(
+        required.every(leaf => leaves.includes(leaf)),
+        `${one.route}: the contract names a leaf the family does not execute`,
+      ).toBe(true)
       expect([...one.execution.assigned].sort(), one.route).toEqual(
-        resolved ? leaves : [],
+        resolved ? [...required].sort() : [],
       )
 
       // A verdict that is not unconditional carries its condition, because the record's whole job is to answer

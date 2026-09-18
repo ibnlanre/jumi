@@ -126,8 +126,8 @@ describe('assemble function', () => {
     it('should resolve background-position dependencies', () => {
       const result = assemble('background-position')
 
-      expect(result).toHaveProperty('--jumi-background-position-x')
-      expect(result).toHaveProperty('--jumi-background-position-y')
+      expect(result).toHaveProperty('--jumi-background-position-x-position')
+      expect(result).toHaveProperty('--jumi-background-position-y-position')
       expect(result).toHaveProperty('--jumi-background-position')
     })
   })

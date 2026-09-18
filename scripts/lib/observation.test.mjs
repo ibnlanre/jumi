@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
+import { compoundComponents } from './evidence.mjs'
 import {
   applicationOf,
   authoringPopulation,
   censusOf,
   censusPopulation,
   chainsOf,
+  chainOf,
   describe as describePair,
   descriptorOf,
   executionLeaves,
@@ -115,21 +117,46 @@ describe('chainsOf and descriptorOf', () => {
     expect(descriptor.parts).toEqual(['column-gap'])
   })
 
-  it('reaches a shorthand the component is two compositions below', () => {
+  it('reaches the authoring route on one channel and the composition route on the other', () => {
+    // The topology is deliberately **two routes**, and neither synthesises the other:
+    //
+    //   authoring     background-position-x-edge → background-position authoring surface → constituent resolver
+    //                 → background-position-x-position
+    //   composition   background-position-x-position → background-position → background
+    //
+    // `background-position` stopped composing the axis slot in the reshape, so the composition route from the edge
+    // stops at the axis and the property relation is an **authoring** one. Forcing it back into a single chain
+    // would undo the distinction the migration exists to keep.
     const descriptor = descriptorOf({
       candidate: 'animate-background-position-x-offset',
-      component: 'background-position-x-edge',
+      component: 'background-position-x-offset',
       contexts: ['the composition'],
       method: 'computed',
     })
 
+    // The authoring channel: the candidate's surface is the property, reached through its declared authoring
+    // surface rather than through composition.
+    expect(descriptor.reach).toBe('authoring')
+    expect(descriptor.consumer).toBe('background-position')
+
+    // The composition channel stops where the model stops composing it, and that is stated rather than elided.
     expect(descriptor.chain).toEqual([
-      'background-position-x-edge',
+      'background-position-x-offset',
       'background-position-x',
+    ])
+
+    // And the execution leaf's own composition route crosses into the property, which is where the resolved
+    // subject finally reaches the CSS value an author sees.
+    expect(
+      chainOf({
+        component: 'background-position-x-position',
+        parent: 'background-position',
+      }),
+    ).toEqual([
+      'background-position-x-position',
       'background-position',
       'background',
     ])
-    expect(descriptor.consumer).toBe('background-position')
   })
 
   it('refuses a candidate whose surface the composition cannot reach', () => {
@@ -144,7 +171,7 @@ describe('chainsOf and descriptorOf', () => {
         contexts: ['flex'],
         method: 'used-gap',
       }),
-    ).toThrow(/not reachable/)
+    ).toThrow(/neither composition/)
   })
 })
 
@@ -169,7 +196,7 @@ describe('population coverage', () => {
     // 326 rather than 324: `offset-anchor`'s reshape declared its four authoring components — they are pairs
     // the family exposes and no longer pairs its composition reads — and its two execution leaves are not
     // population at all, so four arrive and two are refused rather than the graph simply growing.
-    expect(pairs).toHaveLength(326)
+    expect(pairs).toHaveLength(330)
     expect(new Set(pairs.map(one => one.parent)).size).toBe(104)
   })
 
@@ -180,7 +207,7 @@ describe('population coverage', () => {
     // which is the reshape doing what it says; the four authoring pairs arrive because the family now exposes
     // them, which it always did through the groups' own pairs and now declares at the family as well.
     expect(machinery).toHaveLength(21)
-    expect(reach).toHaveLength(305)
+    expect(reach).toHaveLength(309)
   })
 
   it('counts completeness as exactly the declared representations, placed', () => {
@@ -194,9 +221,19 @@ describe('population coverage', () => {
     // The **addressable** declarations. An execution leaf is a form the frames write rather than a surface a
     // candidate addresses, so it has no route to be complete through: its absence from `complete` is the rule,
     // not a defect, and asserting it here would demand an entrance no author has.
-    const declared = new Map(
-      [...readTypedLeaves()].filter(([, one]) => !one.execution),
-    )
+    /**
+     * The declared **representations**, which are not only typed leaves: a compound authoring component is
+     * represented through the resolved leaf its resolver writes, and the registry declares that as its own class. A
+     * pair the tab calls complete has to be a pair this map places, so the two classes belong in one set here — the
+     * alternative is a completeness guard that cannot see the representation the model actually has.
+     */
+    const declared = new Map([
+      ...[...readTypedLeaves()].filter(([, one]) => !one.execution),
+      ...[...compoundComponents()].map(component => [
+        component,
+        { compound: true },
+      ]),
+    ])
     const placed = new Set(
       censusPopulation()
         .filter(one => bucketOf(one.parent, one.component) !== 'machinery')
@@ -287,11 +324,13 @@ describe('the census population', () => {
     // "the rule is inert". The numbers are the accounting: the four authoring pairs are new to the population,
     // the two execution leaves are refused, and the graph itself is unchanged at 324.
     expect(population()).toHaveLength(324)
-    expect(authoringPopulation()).toHaveLength(4)
+    expect(authoringPopulation()).toHaveLength(10)
     expect([...executionLeaves()]).toEqual([
+      'background-position-x-position',
+      'background-position-y-position',
       'offset-anchor-x-position',
       'offset-anchor-y-position',
     ])
-    expect(censusPopulation()).toHaveLength(326)
+    expect(censusPopulation()).toHaveLength(330)
   })
 })
