@@ -1,3 +1,6 @@
+import { censusPopulation, servingCandidates } from '../lib/observation.mjs'
+import { bucketOf } from '../lib/property-model.mjs'
+
 /**
  * The residual reshape ledger: **what D.3 has left**, as opposed to what the census still calls `reshape`.
  *
@@ -16,9 +19,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { censusPopulation, servingCandidates } from '../lib/observation.mjs'
-import { bucketOf } from '../lib/property-model.mjs'
-
 const root = path.resolve(import.meta.dirname, '..', '..')
 
 /**
@@ -27,90 +27,146 @@ const root = path.resolve(import.meta.dirname, '..', '..')
  * family absent from this table is `unmeasured` by construction rather than by omission.
  */
 const SETTLED = new Map([
-  ['scale-3d', {
-    granularity: 'family',
-    production: 'unchanged',
-    reason: 'separable (D.3.8, single and three-way); no candidate serves its constituents',
-    research: 'safe-no-need',
-  }],
-  ['translate-3d', {
-    granularity: 'family',
-    production: 'unchanged',
-    reason: 'separable (D.3.8); co-existence with another transform participant already composes, so typed-whole migration repairs nothing',
-    research: 'safe-no-need',
-  }],
-  ['rotate-3d', {
-    granularity: 'family',
-    production: 'native',
-    reason: 'coupled: a fixed axis reproduces native, a turning axis beside a turning angle does not',
-    research: 'coupled-native',
-  }],
-  ['matrix', {
-    granularity: 'family',
-    production: 'native',
-    reason: 'coupled: the control passes and both adversarial simultaneous arms diverge',
-    research: 'coupled-native',
-  }],
-  ['matrix-3d', {
-    granularity: 'family',
-    production: 'native',
-    reason: 'coupled: two coefficients moving together diverge from native, and sixteen are not independent',
-    research: 'coupled-native',
-  }],
-  ['filter', {
-    granularity: 'route',
-    production: 'unchanged',
-    reason: 'separable in six combinations including nested drop-shadow; shipped execution is native-equivalent',
-    research: 'safe-no-need',
-  }],
-  ['backdrop-filter', {
-    granularity: 'route',
-    production: 'unchanged',
-    reason: 'separable in six combinations including nested drop-shadow; shipped execution is native-equivalent',
-    research: 'safe-no-need',
-  }],
-  ['filter-drop-shadow', {
-    granularity: 'route',
-    production: 'unchanged',
-    reason: 'the nested argument of a separable family, measured as an argument and as part of a coexistence arm',
-    research: 'safe-no-need',
-  }],
-  ['backdrop-filter-drop-shadow', {
-    granularity: 'route',
-    production: 'unchanged',
-    reason: 'the nested argument of a separable family, measured in both gates',
-    research: 'safe-no-need',
-  }],
-  ['math-depth', {
-    granularity: 'family',
-    production: 'migrated',
-    reason: 'the function-argument reshape landed in D.3.6: static shell, typed argument, argument as the subject',
-    research: 'migrated',
-  }],
-  ['background-repeat', {
-    granularity: 'route',
-    production: 'native',
-    reason: 'D.3.9 survey: the public route animates the longhand directly (attribute === component, no parts) and its grammar is `any` over the discrete keywords repeat/no-repeat/space/round — there is no interpolable subject to reshape',
-    research: 'keyword-discrete',
-  }],
-  ['background-position', {
-    granularity: 'route',
-    production: 'defective',
-    reason: 'Gate B: the single-axis route emits whole-property keyframes whose sibling arm falls back to the two-token axis slot, so a lone axis composes a three-token <position> that is dropped at computed-value time and moves nothing; the pair route is native-equivalent',
-    research: 'migration-required',
-  }],
-  ['object-position', {
-    granularity: 'route',
-    production: 'defective',
-    reason: 'Gate B: same shape as `background-position` — inert alone on both axes, native-equivalent when the pair is authored, with the same `0% 0%`-for-a-dropped-declaration signature',
-    research: 'migration-required',
-  }],
-  ['offset-position', {
-    granularity: 'route',
-    production: 'defective',
-    reason: 'Gate B: same shape again, seated in an authored positional state because its resting read is the keyword `normal`; inert alone on both axes, native-equivalent as a pair',
-    research: 'migration-required',
-  }],
+  [
+    'backdrop-filter',
+    {
+      granularity: 'route',
+      production: 'unchanged',
+      reason:
+        'separable in six combinations including nested drop-shadow; shipped execution is native-equivalent',
+      research: 'safe-no-need',
+    },
+  ],
+  [
+    'backdrop-filter-drop-shadow',
+    {
+      granularity: 'route',
+      production: 'unchanged',
+      reason:
+        'the nested argument of a separable family, measured in both gates',
+      research: 'safe-no-need',
+    },
+  ],
+  [
+    'background-position',
+    {
+      granularity: 'route',
+      production: 'defective',
+      reason:
+        'Gate B: partial-composition invalidity — the single-axis route emits whole-property keyframes whose sibling arm falls back to the two-token axis slot, so a lone axis composes a three-token <position> that is dropped at computed-value time and moves nothing; the pair route is native-equivalent',
+      research: 'migration-required',
+    },
+  ],
+  [
+    'background-repeat',
+    {
+      granularity: 'route',
+      production: 'native',
+      reason:
+        'D.3.9 survey: the public route animates the longhand directly (attribute === component, no parts) and its grammar is `any` over the discrete keywords repeat/no-repeat/space/round — there is no interpolable subject to reshape',
+      research: 'keyword-discrete',
+    },
+  ],
+  [
+    'filter',
+    {
+      granularity: 'route',
+      production: 'unchanged',
+      reason:
+        'separable in six combinations including nested drop-shadow; shipped execution is native-equivalent',
+      research: 'safe-no-need',
+    },
+  ],
+  [
+    'filter-drop-shadow',
+    {
+      granularity: 'route',
+      production: 'unchanged',
+      reason:
+        'the nested argument of a separable family, measured as an argument and as part of a coexistence arm',
+      research: 'safe-no-need',
+    },
+  ],
+  [
+    'math-depth',
+    {
+      granularity: 'family',
+      production: 'migrated',
+      reason:
+        'the function-argument reshape landed in D.3.6: static shell, typed argument, argument as the subject',
+      research: 'migrated',
+    },
+  ],
+  [
+    'matrix',
+    {
+      granularity: 'family',
+      production: 'native',
+      reason:
+        'coupled: the control passes and both adversarial simultaneous arms diverge',
+      research: 'coupled-native',
+    },
+  ],
+  [
+    'matrix-3d',
+    {
+      granularity: 'family',
+      production: 'native',
+      reason:
+        'coupled: two coefficients moving together diverge from native, and sixteen are not independent',
+      research: 'coupled-native',
+    },
+  ],
+  [
+    'object-position',
+    {
+      granularity: 'route',
+      production: 'defective',
+      reason:
+        'Gate B: partial-composition invalidity — same shape as `background-position`; inert alone on both axes, native-equivalent when the pair is authored, with the same `0% 0%`-for-a-dropped-declaration signature',
+      research: 'migration-required',
+    },
+  ],
+  [
+    'offset-position',
+    {
+      granularity: 'route',
+      production: 'defective',
+      reason:
+        'Gate B: partial-composition invalidity — same shape again, seated in an authored positional state because its resting read is the keyword `normal`; inert alone on both axes, native-equivalent as a pair, and `normal` stays `normal` outside authored motion',
+      research: 'migration-required',
+    },
+  ],
+  [
+    'rotate-3d',
+    {
+      granularity: 'family',
+      production: 'native',
+      reason:
+        'coupled: a fixed axis reproduces native, a turning axis beside a turning angle does not',
+      research: 'coupled-native',
+    },
+  ],
+  [
+    'scale-3d',
+    {
+      granularity: 'family',
+      production: 'unchanged',
+      reason:
+        'separable (D.3.8, single and three-way); no candidate serves its constituents',
+      research: 'safe-no-need',
+    },
+  ],
+  [
+    'translate-3d',
+    {
+      granularity: 'family',
+      production: 'unchanged',
+      reason:
+        'separable (D.3.8); co-existence with another transform participant already composes, so typed-whole migration repairs nothing',
+      research: 'safe-no-need',
+    },
+  ],
 ])
 
 /** Verdicts already recorded per route, so a family the pass could not observe says so instead of looking open. */
@@ -140,7 +196,9 @@ const reshape = censusPopulation().filter(
  * that is already decided.
  */
 const pairStatus = one =>
-  SETTLED.get(one.component)?.research ?? SETTLED.get(one.parent)?.research ?? null
+  SETTLED.get(one.component)?.research ??
+  SETTLED.get(one.parent)?.research ??
+  null
 
 const families = [...new Set(reshape.map(one => one.parent))].sort()
 
@@ -163,7 +221,8 @@ const ledger = families.map(family => {
      * its three pairs are served by candidates that address the *constituent longhands*, so a verdict about the
      * parent says nothing about the routes that actually exist.
      */
-    granularity: settled?.granularity ?? (open.length < pairs.length ? 'pair' : 'none'),
+    granularity:
+      settled?.granularity ?? (open.length < pairs.length ? 'pair' : 'none'),
     openPairs: open.map(one => one.component),
     pairCount: pairs.length,
     pairs: pairs.map(one => one.component),
@@ -205,7 +264,9 @@ fs.writeFileSync(
 )
 
 console.log(
-  `reshape pairs ${reshape.length} across ${families.length} parents — ${Object.entries(tally)
+  `reshape pairs ${reshape.length} across ${families.length} parents — ${Object.entries(
+    tally,
+  )
     .map(([status, count]) => `${status} ${count}`)
     .join(' · ')}\n`,
 )

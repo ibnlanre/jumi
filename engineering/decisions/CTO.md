@@ -4134,10 +4134,10 @@ rest.
 background-position = var(--jumi-background-position-x) var(--jumi-background-position-y)
 ```
 
-and each of *those* composes an edge beside an offset. So a typed motion animates an `-offset` leaf two levels below
+and each of _those_ composes an edge beside an offset. So a typed motion animates an `-offset` leaf two levels below
 the property, and an arm that looks for offsets in the property's composition finds none. That also corrects the
 ledger's phrasing one step further: `background-position`, `object-position` and `offset-position` do not have the
-same shape, they have the same *kind* of shape at different depths — `object-position` composes its offsets directly,
+same shape, they have the same _kind_ of shape at different depths — `object-position` composes its offsets directly,
 the other two go through an axis.
 
 **Established: multilayer is reachable and does not reach the decomposition.** The public route compiles a
@@ -4152,7 +4152,7 @@ So a two-layer value goes through the property, not through the axis slots, and 
 be stated **single-layer only** rather than left to be inferred. That is the answer the ruling asked for before any
 safety claim, and it arrived without needing the safety claim.
 
-A third state to handle, found while running: `offset-position`'s resting composition computes to the *keyword*
+A third state to handle, found while running: `offset-position`'s resting composition computes to the _keyword_
 `normal`, so its axis decomposition is only exercised once a position is authored — a different starting state from
 the other two, and one the arms have to construct rather than read.
 
@@ -4176,7 +4176,7 @@ tests, 87/87 behaviour arms, `tsc` clean.
 The source swap is in — `scripts/lib/sources.mjs` names the three evidence sources and nothing else may choose
 between them: the **model's resolved expressions** for structure, the **compiled sheet** for what shipped, the
 **computed style** for behaviour. `modelLeaves()` walks the model transitively to the leaves and carries each one's
-rest and path; `resolveToLeaves()` resolves a composition to the *reads*; `liveness()` is the three checks.
+rest and path; `resolveToLeaves()` resolves a composition to the _reads_; `liveness()` is the three checks.
 
 Every arm now proves three things before its equality is accepted, and the first run proved **why**:
 
@@ -4192,7 +4192,7 @@ before any comparison was made, and three fixture defects came out behind it:
 
 1. leaves resolved from the **compiled sheet**, which under `source(none)` carries only the slots the used class
    needs — no axis compositions, so the walk found nothing and the keyframes were empty;
-2. the prototype's property value resolved *through* the leaves, which **removes the reads** the animation writes to
+2. the prototype's property value resolved _through_ the leaves, which **removes the reads** the animation writes to
    — so the property stopped depending on the slot and the motion had nowhere to land;
 3. the shell's **edge reads were undefined**, so the declaration was invalid at computed-value time and the property
    fell to its initial value at every instant.
@@ -4251,8 +4251,11 @@ The keyframe's own declaration was lifted out of the emission and applied as a *
 carrying the same class, with the animation switched off — so no animation machinery is involved in what follows:
 
 ```css
-background-position: var(--jumi-background-position-x-UqNgw-100, var(--jumi-background-position-x))
-                     var(--jumi-background-position-y-UqNgw-100, var(--jumi-background-position-y));
+background-position: var(
+    --jumi-background-position-x-UqNgw-100,
+    var(--jumi-background-position-x)
+  )
+  var(--jumi-background-position-y-UqNgw-100, var(--jumi-background-position-y));
 ```
 
 ```text
@@ -4275,7 +4278,7 @@ resting value at every instant: the animation runs and moves nothing. In the pai
 stops are single tokens, the position is the valid `40% 40%`, and motion appears.
 
 **Classification — `whole-list ownership/contention`.** The per-axis candidate does not write a leaf: it emits a
-**whole-property** keyframe whose per-axis arms fall back to the axis *slot*, which is itself two tokens. One axis
+**whole-property** keyframe whose per-axis arms fall back to the axis _slot_, which is itself two tokens. One axis
 therefore cannot be authored without its sibling, and authoring one alone produces a silently invalid declaration
 rather than an error. It is not an ordering defect (no layer or order is involved), not nested coupling (nothing is
 nested), and not a fixture problem — the isolation above runs with no animation present, and a page that authors only
@@ -4301,3 +4304,81 @@ composed value. `background-size` was asked to stay separate and did — no per-
 **State.** No production code moved. Gate 17/17, 505 unit tests, 87/87 behaviour arms, `tsc` clean. The ledger carries
 the three routes as `migration-required` at route granularity, and the readings are in
 `scripts/position-necessity-series.json`.
+
+## Correction, accepted: the defect is partial-composition invalidity, not contention
+
+The ruling is right and the entry above is wrong in its classification. Nothing contends with another animation
+here: the failure reproduces with **one route alone**, which is the opposite of contention.
+
+```text
+single-axis candidate
+  → whole-property frame
+  → substitutes one axis endpoint
+  → the sibling axis remains a multi-token composition
+  → the resulting <position> has invalid arity
+  → the declaration is dropped
+  → the animation exists and is inert
+```
+
+Recorded as **partial-composition invalidity** (equivalently, incomplete compound execution): the frame owns a
+property the route can only partly state, and the partial statement is invalid rather than merged. Recorded, not
+edited in place, and the term it replaces is removed from this case only — `whole-list ownership/contention` keeps its
+meaning for competing property ownership, which is the `filter` shape D.3.6 measured (a native whole-property
+animation and a constituent motion over one property, one winning outright and the other going silent).
+
+The classification has no bearing on the verdict: Gate B still passes for all three, and the ledger's status does not
+change on it.
+
+### The question before coding, answered: the axis value is not "the offset"
+
+Enumerated from the candidate table rather than assumed — `src/properties/tween.ts`, the three axis families:
+
+```text
+animate-background-position-x          type: position · percentage · length · any   values: empty.position → `center`
+animate-background-position-y          type: position · percentage · length · any   values: objectPosition + percentage
+animate-object-position-x / -y         type: length · percentage · position         values: empty.position → `center`
+animate-offset-position-x / -y         type: length · percentage · position         values: empty.position → `center`
+animate-background-position-x-offset   type: percentage · length                    values: percentage
+```
+
+So the same public route accepts `[40%]`, `[10px]`, `[calc(100%-2rem)]`, `[right_40%]`, `[var(--x)]`, `center` — and
+two facts fall out that the spike has to respect:
+
+**Only an offset that shares its edge is leaf motion.** `[left_10%] → [right_10%]` is accepted, and its motion lives
+entirely in the *edge*, which is a keyword: a discrete swap the offset leaf cannot carry. The leaf route is therefore
+available only when both endpoints normalize to the same edge, and a motion whose endpoints differ in edge keeps the
+shipped whole-property route. This is `axisPosition`'s own clause reading applied to a pair rather than to a value.
+
+**The typed offset leaf is narrower than the public offset route.** `animate-background-position-x-offset` accepts
+`length`, while `typedLeaves['background-position']['background-position-x-offset']` is declared `syntax:
+'<percentage>'` — and a write to a `<percentage>`-registered property is invalid at computed-value time, which is
+exactly the inert-animation shape this pass measured. So `[10px]` is a route an author can write and a leaf value this
+declaration cannot hold. Two honest resolutions, and the spike picks one on evidence rather than on convenience:
+widen the declared leaf to `<length-percentage>` (which the registration accepts and which `offset-anchor`'s
+execution leaves already use), or decline lengths and leave those routes whole. `%` passing must not settle it.
+
+The normalization is to reuse the measured clauses in `axisPosition` rather than invent `value → offset`: a bare
+component sits off the axis's own start edge, a keyword is the edge itself over a zero offset, an edge followed by its
+offset is that pair, and anything else declines.
+
+### What the spike proves, and what it must not touch
+
+Taken as written. The deep proof case is `background-position-x`: single x → the frame writes `x-offset` and the
+property moves; single y → `y-offset`; x + y → both leaves, native-equivalent; the **shell stays static** (edge, axis
+and property compositions are untouched); and the comma-separated multilayer spelling still bypasses this path
+entirely, since it routes through the whole property and must keep doing so.
+
+The `offset-anchor` precedent is reused as a mechanism and not as a contract. Its `constituent` assigns **both**
+execution leaves because partial assignment was unsafe for that family; Gate A established the opposite here — one
+positional axis moves safely while the other stays at its static composition — so the abstraction stays
+`complete assignment required by this family's execution contract`, not "every execution leaf of the parent". For
+these families the complete assignment may legitimately be one offset leaf.
+
+`offset-position: normal` is preserved rather than normalized for uniformity: the typed route activates only once the
+public route supplies an authored positional value, `normal` stays `normal` when nothing is authored, and no substrate
+turns `normal` into `50% 50%` without browser evidence for that semantic change. Unlike `offset-anchor`, whose invalid
+rest was itself the measured defect, nothing here motivates moving it.
+
+Once x only, y only and x + y pass against the shipped build for `background-position`, `object-position` and
+`offset-position` are corroborated with one shipped arm each — and the ledger moves all three from
+`migration-required` to `migrated`.
