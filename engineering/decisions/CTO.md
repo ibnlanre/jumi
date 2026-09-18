@@ -4117,3 +4117,54 @@ rank ties are worth reading as a group instead of broken arbitrarily.
 
 **State.** No production code moved. Gate 17/17, 498 unit tests, 87/87 behaviour arms, `tsc` clean. The ledger is
 `scripts/reshape-residual.json`; `pnpm research:d3-residual` regenerates it.
+
+---
+
+## The axis-pair test: two-level structure established, multilayer answered, and the arms inconclusive for a named reason
+
+The ruling's correction is taken: structure is a reusable hypothesis, not transferable evidence, so
+`background-position` gets the depth and the other two get one adversarial arm each. The pass is
+`scripts/research/d3-position-axis.mjs`, and it reported what it reported — three `fixture-inert` arms and one
+decisive multilayer answer — so the honest record is the two things it established and the defect that stopped the
+rest.
+
+**Established: the decomposition is two levels deep, not one.** The property's own composition is
+
+```text
+background-position = var(--jumi-background-position-x) var(--jumi-background-position-y)
+```
+
+and each of *those* composes an edge beside an offset. So a typed motion animates an `-offset` leaf two levels below
+the property, and an arm that looks for offsets in the property's composition finds none. That also corrects the
+ledger's phrasing one step further: `background-position`, `object-position` and `offset-position` do not have the
+same shape, they have the same *kind* of shape at different depths — `object-position` composes its offsets directly,
+the other two go through an axis.
+
+**Established: multilayer is reachable and does not reach the decomposition.** The public route compiles a
+comma-separated value, and its emission is whole-property:
+
+```text
+class     animate-background-position-[0%_0%,_100%_100%]
+frames    to { background-position: var(--jumi-background-position-Z2vSFXt); }
+```
+
+So a two-layer value goes through the property, not through the axis slots, and any admission for this family has to
+be stated **single-layer only** rather than left to be inferred. That is the answer the ruling asked for before any
+safety claim, and it arrived without needing the safety claim.
+
+A third state to handle, found while running: `offset-position`'s resting composition computes to the *keyword*
+`normal`, so its axis decomposition is only exercised once a position is authored — a different starting state from
+the other two, and one the arms have to construct rather than read.
+
+**Not established, and the reason is a fixture defect rather than a finding.** The typed arms are inert because the
+book resolved the leaves from the **compiled sheet**, and with `source(none)` the sheet carries only the slots the
+used class needs: the axis compositions are not in it, so the walk found no leaves and the keyframes were empty. The
+fix is named rather than half-done — resolve the composition from `readExpressions()`, the model's own resolved map,
+which is what the validation pass uses for exactly this reason — and the arms should be re-run before anything is
+concluded about separability for any of the three families.
+
+That is the fourteenth measurement defect in this track, and the pattern has not changed: an arm that measures an
+empty subject reports agreement with itself, and only the printed series shows it.
+
+**State.** No production code moved; the book is research-only and the lint stage is green. Gate 17/17, 498 unit
+tests, 87/87 behaviour arms, `tsc` clean.
