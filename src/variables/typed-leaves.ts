@@ -616,16 +616,6 @@ export type TypedExecution = {
   authoring?: readonly string[]
 
   /**
-   * A whole value → the leaves it sets, in the family's own order, or `null` to **decline** the
-   * motion so the caller keeps the property-level representation.
-   *
-   * Declining is all-or-nothing on purpose: a motion that cannot be represented completely does not
-   * enter the typed path partially, because a native whole-property animation and a constituent
-   * motion over one property contend for it and the loser goes silent.
-   */
-  whole: (value: string) => Array<[string, string]> | null
-
-  /**
    * A **constituent** value → the complete set of execution leaves it assigns, or `null` to decline the route.
    *
    * A constituent already has a simple shape, and it stays: the authored component *is* the execution leaf, so
@@ -659,6 +649,24 @@ export type TypedExecution = {
      */
     authoring: Record<string, string>,
   ) => Array<[string, string]> | null
+
+  /**
+   * A whole value → the leaves it sets, in the family's own order, or `null` to **decline** the
+   * motion so the caller keeps the property-level representation.
+   *
+   * Declining is all-or-nothing on purpose: a motion that cannot be represented completely does not
+   * enter the typed path partially, because a native whole-property animation and a constituent
+   * motion over one property contend for it and the loser goes silent.
+   *
+   * **Optional, because declaring no strategy is not the same claim as declining every value.** A family that
+   * declares no whole facet has not decided that whole values decline; it has decided that whole values are not
+   * its business and the existing property-level path keeps them. `background-position` is the case that forced
+   * the distinction: its constituent routes resolve to execution leaves while `animate-background-position-[…]`
+   * — multilayer included — must keep the representation it already has. Writing `whole: () => null` instead
+   * would assert a strategy whose every answer happens to be a decline, which is a different statement and would
+   * be read as one by every consumer of this facet.
+   */
+  whole?: (value: string) => Array<[string, string]> | null
 }
 
 /**
@@ -744,8 +752,7 @@ const isArithmetic = (text: string) => {
 }
 
 /** Whether a component is one this family can carry through to a frame. */
-const isComponent = (text: string) =>
-  COMPONENT.test(text) || isArithmetic(text)
+const isComponent = (text: string) => COMPONENT.test(text) || isArithmetic(text)
 
 /** A value split at top-level spaces, so `calc(50% + 4px)` stays one component. */
 const components = (value: string) => {
@@ -788,7 +795,9 @@ export const axisPosition = (edge: string, offset: string): null | string => {
   if (!isComponent(component)) return null
 
   if (component === '0')
-    return { bottom: '100%', left: '0%', right: '100%', top: '0%' }[edge] ?? null
+    return (
+      { bottom: '100%', left: '0%', right: '100%', top: '0%' }[edge] ?? null
+    )
 
   if (edge === 'left' || edge === 'top') return component
   if (edge === 'right' || edge === 'bottom') return `calc(100% - ${component})`
@@ -844,22 +853,6 @@ export const positionComponents = (
 }
 
 export const typedExecutions: Partial<Record<PropertyType, TypedExecution>> = {
-  scale: {
-    whole: value => {
-      const endpoints = scaleLeafEndpoints(value)
-
-      return endpoints
-        ? [
-            ['scale-x', endpoints[0]],
-            ['scale-y', endpoints[1]],
-            ['scale-z', endpoints[2]],
-          ]
-        : null
-    },
-  },
-  translate: {
-    whole: translateLeaves,
-  },
   /**
    * `offset-anchor` — the first **compound** family, and the reason the `constituent` facet exists.
    *
@@ -874,7 +867,6 @@ export const typedExecutions: Partial<Record<PropertyType, TypedExecution>> = {
       'offset-anchor-y-edge',
       'offset-anchor-y-offset',
     ],
-    whole: value => positionComponents(value),
     constituent: (component, _value, authoring) => {
       // Only the four declared components are read, and only from authoring state. An absent slot declines: the
       // projection is built from this family's own surface, so a missing key means the model does not declare it
@@ -908,6 +900,23 @@ export const typedExecutions: Partial<Record<PropertyType, TypedExecution>> = {
           ]
         : null
     },
+    whole: value => positionComponents(value),
+  },
+  'scale': {
+    whole: value => {
+      const endpoints = scaleLeafEndpoints(value)
+
+      return endpoints
+        ? [
+            ['scale-x', endpoints[0]],
+            ['scale-y', endpoints[1]],
+            ['scale-z', endpoints[2]],
+          ]
+        : null
+    },
+  },
+  'translate': {
+    whole: translateLeaves,
   },
 }
 

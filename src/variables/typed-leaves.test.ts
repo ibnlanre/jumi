@@ -160,7 +160,7 @@ describe('typed leaf declarations', () => {
     ])
   })
 
-  it('names only leaves the family reads, at any depth, or the family itself', () => {
+  it('names only leaves that belong to a surface the family actually has', () => {
     // Three shapes, and the runtime has one lookup for all of them — `typedLeavesOf(attribute)`, where the
     // attribute is the property the *candidate* animates.
     //
@@ -187,6 +187,15 @@ describe('typed leaf declarations', () => {
     // The other half of that intent, "a `composite` leaf is a routing problem this increment does not solve", is
     // asserted by the sibling test below: a leaf that is itself a composition is rejected outright, so a
     // composite can be a *path* through this walk but never a declaration.
+    //
+    // **D.3.7 split this assertion from one union into a membership, and the split is the point.** "Read by the
+    // composition" was never the full reason a declaration may exist; once a family resolves execution out of an
+    // authoring surface, a declared component can belong to any of three surfaces — composition, authoring,
+    // execution — and the permissive repair would have been one broad guard accepting any of them. So this arm
+    // asks only the total question, *which* surface the declaration belongs to, and each surface's stronger
+    // property is asserted by its own arm: the authoring projection is minimal and consumed, and an execution
+    // leaf is owned by a declaration and written by a proven route. Membership without the strong property is
+    // the thing that must not pass, and it cannot: it is asserted elsewhere.
     const reachable = (attribute: PropertyType) => {
       const seen = new Set<string>()
       const queue: PropertyType[] = [attribute]
@@ -205,13 +214,14 @@ describe('typed leaf declarations', () => {
 
     for (const [attribute, leaves] of Object.entries(typedLeaves)) {
       const composed = reachable(attribute as PropertyType)
+      const authoring = new Set(authoringOf(attribute as PropertyType))
 
-      for (const leaf of Object.keys(leaves ?? {})) {
+      for (const [leaf, declaration] of Object.entries(leaves ?? {})) {
         if (leaf === attribute) continue
 
         expect(
-          composed.has(leaf),
-          `\`${attribute}\` declares \`${leaf}\`, which it does not read through direct composition`,
+          composed.has(leaf) || authoring.has(leaf) || isExecutionLeaf(declaration),
+          `\`${attribute}\` declares \`${leaf}\`, which belongs to none of its surfaces: not read by its composition, not named by its authoring projection, and not execution machinery`,
         ).toBe(true)
       }
     }
@@ -485,12 +495,12 @@ describe('typed execution declarations', () => {
     // The facet carries the names, and that is the point of extracting it: the core writes
     // `--jumi-<leaf>` for each pair without knowing which family it is animating, or assuming that
     // a decomposition returns its values in the same order as the leaves happen to be registered.
-    expect(typedExecutionOf('scale')?.whole('2 3 4')).toEqual([
+    expect(typedExecutionOf('scale')?.whole?.('2 3 4')).toEqual([
       ['scale-x', '2'],
       ['scale-y', '3'],
       ['scale-z', '4'],
     ])
-    expect(typedExecutionOf('scale')?.whole('150%')).toEqual([
+    expect(typedExecutionOf('scale')?.whole?.('150%')).toEqual([
       ['scale-x', '1.5'],
       ['scale-y', '1.5'],
       ['scale-z', '1.5'],
@@ -510,6 +520,11 @@ describe('typed execution declarations', () => {
     // state the whole facet does not receive — and requiring them here would demand the facet invent
     // an entrance. What an author can address still owes a whole-value reading, and that is asserted.
     for (const [attribute, execution] of Object.entries(typedExecutions)) {
+      // A family that declares no whole strategy is not examined here. What it owes is the execution-surface truth
+      // — every execution leaf owned by a declaration and written by a proven route — not a whole-value reading it
+      // never claimed. Absence and decline are different claims, and this arm is only about decline.
+      if (!execution.whole) continue
+
       const declared = typedLeavesOf(attribute as PropertyType).map(
         ([leaf]) => leaf,
       )
@@ -544,6 +559,8 @@ describe('typed execution declarations', () => {
     // The array stays an array on purpose. It is compiler output in emission order, and a record
     // would push object-key semantics into that output to buy a guarantee one test states outright.
     for (const [attribute, execution] of Object.entries(typedExecutions)) {
+      if (!execution.whole) continue
+
       const names = (execution.whole('2 3 4') ?? []).map(([leaf]) => leaf)
 
       expect(new Set(names).size, `${attribute}: ${names.join(', ')}`).toBe(
@@ -557,12 +574,13 @@ describe('typed execution declarations', () => {
     // composition it wraps: a value that reaches the typed path without a complete decomposition is
     // the partial move this whole boundary exists to prevent.
     const execution = typedExecutionOf('scale')!
+    const whole = execution.whole!
 
     for (const value of ['none', '2 3 4 5', 'var(--x)', '2px', ''])
-      expect(execution.whole(value), value).toBeNull()
+      expect(whole(value), value).toBeNull()
 
     for (const value of ['2', '2 3', '2 3 4', '150%', '2 150%'])
-      expect(execution.whole(value), value).not.toBeNull()
+      expect(whole(value), value).not.toBeNull()
   })
 
   it('has no facet for a family that declares no typed leaves', () => {
@@ -612,6 +630,64 @@ describe('typed execution declarations', () => {
     for (const attribute of Object.keys(typedExecutions) as PropertyType[])
       if (typedLeavesOf(attribute).some(([, one]) => isExecutionLeaf(one)))
         expect(authoringOf(attribute).length, attribute).toBeGreaterThan(0)
+  })
+
+  it('declares an authoring projection the resolver reads, and reads nothing it did not declare', () => {
+    // The two halves of the same property, and neither is checkable from the other.
+    //
+    // **Minimal**: a declared authoring component the resolver never reads is a bag entry — the first step
+    // towards `authoring` becoming another `dependencies`, which is the shape this facet exists to avoid. The
+    // arm is a **differential** rather than an inspection: for each declared slot, some probe must change what
+    // the resolver returns when the slot is present and absent, or the declaration is not pulled on.
+    //
+    // **Complete**: every slot the resolver reads has to be declared, because the projection is built from
+    // exactly this list and an absent key is a decline. Nothing outside the declared projection is *available*
+    // to the resolver, which is the safety half — a resolver free to reach for a nearby model slot would be the
+    // same code with an unbounded contract.
+    for (const [attribute, execution] of Object.entries(typedExecutions)) {
+      const resolve = execution.constituent
+
+      if (!resolve) continue
+
+      const slots = [...(execution.authoring ?? [])]
+
+      // Kind-appropriate defaults, from the one convention the model has: an `-edge` slot holds a keyword and
+      // everything else holds a component. Restating the convention here is deliberate — the arm has to be able
+      // to build a projection without asking the resolver what it wants.
+      const defaultOf = (slot: string) => (slot.endsWith('-edge') ? 'left' : '10%')
+      const probes = ['left', 'right', 'center', 'top', 'bottom', '0', '10%', '20px']
+
+      /** Every answer the resolver gives for a projection, across the family's own entrances. */
+      const answers = (projection: Record<string, string>) => {
+        const out: string[] = []
+
+        for (const slot of slots)
+          for (const probe of probes)
+            out.push(JSON.stringify(resolve(slot, probe, projection)))
+
+        return out.join('|')
+      }
+
+      for (const slot of slots.slice()) {
+        const witness = probes.some(probe => {
+          const complete = Object.fromEntries(
+            slots.map(one => [one, one === slot ? probe : defaultOf(one)]),
+          )
+          const without = Object.fromEntries(
+            slots
+              .filter(one => one !== slot)
+              .map(one => [one, defaultOf(one)]),
+          )
+
+          return answers(complete) !== answers(without)
+        })
+
+        expect(
+          witness,
+          `\`${attribute}\` declares \`${slot}\` as authoring, and no probe changes what its resolver returns — the projection is not minimal`,
+        ).toBe(true)
+      }
+    }
   })
 })
 
@@ -683,7 +759,8 @@ describe('authoring-route evidence', () => {
         .filter(([, declaration]) => isExecutionLeaf(declaration))
         .map(([leaf]) => leaf)
         .sort()
-      const resolved = one.verdict === 'movable' || one.verdict === 'conditional'
+      const resolved =
+        one.verdict === 'movable' || one.verdict === 'conditional'
 
       expect([...one.execution.leaves].sort(), one.route).toEqual(leaves)
       expect([...one.execution.assigned].sort(), one.route).toEqual(

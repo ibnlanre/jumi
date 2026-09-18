@@ -679,7 +679,7 @@ export function createJumiModel({
      * write would make `from` equal `to` and the animation would never move while looking correct.
      */
     const leaves =
-      typedExecutionOf(attribute as PropertyType)?.whole(value) ?? null
+      typedExecutionOf(attribute as PropertyType)?.whole?.(value) ?? null
 
     if (leaves) {
       /**

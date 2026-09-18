@@ -4345,7 +4345,7 @@ So the same public route accepts `[40%]`, `[10px]`, `[calc(100%-2rem)]`, `[right
 two facts fall out that the spike has to respect:
 
 **Only an offset that shares its edge is leaf motion.** `[left_10%] → [right_10%]` is accepted, and its motion lives
-entirely in the *edge*, which is a keyword: a discrete swap the offset leaf cannot carry. The leaf route is therefore
+entirely in the _edge_, which is a keyword: a discrete swap the offset leaf cannot carry. The leaf route is therefore
 available only when both endpoints normalize to the same edge, and a motion whose endpoints differ in edge keeps the
 shipped whole-property route. This is `axisPosition`'s own clause reading applied to a pair rather than to a value.
 
@@ -4404,7 +4404,7 @@ motion, it only stops the route from being unrepresentable. **Outcome: `widen-to
 
 ### Fixture defect 17: the arm animated the wrong axis and agreed with itself
 
-The first run wrote both arms as `background-position: left <offset>` — read as *x edge plus offset*. It is not:
+The first run wrote both arms as `background-position: left <offset>` — read as _x edge plus offset_. It is not:
 that is `<position>`'s **two-value** form, so `left` is the x component and the offset lands on **y**. Both arms
 animated y, agreed exactly, and reported `equivalent` for a question that was not asked. Caught by reading the
 series rather than the verdict — the moving component was the second one, and the intended subject was the first.
@@ -4435,7 +4435,7 @@ adding both entries
 So the declaration stays `<percentage>` for now, the differential stays as the admission evidence, and the adoption
 is its own increment with three named conditions: a probe for the widened syntax, the shape reader's entry for it,
 and an explanation for the five records — measured, not assumed. This is recorded rather than absorbed because the
-alternative was a half-working emission: the widened declaration made the six routes *look* fine in the unit suite
+alternative was a half-working emission: the widened declaration made the six routes _look_ fine in the unit suite
 while the registry had in fact lost them.
 
 One consequence lands now, and it is the ruling's own boundary: with the leaf still `<percentage>`, a `length` offset
@@ -4542,7 +4542,7 @@ edge-changing positions alike — instead of introducing a second architecture f
   x while static y stays composed. The `offset-anchor` requirement — both execution leaves or none — came from that
   family's own contract and is not inherited.
 - **The offset-leaf widening is not needed for this repair**, so it is not touched. Its evidence still stands on its
-  own terms: offset *values* inhabit `<length-percentage>` interpolation space. Whether the declaration needs it
+  own terms: offset _values_ inhabit `<length-percentage>` interpolation space. Whether the declaration needs it
   remains an independent production question, and the infrastructure cost it carried — six records recovered, five
   collateral losses, a 38-versus-28 population disagreement — is not paid before that question is answered.
 - **Multilayer is untouched**, and `object-position` and `offset-position` stay out until the deep case passes.
@@ -4611,6 +4611,78 @@ checklist rather than a surprise.
 **State.** No production change; the offset-leaf declaration is untouched, and `src/composition/background-position.ts`
 and `src/variables/property.ts` are byte-identical to what they were before the attempt. Gate 17/17, 505 unit tests,
 `tsc` clean.
+
+## The model correction, landed green: surfaces, optionality, and a minimal projection
+
+The ruling's four items are in, and three of them turned out to be smaller than the spike's failure list suggested —
+because the model already contained most of the distinctions the ruling asked for. Recorded precisely, since which
+half was already true is the useful part:
+
+```text
+TypedExecution.whole made OPTIONAL            was required; this was the real correction
+core consults it explicitly                   `?.whole?.(value) ?? null`
+authoring? and constituent? already optional  the ruling's contract, already shipped
+route evidence already derives from candidates "a component no candidate addresses has no route to evidence"
+execution-leaf ownership already asserted      `evidences an execution leaf through the family that produces it`
+```
+
+The declaration's own comment now carries the distinction the type was missing, because it is the semantic half:
+**declaring no strategy is not the same claim as declining every value.** `background-position` declaring no `whole`
+says whole values are not its business and the property-level path keeps them; `whole: () => null` would say the
+family has a strategy whose every answer is a decline. Those are different statements, and a consumer reads them
+differently — so the facet is optional rather than faked.
+
+### The collapsed guard, split by the surface it was conflating
+
+`names only leaves the family reads, at any depth, or the family itself` was the guard whose notion of "read" had
+stopped being the full reason a declaration may exist. It is now **one total arm and three strong ones**, and the
+split is the point:
+
+```text
+membership   every declared leaf belongs to a surface the family has:
+             composition · authoring projection · execution machinery
+authoring    the projection is MINIMAL and COMPLETE — new arm, below
+execution    every execution leaf is owned by a declaration and written by a proven route — already asserted
+routes       evidence is owed exactly where a candidate addresses the component — already asserted
+```
+
+The permissive repair would have been a single broad guard accepting any of the three, which is the shape the ruling
+named and refused. Membership is asked as a question about *which* surface, and each surface's stronger property is
+asked by its own arm — so membership alone cannot pass: a declared leaf that is nominally "authoring" still has to be
+in a minimal projection the resolver actually reads.
+
+### The authoring projection, in both directions
+
+The second obsolete guard demanded that `authoring` names be typed leaves, which D.3.7 had already disproved with the
+offset components. Its replacement is the property the ruling described, and its first half is a **differential
+rather than an inspection**:
+
+```text
+minimal    for every declared slot, some probe changes what the resolver returns when the slot is present and
+           absent — otherwise the resolver never pulls on it and `authoring` is on its way to being another
+           `dependencies`
+complete   the projection is built from exactly this list and an absent key is a decline, so nothing outside the
+           declared projection is available to the resolver at all
+```
+
+The arm builds its probe projections from one convention the model already has — an `-edge` slot holds a keyword,
+everything else holds a component — which is deliberate: the arm must be able to construct a projection without
+asking the resolver what it wants. Both compound families pass it, and a bag entry added tomorrow fails it.
+
+### The census distinction, recorded before it moves
+
+The four pairs the migration will add are **deliberate authoring population**, not accidental closure — the
+distinction the earlier accidental dependency widening taught, stated as the rule it should have been:
+
+> Accidental reach through composition closure is not population. Explicitly declared authoring reach is.
+
+So those numbers move when the declaration lands, with the accounting written beside them, and they are not to be
+suppressed.
+
+**State.** Model correction only; no emission change. Gate 17/17, 506 unit tests, `tsc` clean. The next attempt at the
+resolved-axis migration owes exactly one thing its guard does not yet have — authoring-route evidence for the six
+components, which is owed precisely *because* all six have public candidates — and then the structural and browser
+proof the ruling requires.
 
 **State.** No production behaviour changed. Gate 17/17, 505 unit tests, `tsc` clean, and
 `scripts/validated-representations.json` is byte-identical to what the previous pass recorded — the differential and
