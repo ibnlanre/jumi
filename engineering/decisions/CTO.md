@@ -5206,3 +5206,54 @@ the fixture was never incapable of answering the question; the answer is "execut
 tree**. Four failed edits this session were anchored on remembered text rather than read text, and every one of them
 cost a batch. Prettier, prior edits and parallel track changes have already shown why "I wrote this code" is not an
 answer.
+---
+
+## D.3 closure — constituent reach
+
+Closed 2026-09-18. Not at a percentage: because **every residual reshape family now has an evidence-backed
+disposition and no known migration is left owing**. The ledger being empty is the closure condition, so squeezing more
+work out of it is not the next step — another release or product concern is.
+
+```text
+D.3 constituent reach — CLOSED
+
+Every residual reshape family is classified:
+- migrated       where production behaviour required repair
+- safe-no-need   where shipped behaviour already matches native
+- coupled-native where constituent execution would be semantically wrong
+- no-candidate   where no public route exists
+
+migration-required   0
+unmeasured           0
+17/17 gate
+commit               6092d1e
+```
+
+The track's closing state, in the two vocabularies it produced and which must not be collapsed into each other:
+
+```text
+research verdicts     no-candidate 10 · safe-no-need 8 · migrated 4 · coupled-native 3
+route evidence        movable 16 · equivalent-no-op 4 · fixture-unobservable 0
+```
+
+**What the last three passes actually bought.** D.3.9 through D.3.11 separated three facts that had been conflated
+since the Gate B verdicts were first written — that a route *executes*, that a route *assigns the right execution
+subject*, and that a route *produces visible displacement*. The four edge routes are the case that proves they are
+separate: they execute and assign exactly their contracted leaf, and displace nothing, legitimately. `equivalent-no-op`
+is a defensible name for that only because it requires a flat equivalent reference **and** a moving control, which is
+a stronger claim than treating flatness as evidence by itself.
+
+**Standing rules adopted.** The repeated failure modes are now recorded as eight standing research rules in
+`engineering/research/rules.md`, each with the defect that produced it and the mechanism that holds it — plus the one
+rule (structural CSS claims from parsed declarations) still owed a mechanism, which is stated as owed rather than
+implied to be enforced. Two corollaries are kept there because they catch what the eight do not: a probe defect and a
+product defect are indistinguishable from the outside *except* by asking what the reference's own value was; and an
+explanation is not a reading.
+
+**Fixture defect 23** — the substring scanner that reported an unconditional `offset-position:` declaration by
+matching inside `--jumi-offset-position:` — is numbered here for continuity with 15–22. Like the others it is a
+verdict about the *fixture* wearing the clothes of a verdict about the product, and the eighth rule exists because of
+it.
+
+**No D.3.12.** The next work comes from a release or product concern, or from the broader 1.0 audit, not from the
+ledger.
