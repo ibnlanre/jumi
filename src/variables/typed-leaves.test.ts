@@ -658,32 +658,42 @@ describe('typed execution declarations', () => {
       const probes = ['left', 'right', 'center', 'top', 'bottom', '0', '10%', '20px']
 
       /** Every answer the resolver gives for a projection, across the family's own entrances. */
-      const answers = (projection: Record<string, string>) => {
-        const out: string[] = []
-
-        for (const slot of slots)
-          for (const probe of probes)
-            out.push(JSON.stringify(resolve(slot, probe, projection)))
-
-        return out.join('|')
-      }
+      const defaults = Object.fromEntries(slots.map(one => [one, defaultOf(one)]))
+      const answers = (projection: Record<string, string>) =>
+        slots
+          .flatMap(slot =>
+            probes.map(probe => JSON.stringify(resolve(slot, probe, projection))),
+          )
+          .join('|')
 
       for (const slot of slots.slice()) {
-        const witness = probes.some(probe => {
-          const complete = Object.fromEntries(
-            slots.map(one => [one, one === slot ? probe : defaultOf(one)]),
-          )
+        /**
+         * Two roles, because a declared component is read in either one — and the first reapplication of this
+         * family forced the distinction the moment it was declared.
+         *
+         *   **as state**    the projection settles it and the resolver's answer moves with it
+         *   **as address**  it is the component a public route names, so its own authored value is the input
+         *
+         * `background-position`'s axis components are read as addresses: the resolver consults them through its
+         * `component` argument, never through the projection, and an arm that only perturbed the projection would
+         * have failed a declaration that is exactly right. A component read in neither role is the bag entry this
+         * arm exists to catch — it would answer every probe identically and change nothing when dropped.
+         */
+        const asState = probes.some(probe => {
+          const complete = { ...defaults, [slot]: probe }
           const without = Object.fromEntries(
-            slots
-              .filter(one => one !== slot)
-              .map(one => [one, defaultOf(one)]),
+            Object.entries(defaults).filter(([one]) => one !== slot),
           )
 
           return answers(complete) !== answers(without)
         })
+        const asAddress =
+          new Set(
+            probes.map(probe => JSON.stringify(resolve(slot, probe, defaults))),
+          ).size > 1
 
         expect(
-          witness,
+          asState || asAddress,
           `\`${attribute}\` declares \`${slot}\` as authoring, and no probe changes what its resolver returns — the projection is not minimal`,
         ).toBe(true)
       }

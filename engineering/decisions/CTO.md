@@ -4684,6 +4684,56 @@ resolved-axis migration owes exactly one thing its guard does not yet have — a
 components, which is owed precisely *because* all six have public candidates — and then the structural and browser
 proof the ruling requires.
 
+## The reapplication: the new guard fired on its first live declaration, and it was half right
+
+The migration was reapplied on the corrected model, and the model answered with fourteen failures instead of eight —
+which sounds worse and is better, because the new ones are the corrected guards doing their job:
+
+```text
+`background-position` declares `background-position-x` as authoring, and no probe changes what its resolver
+returns — the projection is not minimal
+```
+
+That is the minimality arm, firing on its first live declaration. **It was right about the operationalisation and
+wrong about the model.** `background-position`'s axis components *are* read — as the **address** the resolver is
+called for, never as projection state. The resolver consults them through its `component` argument, so perturbing the
+projection could not move its answer, and an arm that only knew the state role would have failed a declaration that is
+exactly correct.
+
+The arm now asks both roles, which makes it stronger rather than weaker:
+
+```text
+as state    the projection settles it and the resolver's answer moves with it
+as address  it is the component a public route names, so its own authored value is the input
+```
+
+A bag entry that happens to be addressable still fails, because as an address it must answer probes *differently* —
+a slot nothing reads answers every probe identically and changes nothing when dropped. So the corrected model
+immediately taught its own guard a distinction it had been missing, which is the outcome the correction existed to
+produce.
+
+### The cascade, enumerated with values — the landing is now mechanical
+
+```text
+census           326 → 330 pairs · 305 → 309 constituents · [108, 101, 96] → [110, 103, 96]
+                 the +4 deliberate authoring pairs, recorded under the standing rule above
+reach.test.ts    154 · 175 · the doc comment's own numbers
+crosstab.test.mjs 19 · 44 · the completeness arm (36 against 38)
+observation.test.mjs 172 · 183 · 295 · the completeness Set (30 against 32)
+                 and the structural chain arm, whose chain changes shape: `background-position-x-edge` now
+                 reaches `background` through the authoring surface rather than the composition, because the
+                 composition no longer reads the axis slot
+route evidence   8 against 2 — six records owed, and owed *because* all six components have candidates
+```
+
+None of it is a defect. It is the migration's full surface, now known rather than discovered, and the withdrawal is by
+rule rather than by surprise: the ruling requires the structural and browser proof before landing, and a red tree is
+not an intermediate state this track accepts.
+
+**State.** Withdrawn again, cleanly: `src/variables/property.ts` and `src/composition/background-position.ts` are
+byte-identical to their committed form, and the offset-leaf declaration is untouched. Gate 17/17, 506 unit tests,
+`tsc` clean. What is new and kept: the strengthened minimality guard, and this checklist.
+
 **State.** No production behaviour changed. Gate 17/17, 505 unit tests, `tsc` clean, and
 `scripts/validated-representations.json` is byte-identical to what the previous pass recorded — the differential and
 its series are the only new artifacts.
