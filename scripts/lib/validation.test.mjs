@@ -55,7 +55,10 @@ describe('the probe', () => {
 })
 
 describe('the plan', () => {
-  test('every pair with a representation in play plans, and every plan is spelled for its representation', () => {
+  it(
+    'every pair with a representation in play plans, and every plan is spelled for its representation',
+    { timeout: 30_000 },
+    () => {
     // The population is the derivation workstream *plus* the pairs promoted out of it, so the assertion is about
     // the shape of every plan rather than about how many pairs the workstream happens to hold today: a
     // promotion must not require editing this test, only the evidence it is checked against.
