@@ -58,23 +58,13 @@ const SETTLED = new Map([
     },
   ],
   [
-    'skew',
-    {
-      granularity: 'family',
-      production: 'native',
-      reason:
-        'Gate B: interpolates to the named matrix, linearly and exactly (tan of the angle) — separable and unnecessary',
-      research: 'safe-no-need',
-    },
-  ],
-  [
-    'border-image',
+    'background-repeat',
     {
       granularity: 'route',
       production: 'native',
       reason:
-        'Gate B and Gate A with a native reference: every single-value route (number and length) is sample-for-sample native; multi-value spellings emit nothing, which is route reach rather than interpolation',
-      research: 'safe-no-need',
+        'D.3.9 survey: the public route animates the longhand directly (attribute === component, no parts) and its grammar is `any` over the discrete keywords repeat/no-repeat/space/round — there is no interpolable subject to reshape',
+      research: 'keyword-discrete',
     },
   ],
   [
@@ -88,22 +78,13 @@ const SETTLED = new Map([
     },
   ],
   [
-    'perspective-3d',
-    {
-      granularity: 'pair',
-      production: 'native',
-      reason: 'Gate 0: no candidate addresses it — there is no route to migrate',
-      research: 'no-candidate',
-    },
-  ],
-  [
-    'background-repeat',
+    'border-image',
     {
       granularity: 'route',
       production: 'native',
       reason:
-        'D.3.9 survey: the public route animates the longhand directly (attribute === component, no parts) and its grammar is `any` over the discrete keywords repeat/no-repeat/space/round — there is no interpolable subject to reshape',
-      research: 'keyword-discrete',
+        'Gate B and Gate A with a native reference: every single-value route (number and length) is sample-for-sample native; multi-value spellings emit nothing, which is route reach rather than interpolation',
+      research: 'safe-no-need',
     },
   ],
   [
@@ -177,6 +158,16 @@ const SETTLED = new Map([
     },
   ],
   [
+    'perspective-3d',
+    {
+      granularity: 'pair',
+      production: 'native',
+      reason:
+        'Gate 0: no candidate addresses it — there is no route to migrate',
+      research: 'no-candidate',
+    },
+  ],
+  [
     'rotate-3d',
     {
       granularity: 'family',
@@ -193,6 +184,16 @@ const SETTLED = new Map([
       production: 'unchanged',
       reason:
         'separable (D.3.8, single and three-way); no candidate serves its constituents',
+      research: 'safe-no-need',
+    },
+  ],
+  [
+    'skew',
+    {
+      granularity: 'family',
+      production: 'native',
+      reason:
+        'Gate B: interpolates to the named matrix, linearly and exactly (tan of the angle) — separable and unnecessary',
       research: 'safe-no-need',
     },
   ],
@@ -247,9 +248,22 @@ const ledger = families.map(family => {
   const routes = open.flatMap(one => servingCandidates(one))
   const settled = SETTLED.get(family)
   const observable = pairs.filter(one => !unobservable.has(one.component))
+
+  /**
+   * **Gate 0 before anything else**, and derived rather than declared: a family whose open pairs no candidate
+   * addresses has no route to migrate, no behaviour to measure and nothing to repair. Classifying it `unmeasured`
+   * says the opposite — that work remains — and ten such families is the difference between a queue and a closed
+   * ledger. The candidate table is the authority, so this is a reading of the model rather than a hand-written
+   * entry per family.
+   */
+  const reachable = open.flatMap(one => servingCandidates(one))
   const research =
     settled?.research ??
-    (observable.length === 0 ? 'fixture-unobservable' : 'unmeasured')
+    (observable.length === 0
+      ? 'fixture-unobservable'
+      : reachable.length === 0
+        ? 'no-candidate'
+        : 'unmeasured')
 
   return {
     candidates: open.filter(one => servingCandidates(one).length > 0).length,

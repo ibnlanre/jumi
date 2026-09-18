@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { cssNameOf, functionsOf, nativeSheet } from './frames.mjs'
+import { cssNameOf, functionsOf, gateBArm, nativeSheet } from './frames.mjs'
 
 /**
  * The harness's own guard.
@@ -60,10 +60,15 @@ describe('the native-reference builder', () => {
       to: '40% 0%',
     })
 
-    expect(sheet.css).toContain('animation: native-background-position 1000ms ease both')
+    expect(sheet.css).toContain(
+      'animation: native-background-position 1000ms ease both',
+    )
     expect(
-      nativeSheet({ from: '0% 0%', property: 'backgroundPosition', to: '40% 0%' })
-        .css,
+      nativeSheet({
+        from: '0% 0%',
+        property: 'backgroundPosition',
+        to: '40% 0%',
+      }).css,
     ).toContain('1000ms linear both')
   })
 })
