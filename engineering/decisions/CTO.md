@@ -4168,3 +4168,54 @@ empty subject reports agreement with itself, and only the printed series shows i
 
 **State.** No production code moved; the book is research-only and the lint stage is green. Gate 17/17, 498 unit
 tests, 87/87 behaviour arms, `tsc` clean.
+
+---
+
+## The axis-pair test, re-run: all three pass, and the liveness gate earned its place by rejecting three arms first
+
+The source swap is in — `scripts/lib/sources.mjs` names the three evidence sources and nothing else may choose
+between them: the **model's resolved expressions** for structure, the **compiled sheet** for what shipped, the
+**computed style** for behaviour. `modelLeaves()` walks the model transitively to the leaves and carries each one's
+rest and path; `resolveToLeaves()` resolves a composition to the *reads*; `liveness()` is the three checks.
+
+Every arm now proves three things before its equality is accepted, and the first run proved **why**:
+
+```text
+full          background-position  unearned: the observable moved under a perturbed endpoint
+corroboration object-position      unearned: the observable moved under a perturbed endpoint
+corroboration offset-position      unearned: the observable moved under a perturbed endpoint
+```
+
+Three arms measuring a typed series identical to its own perturbed twin — the shape that used to be reported as
+"same-series", or as "differs" when the native side happened to disagree. The gate turned all three into `unearned`
+before any comparison was made, and three fixture defects came out behind it:
+
+1. leaves resolved from the **compiled sheet**, which under `source(none)` carries only the slots the used class
+   needs — no axis compositions, so the walk found nothing and the keyframes were empty;
+2. the prototype's property value resolved *through* the leaves, which **removes the reads** the animation writes to
+   — so the property stopped depending on the slot and the motion had nowhere to land;
+3. the shell's **edge reads were undefined**, so the declaration was invalid at computed-value time and the property
+   fell to its initial value at every instant.
+
+With the shell resolved down to the leaves and every read it makes defined from the model's rests:
+
+```text
+background-position   typed 0% 0% · 10% 10% · 20% 20% · 30% 30% · 40% 40%
+                      native 0% 0% · 10% 10% · 20% 20% · 30% 30% · 40% 40%   same-series
+object-position       typed 50% 50% · … · 90% 90%   native 50% 50% · … · 90% 90%   same-series
+offset-position       typed 50% 50% · … · 90% 90%   native 50% 50% · … · 90% 90%   same-series
+```
+
+`offset-position` is compared from an **authored** position on both sides rather than from its `normal` rest, which
+is what the ruling asked for and what makes the arm an axis test at all: the shipped composition computes to the
+keyword `normal`, and a comparison that started there would be measuring the difference between a keyword and a
+position.
+
+**Gate A passes for all three, on the shape rather than on one family.** Structures are reusable hypotheses and this
+is now the evidence for it: three properties with the same decomposition shape at different depths all reproduce
+native motion when their offset leaves move together, single-layer, with the edges held. Gate B runs next and
+separately, per property, which is the ruling's ordering — and `background-size` stays out of it entirely, since its
+`auto` boundary is a different question.
+
+**State.** No production code moved. Gate 17/17, 498 unit tests, 87/87 behaviour arms, `tsc` clean; the readings are in
+`scripts/position-axis-series.json`.

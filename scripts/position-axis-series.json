@@ -9,147 +9,115 @@
   ],
   "records": [
     {
-      "arms": [
-        {
-          "id": "typed",
-          "label": "x + y offsets animate",
-          "series": [
-            "0% 0%",
-            "0% 0%",
-            "0% 0%",
-            "0% 0%",
-            "0% 0%"
-          ]
-        },
-        {
-          "id": "native",
-          "label": "native property motion",
-          "series": [
-            "0% 0%",
-            "10% 10%",
-            "20% 20%",
-            "30% 30%",
-            "40% 40%"
-          ]
-        }
+      "canary": [
+        "0% 0%",
+        "20% 20%",
+        "40% 40%",
+        "60% 60%",
+        "80% 80%"
       ],
-      "composition": "var(--jumi-background-position-x) var(--jumi-background-position-y)",
+      "checks": {
+        "failed": [],
+        "ok": true
+      },
       "depth": "full",
-      "identical": false,
-      "live": false,
+      "emitted": "var(--jumi-background-position-x) var(--jumi-background-position-y)",
+      "leaves": [
+        "background-position-x-offset",
+        "background-position-y-offset"
+      ],
+      "native": [
+        "0% 0%",
+        "10% 10%",
+        "20% 20%",
+        "30% 30%",
+        "40% 40%"
+      ],
       "property": "background-position",
-      "rest": "0% 0%",
       "route": "animate-background-position-[50%_50%]",
-      "slots": [
-        {
-          "name": "background-position-x-offset",
-          "rest": "0%"
-        },
-        {
-          "name": "background-position-y-offset",
-          "rest": "0%"
-        }
+      "shell": "var(--jumi-background-position-x-edge) var(--jumi-background-position-x-offset) var(--jumi-background-position-y-edge) var(--jumi-background-position-y-offset)",
+      "typed": [
+        "0% 0%",
+        "10% 10%",
+        "20% 20%",
+        "30% 30%",
+        "40% 40%"
       ],
-      "to": "40% 40%",
-      "verdict": "fixture-inert"
+      "verdict": "same-series"
     },
     {
-      "arms": [
-        {
-          "id": "typed",
-          "label": "x + y offsets animate",
-          "series": [
-            "50% 50%",
-            "50% 50%",
-            "50% 50%",
-            "50% 50%",
-            "50% 50%"
-          ]
-        },
-        {
-          "id": "native",
-          "label": "native property motion",
-          "series": [
-            "50% 50%",
-            "60% 60%",
-            "70% 70%",
-            "80% 80%",
-            "90% 90%"
-          ]
-        }
+      "canary": [
+        "50% 50%",
+        "82.5% 82.5%",
+        "115% 115%",
+        "147.5% 147.5%",
+        "180% 180%"
       ],
-      "composition": "var(--jumi-object-position-x) var(--jumi-object-position-y)",
+      "checks": {
+        "failed": [],
+        "ok": true
+      },
       "depth": "corroboration",
-      "identical": false,
-      "live": false,
+      "emitted": "var(--jumi-object-position-x) var(--jumi-object-position-y)",
+      "leaves": [
+        "object-position-x-offset",
+        "object-position-y-offset"
+      ],
+      "native": [
+        "50% 50%",
+        "60% 60%",
+        "70% 70%",
+        "80% 80%",
+        "90% 90%"
+      ],
       "property": "object-position",
-      "rest": "50% 50%",
       "route": "animate-object-position-[50%_50%]",
-      "slots": [
-        {
-          "name": "object-position-x-offset",
-          "rest": "50%"
-        },
-        {
-          "name": "object-position-y-offset",
-          "rest": "50%"
-        }
+      "shell": "var(--jumi-object-position-x-edge) var(--jumi-object-position-x-offset) var(--jumi-object-position-y-edge) var(--jumi-object-position-y-offset)",
+      "typed": [
+        "50% 50%",
+        "60% 60%",
+        "70% 70%",
+        "80% 80%",
+        "90% 90%"
       ],
-      "to": "90% 90%",
-      "verdict": "fixture-inert"
+      "verdict": "same-series"
     },
     {
-      "arms": [
-        {
-          "id": "typed",
-          "label": "x + y offsets animate",
-          "series": [
-            "normal",
-            "normal",
-            "normal",
-            "normal",
-            "normal"
-          ]
-        },
-        {
-          "id": "native",
-          "label": "native property motion",
-          "series": [
-            "normal",
-            "normal",
-            "90% 90%",
-            "90% 90%",
-            "90% 90%"
-          ]
-        }
+      "canary": [
+        "50% 50%",
+        "82.5% 82.5%",
+        "115% 115%",
+        "147.5% 147.5%",
+        "180% 180%"
       ],
-      "composition": "var(--jumi-offset-position-x) var(--jumi-offset-position-y)",
+      "checks": {
+        "failed": [],
+        "ok": true
+      },
       "depth": "corroboration",
-      "identical": false,
-      "live": false,
-      "property": "offset-position",
-      "rest": "normal",
-      "route": "animate-offset-position-[50%_50%]",
-      "slots": [
-        {
-          "name": "offset-position-x-offset",
-          "rest": "50%"
-        },
-        {
-          "name": "offset-position-y-offset",
-          "rest": "50%"
-        }
+      "emitted": "var(--jumi-offset-position-x) var(--jumi-offset-position-y)",
+      "leaves": [
+        "offset-position-x-offset",
+        "offset-position-y-offset"
       ],
-      "to": "90% 90%",
-      "verdict": "fixture-inert"
-    },
-    {
-      "composition": "var(--jumi-background-position-x) var(--jumi-background-position-y)",
-      "emittedFrames": "to {     background-position: var(--jumi-background-position-Z2vSFXt);   }",
-      "kind": "multilayer",
-      "property": "background-position",
-      "reachable": true,
-      "verdict": "does-not-reach-the-decomposition"
+      "native": [
+        "50% 50%",
+        "60% 60%",
+        "70% 70%",
+        "80% 80%",
+        "90% 90%"
+      ],
+      "property": "offset-position",
+      "route": "animate-offset-position-[50%_50%]",
+      "shell": "var(--jumi-offset-position-x-edge) var(--jumi-offset-position-x-offset) var(--jumi-offset-position-y-edge) var(--jumi-offset-position-y-offset)",
+      "typed": [
+        "50% 50%",
+        "60% 60%",
+        "70% 70%",
+        "80% 80%",
+        "90% 90%"
+      ],
+      "verdict": "same-series"
     }
   ]
 }

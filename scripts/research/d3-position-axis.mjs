@@ -1,20 +1,23 @@
 /**
- * The axis-pair generalization test, run the way D.3.8 taught: **one property in depth, two as corroboration**.
+ * The axis-pair generalization test, re-run with the sources separated and the arms made to earn their equality.
  *
- * Shared structure is a reusable hypothesis, not transferable evidence. `background-position`, `object-position` and
- * `offset-position` all expose an axis-pair decomposition in Jumi, and all three are different CSS properties with
- * different consumers and different observation surfaces. So `background-position` gets the full proof case — x, y,
- * both, an edge change, and the multilayer question — and the other two get one adversarial simultaneous arm each.
- * A family that fails splits the class immediately; a family that passes corroborates the mechanism, not the verdict.
+ * `background-position` carries the depth — x, y, x + y, single-layer only — and `object-position` and
+ * `offset-position` carry one adversarial simultaneous arm each, because shared structure is a reusable hypothesis
+ * and not transferable evidence.
  *
- * Two things the book derives rather than assumes, both from the compiled sheet:
+ * Three rules this pass follows, all of them paid for:
  *
- *   the shell     the property's own composition, read out of the emission (`--jumi-<attribute>: …`)
- *   the leaves    the slots that composition reads and that end in `-offset`, which are the ones a typed motion
- *                 animates; the edge beside each one is a keyword and steps, so it is measured as a step
+ *   **A structure question goes to the model.** The decomposition is read from `modelLeaves()`, not from the compiled
+ *   sheet: with `source(none)` the sheet carries only the slots the used class needs, so a walk over it finds nothing
+ *   and an arm measures an empty keyframe.
+ *   **An arm proves three things before its equality is accepted** — the route compiled, the typed leaf was written,
+ *   and the observable moved under a perturbed endpoint. Only then is native-versus-typed a comparison at all.
+ *   **`offset-position` is authored, not rested.** Its resting composition computes to the keyword `normal`, so both
+ *   sides are put into a concrete positional state before anything moves; comparing `normal → position` against the
+ *   other families would not be an axis test.
  *
- * and one it reads from the browser: the **resting value** of the shipped composition, so the native reference
- * starts where the shipped route starts instead of at a value the author would never have.
+ * Multilayer is out of scope by measurement rather than by assumption: the comma-separated input routes through the
+ * whole property and never reaches this decomposition.
  *
  * Run: `pnpm research:d3-position-axis` (exits non-zero only on an arm defect, never on a finding).
  */
@@ -25,6 +28,14 @@ import path from 'node:path'
 import * as compileLib from '../lib/compile.mjs'
 import * as cssLib from '../lib/css.mjs'
 import { DURATION, nativeSheet } from '../lib/frames.mjs'
+import {
+  earned,
+  liveness,
+  modelExpressions,
+  modelLeaves,
+  resolveToLeaves,
+  resolveWith,
+} from '../lib/sources.mjs'
 
 const { compiler } = compileLib
 const finalizeCss = compileLib.finalizeCss ?? cssLib.finalizeCss
@@ -33,84 +44,18 @@ const root = path.resolve(import.meta.dirname, '..', '..')
 const WALL = [0, 250, 500, 750, 1000]
 const ENTRY = `\n@import "tailwindcss" source(none);\n@plugin "${path.join(root, 'dist', 'index.js')}";\n`
 
-/** The three properties, the public route that addresses each longhand, and how much of the proof each carries. */
 const TARGETS = [
-  {
-    attribute: 'background-position',
-    depth: 'full',
-    route: 'animate-background-position-[50%_50%]',
-  },
-  {
-    attribute: 'object-position',
-    depth: 'corroboration',
-    route: 'animate-object-position-[50%_50%]',
-  },
-  {
-    attribute: 'offset-position',
-    depth: 'corroboration',
-    route: 'animate-offset-position-[50%_50%]',
-  },
+  { attribute: 'background-position', depth: 'full', route: 'animate-background-position-[50%_50%]' },
+  { attribute: 'object-position', depth: 'corroboration', route: 'animate-object-position-[50%_50%]' },
+  { attribute: 'offset-position', depth: 'corroboration', route: 'animate-offset-position-[50%_50%]' },
 ]
 
-const slug = text => text.replace(/[^a-z0-9]+/gi, '-')
+const observedOf = attribute =>
+  attribute.replace(/-([a-z])/g, (_, one) => one.toUpperCase())
+
 const browser = await chromium.launch()
 
-/**
- * The composition resolved **transitively to its leaves**, because the property is not where the moving parts are.
- *
- * `background-position` composes `var(--jumi-background-position-x) var(…-y)`, and each of those composes an edge
- * beside an offset — so a typed motion animates an `-offset` leaf two levels down, and an arm that looks for offsets
- * in the property's own composition finds none and measures an empty keyframe. The first run of this book did
- * exactly that and reported three inert arms.
- */
-const leavesOf = (css, attribute) => {
-  const definitions = new Map(
-    [...css.matchAll(/--jumi-([\w-]+):\s*([^;]+);/g)].map(match => [
-      match[1],
-      match[2].trim(),
-    ]),
-  )
-  const out = []
-
-  const walk = (name, seen = new Set()) => {
-    if (seen.has(name)) return
-    seen.add(name)
-
-    const value = definitions.get(name)
-
-    if (!value) return
-
-    const refs = [...value.matchAll(/--jumi-([\w-]+)/g)].map(match => match[1])
-
-    if (!refs.length) {
-      out.push({ name, rest: value })
-
-      return
-    }
-
-    for (const ref of refs) walk(ref, seen)
-  }
-
-  walk(attribute)
-
-  return out
-}
-
-/** Compile one arm's sheet, read its composition, and resolve the leaves a typed motion would animate. */
-const prepare = async target => {
-  const css = finalizeCss(
-    (await compiler(ENTRY, root)).build([target.route]),
-  ).css
-  const composition =
-    new RegExp(`--jumi-${target.attribute}:\\s*([^;]+);`).exec(css)?.[1] ?? ''
-  const slots = leavesOf(css, target.attribute).filter(one =>
-    one.name.endsWith('-offset'),
-  )
-
-  return { css, composition, slots }
-}
-
-const read = async (css, ids, property) => {
+const readSeries = async (css, ids, property) => {
   const page = await browser.newPage()
 
   await page.setContent(
@@ -120,7 +65,7 @@ const read = async (css, ids, property) => {
   )
 
   const values = await page.evaluate(
-    async ({ ids: list, property: name }) => {
+    async ({ ids: list, property: name, wall }) => {
       const out = {}
 
       for (const id of list) {
@@ -128,7 +73,7 @@ const read = async (css, ids, property) => {
         const own = element.getAnimations()
         const series = []
 
-        for (const at of [0, 250, 500, 750, 1000]) {
+        for (const at of wall) {
           own.forEach(animation => {
             animation.pause()
             animation.currentTime = at
@@ -144,7 +89,7 @@ const read = async (css, ids, property) => {
 
       return out
     },
-    { ids, property },
+    { ids, property, wall: WALL },
   )
 
   await page.close()
@@ -155,112 +100,126 @@ const read = async (css, ids, property) => {
 const records = []
 
 for (const target of TARGETS) {
-  const { css, composition, slots } = await prepare(target)
-  const observed = target.attribute.replace(/-([a-z])/g, (_, one) => one.toUpperCase())
+  const observed = observedOf(target.attribute)
+  const css = finalizeCss(
+    (await compiler(ENTRY, root)).build([target.route]),
+  ).css
 
-  // The shipped composition's resting value, so the reference starts where the route starts.
-  const restRead = await read(`${css}\n#rest { }`, ['rest'], observed)
-  const rest = restRead.rest.series[0]
-
-  /**
-   * The typed side: the *same* composition the plugin ships, with the offset leaves registered and animated by hand.
-   * That is what migrating these leaves would produce — the composition stays, the motion moves the leaves it reads,
-   * one level below the axis slots the composition names.
-   */
-  const moved = slots.slice(0, 2)
-  const typedSlots = moved
-    .map(
-      one =>
-        `@property --jumi-${one.name} { syntax: '<percentage>'; inherits: false; initial-value: ${one.rest}; }`,
-    )
-    .join('\n')
-  const typedFrames = moved
-    .map(one => `--jumi-${one.name}: ${one.rest};`)
-    .join(' ')
-  // The offsets move the same distance in both axes, which is what makes the resolved value comparable to the
-  // native arm's `rest + 40%` rather than merely similar to it.
-  const typedFramesEnd = moved
-    .map(one => `--jumi-${one.name}: ${Number.parseFloat(one.rest) + 40}%;`)
-    .join(' ')
+  // ── structural: the leaves, their rests, and the shell the emission composes
+  const leaves = modelLeaves(target.attribute).filter(one =>
+    one.name.endsWith('-offset'),
+  )
+  const emitted = new RegExp(
+    `--jumi-${target.attribute}:\\s*([^;]+);`,
+  ).exec(css)?.[1]
 
   /**
-   * The native reference: the property itself, from the value the shipped composition rests at to the value the
-   * typed arm resolves to — `50% 50%` to `90% 90%` when the edges are `center` and the offsets run to `40%`.
+   * The prototype's property value is the composition **resolved to its leaves**, not the shipped two-level form.
+   *
+   * The shipped shell reads the axis slots, and an axis slot's own definition is emitted only when a candidate that
+   * uses it is compiled — so a page carrying one class has `var(--jumi-background-position-x)` resolving to nothing,
+   * and an arm that animates the leaves beneath it measures a property which never sees them. The canary caught it:
+   * the typed series and its perturbed twin were identical, at every property, which is what the check exists for.
    */
-  const numbers = rest.match(/-?[\d.]+%?/g) ?? ['50%', '50%']
-  const to = numbers
-    .slice(0, 2)
-    .map(value => `${Number.parseFloat(value) + 40}%`)
-    .join(' ')
+  const shell = resolveToLeaves(target.attribute)
 
-  const arms = [
-    {
-      id: `typed`,
-      css: `${typedSlots}\n@keyframes typed { from { ${typedFrames} } to { ${typedFramesEnd} } }\n#typed { animation: typed ${DURATION}ms linear both; ${target.attribute}: ${composition}; }`,
-      label: 'x + y offsets animate',
-    },
-    {
-      ...nativeSheet({
-        from: rest,
-        id: 'native',
-        property: observed,
-        to,
-      }),
-      id: 'native',
-      label: 'native property motion',
-    },
+  /**
+   * Every read the shell makes has to be **defined**, or the declaration is invalid at computed-value time and the
+   * property falls back to its initial value at every instant — which reads as a motion that never happened. With
+   * `source(none)` the sheet carries only the slots the used class needs, so the edge reads beside the offsets are
+   * absent; they are defined here from the model's own rests, which is the structural source doing the job it has.
+   */
+  const reads = [
+    ...new Set(
+      [...shell.matchAll(/--jumi-([\w-]+)/g)].map(match => match[1]),
+    ),
   ]
+  const edgeDefinitions = reads
+    .filter(name => !name.endsWith('-offset'))
+    .map(
+      name =>
+        `--jumi-${name}: ${String(modelExpressions().get(name) ?? '').trim() || 'initial'};`,
+    )
+    .join(' ')
 
-  const readings = await read(
-    `${css}\n${arms.map(one => one.css).join('\n')}`,
-    arms.map(one => one.id),
+  const moved = leaves.slice(0, 2)
+  const values = new Map()
+  const valuesEnd = new Map()
+
+  for (const one of moved) {
+    const start = Number.parseFloat(one.rest)
+    values.set(one.name, one.rest)
+    valuesEnd.set(one.name, `${start + 40}%`)
+  }
+
+  /**
+   * Both sides are **authored** to the same concrete position: the native arm animates the property between the
+   * resolved start and the resolved end, and the typed arm animates the leaves between the same two states. That is
+   * what isolates interpolation from a resting state like `normal`.
+   */
+  const from = resolveWith(target.attribute, values)
+  const to = resolveWith(target.attribute, valuesEnd)
+
+  const typed = {
+    css: [
+      ...[...values.keys()].map(
+        name =>
+          `@property --jumi-${name} { syntax: '<percentage>'; inherits: false; initial-value: ${values.get(name)}; }`,
+      ),
+      `@keyframes typed { from { ${[...values].map(([name, value]) => `--jumi-${name}: ${value};`).join(' ')} } to { ${[...valuesEnd].map(([name, value]) => `--jumi-${name}: ${value};`).join(' ')} } }`,
+      `#typed, #canary { ${edgeDefinitions} }`,
+      `#typed { animation: typed ${DURATION}ms linear both; ${target.attribute}: ${shell}; }`,
+      // The canary: the same arm with the far endpoint perturbed. If this does not move, the leaf is not written.
+      `@keyframes canary { from { ${[...values].map(([name, value]) => `--jumi-${name}: ${value};`).join(' ')} } to { ${[...valuesEnd].map(([name, value]) => `--jumi-${name}: ${value.replace(/[\d.]+/, n => String(Number(n) * 2))};`).join(' ')} } }`,
+      `#canary { animation: canary ${DURATION}ms linear both; ${target.attribute}: ${shell}; }`,
+    ].join('\n'),
+    id: 'typed',
+  }
+  const reference = nativeSheet({
+    from,
+    id: 'native',
+    property: observed,
+    to,
+  })
+
+  const readings = await readSeries(
+    `${css}\n${typed.css}\n${reference.css}`,
+    ['typed', 'canary', reference.name],
     observed,
   )
 
-  const typed = readings.typed.series
-  const native = readings.native.series
+  const typedSeries = readings.typed.series
+  const canarySeries = readings.canary.series
+  const nativeSeries = readings[reference.name].series
   const same = (one, two) => one.every((value, at) => value === two[at])
 
+  // The emission wrote the leaf if the sheet's frames assign it; the typed arm moved if the canary differs from it.
+  const checks = earned(
+    liveness({
+      compiled: Boolean(emitted) && /@keyframes/.test(css),
+      moved: !same(typedSeries, canarySeries),
+      wrote: /--jumi-[\w-]+-offset:/.test(typed.css),
+    }),
+  )
+
   records.push({
-    arms: arms.map(one => ({ id: one.id, label: one.label, series: readings[one.id].series })),
-    composition,
+    canary: canarySeries,
+    checks,
     depth: target.depth,
-    identical: same(typed, native),
-    live: new Set(native).size > 1 && new Set(typed).size > 1,
+    emitted,
+    leaves: moved.map(one => one.name),
+    native: nativeSeries,
     property: target.attribute,
-    rest,
     route: target.route,
-    slots: moved,
-    to,
-    verdict: !(new Set(native).size > 1 && new Set(typed).size > 1)
-      ? 'fixture-inert'
-      : same(typed, native)
+    shell,
+    typed: typedSeries,
+    verdict: !checks.ok
+      ? `unearned: ${checks.failed.join('; ')}`
+      : same(typedSeries, nativeSeries)
         ? 'same-series'
         : 'differs',
   })
 }
-
-/**
- * The multilayer question, answered before any safety claim: can the **public route** carry a comma-separated
- * value, and if it can, does the emission reach the same decomposition it reaches for a single layer?
- */
-const MULTILAYER = 'animate-background-position-[0%_0%,_100%_100%]'
-const multilayerCss = finalizeCss(
-  (await compiler(ENTRY, root)).build([MULTILAYER]),
-).css
-const multilayerFrames =
-  /@keyframes\s+[\w-]+\s*\{([\s\S]*?)\n\}/.exec(multilayerCss)?.[1] ?? ''
-
-records.push({
-  composition: /--jumi-background-position:\s*([^;]+);/.exec(multilayerCss)?.[1] ?? '',
-  emittedFrames: multilayerFrames.replaceAll('\n', ' ').trim().slice(0, 220),
-  kind: 'multilayer',
-  property: 'background-position',
-  reachable: multilayerCss.includes('background-position'),
-  verdict: multilayerFrames.includes('--jumi-background-position-x-offset')
-    ? 'reaches-the-decomposition'
-    : 'does-not-reach-the-decomposition',
-})
 
 await browser.close()
 
@@ -272,13 +231,13 @@ fs.writeFileSync(
 )
 
 for (const one of records) {
-  console.log(`${one.property.padEnd(22)} ${one.verdict}`)
-  console.log(`    composition ${one.composition ?? '—'}`)
-
-  for (const arm of one.arms ?? [])
-    console.log(`    ${arm.id.padEnd(7)} ${arm.label.padEnd(24)} ${arm.series.join(' · ')}`)
-
-  if (one.kind === 'multilayer') console.log(`    frames ${one.emittedFrames}`)
+  console.log(
+    `${one.depth.padEnd(13)} ${one.property.padEnd(22)} ${one.verdict}\n` +
+      `    leaves ${(one.leaves ?? []).join(', ') || '—'}\n` +
+      `    shell  ${one.shell ?? '—'}\n` +
+      `    typed  ${(one.typed ?? []).join(' · ') || '—'}\n` +
+      `    native ${(one.native ?? []).join(' · ') || '—'}`,
+  )
 }
 
 console.log(`\nwritten to \`${path.relative(root, target)}\``)
