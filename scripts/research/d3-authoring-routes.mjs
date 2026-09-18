@@ -30,6 +30,7 @@
  */
 import { chromium } from 'playwright'
 
+import { nativeSheet } from '../lib/frames.mjs'
 import {
   readCandidates,
   readTypedExecutions,
@@ -41,7 +42,6 @@ import path from 'node:path'
 
 import * as compileLib from '../lib/compile.mjs'
 import * as cssLib from '../lib/css.mjs'
-import { nativeSheet } from '../lib/frames.mjs'
 
 const { compiler } = compileLib
 const finalizeCss = compileLib.finalizeCss ?? cssLib.finalizeCss
@@ -154,7 +154,8 @@ const FAMILIES = [...readTypedExecutions()]
       .map(component => {
         const declared = PROBES[component]
 
-        if (!declared) throw new Error(`no probe is declared for \`${component}\``)
+        if (!declared)
+          throw new Error(`no probe is declared for \`${component}\``)
 
         const entry =
           typeof declared === 'string' ? { probe: declared } : declared
@@ -308,7 +309,8 @@ for (const { family, leaves, routes, surface } of FAMILIES)
       ? 'declined'
       : moves(resting)
         ? 'movable'
-        : native?.equivalent.turns === 'flat' && native.control.turns === 'moves'
+        : native?.equivalent.turns === 'flat' &&
+            native.control.turns === 'moves'
           ? 'equivalent-no-op'
           : 'fixture-unobservable'
 

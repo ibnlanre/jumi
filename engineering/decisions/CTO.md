@@ -5148,7 +5148,7 @@ right 50%  →  100% 50%     sample for sample: 0% 50% → 25% 50% → 50% 50% �
 ```
 
 The reading is not about the route, it is about the spelling. In a two-value `<position>` the second component binds
-the **other** axis, so `right 50%` is x at the right edge over a zero offset and y at 50%; the edge *plus its offset*
+the **other** axis, so `right 50%` is x at the right edge over a zero offset and y at 50%; the edge _plus its offset_
 needs the four-value form. This is fixture defect 17's confusion, so the arm was rebuilt to commit no defect:
 
 ```text
@@ -5170,8 +5170,8 @@ is therefore only available when `equivalent` is flat **and** `control` moves.
 publishes exactly its contracted leaf, and legitimately resolves to its own resting value — native-equivalent under
 its own semantics, which is the ruling's conclusion reached by measurement rather than by algebra.
 
-**Fixture defect 22** (sibling of the camelCase defect): *a reference written in a spelling that means something
-else*. Both defects produce a clean-looking reading rather than an error, and both were caught by asking what the
+**Fixture defect 22** (sibling of the camelCase defect): _a reference written in a spelling that means something
+else_. Both defects produce a clean-looking reading rather than an error, and both were caught by asking what the
 reference's own value was rather than whether it agreed with the shipped arm.
 
 **Registry reconciliation, read from the guard rather than inventoried.** The completeness arm named exactly four
@@ -5237,8 +5237,8 @@ route evidence        movable 16 · equivalent-no-op 4 · fixture-unobservable 0
 ```
 
 **What the last three passes actually bought.** D.3.9 through D.3.11 separated three facts that had been conflated
-since the Gate B verdicts were first written — that a route *executes*, that a route *assigns the right execution
-subject*, and that a route *produces visible displacement*. The four edge routes are the case that proves they are
+since the Gate B verdicts were first written — that a route _executes_, that a route _assigns the right execution
+subject_, and that a route _produces visible displacement_. The four edge routes are the case that proves they are
 separate: they execute and assign exactly their contracted leaf, and displace nothing, legitimately. `equivalent-no-op`
 is a defensible name for that only because it requires a flat equivalent reference **and** a moving control, which is
 a stronger claim than treating flatness as evidence by itself.
@@ -5247,12 +5247,12 @@ a stronger claim than treating flatness as evidence by itself.
 `engineering/research/rules.md`, each with the defect that produced it and the mechanism that holds it — plus the one
 rule (structural CSS claims from parsed declarations) still owed a mechanism, which is stated as owed rather than
 implied to be enforced. Two corollaries are kept there because they catch what the eight do not: a probe defect and a
-product defect are indistinguishable from the outside *except* by asking what the reference's own value was; and an
+product defect are indistinguishable from the outside _except_ by asking what the reference's own value was; and an
 explanation is not a reading.
 
 **Fixture defect 23** — the substring scanner that reported an unconditional `offset-position:` declaration by
 matching inside `--jumi-offset-position:` — is numbered here for continuity with 15–22. Like the others it is a
-verdict about the *fixture* wearing the clothes of a verdict about the product, and the eighth rule exists because of
+verdict about the _fixture_ wearing the clothes of a verdict about the product, and the eighth rule exists because of
 it.
 
 **No D.3.12.** The next work comes from a release or product concern, or from the broader 1.0 audit, not from the
