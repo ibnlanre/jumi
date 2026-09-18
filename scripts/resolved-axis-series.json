@@ -1,0 +1,153 @@
+{
+  "outcome": "resolved-axis-reproduces-native",
+  "source": "scripts/research/d3-resolved-axis.mjs",
+  "wall": [
+    0,
+    250,
+    500,
+    750,
+    1000
+  ],
+  "records": [
+    {
+      "attribution": {
+        "failed": [],
+        "ok": true
+      },
+      "authored": "left 0% top 0% → left 40% top 0%",
+      "checks": {
+        "failed": [],
+        "ok": true
+      },
+      "kind": "same-edge percentage",
+      "reference": [
+        "0% 0%",
+        "10% 0%",
+        "20% 0%",
+        "30% 0%",
+        "40% 0%"
+      ],
+      "resolved": [
+        "0% 0%",
+        "10% 0%",
+        "20% 0%",
+        "30% 0%",
+        "40% 0%"
+      ],
+      "resolvedEndpoints": "0% → 40%",
+      "verdict": "equivalent"
+    },
+    {
+      "attribution": {
+        "failed": [],
+        "ok": true
+      },
+      "authored": "left 0px top 0% → left 40px top 0%",
+      "checks": {
+        "failed": [],
+        "ok": true
+      },
+      "kind": "same-edge length",
+      "reference": [
+        "0px 0%",
+        "10px 0%",
+        "20px 0%",
+        "30px 0%",
+        "40px 0%"
+      ],
+      "resolved": [
+        "0px 0%",
+        "10px 0%",
+        "20px 0%",
+        "30px 0%",
+        "40px 0%"
+      ],
+      "resolvedEndpoints": "0px → 40px",
+      "verdict": "equivalent"
+    },
+    {
+      "attribution": {
+        "failed": [],
+        "ok": true
+      },
+      "authored": "left 10px top 0% → left 40% top 0%",
+      "checks": {
+        "failed": [],
+        "ok": true
+      },
+      "kind": "mixed units",
+      "reference": [
+        "calc(0% + 10px) 0%",
+        "calc(10% + 7.5px) 0%",
+        "calc(20% + 5px) 0%",
+        "calc(30% + 2.5px) 0%",
+        "40% 0%"
+      ],
+      "resolved": [
+        "calc(0% + 10px) 0%",
+        "calc(10% + 7.5px) 0%",
+        "calc(20% + 5px) 0%",
+        "calc(30% + 2.5px) 0%",
+        "40% 0%"
+      ],
+      "resolvedEndpoints": "10px → 40%",
+      "verdict": "equivalent"
+    },
+    {
+      "attribution": {
+        "failed": [],
+        "ok": true
+      },
+      "authored": "left 0% top 0% → right 40% top 0%",
+      "checks": {
+        "failed": [],
+        "ok": true
+      },
+      "kind": "edge-changing",
+      "reference": [
+        "0% 0%",
+        "15% 0%",
+        "30% 0%",
+        "45% 0%",
+        "60% 0%"
+      ],
+      "resolved": [
+        "0% 0%",
+        "15% 0%",
+        "30% 0%",
+        "45% 0%",
+        "60% 0%"
+      ],
+      "resolvedEndpoints": "0% → calc(100% - 40%)",
+      "verdict": "equivalent"
+    },
+    {
+      "attribution": {
+        "failed": [],
+        "ok": true
+      },
+      "authored": "left calc(10% + 5px) top 0% → right calc(40% - 5px) top 0%",
+      "checks": {
+        "failed": [],
+        "ok": true
+      },
+      "kind": "arithmetic",
+      "reference": [
+        "calc(10% + 5px) 0%",
+        "calc(22.5% + 5px) 0%",
+        "calc(35% + 5px) 0%",
+        "calc(47.5% + 5px) 0%",
+        "calc(60% + 5px) 0%"
+      ],
+      "resolved": [
+        "calc(10% + 5px) 0%",
+        "calc(22.5% + 5px) 0%",
+        "calc(35% + 5px) 0%",
+        "calc(47.5% + 5px) 0%",
+        "calc(60% + 5px) 0%"
+      ],
+      "resolvedEndpoints": "calc(10% + 5px) → calc(100% - calc(40% - 5px))",
+      "verdict": "equivalent"
+    }
+  ]
+}

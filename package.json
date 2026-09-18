@@ -129,6 +129,7 @@
     "research:d3-position-necessity": "node scripts/research/d3-position-necessity.mjs",
     "research:d3-offset-leaf": "node scripts/research/d3-offset-leaf.mjs",
     "research:d3-fallback-arms": "node scripts/research/d3-fallback-arms.mjs",
+    "research:d3-resolved-axis": "node scripts/research/d3-resolved-axis.mjs",
     "research:identity-collision": "node scripts/research/identity-collision.mjs",
     "candidate:diff": "node scripts/candidate-diff.mjs",
     "check": "node scripts/check.mjs",

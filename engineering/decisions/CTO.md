@@ -4494,6 +4494,64 @@ verdicts now, and the distinction is what let the two inert results be read rath
 `scripts/fallback-arms-series.json`, and the percentage-only `background-position` spike — a plumbing proof, not the
 complete landing — is unaffected by this finding and remains next.
 
+## The resolved-axis falsification: the execution subject is the resolved component, not the offset
+
+That last line is superseded by the ruling that followed it, and the fallback arms are why. A percentage-only spike
+would have proven plumbing for a subject already known to be narrower than the public route: the route accepts
+percentages, lengths, mixed units, `calc()` and edge-changing positions, while an offset leaf can represent only the
+same-edge subset and can represent an edge-changing motion under no syntax at all.
+
+The fallback arms also carried the clue. `left 0% → right 40%` — inert on the shipped route — has a native reference
+that walks `0% · 15% · 30% · 45% · 60%`, which is `0% → 60%`: the far endpoint **resolved** through its edge. That is
+interpolation in resolved positional-component space, the same architectural split D.3.7 established for
+`offset-anchor` — authoring state is not execution state.
+
+So the hypothesis was falsified or confirmed rather than assumed, `offset-anchor` used as a hypothesis and not as a
+transfer, single layer only, y pinned on both sides, x first:
+
+```text
+same-edge percentage  0% → 40%                                equivalent   0% 0% · 10% 0% · 20% 0% · 30% 0% · 40% 0%
+same-edge length      0px → 40px                              equivalent   0px 0% · 10px 0% · 20px 0% · 30px 0% · 40px 0%
+mixed units           10px → 40%                              equivalent   calc(0% + 10px) 0% · calc(10% + 7.5px) 0% · … · 40% 0%
+edge-changing         0% → calc(100% - 40%)                   equivalent   0% 0% · 15% 0% · 30% 0% · 45% 0% · 60% 0%
+arithmetic            calc(10% + 5px) → calc(100% - calc(40% - 5px))  equivalent  calc(10% + 5px) · … · calc(60% + 5px)
+```
+
+Every pair agrees sample for sample, and the two books cross-check: the edge-changing reference here is the same
+walk the fallback arms measured for `right 40%`, from a different fixture. **Outcome:
+`resolved-axis-reproduces-native`** — the hypothesis survived its falsification attempt.
+
+The candidate arm registered the resolved endpoints in a `<length-percentage>` leaf under a static two-value shell
+with y pinned, which is the composition a migration would emit; the reference was the browser interpolating the
+authored positions, which is the behaviour being claimed. The resolution clauses are restated in the book rather than
+imported, following the same precedent as `offset-anchor`'s prototype: production cannot import from `scripts/`, so
+the two are read against each other instead.
+
+### What this changes, and what it does not
+
+```text
+production subject   authoring  x-edge + x-offset            (unchanged, what an author writes)
+execution            x-position <length-percentage>         (resolved, one leaf per moving axis)
+```
+
+`background-position`'s public axis routes should normalize each endpoint through the measured clauses and animate
+the resolved component, which covers the whole accepted grammar in one subject — lengths, mixed units, `calc()` and
+edge-changing positions alike — instead of introducing a second architecture for the edge-changing class.
+
+- **Both axes are not required.** Gate A established independent x/y interpolation, so an x route may animate resolved
+  x while static y stays composed. The `offset-anchor` requirement — both execution leaves or none — came from that
+  family's own contract and is not inherited.
+- **The offset-leaf widening is not needed for this repair**, so it is not touched. Its evidence still stands on its
+  own terms: offset *values* inhabit `<length-percentage>` interpolation space. Whether the declaration needs it
+  remains an independent production question, and the infrastructure cost it carried — six records recovered, five
+  collateral losses, a 38-versus-28 population disagreement — is not paid before that question is answered.
+- **Multilayer is untouched**, and `object-position` and `offset-position` stay out until the deep case passes.
+
+**State.** No production change. Gate 17/17, 505 unit tests, `tsc` clean; the readings are in
+`scripts/resolved-axis-series.json`, and the next step is the `background-position` spike **with the resolved subject**
+— the same five classes proved here, in production, with the shell static and multilayer still on the whole-property
+path.
+
 **State.** No production behaviour changed. Gate 17/17, 505 unit tests, `tsc` clean, and
 `scripts/validated-representations.json` is byte-identical to what the previous pass recorded — the differential and
 its series are the only new artifacts.
