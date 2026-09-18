@@ -5055,3 +5055,44 @@ no-candidate  the routes=0 families  animation-range · animation-timeline (+2 s
 **No defect in the residual queue.** `border-image-outset`'s withdrawn verdict was the last one, and it was withdrawn
 by a native reference rather than by argument — which is the third time in this sweep that a browser reading falsified
 an assumption cheaply.
+
+## D.3.11 opened, and stopped at the boundary the ruling named: `offset-position` cannot take this shell
+
+The ruling reserved one stop, and a single arm reaches it. `background-position`'s shell applied to a property whose
+resting value is a keyword:
+
+```css
+@property --probe-x { syntax: "<length-percentage>"; inherits: false; initial-value: 0px; }
+@property --probe-y { syntax: "<length-percentage>"; inherits: false; initial-value: 0px; }
+#shell    { offset-position: var(--probe-x) var(--probe-y); }
+#authored { offset-position: var(--probe-x) var(--probe-y); --probe-x: 40%; --probe-y: 50%; }
+```
+
+```text
+nothing authored       base   normal        shell   0px 0px        ← the substrate changed the computed value
+authored               authored 40% 50%     ← the shell is correct once state exists
+```
+
+**`normal` becomes `0px 0px`.** A registered `<length-percentage>` leaf is always *defined* — its registration supplies
+an initial value, so the `var()` fallback that would have preserved `normal` can never apply — and the shell therefore
+asserts a concrete position on every element that never authored one. That is precisely the boundary:
+
+> No authored positional state must mean no typed substrate that changes computed `normal`.
+
+and it cannot be met by a leaf whose registration gives it a value. A fake resolved rest is not an option either, so
+the honest conclusion is the one the ruling allowed for: **`offset-position` needs materially different machinery**, not
+a copy of this one.
+
+The shape that would satisfy it is a **route-scoped shell**: the property declaration emitted by the authored route
+rather than by the base composition, so an untouched element keeps the browser's own `normal` and only a route that
+authors positional state brings the resolved pair into being. The compound branch already emits a per-candidate
+substrate, so that is reachable — but it is a second mechanism, and inventing it to rescue a family whose six routes
+were only *measured* inert is exactly the kind of thing this track has learned to ask about first.
+
+**`object-position` is unaffected**, and that is the useful half of the comparison: its rests are concrete (`50%`), so
+the shell asserts what the browser already computes, and it can migrate exactly as `background-position` did. Its
+Gate B verdict is the same defect, its Gate A prototype the same equivalence, and its family-specific semantics — the
+`50%` rest — survive the shell unchanged.
+
+**State.** No production change. `offset-position` stops here pending a ruling on whether the route-scoped shell is
+worth building for it; `object-position` has no such obstacle.
