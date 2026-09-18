@@ -4905,7 +4905,7 @@ the two resolved execution leaves · the assignment contract · `whole` made opt
 `axisEndpoint`, `AXIS_PREFIX`, `axisOf` · the family's resolver and authoring surface
 ```
 
-What is *not* the migration is three normalisations, and they carry no semantics:
+What is _not_ the migration is three normalisations, and they carry no semantics:
 
 ```text
 `typedExecutions` keys sorted        assigns · authoring · constituent · whole
@@ -4929,9 +4929,46 @@ The process rule this episode earned, recorded because it cost four days to lear
 > **Once the browser semantics, the execution model and the production repair are proven, switch from research mode to
 > implementation mode, and require a behavioural contradiction before reopening architecture.**
 
-Two failures are *not* that: a failing census count, and a guard whose ontology predates the model. Both are plumbing,
+Two failures are _not_ that: a failing census count, and a guard whose ontology predates the model. Both are plumbing,
 and both should be fixed forward and reported after.
 
 **State.** No production behaviour changed. Gate 17/17, 505 unit tests, `tsc` clean, and
 `scripts/validated-representations.json` is byte-identical to what the previous pass recorded — the differential and
 its series are the only new artifacts.
+
+## D.3.10 opened: the ledger regenerated, and Gate B across the residual queue
+
+The ledger from HEAD, with `background-position` moved to `migrated` (`096ea5f`): 96 reshape pairs, **unmeasured 12**,
+and the queue ranked by reachable routes is `border-image` (2) · `skew` (2) · `transform` (1) · `background` (1). Every
+remaining family sits at `routes=0`, which is Gate 0 `no-candidate` by the candidate table and needs no browser:
+`animation-range`, `animation-timeline` and its two scroll families, `box-shadow-inset/outset`, `border-block-width`,
+`border-inline`, `animation-delay`.
+
+Gate B ran on the four with routes, and the browser answered:
+
+```text
+family          routes  shipped behaviour                                      verdict
+skew            2       interpolates to the named matrix, linearly               equivalent → safe-no-need
+                        skewX(30deg)  0 · .1317 · .2679 · .4142 · .57735   (= tan 30°)
+                        skewY(20deg)  0 · .0875 · .1763 · .2679 · .3640   (= tan 20°)
+border-image    2       outset  0 · 0 · 8px · 8px · 8px       discrete         defective → Gate A
+                        repeat  stretch · stretch · round · round   discrete   equivalent → keyword-discrete
+background      1       size    auto · auto · 50% auto · 50% auto   discrete   needs a native reference
+transform       1       perspective-3d emits no animation at all   no candidate → no-candidate
+```
+
+`skew` is the useful new datum: two routes that **already do what they say**, putting an angle on the transform matrix
+exactly as native does — separable *and* unnecessary, which is the case this ruling keeps insisting on checking first.
+`border-image-repeat` flips discretely, which is also what native does with a keyword, so it joins `background-repeat`
+in that class.
+
+`border-image-outset` is the one real defect: `0 → 8px` through a **discrete flip** where native interpolates the length
+list smoothly. That is a Gate A question of the same shape the position family had — a route animating a property it
+cannot interpolate — and it is queued rather than started, because it is a migration and not a fix-forward.
+
+### Fixture defect 19: a constituent route's declared value is not its target
+
+`animation: none` on an element carrying a constituent class reads the **resting** declaration, because the shell that
+applies the target is emitted by the animation itself. My target check therefore read `0`, `stretch`, `auto` and `none`
+as "the declared value" and reported three `diverges` the series contradict. The verdicts above come from the series;
+a target check needs a native reference or a typed expectation, not a static element.

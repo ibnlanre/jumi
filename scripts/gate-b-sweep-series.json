@@ -1,0 +1,139 @@
+{
+  "source": "scripts/research/d3-gate-b-sweep.mjs",
+  "wall": [
+    0,
+    250,
+    500,
+    750,
+    1000
+  ],
+  "records": [
+    {
+      "checks": {
+        "failed": [
+          "the declared value is not the resting value"
+        ],
+        "ok": false
+      },
+      "klass": "animate-skew-x-[30deg]",
+      "component": "skew-x",
+      "family": "skew",
+      "observable": "transform",
+      "probe": "30deg",
+      "declared": "none",
+      "series": [
+        "matrix(1, 0, 0, 1, 0, 0)",
+        "matrix(1, 0, 0.131652, 1, 0, 0)",
+        "matrix(1, 0, 0.267949, 1, 0, 0)",
+        "matrix(1, 0, 0.414214, 1, 0, 0)",
+        "matrix(1, 0, 0.57735, 1, 0, 0)"
+      ],
+      "verdict": "unearned: the declared value is not the resting value"
+    },
+    {
+      "checks": {
+        "failed": [
+          "the declared value is not the resting value"
+        ],
+        "ok": false
+      },
+      "klass": "animate-skew-y-[20deg]",
+      "component": "skew-y",
+      "family": "skew",
+      "observable": "transform",
+      "probe": "20deg",
+      "declared": "none",
+      "series": [
+        "matrix(1, 0, 0, 1, 0, 0)",
+        "matrix(1, 0.0874887, 0, 1, 0, 0)",
+        "matrix(1, 0.176327, 0, 1, 0, 0)",
+        "matrix(1, 0.267949, 0, 1, 0, 0)",
+        "matrix(1, 0.36397, 0, 1, 0, 0)"
+      ],
+      "verdict": "unearned: the declared value is not the resting value"
+    },
+    {
+      "checks": {
+        "failed": [],
+        "ok": true
+      },
+      "klass": "animate-border-image-outset-[8px]",
+      "component": "border-image-outset",
+      "family": "border-image",
+      "observable": "borderImageOutset",
+      "probe": "8px",
+      "declared": "0",
+      "series": [
+        "0",
+        "0",
+        "8px",
+        "8px",
+        "8px"
+      ],
+      "verdict": "diverges"
+    },
+    {
+      "checks": {
+        "failed": [],
+        "ok": true
+      },
+      "klass": "animate-border-image-repeat-[round]",
+      "component": "border-image-repeat",
+      "family": "border-image",
+      "observable": "borderImageRepeat",
+      "probe": "round",
+      "declared": "stretch",
+      "series": [
+        "stretch",
+        "stretch",
+        "round",
+        "round",
+        "round"
+      ],
+      "verdict": "diverges"
+    },
+    {
+      "checks": {
+        "failed": [],
+        "ok": true
+      },
+      "klass": "animate-background-size-[50%]",
+      "component": "background-size",
+      "family": "background",
+      "observable": "backgroundSize",
+      "probe": "50%",
+      "declared": "auto",
+      "series": [
+        "auto",
+        "auto",
+        "50% auto",
+        "50% auto",
+        "50% auto"
+      ],
+      "verdict": "diverges"
+    },
+    {
+      "checks": {
+        "failed": [
+          "the shipped class emitted an animation",
+          "the declared value is not the resting value"
+        ],
+        "ok": false
+      },
+      "klass": "animate-perspective-3d-[300px]",
+      "component": "perspective-3d",
+      "family": "transform",
+      "observable": "perspective",
+      "probe": "300px",
+      "declared": "none",
+      "series": [
+        "none",
+        "none",
+        "none",
+        "none",
+        "none"
+      ],
+      "verdict": "unearned: the shipped class emitted an animation; the declared value is not the resting value"
+    }
+  ]
+}
