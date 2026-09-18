@@ -4958,7 +4958,7 @@ transform       1       perspective-3d emits no animation at all   no candidate 
 ```
 
 `skew` is the useful new datum: two routes that **already do what they say**, putting an angle on the transform matrix
-exactly as native does — separable *and* unnecessary, which is the case this ruling keeps insisting on checking first.
+exactly as native does — separable _and_ unnecessary, which is the case this ruling keeps insisting on checking first.
 `border-image-repeat` flips discretely, which is also what native does with a keyword, so it joins `background-repeat`
 in that class.
 
@@ -4972,3 +4972,40 @@ cannot interpolate — and it is queued rather than started, because it is a mig
 applies the target is emitted by the animation itself. My target check therefore read `0`, `stretch`, `auto` and `none`
 as "the declared value" and reported three `diverges` the series contradict. The verdicts above come from the series;
 a target check needs a native reference or a typed expectation, not a static element.
+
+## Gate A for `border-image-outset`: the browser contradicts the Gate B verdict, and the verdict was mine to lose
+
+The native reference answers the ruling's grammar questions, and the answer is not the one Gate B assumed:
+
+```text
+native, non-zero probes
+  0 → 2                    0 · .817 · 1.605 · 1.921 · 2                    SMOOTH      number → number
+  0 → 8px                  0 · 0 · 8px · 8px · 8px                        discrete    number → length
+  0 → 16px                 0 · 0 · 16px · 16px · 16px                      discrete    number → length
+  0 → 2 10px               0 · 0 · 2 10px · 2 10px · 2 10px                discrete    mixed list
+  0 → 2 10px 4px 20px      0 · 0 · 2 10px 4px 20px · …                     discrete    4-value list
+  0 → 10px 2               0 · 0 · 10px 2 · …                              discrete    length ↔ number
+```
+
+So the interpolation subject is **not** a set of independently interpolable components across types. It is smooth
+within one type — number to number — and **discrete across the number↔length boundary**, which is precisely where the
+ruling warned that zero is dangerous: `0` is a `<number>`, and the boundary it hides is the type, not the value.
+
+**That contradicts the assumption Gate B recorded, and the Gate B verdict was an artefact of fixture defect 19.** The
+`border-image-outset` arm's `diverges` came from reading a static element's resting declaration as its target; with the
+native reference in place, the shipped `[8px]` route is `0 · 0 · 8px · 8px · 8px` — **identical to native**. The one
+spelling that measured cleanly behaves exactly like the browser, so there is no reproduced defect to repair, and the
+`defective → Gate A` label above is withdrawn.
+
+### What is still open, and it is not a defect claim
+
+Every other spelling in the sweep emitted **no animation at all** — `[16px]`, `[2]`, `[2_10px]`, `[2_10px_4px_20px]`,
+`[10px_2]`, and both `background-size` classes. That is either an invalid arbitrary value for the candidate's declared
+`type` list, or a route the plugin declines, and the two have different consequences: the first is a spelling question
+for the author, the second is a Gate 0 `no-candidate`. It is measured next rather than inferred, and `[8px]` working
+while `[16px]` emits nothing is exactly the kind of asymmetry that should be read from the candidate table instead of
+guessed.
+
+**State.** No production change. Gate A's answer for `border-image-outset` is `native/property execution is correct
+where it runs` — the whole-property path is what native does, and the components are not independently interpolable
+across types.

@@ -1,0 +1,236 @@
+{
+  "source": "scripts/research/d3-outset-size.mjs",
+  "wall": [
+    0,
+    250,
+    500,
+    750,
+    1000
+  ],
+  "records": [
+    {
+      "checks": {
+        "failed": [
+          "the shipped class emitted an animation",
+          "the shipped route moved"
+        ],
+        "ok": false
+      },
+      "kind": "length → length",
+      "klass": "animate-border-image-outset-[8px]",
+      "native": [
+        "0",
+        "0",
+        "8px",
+        "8px",
+        "8px"
+      ],
+      "rest": "0",
+      "shipped": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "to": "8px",
+      "verdict": "unearned: the shipped class emitted an animation; the shipped route moved"
+    },
+    {
+      "checks": {
+        "failed": [
+          "the shipped class emitted an animation",
+          "the shipped route moved"
+        ],
+        "ok": false
+      },
+      "kind": "length → length (nonzero)",
+      "klass": "animate-border-image-outset-[16px]",
+      "native": [
+        "0",
+        "0",
+        "16px",
+        "16px",
+        "16px"
+      ],
+      "rest": "0",
+      "shipped": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "to": "16px",
+      "verdict": "unearned: the shipped class emitted an animation; the shipped route moved"
+    },
+    {
+      "checks": {
+        "failed": [
+          "the shipped class emitted an animation",
+          "the shipped route moved"
+        ],
+        "ok": false
+      },
+      "kind": "number → number",
+      "klass": "animate-border-image-outset-[2]",
+      "native": [
+        "0",
+        "0.817021",
+        "1.60481",
+        "1.92092",
+        "2"
+      ],
+      "rest": "0",
+      "shipped": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "to": "2",
+      "verdict": "unearned: the shipped class emitted an animation; the shipped route moved"
+    },
+    {
+      "checks": {
+        "failed": [
+          "the shipped class emitted an animation",
+          "the shipped route moved"
+        ],
+        "ok": false
+      },
+      "kind": "list, 2 values",
+      "klass": "animate-border-image-outset-[2_10px]",
+      "native": [
+        "0",
+        "0",
+        "2 10px",
+        "2 10px",
+        "2 10px"
+      ],
+      "rest": "0",
+      "shipped": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "to": "2 10px",
+      "verdict": "unearned: the shipped class emitted an animation; the shipped route moved"
+    },
+    {
+      "checks": {
+        "failed": [
+          "the shipped class emitted an animation",
+          "the shipped route moved"
+        ],
+        "ok": false
+      },
+      "kind": "list, 4 values",
+      "klass": "animate-border-image-outset-[2_10px_4px_20px]",
+      "native": [
+        "0",
+        "0",
+        "2 10px 4px 20px",
+        "2 10px 4px 20px",
+        "2 10px 4px 20px"
+      ],
+      "rest": "0",
+      "shipped": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "to": "2 10px 4px 20px",
+      "verdict": "unearned: the shipped class emitted an animation; the shipped route moved"
+    },
+    {
+      "checks": {
+        "failed": [
+          "the shipped class emitted an animation",
+          "the shipped route moved"
+        ],
+        "ok": false
+      },
+      "kind": "mixed, number ↔ length",
+      "klass": "animate-border-image-outset-[10px_2]",
+      "native": [
+        "0",
+        "0",
+        "10px 2",
+        "10px 2",
+        "10px 2"
+      ],
+      "rest": "0",
+      "shipped": [
+        "0",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "to": "10px 2",
+      "verdict": "unearned: the shipped class emitted an animation; the shipped route moved"
+    },
+    {
+      "checks": {
+        "failed": [
+          "the shipped class emitted an animation",
+          "the shipped route moved"
+        ],
+        "ok": false
+      },
+      "kind": "size: auto → percentage",
+      "klass": "animate-background-size-[50%_auto]",
+      "native": [
+        "auto",
+        "auto",
+        "50% auto",
+        "50% auto",
+        "50% auto"
+      ],
+      "rest": "auto",
+      "shipped": [
+        "auto",
+        "auto",
+        "auto",
+        "auto",
+        "auto"
+      ],
+      "to": "50% auto",
+      "verdict": "unearned: the shipped class emitted an animation; the shipped route moved"
+    },
+    {
+      "checks": {
+        "failed": [
+          "the shipped class emitted an animation",
+          "the shipped route moved"
+        ],
+        "ok": false
+      },
+      "kind": "size: percentage → percentage",
+      "klass": "animate-background-size-[50%_50%]",
+      "native": [
+        "auto",
+        "auto",
+        "50% 50%",
+        "50% 50%",
+        "50% 50%"
+      ],
+      "rest": "auto",
+      "shipped": [
+        "auto",
+        "auto",
+        "auto",
+        "auto",
+        "auto"
+      ],
+      "to": "50% 50%",
+      "verdict": "unearned: the shipped class emitted an animation; the shipped route moved"
+    }
+  ]
+}
