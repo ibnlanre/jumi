@@ -5428,3 +5428,42 @@ the mappings carry that on their own, and 682,816 bytes of the tarball are buyin
 measured consumer path reads. D is not recommended — it is the cheapest and the only option that publishes
 references nothing resolves. A stays defensible if the judgement is that a megabyte is fine. The numbers are
 the contribution; the call is not mine to make.
+---
+
+## Sourcemaps — B, and B as a packaging invariant
+
+**The call.** Publish source maps, strip `sourcesContent`, keep the mappings and every `sourceMappingURL`
+reference intact. The reasoning is the measurement's own: B keeps the property that was proved useful — a
+consumer's stack trace resolving to the original Jumi source location, which the mappings carry on their own —
+and removes what was proved dead weight for published consumers, the embedded source.
+
+**The Vite arm decided it.** Downstream bundlers are not composing Jumi's maps into the application map, so
+~3 MB of embedded text was not buying DevTools fidelity in the bundled-consumer path consumers actually take.
+It was increasing package weight and nothing else that was measured.
+
+**C was declined on consistency, not on size.** The ~5 kB difference is irrelevant; one exceptional map policy
+costs more to explain than it buys, unless `view-transition` grows a standalone-browser debugging story that
+materially needs its source embedded. It has not. If there is no real product reason for the exception,
+consistency wins.
+
+**Landed as `f368a69`.** The rewrite is one key: after `tsup` emits, each `.map` is parsed and
+`sourcesContent` is deleted, leaving `version`, `sources`, `names` and `mappings` — and the reference in the
+file beside it — exactly as emitted. It lives in `scripts/bundle.mjs`, which owns the build, so it runs on
+every route to a `dist/` and on none of the readers that inherit one under `JUMI_BUNDLE=prebuilt`. The eight
+maps go from 4,105,742 bytes to 1,026,096; the tarball from 1,070,498 to **387,682**.
+
+**The ruling is an invariant now, held by the consumer stage** — asserted on the installed artifact, which is
+the position the ruling asked to be the proof. Every shipped file's map is published and parses; no map embeds
+its source; no map names an absolute or `file:` source, which discharges the caution about local-only paths
+rather than arguing it; the pack stays under a **ceiling** of 600,000 bytes rather than the measured 387,682,
+so the check is about the shape and Jumi can grow without churning it; and a failure raised inside the
+installed package resolves to a `src/*.ts` position.
+
+**The control, with no file mutated.** Rebuilding `dist/` the way `tsup` emits it — the embedded source back —
+and running the stage under `JUMI_BUNDLE=prebuilt`, the handover the gate already has, used here to say "the
+build is not mine": `size` fails at 1,070,498, `maps` names all eight as still embedding their source, and
+`mapped trace` **still passes**. The value and the cost are asserted separately, which is the point — a change
+that reinstates the embedded text fails on the shape, not on the mapping.
+
+18/18 gate, 119.7s of stage work, down from 141.0s: the site build and the browser replay no longer read four
+megabytes of embedded source.
