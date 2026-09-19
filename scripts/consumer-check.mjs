@@ -437,6 +437,86 @@ export const surfaces = { ${arm.entries.map(identifier).join(', ')} }
       : `${arm.entries.length} entry point${arm.entries.length === 1 ? '' : 's'} execute from both module systems`,
   )
 
+  // Construction, not loading. `Object.keys` proves a module parses; it cannot prove the call works — and
+  // the Vite entry's defect was exactly that: `require('@ibnlanre/jumi/vite')()` threw while the module
+  // loaded cleanly, so the claim above held while the package was unusable from CommonJS. Every entry
+  // whose default export is a factory is constructed, and both sides must build the same plugin names —
+  // the shape, not just the count.
+  const CONSTRUCTED = {
+    // One reader per entry, because "constructed" means something different on each side of the
+    // boundary: the Vite factory returns a plugin array, and the PostCSS factory returns a processor
+    // whose `plugins` a PostCSS run consumes. Both are read off the call itself, and CommonJS and ES
+    // modules must read the same thing.
+    '/postcss':
+      "made && Array.isArray(made.plugins) ? 'v' + made.version + ' ' + made.plugins.length + ' plugin(s)' : null",
+    '/vite':
+      "Array.isArray(made) ? made.map(one => one.name).join(',') : null",
+  }
+
+  const construct = (specifier, system, shape) => {
+    // The call a consumer writes, not a call that happens to work: `require('@ibnlanre/jumi/vite')()`
+    // from CommonJS and `(await import('@ibnlanre/jumi/vite')).default()` from ES modules. Both spellings
+    // are in the README, so both are the claim.
+    const call =
+      system === 'require'
+        ? `require('${specifier}')()`
+        : `(await import('${specifier}')).default()`
+
+    return attempt(
+      'node',
+      [
+        ...(system === 'import' ? ['--input-type=module'] : []),
+        '-e',
+        `const made = ${call}\nconst shape = ${shape}\nprocess.stdout.write(shape === null ? 'INVALID' : shape)`,
+      ],
+      { cwd: dir },
+    )
+  }
+
+  const constructions = []
+  const constructionProblems = []
+
+  for (const [entry, shape] of Object.entries(CONSTRUCTED)) {
+    if (!arm.entries.includes(entry)) continue
+
+    const specifier = `@ibnlanre/jumi${entry}`
+    const required = construct(specifier, 'require', shape)
+    const imported = construct(specifier, 'import', shape)
+    const constructed = result =>
+      result.status === 0 &&
+      result.output.trim().length > 0 &&
+      result.output.trim() !== 'INVALID'
+
+    constructions.push({ specifier })
+
+    if (!constructed(required))
+      constructionProblems.push(
+        `require('${specifier}')() → ${firstLines(required.output, 1)}`,
+      )
+    if (!constructed(imported))
+      constructionProblems.push(
+        `import('${specifier}')() → ${firstLines(imported.output, 1)}`,
+      )
+    if (
+      constructed(required) &&
+      constructed(imported) &&
+      required.output.trim() !== imported.output.trim()
+    )
+      constructionProblems.push(
+        `require('${specifier}')() → [${required.output.trim()}] but import → [${imported.output.trim()}]`,
+      )
+  }
+
+  claim(
+    constructed === 0 || constructionProblems.length === 0,
+    'construct',
+    constructions.length === 0
+      ? 'no integration entry in this arm'
+      : constructionProblems.length
+        ? constructionProblems.join('; ')
+        : `${constructions.length} integration entr${constructions.length === 1 ? 'y' : 'ies'} construct the same shape from both module systems`,
+  )
+
   // Named exports are the interop promise: a CommonJS consumer and an ES module consumer of the same
   // artifact must see the same names, or a package is only usable from one side of the boundary.
   const absent = execution.flatMap(shape =>

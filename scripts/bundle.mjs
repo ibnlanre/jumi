@@ -156,6 +156,44 @@ const repairCommonJsDeclarations = () =>
   }, 0)
 
 /**
+ * The integration entries, made callable from CommonJS.
+ *
+ * `require('@ibnlanre/jumi/vite')()` is the call a CommonJS consumer writes, and the bundler emits a
+ * namespace object instead — `{ default, jumiFinalizer }` — so the call throws before any plugin is
+ * constructed. That defect is one line further in, too: once `.default` is reached, `jumi()` spread the
+ * namespace the `__toESM` wrap leaves in place of `@tailwindcss/vite`'s factory, which is repaired in
+ * `src/vite.ts` where the call is. This is the other half — the shape the consumer touches.
+ *
+ * `Object.assign` onto the factory keeps the named export reachable (`require(…).jumiFinalizer`) and
+ * leaves `.default` pointing at the factory, so the `.default()` spelling keeps working. Appended rather
+ * than rewritten, because the assignment has to run after the bundler's own `module.exports`, and
+ * fail-closed in the same way as the declaration repair: no anchor, no build.
+ */
+const CALLABLE_ANCHOR =
+  'module.exports = Object.assign(module.exports.default, module.exports);'
+const CALLABLE = ['postcss.cjs', 'vite.cjs']
+
+const exposeCommonJsFactories = () =>
+  CALLABLE.reduce((exposed, name) => {
+    const file = path.join(root, 'dist', name)
+    const source = readFileSync(file, 'utf8')
+
+    if (source.includes(CALLABLE_ANCHOR)) return exposed
+
+    if (!source.includes('module.exports = __toCommonJS('))
+      throw new Error(
+        `${name}: no CommonJS export assignment to build the callable entry on`,
+      )
+
+    // The leading newline is load-bearing: the bundler's output does not end with one, and the line
+    // before this assignment is a `//` sourceMappingURL comment — glued together, that comment swallows
+    // the assignment and the entry stays uncallable while the build looks clean.
+    writeFileSync(file, `${source}\n${CALLABLE_ANCHOR}\n`)
+
+    return exposed + 1
+  }, 0)
+
+/**
  * Bundle `dist/`, unless the caller already did.
  *
  * Returns whether it built, so a caller can say so. The announcement is here rather than at the call
@@ -172,6 +210,7 @@ export const ensureBundle = ({ announce = true } = {}) => {
   execFileSync('pnpm', ['exec', 'tsup'], { cwd: root, stdio: 'pipe' })
   stripSourcesContent()
   repairCommonJsDeclarations()
+  exposeCommonJsFactories()
 
   return true
 }

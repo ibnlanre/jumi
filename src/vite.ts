@@ -55,9 +55,24 @@ export default function jumi(options?: {
   plugin?: string
   tailwind?: PluginOptions
 }): Plugin[] {
+  /**
+   * The factory, read from whichever place the build put it.
+   *
+   * This line is a CommonJS interop repair, and it is the smallest boundary for one: the defect was
+   * here, in the call, not in the declarations. esbuild's `__toESM` wrap leaves `.default` pointing at
+   * the **module namespace** in the CommonJS output, so spreading its result iterates a plain object and
+   * throws — `require('@ibnlanre/jumi/vite')()` was a TypeError while the module itself loaded cleanly,
+   * which is why the consumer stage's execution claim held and the package was still unusable from
+   * CommonJS. The ES module build hands the factory over directly, where `.default` is undefined and
+   * the right-hand side is what the call always used. `scripts/consumer-check.mjs` now constructs this
+   * entry from both module systems rather than only loading it.
+   */
+  const factory =
+    (tailwindcss as { default?: typeof tailwindcss }).default ?? tailwindcss
+
   return [
     jumiRegister(options?.plugin),
-    ...tailwindcss(options?.tailwind),
+    ...factory(options?.tailwind),
     jumiFinalizer(),
   ]
 }
