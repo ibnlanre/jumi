@@ -12,6 +12,7 @@ engineering/
   architecture/   how the machine works, and why it is shaped this way
   decisions/      proposals and decisions, including ones not acted on
   research/       investigations, measurements, and their conclusions
+  reviews/        independent reviews of a shipped surface, and the findings they opened
   roadmap/        what is planned, in what order, and what was closed
 ```
 
@@ -36,6 +37,11 @@ engineering/
 | `research/view-transitions.md`             | the View Transition API measured against the emitted model: the composition retargets onto the pseudo-elements and cannot be reached from the source element, the incoming document governs the tree cross-document, the group stays browser-owned, and the hoist means the slot publication must be re-materialized alongside the composition — then the shipped emitter, its eleven invariants, and the falsifications that hold them |
 | `research/style-cost.md`                   | what the aggregate costs DevTools: 863 KB of protocol response for one selected element at 228 slots, 82% of it the declaration payload, and the hoisted representation that removes 61% of it and 60% of the recalc — confirmed by hand at 47 s → 2.7 s in the Inspector, and by the shipped build at 965,683 → 419,673 bytes with 228/228 live animations unchanged                                                                   |
 | `roadmap/migration.md`                     | the migration: its phases, what closed, and what was decided along the way                                                                                                                                                                                                                                                                                                                                                              |
+
+| `research/studio.md` | the Studio investigations written before the implementation: the public-vocabulary audit, the probes that established paint-only isolation and in-worker compilation, the mirrored-sandbox scene decision, and the seeking model — with per-segment easing, transitions and view transitions deferred |
+| `roadmap/studio.md` | the Studio workstream: the first milestone, layout and interaction contracts, the versioned project state it serializes, later milestones, and the verification acceptance that gates it |
+| `roadmap/studio-workspace-pass.md` | the workspace pass: independent resizable/collapsible docks, source selection, overlap cycling, semantic-default pruning, contextual inspectors, timeline grouping, pre-roll and the draggable origin — with its scope limits and the 46 browser assertions that hold them |
+| `roadmap/studio-authoring-pass.md` | the authoring pass: base declarations on the scene tree, named-instance separation, audition outside the project, the row-model timeline, SVG-aware base controls, and the gesture/undo contract — verified by an independent recompile |
 
 ## Rules of the split
 
