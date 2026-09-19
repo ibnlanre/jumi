@@ -407,11 +407,13 @@ pnpm incremental:check      # incremental builds stay correct and local
 pnpm behaviour:check        # a real browser resolves a real carrier
 pnpm vite:check             # the shipped Vite integration, in dev and in every build shape
 pnpm postcss:check          # the shipped PostCSS integration, in every configuration
+pnpm phrase:check           # the phrase route: two handlers, one prefix, one documented domain
+pnpm consumer:check         # the packed artifact: installed isolated, declarations checked, entries constructed
 pnpm legacy:check           # no carrier class in a shipped surface
 pnpm stories:check          # every effect the Storybook names is one Jumi ships
 ```
 
-`pnpm check` runs those eleven in that order and **names every one in its summary**, with the
+`pnpm check` runs all eighteen stages in that order and **names every one in its summary**, with the
 stages it did not reach marked `not run` rather than left out. The sequence still stops at the first
 failure — later checks against a half-built `dist` would be a different gate, not a clearer one — but
 a failure can no longer read as "everything after it passed". That misreading cost a real bug: a
@@ -454,12 +456,12 @@ big a release is — a `fix:` can be the most important change in a release, and
 something a prefix should be trusted to make.
 
 ```bash
-pnpm check                                    # the gate, all sixteen stages
+pnpm check                                    # the gate, all eighteen stages
 pnpm run docs:build                           # the only path that builds every page
-pnpm run release:minor                        # writes the version to package.json, and nothing else
+pnpm version 0.1.0 --no-git-tag-version       # or release:minor, when that is the decided size
 pnpm run changelog                            # prepends the release, stamped with that version
-git add -A && git commit -m "chore(release): v1.0.0"
-git tag v1.0.0
+git add -A && git commit -m "chore(release): v0.1.0"
+git tag v0.1.0
 pnpm publish
 ```
 
@@ -467,6 +469,10 @@ Four things about that flow are load-bearing:
 
 - **The bump comes before the changelog.** The generator stamps the release header from `package.json`, so
   running it first labels the release with the _previous_ version.
+- **The first release writes its own notes.** `pnpm run changelog` prepends above a tag boundary and
+  refuses when none exists — "no tag to start from" — so there is nothing for it to generate _from_ until
+  a release has been tagged. For the first release the curated section in `CHANGELOG.md` **is** the
+  release's notes; generation starts with the release after it.
 - **`release:*` does not commit or tag.** It runs `pnpm version <bump> --no-git-tag-version`, which edits
   `package.json` and stops — so the release is one commit and one tag, not two of each.
 - **The boundary is a tag.** Everything written in `CHANGELOG.md` before the first tag is curated by hand and is

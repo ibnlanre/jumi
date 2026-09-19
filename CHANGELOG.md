@@ -1,16 +1,19 @@
 # Changelog
 
-> **Curated above, generated below.** The 1.0.0 notes are hand-written from the research records in
+> **Curated above, generated below.** The 0.1.0 notes are hand-written from the research records in
 > `engineering/research/`, and they are the history for the releases they describe. Everything below the divider
 > is the mechanical record, generated from Conventional Commits with `pnpm run changelog` — which prepends each
 > new release at the top and leaves what is already here alone. Release flow: [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## 1.0.0 — unreleased
+## 0.1.0 — unreleased
 
 Each note below describes behaviour that was measured rather than recalled. None of it changes a motion; the
 changes are about what Jumi writes, and about leaving the author's own CSS alone.
 
-### Upgrading from 1.0.0-beta.1
+### Upgrading from the unpublished 1.0.0-beta.1 line
+
+That line was never published, so nothing installed has to move — these are the changes it accumulated on the
+way to this release.
 
 **`interpolate-size` is no longer set for you.** It used to be written onto every element that animates, and the
 declaration is inherited — so it opted in the element's whole subtree. Measured: a child with no motion of its
