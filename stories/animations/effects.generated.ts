@@ -77,6 +77,27 @@ export const families: Array<Family> = [
   {
     effects: [
       {
+        class: 'blinds-in-x',
+        name: 'blinds-in-x',
+      },
+      {
+        class: 'blinds-in-y',
+        name: 'blinds-in-y',
+      },
+      {
+        class: 'blinds-out-x',
+        name: 'blinds-out-x',
+      },
+      {
+        class: 'blinds-out-y',
+        name: 'blinds-out-y',
+      },
+    ],
+    family: 'blinds',
+  },
+  {
+    effects: [
+      {
         class: 'blink',
         name: 'blink',
       },
@@ -474,6 +495,15 @@ export const families: Array<Family> = [
   {
     effects: [
       {
+        class: 'hinge-drop',
+        name: 'hinge-drop',
+      },
+    ],
+    family: 'hinge',
+  },
+  {
+    effects: [
+      {
         class: 'hue-shift',
         name: 'hue-shift',
       },
@@ -618,6 +648,19 @@ export const families: Array<Family> = [
       },
     ],
     family: 'pulsing',
+  },
+  {
+    effects: [
+      {
+        class: 'radial-wipe-in',
+        name: 'radial-wipe-in',
+      },
+      {
+        class: 'radial-wipe-out',
+        name: 'radial-wipe-out',
+      },
+    ],
+    family: 'radial',
   },
   {
     effects: [

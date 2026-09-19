@@ -40,6 +40,22 @@
     "name": "back-in-up"
   },
   {
+    "className": "animate-blinds-in-x",
+    "name": "blinds-in-x"
+  },
+  {
+    "className": "animate-blinds-in-y",
+    "name": "blinds-in-y"
+  },
+  {
+    "className": "animate-blinds-out-x",
+    "name": "blinds-out-x"
+  },
+  {
+    "className": "animate-blinds-out-y",
+    "name": "blinds-out-y"
+  },
+  {
     "className": "animate-blink",
     "name": "blink"
   },
@@ -332,6 +348,10 @@
     "name": "heart-beat"
   },
   {
+    "className": "animate-hinge-drop",
+    "name": "hinge-drop"
+  },
+  {
     "className": "animate-hue-shift",
     "name": "hue-shift"
   },
@@ -418,6 +438,14 @@
   {
     "className": "animate-pulsing",
     "name": "pulsing"
+  },
+  {
+    "className": "animate-radial-wipe-in",
+    "name": "radial-wipe-in"
+  },
+  {
+    "className": "animate-radial-wipe-out",
+    "name": "radial-wipe-out"
   },
   {
     "className": "animate-reveal-down",

@@ -129,3 +129,55 @@ Because the driver is an ordinary animation, everything else composes with it. S
 ## CSS still sets the boundaries
 
 A utility cannot make a non-animatable CSS property interpolate. Some properties change discretely, and properties such as width can trigger layout work. Use transform and opacity for frequent decorative motion where they suit the effect, and test more complex properties on your target devices.
+
+## Animate SVG dashes
+
+Dash patterns and dash offsets are ordinary property animations:
+
+```html
+<svg viewBox="0 0 240 80">
+  <path
+    d="M 10 40 H 230"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="4"
+    stroke-dasharray="4 8"
+    class="animate-stroke-dasharray-[12_4] animation-duration-[1200ms]"
+  />
+</svg>
+```
+
+`animate-stroke-dasharray-*` accepts `none`, numbers, lengths, percentages, and CSS dash lists.
+Use underscores for spaces inside arbitrary values; comma-separated lists also work. Dash lengths must
+be nonnegative. An odd-length list follows SVG's native repeated-list rules.
+
+`animate-stroke-dashoffset-*` accepts numbers, lengths and percentages, including negative offsets:
+
+```html
+<path
+  d="M 10 40 H 230"
+  fill="none"
+  stroke="currentColor"
+  stroke-dasharray="8 4"
+  class="-animate-stroke-dashoffset-[12px]"
+/>
+```
+
+Both properties support phrases, named motion instances and normal timing controls:
+
+```html
+<path
+  d="M 10 40 H 230"
+  fill="none"
+  stroke="currentColor"
+  stroke-dasharray="8 4"
+  class="animate-stroke-dashoffset-[0:12|40:4|100:0]/trace
+         animation-duration-[2s]/trace
+         animation-timing-function-linear/trace"
+/>
+```
+
+These utilities do not measure paths or turn percentages into path-length progress. SVG percentages use
+its viewport-based reference, not the total length of a path. For a stroke-drawing recipe, establish an
+explicit `pathLength`/dash convention on your asset first. Existing dash styling and multiple subpaths
+matter. Jumi exposes the CSS properties; it does not supply a universal `draw` preset.

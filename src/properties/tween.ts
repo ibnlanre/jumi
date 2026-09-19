@@ -2236,6 +2236,17 @@ export const getMatchTween: GetMatchComponents = creator => {
       type: ['color', 'url', 'any'],
       values: theme('colors', stroke),
     },
+    'animate-stroke-dasharray': {
+      fn: property('stroke-dasharray'),
+      type: ['length', 'percentage', 'number', 'any'],
+      values: empty.none,
+    },
+    'animate-stroke-dashoffset': {
+      fn: property('stroke-dashoffset'),
+      supportsNegativeValues: true,
+      type: ['length', 'percentage', 'number', 'any'],
+      values: empty.number,
+    },
     'animate-stroke-width': {
       fn: property('stroke-width'),
       type: ['length', 'percentage', 'number', 'any'],

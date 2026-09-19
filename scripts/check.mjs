@@ -117,6 +117,12 @@ const STAGES = [
     run: ['run', 'behaviour:check'],
   },
   {
+    about:
+      'new effects and SVG dash routes match native references in the engines this host can launch',
+    label: 'effects',
+    run: ['run', 'effects:check'],
+  },
+  {
     about: 'the emitted view transition actually travels',
     label: 'view-transition',
     run: ['run', 'view-transition:check'],
