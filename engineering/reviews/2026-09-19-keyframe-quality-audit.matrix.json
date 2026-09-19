@@ -1834,6 +1834,1720 @@
     }
   },
   "directionAudit": "124 directional names; an entrance travels away from its named side, an exit toward it; no disagreements except the four arc-* names, which follow the entrance convention by substance",
+  "disposition": {
+    "approvedCorrectionsCommit": "dcc594d",
+    "approvedCorrectionsCommitFull": "dcc594de21a207b7eb88143b4c1e0a95bbe19623",
+    "auditedCommit": "9ac0375",
+    "catalogAfter": 235,
+    "catalogUnchanged": true,
+    "gate": {
+      "stages": 19,
+      "passed": 19,
+      "exitCode": 0,
+      "command": "pnpm check"
+    },
+    "cssSnapshot": {
+      "regenerated": true,
+      "changed": false,
+      "note": "pnpm css:snapshot rewrote the recorded snapshot byte for byte; the corpus references none of the corrected effects, so the 21 changed keyframe emissions are the whole diff and no unrelated emission moved."
+    },
+    "implemented": [
+      {
+        "item": 1,
+        "finding": "B1",
+        "decision": "Repeat transform-origin in every stop; the declared pivot stays the pivot.",
+        "effects": [
+          "accordion",
+          "fold-in",
+          "fold-out"
+        ],
+        "class": "adjust origin",
+        "proof": "fixed origins remain fixed numerically throughout interpolation",
+        "readings": {
+          "accordion": {
+            "samples": [
+              "0%",
+              "30%",
+              "60%",
+              "80%",
+              "100%"
+            ],
+            "before": [
+              "100px 0px",
+              "100px 30.7989px",
+              "100px 53.1138px",
+              "100px 58.5375px",
+              "100px 60px"
+            ],
+            "beforeDistinct": 5,
+            "after": [
+              "100px 0px",
+              "100px 0px",
+              "100px 0px",
+              "100px 0px",
+              "100px 0px"
+            ],
+            "afterDistinct": 1,
+            "firefoxAfterDistinct": 1,
+            "webkitAfterDistinct": 1
+          },
+          "fold-in": {
+            "samples": [
+              "0%",
+              "30%",
+              "60%",
+              "80%",
+              "100%"
+            ],
+            "before": [
+              "100px 120px",
+              "100px 95.4894px",
+              "100px 71.8558px",
+              "100px 62.3725px",
+              "100px 60px"
+            ],
+            "beforeDistinct": 5,
+            "after": [
+              "100px 120px",
+              "100px 120px",
+              "100px 120px",
+              "100px 120px",
+              "100px 120px"
+            ],
+            "afterDistinct": 1,
+            "firefoxAfterDistinct": 1,
+            "webkitAfterDistinct": 1
+          },
+          "fold-out": {
+            "samples": [
+              "0%",
+              "30%",
+              "60%",
+              "80%",
+              "100%"
+            ],
+            "before": [
+              "100px 120px",
+              "100px 95.4894px",
+              "100px 71.8558px",
+              "100px 62.3725px",
+              "100px 60px"
+            ],
+            "beforeDistinct": 5,
+            "after": [
+              "100px 120px",
+              "100px 120px",
+              "100px 120px",
+              "100px 120px",
+              "100px 120px"
+            ],
+            "afterDistinct": 1,
+            "firefoxAfterDistinct": 1,
+            "webkitAfterDistinct": 1
+          },
+          "unfold-x": {
+            "samples": [
+              "0%",
+              "30%",
+              "60%",
+              "80%",
+              "100%"
+            ],
+            "before": [
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px"
+            ],
+            "beforeDistinct": 1,
+            "after": [
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px"
+            ],
+            "afterDistinct": 1,
+            "firefoxAfterDistinct": 1,
+            "webkitAfterDistinct": 1
+          },
+          "unfold-y": {
+            "samples": [
+              "0%",
+              "30%",
+              "60%",
+              "80%",
+              "100%"
+            ],
+            "before": [
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px"
+            ],
+            "beforeDistinct": 1,
+            "after": [
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px"
+            ],
+            "afterDistinct": 1,
+            "firefoxAfterDistinct": 1,
+            "webkitAfterDistinct": 1
+          }
+        }
+      },
+      {
+        "item": 2,
+        "finding": "B1 (same defect, conditional case)",
+        "decision": "State 'center' explicitly in unfold-x/unfold-y instead of leaning on the element's own origin.",
+        "effects": [
+          "unfold-x",
+          "unfold-y"
+        ],
+        "class": "adjust origin",
+        "proof": "declared pivot is unchanged, so geometry is unchanged; the declaration is now explicit",
+        "readings": {
+          "accordion": {
+            "samples": [
+              "0%",
+              "30%",
+              "60%",
+              "80%",
+              "100%"
+            ],
+            "before": [
+              "100px 0px",
+              "100px 30.7989px",
+              "100px 53.1138px",
+              "100px 58.5375px",
+              "100px 60px"
+            ],
+            "beforeDistinct": 5,
+            "after": [
+              "100px 0px",
+              "100px 0px",
+              "100px 0px",
+              "100px 0px",
+              "100px 0px"
+            ],
+            "afterDistinct": 1,
+            "firefoxAfterDistinct": 1,
+            "webkitAfterDistinct": 1
+          },
+          "fold-in": {
+            "samples": [
+              "0%",
+              "30%",
+              "60%",
+              "80%",
+              "100%"
+            ],
+            "before": [
+              "100px 120px",
+              "100px 95.4894px",
+              "100px 71.8558px",
+              "100px 62.3725px",
+              "100px 60px"
+            ],
+            "beforeDistinct": 5,
+            "after": [
+              "100px 120px",
+              "100px 120px",
+              "100px 120px",
+              "100px 120px",
+              "100px 120px"
+            ],
+            "afterDistinct": 1,
+            "firefoxAfterDistinct": 1,
+            "webkitAfterDistinct": 1
+          },
+          "fold-out": {
+            "samples": [
+              "0%",
+              "30%",
+              "60%",
+              "80%",
+              "100%"
+            ],
+            "before": [
+              "100px 120px",
+              "100px 95.4894px",
+              "100px 71.8558px",
+              "100px 62.3725px",
+              "100px 60px"
+            ],
+            "beforeDistinct": 5,
+            "after": [
+              "100px 120px",
+              "100px 120px",
+              "100px 120px",
+              "100px 120px",
+              "100px 120px"
+            ],
+            "afterDistinct": 1,
+            "firefoxAfterDistinct": 1,
+            "webkitAfterDistinct": 1
+          },
+          "unfold-x": {
+            "samples": [
+              "0%",
+              "30%",
+              "60%",
+              "80%",
+              "100%"
+            ],
+            "before": [
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px"
+            ],
+            "beforeDistinct": 1,
+            "after": [
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px"
+            ],
+            "afterDistinct": 1,
+            "firefoxAfterDistinct": 1,
+            "webkitAfterDistinct": 1
+          },
+          "unfold-y": {
+            "samples": [
+              "0%",
+              "30%",
+              "60%",
+              "80%",
+              "100%"
+            ],
+            "before": [
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px"
+            ],
+            "beforeDistinct": 1,
+            "after": [
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px",
+              "100px 60px"
+            ],
+            "afterDistinct": 1,
+            "firefoxAfterDistinct": 1,
+            "webkitAfterDistinct": 1
+          }
+        }
+      },
+      {
+        "item": 3,
+        "finding": "B2",
+        "decision": "Add an explicit 0% rotateZ(0deg) rest state.",
+        "effects": [
+          "swing"
+        ],
+        "class": "adjust keyframes",
+        "proof": "the effect is independent of a non-identity underlying transform",
+        "readings": {
+          "before": {
+            "none": [
+              0,
+              6.128,
+              12.036,
+              14.407,
+              15,
+              -10,
+              0
+            ],
+            "rotated": [
+              20,
+              17.957,
+              15.988,
+              15.198,
+              15,
+              -10,
+              0
+            ]
+          },
+          "after": {
+            "none": [
+              0,
+              6.128,
+              12.036,
+              14.407,
+              15,
+              -10,
+              0
+            ],
+            "rotated": [
+              0,
+              6.128,
+              12.036,
+              14.407,
+              15,
+              -10,
+              0
+            ]
+          },
+          "afterIdenticalAcrossBases": {
+            "chromium": true,
+            "firefox": true,
+            "webkit": true
+          }
+        }
+      },
+      {
+        "item": 4,
+        "finding": "B3",
+        "decision": "Keep the lifted pose as the perceptual peak and return to rest: 0% identity, 50% translateY(-5px) scale(1.02), 100% identity.",
+        "effects": [
+          "lift"
+        ],
+        "class": "adjust keyframes",
+        "proof": "reaches the intended peak and returns continuously to identity",
+        "readings": {
+          "samples": {
+            "chromium": [
+              "0:0:1",
+              "125:-2.0425:1.00817",
+              "250:-4.012:1.01605",
+              "375:-4.8023:1.01921",
+              "500:-5:1.02",
+              "625:-2.9575:1.01183",
+              "750:-0.988:1.00395",
+              "875:-0.1977:1.00079",
+              "1000:0:1"
+            ],
+            "firefox": [
+              "0:0:1",
+              "125:-2.0426:1.00817",
+              "250:-4.012:1.01605",
+              "375:-4.8023:1.01921",
+              "500:-5:1.02",
+              "625:-2.9574:1.01183",
+              "750:-0.988:1.00395",
+              "875:-0.1977:1.00079",
+              "1000:0:1"
+            ],
+            "webkit": [
+              "0:0:1",
+              "125:-2.0426:1.00817",
+              "250:-4.012:1.01605",
+              "375:-4.8023:1.01921",
+              "500:-5:1.02",
+              "625:-2.9574:1.01183",
+              "750:-0.988:1.00395",
+              "875:-0.1977:1.00079",
+              "1000:0:1"
+            ]
+          },
+          "peak": {
+            "translateY": -5,
+            "scale": 1.02,
+            "at": 500
+          },
+          "largestStepPx": 2.0425,
+          "endsAtRest": true
+        }
+      },
+      {
+        "item": 5,
+        "finding": "B4",
+        "decision": "Remove the inert transform-origin declarations only.",
+        "effects": [
+          "expand-right",
+          "expand-up"
+        ],
+        "class": "adjust origin (inert declaration removed)",
+        "proof": "removing the declarations produces byte-for-byte equivalent computed geometry, and the two effects still match the expand-left/expand-down controls that never declared an origin",
+        "readings": {
+          "expand-right": {
+            "before": [
+              [
+                0,
+                40,
+                40,
+                0,
+                120
+              ],
+              [
+                50,
+                40,
+                40,
+                320.953,
+                120
+              ],
+              [
+                100,
+                40,
+                40,
+                400,
+                120
+              ]
+            ],
+            "after": [
+              [
+                0,
+                40,
+                40,
+                0,
+                120
+              ],
+              [
+                50,
+                40,
+                40,
+                320.953,
+                120
+              ],
+              [
+                100,
+                40,
+                40,
+                400,
+                120
+              ]
+            ],
+            "identical": true
+          },
+          "expand-up": {
+            "before": [
+              [
+                0,
+                40,
+                40,
+                200,
+                0
+              ],
+              [
+                50,
+                40,
+                40,
+                200,
+                320.953
+              ],
+              [
+                100,
+                40,
+                40,
+                200,
+                400
+              ]
+            ],
+            "after": [
+              [
+                0,
+                40,
+                40,
+                200,
+                0
+              ],
+              [
+                50,
+                40,
+                40,
+                200,
+                320.953
+              ],
+              [
+                100,
+                40,
+                40,
+                200,
+                400
+              ]
+            ],
+            "identical": true
+          },
+          "expand-left": {
+            "before": [
+              [
+                0,
+                40,
+                40,
+                0,
+                120
+              ],
+              [
+                50,
+                40,
+                40,
+                320.953,
+                120
+              ],
+              [
+                100,
+                40,
+                40,
+                400,
+                120
+              ]
+            ],
+            "after": [
+              [
+                0,
+                40,
+                40,
+                0,
+                120
+              ],
+              [
+                50,
+                40,
+                40,
+                320.953,
+                120
+              ],
+              [
+                100,
+                40,
+                40,
+                400,
+                120
+              ]
+            ],
+            "identical": true
+          },
+          "expand-down": {
+            "before": [
+              [
+                0,
+                40,
+                40,
+                200,
+                0
+              ],
+              [
+                50,
+                40,
+                40,
+                200,
+                320.953
+              ],
+              [
+                100,
+                40,
+                40,
+                200,
+                400
+              ]
+            ],
+            "after": [
+              [
+                0,
+                40,
+                40,
+                200,
+                0
+              ],
+              [
+                50,
+                40,
+                40,
+                200,
+                320.953
+              ],
+              [
+                100,
+                40,
+                40,
+                200,
+                400
+              ]
+            ],
+            "identical": true
+          }
+        }
+      },
+      {
+        "item": 6,
+        "finding": "B5",
+        "decision": "End every reveal past the element so it covers the box, and make the five triangle directions agree on the corner they keep.",
+        "effects": [
+          "diamond-in",
+          "diamond-out",
+          "triangle-in",
+          "triangle-in-bottom-left",
+          "triangle-in-bottom-right",
+          "triangle-in-top-left",
+          "triangle-in-top-right",
+          "triangle-out",
+          "triangle-out-bottom-left",
+          "triangle-out-bottom-right",
+          "triangle-out-top-left",
+          "triangle-out-top-right"
+        ],
+        "class": "adjust keyframes",
+        "proof": "zero uncovered pixels at the final frame and sensible intermediate geometry on square, wide and tall boxes",
+        "readings": {
+          "square diamond-in": {
+            "coverage": {
+              "chromium": [
+                0,
+                0.4095,
+                0.9747,
+                1,
+                1
+              ],
+              "firefox": [
+                0,
+                0.4095,
+                0.9747,
+                1,
+                1
+              ],
+              "webkit": [
+                0,
+                0.4095,
+                0.9747,
+                1,
+                1
+              ]
+            },
+            "holes": 0
+          },
+          "square diamond-out": {
+            "coverage": {
+              "chromium": [
+                1,
+                0.7585,
+                0.099,
+                0.0045,
+                0
+              ],
+              "firefox": [
+                1,
+                0.7585,
+                0.0985,
+                0.0045,
+                0
+              ],
+              "webkit": [
+                1,
+                0.7585,
+                0.099,
+                0.0045,
+                0
+              ]
+            },
+            "holes": 0
+          },
+          "square triangle-in": {
+            "coverage": {
+              "chromium": [
+                0,
+                0.646,
+                0.9996,
+                1,
+                1
+              ],
+              "firefox": [
+                0,
+                0.646,
+                0.9996,
+                1,
+                1
+              ],
+              "webkit": [
+                0,
+                0.646,
+                0.9996,
+                1,
+                1
+              ]
+            },
+            "holes": 0
+          },
+          "square triangle-in-bottom-left": {
+            "coverage": {
+              "chromium": [
+                0,
+                0.4073,
+                0.973,
+                1,
+                1
+              ],
+              "firefox": [
+                0,
+                0.4073,
+                0.973,
+                1,
+                1
+              ],
+              "webkit": [
+                0,
+                0.4073,
+                0.973,
+                1,
+                1
+              ]
+            },
+            "holes": 0
+          },
+          "square triangle-in-bottom-right": {
+            "coverage": {
+              "chromium": [
+                0,
+                0.4073,
+                0.973,
+                1,
+                1
+              ],
+              "firefox": [
+                0,
+                0.4073,
+                0.973,
+                1,
+                1
+              ],
+              "webkit": [
+                0,
+                0.4073,
+                0.973,
+                1,
+                1
+              ]
+            },
+            "holes": 0
+          },
+          "square triangle-in-top-left": {
+            "coverage": {
+              "chromium": [
+                0,
+                0.4073,
+                0.973,
+                1,
+                1
+              ],
+              "firefox": [
+                0,
+                0.4073,
+                0.973,
+                1,
+                1
+              ],
+              "webkit": [
+                0,
+                0.4073,
+                0.973,
+                1,
+                1
+              ]
+            },
+            "holes": 0
+          },
+          "square triangle-in-top-right": {
+            "coverage": {
+              "chromium": [
+                0,
+                0.4073,
+                0.973,
+                1,
+                1
+              ],
+              "firefox": [
+                0,
+                0.4073,
+                0.973,
+                1,
+                1
+              ],
+              "webkit": [
+                0,
+                0.4073,
+                0.973,
+                1,
+                1
+              ]
+            },
+            "holes": 0
+          },
+          "square triangle-out": {
+            "coverage": {
+              "chromium": [
+                1,
+                0.9192,
+                0.1663,
+                0.007,
+                0
+              ],
+              "firefox": [
+                1,
+                0.9192,
+                0.1663,
+                0.007,
+                0
+              ],
+              "webkit": [
+                1,
+                0.9192,
+                0.1663,
+                0.007,
+                0
+              ]
+            },
+            "holes": 0
+          },
+          "square triangle-out-bottom-left": {
+            "coverage": {
+              "chromium": [
+                1,
+                0.7568,
+                0.0957,
+                0.004,
+                0
+              ],
+              "firefox": [
+                1,
+                0.7568,
+                0.0957,
+                0.0039,
+                0
+              ],
+              "webkit": [
+                1,
+                0.7568,
+                0.0957,
+                0.0038,
+                0
+              ]
+            },
+            "holes": 0
+          },
+          "square triangle-out-bottom-right": {
+            "coverage": {
+              "chromium": [
+                1,
+                0.7568,
+                0.0957,
+                0.004,
+                0
+              ],
+              "firefox": [
+                1,
+                0.7568,
+                0.0957,
+                0.004,
+                0
+              ],
+              "webkit": [
+                1,
+                0.7568,
+                0.0957,
+                0.0038,
+                0
+              ]
+            },
+            "holes": 0
+          },
+          "square triangle-out-top-left": {
+            "coverage": {
+              "chromium": [
+                1,
+                0.7568,
+                0.0957,
+                0.0039,
+                0
+              ],
+              "firefox": [
+                1,
+                0.7568,
+                0.0957,
+                0.0039,
+                0
+              ],
+              "webkit": [
+                1,
+                0.7568,
+                0.0957,
+                0.0038,
+                0
+              ]
+            },
+            "holes": 0
+          },
+          "square triangle-out-top-right": {
+            "coverage": {
+              "chromium": [
+                1,
+                0.7568,
+                0.0957,
+                0.004,
+                0
+              ],
+              "firefox": [
+                1,
+                0.7568,
+                0.0957,
+                0.004,
+                0
+              ],
+              "webkit": [
+                1,
+                0.7568,
+                0.0957,
+                0.0038,
+                0
+              ]
+            },
+            "holes": 0
+          },
+          "wide diamond-in": {
+            "coverage": {
+              "chromium": [
+                0,
+                0.4106,
+                0.9743,
+                1,
+                1
+              ],
+              "firefox": [
+                0,
+                0.4106,
+                0.9743,
+                1,
+                1
+              ],
+              "webkit": [
+                0,
+                0.4104,
+                0.9743,
+                1,
+                1
+              ]
+            },
+            "holes": 0
+          },
+          "wide diamond-out": {
+            "coverage": {
+              "chromium": [
+                1,
+                0.7598,
+                0.0968,
+                0.0044,
+                0
+              ],
+              "firefox": [
+                1,
+                0.7599,
+                0.097,
+                0.0044,
+                0
+              ],
+              "webkit": [
+                1,
+                0.7608,
+                0.0975,
+                0.0044,
+                0
+              ]
+            },
+            "holes": 0
+          },
+          "wide triangle-in": {
+            "coverage": {
+              "chromium": [
+                0,
+                0.6442,
+                0.9996,
+                1,
+                1
+              ],
+              "firefox": [
+                0,
+                0.6444,
+                0.9996,
+                1,
+                1
+              ],
+              "webkit": [
+                0,
+                0.6441,
+                0.9996,
+                1,
+                1
+              ]
+            },
+            "holes": 0
+          },
+          "wide triangle-in-bottom-left": {
+            "coverage": {
+              "chromium": [
+                0,
+                0.4061,
+                0.973,
+                1,
+                1
+              ],
+              "firefox": [
+                0,
+                0.4064,
+                0.9731,
+                1,
+                1
+              ],
+              "webkit": [
+                0,
+                0.4069,
+                0.9733,
+                1,
+                1
+              ]
+            },
+            "holes": 0
+          },
+          "wide triangle-in-bottom-right": {
+            "coverage": {
+              "chromium": [
+                0,
+                0.4063,
+                0.973,
+                1,
+                1
+              ],
+              "firefox": [
+                0,
+                0.4065,
+                0.9731,
+                1,
+                1
+              ],
+              "webkit": [
+                0,
+                0.4069,
+                0.9733,
+                1,
+                1
+              ]
+            },
+            "holes": 0
+          },
+          "wide triangle-in-top-left": {
+            "coverage": {
+              "chromium": [
+                0,
+                0.4061,
+                0.973,
+                1,
+                1
+              ],
+              "firefox": [
+                0,
+                0.4064,
+                0.9731,
+                1,
+                1
+              ],
+              "webkit": [
+                0,
+                0.4069,
+                0.9733,
+                1,
+                1
+              ]
+            },
+            "holes": 0
+          },
+          "wide triangle-in-top-right": {
+            "coverage": {
+              "chromium": [
+                0,
+                0.4063,
+                0.973,
+                1,
+                1
+              ],
+              "firefox": [
+                0,
+                0.4065,
+                0.9731,
+                1,
+                1
+              ],
+              "webkit": [
+                0,
+                0.4069,
+                0.9733,
+                1,
+                1
+              ]
+            },
+            "holes": 0
+          },
+          "wide triangle-out": {
+            "coverage": {
+              "chromium": [
+                1,
+                0.919,
+                0.1663,
+                0.0072,
+                0
+              ],
+              "firefox": [
+                1,
+                0.919,
+                0.1663,
+                0.0072,
+                0
+              ],
+              "webkit": [
+                1,
+                0.9191,
+                0.1662,
+                0.0072,
+                0
+              ]
+            },
+            "holes": 0
+          },
+          "wide triangle-out-bottom-left": {
+            "coverage": {
+              "chromium": [
+                1,
+                0.7586,
+                0.0961,
+                0.0041,
+                0
+              ],
+              "firefox": [
+                1,
+                0.7585,
+                0.0961,
+                0.0041,
+                0
+              ],
+              "webkit": [
+                1,
+                0.7579,
+                0.0961,
+                0.0041,
+                0
+              ]
+            },
+            "holes": 0
+          },
+          "wide triangle-out-bottom-right": {
+            "coverage": {
+              "chromium": [
+                1,
+                0.7586,
+                0.0961,
+                0.0041,
+                0
+              ],
+              "firefox": [
+                1,
+                0.7585,
+                0.0961,
+                0.0041,
+                0
+              ],
+              "webkit": [
+                1,
+                0.7579,
+                0.0961,
+                0.0041,
+                0
+              ]
+            },
+            "holes": 0
+          },
+          "wide triangle-out-top-left": {
+            "coverage": {
+              "chromium": [
+                1,
+                0.7586,
+                0.0961,
+                0.0041,
+                0
+              ],
+              "firefox": [
+                1,
+                0.7585,
+                0.0961,
+                0.0041,
+                0
+              ],
+              "webkit": [
+                1,
+                0.7584,
+                0.0961,
+                0.0041,
+                0
+              ]
+            },
+            "holes": 0
+          },
+          "wide triangle-out-top-right": {
+            "coverage": {
+              "chromium": [
+                1,
+                0.7586,
+                0.0961,
+                0.0041,
+                0
+              ],
+              "firefox": [
+                1,
+                0.7585,
+                0.0961,
+                0.0041,
+                0
+              ],
+              "webkit": [
+                1,
+                0.7584,
+                0.0961,
+                0.0041,
+                0
+              ]
+            },
+            "holes": 0
+          },
+          "tall diamond-in": {
+            "coverage": {
+              "chromium": [
+                0,
+                0.4106,
+                0.9743,
+                1,
+                1
+              ],
+              "firefox": [
+                0,
+                0.4105,
+                0.9743,
+                1,
+                1
+              ],
+              "webkit": [
+                0,
+                0.4104,
+                0.9743,
+                1,
+                1
+              ]
+            },
+            "holes": 0
+          },
+          "tall diamond-out": {
+            "coverage": {
+              "chromium": [
+                1,
+                0.7608,
+                0.0975,
+                0.0044,
+                0
+              ],
+              "firefox": [
+                1,
+                0.7608,
+                0.0975,
+                0.0044,
+                0
+              ],
+              "webkit": [
+                1,
+                0.7608,
+                0.0975,
+                0.0044,
+                0
+              ]
+            },
+            "holes": 0
+          },
+          "tall triangle-in": {
+            "coverage": {
+              "chromium": [
+                0,
+                0.6465,
+                0.9997,
+                1,
+                1
+              ],
+              "firefox": [
+                0,
+                0.6465,
+                0.9997,
+                1,
+                1
+              ],
+              "webkit": [
+                0,
+                0.6465,
+                0.9997,
+                1,
+                1
+              ]
+            },
+            "holes": 0
+          },
+          "tall triangle-in-bottom-left": {
+            "coverage": {
+              "chromium": [
+                0,
+                0.4069,
+                0.9733,
+                1,
+                1
+              ],
+              "firefox": [
+                0,
+                0.4069,
+                0.9733,
+                1,
+                1
+              ],
+              "webkit": [
+                0,
+                0.4069,
+                0.9733,
+                1,
+                1
+              ]
+            },
+            "holes": 0
+          },
+          "tall triangle-in-bottom-right": {
+            "coverage": {
+              "chromium": [
+                0,
+                0.4069,
+                0.9733,
+                1,
+                1
+              ],
+              "firefox": [
+                0,
+                0.4069,
+                0.9733,
+                1,
+                1
+              ],
+              "webkit": [
+                0,
+                0.4069,
+                0.9733,
+                1,
+                1
+              ]
+            },
+            "holes": 0
+          },
+          "tall triangle-in-top-left": {
+            "coverage": {
+              "chromium": [
+                0,
+                0.4069,
+                0.9733,
+                1,
+                1
+              ],
+              "firefox": [
+                0,
+                0.4069,
+                0.9733,
+                1,
+                1
+              ],
+              "webkit": [
+                0,
+                0.4069,
+                0.9733,
+                1,
+                1
+              ]
+            },
+            "holes": 0
+          },
+          "tall triangle-in-top-right": {
+            "coverage": {
+              "chromium": [
+                0,
+                0.4069,
+                0.9733,
+                1,
+                1
+              ],
+              "firefox": [
+                0,
+                0.4069,
+                0.9733,
+                1,
+                1
+              ],
+              "webkit": [
+                0,
+                0.4069,
+                0.9733,
+                1,
+                1
+              ]
+            },
+            "holes": 0
+          },
+          "tall triangle-out": {
+            "coverage": {
+              "chromium": [
+                1,
+                0.9198,
+                0.1672,
+                0.0073,
+                0
+              ],
+              "firefox": [
+                1,
+                0.9198,
+                0.1672,
+                0.0073,
+                0
+              ],
+              "webkit": [
+                1,
+                0.9198,
+                0.1672,
+                0.0073,
+                0
+              ]
+            },
+            "holes": 0
+          },
+          "tall triangle-out-bottom-left": {
+            "coverage": {
+              "chromium": [
+                1,
+                0.7579,
+                0.096,
+                0.0041,
+                0
+              ],
+              "firefox": [
+                1,
+                0.7585,
+                0.0957,
+                0.0041,
+                0
+              ],
+              "webkit": [
+                1,
+                0.7584,
+                0.0961,
+                0.0041,
+                0
+              ]
+            },
+            "holes": 0
+          },
+          "tall triangle-out-bottom-right": {
+            "coverage": {
+              "chromium": [
+                1,
+                0.7579,
+                0.0961,
+                0.0041,
+                0
+              ],
+              "firefox": [
+                1,
+                0.7585,
+                0.0959,
+                0.0041,
+                0
+              ],
+              "webkit": [
+                1,
+                0.7584,
+                0.0961,
+                0.0041,
+                0
+              ]
+            },
+            "holes": 0
+          },
+          "tall triangle-out-top-left": {
+            "coverage": {
+              "chromium": [
+                1,
+                0.7582,
+                0.0958,
+                0.0041,
+                0
+              ],
+              "firefox": [
+                1,
+                0.7584,
+                0.0957,
+                0.0041,
+                0
+              ],
+              "webkit": [
+                1,
+                0.7579,
+                0.0961,
+                0.0041,
+                0
+              ]
+            },
+            "holes": 0
+          },
+          "tall triangle-out-top-right": {
+            "coverage": {
+              "chromium": [
+                1,
+                0.7583,
+                0.0959,
+                0.0041,
+                0
+              ],
+              "firefox": [
+                1,
+                0.7586,
+                0.0959,
+                0.0041,
+                0
+              ],
+              "webkit": [
+                1,
+                0.7579,
+                0.0961,
+                0.0041,
+                0
+              ]
+            },
+            "holes": 0
+          }
+        }
+      }
+    ],
+    "notImplemented": [
+      {
+        "item": 8,
+        "what": "zoom-out-elastic perceptual envelope",
+        "reason": "excluded from the approved scope"
+      },
+      {
+        "item": 9,
+        "what": "pulsing/zoom-pulse and the reveal/unmask/square/mask aliases",
+        "reason": "excluded from the approved scope"
+      },
+      {
+        "what": "distance-unit normalization",
+        "reason": "excluded from the approved scope"
+      },
+      {
+        "what": "slide-out visibility behaviour",
+        "reason": "excluded from the approved scope"
+      },
+      {
+        "what": "naming asymmetries",
+        "reason": "excluded from the approved scope"
+      },
+      {
+        "item": 4,
+        "what": "documenting the real anchor of all four expand effects",
+        "reason": "the approval covered the inert declaration only"
+      },
+      {
+        "item": 6,
+        "what": "documenting typing's containing-block contract",
+        "reason": "documentation, not part of the approved five"
+      },
+      {
+        "item": 7,
+        "what": "documenting the accordion ramp and the fill-mode dependence of the reveal family",
+        "reason": "documentation, not part of the approved five"
+      }
+    ],
+    "verification": {
+      "instrument": "scripts/tmp-corrections-check.mjs and scripts/tmp-corrections-compare.mjs (scratch, gitignored)",
+      "phases": [
+        "before (chromium, firefox)",
+        "after (chromium, firefox, webkit)"
+      ],
+      "engines": {
+        "chromium": "153.0.8010.12",
+        "firefox": "155.0",
+        "webkit": "26.0"
+      },
+      "watchedEffects": 23,
+      "emittedKeyframesChanged": [
+        "jumi-accordion",
+        "jumi-diamond-in",
+        "jumi-diamond-out",
+        "jumi-expand-right",
+        "jumi-expand-up",
+        "jumi-fold-in",
+        "jumi-fold-out",
+        "jumi-lift",
+        "jumi-swing",
+        "jumi-triangle-in",
+        "jumi-triangle-in-bottom-left",
+        "jumi-triangle-in-bottom-right",
+        "jumi-triangle-in-top-left",
+        "jumi-triangle-in-top-right",
+        "jumi-triangle-out",
+        "jumi-triangle-out-bottom-left",
+        "jumi-triangle-out-bottom-right",
+        "jumi-triangle-out-top-left",
+        "jumi-triangle-out-top-right",
+        "jumi-unfold-x",
+        "jumi-unfold-y"
+      ],
+      "byteIdenticalControls": [
+        "jumi-expand-down",
+        "jumi-expand-left"
+      ],
+      "instrumentDiagnostics": 0,
+      "claims": [
+        {
+          "claim": "a. fixed origins remain fixed numerically throughout interpolation",
+          "status": "verified"
+        },
+        {
+          "claim": "b. swing is independent of a non-identity underlying transform",
+          "status": "verified"
+        },
+        {
+          "claim": "c. lift reaches the intended peak and returns continuously to identity",
+          "status": "verified"
+        },
+        {
+          "claim": "d. removing the expand origins produces equivalent computed geometry",
+          "status": "verified"
+        },
+        {
+          "claim": "e. diamond and triangle reveals have zero uncovered pixels at the final frame, with sensible intermediate geometry on square, wide and tall boxes",
+          "status": "verified"
+        }
+      ]
+    }
+  },
   "effects": [
     {
       "clip": null,
