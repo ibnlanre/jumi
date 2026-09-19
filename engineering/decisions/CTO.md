@@ -5324,3 +5324,38 @@ line exists so that reducing it is not mistaken for a prerequisite.
 Landed as `b3ab737`, 17/17 gate. Next in the order this established: the package-consumer stage — pack,
 install, compile the consumer matrix, execute representative imports — then the sourcemap question, measured
 for its contribution before it is decided, since 1.1 MB is not by itself a reason.
+---
+
+## The consumer's position, as a gate stage
+
+Landed 2026-09-19 as `6c1db0d`. Ordered next by the release-surface ruling, built to the shape it asked for:
+build · pack · install the tarball into a clean fixture · consume the exported entry points · compile the
+TypeScript consumer matrix · execute representative CommonJS and ESM imports.
+
+**What it asks, from the consumer's own position.** `npm pack`, then the tarball's listing — all four entry
+points carry a runtime _and_ a declaration file per condition — then an install into `scripts/tmp-consumer`,
+emptied at the start of every run so yesterday's `node_modules` cannot answer today's question. A CommonJS
+(`.ts`) and an ESM (`.mts`) consumer compile under `node16` **and** `nodenext`; each condition's declaration is
+attributed through `--traceResolution` rather than inferred from "it compiled", because that is also what a
+consumer gets when a declaration resolves by accident; the root entry executes from both sides and every name a
+`require` reaches is reachable from `import`; all four entries resolve, `.cjs` under `require` and `.js` under
+`import`.
+
+**Both modes, because one of them is blind.** With the defect restored, `tsc node16` fails with four TS1479s and
+`tsc nodenext` passes — `nodenext` models a Node that can `require` ESM, so it cannot see the difference at all.
+That is why the ruling asked for both, and it is now measured rather than assumed.
+
+**The control, run in both directions at once.** The export map flattened and the editor plugin returned to
+`dependencies` in a single mutation: three claims fired — the install tree reported **15 packages against 8**,
+the compile reported TS1479 for the first entry point, and the attribution named `dist/index.d.ts` as what
+`require` had been given. `package.json` was restored byte-identically afterwards. So the stage fails on a
+packaging defect **while every other stage stays green**, which is the property it was ordered to have.
+
+9.7s in the pool, and it writes nothing into `dist/`: `npm pack` fires neither `prepack` nor `prepare`, since
+the manifest has only `prepublishOnly`, so the pool's fingerprint check still means what it says. The gate is
+18 stages; 141.0s of stage work.
+
+**Its blind spots, stated.** It installs from the registry with `--prefer-offline`, so a cold cache needs the
+network. It consumes the four published entry points and executes the root, not every exported symbol. And it
+reads the _published_ artifact, so it says nothing about the source build — which is the division of labour it
+was built to create, not a gap in it.
