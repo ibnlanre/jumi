@@ -5701,3 +5701,61 @@ domain is enforced where the keyframe would be written and where the selection w
 nothing is clamped, and no value is rewritten.
 
 18/18 gate, `b467c4a`. All seven findings of the independent review are now closed.
+
+---
+
+## Release candidate — publishing dry run
+
+The review cycle being closed, the ruling was a release-candidate dry run: pack exactly what would be
+published, inspect it, install it externally, exercise the documented entry points, and verify publish
+metadata and versioning — reporting only release-process defects. Nothing was published, and nothing was
+pushed.
+
+**The baseline is behaviourally frozen.** `7be72ff` was reviewed and independently reverified. Two
+commits have landed since: the four studio documents into their engineering pockets (no content change)
+and the formatter's output on code the last three commits landed. Compared per file, the two executable
+files are **identical in their alphanumeric token stream** — the differences are wrapping, redundant
+parentheses and one trailing comma — and the two studio files differ only by an unused type import and an
+import order. Gate 18/18 on the current tree.
+
+**What would be published, verified.** `npm pack` produces a 28-file, 391,784-byte tarball: `dist/`
+(four entries × `js`/`cjs`/`d.ts`/`d.cts`, plus eight maps), `CHANGELOG.md`, `LICENSE`, `README.md`,
+`package.json` — no `sourcesContent` in any map, and no source, docs, scripts or engineering files.
+`pack` runs no lifecycle: `dist` is byte-identical before and after. `npm publish --dry-run` runs
+`prepublishOnly`, which rebuilds `dist/` and `examples/output.css` deterministically and leaves the tree
+clean — and the tarball it would upload has the **same shasum** as the pack taken before that rebuild
+(`e65796f6…`), so the artifact is reproducible.
+
+**Installed externally, exercised.** Into an empty project: all four entries resolve from both module
+systems with identical export keys; the installed `dist` is byte-identical to the tarball's; the
+documented PostCSS form (`'@ibnlanre/jumi/postcss': {}`) emits real motion — `@keyframes jumi-fade-in`,
+slot variables, no staging left behind.
+
+**Defects found — all release-process.**
+
+1. **`@ibnlanre/jumi/vite` cannot be constructed from CommonJS.** `dist/vite.cjs:8258` spreads
+   `__toESM(require("@tailwindcss/vite"), 1).default(options.tailwind)`, which resolves to the module
+   *namespace* rather than the factory, so `jumi()` throws `TypeError: (0 , import_vite.default) is not
+   a function or its return value is not iterable`. Measured with `@tailwindcss/vite@4.3.3`, with and
+   without `vite` (8.3.0) installed, on Node v22.19.0; the identical ESM call returns five plugins. The
+   peer ranges are satisfied, so this is inside the declared support surface — and the gate's `consumer`
+   stage does not catch it because its CJS arm loads modules without constructing the Vite plugin.
+2. **A prerelease would be tagged `latest`.** `npm publish --dry-run` reports `Publishing to
+   https://registry.npmjs.org/ with tag latest and public access` for `1.0.0-beta.1`. `publishConfig`
+   declares `access` and no `tag`, and the documented flow runs a bare `pnpm publish` — so a beta would
+   become what `npm install @ibnlanre/jumi` resolves to.
+3. **No tag exists for the release flow to start from.** `git tag` is empty, and `scripts/changelog.mjs`
+   refuses with "no tag to start from … Tag the boundary first", suggesting
+   `git tag v1.0.0-beta.1 <the commit that shipped it>`. The documented order — changelog, then tag —
+   cannot run until that historic tag is placed.
+4. Minor: `CONTRIBUTING.md`'s release block still says "all sixteen stages" (the gate is 18); the
+   `package.json` subpath is not exported, so tooling that reads `<pkg>/package.json` fails; no
+   `homepage` or `bugs` field.
+
+**Verified clean on the versioning side.** `package.json` is `1.0.0-beta.1`; the changelog's top section
+is `1.0.0 — unreleased`; `release:minor` applied to a copy of `package.json` produces exactly **`1.0.0`**
+(semver drops the prerelease), which matches. `publishConfig.access` is `public`, the optional peers are
+marked optional, and the gate is 18/18 on the tree that would ship.
+
+None of the defects above was repaired here: the ruling was that engineering stops and release
+operations begin, and these are for the CTO to route.
