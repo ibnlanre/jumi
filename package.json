@@ -8,24 +8,44 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./postcss": {
-      "types": "./dist/postcss.d.ts",
-      "import": "./dist/postcss.js",
-      "require": "./dist/postcss.cjs"
+      "import": {
+        "types": "./dist/postcss.d.ts",
+        "default": "./dist/postcss.js"
+      },
+      "require": {
+        "types": "./dist/postcss.d.cts",
+        "default": "./dist/postcss.cjs"
+      }
     },
     "./vite": {
-      "types": "./dist/vite.d.ts",
-      "import": "./dist/vite.js",
-      "require": "./dist/vite.cjs"
+      "import": {
+        "types": "./dist/vite.d.ts",
+        "default": "./dist/vite.js"
+      },
+      "require": {
+        "types": "./dist/vite.d.cts",
+        "default": "./dist/vite.cjs"
+      }
     },
     "./view-transition": {
-      "types": "./dist/view-transition.d.ts",
-      "import": "./dist/view-transition.js",
-      "require": "./dist/view-transition.cjs"
+      "import": {
+        "types": "./dist/view-transition.d.ts",
+        "default": "./dist/view-transition.js"
+      },
+      "require": {
+        "types": "./dist/view-transition.d.cts",
+        "default": "./dist/view-transition.cjs"
+      }
     }
   },
   "type": "module",
@@ -155,6 +175,7 @@
     "vite": "^5.2.0 || ^6 || ^7 || ^8"
   },
   "devDependencies": {
+    "@astrojs/ts-plugin": "^1.10.11",
     "@chromatic-com/storybook": "^4.1.2",
     "@storybook/addon-a11y": "^10.0.7",
     "@storybook/addon-docs": "^10.0.7",
@@ -215,7 +236,6 @@
     "url": "https://github.com/ibnlanre/jumi"
   },
   "dependencies": {
-    "@astrojs/ts-plugin": "^1.10.11",
     "culori": "^4.0.2",
     "shorthash2": "^1.0.5"
   },

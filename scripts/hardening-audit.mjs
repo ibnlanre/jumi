@@ -62,18 +62,69 @@ for (const field of ['main', 'module', 'types']) {
 
 const requireFrom = createRequire(import.meta.url)
 
+// An export entry is either a flat map of conditions to targets — `{ types,
+// import, require }`, each a string — or conditions nested one level deeper,
+// `{ import: { types, default }, require: { types, default } }`, which is what
+// a dual-published package needs so each condition carries the declaration
+// file that matches how it will be loaded. Both shapes are legal; the audit
+// reads whichever it finds, and names each target by the path it took to get
+// there, because the nesting is the part that can be silently wrong.
+const targetsOf = entry =>
+  Object.entries(entry).flatMap(([condition, value]) =>
+    typeof value === 'string'
+      ? [[condition, value]]
+      : Object.entries(value).map(([kind, target]) => [
+          `${condition}.${kind}`,
+          target,
+        ]),
+  )
+
 for (const [subpath, entry] of Object.entries(manifest.exports)) {
   const problems = []
+  const targets = targetsOf(entry)
 
-  for (const kind of ['types', 'import', 'require']) {
-    if (entry[kind] && !existsSync(path.join(root, entry[kind])))
-      problems.push(`${kind} ${entry[kind]} missing`)
+  for (const [label, target] of targets) {
+    if (typeof target !== 'string') {
+      problems.push(`${label} is not a string`)
+
+      continue
+    }
+
+    if (!existsSync(path.join(root, target)))
+      problems.push(`${label} ${target} missing`)
   }
 
-  if (!problems.length) {
+  // Under "type": "module" a bare `.d.ts` is an ES module declaration, so a
+  // `require` condition pointing at one describes a file TypeScript will
+  // refuse to load with `require` — the declaration ships and never resolves.
+  // This is the failure the audit exists to catch, and it is invisible to a
+  // check that only asks whether the file exists.
+  if (manifest.type === 'module')
+    for (const [label, target] of targets) {
+      if (typeof target !== 'string') continue
+
+      if (label === 'require.types' && target.endsWith('.d.ts'))
+        problems.push(`${label} ${target} is an ES module declaration`)
+
+      if (label === 'import.types' && target.endsWith('.d.cts'))
+        problems.push(`${label} ${target} is a CommonJS declaration`)
+    }
+
+  const targetOf = condition => {
+    const value = entry[condition]
+
+    return typeof value === 'string' ? value : value?.default
+  }
+
+  const importTarget = targetOf('import')
+  const requireTarget = targetOf('require')
+
+  if (!problems.length && (!importTarget || !requireTarget)) {
+    problems.push('no import and require targets to load')
+  } else if (!problems.length) {
     try {
-      const loaded = await import(path.join(root, entry.import))
-      const required = requireFrom(path.join(root, entry.require))
+      const loaded = await import(path.join(root, importTarget))
+      const required = requireFrom(path.join(root, requireTarget))
 
       if (!Object.keys(loaded).length && !Object.keys(required).length)
         problems.push('imports and requires, but exports nothing')
@@ -142,14 +193,27 @@ line(
   `${onDisk.length}, unregistered: ${unregistered.length}`,
 )
 
+// `git grep` exits 1 when the needle appears in no tracked file at all. That is
+// an answer — the file is unreferenced — not a failure, so it must not be
+// thrown. Any other status is a real error and is left to propagate.
+const referencesTo = base => {
+  try {
+    return execFileSync('git', ['grep', '-l', base], {
+      cwd: root,
+      encoding: 'utf8',
+    })
+      .split('\n')
+      .filter(Boolean)
+  } catch (error) {
+    if (error.status === 1) return []
+
+    throw error
+  }
+}
+
 for (const file of unregistered) {
   const base = path.basename(file)
-  const referenced = execFileSync('git', ['grep', '-l', base], {
-    cwd: root,
-    encoding: 'utf8',
-  })
-    .split('\n')
-    .filter(entry => entry && entry !== file)
+  const referenced = referencesTo(base).filter(entry => entry !== file)
 
   line(
     `  ${file}`,
@@ -300,7 +364,17 @@ const propertyNames = new Set(
 
 // Only backticked spans that are *entirely* a class-like token, so prose that merely contains one
 // (`animation-side`, `the animation`) is not mistaken for a claim that a class exists.
-const backticked = [...records.matchAll(/`([^`\n]+)`/g)].map(match => match[1])
+// A code span inside a markdown table has to escape the pipe, so the record
+// writes `animate-skew-[0:0deg\|100:5deg]` for the class a user types as
+// `animate-skew-[0:0deg|100:5deg]`. Read literally, the backslash survives into
+// the value — the compiler emits `skew(0deg\)`, escapes the closing paren, and
+// the post-build step cannot parse its own emission. Markdown renders the span
+// without the backslash, so this reads it the same way.
+const unescapeMarkdown = span => span.replace(/\\([|*_[\]\\])/g, '$1')
+
+const backticked = [...records.matchAll(/`([^`\n]+)`/g)].map(match =>
+  unescapeMarkdown(match[1]),
+)
 const tokens = [
   ...new Set(
     backticked.flatMap(span =>
@@ -346,8 +420,29 @@ const entry = `
 @plugin "${path.join(project, 'dist', 'index.js')}";
 `
 const baseline = build(await compiler(entry, project), []).css
-const batch = build(await compiler(entry, project), claims).css
+
+/**
+ * A build that answers `null` instead of throwing. A candidate whose emission the post-build step cannot
+ * parse — a markdown-escaped span, a value no one can write — would otherwise take the whole report with
+ * it, and a report that dies names nothing. The baseline is deliberately not tolerated: an empty build
+ * that cannot be parsed is a defect in the product, and failing loudly on it is the correct report.
+ */
+const attempt = async candidates => {
+  try {
+    return build(await compiler(entry, project), candidates).css
+  } catch {
+    return null
+  }
+}
+
+// The batch is only a fast negative filter — "does this stylesheet mention the token at all" — and every
+// token it does not mention is confirmed on its own. That makes it the one build allowed to fail: if it
+// cannot be read, every claim takes the slow path and the report is unchanged.
+const batch = (await attempt(claims)) ?? ''
 const unresolved = []
+const unreadable = []
+
+if (!batch) line('batch build', 'unreadable — every claim confirmed on its own')
 
 for (const token of claims) {
   if (PROSE.has(token)) continue
@@ -358,8 +453,9 @@ for (const token of claims) {
 
   if (new RegExp(`\\.${escaped}[\\s,{:.]`).test(batch)) continue
 
-  const alone = build(await compiler(entry, project), [token]).css
-  if (alone === baseline) unresolved.push(token)
+  const alone = await attempt([token])
+  if (alone === null) unreadable.push(token)
+  else if (alone === baseline) unresolved.push(token)
 }
 
 line(
@@ -371,6 +467,10 @@ line(
   `${unresolved.length} (of ${claims.length - [...claims].filter(token => PROSE.has(token)).length} prose-filtered)`,
 )
 for (const token of unresolved) console.log(`      ${token}`)
+if (unreadable.length) {
+  line('claims whose emission cannot be parsed', String(unreadable.length))
+  for (const token of unreadable) console.log(`      ${token}`)
+}
 
 // ── G · what a browser without the modern features would do ───────────────────────────────────────────
 heading(
