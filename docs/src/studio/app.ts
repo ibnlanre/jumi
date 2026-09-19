@@ -15,6 +15,7 @@ import {
   moveFrames,
   parentOf,
   parseClasses,
+  trackName,
   uid,
   validateProject,
 } from './model'
@@ -373,10 +374,7 @@ function addTrack() {
   }
   change(() => {
     for (const id of project.editor.selected) {
-      let name = entry.utility.slice(8)
-      let index = 2
-      while (project.tracks.some(t => t.nodeId === id && t.name === name))
-        name = `${entry.utility.slice(8)}-${index++}`
+      const name = trackName(entry.utility, project.tracks, id)
       const value =
         entry.attribute === 'opacity' ? '.25' : suggestValue(entry.attribute)
       const end =

@@ -930,6 +930,61 @@ try {
     replayErrors.length === 0,
   )
   await independent.close()
+
+  // Each authored track's duration, read in the browser rather than in the export.
+  //
+  // A track's controls are named after the track, and `/opacity` is not a label — it is the `opacity`
+  // property's scope, so a motion named `opacity` writes controls that reach its siblings on the element.
+  // Before the model accounted for that, the `opacity-2` track below omitted its own 1000ms (the Jumi
+  // default) and read the sibling's 2000ms instead — in this frame *and* in the exported page, because both
+  // consume one serialization, which is why replay parity could not see it. The pair is what the model
+  // produces for those two tracks; auditions read one motion at a time, so the assertion is per authored
+  // track rather than per element.
+  const holder = await page.evaluate(
+    () => window.__jumiStudio.project.scene.root.id,
+  )
+  await page.locator(`#scene-tree [data-select="${holder}"]`).click()
+  await page.locator('[data-action=import-classes]').click()
+  await page
+    .locator('#phrase-input')
+    .fill(
+      'animate-opacity-[0:0|100:1]/opacity animation-duration-[2000ms]/opacity ' +
+        'animate-opacity-[0:0|100:1]/opacity-2 animation-duration-[1000ms]/opacity-2',
+    )
+  await page.locator('#apply-phrases').click()
+  await ready()
+
+  for (const [name, duration] of [
+    ['opacity', 2000],
+    ['opacity-2', 1000],
+  ]) {
+    await page.locator(`[data-audition="motion:${holder}:${name}"]`).click()
+    const readings = await page
+      .frameLocator('#scene-frame')
+      .locator('body')
+      .evaluate(() =>
+        [...document.getAnimations()].map(
+          animation => animation.effect.getTiming().duration,
+        ),
+      )
+    check(
+      `a track named for its own property plays at its own ${duration}ms (read ${JSON.stringify(readings)})`,
+      readings.length === 1 && readings[0] === duration,
+    )
+  }
+
+  await page.locator('[data-action=reset-audition]').click()
+  for (const name of ['opacity', 'opacity-2']) {
+    const id = await page.evaluate(
+      ([track, node]) =>
+        window.__jumiStudio.project.tracks.find(
+          t => t.name === track && t.nodeId === node,
+        ).id,
+      [name, holder],
+    )
+    await page.locator('[data-track-delete="' + id + '"]').click()
+  }
+  await ready()
   const folder = path.join(root, 'artifacts/studio')
   await mkdir(folder, { recursive: true })
   await page.locator('button[data-left-tab=layers]').click()

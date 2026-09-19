@@ -11,6 +11,7 @@ import {
   moveFrames,
   parseClasses,
   trackClasses,
+  trackName,
   validateProject,
 } from './model'
 import { makeScene } from './scenes'
@@ -44,6 +45,61 @@ describe('Studio public output contract', () => {
     expect(exportedTrackClasses(t, p)).toContain(
       `animation-duration-[1000ms]/${t.name}`,
     )
+  })
+  it('writes the controls a sibling would otherwise decide, when its name is the property', () => {
+    const p = makeScene('signal'),
+      first = p.tracks[0]
+    const second = {
+      ...structuredClone(first),
+      id: 'second',
+      name: 'opacity-2',
+    }
+
+    first.id = 'first'
+    first.name = 'opacity'
+    first.utility = 'animate-opacity'
+    first.controls = { ...jumiDefaults, duration: 2000 }
+    second.controls = { ...jumiDefaults, duration: 1000 }
+    p.tracks = [first, second]
+
+    // `/opacity` is the property's scope, so the first track's 2000ms reaches the second. The second cannot
+    // omit its own 1000ms, or it reads the sibling's value — which is what it used to do, in the exported page
+    // and in the editor's replay alike, because both read this one serialization.
+    expect(exportedTrackClasses(second, p)).toContain(
+      'animation-duration-[1000ms]/opacity-2',
+    )
+    // Preserving writes every control, not just the one that differs — the point is that nothing is left to
+    // be decided by the sibling.
+    expect(exportedTrackClasses(second, p).length).toBeGreaterThan(1)
+    expect(exportedTrackClasses(first, p)).toContain(
+      'animation-duration-[2000ms]/opacity',
+    )
+
+    // With no such sibling the count stays omitted, which is the rule this is an exception to: it is about
+    // what a sibling would decide, not about durations being written out always.
+    p.tracks = [second]
+    expect(exportedTrackClasses(second, p)).toHaveLength(1)
+    expect(exportedTrackClasses(second, p)).not.toContain(
+      'animation-duration-[1000ms]/opacity-2',
+    )
+  })
+  it('names a new track locally rather than by the bare property', () => {
+    expect(trackName('animate-opacity', [], 'node')).toBe('opacity-1')
+    expect(
+      trackName(
+        'animate-opacity',
+        [{ name: 'opacity-1', nodeId: 'node' }],
+        'node',
+      ),
+    ).toBe('opacity-2')
+    // Another element's track does not push this element's count.
+    expect(
+      trackName(
+        'animate-opacity',
+        [{ name: 'opacity-1', nodeId: 'other' }],
+        'node',
+      ),
+    ).toBe('opacity-1')
   })
   it('derives composed properties and value types from the actual registrations', () => {
     expect(

@@ -85,8 +85,50 @@ export function exportedTrackClasses(
     flatten(project.scene.root)
       .map(n => Object.values(n.attributes).join(' '))
       .join(' ')
-  const preserve = /--jumi-|animation[-:]|animate-stagger|@theme/.test(authored)
-  return trackClasses(track, preserve)
+  const cascade = /--jumi-|animation[-:]|animate-stagger|@theme/.test(authored)
+
+  /**
+   * A sibling on the same element whose **name is this track's own property**.
+   *
+   * Controls are scoped by the track's name, and a property's name is not a label: `/opacity` is the scope of
+   * every `opacity` motion on the element, so a track named `opacity` publishes controls that reach this track
+   * as well. What that track omits is then decided by its sibling, so this one cannot omit anything — its
+   * "default" is whatever the sibling wrote. Measured before this check: an `opacity-2` track authored at
+   * 1000ms ran at its sibling's 2000ms, in the exported page *and* in the editor's own replay, because both
+   * read one serialization and parity cannot see a mistake they share.
+   */
+  const address = track.utility.slice('animate-'.length)
+  const shadowed = project.tracks.some(
+    other =>
+      other.id !== track.id &&
+      other.nodeId === track.nodeId &&
+      other.name === address,
+  )
+
+  return trackClasses(track, cascade || shadowed)
+}
+
+/**
+ * The name a new track gets: the property with a count — never the bare property.
+ *
+ * A bare property name is a **structural address**, not a label: a track named `opacity` publishes controls in
+ * the `opacity` property's scope, which reaches its siblings' motions as well as its own, so one track's timing
+ * would depend on another's. `opacity-1` keeps the label readable and the name local, so the default a new
+ * track gets can never do that. `exportedTrackClasses` still preserves around a name that *is* an address,
+ * because names are editable and projects made before this carry them.
+ */
+export function trackName(
+  utility: string,
+  tracks: ReadonlyArray<{ name: string; nodeId: string }>,
+  nodeId: string,
+): string {
+  const base = utility.slice('animate-'.length)
+  let name = `${base}-1`
+  let index = 2
+  while (tracks.some(t => t.nodeId === nodeId && t.name === name))
+    name = `${base}-${index++}`
+
+  return name
 }
 export const uid = () =>
   `m${globalThis.crypto.randomUUID().replaceAll('-', '').slice(0, 10)}`
