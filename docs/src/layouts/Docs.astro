@@ -61,7 +61,16 @@ const links = [
   </div>
   <script>
     document.querySelectorAll<HTMLPreElement>('.prose pre').forEach(pre => {
+      // The frame owns the button; only the `pre` scrolls. Appended to the `pre` — which is what this
+      // did — the button is a child of the scroller, so it travelled with the code the moment a line was
+      // wider than the column: the screenshot case, and the reason the wrapper exists.
+      const frame = document.createElement('div')
+      frame.className = 'code-frame'
+      pre.replaceWith(frame)
+      frame.append(pre)
+
       const button = document.createElement('button')
+      button.type = 'button'
       button.className = 'copy-code'
       button.textContent = 'Copy'
       button.setAttribute('aria-label', 'Copy code example')
@@ -76,7 +85,7 @@ const links = [
         }
         setTimeout(() => (button.textContent = 'Copy'), 1800)
       })
-      pre.append(button)
+      frame.append(button)
     })
   </script>
 </Layout>

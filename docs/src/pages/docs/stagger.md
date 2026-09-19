@@ -6,13 +6,13 @@ description: One motion, passed from child to child. No JavaScript loop required
 
 ## Forward stagger
 
-Put the stagger utility on the parent and the animation utilities on its direct children.
+Put the stagger utility on the parent and the children's animation on it too — `*:` applies a utility to every direct child:
 
 ```html
-<div class="animate-stagger-forward-[120ms]/3">
-  <div class="animate-bounce-in">One</div>
-  <div class="animate-bounce-in">Two</div>
-  <div class="animate-bounce-in">Three</div>
+<div class="animate-stagger-forward-[120ms]/3 *:animate-bounce-in">
+  <div>One</div>
+  <div>Two</div>
+  <div>Three</div>
 </div>
 ```
 
@@ -21,10 +21,10 @@ The delays are 0ms, 120ms, and 240ms. The `/3` count allows Jumi to generate a f
 ## Reverse the order
 
 ```html
-<div class="animate-stagger-backward-[150ms]/3">
-  <div class="animate-fade-in-up">Last</div>
-  <div class="animate-fade-in-up">Second</div>
-  <div class="animate-fade-in-up">First</div>
+<div class="animate-stagger-backward-[150ms]/3 *:animate-fade-in-up">
+  <div>Last</div>
+  <div>Second</div>
+  <div>First</div>
 </div>
 ```
 

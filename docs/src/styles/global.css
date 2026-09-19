@@ -751,13 +751,18 @@ footer > a:last-child {
   overflow-wrap: anywhere;
 }
 .prose pre {
-  position: relative;
   border: 1px solid var(--line);
   border-radius: 4px;
   padding: 45px 22px 22px;
-  margin: 24px 0;
+  margin: 0;
   background: #1c2018 !important;
   font-size: 13px;
+}
+/* The wrapper carries the spacing the `pre` used to, so the margins stay outside the frame and the
+   absolutely-positioned button anchors to code-block chrome rather than to the scrolling content. */
+.code-frame {
+  position: relative;
+  margin: 24px 0;
 }
 .copy-code {
   position: absolute;
