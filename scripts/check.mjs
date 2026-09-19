@@ -141,10 +141,11 @@ const STAGES = [
   // publishes. It exists because all sixteen other stages stayed green while a `require`-side consumer of the
   // packed artifact could not compile at all — the map named one `types` per entry, so the `.d.cts` files that
   // shipped were never referenced — and `nodenext` alone cannot see it, since it models a Node that can
-  // `require` ESM. Nothing else in the gate reads the export map, `files`, or an installed tree.
+  // `require` ESM. Nothing else in the gate reads the export map, `files`, an installed tree, or a
+  // published source map.
   {
     about:
-      'the packed artifact holds for a consumer, installed from the tarball',
+      'the packed artifact holds for a consumer: entry points, declarations and maps',
     label: 'consumer',
     run: ['run', 'consumer:check'],
   },

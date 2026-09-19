@@ -31,6 +31,7 @@
  * Run: `pnpm bundle` · or import `ensureBundle` from a stage.
  */
 import { execFileSync } from 'node:child_process'
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 import path from 'node:path'
@@ -48,6 +49,37 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 export const bundleIsOwned = () => process.env.JUMI_BUNDLE === 'prebuilt'
 
 /**
+ * Publish the maps without the source text they embed.
+ *
+ * Measured 2026-09-19, on the packed artifact: the eight maps were 792,966 of the tarball's 1,070,498
+ * bytes — 74% — and 2,978,204 bytes of that was `sourcesContent`. What a consumer does with a map is
+ * read a stack trace, and that reading is carried by the mappings alone: under `node
+ * --enable-source-maps` a failing call through the installed package names
+ * `src/helpers/carriers/index.ts:1355` whether the embedded text is there or not. A Vite consumer's
+ * composed map came out identical three ways — with the text, without it, and with no maps at all —
+ * because bundlers do not compose a dependency's maps, so the embedded text was not buying browser
+ * DevTools fidelity in the path consumers actually take. Ruled as B: publish the maps, strip the text.
+ *
+ * Only that one key is removed. `version`, `file`, `sources`, `names` and `mappings` are left exactly
+ * as `tsup` wrote them, and every shipped file keeps its `sourceMappingURL` reference, so the maps
+ * still resolve — they just no longer carry a copy of the source.
+ */
+const stripSourcesContent = () =>
+  readdirSync(path.join(root, 'dist'))
+    .filter(name => name.endsWith('.map'))
+    .reduce((stripped, name) => {
+      const file = path.join(root, 'dist', name)
+      const map = JSON.parse(readFileSync(file, 'utf8'))
+
+      if (!('sourcesContent' in map)) return stripped
+
+      delete map.sourcesContent
+      writeFileSync(file, JSON.stringify(map))
+
+      return stripped + 1
+    }, 0)
+
+/**
  * Bundle `dist/`, unless the caller already did.
  *
  * Returns whether it built, so a caller can say so. The announcement is here rather than at the call
@@ -62,6 +94,7 @@ export const ensureBundle = ({ announce = true } = {}) => {
 
   if (announce) console.log('· bundling')
   execFileSync('pnpm', ['exec', 'tsup'], { cwd: root, stdio: 'pipe' })
+  stripSourcesContent()
 
   return true
 }

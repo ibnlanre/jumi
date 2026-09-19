@@ -24,6 +24,9 @@
  *               `.d.ts` under `import` — asked of `--traceResolution`, since "it compiled" is also
  *               what a consumer gets from a declaration file that resolves by accident
  *   executed    `require` and `import` of the root entry, and resolution of all four in both systems
+ *   mapped      every shipped file's map is published, parses, keeps its mappings and carries no
+ *               embedded source — and a failure inside the installed package resolves to a `src/*.ts`
+ *               position, which is the one thing the maps are for (ruled B, 2026-09-19)
  *
  * It installs from the registry, because that is what installing is. The fixture lives in
  * `scripts/tmp-consumer`, which `.gitignore` covers, and it is emptied at the start of every run: a
@@ -32,7 +35,15 @@
  * Run: pnpm consumer:check
  */
 import { execFileSync } from 'node:child_process'
-import { mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 import { ensureBundle } from './bundle.mjs'
@@ -78,6 +89,14 @@ const firstLines = (text, count = 3) =>
 const tsc = path.join(root, 'node_modules', '.bin', 'tsc')
 const entryPoints = ['', '/postcss', '/vite', '/view-transition']
 
+/**
+ * A ceiling, not the measured size. The maps with their embedded source were 1,070,498 bytes packed;
+ * with the mappings alone they are ~388,000. Freezing that number would churn with every feature Jumi
+ * grows, so the claim is about the shape: the mappings cannot get near the old figure, so anything
+ * approaching it means `sourcesContent` came back.
+ */
+const packedCeiling = 600_000
+
 rmSync(dir, { force: true, recursive: true })
 mkdirSync(dir, { recursive: true })
 
@@ -110,6 +129,14 @@ claim(
     ? `absent from the tarball — ${unlisted.join(', ')}`
     : `${readdirSync(dir).find(name => name.endsWith('.tgz'))}, ` +
         `all four entry points carry a runtime and a declaration file per condition`,
+)
+
+const packedBytes = statSync(tarball).size
+
+claim(
+  packedBytes < packedCeiling,
+  'size',
+  `${packedBytes.toLocaleString()} bytes packed, ceiling ${packedCeiling.toLocaleString()}`,
 )
 
 /* ------------------------------------------------------------------------------------
@@ -265,6 +292,102 @@ claim(
   wrong.length
     ? wrong.join('; ')
     : 'require reaches a .d.cts and import a .d.ts, for all four entry points',
+)
+
+/* ------------------------------------------------------------------------------------
+ * The maps: published, parseable, and without the source they used to embed
+ * ---------------------------------------------------------------------------------- */
+
+const publishedPackage = path.join(dir, 'node_modules', '@ibnlanre', 'jumi')
+const mapProblems = []
+
+for (const entry of entryPoints) {
+  const name = entry ? entry.slice(1) : 'index'
+
+  for (const format of ['js', 'cjs']) {
+    const file = path.join(publishedPackage, 'dist', `${name}.${format}`)
+    const reference = /\/\/# sourceMappingURL=(\S+)/.exec(
+      readFileSync(file, 'utf8'),
+    )?.[1]
+
+    if (!reference) {
+      mapProblems.push(`${name}.${format} names no map`)
+
+      continue
+    }
+
+    const mapFile = path.join(path.dirname(file), reference)
+
+    if (!existsSync(mapFile)) {
+      mapProblems.push(
+        `${name}.${format} points at ${reference}, which is not published`,
+      )
+
+      continue
+    }
+
+    let map = null
+    try {
+      map = JSON.parse(readFileSync(mapFile, 'utf8'))
+    } catch (error) {
+      mapProblems.push(
+        `${reference} does not parse: ${firstLines(String(error.message), 1)}`,
+      )
+
+      continue
+    }
+
+    // B, ruled 2026-09-19: the mappings ship, the embedded source does not. The maps were 74% of the
+    // tarball and 2,978,204 bytes of that was `sourcesContent`, which no measured consumer path read.
+    if ('sourcesContent' in map)
+      mapProblems.push(`${reference} still embeds its source`)
+    if (!map.version || !Array.isArray(map.sources) || !map.mappings)
+      mapProblems.push(`${reference} is missing version, sources or mappings`)
+
+    const absolute = (map.sources ?? []).filter(
+      source => source.startsWith('/') || source.startsWith('file:'),
+    )
+    if (absolute.length)
+      mapProblems.push(`${reference} names an absolute source: ${absolute[0]}`)
+  }
+}
+
+claim(
+  mapProblems.length === 0,
+  'maps',
+  mapProblems.length
+    ? mapProblems.join('; ')
+    : 'eight maps published and referenced, mappings intact, no embedded source, no absolute sources',
+)
+
+// The value the ruling was made to keep, asserted where it is delivered — the installed package, not
+// the build. A failure raised inside Jumi's own shipped code must name a `src/*.ts` position; the
+// same call with an unusable map names `dist/index.cjs`, which is the reading this rules out.
+writeFileSync(
+  path.join(dir, 'map-trace.cjs'),
+  `const jumi = require('@ibnlanre/jumi')
+
+try {
+  jumi.finalizeCss(null)
+  console.log('no error raised')
+} catch (error) {
+  console.log(error.stack)
+}
+`,
+)
+
+const mappedTrace = run('node', ['--enable-source-maps', 'map-trace.cjs'])
+const mapped = /@ibnlanre\/jumi\/src\/[^\s)]+\.ts:\d+:\d+/.exec(mappedTrace)
+const unmapped = /@ibnlanre\/jumi\/dist\/[^\s)]+\.(?:c|m)?js:\d+/.exec(
+  mappedTrace,
+)
+
+claim(
+  Boolean(mapped) && !unmapped,
+  'mapped trace',
+  mapped
+    ? `a failure in the installed package names ${mapped[0]}`
+    : `no src/ position in the trace — ${firstLines(mappedTrace, 2)}`,
 )
 
 /* ------------------------------------------------------------------------------------
