@@ -5467,3 +5467,53 @@ that reinstates the embedded text fails on the shape, not on the mapping.
 
 18/18 gate, 119.7s of stage work, down from 141.0s: the site build and the browser replay no longer read four
 megabytes of embedded source.
+---
+
+## Independent review — the release-surface half answered, the behavioural half open
+
+An independent review of `f66efb9` arrived on 2026-09-19, kept as
+`engineering/reviews/2026-09-19-independent-review.md` with its seven findings, its closed-track challenge list and
+its own ordering. Its first recommendation — repair consumer isolation, enable declaration checking, and use that
+gate to fix the two published integration type failures — is answered here. **The rest is not**, and is stated as
+open at the end so nothing reads as a broader claim than it is.
+
+**Findings 3, 4 and 5 reproduced before they were touched, then fixed (`d8663d3`).** `TS2305` for `PluginOptions`
+against the installed `postcss.d.cts` under **both** module modes; two `TS1479`s against `vite.d.cts` under `node16`
+only; and the fixture resolving `vite`, `@tailwindcss/vite` and `@tailwindcss/postcss` out of the repository's own
+tree rather than its install.
+
+**Why the declarations were broken.** Both integration entries sit behind the `require` condition, and their peers
+are not CommonJS-shaped: `@tailwindcss/postcss` exports no named types on its require side (its declaration there is
+an `export =`), `@tailwindcss/vite` publishes no `require` condition at all, and `vite` is `"type": "module"`. The
+sources now name those types through an explicit `resolution-mode: 'import'` reference — the form TypeScript
+requires from a CommonJS declaration (`TS1542` is the error without it) and erases at runtime, so
+`require('@ibnlanre/jumi/vite')` and `require('@ibnlanre/jumi/postcss')` both still execute.
+
+**The bundler undoes that, so the build repairs it.** The declaration bundler rewrites every external type
+reference into a static namespace import with a qualified name, which is precisely what the condition forbids.
+Measured: `dts.resolve` in both its forms (`false`, `[]`) leaves the emitted shape identical, so the option cannot
+carry this. `scripts/bundle.mjs` — which already owns the post-emission map strip — repairs the two `.d.cts` files
+and **fails closed**: if the imports are present and the references are not rewritten, the build throws rather than
+shipping declarations it does not understand.
+
+**The fixture that could not have seen any of it.** The stage's fixture sat inside the repository, so module
+resolution walked up into the repository's `node_modules` and answered with packages the install had never
+provided; and `skipLibCheck: true` hid errors _in the declarations under test_, which is the whole surface a
+consumer's first compile touches. It now installs one isolated fixture per integration into the system temporary
+directory — a plugin-only arm that must not see the integration peers, and one arm per integration with exactly
+that integration's peers — asserts that every peer it did not install is unresolvable there, compiles a CommonJS
+and an ES module consumer under `node16` **and** `nodenext` with declaration checking on, and provisions each arm
+with what that integration's own types require (`@types/node` and a modern `lib` for Vite, which would otherwise be
+reported as Jumi's defect). 29 claims across three arms; `consumer` is 23.4s in the pool, 18/18 green.
+
+**The control.** With the repair disabled, the rebuilt declarations return and the stage fails on exactly those
+defects — `TS2503` and two `TS1479`s — under both module modes, while every other stage stays green. The stage now
+proves the property it was claimed to prove.
+
+**Open from the same review, not addressed here.** Finding 1 — segment timing matches definitions by prefix, so
+`/padding` reaches `padding-left` and `/color` reaches `color-scheme`. Finding 2 — Studio prunes a control whose
+fallback another authored track changes, so an authored 1000ms track runs at 2000ms. Finding 6 — a disabled
+execution arm can still be certified `equivalent-no-op`, because the classifier never requires a live animation or
+equality between the shipped and native readings. Finding 7 — phrase offsets accept values outside the documented
+0–100 domain. Each is a behavioural or evidence repair in a subsystem this pass did not open, and the review's
+section E — the decisions it would leave alone, sourcemap option B among them — is noted and unchanged.
