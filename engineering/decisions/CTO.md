@@ -5735,13 +5735,13 @@ slot variables, no staging left behind.
 
 1. **`@ibnlanre/jumi/vite` cannot be constructed from CommonJS.** `dist/vite.cjs:8258` spreads
    `__toESM(require("@tailwindcss/vite"), 1).default(options.tailwind)`, which resolves to the module
-   *namespace* rather than the factory, so `jumi()` throws `TypeError: (0 , import_vite.default) is not
-   a function or its return value is not iterable`. Measured with `@tailwindcss/vite@4.3.3`, with and
+   _namespace_ rather than the factory, so `jumi()` throws `TypeError: (0 , import_vite.default) is not
+a function or its return value is not iterable`. Measured with `@tailwindcss/vite@4.3.3`, with and
    without `vite` (8.3.0) installed, on Node v22.19.0; the identical ESM call returns five plugins. The
    peer ranges are satisfied, so this is inside the declared support surface — and the gate's `consumer`
    stage does not catch it because its CJS arm loads modules without constructing the Vite plugin.
 2. **A prerelease would be tagged `latest`.** `npm publish --dry-run` reports `Publishing to
-   https://registry.npmjs.org/ with tag latest and public access` for `1.0.0-beta.1`. `publishConfig`
+https://registry.npmjs.org/ with tag latest and public access` for `1.0.0-beta.1`. `publishConfig`
    declares `access` and no `tag`, and the documented flow runs a bare `pnpm publish` — so a beta would
    become what `npm install @ibnlanre/jumi` resolves to.
 3. **No tag exists for the release flow to start from.** `git tag` is empty, and `scripts/changelog.mjs`
