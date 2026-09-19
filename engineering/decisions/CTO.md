@@ -5517,3 +5517,38 @@ execution arm can still be certified `equivalent-no-op`, because the classifier 
 equality between the shipped and native readings. Finding 7 — phrase offsets accept values outside the documented
 0–100 domain. Each is a behavioural or evidence repair in a subsystem this pass did not open, and the review's
 section E — the decisions it would leave alone, sourcemap option B among them — is noted and unchanged.
+---
+
+## Independent review, finding 1 — a property address is resolved from the rule, not the name
+
+**Reproduced before it was touched.** A `/property` timing record decided whether a definition belonged to the
+address by asking whether the definition's _name_ began with it. An attribute may itself contain a hyphen, so
+`/padding` reached `padding-left` and `/color` reached `color-scheme`. The sheet showed it in one line: `/padding`
+beside a `padding-left` phrase wrote
+`--jumi-slot-8-sideways-22qROt-padding-left-animation-name: jumi-padding-left-22qROt-segment-ZBTfnY` — a
+`-segment-` clone of _that_ phrase's definition — and the browser read `31.5357px` at the midpoint where the
+un-eased motion reads `50px`. The address had eased a property it does not name.
+
+**The fix is the identity, taken from where it is known.** A definition key is `<attribute>-<id>` for a phrase or a
+single value and the attribute alone for a composed tween or an effect; an id is `shorthash2`'s base62 — the
+invariant `instance.ts` already states and relies on — so it holds no hyphen and the last segment is the id exactly
+when there is one. `attributeOf(base)` reads the attribute off the rule's own key, and _whether there is an id to
+strip_ is a question about an **attribute**, which the model answers (`structuralAddress`) rather than a guess
+about a name. The prefix test is gone, not narrowed: a longer attribute's definition no longer answers to a
+shorter address.
+
+**Two arms, both orders, and the value rather than the mechanism.** `behaviour-check` gains one arm per address:
+`/padding` beside a `padding-left` phrase must leave the motion un-eased at `50px`, and `/padding-left` must still
+ease it to `~31.54px` — the second is what says the repair kept the reach rather than removing it. Both run in
+both candidate orders, which the review asked for and which `orderDrift` (durations only) would not have covered
+for an easing. **Controlled by stashing the fix:** the first arm fails with the review's own reading
+(`31.5357px`), the second passes in both worlds, and every other stage stays green.
+
+**A registry consequence worth recording.** The serialize audit's registry entry for that function classified the
+prefix test; with the test gone the entry claimed nothing and the stage failed. `attributeOf`'s `lastIndexOf` is
+arithmetic on an identifier the model produced — not a claim about serialized text — so no entry replaces it, and
+the reason sits beside the retired entry rather than leaving a hole in the registry. The frozen snapshot is
+**unchanged** (101,193 bytes shipped from 988,343 emitted): no corpus carried the collision, which is part of why
+the defect survived the corpus.
+
+18/18 gate, `d9a4602`. Findings 2, 6 and 7 remain open.
