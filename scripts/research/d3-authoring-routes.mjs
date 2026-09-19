@@ -326,7 +326,8 @@ const verdictOf = ({ assigned, native, resting }) => {
    */
   return resting.animations > 0 &&
     native !== null &&
-    JSON.stringify(resting.values) === JSON.stringify(native.equivalent.series) &&
+    JSON.stringify(resting.values) ===
+      JSON.stringify(native.equivalent.series) &&
     native.equivalent.turns === 'flat' &&
     native.control.turns === 'moves'
     ? 'equivalent-no-op'
@@ -409,14 +410,19 @@ for (const one of records)
     `${one.authoring.component.padEnd(26)} ${one.verdict.padEnd(11)} assigned=${one.execution.assigned.join('+') || 'none'}  ${one.evidence.series.join(' → ')}`,
   )
 
-const certified = disabledControls.filter(one => one.verdict === 'equivalent-no-op')
+const certified = disabledControls.filter(
+  one => one.verdict === 'equivalent-no-op',
+)
 
 console.log(
   `\ndisabled-activation control: ${disabledControls.length - certified.length}/${disabledControls.length} refused, ` +
     `animations ${[...new Set(disabledControls.map(one => one.animations))].join('/')}, ` +
     `verdicts ${JSON.stringify(
       disabledControls.reduce(
-        (tally, one) => ((tally[one.verdict] = (tally[one.verdict] ?? 0) + 1), tally),
+        (tally, one) => (
+          (tally[one.verdict] = (tally[one.verdict] ?? 0) + 1),
+          tally
+        ),
         {},
       ),
     )}`,

@@ -1,6 +1,7 @@
-import { flatten, parentOf } from './tree'
-export { flatten, parentOf } from './tree'
 import type { PropertyEntry } from './catalog'
+
+import { flatten } from './tree'
+export { flatten, parentOf } from './tree'
 
 import { propertyVariables } from '@/variables/property'
 

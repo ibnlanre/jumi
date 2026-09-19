@@ -1,5 +1,5 @@
 import type { ControlEntry, PropertyEntry } from './catalog'
-import type { Controls, StudioProject, Track } from './model'
+import type { StudioProject, Track } from './model'
 
 import { baseCss, baseProperties, sourceStyle, validBase } from './base'
 import { bezier, curveDrawing, curveValue, easingMarkup } from './easing'

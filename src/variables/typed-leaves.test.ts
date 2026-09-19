@@ -896,7 +896,9 @@ describe('authoring-route evidence', () => {
     expect(authoringEvidence.disabledControls.length).toBeGreaterThan(0)
 
     for (const one of authoringEvidence.disabledControls) {
-      expect(one.animations, `${one.route}: the control is not disabled`).toBe(0)
+      expect(one.animations, `${one.route}: the control is not disabled`).toBe(
+        0,
+      )
       expect(one.verdict, one.route).not.toBe('equivalent-no-op')
     }
   })
