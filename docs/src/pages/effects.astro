@@ -114,25 +114,34 @@ import effects from '../data/effects.json'
     search.addEventListener('input', filter)
     cards.forEach(card => {
       const glyph = card.querySelector<HTMLElement>('.effect-glyph')!
-      // Attached once per glyph, not once per click. A second click cancels the animation in
+      // One replay, two triggers. Settling the glyph in this frame and restoring it two frames
+      // later is what makes the browser read the class as a *new* animation rather than the same
+      // one already applied — without the gap, re-adding `is-playing` would change nothing.
+      const replay = () => {
+        glyph.style.animation = 'none'
+        card.classList.remove('is-playing')
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => {
+            glyph.style.removeProperty('animation')
+            card.classList.add('is-playing')
+          }),
+        )
+      }
+      // Attached once per glyph, not once per play. A second replay cancels the animation in
       // flight, and a cancelled animation fires `animationcancel` rather than `animationend` — so a
-      // per-click listener marked `{ once: true }` would never be removed, and clicking one card
+      // per-play listener marked `{ once: true }` would never be removed, and playing one card
       // repeatedly would stack handlers on it.
       glyph.addEventListener('animationend', () =>
         card.classList.remove('is-playing'),
       )
       card
         .querySelector('button.effect-play')
-        ?.addEventListener('click', () => {
-          glyph.style.animation = 'none'
-          card.classList.remove('is-playing')
-          requestAnimationFrame(() =>
-            requestAnimationFrame(() => {
-              glyph.style.removeProperty('animation')
-              card.classList.add('is-playing')
-            }),
-          )
-        })
+        ?.addEventListener('click', replay)
+      // Hover plays too — beside the button rather than instead of it. Touch is skipped: a tap's
+      // pointerenter is not a hover, and the button is the answer there, as it is for the keyboard.
+      card.addEventListener('pointerenter', event => {
+        if (event.pointerType !== 'touch') replay()
+      })
     })
   </script>
 </Layout>
