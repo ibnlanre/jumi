@@ -5359,3 +5359,72 @@ the manifest has only `prepublishOnly`, so the pool's fingerprint check still me
 network. It consumes the four published entry points and executes the root, not every exported symbol. And it
 reads the _published_ artifact, so it says nothing about the source build — which is the division of labour it
 was built to create, not a gap in it.
+---
+
+## The sourcemap question — what the maps cost, and what they buy
+
+Measured 2026-09-19 on the packed artifact, so these are the published numbers rather than the build's.
+`tsup.config.ts` sets `sourcemap: true`, so each of the four entry points ships a map per format — eight maps,
+each referenced by the file beside it (`//# sourceMappingURL=index.js.map`) — and the declarations ship none.
+
+**The cost, by three measures.** The tarball is 1,070,498 bytes; the same tree packed without the maps is
+277,532, so the maps are **792,966 bytes — 74% of the tarball**. Unpacked they are 4,105,742 of 5,795,707
+(71%), and an installed copy measures 5,849,088 against 1,724,416 (70%). The method is not the measurement:
+staging the same set and packing it with the maps reproduces the repository's own `npm pack` byte for byte.
+
+```text
+index.cjs.map 897,120 · index.js.map 895,723 · vite.cjs.map 573,212 · vite.js.map 572,958
+postcss.cjs.map 570,871 · postcss.js.map 570,597 · view-transition.cjs.map 12,652 · view-transition.js.map 12,609
+```
+
+**What is in them.** 2,978,204 bytes of embedded source (`sourcesContent`) and 993,333 characters of
+mappings; 227 distinct sources, 226 under `src/` and one from `node_modules` (`css.escape`). So the maps are
+Jumi's own source, once per format — not a dependency tree, and not duplication of anything a consumer
+already has.
+
+**What they buy, read rather than argued.** A consumer's failing call through the shipped finalizer, under
+`node --enable-source-maps`:
+
+```text
+with maps      at Object.finalizeCss (…/@ibnlanre/jumi/src/helpers/carriers/index.ts:1355:24)
+without maps   at Object.finalizeCss (…/@ibnlanre/jumi/dist/index.cjs:9708:40)
+```
+
+The mapped line is the right one — line 1355 is `postcss.parse(css)` inside `finalizeCss`, which is the call
+that threw. One frame read back, not a general claim about every frame.
+
+**And what they do not buy.** A Vite consumer building with `sourcemap: true` over the same import produced
+the same composed map in all three arms: `dist/view-transition.js` in `sources`, that file's text in
+`sourcesContent`, and Jumi's own mappings not composed into the output at all. For a bundler consumer the
+maps reach nothing, so the browser-devtools argument does not survive contact with a bundler; the one browser
+that reads them is the docs site, which vendors `dist/` from this repository and is unaffected by what the
+tarball ships.
+
+**The middle option, measured rather than assumed.** Stripping `sourcesContent` and keeping every mapping
+gives 387,682 bytes packed and 2,716,061 unpacked, and the traced frame is **identical** — still
+`src/helpers/carriers/index.ts:1355:24`. Keeping the embedded source only for `view-transition`, the one entry
+a browser loads (12.6 kB of maps against 897 kB for `index`), is 392,651 bytes.
+
+```text
+option                                          packed     unpacked    Node frame
+A  as it stands                                1,070,498   5,795,707   src/…/index.ts:1355
+B  mappings kept, embedded source dropped        387,682   2,716,061   src/…/index.ts:1355
+C  B, but the browser entry keeps its source     392,651           —   src/…/index.ts:1355
+D  no maps (files: ["!dist/**/*.map"])           277,532   1,689,965   dist/index.cjs:9708
+```
+
+**The shape of each, because that is part of the price.** A is free. B and C need a step that rewrites the
+emitted maps — no `tsup` or `esbuild` option turns `sourcesContent` off — and if that step writes `dist/` it
+takes the embedded source out of the docs site's vendored copies as well, which is the only place a browser
+reads them. D is the only option reachable from `package.json` alone: a negated `files` entry was measured to
+pack zero maps, and the two routes agree to within the manifest's own bytes (277,553 against 277,532). But D
+publishes eight `sourceMappingURL` references to files that are not there — the dangling-reference failure
+`prepare-docs.mjs` goes out of its way to prevent for the site — and it forfeits the traced frame. It would
+also fail the audit's `files` check, which reads every entry as a literal path, so it is not quite free
+either.
+
+**Recommendation.** B or C: the measured benefit is a source-level frame in a consumer's Node stack trace,
+the mappings carry that on their own, and 682,816 bytes of the tarball are buying embedded source that no
+measured consumer path reads. D is not recommended — it is the cheapest and the only option that publishes
+references nothing resolves. A stays defensible if the judgement is that a megabyte is fine. The numbers are
+the contribution; the call is not mine to make.
