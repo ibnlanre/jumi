@@ -95,6 +95,7 @@
     "demo:check": "node scripts/demo-check.mjs",
     "vite:check": "node scripts/vite-check.mjs",
     "postcss:check": "node scripts/postcss-check.mjs",
+    "consumer:check": "node scripts/consumer-check.mjs",
     "spike:candidates": "node scripts/spike-candidates.mjs",
     "spike:variants": "node scripts/spike-variants.mjs",
     "spike:view-transitions": "node scripts/spike-view-transitions.mjs",
