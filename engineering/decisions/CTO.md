@@ -5759,3 +5759,69 @@ marked optional, and the gate is 18/18 on the tree that would ship.
 
 None of the defects above was repaired here: the ruling was that engineering stops and release
 operations begin, and these are for the CTO to route.
+
+---
+
+## Pre-`0.1.0` release pass — all seven items
+
+**1 · The CSS snapshot, from clean HEAD.** Emitted 988,343 bytes, finalized/shipped 101,193, recorded
+snapshot `scripts/css-snapshot/snapshot.css` 101,193 — **byte-identical**, so there is no diff to
+classify. The confirmations are the recorded structure itself, equal field for field: `protocol.staging`
+0 (and no `jumi-staging` text in the shipped sheet), no legacy carrier/setup selector, `dead-links
+--strict` reporting no dead reads and no unconsumed frame writes, `@property` registrations 120 with the
+canonical `properties` counter unchanged, and keyframes 41 (canonical) / 18 (carrier variant) — no
+growth in either corpus. The toolchain upgrade below re-ran the same snapshot afterwards: still
+byte-identical.
+
+**2 · The CJS Vite defect, fixed and now covered.** Reproduced from the packed artifact:
+`require('@ibnlanre/jumi/vite')` was a namespace object, and once `.default` was reached the spread threw
+the `__toESM` TypeError. Two repairs at the smallest boundaries: `src/vite.ts` reads the factory from
+whichever shape the build produced, and `scripts/bundle.mjs` — the seam that already repairs
+`vite.d.cts` — appends a callable `module.exports` (fail-closed on a missing anchor; the leading newline
+is load-bearing, because the bundler's output ends in a sourceMappingURL comment that would swallow it).
+Both loaders now construct the same five plugins, and the consumer stage **constructs** `/vite` and
+`/postcss` from both module systems and requires the shapes to agree. Control: against the pre-fix
+install the new probe reports `require(...) is not a function`.
+
+**3 · Docs parity.** Audited against every listed theme: no stale setup/carrier classes (the only
+mentions state their absence), no old timeline-range naming, no old phrase syntax, `/name` and
+`/property` addressing current, segment timing phrases not promised, resolved positional authoring
+current, view-transition syntax current, installation paths and the Vite/PostCSS integration current,
+`jumiFinalizer` current, Tailwind v4 stated. Corrected: `CONTRIBUTING.md` said the gate was "all sixteen
+stages" and "those eleven" — both now eighteen, and its check list names the phrase and consumer stages —
+plus the release block gained the first-release fact the generator itself reports.
+
+**4 · The Copy button.** The button was appended to the `pre`, so it was a child of the scroller and
+travelled with the code — the screenshot case. It now belongs to a `.code-frame` wrapper and only the
+`pre` scrolls. Proved in Chromium at 1280×900 and 390×844, on a block with 1245px of code in a 353px
+box: the button is outside the `pre`, its box is unchanged by a full horizontal scroll, and it takes
+keyboard focus.
+
+**5 · Child variants.** Two genuine replacements, on the stagger page, where the prose already described
+children being animated from the parent: `*:animate-bounce-in` and `*:animate-fade-in-up`. The other
+repeated classes in the docs were assessed and left — they are styling hooks spread across separate
+sections rather than siblings, and the stylesheet matches on their names.
+
+**6 · The version, from registry state.** `npm view @ibnlanre/jumi` returns **404**: no versions, no
+dist-tags, so `1.0.0-beta.1` was never published and `0.1.0` has no published lineage to collide with.
+The version is now `0.1.0` everywhere it is stated — `package.json`, the changelog heading, the docs
+version data — and the changelog marks the beta line as unpublished. This also settles the tag question:
+the dry run reporting `with tag latest` is correct for a first stable release, and a `--tag next` rule is
+only needed if a prerelease is ever published.
+
+**7 · Release preparation, all green.** Gate 18/18 (130.7s), CSS snapshot byte-identical, docs build 16
+pages, external pack 28 files / 391,942 bytes installed and constructed from both module systems in
+isolated arms, `npm publish --dry-run` clean, working tree clean at `12f9e73`. The toolchain was
+upgraded in the same window at the owner's direction — TypeScript 6.0.3 (held deliberately against the
+7.0.2 latest; the tsup dts injection of `baseUrl` needed the documented `ignoreDeprecations` bridge),
+vite 8.3.0, vitest 5.0.1, eslint 10.11.0, astro 7.3.3, postcss 8.5.28, storybook 10.6.0 — and the
+snapshot did not move with it.
+
+**The publish command, for the explicit go-ahead:**
+
+```bash
+git tag v0.1.0 && git push origin main --tags
+pnpm publish
+```
+
+Nothing has been published, pushed, or tagged.
