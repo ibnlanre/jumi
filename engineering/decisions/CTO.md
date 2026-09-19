@@ -5651,3 +5651,53 @@ remains a hand-run research script; what is enforced on every pass is the record
 outcome and its refusal.
 
 18/18 gate, `6077fc7`. Finding 7 remains open.
+
+---
+
+## Finding 7 — the phrase route keeps the domain it declares
+
+The review's finding 7: `src/core/index.ts:2032–2048` checked finiteness and not the documented 0–100
+domain (`engineering/architecture/phrases.md:15`), so `animate-opacity-[0:0|150:1]` emitted a `150%`
+keyframe without a warning — malformed author input left to browser rejection rather than the boundary
+the grammar promises.
+
+**Reproduced through the shipped bundle, not by inspection.** `0:0|150:1` compiled to
+`@keyframes jumi-opacity-sm9RN` with `0%` and `150%` stops, two offset variables
+(`--jumi-opacity-sm9RN-0`, `-150`), and `warnings: []`. The engine discards a stop it cannot use, so the
+second frame the author wrote was gone and nothing said so. The studio editor already refuses offset 150
+when a keyframe is typed by hand (`docs/src/studio/model.ts`), which is the inconsistency the finding
+names: one boundary, two readers, one of them mute.
+
+**Two questions, two answers.** `parsePhrase` is untouched: `150:1` _is_ a phrase — the offset is a bare
+number, and a bare number is any run of digits — and the split is deliberate, because a message has to
+quote what the author wrote rather than a grammar it misread. The domain is a second reader,
+`phraseOffsetRefusal`, which names the first offset outside `0–100`.
+
+**Reported and dropped, the shape `animation-range` already uses.** The model refuses the phrase
+outright — nothing is registered, so no keyframe, no offset variables and no name: the motion does not
+half-exist — and records the refusal in an inert declaration, which is the only channel a model without a
+warning channel has (`refusedName`'s shape, the same hash-for-dedupe split of fact from message). The
+carrier reports it from that record, quoting the class and the offset, and the selection reader drops the
+same values off a timing control: the pass that warns and the pass that acts read one boundary, because a
+fix on one of them is exactly how this survived a first pass.
+
+**Measured after the repair**, through the same bundle: one warning per refused class, a stop set of
+exactly `0%, 100%`, and the legal twin beside each refused phrase still emitting its two frames. On the
+selection path — `animation-timing-function-[0:ease-in]/alpha` beside `[0:0|150:1]/beta` — the stage
+reads `alpha specialized, beta not specialized`. That second half is what the first version of the repair
+missed, and the measurement is what showed it: the warning fired while the refused record still
+specialized its clone, so the selection reader was taught the same boundary.
+
+**Where it is enforced.** Unit: the core corpus pins the split — the grammar parses, the domain refuses,
+the boundaries are inclusive, the read names the first refusal — and the carrier pairs a refused record's
+warning with its legal twin's silence. Stage: `phrase-check` gained a domain section (four checks, 15/15
+now) compiling `150` and `100.5` beside `100`, plus the selection pair above. The serialize audit
+classifies the four new rewrites, its rule being that a rewrite nobody classified is the state it exists
+to prevent.
+
+**What this does not fix.** A phrase malformed in _shape_ still leaves the phrase route entirely — that
+is what makes `isPhrase` a stable doorway around the host's type check, and it is not this finding. The
+domain is enforced where the keyframe would be written and where the selection would be published;
+nothing is clamped, and no value is rewritten.
+
+18/18 gate, `b467c4a`. All seven findings of the independent review are now closed.
