@@ -411,12 +411,11 @@ const registry = [
     'ACTIVATED_SLOT.exec(activation.prop)',
     'the definition base an activation names',
   ),
-  safe(
-    carriers,
-    'addressedInstances',
-    'jumi-${address}',
-    'whether a definition belongs to an attribute',
-  ),
+  // The registry entry that stood here claimed the prefix test that decided whether a definition belonged to
+  // an attribute. That test is gone — it read the *name* of a generated definition, so `/padding` reached
+  // `padding-left` — and the replacement reads the attribute off the rule's own key in `attributeOf`, whose
+  // `lastIndexOf` is arithmetic on an identifier rather than a claim about serialized text. Nothing in this
+  // bucket covers it, and widening `CSS_TEXT` to reach it would be the direction this file warns against.
   safe(
     carriers,
     'addressedInstances',

@@ -715,6 +715,23 @@ const specialize = (root: Root, definition: string, segments: Segment[]) => {
 }
 
 /**
+ * The **attribute** a definition belongs to, read off the rule that carries it.
+ *
+ * A definition key is `<attribute>-<id>` for a phrase or a single value and the attribute alone for a composed
+ * tween or an effect, and an id is `shorthash2`'s base62 — `instance.ts` states that invariant and relies on it
+ * — so an id holds no hyphen. The last segment is therefore the id exactly when there is one, and which case
+ * applies is a question about an **attribute**, which the model answers (`structuralAddress`) rather than a
+ * guess about the shape of the name.
+ */
+const attributeOf = (base: string) => {
+  if (structuralAddress(base)) return base
+
+  const cut = base.lastIndexOf('-')
+
+  return cut > 0 ? base.slice(0, cut) : base
+}
+
+/**
  * The instances an address reaches: a name, or a property scope.
  *
  * Both go through `instanceKeys`, the one derivation of what a rule means. That is what makes a property
@@ -736,12 +753,16 @@ const addressedInstances = (root: Root, address: string) => {
 
     if (!base) return
 
-    // A definition is `jumi-<attribute>` for an effect or a composed tween and `jumi-<attribute>-<id>` for a
-    // phrase — and the id is a hash, so it cannot be mistaken for another attribute's.
+    // A property address reaches the instances of *that* property, and which property a rule belongs to is
+    // read off the rule rather than off the shape of a generated name.
+    //
+    // It used to ask whether the definition's *name* began with the address, which let `/padding` select
+    // `padding-left`: an attribute may itself contain hyphens, so the longer attribute's definition begins
+    // with the shorter address and the record specialised the wrong property's motion. Measured, `/padding`
+    // beside a `padding-left` phrase emitted a `-segment-` clone of that phrase's definition and eased it,
+    // while the scalar `/property` spelling had no such reach.
     const structural =
-      structuralAddress(address) &&
-      (definition === `jumi-${address}` ||
-        definition.startsWith(`jumi-${address}-`))
+      structuralAddress(address) && attributeOf(base) === address
 
     const named = own.find(node => LABELLED_SLOT.test(node.prop))?.value
 

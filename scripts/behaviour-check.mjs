@@ -736,6 +736,21 @@ const NAMED_ARMS = [
     's',
     'animate-rotate-[0:0deg|100:90deg]/alpha animate-rotate-[0:0deg|100:90deg]/beta animation-timing-function-[0:step-start]/rotate animation-duration-1000',
   ],
+  // The boundary a property address must not cross. An attribute may itself contain a hyphen, so `padding`
+  // is a prefix of `padding-left` — and the record for `/padding` beside a `padding-left` phrase used to
+  // select that phrase's instance and specialize *its* definition. Measured at the midpoint, `padding-left`
+  // read `31.5357px` where it should read `50px`: the address eased a property it does not name.
+  //
+  // Two arms, one address each, because the repair has to fail the first *without* breaking the second, and
+  // `padding-left` is the address that must keep its reach.
+  [
+    'u',
+    'animate-padding-left-[0:0px|100:100px]/sideways animation-timing-function-linear animation-timing-function-[0:ease-in]/padding animation-duration-1000',
+  ],
+  [
+    'v',
+    'animate-padding-left-[0:0px|100:100px]/sideways animation-timing-function-linear animation-timing-function-[0:ease-in]/padding-left animation-duration-1000',
+  ],
 ]
 
 const NAMED_CANDIDATES = [
@@ -903,6 +918,70 @@ const propertyAddress = async () => {
 }
 
 const property = await propertyAddress()
+
+/**
+ * A **prefix collision** between two property addresses, read from the value the browser lands on.
+ *
+ * `padding` is a prefix of `padding-left`, and the two arms differ only in which one their record names: with
+ * `/padding` the phrase's motion must stay exactly as it was, and with `/padding-left` it must be eased. The
+ * reading is a midpoint value rather than a keyframe literal, because the literal is only the mechanism — the
+ * defect was a value change on a property the address does not name (`31.5357px` for a motion that should have
+ * read `50px`).
+ *
+ * Paused and stepped by `currentTime`, like every other time reading here: a live sample takes whatever moment
+ * the machine happens to reach. `animation-timing-function-linear` is on the element so the sheet's own
+ * default (`ease`) cannot be mistaken for the phrase's easing.
+ */
+const prefixCollision = async candidates => {
+  const built = build(await compiler(ENTRY, root), candidates)
+  const classes = Object.fromEntries(NAMED_ARMS)
+  const page = await load(
+    built.css,
+    ['u', 'v']
+      .map(id => `<div id="named-${id}" class="${classes[id]}"></div>`)
+      .join('\n'),
+  )
+
+  const reading = await page.evaluate(async () => {
+    const read = async id => {
+      const element = document.querySelector(`#${id}`)
+      const own = [...element.getAnimations()]
+      const base = own.map(
+        animation => animation.effect?.getTiming?.().easing ?? 'linear',
+      )
+
+      own.forEach(animation => animation.pause())
+      await new Promise(resolve => requestAnimationFrame(resolve))
+
+      for (const animation of own) animation.currentTime = 500
+
+      await new Promise(resolve => requestAnimationFrame(resolve))
+
+      return {
+        eased: own.flatMap((animation, at) =>
+          (animation.effect?.getKeyframes?.() ?? [])
+            .filter(
+              frame => frame.easing && frame.easing !== (base[at] ?? 'linear'),
+            )
+            .map(
+              frame =>
+                `${Math.round((frame.offset ?? 0) * 100)}:${frame.easing}`,
+            ),
+        ),
+        value: getComputedStyle(element).paddingLeft,
+      }
+    }
+
+    return { u: await read('named-u'), v: await read('named-v') }
+  })
+
+  await page.close()
+
+  return reading
+}
+
+const collision = await prefixCollision(NAMED_CANDIDATES)
+const collisionReversed = await prefixCollision([...NAMED_CANDIDATES].reverse())
 
 /**
  * The two directions of the inheritance rule, measured on **nested** elements.
@@ -1157,6 +1236,23 @@ const naming = [
       !only('nocontrol')[0].name.includes('-segment-') &&
       written('nocontrol').length === 0,
     JSON.stringify(only('nocontrol')),
+  ],
+  [
+    'a property address that is a prefix of another property does not reach it',
+    collision.u.value === '50px' &&
+      collision.u.eased.length === 0 &&
+      collisionReversed.u.value === '50px' &&
+      collisionReversed.u.eased.length === 0,
+    `\`/padding\` beside a \`padding-left\` phrase: ${JSON.stringify(collision.u)} forward, ${JSON.stringify(collisionReversed.u)} reversed — the un-eased midpoint is 50px`,
+  ],
+  [
+    'and the address that names the property still reaches it',
+    [collision, collisionReversed].every(
+      reading =>
+        reading.v.eased.some(easing => /ease-in/.test(easing)) &&
+        Math.abs(Number.parseFloat(reading.v.value) - 31.5357) < 0.01,
+    ),
+    `\`/padding-left\` beside the same phrase: ${JSON.stringify(collision.v)} forward, ${JSON.stringify(collisionReversed.v)} reversed — an eased midpoint is ~31.54px`,
   ],
   [
     'a phrase on a shorthand part leaves the motion running',
