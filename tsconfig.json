@@ -12,6 +12,12 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "exactOptionalPropertyTypes": true,
+    // tsup's declaration build injects `baseUrl` to resolve the `paths` below, and TypeScript 6
+    // reports an injected deprecated option as an error (TS5101) even though this file never sets
+    // one. The flag is TypeScript's own advice in that message, and it is a bridge: TypeScript 7
+    // removes both the option and the silencer, at which point the injection has to go rather than be
+    // hidden behind this.
+    "ignoreDeprecations": "6.0",
     "isolatedModules": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "module": "ESNext",

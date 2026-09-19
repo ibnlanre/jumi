@@ -449,8 +449,7 @@ export const surfaces = { ${arm.entries.map(identifier).join(', ')} }
     // modules must read the same thing.
     '/postcss':
       "made && Array.isArray(made.plugins) ? 'v' + made.version + ' ' + made.plugins.length + ' plugin(s)' : null",
-    '/vite':
-      "Array.isArray(made) ? made.map(one => one.name).join(',') : null",
+    '/vite': "Array.isArray(made) ? made.map(one => one.name).join(',') : null",
   }
 
   const construct = (specifier, system, shape) => {
@@ -508,7 +507,7 @@ export const surfaces = { ${arm.entries.map(identifier).join(', ')} }
   }
 
   claim(
-    constructed === 0 || constructionProblems.length === 0,
+    constructions.length === 0 || constructionProblems.length === 0,
     'construct',
     constructions.length === 0
       ? 'no integration entry in this arm'
