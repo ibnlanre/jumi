@@ -1,4 +1,54 @@
 {
+  "disabledControls": [
+    {
+      "animations": 0,
+      "route": "object-position/object-position-x-edge@object-position",
+      "series": [
+        "50% 50%",
+        "50% 50%",
+        "50% 50%",
+        "50% 50%",
+        "50% 50%"
+      ],
+      "verdict": "fixture-unobservable"
+    },
+    {
+      "animations": 0,
+      "route": "object-position/object-position-y-edge@object-position",
+      "series": [
+        "50% 50%",
+        "50% 50%",
+        "50% 50%",
+        "50% 50%",
+        "50% 50%"
+      ],
+      "verdict": "fixture-unobservable"
+    },
+    {
+      "animations": 0,
+      "route": "offset-position/offset-position-x-edge@offset-position",
+      "series": [
+        "normal",
+        "normal",
+        "normal",
+        "normal",
+        "normal"
+      ],
+      "verdict": "fixture-unobservable"
+    },
+    {
+      "animations": 0,
+      "route": "offset-position/offset-position-y-edge@offset-position",
+      "series": [
+        "normal",
+        "normal",
+        "normal",
+        "normal",
+        "normal"
+      ],
+      "verdict": "fixture-unobservable"
+    }
+  ],
   "records": [
     {
       "authoring": {
@@ -14,6 +64,7 @@
       "condition": null,
       "consumer": "background-position",
       "evidence": {
+        "animations": 1,
         "book": "scripts/research/d3-authoring-routes.mjs",
         "probe": "40%",
         "series": [
@@ -53,6 +104,7 @@
       "condition": null,
       "consumer": "background-position",
       "evidence": {
+        "animations": 1,
         "book": "scripts/research/d3-authoring-routes.mjs",
         "probe": "right",
         "series": [
@@ -92,6 +144,7 @@
       "condition": null,
       "consumer": "background-position",
       "evidence": {
+        "animations": 1,
         "book": "scripts/research/d3-authoring-routes.mjs",
         "probe": "10%",
         "series": [
@@ -131,6 +184,7 @@
       "condition": null,
       "consumer": "background-position",
       "evidence": {
+        "animations": 1,
         "book": "scripts/research/d3-authoring-routes.mjs",
         "probe": "40%",
         "series": [
@@ -170,6 +224,7 @@
       "condition": null,
       "consumer": "background-position",
       "evidence": {
+        "animations": 1,
         "book": "scripts/research/d3-authoring-routes.mjs",
         "probe": "bottom",
         "series": [
@@ -209,6 +264,7 @@
       "condition": null,
       "consumer": "background-position",
       "evidence": {
+        "animations": 1,
         "book": "scripts/research/d3-authoring-routes.mjs",
         "probe": "10%",
         "series": [
@@ -248,6 +304,7 @@
       "condition": null,
       "consumer": "object-position",
       "evidence": {
+        "animations": 1,
         "book": "scripts/research/d3-authoring-routes.mjs",
         "probe": "40%",
         "series": [
@@ -287,9 +344,11 @@
       "condition": "executes and publishes object-position-x-position, and the endpoint it publishes is calc(100% - 50%) — a value native-equal to the position the route already rests at, so the endpoints are equal at every sample. The reference proves it rather than asserting it: the edge-with-its-offset spelling of that position is flat (50% 50% → right 50% top 50%: 50% 50% → 50% 50% → 50% 50% → 50% 50% → 50% 50%), while the control that spells the same edges without their offsets moves (left 50% → right 50%: 0% 50% → 25% 50% → 50% 50% → 75% 50% → 100% 50%) — in a two-value position the second component binds the other axis, so the control is what makes the flat reading admissible. Executed, contracted leaf published, native-equivalent: not a decline, and not an unobservable fixture, because the fixture answered the question.",
       "consumer": "object-position",
       "evidence": {
+        "animations": 1,
         "book": "scripts/research/d3-authoring-routes.mjs",
         "native": {
           "control": {
+            "animations": 1,
             "from": "left 50%",
             "series": [
               "0% 50%",
@@ -302,6 +361,7 @@
             "turns": "moves"
           },
           "equivalent": {
+            "animations": 1,
             "from": "50% 50%",
             "series": [
               "50% 50%",
@@ -352,6 +412,7 @@
       "condition": null,
       "consumer": "object-position",
       "evidence": {
+        "animations": 1,
         "book": "scripts/research/d3-authoring-routes.mjs",
         "probe": "10%",
         "series": [
@@ -391,6 +452,7 @@
       "condition": null,
       "consumer": "object-position",
       "evidence": {
+        "animations": 1,
         "book": "scripts/research/d3-authoring-routes.mjs",
         "probe": "40%",
         "series": [
@@ -430,9 +492,11 @@
       "condition": "executes and publishes object-position-y-position, and the endpoint it publishes is calc(100% - 50%) — a value native-equal to the position the route already rests at, so the endpoints are equal at every sample. The reference proves it rather than asserting it: the edge-with-its-offset spelling of that position is flat (50% 50% → left 50% bottom 50%: 50% 50% → 50% 50% → 50% 50% → 50% 50% → 50% 50%), while the control that spells the same edges without their offsets moves (50% top → 50% bottom: 50% 0% → 50% 25% → 50% 50% → 50% 75% → 50% 100%) — in a two-value position the second component binds the other axis, so the control is what makes the flat reading admissible. Executed, contracted leaf published, native-equivalent: not a decline, and not an unobservable fixture, because the fixture answered the question.",
       "consumer": "object-position",
       "evidence": {
+        "animations": 1,
         "book": "scripts/research/d3-authoring-routes.mjs",
         "native": {
           "control": {
+            "animations": 1,
             "from": "50% top",
             "series": [
               "50% 0%",
@@ -445,6 +509,7 @@
             "turns": "moves"
           },
           "equivalent": {
+            "animations": 1,
             "from": "50% 50%",
             "series": [
               "50% 50%",
@@ -495,6 +560,7 @@
       "condition": null,
       "consumer": "object-position",
       "evidence": {
+        "animations": 1,
         "book": "scripts/research/d3-authoring-routes.mjs",
         "probe": "10%",
         "series": [
@@ -532,6 +598,7 @@
       "condition": null,
       "consumer": "offset-anchor",
       "evidence": {
+        "animations": 1,
         "book": "scripts/research/d3-authoring-routes.mjs",
         "probe": "left",
         "series": [
@@ -570,6 +637,7 @@
       "condition": null,
       "consumer": "offset-anchor",
       "evidence": {
+        "animations": 1,
         "book": "scripts/research/d3-authoring-routes.mjs",
         "probe": "top",
         "series": [
@@ -610,6 +678,7 @@
       "condition": null,
       "consumer": "offset-position",
       "evidence": {
+        "animations": 1,
         "book": "scripts/research/d3-authoring-routes.mjs",
         "probe": "40%",
         "series": [
@@ -649,9 +718,11 @@
       "condition": "executes and publishes offset-position-x-position, and the endpoint it publishes is calc(100% - 50%) — a value native-equal to the position the route already rests at, so the endpoints are equal at every sample. The reference proves it rather than asserting it: the edge-with-its-offset spelling of that position is flat (50% 50% → right 50% top 50%: 50% 50% → 50% 50% → 50% 50% → 50% 50% → 50% 50%), while the control that spells the same edges without their offsets moves (left 50% → right 50%: 0% 50% → 25% 50% → 50% 50% → 75% 50% → 100% 50%) — in a two-value position the second component binds the other axis, so the control is what makes the flat reading admissible. Executed, contracted leaf published, native-equivalent: not a decline, and not an unobservable fixture, because the fixture answered the question.",
       "consumer": "offset-position",
       "evidence": {
+        "animations": 1,
         "book": "scripts/research/d3-authoring-routes.mjs",
         "native": {
           "control": {
+            "animations": 1,
             "from": "left 50%",
             "series": [
               "0% 50%",
@@ -664,6 +735,7 @@
             "turns": "moves"
           },
           "equivalent": {
+            "animations": 1,
             "from": "50% 50%",
             "series": [
               "50% 50%",
@@ -714,6 +786,7 @@
       "condition": null,
       "consumer": "offset-position",
       "evidence": {
+        "animations": 1,
         "book": "scripts/research/d3-authoring-routes.mjs",
         "probe": "10%",
         "series": [
@@ -753,6 +826,7 @@
       "condition": null,
       "consumer": "offset-position",
       "evidence": {
+        "animations": 1,
         "book": "scripts/research/d3-authoring-routes.mjs",
         "probe": "40%",
         "series": [
@@ -792,9 +866,11 @@
       "condition": "executes and publishes offset-position-y-position, and the endpoint it publishes is calc(100% - 50%) — a value native-equal to the position the route already rests at, so the endpoints are equal at every sample. The reference proves it rather than asserting it: the edge-with-its-offset spelling of that position is flat (50% 50% → left 50% bottom 50%: 50% 50% → 50% 50% → 50% 50% → 50% 50% → 50% 50%), while the control that spells the same edges without their offsets moves (50% top → 50% bottom: 50% 0% → 50% 25% → 50% 50% → 50% 75% → 50% 100%) — in a two-value position the second component binds the other axis, so the control is what makes the flat reading admissible. Executed, contracted leaf published, native-equivalent: not a decline, and not an unobservable fixture, because the fixture answered the question.",
       "consumer": "offset-position",
       "evidence": {
+        "animations": 1,
         "book": "scripts/research/d3-authoring-routes.mjs",
         "native": {
           "control": {
+            "animations": 1,
             "from": "50% top",
             "series": [
               "50% 0%",
@@ -807,6 +883,7 @@
             "turns": "moves"
           },
           "equivalent": {
+            "animations": 1,
             "from": "50% 50%",
             "series": [
               "50% 50%",
@@ -857,6 +934,7 @@
       "condition": null,
       "consumer": "offset-position",
       "evidence": {
+        "animations": 1,
         "book": "scripts/research/d3-authoring-routes.mjs",
         "probe": "10%",
         "series": [

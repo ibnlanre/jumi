@@ -718,10 +718,38 @@ describe('typed execution declarations', () => {
 })
 
 type AuthoringEvidence = {
+  disabledControls: Array<{
+    animations: number
+    route: string
+    series: string[]
+    verdict: string
+  }>
   records: Array<{
     authoring: { component: string; context: string[] }
     condition: null | string
     consumer: string
+    evidence: {
+      animations: number
+      book: string
+      native?: {
+        control: {
+          animations: number
+          from: string
+          series: string[]
+          to: string
+          turns: string
+        }
+        equivalent: {
+          animations: number
+          from: string
+          series: string[]
+          to: string
+          turns: string
+        }
+      }
+      probe: string
+      series: string[]
+    }
     execution: { assigned: string[]; leaves: string[] }
     parent: string
     representation: string
@@ -815,6 +843,34 @@ describe('authoring-route evidence', () => {
         resolved ? [...required].sort() : [],
       )
 
+      /**
+       * And the reading has to be of a route that **ran**, with an `equivalent-no-op` agreeing with the native
+       * reference it is measured against. The review's finding 6: a class whose animation is switched off still
+       * publishes its endpoint token, so five samples of its *resting* value were accepted against a native
+       * series that was flat for its own reason — two readings, one conclusion, and nothing asking them to
+       * agree. The book asserts this when it runs; this is what asserts it on every gate pass, which is the only
+       * place the assertion is actually enforced.
+       */
+      expect(
+        one.evidence.animations,
+        `${one.route}: the arm is read but never ran`,
+      ).toBeGreaterThan(0)
+
+      if (one.verdict === 'equivalent-no-op') {
+        const native = one.evidence.native
+
+        expect(
+          native,
+          `${one.route}: certified native-equivalent with no native reference`,
+        ).toBeTruthy()
+        expect(native?.equivalent.animations, one.route).toBeGreaterThan(0)
+        expect(native?.equivalent.series, one.route).toEqual(
+          one.evidence.series,
+        )
+        expect(native?.equivalent.turns, one.route).toBe('flat')
+        expect(native?.control.turns, one.route).toBe('moves')
+      }
+
       // A verdict that is not unconditional carries its condition, because the record's whole job is to answer
       // *under what authoring state* this public route enters typed execution — and the offsets are the case
       // that makes the question real: their normalizer refuses `center` over a non-zero offset by contract.
@@ -827,6 +883,21 @@ describe('authoring-route evidence', () => {
           .filter(name => name !== one.authoring.component)
           .sort(),
       )
+    }
+  })
+
+  it('refuses the disabled-activation control, in the file the gate reads', () => {
+    // Finding 6's negative control, kept where it can fail a gate rather than where its author can forget it.
+    // The book runs every armed route twice — once live, once with `animation: none !important` — and classifies
+    // both through the same function. The disabled arm is the case the old classifier accepted: it publishes the
+    // same endpoint token, still *assigns* its execution leaf, and reads one value five times, because nothing
+    // ran. A classifier that certifies it as `equivalent-no-op` is certifying a reading of the fixture, so the
+    // control asserts the refusal on both its facts: no live animation, and a verdict that is not that one.
+    expect(authoringEvidence.disabledControls.length).toBeGreaterThan(0)
+
+    for (const one of authoringEvidence.disabledControls) {
+      expect(one.animations, `${one.route}: the control is not disabled`).toBe(0)
+      expect(one.verdict, one.route).not.toBe('equivalent-no-op')
     }
   })
 })

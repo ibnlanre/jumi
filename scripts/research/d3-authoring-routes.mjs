@@ -193,28 +193,30 @@ const samplesOf = (page, id, observable) =>
         out.push(getComputedStyle(element)[property])
       }
 
-      return out
+      // The count comes back with the values, because a series read off an element that never animated is the
+      // resting value five times — a reading of the fixture, which the verdict has to be able to refuse.
+      return { animations: own.length, values: out }
     },
     { id, observable },
   )
 
 /** The shipped arm: the authoring class applied **alone**, compiled by the plugin, read at five instants. */
-const series = async (classes, observable) => {
+const series = async (classes, observable, extraStyle = '') => {
   const css = finalizeCss((await compiler(ENTRY, root)).build(classes)).css
   const browser = await chromium.launch()
   const page = await browser.newPage()
 
   await page.setContent(
     `<!doctype html><html><head><style>${css}</style></head><body>` +
-      `<div id="probe" class="${classes.join(' ')}" style="animation-timing-function: linear"></div>` +
+      `<div id="probe" class="${classes.join(' ')}" style="animation-timing-function: linear${extraStyle}"></div>` +
       `</body></html>`,
   )
 
-  const values = await samplesOf(page, 'probe', observable)
+  const { animations, values } = await samplesOf(page, 'probe', observable)
 
   await browser.close()
 
-  return { css, values }
+  return { animations, css, values }
 }
 
 /**
@@ -240,15 +242,16 @@ const nativeReference = async (family, { control, equivalent }) => {
         `</body></html>`,
     )
 
-    const series = await samplesOf(page, arm.name, arm.property)
+    const { animations, values } = await samplesOf(page, arm.name, arm.property)
 
     await browser.close()
 
     return {
+      animations,
       from,
-      series,
+      series: values,
       to,
-      turns: new Set(series).size > 1 ? 'moves' : 'flat',
+      turns: new Set(values).size > 1 ? 'moves' : 'flat',
     }
   }
 
@@ -287,11 +290,53 @@ const resolvedOf = (css, leaf) =>
     ?.replace(/\s+/g, ' ')
     .trim() ?? null
 
+/**
+ * The **negative control** for the classifier below: every armed route, run once more with its animation switched
+ * off, and classified through the same function. A disabled arm publishes the same token and reads its resting
+ * value at every sample — the reading finding 6 showed was admissible — so the classifier refusing it is the
+ * difference between a guard and a comment. The outcome is written into the evidence file as well as printed,
+ * because `src/variables/typed-leaves.test.ts` is what runs on every gate pass, and a control only the author
+ * runs is a control that stops being run.
+ */
+const disabledControls = []
+
+/**
+ * The verdict, as one function of the readings it is a verdict *about*.
+ *
+ * Extracted so the disabled-activation control runs the **same** classifier rather than a transcription
+ * of it: a control that re-implements the rule it checks passes whenever the two implementations drift together,
+ * which is the failure the control exists to catch.
+ */
+const verdictOf = ({ assigned, native, resting }) => {
+  if (!assigned.length) return 'declined'
+  if (new Set(resting.values).size > 1) return 'movable'
+
+  /**
+   * `equivalent-no-op` needs the shipped arm to have **run**, and to read what its native reference reads. It
+   * asked for neither, and that was finding 6: a class whose animation is switched off still publishes its
+   * endpoint token, so five readings of the *resting* value were admissible against a native reference that was
+   * flat for its own reason — two readings, one conclusion, nothing checking they agreed. Measured: with
+   * `#probe { animation: none !important }` the shipped series reads `normal` at every sample against a native
+   * `50% 50%`, and the classifier called it `equivalent-no-op` anyway.
+   *
+   * So the verdict is now about an **agreement**: a live animation (`resting.animations > 0`), a shipped series
+   * equal to the native equivalent's, and the moving control that keeps the flat native arm from being read as a
+   * property fact. An arm that fails the first two is a reading of the fixture, which is what `fixture-unobservable`
+   * has always meant.
+   */
+  return resting.animations > 0 &&
+    native !== null &&
+    JSON.stringify(resting.values) === JSON.stringify(native.equivalent.series) &&
+    native.equivalent.turns === 'flat' &&
+    native.control.turns === 'moves'
+    ? 'equivalent-no-op'
+    : 'fixture-unobservable'
+}
+
 for (const { family, leaves, routes, surface } of FAMILIES)
   for (const { component, probe } of routes) {
     const klass = `animate-${component}-[${probe}]`
     const resting = await series([klass], observableOf(family))
-    const moves = read => new Set(read.values).size > 1
     const assigned = leavesOf(resting, leaves)
     const native = NATIVE[component]
       ? await nativeReference(family, NATIVE[component])
@@ -305,14 +350,7 @@ for (const { family, leaves, routes, surface } of FAMILIES)
      * **native reference is equally flat**, because a flat journey over a reference that moves is a route the
      * fixture cannot discriminate, and that keeps its own name rather than borrowing one about the property.
      */
-    const verdict = !assigned.length
-      ? 'declined'
-      : moves(resting)
-        ? 'movable'
-        : native?.equivalent.turns === 'flat' &&
-            native.control.turns === 'moves'
-          ? 'equivalent-no-op'
-          : 'fixture-unobservable'
+    const verdict = verdictOf({ assigned, native, resting })
 
     records.push({
       authoring: {
@@ -325,10 +363,11 @@ for (const { family, leaves, routes, surface } of FAMILIES)
           : verdict === 'equivalent-no-op'
             ? `executes and publishes ${assigned.join(' and ')}, and the endpoint it publishes is ${assigned.map(leaf => resolvedOf(resting.css, leaf)).join(' and ')} — a value native-equal to the position the route already rests at, so the endpoints are equal at every sample. The reference proves it rather than asserting it: the edge-with-its-offset spelling of that position is flat (${native.equivalent.from} → ${native.equivalent.to}: ${native.equivalent.series.join(' → ')}), while the control that spells the same edges without their offsets moves (${native.control.from} → ${native.control.to}: ${native.control.series.join(' → ')}) — in a two-value position the second component binds the other axis, so the control is what makes the flat reading admissible. Executed, contracted leaf published, native-equivalent: not a decline, and not an unobservable fixture, because the fixture answered the question.`
             : verdict === 'fixture-unobservable'
-              ? 'assigns its execution leaf and neither the arm nor a native reference discriminates it, which is a reading of the fixture rather than of the route'
+              ? `assigns its execution leaf, and the flat reading is a fact about the fixture rather than about the route: ${resting.animations === 0 ? 'the arm carries no live animation' : native === null ? 'no native reference covers it' : `its series (${resting.values.join(' → ')}) differs from the native equivalent (${native.equivalent.series.join(' → ')})`}, so nothing here separates an executed route from an unexecuted one`
               : null,
       consumer: family,
       evidence: {
+        animations: resting.animations,
         book: 'scripts/research/d3-authoring-routes.mjs',
         ...(native ? { native } : {}),
         probe,
@@ -341,15 +380,53 @@ for (const { family, leaves, routes, surface } of FAMILIES)
       route: `${family}/${component}@${family}`,
       verdict,
     })
+
+    if (native) {
+      const disabled = await series(
+        [klass],
+        observableOf(family),
+        '; animation: none !important',
+      )
+
+      disabledControls.push({
+        animations: disabled.animations,
+        route: `${family}/${component}@${family}`,
+        series: disabled.values,
+        verdict: verdictOf({ assigned, native, resting: disabled }),
+      })
+    }
   }
 
 const target = path.join(root, 'scripts', 'authoring-route-evidence.json')
 
-fs.writeFileSync(target, `${JSON.stringify({ records }, null, 2)}\n`)
+fs.writeFileSync(
+  target,
+  `${JSON.stringify({ disabledControls, records }, null, 2)}\n`,
+)
 
 for (const one of records)
   console.log(
     `${one.authoring.component.padEnd(26)} ${one.verdict.padEnd(11)} assigned=${one.execution.assigned.join('+') || 'none'}  ${one.evidence.series.join(' → ')}`,
   )
+
+const certified = disabledControls.filter(one => one.verdict === 'equivalent-no-op')
+
+console.log(
+  `\ndisabled-activation control: ${disabledControls.length - certified.length}/${disabledControls.length} refused, ` +
+    `animations ${[...new Set(disabledControls.map(one => one.animations))].join('/')}, ` +
+    `verdicts ${JSON.stringify(
+      disabledControls.reduce(
+        (tally, one) => ((tally[one.verdict] = (tally[one.verdict] ?? 0) + 1), tally),
+        {},
+      ),
+    )}`,
+)
+
+for (const one of certified)
+  console.error(
+    `✗ ${one.route}: the disabled arm was certified ${one.verdict} — animations ${one.animations}, series ${one.series.join(' → ')}`,
+  )
+
+if (certified.length) process.exitCode = 1
 
 console.log(`\nwritten to \`${path.relative(root, target)}\``)
