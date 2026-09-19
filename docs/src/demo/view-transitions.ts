@@ -1,4 +1,6 @@
-import { runViewTransition } from '../../vendor/jumi-view-transition.js'
+import { createViewTransition } from '../../vendor/jumi-view-transition.js'
+
+const transition = createViewTransition()
 
 /**
  * The demo's behaviour, in a module rather than in the page's `<script>` block.
@@ -63,7 +65,7 @@ const apply = () => {
  * `animationstart` on the root element is the moment the pseudo animations exist: the tree hangs off
  * the root, so its animations' events fire there — not on `body`, and not by bubbling — with
  * `pseudoElement` set, which is what makes one name addressable. That matters because the transition
- * object belongs to `runViewTransition` and is deliberately not handed out, so `transition.ready` is
+ * object belongs to `createViewTransition` and is deliberately not handed out, so `transition.ready` is
  * not the page's to await; this event is the public equivalent, and it arrives when it happens rather
  * than after a poll.
  *
@@ -92,7 +94,7 @@ document.documentElement.addEventListener('animationstart', event => {
  * this cannot avoid JavaScript the way the cross-document case can. What the page no longer does is
  * keep track of the lifecycle: which transition is current, what a second call means, that an aborted
  * call's callback still runs, and that a click has to be held until the geometry settles are all
- * `runViewTransition`'s, which is why this is three lines instead of forty.
+ * `createViewTransition`'s, which is why this is three lines instead of forty.
  *
  * **And no options.** The default is this page's behaviour in both of its cases: a duplicate handler
  * firing in the same task as the gesture it belongs to is coalesced — the update still applies, and no
@@ -108,7 +110,7 @@ const move = (id: string) => {
     apply()
   }
 
-  void runViewTransition(change)
+  void transition.run(change)
 }
 
 for (const card of cards)

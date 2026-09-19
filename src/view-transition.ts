@@ -1,5 +1,24 @@
 export type ViewTransitionConcurrency = 'auto' | 'coalesce' | 'supersede'
 
+/** Shared policy for every invocation of this controller's wrapped operations. */
+export type ViewTransitionControllerOptions = ViewTransitionOptions
+
+/**
+ * The lifecycle, which is total per run and exclusive in its shapes: a run that materialises reports start and
+ * then end; one that is declined reports decline and never starts; one that rejects reports error.
+ *
+ * A hook is told *which operation* it is observing by being that operation's hook rather than by an
+ * identifier: ownership is what `wrap(update, hooks)` buys. Overlapping calls of one wrapped operation stay
+ * distinct internally without the distinction being handed out, so these hooks cannot identify which overlapping invocation fired. Each returned promise
+ * remains the individual caller’s outcome channel.
+ */
+export type ViewTransitionHooks = {
+  onDecline?: (reason: ViewTransitionReason) => void
+  onError?: (error: unknown) => void
+  onTransitionEnd?: () => void
+  onTransitionStart?: () => void
+}
+
 export type ViewTransitionOptions = {
   /**
    * What to do when a transition is already running, which is a question about *who* is calling.
@@ -7,7 +26,7 @@ export type ViewTransitionOptions = {
    * `auto` — the default — tells an echo from a new intent by when the call arrives, because that is the one
    * signal a caller cannot fake by accident: a second call in the same task (its microtasks included) cannot
    * be a second human gesture, while a call from a later task can be. An echo is coalesced and a gesture
-   * supersedes, which is what makes `runViewTransition(change)` the right call for both — see the marker's
+   * supersedes, which is what makes `transition.run(change)` the right call for both — see the marker's
    * own note for the measurements behind that.
    *
    * `coalesce` applies the update exactly once and starts no second transition, whatever the timing. The
@@ -22,13 +41,21 @@ export type ViewTransitionOptions = {
   concurrency?: ViewTransitionConcurrency
 }
 
+export type ViewTransitionOutcome =
+  | {
+      reason: ViewTransitionReason
+      transitioned: false
+    }
+  | { transitioned: true }
+
 /**
  * Jumi's view transition orchestration: the smallest thing that removes the platform's lifecycle footguns
  * without owning the caller's state.
  *
- *   import { runViewTransition } from '@ibnlanre/jumi/view-transition'
+ *   import { createViewTransition } from '@ibnlanre/jumi/view-transition'
  *
- *   await runViewTransition(() => {
+ *   const transition = createViewTransition()
+ *   await transition.run(() => {
  *     active = next
  *     apply()
  *   })
@@ -62,12 +89,9 @@ export type ViewTransitionOptions = {
  * at once and comes back to the caller as its own error rather than as an outcome, because an async callback
  * passed to a synchronous API is a mistake and not a platform situation.
  */
-export type ViewTransitionOutcome =
-  | {
-      reason: 'aborted' | 'hidden' | 'in-flight' | 'unsupported'
-      transitioned: false
-    }
-  | { transitioned: true }
+/** Why a transition did not run. A reason is an occasion, never a mistake — mistakes reject. */
+export type ViewTransitionReason =
+  'aborted' | 'hidden' | 'in-flight' | 'unsupported'
 
 /** A promise-returning update is not this API's shape, and saying so in the type is half of enforcing it. */
 type Synchronous<T> = T extends PromiseLike<unknown> ? never : T
@@ -75,7 +99,7 @@ type Synchronous<T> = T extends PromiseLike<unknown> ? never : T
 class AsyncUpdateError extends TypeError {
   constructor() {
     super(
-      'runViewTransition() requires a synchronous update: do not await, schedule a frame, or return a' +
+      'View transition update requires a synchronous update: do not await, schedule a frame, or return a' +
         ' promise from the update callback. A promise is handed to the browser as a pending callback, and' +
         ' awaiting a rendering frame inside it deadlocks the transition permanently.',
     )
@@ -84,7 +108,7 @@ class AsyncUpdateError extends TypeError {
 }
 
 const isThenable = (value: unknown): value is PromiseLike<unknown> =>
-  typeof value === 'object' &&
+  (typeof value === 'object' || typeof value === 'function') &&
   value !== null &&
   typeof (value as PromiseLike<unknown>).then === 'function'
 
@@ -139,17 +163,27 @@ const repeatsCurrentInteraction = () => {
 }
 
 /**
- * Run `update` as a view transition, or as an ordinary update when there is nothing to transition with.
+ * The engine: one implementation, two faces. A controller’s `run` and `wrap` methods differ only in who
+ * receives the lifecycle, and neither may grow its own copy of the platform's rules.
  *
  * Jumi invokes the update **exactly once per call**, and the update must complete synchronously. "Exactly
  * once" is a promise about the invocation and not about the lifetime of anything the update starts.
  */
-export function runViewTransition<T>(
-  /** The mutation. It must return nothing, or something that is not a promise. */
-  update: () => Synchronous<T> & T,
-  options?: ViewTransitionOptions,
-): Promise<ViewTransitionOutcome> {
-  const mutate = update as () => unknown
+const engine = async (
+  /** The mutation, already guarded by the public face that accepted it. It must return nothing, or
+   * something that is not a promise — checked here for the callers types cannot reach. */
+  update: () => unknown,
+  options: undefined | ViewTransitionOptions,
+  hooks: ViewTransitionHooks,
+): Promise<ViewTransitionOutcome> => {
+  const mutate = () => {
+    const result = update()
+    if (isThenable(result)) {
+      // Observe an invalid callback's promise without letting it hold a browser snapshot open.
+      void Promise.resolve(result).catch(() => {})
+      throw new AsyncUpdateError()
+    }
+  }
 
   if (
     typeof document === 'undefined' ||
@@ -157,7 +191,7 @@ export function runViewTransition<T>(
   ) {
     mutate()
 
-    return Promise.resolve({ reason: 'unsupported', transitioned: false })
+    return declined(hooks, 'unsupported')
   }
 
   // A hidden document skips the transition outright and rejects `ready`. Deciding here reports that as an
@@ -165,7 +199,7 @@ export function runViewTransition<T>(
   if (document.visibilityState === 'hidden') {
     mutate()
 
-    return Promise.resolve({ reason: 'hidden', transitioned: false })
+    return declined(hooks, 'hidden')
   }
 
   // Read and arm in one move, and only on this path: the marker decides nothing unless a transition is in
@@ -179,18 +213,10 @@ export function runViewTransition<T>(
   ) {
     mutate()
 
-    return Promise.resolve({ reason: 'in-flight', transitioned: false })
+    return declined(hooks, 'in-flight')
   }
 
-  const transition = document.startViewTransition(() => {
-    const result = mutate()
-
-    // Never hand this back to the platform. See the module header: a returned promise is what allows the
-    // deadlock, and throwing abandons the transition immediately instead.
-    if (isThenable(result)) throw new AsyncUpdateError()
-
-    return undefined
-  })
+  const transition = document.startViewTransition(mutate)
 
   current = transition
 
@@ -198,7 +224,13 @@ export function runViewTransition<T>(
   // — measured: a superseded transition settles `finished` normally while nothing animated. So readiness is
   // the signal that the transition materialised, and it is recorded rather than swallowed.
   const readiness = transition.ready.then(
-    () => true,
+    () => {
+      // The first moment anything is visually transitioning — the pseudo tree exists. This, not the call, is
+      // what `onTransitionStart` names: a call may still be declined after it, and a declined run never starts.
+      report(hooks.onTransitionStart)
+
+      return true
+    },
     () => false,
   )
 
@@ -210,19 +242,103 @@ export function runViewTransition<T>(
   return transition.finished
     .then(
       async () => {
-        if (await readiness) return { transitioned: true as const }
+        if (await readiness) {
+          // `finished` settling is not completion: a superseded transition settles it normally while nothing
+          // animated. So this closes the interval start opened — a started transition ceasing to be active —
+          // and never claims the animation reached its visual end.
+          report(hooks.onTransitionEnd)
 
-        return { reason: 'aborted' as const, transitioned: false }
+          return { transitioned: true as const }
+        }
+
+        return declined(hooks, 'aborted')
       },
       (error: unknown) => {
-        // The update's own mistake, surfaced as itself. A platform abort is a runtime situation and gets the
-        // outcome vocabulary instead.
-        if (error instanceof AsyncUpdateError) throw error
-
-        return { reason: 'aborted' as const, transitioned: false }
+        // Platform skips resolve finished; a rejected finished carries the update failure.
+        throw error
       },
     )
     .finally(() => {
       if (current === transition) current = null
     })
 }
+
+/** Report a decline, and answer with the outcome that describes it. */
+const declined = (
+  hooks: ViewTransitionHooks,
+  reason: ViewTransitionReason,
+): Promise<ViewTransitionOutcome> => {
+  report(hooks.onDecline, reason)
+
+  return Promise.resolve({ reason, transitioned: false })
+}
+
+/**
+ * Call a hook without letting it become part of the transaction.
+ *
+ * A hook is instrumentation — telemetry, a dataset flag, a log — so its own failure must not rewrite what
+ * happened to the run it was watching. A throw goes to the global error handler, where a development
+ * environment will see it, and the run keeps the outcome it earned.
+ */
+const report = <Args extends unknown[]>(
+  hook: ((...args: Args) => void) | undefined,
+  ...args: Args
+) => {
+  if (!hook) return
+
+  try {
+    hook(...args)
+  } catch (error) {
+    if (typeof reportError === 'function') reportError(error)
+    else console.error(error)
+  }
+}
+
+/**
+ * Configure a shared policy interface, not an independent transition domain. All controllers in this
+ * module instance coordinate the document's active transition. `run` executes a one-off update; `wrap`
+ * attaches lifecycle observation to a reusable operation.
+ *
+ *   const transition = createViewTransition({ concurrency: 'auto' })
+ *   const open = transition.wrap(updateOpen, {
+ *     onTransitionStart() {},
+ *     onTransitionEnd() {},
+ *     onDecline(reason) {},
+ *     onError(error) {},
+ *   })
+ *   await open(true)
+ *
+ * Arguments and the call receiver are forwarded. The original return value is replaced by an outcome
+ * promise. Each invocation has its own browser transition and promise, even when wrappers are shared.
+ * Updates must commit DOM changes synchronously; framework setters may require an explicit flush.
+ * Hooks observe the operation, not a publicly identified invocation. A started transition ending does not
+ * promise it reached its visual endpoint. An error hook observes rejection without changing the result.
+ */
+export const createViewTransition = (
+  options: ViewTransitionControllerOptions = {},
+) => ({
+  /** Run a one-off synchronous DOM update, optionally overriding this controller's policy. */
+  run<Result>(
+    update: () => Result & Synchronous<Result>,
+    overrides?: ViewTransitionOptions,
+  ): Promise<ViewTransitionOutcome> {
+    return engine(
+      update,
+      { concurrency: overrides?.concurrency ?? options.concurrency ?? 'auto' },
+      {},
+    )
+  },
+
+  wrap<Args extends unknown[], Result, Receiver>(
+    update: (this: Receiver, ...args: Args) => Result & Synchronous<Result>,
+    hooks: ViewTransitionHooks = {},
+  ): (this: Receiver, ...args: Args) => Promise<ViewTransitionOutcome> {
+    return function (this: Receiver, ...args: Args) {
+      const running = engine(() => update.apply(this, args), options, hooks)
+      // Attach observation to the original promise. It still rejects for callers who await it.
+      if (hooks.onError)
+        void running.catch(error => report(hooks.onError, error))
+      return running
+    }
+  },
+})

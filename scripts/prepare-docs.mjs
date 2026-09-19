@@ -40,7 +40,7 @@ await writeFile(
  *
  * The distinction is not cosmetic. A module vendored without one is *inferred* from the bundle, and that
  * inference accepts whatever shape the bundle happens to have: with the runtime vendored as a lone `.js`,
- * `runViewTransition(async () => …)` compiled in the demo and any spelling of `concurrency` compiled with it,
+ * `transition.run(async () => …)` compiled in the demo and any spelling of `concurrency` compiled with it,
  * which is the whole contract of both. This is the only place that contract is exercised, so the declaration
  * comes along — from the same build, so a copy that goes stale goes stale *with* the code it describes.
  *

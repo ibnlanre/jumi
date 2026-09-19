@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>runViewTransition</title>
+    <title>createViewTransition</title>
   </head>
   <body>
     <p>
@@ -9,7 +9,7 @@
       script, and it has one because the thing under test <em>is</em> a script.
     </p>
     <script type="module">
-      import { runViewTransition } from '/jumi-runtime.js'
+      import { createViewTransition } from '/jumi-runtime.js'
 
       // Counted, not trusted: deciding how many transitions to start is the wrapper's whole job, and a
       // count taken from the wrapper would agree with the wrapper.
@@ -34,7 +34,7 @@
           counts.calls = 0
           window.__unhandled.length = 0
         },
-        run: runViewTransition,
+        run: createViewTransition().run,
       }
     </script>
   </body>

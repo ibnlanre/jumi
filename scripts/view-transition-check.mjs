@@ -923,7 +923,7 @@ for (const [claim, candidate] of [
 /**
  * And the claim the installation page makes about where the runtime lives.
  *
- * `runViewTransition` is the only thing in the package that touches the DOM, and the docs say so — the root
+ * `transition.run` is the only thing in the package that touches the DOM, and the docs say so — the root
  * stays CSS and build-time, and the page imports the subpath when it needs to drive a transition. That is one
  * import away from being false: a helper pulled into `src/index.ts` that happens to reach for `document` would
  * break it, and nothing else in the gate examines the root entry's bytes, so it would break quietly.
@@ -1003,7 +1003,7 @@ check(
 /* ------------------------------------------------------------------ the runtime wrapper */
 
 /**
- * `runViewTransition`, against the platform it stands in front of.
+ * `transition.run`, against the platform it stands in front of.
  *
  * A fake cannot answer these, and this was tried first: the whole reason the wrapper exists is that the real
  * `startViewTransition` defers its callback, aborts whatever is in flight without stopping the aborted call's
@@ -1066,7 +1066,7 @@ check(
  * And the default on the shape it is *for* letting through: a later task.
  *
  * A second click is a later task, which is why this is asserted with a timer rather than by asking for it —
- * `runViewTransition(change)` with no options is what the demo calls, and the second click has to supersede
+ * `transition.run(change)` with no options is what the demo calls, and the second click has to supersede
  * without the page saying so. `demo:check` makes the same claim end to end, through a real mouse.
  */
 const deferred = await runtimePage.evaluate(() =>
@@ -1220,6 +1220,177 @@ check(
   'with no unhandled rejection from the refusal',
   refusal.unhandled.length === 0,
   refusal.unhandled.join(' | ') || 'none',
+)
+
+// Operation hooks and invocation outcomes are checked against the shipped runtime in a real browser.
+const wrapped = await runtimePage.evaluate(async () => {
+  const { createViewTransition } = await import('/jumi-runtime.js')
+  const events = []
+  const values = []
+  const controller = createViewTransition({ concurrency: 'coalesce' })
+  const open = controller.wrap(
+    value => {
+      values.push(value)
+    },
+    {
+      onDecline: reason => events.push(reason),
+      onError: () => events.push('error'),
+      onTransitionEnd: () => events.push('end'),
+      onTransitionStart: () => events.push('start'),
+    },
+  )
+  const outcomes = await Promise.all([open(true), open(false)])
+  const error = new Error('wrapped update failed')
+  let observed = 0
+  let rejected = false
+  const fail = controller.wrap(
+    () => {
+      throw error
+    },
+    {
+      onError: value => {
+        if (value === error) observed++
+      },
+    },
+  )
+  try {
+    await fail()
+  } catch (value) {
+    rejected = value === error
+  }
+  const otherEvents = []
+  const other = controller.wrap(() => {}, {
+    onTransitionEnd: () => otherEvents.push('end'),
+    onTransitionStart: () => otherEvents.push('start'),
+  })
+  await other()
+  return { events, observed, otherEvents, outcomes, rejected, values }
+})
+check(
+  'wrapped overlapping invocations retain independent outcomes and operation hooks',
+  JSON.stringify(wrapped.values) === '[false,true]' &&
+    wrapped.outcomes[0].transitioned &&
+    wrapped.outcomes[1].reason === 'in-flight' &&
+    JSON.stringify(wrapped.events) === '["in-flight","start","end"]',
+  JSON.stringify(wrapped),
+)
+check(
+  'wrapped update errors reject and are observed exactly once',
+  wrapped.rejected && wrapped.observed === 1,
+  JSON.stringify(wrapped),
+)
+check(
+  'a second operation owns its lifecycle and recovery remains usable',
+  JSON.stringify(wrapped.otherEvents) === '["start","end"]',
+  JSON.stringify(wrapped.otherEvents),
+)
+
+const stopped = await runtimePage.evaluate(async () => {
+  const { createViewTransition } = await import('/jumi-runtime.js')
+  const events = []
+  let native
+  const original = document.startViewTransition
+  document.startViewTransition = function (update) {
+    native = original.call(this, update)
+    return native
+  }
+  try {
+    const operation = createViewTransition().wrap(() => {}, {
+      onDecline() {
+        events.push('decline')
+      },
+      onTransitionEnd() {
+        events.push('end')
+      },
+      onTransitionStart() {
+        events.push('start')
+        native.skipTransition()
+      },
+    })
+    const outcome = await operation()
+    let errors = 0
+    const invalid = createViewTransition().wrap(async () => {}, {
+      onError() {
+        errors++
+      },
+    })
+    let rejected = false
+    try {
+      await invalid()
+    } catch {
+      rejected = true
+    }
+    return { errors, events, outcome, rejected }
+  } finally {
+    document.startViewTransition = original
+  }
+})
+check(
+  'skipping a started wrapped transition ends its lifecycle without declining',
+  JSON.stringify(stopped.events) === '["start","end"]' &&
+    stopped.outcome.transitioned,
+  JSON.stringify(stopped),
+)
+check(
+  'JavaScript async wrappers are refused and observed without wedging playback',
+  stopped.errors === 1 && stopped.rejected,
+  JSON.stringify(stopped),
+)
+
+const controllers = await runtimePage.evaluate(async () => {
+  const api = await import('/jumi-runtime.js')
+  const { counts, reset } = window.__probe
+  reset()
+  const first = api.createViewTransition({ concurrency: 'supersede' })
+  const second = api.createViewTransition({ concurrency: 'coalesce' })
+  let updates = 0
+  const one = first.run(() => {
+    updates++
+  })
+  const two = second.wrap(() => {
+    updates++
+  })()
+  const shared = await Promise.all([one, two])
+  const calls = counts.calls
+  reset()
+  const three = second.run(() => {
+    updates++
+  })
+  const four = second.run(
+    () => {
+      updates++
+    },
+    { concurrency: 'supersede' },
+  )
+  const overridden = await Promise.all([three, four])
+  return {
+    calls,
+    exports: Object.keys(api),
+    overridden,
+    overrideCalls: counts.calls,
+    shared,
+    updates,
+  }
+})
+check(
+  'controllers coordinate across run and wrap using the incoming policy',
+  controllers.calls === 1 &&
+    controllers.shared[0].transitioned &&
+    controllers.shared[1].reason === 'in-flight',
+  JSON.stringify(controllers),
+)
+check(
+  'run overrides controller policy without dropping either update',
+  controllers.overrideCalls === 2 &&
+    controllers.updates === 4 &&
+    controllers.overridden[0].reason === 'aborted' &&
+    controllers.overridden[1].transitioned,
+  JSON.stringify(controllers),
+)
+check(
+  'the constructor is the only public runtime export',
+  JSON.stringify(controllers.exports) === '["createViewTransition"]',
+  JSON.stringify(controllers.exports),
 )
 
 const unsupported = await runtimePage.evaluate(() =>

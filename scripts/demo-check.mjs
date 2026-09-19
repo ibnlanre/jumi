@@ -19,7 +19,7 @@
  * works, sometimes it doesn't", because what a reader got depended only on how fast they had clicked before,
  * and holding it until the geometry settled made the page feel a quarter of a second behind. The lifecycle
  * that made holding necessary — which transition is current, and what a second call does to the first — is
- * `runViewTransition`'s, and the arms below assert the boundary it opens is filled by the call that survives.
+ * `transition.run`'s, and the arms below assert the boundary it opens is filled by the call that survives.
  * The mode switch is answered without the projection gate the cards used to need: the switch does not move,
  * so nothing about a click on it is ambiguous, and gating it dropped the switch during every native swap.
  *
@@ -335,7 +335,7 @@ const midFlight = await page.evaluate(
  *
  * This was held until the projection settled first, for one reason: the platform aborts the transition in
  * flight and the aborted call's callback still runs, so the survivor could animate a boundary it had not
- * filled in. That is `runViewTransition`'s job now — the page asks for `supersede` and the wrapper passes the
+ * filled in. That is `transition.run`'s job now — the page asks for `supersede` and the wrapper passes the
  * caller's mutation inside the boundary it opens — so the gesture applies in the frame it arrives instead of
  * a quarter of a second later. Asserting the change alone would pass on a version that jumped the layout with
  * no transition at all, so the call itself is read out of the record: the *surviving* call's callback is

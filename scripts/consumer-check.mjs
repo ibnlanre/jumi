@@ -280,6 +280,27 @@ for (const arm of arms) {
     .join('\n')}
 
 export const surfaces = { ${arm.entries.map(identifier).join(', ')} }
+${
+  arm.entries.includes('/view-transition')
+    ? `
+import { createViewTransition, type ViewTransitionOutcome } from '@ibnlanre/jumi/view-transition'
+const controller = createViewTransition({ concurrency: 'auto' })
+const open = controller.wrap((value: boolean) => value, { onDecline(reason) { const text: string = reason } })
+const result: Promise<ViewTransitionOutcome> = open(true)
+// @ts-expect-error argument types survive wrapping
+open('true')
+// @ts-expect-error async operations are not accepted
+controller.wrap(async () => {})
+// @ts-expect-error lifecycle belongs to the operation
+createViewTransition({ onTransitionStart() {} })
+const once: Promise<ViewTransitionOutcome> = controller.run(() => {}, { concurrency: 'supersede' })
+// @ts-expect-error one-off updates must also be synchronous
+controller.run(async () => {})
+// @ts-expect-error the standalone runtime helper is no longer public
+import { runViewTransition } from '@ibnlanre/jumi/view-transition'
+`
+    : ''
+}
 `
 
   // The extension decides the module system, so one source is both consumers: `.ts` is CommonJS in a

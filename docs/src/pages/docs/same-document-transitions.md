@@ -12,12 +12,14 @@ two documents are captured for you — but swapping a card, opening a panel, or 
 _inside_ one document, and the browser cannot see it happen. It needs a before and an after, which means
 someone has to say when the change is.
 
-That is the whole job of `runViewTransition`:
+Create a transition controller and run the state change through it:
 
 ```ts
-import { runViewTransition } from '@ibnlanre/jumi/view-transition'
+import { createViewTransition } from '@ibnlanre/jumi/view-transition'
 
-runViewTransition(() => {
+const transition = createViewTransition()
+
+transition.run(() => {
   setActive('bravo')
 })
 ```
@@ -38,7 +40,7 @@ asynchronous, do that first and then transition the result:
 ```ts
 const next = await load()
 
-runViewTransition(() => {
+transition.run(() => {
   setActive(next)
 })
 ```
@@ -61,23 +63,28 @@ problem. Override it only when you know something the timing does not:
 
 ```ts
 // a poll or a resize writing on a schedule: never a second transition per write
-runViewTransition(update, { concurrency: 'coalesce' })
+const backgroundUpdates = createViewTransition({ concurrency: 'coalesce' })
+backgroundUpdates.run(update)
 
-// always start a transition, whatever the timing
-runViewTransition(update, { concurrency: 'supersede' })
+// override a controller's policy for this call
+transition.run(update, { concurrency: 'supersede' })
 ```
 
 ## The result, if you want it
 
 The call resolves to an outcome instead of rejecting whenever the transition could not run. Most callers fire
-it and ignore the result; branch on it when the difference matters, such as reporting why nothing animated:
+it and ignore the result; branch on it when the difference matters, such as reporting why nothing animated —
+the outcome is a discriminated union, so `reason` exists only on the branch where nothing ran:
 
 ```ts
-const result = await runViewTransition(() => {
+const result = await transition.run(() => {
   setOpen(true)
 })
 
-if (!result.transitioned) {
+if (result.transitioned) {
+  console.log('the change animated')
+} else {
+  // narrowed: `reason` exists here, and nowhere else
   console.log(result.reason)
 }
 ```
@@ -91,8 +98,88 @@ if (!result.transitioned) {
 | `{ transitioned: false, reason: 'unsupported' }` | this browser has no view transitions                     |
 
 Your update runs exactly once per call in every one of those cases. An outcome describes the animation, never
-whether your change happened — and the one thing the call refuses loudly rather than reporting is an
-asynchronous callback, because that is a mistake rather than a platform situation.
+whether your change happened — while update errors and asynchronous callbacks reject rather than becoming platform outcomes.
+
+## Reusable operations
+
+Use `transition.run(update, options)` for a one-off change. For reusable operations, the controller
+holds shared concurrency policy and each wrapped operation owns its lifecycle:
+
+```ts
+import { createViewTransition } from '@ibnlanre/jumi/view-transition'
+
+const transition = createViewTransition({ concurrency: 'auto' })
+const open = transition.wrap(updateOpen, {
+  onTransitionStart() {
+    console.log('open transition started')
+  },
+  onTransitionEnd() {
+    console.log('open transition stopped')
+  },
+  onDecline(reason) {
+    console.log('updated without animation', reason)
+  },
+  onError(error) {
+    console.error(error)
+  },
+})
+
+await open(true)
+```
+
+`wrap()` preserves the update's argument types and call receiver, but intentionally replaces its original
+return value with `Promise<ViewTransitionOutcome>`. Functional updater arguments are forwarded unchanged.
+The controller exposes `run` for one-offs and `wrap` for reusable operations. Lifecycle hooks belong to
+the wrapped operation, not the controller.
+
+| Hook                  | Meaning                                                                                                                                |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `onTransitionStart()` | The visual transition materialized (`ready` resolved).                                                                                 |
+| `onTransitionEnd()`   | A started transition ceased being active, including being superseded or skipped. This does not promise it reached its visual endpoint. |
+| `onDecline(reason)`   | The mutation happened, but no visual transition materialized.                                                                          |
+| `onError(error)`      | The invocation rejected. The hook observes the error; its returned promise still rejects.                                              |
+
+Wrapping establishes **operation attribution**, not invocation attribution. `open(true)` and `open(false)`
+can overlap and invoke the same hooks. Jumi tracks their transitions independently internally; each call's
+returned promise is its own outcome channel. A hook alone cannot identify which overlapping call fired.
+A controller is a configured interface, **not an independent transition domain**. All controllers in the
+same module instance coordinate the document’s active transition. Separate controllers can carry different
+policies, but their transitions still compete. The policy of the incoming call determines how it proceeds.
+
+Update errors reject, including on unsupported, hidden and coalesced paths. With `onError`, Jumi attaches
+an observer to that rejection; awaiting the returned promise still throws. A hook's own exception is
+reported to the global error handler and does not change the invocation's outcome.
+
+## Framework updates must commit the DOM
+
+A synchronous JavaScript setter does not necessarily commit the DOM synchronously. The wrapped update
+must finish its DOM changes inside the browser's update callback. Jumi cannot infer or flush a framework's
+rendering schedule.
+
+For React, make the commit boundary explicit:
+
+```ts
+import { flushSync } from 'react-dom'
+import type { SetStateAction } from 'react'
+import { createViewTransition } from '@ibnlanre/jumi/view-transition'
+
+const transition = createViewTransition()
+const open = transition.wrap((next: SetStateAction<boolean>) => {
+  flushSync(() => setOpen(next))
+})
+
+await open(true)
+await open(previous => !previous)
+```
+
+Use this from an event handler where flushing is supported. `wrap(setOpen)` alone does not guarantee the
+new DOM is captured. React's [flushSync documentation](https://react.dev/reference/react-dom/flushSync)
+explains the constraints and performance tradeoffs. Other frameworks need their equivalent synchronous
+commit boundary. Async navigation functions are not automatically valid updates: finish asynchronous work
+first, then wrap the synchronous DOM mutation.
+
+Both APIs reject Promise-returning updates at the TypeScript boundary and at runtime. Neither introduces
+an asynchronous update mode.
 
 ## See it together
 

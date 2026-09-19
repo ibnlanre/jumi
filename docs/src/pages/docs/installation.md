@@ -110,9 +110,11 @@ taking the corner, a panel opening, a list reordering. That half needs someone t
 happens, and it lives behind its own subpath so the root package stays free of runtime code:
 
 ```ts
-import { runViewTransition } from '@ibnlanre/jumi/view-transition'
+import { createViewTransition } from '@ibnlanre/jumi/view-transition'
 
-runViewTransition(() => {
+const transition = createViewTransition()
+
+transition.run(() => {
   setActive('bravo')
 })
 ```

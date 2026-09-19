@@ -5825,3 +5825,98 @@ pnpm publish
 ```
 
 Nothing has been published, pushed, or tagged.
+
+---
+
+## 2026-09-19 — view transitions: one factory, and the lifecycle belongs to the operation
+
+The ruling's wording carries the design, so it is kept: "`.wrap()` solves **operation attribution**, not
+**invocation attribution**" — `open(true)` and `open(false)` have one owner, `open`, while overlapping calls
+remain two invocations observed by the same hooks. "Wrapped functions must satisfy the same synchronous
+update contract" — the DOM must have committed when the update returns. The ownership sentence, verbatim:
+"**`.wrap()` gives lifecycle ownership to the operation that was wrapped. Overlapping invocations remain
+distinct internally, and the caller-specific result remains the returned promise.**" Two earlier drafts —
+a standalone `withViewTransition` helper, then a controller holding lifecycle hooks beside a separate
+primitive export — were superseded before commit; the React finding they carried survived into the docs
+(a setter must commit the DOM synchronously; `wrap(setOpen)` alone does not guarantee that).
+
+**The shape that shipped**, one public runtime export (the check asserts
+`Object.keys(api) === ["createViewTransition"]`):
+
+```ts
+const transition = createViewTransition({ concurrency: 'auto' })
+
+transition.run(change) // one-off — no lifecycle; per-call `{ concurrency }` override
+const open = transition.wrap(updateOpen, {
+  // reusable operation — the lifecycle lives here
+  onTransitionStart() {}, // materialised (`ready`), not the call
+  onTransitionEnd() {}, // a started transition ceased being active — supersede and skip land here
+  onDecline(reason) {}, // the mutation happened; no visual transition did
+  onError(error) {}, // observes the rejection; the returned promise still rejects
+})
+await open(true)
+```
+
+`ViewTransitionControllerOptions` is `ViewTransitionOptions` — the controller holds **policy only**
+(`concurrency`), never lifecycle: `createViewTransition({ onTransitionStart() {} })` is refused at the type
+level, pinned in the unit file and by the consumer arm ("lifecycle belongs to the operation"). The
+standalone `runViewTransition` export is gone; the ruling's "keep both layers" landed as `run` versus
+`wrap` on one factory — a one-off update and a reusable operation are different questions with different
+methods, not two exports. The consumer arm pins the removal ("the standalone runtime helper is no longer
+public"), and the module says what a controller is: "a shared policy interface, not an independent
+transition domain — all controllers in this module instance coordinate the document's active transition."
+
+`wrap()` preserves the update's parameter types and call receiver, forwards arguments (a functional updater
+unchanged) and replaces the original return with `Promise<ViewTransitionOutcome>`; a wrapped call takes no
+per-call concurrency override, because its parameter list belongs to the operation. Async updates are
+refused on both faces — the signature (`Synchronous<Result>`) and the runtime (`AsyncUpdateError`) — on
+`run` and `wrap` alike, and a returned thenable is observed before it is thrown, so it cannot hold a
+browser snapshot open; the refusal comes back as a rejection, never as a decline reason, and leaves no
+transition wedged (a call after the refusal still runs one).
+
+**A hook that throws cannot rewrite history.** Every hook goes through `report`, which catches and forwards
+to `reportError` (with a `console.error` fallback), so a broken `onDecline` cannot swallow or alter the
+outcome the run earned — hooks observe, they are never part of the transaction. `onError` keeps the same
+stance: `wrap` attaches one observer (`void running.catch(...)`) only when the hook is configured, so the
+failure is seen once by the hook; the returned promise is the same object and still rejects for the caller,
+and with no `onError` a mistake stays exactly as loud as the runtime's own.
+
+**Measured in the browser** (`view-transition:check`, against the shipped runtime):
+
+- overlapping invocations of one wrapped operation under `coalesce` — both updates ran (`[false, true]`:
+  the declined call's update runs first, because the platform defers the started call's callback), outcomes
+  `[{ transitioned: true }, { reason: 'in-flight', transitioned: false }]`, events
+  `["in-flight", "start", "end"]`. Operation attribution in one line: one owner, two invocations, each with
+  its own promise.
+- `skipTransition()` from `onTransitionStart`: `["start", "end"]` and `transitioned: true` — a skip is an
+  end, not a decline.
+- a wrapped update error rejects and is observed **exactly once**; the next operation on the same controller
+  then runs `["start", "end"]` — recovery stays usable.
+- two controllers, `supersede.run` and `coalesce.wrap` overlapping in one task: **one** platform transition
+  starts and the coalescing call is the one declined — the incoming call's policy decides, which is what
+  "not independent transition domains" means.
+- `run` override on a `coalesce` controller (`{ concurrency: 'supersede' }`): two transitions, every update
+  applied, first outcome `aborted`, second `transitioned`.
+- with the platform removed: the ordinary update happens, the outcome says `unsupported`; and a refused
+  async update leaves the next call still able to transition — no wedge, no unhandled rejection.
+
+**Tests** (`src/view-transition.test.ts`, 8 — the type contract, with behaviour asserted in the browser):
+a sync update is accepted and a thenable is refused at both levels; a decline reports once with its reason
+and never reports a start; `wrap` forwards arguments (functional updater included) and returns the outcome;
+a throwing hook reaches `globalThis.reportError` with the outcome unchanged; async wrappers and a
+lifecycle-bearing controller options object are refused by `tsc` (each as an enforced `@ts-expect-error`);
+an update error rejects and is observed exactly once; a receiver is forwarded while the return value is
+replaced.
+
+**Docs, already at the shape.** `same-document-transitions.md` teaches the factory first
+(`transition.run`), keeps the outcome table, then "Reusable operations" — `wrap(updateOpen, hooks)`, the
+hook table, and operation-versus-invocation attribution — and closes with "Framework updates must commit
+the DOM": `wrap(setOpen)` alone does not guarantee React captured the new DOM, so the flush is explicit
+(`flushSync`), named rather than implied. `installation.md` and the demo page use the factory too.
+
+**Status.** Gate **18/18** (128.3s) on the staged tree, with the `view-transition` stage proving the arms
+above against the shipped runtime and the `consumer` stage proving the public surface in three isolated
+installs — including `runViewTransition`'s removal as a compile-time refusal. Build note kept from the
+previous entry: the `types` stage runs after `bundle` because `.storybook/main.ts` and `tailwind.config.ts`
+import the built entry. Everything is staged; nothing is committed (`HEAD` remains `f9d06c5`) and nothing
+has been published.
