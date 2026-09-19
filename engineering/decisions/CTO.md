@@ -5257,3 +5257,70 @@ it.
 
 **No D.3.12.** The next work comes from a release or product concern, or from the broader 1.0 audit, not from the
 ledger.
+---
+
+## Release surface — the export map shipped declarations nothing referenced, and the audit that measures it could not run
+
+Measured 2026-09-19 from the packed artifact: `pnpm bundle`, `npm pack`, install the tarball into a clean
+fixture, and read the fixture — never the tree. Ordered on the ruling: pack and consume first, metadata edits
+second.
+
+**A — reproduced, fixed, and proved from the tarball.** Under `moduleResolution: node16` a CommonJS consumer
+got four TS1479s, one per entry point — the referenced file is an ECMAScript module and cannot be imported with
+`require`. Under `nodenext`, nothing. Both modes resolved the _same_ file, `dist/index.d.ts`, confirmed by
+`--traceResolution`: tsup emits a `.d.cts` for all four entries and they shipped in the tarball, but the flat
+export map gave each entry a single `types`, so no condition ever referenced them. Every condition now carries
+the declaration that matches how it loads — `require` → `.d.cts`, `import` → `.d.ts` — with the runtime targets
+unchanged. Re-packed and re-installed, node16 and nodenext both compile both consumers with zero errors, and
+the trace attributes the four `.d.cts` to the CJS consumer and the four `.d.ts` to the ESM one. Runtime
+resolution is unchanged for all four entry points in both module systems, and the root exports the same four
+names either way.
+
+**B — withdrawn, and the correction is mine to carry.** I reported `peerDependenciesMeta`, the `engines` field
+and a peer-install policy as missing. `peerDependenciesMeta` and `engines` (`node >= 20.3.0`) both already
+exist in the manifest, and a clean install of the tarball reports `UNMET OPTIONAL DEPENDENCY` for `vite`,
+`@tailwindcss/vite` and `@tailwindcss/postcss` while installing none of them. The error was asserting an
+absence from a partial read — lines 1–140 and 140–200 of a file whose tail sits at 205–230 — and delivering it
+under a measured label. **C was answered by the manifest as it stood;** there was nothing to rule on.
+
+**B′ — found in the same pass, measured, and fixed.** `@astrojs/ts-plugin` was a runtime `dependency` while
+being referenced only by the `plugins` array in `tsconfig.json`: `grep` finds `@astrojs` nowhere in `src/` or
+`dist/`. Installing the tarball brings 8 packages; installing that plugin beside it brings 11 more, which
+reproduces the earlier count of 19 exactly — 11 of them the plugin's transitive tree (`@astrojs/compiler`,
+`@astrojs/yaml2ts`, `@volar/*`, `yaml`, `path-browserify`, `vscode-*`). It is a `devDependency` now, the
+workspace keeping it for the docs build, and the same install brings 8. **One sub-claim left unverified:** the
+lockfile's `@astrojs/compiler-binding-darwin-*` entries carry `cpu`/`os` platform fields and
+`engines: ^20.19.0 || >=22.12.0`, narrower than the manifest's own floor, but a consumer install of
+`@astrojs/ts-plugin@^1.10.11` installs no binding package, so the install-failure vector is **not**
+demonstrated.
+
+**The instrument was broken by the change, and in two ways that predate it.** `scripts/hardening-audit.mjs`
+read `entry[kind]` as a string, so a nested export entry crashed it inside `path.join`; it read `git grep`'s
+no-matches exit as a crash, so the first unreferenced script ended the run before a single report line; and it
+fed markdown-escaped spans to the compiler, where the table escape in `animate-skew-[0:0deg\|100:5deg]` reached
+the value as `skew(0deg\)`, escaped the closing paren, and made the post-build step reject its own emission.
+No gate stage could see any of it: `hardening:audit` is not one of the 17 stages, and it exits 0 even when it
+has findings, so its exit code is not a signal.
+
+**Report, don't throw; name, don't die.** All three are repaired on that principle and each is proved with a
+negative control rather than by reading the code: the nesting check fires on a `require.types` pointing at an
+ESM `.d.ts`, the existence check fires on a missing target, and the extraction reads a code span the way
+markdown renders it. The batch build — only a fast negative filter, since every claim it does not mention is
+confirmed on its own — is now the one build allowed to fail, naming the claims that fail individually instead
+of taking the report with it. With that the audit completes for the first time: 165 extracted claims, 27 that
+no Jumi build resolves, none unreadable, and nothing to fix in A, B or C.
+
+**Instrument defects 24–26**, numbered as a separate series from the fixture defects 15–23 because the carrier
+is different — the tool, not the probe: the nested entry read as a string (24), `git grep`'s "no matches"
+treated as a crash (25), and the markdown escape handed to the compiler as though the record's rendering were
+the class (26). 25 and 26 are one defect twice: an expected answer treated as a failure. Its third appearance
+— the batch build — was answered by stating which step may fail and what the fallback question is, not by
+making the failing input legal.
+
+**Open, deliberately unreduced.** The batch of all 165 claims still cannot be parsed while every claim compiles
+alone, so the trigger is the combination, not a token. The report is complete without the reduction, and this
+line exists so that reducing it is not mistaken for a prerequisite.
+
+Landed as `b3ab737`, 17/17 gate. Next in the order this established: the package-consumer stage — pack,
+install, compile the consumer matrix, execute representative imports — then the sourcemap question, measured
+for its contribution before it is decided, since 1.1 MB is not by itself a reason.
