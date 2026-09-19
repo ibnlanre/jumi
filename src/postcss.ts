@@ -1,4 +1,3 @@
-import type { PluginOptions } from '@tailwindcss/postcss'
 import type { Plugin, Processor } from 'postcss'
 
 import { finalize } from './helpers/carriers'
@@ -6,6 +5,21 @@ import { pluginSpecifier, register } from './helpers/register'
 
 import tailwindcss from '@tailwindcss/postcss'
 import postcss from 'postcss'
+
+/**
+ * Read through the **import** condition rather than by plain name, and that is the whole point.
+ *
+ * The two sides of that package do not export the same names: the declaration behind `require` is an
+ * `export =` assignment with no named members, while `PluginOptions` exists only in the declaration behind
+ * `import`. A plain named type import in the emitted `dist/postcss.d.cts` therefore failed to find it under
+ * **both** `node16` and `nodenext` — a consumer's compile failed with `TS2305` on Jumi's own declaration,
+ * not on their code. Naming the condition makes the reference legal from a CommonJS declaration *and* from
+ * this ES module, which is what lets one source emit both, and the reference is erased — so
+ * `require('@ibnlanre/jumi/postcss')` is unaffected.
+ */
+type PluginOptions = import('@tailwindcss/postcss', {
+  with: { 'resolution-mode': 'import' },
+}).PluginOptions
 
 /**
  * Jumi's PostCSS integration: one entry, and it owns Jumi's whole lifecycle inside the build.

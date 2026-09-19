@@ -80,6 +80,82 @@ const stripSourcesContent = () =>
     }, 0)
 
 /**
+ * The integration declarations, repaired for the condition they sit behind.
+ *
+ * `postcss.d.cts` and `vite.d.cts` are CommonJS declarations — they sit behind the `require` condition — and
+ * the peer types they name are not: `@tailwindcss/postcss` exports no named types on its require side (its
+ * declaration there is an `export =`), while `@tailwindcss/vite` and `vite` are ES modules. The sources name
+ * those types through an explicit `resolution-mode: 'import'` reference, which TypeScript accepts from a
+ * CommonJS declaration (`TS1542` is the error without it) and erases at runtime.
+ *
+ * The declaration bundler does not preserve that. It rewrites every external type reference into a static
+ * namespace import with a qualified name — `import * as vite from 'vite'` beside `vite.Plugin` — which throws
+ * the legality away again: a consumer's first compile in a CommonJS project failed with `TS1479` twice and
+ * `TS2503` for a name that does not exist on that side. `dts.resolve` cannot be talked out of it; measured,
+ * both `false` and `[]` leave the emitted shape identical. So the two files are repaired here, and the
+ * repair is fail-closed: if the imports are present and the references are not rewritten, the build throws
+ * rather than shipping declarations it does not understand.
+ */
+const REPAIRS = [
+  {
+    file: 'vite.d.cts',
+    imports: [
+      /^import \* as _tailwindcss_vite from '@tailwindcss\/vite';\n/m,
+      /^import \* as vite from 'vite';\n/m,
+    ],
+    references: [
+      [
+        '_tailwindcss_vite.PluginOptions',
+        "import('@tailwindcss/vite', { with: { 'resolution-mode': 'import' } }).PluginOptions",
+      ],
+      [
+        'vite.Plugin',
+        "import('vite', { with: { 'resolution-mode': 'import' } }).Plugin",
+      ],
+    ],
+  },
+  {
+    file: 'postcss.d.cts',
+    imports: [
+      /^import \* as _tailwindcss_postcss from '@tailwindcss\/postcss';\n/m,
+    ],
+    references: [
+      [
+        '_tailwindcss_postcss.PluginOptions',
+        "import('@tailwindcss/postcss', { with: { 'resolution-mode': 'import' } }).PluginOptions",
+      ],
+    ],
+  },
+]
+
+const repairCommonJsDeclarations = () =>
+  REPAIRS.reduce((repaired, repair) => {
+    const file = path.join(root, 'dist', repair.file)
+    const source = readFileSync(file, 'utf8')
+
+    // A bundler that learns to emit a legal shape needs no repair, and must not be broken by one.
+    if (!repair.imports.some(pattern => pattern.test(source))) return repaired
+
+    let fixed = source
+    for (const pattern of repair.imports) fixed = fixed.replace(pattern, '')
+    for (const [from, to] of repair.references)
+      fixed = fixed.split(from).join(to)
+
+    for (const [from] of repair.references)
+      if (fixed.includes(from))
+        throw new Error(`${repair.file}: ${from} survived the repair`)
+
+    if (/^import \* as \S+ from '@?[\w/]+';\n/m.test(fixed))
+      throw new Error(
+        `${repair.file}: a namespace import survived the repair, and this file is a CommonJS declaration`,
+      )
+
+    writeFileSync(file, fixed)
+
+    return repaired + 1
+  }, 0)
+
+/**
  * Bundle `dist/`, unless the caller already did.
  *
  * Returns whether it built, so a caller can say so. The announcement is here rather than at the call
@@ -95,6 +171,7 @@ export const ensureBundle = ({ announce = true } = {}) => {
   if (announce) console.log('· bundling')
   execFileSync('pnpm', ['exec', 'tsup'], { cwd: root, stdio: 'pipe' })
   stripSourcesContent()
+  repairCommonJsDeclarations()
 
   return true
 }

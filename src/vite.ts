@@ -1,10 +1,26 @@
-import type { PluginOptions } from '@tailwindcss/vite'
-import type { Plugin } from 'vite'
-
 import { finalizeCss, stagingMarker } from './helpers/carriers'
 import { pluginSpecifier, registerCss } from './helpers/register'
 
 import tailwindcss from '@tailwindcss/vite'
+
+/**
+ * The two types this file needs from packages that are ES modules — and they have to say so.
+ *
+ * `dist/vite.d.cts` is a CommonJS declaration, because it sits behind the `require` condition, and both
+ * `@tailwindcss/vite` and `vite` are ES modules: the first publishes no `require` condition at all and the
+ * second is `"type": "module"`. TypeScript refuses a type import of an ES module from a CommonJS module
+ * unless it is told which condition to resolve — `TS1542`, "must have a 'resolution-mode' attribute" — and
+ * with the attribute it accepts it: the reference is erased, so the `require`-side runtime never changes.
+ *
+ * Without this the published `vite.d.cts` reported two `TS1479`s under `moduleResolution: node16` and a
+ * consumer's first compile in a CommonJS project failed on declarations they never touched.
+ */
+type Plugin = import('vite', {
+  with: { 'resolution-mode': 'import' },
+}).Plugin
+type PluginOptions = import('@tailwindcss/vite', {
+  with: { 'resolution-mode': 'import' },
+}).PluginOptions
 
 /**
  * Jumi's Vite integration: one entry, and it owns Jumi's whole lifecycle inside the build.

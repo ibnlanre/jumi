@@ -7,30 +7,43 @@
  * module resolves *because the file is there*, not because the manifest published it. A consumer gets
  * a tarball, and the only things they can see are `files` and `exports`.
  *
- * That gap is not hypothetical. `moduleResolution: node16` gave a CommonJS consumer four TS1479s —
- * "the referenced file is an ECMAScript module and cannot be imported with `require`" — while
- * `nodenext` reported nothing and all seventeen stages stayed green. The map named one `types` per
- * entry; tsup emitted a `.d.cts` beside every `.d.ts`; nothing referenced them. A test that imports
- * `dist/` by path cannot see it, and `nodenext` alone cannot either: it models a Node that can
- * `require` ESM, so it passes without the declarations being right.
+ * That gap is not hypothetical, and neither half of it is.
+ *
+ *   moduleResolution: node16   a CommonJS consumer got four TS1479s — "the referenced file is an
+ *                              ECMAScript module and cannot be imported with `require`" — because the
+ *                              export map named one `types` per entry, so the `.d.cts` files that
+ *                              shipped were never referenced. `nodenext` reported nothing: it models a
+ *                              Node that can `require` ESM.
+ *   skipLibCheck: true         the first version of this stage passed while the published
+ *                              `postcss.d.cts` could not resolve a name at all (`TS2305`, the
+ *                              dependency's require-side declaration is an `export =`) and
+ *                              `vite.d.cts` imported two ES modules from a CommonJS declaration. The
+ *                              skip hides errors *in the declarations under test* — which is the whole
+ *                              surface a consumer's first compile touches.
+ *   a fixture inside the repo  a directory under `scripts/` resolves the repository's own
+ *                              `node_modules` by walking up, so absent optional peers were found
+ *                              anyway and an arm could type-check an integration against packages its
+ *                              install had never provided.
  *
  * So this stage asks the consumer's question from the consumer's position:
  *
  *   packed      `npm pack` — `files` and `exports` decide what exists, not the working tree
  *   listed      every entry point's four published files are in the tarball, not just on disk
- *   installed   into a clean fixture, so resolution starts at the published manifest
- *   compiled    `node16` **and** `nodenext`, CommonJS and ESM consumers, both must be error-free
+ *   size        a packed ceiling, which catches embedded source coming back without freezing bytes
+ *   armed       one **isolated** arm per integration, each in its own directory under the system
+ *               temporary directory with only that integration's peers — and a plugin-only arm that
+ *               must not be able to see them, asserted rather than assumed
+ *   compiled    `node16` **and** `nodenext`, CommonJS and ESM consumers, with declaration checking on
  *   attributed  the declarations each condition actually resolves — `.d.cts` under `require`,
  *               `.d.ts` under `import` — asked of `--traceResolution`, since "it compiled" is also
  *               what a consumer gets from a declaration file that resolves by accident
- *   executed    `require` and `import` of the root entry, and resolution of all four in both systems
+ *   executed    `require` and `import` of each arm's entries, and resolution of each in both systems
  *   mapped      every shipped file's map is published, parses, keeps its mappings and carries no
  *               embedded source — and a failure inside the installed package resolves to a `src/*.ts`
  *               position, which is the one thing the maps are for (ruled B, 2026-09-19)
  *
- * It installs from the registry, because that is what installing is. The fixture lives in
- * `scripts/tmp-consumer`, which `.gitignore` covers, and it is emptied at the start of every run: a
- * `node_modules` left from yesterday would answer yesterday's question.
+ * It installs from the registry, because that is what installing is. Each arm's fixture is emptied at
+ * the start of every run: a `node_modules` left from yesterday would answer yesterday's question.
  *
  * Run: pnpm consumer:check
  */
@@ -44,6 +57,7 @@ import {
   statSync,
   writeFileSync,
 } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { fileURLToPath } from 'node:url'
 
 import { ensureBundle } from './bundle.mjs'
@@ -52,18 +66,17 @@ import path from 'node:path'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const root = path.join(here, '..')
-const dir = path.join(here, 'tmp-consumer')
 
 ensureBundle()
 
 const failures = []
 
-/** Run a command in the fixture and return its stdout. A non-zero exit throws with both streams. */
+/** Run a command and return its stdout. A non-zero exit throws with both streams attached. */
 const run = (command, args, options = {}) =>
-  execFileSync(command, args, { cwd: dir, encoding: 'utf8', ...options })
+  execFileSync(command, args, { cwd: root, encoding: 'utf8', ...options })
 
 /** Run a command whose failure is the answer, and hand back what it said. */
-const attempt = (command, args, options = {}) => {
+const attempt = (command, args, options) => {
   try {
     return { output: run(command, args, options), status: 0 }
   } catch (error) {
@@ -97,8 +110,39 @@ const entryPoints = ['', '/postcss', '/vite', '/view-transition']
  */
 const packedCeiling = 600_000
 
-rmSync(dir, { force: true, recursive: true })
-mkdirSync(dir, { recursive: true })
+/**
+ * One arm per integration, plus the plugin on its own.
+ *
+ * The arms exist because the peers differ: `@tailwindcss/postcss` and the `vite` pair are optional, so
+ * a consumer who imports one integration has it and a consumer who imports another does not. Each arm
+ * installs only its own, and asserts the others are *absent* — the isolation claim, which is what the
+ * first version of this stage could not make while its fixture sat inside the repository.
+ */
+const arms = [
+  { entries: ['', '/view-transition'], label: 'plugin only', peers: [] },
+  {
+    entries: ['/postcss'],
+    label: 'PostCSS integration',
+    peers: ['@tailwindcss/postcss'],
+  },
+  {
+    compilerOptions: { lib: ['ESNext'], types: ['node'] },
+    entries: ['/vite'],
+    label: 'Vite integration',
+    // `@types/node` is not a convenience here. Vite's own declarations import `node:http` and expect the
+    // `node` types, and Rolldown's want a modern `lib` — so a consumer of this integration has both. An arm
+    // that provisioned only the package would report Vite's environment requirements as Jumi's defects.
+    peers: ['vite', '@tailwindcss/vite', '@types/node'],
+  },
+]
+
+const identifier = entry =>
+  entry
+    ? entry.slice(1).replace(/-(\w)/g, (_, letter) => letter.toUpperCase())
+    : 'root'
+
+const fixture = label =>
+  path.join(tmpdir(), `jumi-consumer-${label.replace(/\s+/g, '-')}`)
 
 /* ------------------------------------------------------------------------------------
  * What the manifest publishes
@@ -106,11 +150,15 @@ mkdirSync(dir, { recursive: true })
 
 console.log('')
 
-run('npm', ['pack', '--pack-destination', dir, '--silent'], { cwd: root })
+const packDir = path.join(tmpdir(), 'jumi-consumer-pack')
+rmSync(packDir, { force: true, recursive: true })
+mkdirSync(packDir, { recursive: true })
+
+run('npm', ['pack', '--pack-destination', packDir, '--silent'], { cwd: root })
 
 const tarball = path.join(
-  dir,
-  readdirSync(dir).find(name => name.endsWith('.tgz')),
+  packDir,
+  readdirSync(packDir).find(name => name.endsWith('.tgz')),
 )
 const listing = run('tar', ['-tzf', tarball])
 
@@ -127,8 +175,7 @@ claim(
   'packed',
   unlisted.length
     ? `absent from the tarball — ${unlisted.join(', ')}`
-    : `${readdirSync(dir).find(name => name.endsWith('.tgz'))}, ` +
-        `all four entry points carry a runtime and a declaration file per condition`,
+    : `${path.basename(tarball)}, all four entry points carry a runtime and a declaration file per condition`,
 )
 
 const packedBytes = statSync(tarball).size
@@ -140,172 +187,321 @@ claim(
 )
 
 /* ------------------------------------------------------------------------------------
- * What an install brings
+ * One isolated install per arm, and what each of them compiles and runs
  * ---------------------------------------------------------------------------------- */
 
-writeFileSync(
-  path.join(dir, 'package.json'),
-  `${JSON.stringify(
-    { name: 'jumi-consumer-check', private: true, type: 'commonjs' },
-    null,
-    2,
-  )}\n`,
-)
+for (const arm of arms) {
+  const dir = fixture(arm.label)
+  arm.dir = dir
 
-const installed = attempt('npm', [
-  'install',
-  '--no-audit',
-  '--no-fund',
-  '--prefer-offline',
-  tarball,
-])
-
-if (installed.status !== 0) {
-  console.error(
-    `\n✗ the tarball does not install: ${firstLines(installed.output)}`,
-  )
-  process.exit(1)
-}
-
-const packages = readdirSync(path.join(dir, 'node_modules')).filter(
-  name => !name.startsWith('.'),
-)
-
-// The editor plugin is a devDependency of this repository and nothing a consumer runs. It was a
-// runtime dependency once, which put eleven packages in every install for a language-service
-// plugin the manifest never loads.
-claim(
-  !readdirSync(path.join(dir, 'node_modules')).includes('@astrojs'),
-  'install tree',
-  `no editor plugin, ${packages.length} packages: ${packages.join(' ')}`,
-)
-
-/* ------------------------------------------------------------------------------------
- * The consumers, compiled the two ways a consumer can be configured
- * ---------------------------------------------------------------------------------- */
-
-const consumerSource = `import * as root from '@ibnlanre/jumi'
-import * as postcss from '@ibnlanre/jumi/postcss'
-import * as vite from '@ibnlanre/jumi/vite'
-import * as viewTransition from '@ibnlanre/jumi/view-transition'
-
-export const surfaces = { postcss, root, viewTransition, vite }
-`
-
-// The extension decides the module system, so one source is both consumers: `.ts` is CommonJS in a
-// package without `"type": "module"`, and `.mts` is an ES module.
-writeFileSync(path.join(dir, 'cjs-consumer.ts'), consumerSource)
-writeFileSync(path.join(dir, 'esm-consumer.mts'), consumerSource)
-writeFileSync(
-  path.join(dir, 'tsconfig.json'),
-  `${JSON.stringify(
-    {
-      compilerOptions: {
-        module: 'node16',
-        moduleResolution: 'node16',
-        noEmit: true,
-        skipLibCheck: true,
-        strict: true,
-        target: 'ES2022',
-        types: [],
+  rmSync(dir, { force: true, recursive: true })
+  mkdirSync(dir, { recursive: true })
+  writeFileSync(
+    path.join(dir, 'package.json'),
+    `${JSON.stringify(
+      {
+        name: path.basename(dir),
+        private: true,
+        type: 'commonjs',
       },
-      files: ['cjs-consumer.ts', 'esm-consumer.mts'],
-    },
-    null,
-    2,
-  )}\n`,
-)
+      null,
+      2,
+    )}\n`,
+  )
 
-console.log('')
+  const installed = attempt(
+    'npm',
+    [
+      'install',
+      '--no-audit',
+      '--no-fund',
+      '--prefer-offline',
+      tarball,
+      ...arm.peers,
+    ],
+    { cwd: dir },
+  )
 
-for (const mode of ['node16', 'nodenext']) {
-  const compiled = attempt(tsc, [
-    '-p',
-    dir,
-    '--module',
-    mode,
-    '--moduleResolution',
-    mode,
-  ])
+  if (installed.status !== 0) {
+    console.error(
+      `\n✗ ${arm.label}: the tarball does not install: ${firstLines(installed.output)}`,
+    )
+    process.exit(1)
+  }
+
+  const packages = readdirSync(path.join(dir, 'node_modules')).filter(
+    name => !name.startsWith('.'),
+  )
+
+  console.log(
+    `\n    ${arm.label} · ${packages.length} packages` +
+      `${arm.peers.length ? ` · ${arm.peers.join(', ')}` : ' · no integration peers'}`,
+  )
 
   claim(
-    compiled.status === 0,
-    `tsc ${mode}`,
-    compiled.status === 0
-      ? 'the CommonJS and the ESM consumer both compile'
-      : firstLines(compiled.output, 4),
+    !packages.includes('@astrojs'),
+    'install tree',
+    `no editor plugin, ${packages.length} packages`,
+  )
+
+  // Isolation is a claim, not a property of the address. Every peer this arm did not install has to be
+  // unresolvable here, or the arm is borrowing the repository's dependencies rather than standing alone.
+  const foreign = arms
+    .flatMap(other => other.peers)
+    .filter(peer => !arm.peers.includes(peer))
+  const borrowed = []
+  for (const peer of foreign) {
+    // The probe answers rather than throws: an absent module is the expected answer here, and letting
+    // Node print its `MODULE_NOT_FOUND` stack would bury the claims it is evidence for.
+    const resolved = attempt(
+      'node',
+      [
+        '-e',
+        `try { process.stdout.write(require.resolve('${peer}')) } catch {}`,
+      ],
+      { cwd: dir },
+    )
+
+    if (resolved.output.trim()) borrowed.push(`${peer} → ${resolved.output}`)
+  }
+
+  claim(
+    borrowed.length === 0,
+    'isolated',
+    borrowed.length
+      ? `resolved from outside this install: ${borrowed.join(', ')}`
+      : `${foreign.join(', ')} do not resolve from this install`,
+  )
+
+  const consumerSource = `${arm.entries
+    .map(
+      entry => `import * as ${identifier(entry)} from '@ibnlanre/jumi${entry}'`,
+    )
+    .join('\n')}
+
+export const surfaces = { ${arm.entries.map(identifier).join(', ')} }
+`
+
+  // The extension decides the module system, so one source is both consumers: `.ts` is CommonJS in a
+  // package without `"type": "module"`, and `.mts` is an ES module.
+  writeFileSync(path.join(dir, 'cjs-consumer.ts'), consumerSource)
+  writeFileSync(path.join(dir, 'esm-consumer.mts'), consumerSource)
+  writeFileSync(
+    path.join(dir, 'tsconfig.json'),
+    `${JSON.stringify(
+      {
+        compilerOptions: {
+          module: 'node16',
+          moduleResolution: 'node16',
+          noEmit: true,
+          // On purpose, and it is the point of this stage rather than a detail: with
+          // `skipLibCheck: true` the published `postcss.d.cts` resolved no `PluginOptions` at all and
+          // `vite.d.cts` imported two ES modules from a CommonJS declaration, and every claim here
+          // stayed green. The skip hides errors *in the declarations being tested*.
+          skipLibCheck: false,
+          strict: true,
+          target: 'ES2022',
+          types: [],
+          ...arm.compilerOptions,
+        },
+        files: ['cjs-consumer.ts', 'esm-consumer.mts'],
+      },
+      null,
+      2,
+    )}\n`,
+  )
+
+  for (const mode of ['node16', 'nodenext']) {
+    const compiled = attempt(
+      tsc,
+      ['-p', dir, '--module', mode, '--moduleResolution', mode],
+      { cwd: dir },
+    )
+
+    claim(
+      compiled.status === 0,
+      `tsc ${mode}`,
+      compiled.status === 0
+        ? `the CommonJS and the ESM consumer compile, declarations checked`
+        : firstLines(compiled.output, 4),
+    )
+  }
+
+  // "It compiled" is also what a consumer gets when a declaration resolves by accident, so the trace
+  // names the file. Pairing each resolution with the block that asked for it is what makes the answer
+  // about the *condition* rather than about the package.
+  const traced = attempt(
+    tsc,
+    [
+      '-p',
+      dir,
+      '--module',
+      'node16',
+      '--moduleResolution',
+      'node16',
+      '--traceResolution',
+    ],
+    { cwd: dir },
+  ).output
+
+  const resolved = new Map()
+  let asking = null
+
+  for (const line of traced.split('\n')) {
+    const opening = /^======== Resolving module '(.+)' from '(.+)'/.exec(line)
+    if (opening) {
+      asking = `${path.basename(opening[2])}|${opening[1]}`
+      continue
+    }
+
+    const closing =
+      /^======== Module name '(.+)' was successfully resolved to '(.+)' with Package ID/.exec(
+        line,
+      )
+    if (closing && asking) {
+      resolved.set(asking, closing[2])
+      asking = null
+    }
+  }
+
+  const wrong = []
+  for (const entry of arm.entries) {
+    const specifier = `@ibnlanre/jumi${entry}`
+    const required = resolved.get(`cjs-consumer.ts|${specifier}`)
+    const imported = resolved.get(`esm-consumer.mts|${specifier}`)
+
+    if (!required?.endsWith('.d.cts'))
+      wrong.push(`${specifier} · require → ${required ?? 'nothing'}`)
+    if (!imported?.endsWith('.d.ts') || imported.endsWith('.d.cts'))
+      wrong.push(`${specifier} · import → ${imported ?? 'nothing'}`)
+  }
+
+  claim(
+    wrong.length === 0,
+    'declarations',
+    wrong.length
+      ? wrong.join('; ')
+      : `require reaches a .d.cts and import a .d.ts, for ${arm.entries.length} entry point${arm.entries.length === 1 ? '' : 's'}`,
+  )
+
+  // Execution, not resolution: the entry has to load from both sides of the boundary, which for the
+  // integrations means the optional peer is genuinely present and genuinely loadable.
+  const execute = (specifier, system) =>
+    system === 'require'
+      ? attempt(
+          'node',
+          [
+            '-e',
+            `process.stdout.write(Object.keys(require('${specifier}')).sort().join(','))`,
+          ],
+          { cwd: dir },
+        )
+      : attempt(
+          'node',
+          [
+            '--input-type=module',
+            '-e',
+            `process.stdout.write(Object.keys(await import('${specifier}')).sort().join(','))`,
+          ],
+          { cwd: dir },
+        )
+
+  const execution = []
+  const executionProblems = []
+  for (const entry of arm.entries) {
+    const specifier = `@ibnlanre/jumi${entry}`
+    const required = execute(specifier, 'require')
+    const imported = execute(specifier, 'import')
+
+    execution.push({
+      imported: imported.output.trim().split(','),
+      required: required.output.trim().split(','),
+      specifier,
+    })
+
+    if (required.status !== 0 || !required.output.trim())
+      executionProblems.push(
+        `require('${specifier}') → ${firstLines(required.output, 1)}`,
+      )
+    if (imported.status !== 0 || !imported.output.trim())
+      executionProblems.push(
+        `import('${specifier}') → ${firstLines(imported.output, 1)}`,
+      )
+  }
+
+  claim(
+    executionProblems.length === 0,
+    'execute',
+    executionProblems.length
+      ? executionProblems.join('; ')
+      : `${arm.entries.length} entry point${arm.entries.length === 1 ? '' : 's'} execute from both module systems`,
+  )
+
+  // Named exports are the interop promise: a CommonJS consumer and an ES module consumer of the same
+  // artifact must see the same names, or a package is only usable from one side of the boundary.
+  const absent = execution.flatMap(shape =>
+    shape.required.filter(name => !shape.imported.includes(name)),
+  )
+  claim(
+    absent.length === 0,
+    'interop',
+    absent.length
+      ? `${absent.join(', ')} reachable by require but not by import`
+      : 'every name a require reaches is reachable from import',
+  )
+
+  const unresolved = []
+  for (const entry of arm.entries) {
+    const specifier = `@ibnlanre/jumi${entry}`
+    const required = attempt(
+      'node',
+      ['-e', `process.stdout.write(require.resolve('${specifier}'))`],
+      { cwd: dir },
+    )
+    const imported = attempt(
+      'node',
+      [
+        '--input-type=module',
+        '-e',
+        `process.stdout.write(import.meta.resolve('${specifier}'))`,
+      ],
+      { cwd: dir },
+    )
+
+    if (required.status !== 0 || !required.output.endsWith('.cjs'))
+      unresolved.push(
+        `${specifier} · require → ${firstLines(required.output, 1)}`,
+      )
+    if (imported.status !== 0 || !imported.output.endsWith('.js'))
+      unresolved.push(
+        `${specifier} · import → ${firstLines(imported.output, 1)}`,
+      )
+  }
+
+  claim(
+    unresolved.length === 0,
+    'resolve',
+    unresolved.length
+      ? unresolved.join('; ')
+      : `require reaches the .cjs and import the .js of ${arm.entries.length} entry point${arm.entries.length === 1 ? '' : 's'}`,
   )
 }
-
-/* ------------------------------------------------------------------------------------
- * Which declaration each condition is given
- * ---------------------------------------------------------------------------------- */
-
-// "It compiled" is also what a consumer gets when a declaration resolves by accident, so the trace
-// names the file. Pairing each resolution with the block that asked for it is what makes the answer
-// about the *condition* rather than about the package.
-const traced = attempt(tsc, [
-  '-p',
-  dir,
-  '--module',
-  'node16',
-  '--moduleResolution',
-  'node16',
-  '--traceResolution',
-]).output
-
-const resolved = new Map()
-let asking = null
-
-for (const line of traced.split('\n')) {
-  const opening = /^======== Resolving module '(.+)' from '(.+)'/.exec(line)
-  if (opening) {
-    asking = `${path.basename(opening[2])}|${opening[1]}`
-    continue
-  }
-
-  const closing =
-    /^======== Module name '(.+)' was successfully resolved to '(.+)' with Package ID/.exec(
-      line,
-    )
-  if (closing && asking) {
-    resolved.set(asking, closing[2])
-    asking = null
-  }
-}
-
-const wrong = []
-for (const entry of entryPoints) {
-  const specifier = `@ibnlanre/jumi${entry}`
-  const required = resolved.get(`cjs-consumer.ts|${specifier}`)
-  const imported = resolved.get(`esm-consumer.mts|${specifier}`)
-
-  if (!required?.endsWith('.d.cts'))
-    wrong.push(`${specifier} · require → ${required ?? 'nothing'}`)
-  if (!imported?.endsWith('.d.ts') || imported.endsWith('.d.cts'))
-    wrong.push(`${specifier} · import → ${imported ?? 'nothing'}`)
-}
-
-claim(
-  wrong.length === 0,
-  'declarations',
-  wrong.length
-    ? wrong.join('; ')
-    : 'require reaches a .d.cts and import a .d.ts, for all four entry points',
-)
 
 /* ------------------------------------------------------------------------------------
  * The maps: published, parseable, and without the source they used to embed
  * ---------------------------------------------------------------------------------- */
 
-const publishedPackage = path.join(dir, 'node_modules', '@ibnlanre', 'jumi')
+console.log('')
+
+const [pluginArm] = arms
+const published = path.join(pluginArm.dir, 'node_modules', '@ibnlanre', 'jumi')
 const mapProblems = []
 
 for (const entry of entryPoints) {
   const name = entry ? entry.slice(1) : 'index'
 
   for (const format of ['js', 'cjs']) {
-    const file = path.join(publishedPackage, 'dist', `${name}.${format}`)
+    const file = path.join(published, 'dist', `${name}.${format}`)
     const reference = /\/\/# sourceMappingURL=(\S+)/.exec(
       readFileSync(file, 'utf8'),
     )?.[1]
@@ -364,7 +560,7 @@ claim(
 // the build. A failure raised inside Jumi's own shipped code must name a `src/*.ts` position; the
 // same call with an unusable map names `dist/index.cjs`, which is the reading this rules out.
 writeFileSync(
-  path.join(dir, 'map-trace.cjs'),
+  path.join(pluginArm.dir, 'map-trace.cjs'),
   `const jumi = require('@ibnlanre/jumi')
 
 try {
@@ -376,7 +572,9 @@ try {
 `,
 )
 
-const mappedTrace = run('node', ['--enable-source-maps', 'map-trace.cjs'])
+const mappedTrace = run('node', ['--enable-source-maps', 'map-trace.cjs'], {
+  cwd: pluginArm.dir,
+})
 const mapped = /@ibnlanre\/jumi\/src\/[^\s)]+\.ts:\d+:\d+/.exec(mappedTrace)
 const unmapped = /@ibnlanre\/jumi\/dist\/[^\s)]+\.(?:c|m)?js:\d+/.exec(
   mappedTrace,
@@ -390,82 +588,6 @@ claim(
     : `no src/ position in the trace — ${firstLines(mappedTrace, 2)}`,
 )
 
-/* ------------------------------------------------------------------------------------
- * Execution, not resolution
- * ---------------------------------------------------------------------------------- */
-
-console.log('')
-
-const executed = {}
-for (const [system, args] of [
-  [
-    'require',
-    [
-      '-e',
-      "process.stdout.write(Object.keys(require('@ibnlanre/jumi')).sort().join(','))",
-    ],
-  ],
-  [
-    'import',
-    [
-      '--input-type=module',
-      '-e',
-      "process.stdout.write(Object.keys(await import('@ibnlanre/jumi')).sort().join(','))",
-    ],
-  ],
-]) {
-  const result = attempt('node', args)
-  executed[system] = result.status === 0 ? result.output.trim().split(',') : []
-
-  claim(
-    executed[system].length > 0,
-    system,
-    result.status === 0
-      ? `the root entry executes and exports ${executed[system].length} names`
-      : firstLines(result.output),
-  )
-}
-
-// Named exports are the interop promise: a CommonJS consumer and an ES module consumer of the same
-// artifact must see the same names, or a package is only usable from one side of the boundary.
-const absent = executed.require.filter(name => !executed.import.includes(name))
-claim(
-  absent.length === 0,
-  'interop',
-  absent.length
-    ? `${absent.join(', ')} reachable by require but not by import`
-    : 'every name a require reaches is reachable from import',
-)
-
-const unresolved = []
-for (const entry of entryPoints) {
-  const specifier = `@ibnlanre/jumi${entry}`
-  const required = attempt('node', [
-    '-e',
-    `process.stdout.write(require.resolve('${specifier}'))`,
-  ])
-  const imported = attempt('node', [
-    '--input-type=module',
-    '-e',
-    `process.stdout.write(import.meta.resolve('${specifier}'))`,
-  ])
-
-  if (required.status !== 0 || !required.output.endsWith('.cjs'))
-    unresolved.push(
-      `${specifier} · require → ${firstLines(required.output, 1)}`,
-    )
-  if (imported.status !== 0 || !imported.output.endsWith('.js'))
-    unresolved.push(`${specifier} · import → ${firstLines(imported.output, 1)}`)
-}
-
-claim(
-  unresolved.length === 0,
-  'resolved',
-  unresolved.length
-    ? unresolved.join('; ')
-    : 'require reaches every .cjs and import every .js, for all four entry points',
-)
-
 if (failures.length) {
   console.error('\n✗ the published artifact does not hold for a consumer:')
   for (const failure of failures) console.error(`  ${failure}`)
@@ -473,8 +595,11 @@ if (failures.length) {
 }
 
 console.log(
-  '\n✓ the tarball publishes every entry point, installs without the editor plugin,',
+  '\n✓ the tarball publishes every entry point, installs without the editor plugin, gives each',
 )
 console.log(
-  '  gives each condition the declaration for how it loads, and runs from both sides.\n',
+  '  condition the declaration for how it loads, keeps its maps without embedded source, and runs',
+)
+console.log(
+  '  from both sides — in three isolated arms, with declaration checking on.\n',
 )
