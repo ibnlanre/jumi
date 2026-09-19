@@ -515,6 +515,18 @@ export function createJumiModel({
   })
 
   /**
+   * Record a phrase whose offsets leave the documented domain, so the build can report it.
+   *
+   * The grammar and the domain are two questions, and this is the second one's record. The property carries
+   * the fact — which value, deduped by hash — and the value carries the authored text, because the message
+   * has to quote what the author wrote rather than a canonical form of it. The same split as `refusedName`,
+   * and for the same reason: the model has no channel to warn through.
+   */
+  const phraseRefused = (value: string): CssInJs => ({
+    [cssEscape(`--jumi-phrase-${shorthash2(value)}-refused`)]: value,
+  })
+
+  /**
    * Record a name that is a structural address, so the build can report it.
    *
    * A different refusal from `refusedName`, and the difference is what an author should do about it: a
@@ -1437,6 +1449,20 @@ export function createJumiModel({
         // and with it the property. Nothing else contributes to it, so its
         // frames are safe to trust and nothing has to be shared.
         if (frameList) {
+          const refused = phraseOffsetRefusal(frameList)
+
+          /**
+           * Reported, then dropped. A phrase's offsets are percentages in the domain the grammar declares,
+           * and a frame outside it is not something to hand the browser and hope: measured, `150%` reached
+           * the keyframe, the engine discarded that stop, and no output said the author's second stop was
+           * gone.
+           *
+           * Nothing is registered, so the phrase writes no keyframe, no offset variables and no name — the
+           * motion does not half-exist — and the refusal record is what `@/helpers/carriers` reads to say
+           * why. The model has no warning channel, so it states the fact where a pass that does can find it.
+           */
+          if (refused !== null) return phraseRefused(value)
+
           register(attribute)
 
           const id = shorthash2(phraseKey(frameList))
@@ -2057,6 +2083,27 @@ export function parsePhrase(value: string): Frame[] | null {
   return [...frames]
     .sort(([a], [b]) => a - b)
     .map(([offset, content]) => ({ offset, value: content }))
+}
+
+/**
+ * The first offset in a phrase that leaves the documented domain — 0–100, the `%` implied — or `null`.
+ *
+ * Two questions, and the split is the point: `parsePhrase` says whether a value *is* a phrase, and this says
+ * whether it is one Jumi will **write**. `150:1` parses, because the grammar's offset is a bare number and
+ * any run of digits is one, and it is a frame no engine can use — measured through the shipped bundle,
+ * `animate-opacity-[0:0|150:1]` emitted a keyframe with `0%` and `150%` stops and two offset variables,
+ * and every channel said nothing.
+ *
+ * A function over frames rather than a clause inside the parser, because the two callers do different
+ * things with the answer — the model refuses the phrase outright, the carrier drops it off a control's
+ * timing — and both **report** it rather than repair it. The boundary is the one
+ * `engineering/architecture/phrases.md` declares, and the one the studio editor already enforces when a
+ * keyframe is authored by hand.
+ */
+export const phraseOffsetRefusal = (frames: Frame[]): null | number => {
+  const refused = frames.find(({ offset }) => offset < 0 || offset > 100)
+
+  return refused ? refused.offset : null
 }
 
 /**

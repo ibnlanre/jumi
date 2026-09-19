@@ -79,7 +79,7 @@ const LENGTH_PERCENTAGE =
  * an attribute. Escapes are stepped over rather than through, because `\:` is how a variant boundary
  * is written inside the token and is not a boundary of the token.
  */
-const classToken = (selector: string) => {
+export const classToken = (selector: string) => {
   for (let index = 1; index < selector.length; index += 1) {
     if (selector[index] === '\\') {
       index += 1

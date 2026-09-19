@@ -10,9 +10,19 @@ import type {
 import type { Product, ViewTransitionStaging } from './view-transition'
 import type { Collection } from '@/types'
 
-import { parsePhrase, separateParts, structuralAddress } from '@/core'
+import {
+  parsePhrase,
+  phraseOffsetRefusal,
+  separateParts,
+  structuralAddress,
+} from '@/core'
 
-import { RANGE_GRAMMAR, rangeAccepted, rangeReadings } from './animation-range'
+import {
+  classToken,
+  RANGE_GRAMMAR,
+  rangeAccepted,
+  rangeReadings,
+} from './animation-range'
 import {
   ACTIVATED_SLOT,
   instanceKeys,
@@ -131,6 +141,14 @@ const REFUSED_NAME = /^--jumi-name-.+-refused$/
  * cannot address it by that word.
  */
 const SHADOWED_NAME = /^--jumi-name-.+-shadowed$/
+
+/**
+ * A phrase the model refused to write, stated as a declaration of its own.
+ *
+ * The same shape as the name markers above, one reason further along: the phrase route is a documented
+ * grammar with a documented domain, and an offset outside it is refused by the pass that can say so.
+ */
+const PHRASE_REFUSED = /^--jumi-phrase-.+-refused$/
 
 /**
  * The prefix every staged declaration is written under, and the only thing a host needs to
@@ -832,6 +850,11 @@ const segmentSelections = (root: Root) => {
 
       if (!address || !segments.length) continue
 
+      // A record the reporting pass refuses specializes nothing. That pass states the reason, and without
+      // this the selection would publish the clone its message says was dropped — the pass that warns and the
+      // pass that acts have to read the same boundary.
+      if (phraseOffsetRefusal(segments) !== null) continue
+
       for (const { definition, key } of addressedInstances(root, address)) {
         const specialized = specialize(root, definition, segments)
 
@@ -1088,6 +1111,54 @@ export function finalize(
   root.walkRules(rule => {
     for (const declaration of ownDeclarations(rule)) {
       if (reported.has(declaration.prop)) continue
+
+      /**
+       * The phrase route's domain, reported where the record is.
+       *
+       * A phrase is the one doorway around the host's type check, and its offsets are a grammar the
+       * architecture document states as 0-100 — a boundary this pass had no way to know about: measured
+       * through the shipped bundle, `animate-opacity-[0:0|150:1]` produced a `150%` stop the engine
+       * discards, and no message at all. The phrase is dropped rather than published, so nothing is left
+       * for the browser to throw away, and the message quotes the class because that is what the author can
+       * edit.
+       */
+      if (PHRASE_REFUSED.test(declaration.prop)) {
+        reported.add(declaration.prop)
+
+        const offset = phraseOffsetRefusal(parsePhrase(declaration.value) ?? [])
+        const source = classToken(rule.selector).replace(/\\(.)/g, '$1')
+
+        finalized.warnings.push(
+          `"${source}": a phrase's offsets are percentages in 0-100, and this one writes ${offset} — the animation was dropped rather than left for the browser to discard.`,
+        )
+
+        continue
+      }
+
+      /**
+       * And the same domain on a **selection** phrase — the timing a control asks its slot for.
+       *
+       * A different record with a different consequence: the refusal above drops a motion that was never
+       * written, while this one drops a *request*, so the timing the slot would have been specialized to
+       * falls back to the property scope's. Reported for the same reason, against the same boundary, because
+       * one grammar with two readers must not have two doors.
+       */
+      if (SEGMENT_RECORD.test(declaration.prop)) {
+        const [, ...rest] = declaration.value.trim().split(' ')
+        const offset = phraseOffsetRefusal(parsePhrase(rest.join(' ')) ?? [])
+
+        if (offset === null) continue
+
+        reported.add(declaration.prop)
+
+        const source = classToken(rule.selector).replace(/\\(.)/g, '$1')
+
+        finalized.warnings.push(
+          `"${source}": a phrase's offsets are percentages in 0-100, and this one writes ${offset} — the selection was dropped, so the slot keeps its own timing.`,
+        )
+
+        continue
+      }
 
       if (SHADOWED_NAME.test(declaration.prop)) {
         reported.add(declaration.prop)

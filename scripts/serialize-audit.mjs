@@ -462,6 +462,32 @@ const registry = [
   safe(
     carriers,
     'finalize',
+    'PHRASE_REFUSED.test(',
+    'whether a declaration is a phrase the model refused to write',
+  ),
+  safe(
+    carriers,
+    'finalize',
+    'SEGMENT_RECORD.test(',
+    'whether a declaration is a selection phrase awaiting the domain check',
+  ),
+  tolerant(
+    carriers,
+    'finalize',
+    ".trim().split(' ')",
+    'the address and the phrase a segment record carries',
+    'the same single space `segmentSelections` reads its records with. The address is whitespace-free by construction, so nothing can be lost between the two readers',
+  ),
+  inferred(
+    carriers,
+    'finalize',
+    'classToken(rule.selector).replace(',
+    'the author’s own class, for a message',
+    'a tokenizer, and the unescape is the one `animate-range` already carries for the same purpose',
+  ),
+  safe(
+    carriers,
+    'finalize',
     "name.startsWith('--')",
     'whether a payload entry is a custom property',
   ),

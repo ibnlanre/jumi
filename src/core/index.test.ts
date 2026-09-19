@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { addressableName, isPhrase } from '@/core'
+import {
+  addressableName,
+  isPhrase,
+  parsePhrase,
+  phraseOffsetRefusal,
+} from '@/core'
 
 /**
  * The one doorway around the host's type check.
@@ -75,6 +80,25 @@ describe('what Jumi will accept as a phrase', () => {
     expect(isPhrase('url(0:0%|100:100%)')).toBe(false)
     expect(isPhrase('calc(0:1px|100:2px)')).toBe(false)
     expect(isPhrase('var(--x, 0:1px|100:2px)')).toBe(false)
+  })
+})
+
+describe('the offsets Jumi will write', () => {
+  it('separates the grammar from the domain, and reads the first refusal', () => {
+    // Two questions with two answers. `150:1` *is* a phrase — the grammar's offset is a bare number, and any
+    // run of digits is one — and it is not one Jumi will write, because the documented domain is 0-100. The
+    // split is why `parsePhrase` did not change: what a value means is a contract the build reports on, and
+    // the refusal happens where the keyframe would have been written.
+    const frames = parsePhrase('0:0|150:1')
+
+    expect(frames).not.toBeNull()
+    expect(phraseOffsetRefusal(frames ?? [])).toBe(150)
+
+    // The boundaries are the documented ones and inclusive, so `0` and `100` are frames and `100.5` is not;
+    // and the read names the *first* refusal, so a message quotes one offset rather than a list.
+    expect(phraseOffsetRefusal(parsePhrase('0:0|100:1') ?? [])).toBeNull()
+    expect(phraseOffsetRefusal(parsePhrase('0:0|100.5:1') ?? [])).toBe(100.5)
+    expect(phraseOffsetRefusal(parsePhrase('0:0|25:1|150:2') ?? [])).toBe(150)
   })
 })
 

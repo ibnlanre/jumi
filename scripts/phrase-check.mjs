@@ -295,6 +295,66 @@ for (const [kind, candidate] of LOOKALIKES) {
   )
 }
 
+// ── 4 · the domain the grammar declares ──────────────────────────────────────────────────────────
+//
+// `parsePhrase` answers whether a value *is* a phrase; the offsets are a second question, and the answer
+// is the documented 0-100. Measured before this section existed: `animate-opacity-[0:0|150:1]` compiled to
+// a keyframe with a `150%` stop, the engine discarded that stop, and no channel said anything.
+console.log('\n· the offsets: 0-100, or reported and dropped')
+
+const DOMAIN = [
+  'animate-opacity-[0:0|150:1]',
+  'animate-opacity-[0:0|100.5:1]',
+  'animate-opacity-[0:0|100:1]',
+  'animate-padding-left-[0:0px|100:100px]/alpha',
+  'animate-padding-left-[0:0px|100:100px]/beta',
+  'animation-timing-function-[0:ease-in]/alpha',
+  'animation-timing-function-[0:0|150:1]/beta',
+  'animation-duration-1000',
+]
+
+const domain = build(await compiler(jumiEntry, root), DOMAIN)
+const stops = [...domain.css.matchAll(/(?:^|\s)(\d+(?:\.\d+)?)%\s*\{/g)].map(
+  match => `${match[1]}%`,
+)
+
+check(
+  'a value phrase outside the domain is reported, by class and by offset',
+  domain.warnings.some(
+    warning =>
+      warning.includes('animate-opacity-[0:0|150:1]') &&
+      warning.includes('150') &&
+      warning.includes('0-100'),
+  ) && domain.warnings.some(warning => warning.includes('100.5')),
+  domain.warnings.join(' · ') || 'no warning',
+)
+
+check(
+  'and nothing outside the domain reaches a frame, while the legal twin keeps its two',
+  !stops.includes('150%') &&
+    !stops.includes('100.5%') &&
+    [...new Set(stops)].join(',') === '0%,100%',
+  `stops ${[...new Set(stops)].join(', ')}${domain.warnings.length ? ` · ${domain.warnings.length} warning(s)` : ''}`,
+)
+
+check(
+  'a selection phrase outside the domain is dropped, and its legal twin still specializes',
+  domain.warnings.some(warning =>
+    warning.includes('animation-timing-function-[0:0|150:1]/beta'),
+  ) &&
+    /--jumi-slot-[\w-]*alpha[\w-]*-animation-name:/.test(domain.css) &&
+    !/--jumi-slot-[\w-]*beta[\w-]*-animation-name:/.test(domain.css),
+  `alpha ${/--jumi-slot-[\w-]*alpha[\w-]*-animation-name:/.test(domain.css) ? 'specialized' : 'not specialized'}, beta ${/--jumi-slot-[\w-]*beta[\w-]*-animation-name:/.test(domain.css) ? 'specialized' : 'not specialized'}`,
+)
+
+check(
+  'the boundary is inclusive: 0 and 100 are frames',
+  !domain.warnings.some(warning =>
+    warning.includes('animate-opacity-[0:0|100:1]'),
+  ),
+  domain.warnings.find(warning => warning.includes('100:1')) ?? 'no warning',
+)
+
 console.log(
   `\n  ${asserted - failures.length}/${asserted} phrase-contract behaviours hold`,
 )

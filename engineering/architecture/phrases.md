@@ -44,6 +44,13 @@ ratios use a slash.
   way a duplicated offset is.
 - Reparsed and normalised per declaration: frames sorted by offset, duplicated offsets last-wins,
   trimmed. Hashed from that canonical form, so `0:a|50:b` and `50:b|0:a` are one keyframe.
+- **Offsets outside 0–100 are reported and dropped**, not repaired and not left to the browser. A
+  phrase is the one doorway around the host's type check, so the domain is enforced where the keyframe
+  would be written: the motion emits nothing — no keyframe, no offset variables, no name — and the
+  build warns with the class and the offset it refused. A phrase that is a _selection_ (a
+  phrase-valued timing control) is dropped the same way, so the slot keeps its own timing. The
+  parser is untouched by this: `150:1` is a frame the **domain** refuses, not a value the **grammar**
+  misreads, and keeping the two questions apart is what lets the message quote what the author wrote.
 - A bare value is the degenerate phrase: `animate-rotate-45` ≡ `45deg@100`, and its output is
   unchanged.
 - Undeclared offsets are the property's resting value, which is why a phrase closes itself and loops

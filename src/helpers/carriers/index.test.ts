@@ -553,3 +553,40 @@ describe('the finalizer', () => {
     expect(out).toContain('animation-timeline: var(--jumi-animation-timeline);')
   })
 })
+
+describe('a phrase outside the documented domain', () => {
+  it('is reported from the record the model refused it with, and never as an animation', () => {
+    const { css: out, warnings } = finalizeCss(
+      '.animate-opacity-\\[0\\:0\\|150\\:1\\] { --jumi-phrase-sm9RN-refused: 0:0|150:1; }',
+    )
+
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('animate-opacity-[0:0|150:1]')
+    expect(warnings[0]).toContain('150')
+    expect(warnings[0]).toContain('0-100')
+
+    // Nothing to animate: a refusal is a record, not a motion.
+    expect(out).not.toContain('@keyframes')
+  })
+
+  it('reports a refused selection, and leaves the legal one silent', () => {
+    // The same boundary read off the other record. The two are separate readers of one grammar, and a repair
+    // on one of them is exactly how this survived — nothing refused the value, and the pass that acts saw
+    // nothing to refuse.
+    const refused = finalizeCss(
+      '.animation-timing-function-\\[0\\:0\\|150\\:1\\]\\/beta { --jumi-segment-abc123: beta 0:0|150:1; }',
+    )
+
+    expect(refused.warnings).toHaveLength(1)
+    expect(refused.warnings[0]).toContain(
+      'animation-timing-function-[0:0|150:1]/beta',
+    )
+    expect(refused.warnings[0]).toContain('150')
+
+    const legal = finalizeCss(
+      '.animation-timing-function-\\[0\\:ease-in\\]\\/beta { --jumi-segment-abc124: beta 0:ease-in; }',
+    )
+
+    expect(legal.warnings).toEqual([])
+  })
+})
