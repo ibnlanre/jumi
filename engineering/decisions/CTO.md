@@ -5584,3 +5584,70 @@ authored the sibling relationship _before_ this change keeps its classes until i
 honest boundary of a serializer repair.
 
 18/18 gate, `cf7be9d`. Findings 6 and 7 remain open.
+
+---
+
+## Finding 6 — the no-op classifier learned to ask whether anything ran
+
+The review's finding 6: `scripts/research/d3-authoring-routes.mjs:181–196` sampled
+successfully even with zero animations, and the verdict at `308–315` accepted a flat
+shipped reading when the _separate_ native equivalent was flat and the native control
+moved. It never required a running execution path, and it never compared the shipped
+readings with the native one. The review's own table is the case: a disabled
+activation — shipped `0` animations, reading `normal` throughout — classified as
+`equivalent-no-op` while its native equivalent read `50 % 50 %` throughout. Two
+readings, one conclusion, nothing checking they agreed.
+
+**Reproduced before repairing.** The book now runs every armed route twice: once as
+shipped, once with `#probe { animation: none !important }` appended to the probe's
+inline style. Replaying the **old rule** on those same disabled readings certifies
+all four as `equivalent-no-op` — so this was not a hypothetical: the classifier's
+own inputs contained the counterexample, and the fixture the review named is
+reproducible in the book the classifier lives in.
+
+**The repair is one function of the readings it judges.** `verdictOf` is extracted
+so the control runs the **same** classifier rather than a transcription of it — a
+control that re-implements the rule it checks passes whenever the two implementations
+drift together, which is the failure the control exists to catch. `equivalent-no-op`
+now needs:
+
+- `resting.animations > 0` — the arm **ran**;
+- the shipped series **equal** to the native equivalent's, string for string;
+- the native reference flat and its control moving, as before.
+
+Anything else is `fixture-unobservable`, which is what that verdict has always meant:
+a reading of the fixture rather than of the route. `samplesOf` returns the animation
+count with the values, because a series read off an element that never animated is
+the resting value five times.
+
+**Both conditions carry weight, and that was measured rather than assumed.** The four
+certified routes keep their verdicts unchanged — 16 `movable`, 4 `equivalent-no-op`,
+the same ledger as before the change — and their shipped and native series were
+already equal string for string, so the agreement requirement costs the honest cases
+nothing. The four disabled arms are refused 4/4: `object-position`'s disabled arms
+read `50% 50%` (equal to their native equivalent — refused by **liveness alone**),
+`offset-position`'s read `normal` (refused by equality _and_ liveness). Two routes
+where only one condition bites is why both are there.
+
+**The control is enforced where the gate runs.** The outcomes are written into
+`scripts/authoring-route-evidence.json` as `disabledControls`, and the authoring-route
+evidence guard — the same guard the review noted at `typed-leaves.test.ts:814`, which
+checked assignment names and did not reject this case — now also asserts, per arm,
+that the shipped animation count is greater than zero, that a certified
+`equivalent-no-op` agrees with its native reference, and that every disabled control
+is refused. The book exits non-zero if a disabled arm is ever certified.
+
+**Watched failing.** Planting `equivalent-no-op` on one disabled control in the
+evidence fails the gate-side test with
+`object-position/object-position-x-edge@object-position: expected 'equivalent-no-op' not to be 'equivalent-no-op'`
+(`typed-leaves.test.ts:900`), and the evidence file was restored byte-identically
+afterwards. The book's own run prints `disabled-activation control: 4/4 refused,
+animations 0, verdicts {"fixture-unobservable":4}`.
+
+**What this does not fix.** The classifier is as strong as the observable it reads: a
+route whose property the fixture cannot see still lands in `fixture-unobservable`, and
+that is a statement about the fixture, deliberately not about the route. The book
+remains a hand-run research script; what is enforced on every pass is the recorded
+outcome and its refusal.
+
+18/18 gate, `6077fc7`. Finding 7 remains open.
