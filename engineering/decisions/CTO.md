@@ -5552,3 +5552,35 @@ the reason sits beside the retired entry rather than leaving a hole in the regis
 the defect survived the corpus.
 
 18/18 gate, `d9a4602`. Findings 2, 6 and 7 remain open.
+---
+
+## Independent review, finding 2 — a track's name is a scope, and the project's own tracks were not consulted
+
+**Reproduced at the serialization, then read in a browser.** Controls are scoped by the track's name, and a
+property's name is not a label: `/opacity` is the scope of every `opacity` motion on the element, so a track
+named `opacity` publishes controls that reach its siblings. `exportedTrackClasses` already scanned authored CSS
+and attributes for exactly this hazard and did not consider the project's own tracks — so an `opacity-2` track
+authored at 1000ms omitted its duration (the Jumi default) and read its sibling's 2000ms. Measured both ways by
+compiling each serialization and reading the browser: the pre-fix list gives **2000ms for both animations**,
+which is the review's own reading, and the fixed list gives 2000ms and 1000ms.
+
+**Two changes, because the situation has two entrances.** `exportedTrackClasses` now preserves a track's controls
+when a sibling on the same element carries the address of the property this track animates — the omission was
+never this track's to make, since what it left out is what the sibling decided. And `trackName` gives a new track
+a local name (`opacity-1`, not `opacity`), so the default a track gets can no longer create the situation at all.
+Names remain editable and projects made before this carry them, which is why the first change is the one that has
+to hold.
+
+**Tested where each half lives.** Unit: the sibling case _and_ its control — with no such sibling the default is
+still omitted, so this is an exception rather than a change of policy — plus the naming rule and the per-element
+count. Browser: the studio stage auditions the pair the model produces and reads **`[2000]` and `[1000]`** per
+authored track, which is what the review asked for — the browser duration against each authored track, not only
+against the exported page. The check prints its reading, so a future failure says what it saw rather than only
+which arm failed. Studio is now 74 browser checks.
+
+**What this does not fix.** The editor and the exported page still consume one serialization, so parity remains
+necessary and not sufficient; what changed is that this particular omission is no longer possible. A scene that
+authored the sibling relationship _before_ this change keeps its classes until it is re-exported, which is the
+honest boundary of a serializer repair.
+
+18/18 gate, `cf7be9d`. Findings 6 and 7 remain open.
