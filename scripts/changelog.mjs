@@ -2,11 +2,12 @@
 /**
  * Generate the release notes from the commit history, behind a boundary.
  *
- * The boundary is a **tag**, and it is not optional. Everything before the first tag is the hand-written
- * narrative already in `CHANGELOG.md` — measured rather than summarised, and the reason the research records
- * exist at all. Everything after it is generated from Conventional Commits. The generator has no notion of
- * "the beginning of time": with no tags it happily regenerates the entire history, which would demote curated
- * notes to commit summaries. So this refuses to run until there is a tag to start from.
+ * The boundary is a **tag**, and it is not optional. Everything before the first tag is already written in
+ * `CHANGELOG.md` — the curated `0.1.0` notes, plus one generated block kept for the never-published
+ * `1.0.0-beta.1` line — and it is the reason the research records exist at all. Everything after it is
+ * generated from Conventional Commits. The generator has no notion of "the beginning of time": with no tags
+ * it happily regenerates the entire history, which would demote curated notes to commit summaries. So this
+ * refuses to run until there is a tag to start from.
  *
  * The **version is not decided here**. `pnpm version <bump> --no-git-tag-version` writes it to `package.json`
  * first and the generator stamps the release header from that, so how big a release is stays an explicit
@@ -48,7 +49,7 @@ if (!tag) {
       'describes. Tag the boundary first — the release the curated notes end at — and generation will begin after\n' +
       'it:\n' +
       '\n' +
-      '  git tag v1.0.0-beta.1 <the commit that shipped it>\n',
+      '  git tag v0.1.0 <the release commit>\n',
   )
   process.exit(1)
 }

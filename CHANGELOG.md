@@ -1,9 +1,12 @@
 # Changelog
 
-> **Curated above, generated below.** The 0.1.0 notes are hand-written from the research records in
-> `engineering/research/`, and they are the history for the releases they describe. Everything below the divider
-> is the mechanical record, generated from Conventional Commits with `pnpm run changelog` — which prepends each
-> new release at the top and leaves what is already here alone. Release flow: [CONTRIBUTING.md](CONTRIBUTING.md).
+> **Nothing here has shipped.** `@ibnlanre/jumi` has no published version yet — `0.1.0` will be the first.
+> Its notes are hand-written from the measurement records in `engineering/research/`, and they give the reasons
+> rather than a recap. Everything under the divider is the mechanical commit record of the `1.0.0-beta.1`
+> line, which was prepared and then renamed before anything was published; it is kept for provenance, not as a
+> release note. From the release after `0.1.0`, `pnpm run changelog` adds each new release at the top of this
+> file as a generated section and leaves what is already written alone. Release flow:
+> [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## 0.1.0 — unreleased
 
@@ -76,7 +79,12 @@ argument for the generated half being the mechanical record and this half being 
 
 ---
 
-## 1.0.0-beta.1 (2026-09-14)
+## 1.0.0-beta.1 — never published
+
+The commit record of the line prepared as `1.0.0-beta.1` and renamed to `0.1.0` before anything shipped,
+generated mechanically from Conventional Commits (through 2026-09-14). It is kept for provenance — what
+changed, and when — rather than as a release note: nothing under this heading has ever been installed from a
+registry, so the version, the date and the section names below describe the work, not a release.
 
 ### ⚠ BREAKING CHANGES
 

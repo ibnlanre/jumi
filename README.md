@@ -128,10 +128,10 @@ the timing of the compound property's slot.
 ## Start a chain reaction
 
 ```html
-<div class="animate-stagger-forward-120/3">
-  <div class="animate-fade-in-up">One</div>
-  <div class="animate-fade-in-up">Two</div>
-  <div class="animate-fade-in-up">Three</div>
+<div class="animate-stagger-forward-120/3 *:animate-fade-in-up">
+  <div>One</div>
+  <div>Two</div>
+  <div>Three</div>
 </div>
 ```
 

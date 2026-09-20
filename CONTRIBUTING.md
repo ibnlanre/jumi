@@ -463,7 +463,7 @@ something a prefix should be trusted to make.
 pnpm check                                    # the gate, all nineteen stages
 pnpm run docs:build                           # the only path that builds every page
 pnpm version 0.1.0 --no-git-tag-version       # or release:minor, when that is the decided size
-pnpm run changelog                            # prepends the release, stamped with that version
+pnpm run changelog                            # second release onward: prepends the generated section
 git add -A && git commit -m "chore(release): v0.1.0"
 git tag v0.1.0
 pnpm publish
@@ -476,12 +476,15 @@ Four things about that flow are load-bearing:
 - **The first release writes its own notes.** `pnpm run changelog` prepends above a tag boundary and
   refuses when none exists — "no tag to start from" — so there is nothing for it to generate _from_ until
   a release has been tagged. For the first release the curated section in `CHANGELOG.md` **is** the
-  release's notes; generation starts with the release after it.
+  release's notes: stamp its heading (drop `— unreleased`, add the date) and skip the generator, which
+  cannot run until the tag this release is about to create exists. Generation starts with the release after
+  it.
 - **`release:*` does not commit or tag.** It runs `pnpm version <bump> --no-git-tag-version`, which edits
   `package.json` and stops — so the release is one commit and one tag, not two of each.
-- **The boundary is a tag.** Everything written in `CHANGELOG.md` before the first tag is curated by hand and is
-  left exactly as written; generation prepends above it. With no tag at all the generator would rewrite the
-  entire history, so `pnpm run changelog` refuses to run until one exists.
+- **The boundary is a tag.** Everything written in `CHANGELOG.md` before the first tag — the curated `0.1.0`
+  notes, plus the one generated block kept for the never-published `1.0.0-beta.1` line — is left exactly as
+  written; generation prepends above it. With no tag at all the generator would rewrite the entire history, so
+  `pnpm run changelog` refuses to run until one exists.
 - **Never run the generator with `-r 0`.** That mode overwrites the file instead of prepending to it — it is how
   the hand-written 1.0.0 notes were destroyed once. To _inspect_ output, use the CLI directly with `--stdout`.
 
