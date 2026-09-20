@@ -405,15 +405,19 @@ pnpm theme:map              # the theme maps still resolve
 pnpm css:check              # the byte snapshot, over two frozen corpora
 pnpm incremental:check      # incremental builds stay correct and local
 pnpm behaviour:check        # a real browser resolves a real carrier
+pnpm effects:check          # the effect catalog: names, counts, and the keyframes behind them
+pnpm view-transition:check  # the shipped view-transition runtime, in a real browser
+pnpm scroll-driven:check    # the scroll-driven utilities, against a real timeline
 pnpm vite:check             # the shipped Vite integration, in dev and in every build shape
 pnpm postcss:check          # the shipped PostCSS integration, in every configuration
 pnpm phrase:check           # the phrase route: two handlers, one prefix, one documented domain
 pnpm consumer:check         # the packed artifact: installed isolated, declarations checked, entries constructed
 pnpm legacy:check           # no carrier class in a shipped surface
 pnpm stories:check          # every effect the Storybook names is one Jumi ships
+pnpm studio:check           # an authored scene survives export, an independent compile and a replay
 ```
 
-`pnpm check` runs all eighteen stages in that order and **names every one in its summary**, with the
+`pnpm check` runs all nineteen stages in that order and **names every one in its summary**, with the
 stages it did not reach marked `not run` rather than left out. The sequence still stops at the first
 failure — later checks against a half-built `dist` would be a different gate, not a clearer one — but
 a failure can no longer read as "everything after it passed". That misreading cost a real bug: a
@@ -456,7 +460,7 @@ big a release is — a `fix:` can be the most important change in a release, and
 something a prefix should be trusted to make.
 
 ```bash
-pnpm check                                    # the gate, all eighteen stages
+pnpm check                                    # the gate, all nineteen stages
 pnpm run docs:build                           # the only path that builds every page
 pnpm version 0.1.0 --no-git-tag-version       # or release:minor, when that is the decided size
 pnpm run changelog                            # prepends the release, stamped with that version

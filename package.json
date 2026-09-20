@@ -235,7 +235,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ibnlanre/jumi"
+    "url": "git+https://github.com/ibnlanre/jumi.git"
   },
   "dependencies": {
     "culori": "^4.0.2",

@@ -19,10 +19,10 @@ before/after evidence for each approved item and states what was deliberately le
 
 Three instruments, none of which changed the library:
 
-| Instrument | What it measured |
-| --- | --- |
-| **Static matrix** (`scripts/tmp-audit-matrix.mjs`) | Per effect: family, role, keyframe offsets, owned properties, `transform-origin` (and how many stops declare it), per-stop timing functions, endpoint states, per-stop transform arithmetic, net translation, scale extremes, clip function/vertex chains, exact duplicates, stop-for-stop reversal pairs, role-aware direction semantics. |
-| **Sweep, all 235** (`scripts/tmp-audit-browser.mjs`) | Chromium 153.0.8010.12 and Firefox 155.0, one live animation per effect, sampled **at the authored offsets and at the midpoints between them**: exactly one live Jumi animation; endpoint agreement with the authored `0%`/`100%` declarations; a midpoint hull check on translation/scale/rotation/opacity/size (a sample outside its segment's hull is a discrete step); and a discrete-interpolation test for `clip-path`, `filter`, `box-shadow`, `text-shadow` and `border-radius`. |
+| Instrument                                            | What it measured                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Static matrix** (`scripts/tmp-audit-matrix.mjs`)    | Per effect: family, role, keyframe offsets, owned properties, `transform-origin` (and how many stops declare it), per-stop timing functions, endpoint states, per-stop transform arithmetic, net translation, scale extremes, clip function/vertex chains, exact duplicates, stop-for-stop reversal pairs, role-aware direction semantics.                                                                                                                                                                                                                          |
+| **Sweep, all 235** (`scripts/tmp-audit-browser.mjs`)  | Chromium 153.0.8010.12 and Firefox 155.0, one live animation per effect, sampled **at the authored offsets and at the midpoints between them**: exactly one live Jumi animation; endpoint agreement with the authored `0%`/`100%` declarations; a midpoint hull check on translation/scale/rotation/opacity/size (a sample outside its segment's hull is a discrete step); and a discrete-interpolation test for `clip-path`, `filter`, `box-shadow`, `text-shadow` and `border-radius`.                                                                            |
 | **Targeted probe** (`scripts/tmp-audit-targeted.mjs`) | Rendered coverage of every clip effect (pixel count of the visible area, plus enclosed-hole count for seams), the same element with `fill-mode: none` after the animation ends, `swing` with and without a base transform, `lift` across its loop point, the `expand-*` box geometry, `typing`'s end width, `accordion` at three content heights, 3D matrices and rendered boxes, the rendered displacement of the point at each declared origin on 3×element sizes, the pointer behaviour of an exit that finished with `forwards`, and filter-list interpolation. |
 
 Two instrument lessons worth keeping:
@@ -40,15 +40,15 @@ readings, not arithmetic.
 
 ## Verdicts at a glance
 
-| Classification | Count | Effects |
-| --- | ---: | --- |
-| Keep exactly | 199 | everything not named below |
-| Adjust keyframes | 8 | `swing`; `lift`; `diamond-in`; `triangle-in` + its four corner variants |
-| Adjust origin | 5 (+2 conditional) | `accordion`, `fold-in`, `fold-out`; `expand-right`, `expand-up` (inert declaration); `unfold-x`/`unfold-y` when an author sets their own origin |
-| Documentation clarification | 4 | `typing`; the `expand-left`/`expand-down` anchor; `shadow` (text-only) |
-| Duplicate / alias observation | 16 names (1 exact group, 13 near-alias pairs) | `pulsing`/`zoom-pulse`; `reveal-*`↔`unmask-*`; `square-in-*`↔`unmask-*`; `square-out-*`↔`mask-*` |
-| Adjust timing (perceptual) | 1 | `zoom-out-elastic` |
-| Needs browser-specific investigation | 0 | the two engines agree on every measurement; WebKit is unavailable on this host (see E) |
+| Classification                       |                                         Count | Effects                                                                                                                                         |
+| ------------------------------------ | --------------------------------------------: | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Keep exactly                         |                                           199 | everything not named below                                                                                                                      |
+| Adjust keyframes                     |                                             8 | `swing`; `lift`; `diamond-in`; `triangle-in` + its four corner variants                                                                         |
+| Adjust origin                        |                            5 (+2 conditional) | `accordion`, `fold-in`, `fold-out`; `expand-right`, `expand-up` (inert declaration); `unfold-x`/`unfold-y` when an author sets their own origin |
+| Documentation clarification          |                                             4 | `typing`; the `expand-left`/`expand-down` anchor; `shadow` (text-only)                                                                          |
+| Duplicate / alias observation        | 16 names (1 exact group, 13 near-alias pairs) | `pulsing`/`zoom-pulse`; `reveal-*`↔`unmask-*`; `square-in-*`↔`unmask-*`; `square-out-*`↔`mask-*`                                                |
+| Adjust timing (perceptual)           |                                             1 | `zoom-out-elastic`                                                                                                                              |
+| Needs browser-specific investigation |                                             0 | the two engines agree on every measurement; WebKit is unavailable on this host (see E)                                                          |
 
 ## A. Effects reviewed and kept unchanged
 
@@ -75,8 +75,8 @@ Family by family, what was challenged and why it stands:
   envelope is discussed in C.
 - **Planar turns and spiral travel (16).** `spiral-path`'s counter-rotations keep the element upright
   while it orbits — the intermediate matrices confirm it. `arc-*` pivots **about the declared edge
-  centre, not the named corner**, and *additionally translates*: the point at the declared origin
-  travels 63.64px during the entry (identical at 200×120, 80×240 and 300×60). That is a *travel*
+  centre, not the named corner**, and _additionally translates_: the point at the declared origin
+  travels 63.64px during the entry (identical at 200×120, 80×240 and 300×60). That is a _travel_
   with a pivot, not a fixed attachment; the names describe where the element comes from. Kept, worth
   one sentence in the docs.
 - **3D orientation and folding (24).** The whole family renders as an **orthographic projection**:
@@ -94,7 +94,7 @@ Family by family, what was challenged and why it stands:
   The new `radial-wipe-*` and `blinds-*` are clean at every sample.
 - **Attention, oscillation and activity (24).** Every member returns to rest — `shake`, `wobble`,
   `tada`, `jello`, `flicker`, `figure-eight`, `glitch`, `morph`, `scatter` — with two exceptions,
-  `lift` (defect) and `heart-beat`, whose 35%→100% hold is the rest *between beats* and is exactly how
+  `lift` (defect) and `heart-beat`, whose 35%→100% hold is the rest _between beats_ and is exactly how
   a heartbeat reads. `jello`'s halving skew series, `wobble`'s decay and `tada`'s alternating stops
   are deliberate shapes, not redundant stops.
 - **Shear (10).** Sign semantics are internally consistent: the two-axis names match the single-axis
@@ -109,7 +109,7 @@ Family by family, what was challenged and why it stands:
 - **Layout and display opening (7).** `power-on`/`power-off` are exact reversals with honest
   endpoints. `expand-*` and `accordion` carry the findings in B.
 - **Typographic presentation (4).** `letter-space-in/out` are not mechanical inverses (−0.5em→0 vs
-  0→+0.5em) but both *spread* the text: the entrance converges to normal tracking, the exit leaves
+  0→+0.5em) but both _spread_ the text: the entrance converges to normal tracking, the exit leaves
   stretched. Intentional and kept; `typing` is discussed in B/C.
 
 ## B. Confirmed defects
@@ -119,7 +119,7 @@ Ordered by correctness, with the measurement that shows each one.
 ### B1. A `transform-origin` declared in only some keyframes drifts to the element's own origin
 
 **Effects:** `accordion` (1 of 3 stops), `fold-in` (1 of 3), `fold-out` (1 of 3) — and
-`unfold-x`/`unfold-y` (1 of 4), which are harmless *only* while the element's own origin is the
+`unfold-x`/`unfold-y` (1 of 4), which are harmless _only_ while the element's own origin is the
 default centre.
 
 **Current behaviour (measured).** Per CSS, a keyframe that does not declare a property takes the
@@ -210,7 +210,7 @@ triangle-in-top-left     0.4783      triangle-in-top-right    0.4791
 
 Every other entrance in the clip families (`circle-in`, `square-in`, `reveal-*`, `unmask-*`,
 `radial-wipe-in`, `blinds-in-*`) reaches 0.9488 — the whole element. `diamond-in`/`triangle-in`
-instead *end on the shape*. With `animation-fill-mode: none` the clip is then dropped and the missing
+instead _end on the shape_. With `animation-fill-mode: none` the clip is then dropped and the missing
 area pops in: the same element reads **0.9488 immediately after the animation ends**. So the effect
 holds a half-visible window and then snaps to full.
 
@@ -220,9 +220,9 @@ The four triangles are also internally inconsistent: `triangle-in-bottom-left` a
 bottom corners hidden.
 
 **Proposed correction.** Decide the intended endpoint (product decision):
-*(a)* make every entrance reach full coverage (grow past the corners, as `circle-in-bottom-*` already
+_(a)_ make every entrance reach full coverage (grow past the corners, as `circle-in-bottom-*` already
 does with its 150% radius) — then the endpoint matches its siblings and no snap remains; or
-*(b)* keep the shaped window as the effect's semantics and document that it requires
+_(b)_ keep the shaped window as the effect's semantics and document that it requires
 `animation-fill-mode: forwards`, that it ends partially hidden, and that the four variants' kept
 corners are not rotations of one another.
 
@@ -277,9 +277,9 @@ Not defects — the motion is as authored, and each would be a deliberate change
   identical stop for stop; `reveal-*` adds `opacity 0 → 1`. Four near-alias pairs; the fade is the
   only difference.
 - **`square-out-*` ↔ `mask-*` and `square-in-*` ↔ `unmask-*`** — the four corner pairs in each
-direction are identical geometry with different zero spellings (`0` vs `0%`), so five pairs on the
-exit side and four on the entrance side. (`square-in` and `unmask` themselves are *not* aliases:
-`square-in` collapses from the centre point, `unmask` starts from the centre band.)
+  direction are identical geometry with different zero spellings (`0` vs `0%`), so five pairs on the
+  exit side and four on the entrance side. (`square-in` and `unmask` themselves are _not_ aliases:
+  `square-in` collapses from the centre point, `unmask` starts from the centre band.)
 - **`word-slide` ≈ `fade-in-up`** — both fade in while translating up; the distance differs
   (20px vs 60px) and the transform spelling differs.
 - **43 stop-for-stop reversal pairs** (the catalogue's in/out convention, including the three new
@@ -310,18 +310,18 @@ exit side and four on the entrance side. (`square-in` and `unmask` themselves ar
 Correctness first, polish second. Every item names the classification and whether a product decision
 is required before implementation.
 
-| # | Item | Classification | Product decision? | Status |
-| --- | --- | --- | --- | --- |
-| 1 | Repeat `transform-origin` in every stop of `accordion`, `fold-in`, `fold-out`, `unfold-x`, `unfold-y` (B1) | adjust origin | endpoint unchanged; trajectory changes — approve | **implemented**, `dcc594d` (G) |
-| 2 | Add an explicit `0%` stop to `swing` (B2) | adjust keyframes | approve (first 20% of public motion) | **implemented**, `dcc594d` (G) |
-| 3 | Decide `lift`'s contract: return to rest, or document a pose (B3) | adjust keyframes / documentation | yes | **implemented as return to rest**, `dcc594d` (G) |
-| 4 | Remove the inert `transform-origin` from `expand-right`/`expand-up`; document the real anchor of all four (B4) | adjust origin / documentation | removal is safe; renaming is a separate decision | **removal implemented**, `dcc594d`; documentation open |
-| 4b | Clarify in the docs that `expand-left`/`expand-down` anchor at the leading/top edge like their pair (B4) | documentation | no | open |
-| 5 | Decide `diamond-in`/`triangle-in*` endpoints, and make the four triangles consistent (B5) | adjust keyframes **or** documentation | yes | **implemented as full reveal**, `dcc594d` (G) |
-| 6 | Document `typing`'s containing-block contract and the shrink-wrapped-parent recipe (B6) | documentation | no | open |
-| 7 | Document `accordion`'s fixed 500px/1000px ramp (content taller than 1000px stays clipped under `forwards`; a 40px element completes its reveal at ≈5% of the timeline) and `mask-*`/`diamond-in`/`triangle-in`'s dependence on `animation-fill-mode` | documentation | no | open |
-| 8 | `zoom-out-elastic` envelope (C) | adjust timing | yes — perceptual only | excluded from this pass |
-| 9 | Alias decisions: `pulsing`/`zoom-pulse`; `reveal-*`↔`unmask-*`; `square-*`↔`mask-*`; `word-slide`↔`fade-in-up` (D) | duplicate/alias observation | yes — separate API pass, deliberately not now | excluded from this pass |
+| #   | Item                                                                                                                                                                                                                                                 | Classification                        | Product decision?                                | Status                                                 |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- | ------------------------------------------------ | ------------------------------------------------------ |
+| 1   | Repeat `transform-origin` in every stop of `accordion`, `fold-in`, `fold-out`, `unfold-x`, `unfold-y` (B1)                                                                                                                                           | adjust origin                         | endpoint unchanged; trajectory changes — approve | **implemented**, `dcc594d` (G)                         |
+| 2   | Add an explicit `0%` stop to `swing` (B2)                                                                                                                                                                                                            | adjust keyframes                      | approve (first 20% of public motion)             | **implemented**, `dcc594d` (G)                         |
+| 3   | Decide `lift`'s contract: return to rest, or document a pose (B3)                                                                                                                                                                                    | adjust keyframes / documentation      | yes                                              | **implemented as return to rest**, `dcc594d` (G)       |
+| 4   | Remove the inert `transform-origin` from `expand-right`/`expand-up`; document the real anchor of all four (B4)                                                                                                                                       | adjust origin / documentation         | removal is safe; renaming is a separate decision | **removal implemented**, `dcc594d`; documentation open |
+| 4b  | Clarify in the docs that `expand-left`/`expand-down` anchor at the leading/top edge like their pair (B4)                                                                                                                                             | documentation                         | no                                               | open                                                   |
+| 5   | Decide `diamond-in`/`triangle-in*` endpoints, and make the four triangles consistent (B5)                                                                                                                                                            | adjust keyframes **or** documentation | yes                                              | **implemented as full reveal**, `dcc594d` (G)          |
+| 6   | Document `typing`'s containing-block contract and the shrink-wrapped-parent recipe (B6)                                                                                                                                                              | documentation                         | no                                               | open                                                   |
+| 7   | Document `accordion`'s fixed 500px/1000px ramp (content taller than 1000px stays clipped under `forwards`; a 40px element completes its reveal at ≈5% of the timeline) and `mask-*`/`diamond-in`/`triangle-in`'s dependence on `animation-fill-mode` | documentation                         | no                                               | open                                                   |
+| 8   | `zoom-out-elastic` envelope (C)                                                                                                                                                                                                                      | adjust timing                         | yes — perceptual only                            | excluded from this pass                                |
+| 9   | Alias decisions: `pulsing`/`zoom-pulse`; `reveal-*`↔`unmask-*`; `square-*`↔`mask-*`; `word-slide`↔`fade-in-up` (D)                                                                                                                                   | duplicate/alias observation           | yes — separate API pass, deliberately not now    | excluded from this pass                                |
 
 Items 1–5 change public motion and all of them are small, local edits to `effects.ts`; item 1 and 4
 cannot change any rendered endpoint. Items 6–7 change no motion at all and could land immediately.
@@ -337,14 +337,14 @@ with the same instrument for both records: 23 watched effects — the 21 changed
 The before record ran in Chromium 153.0.8010.12 and Firefox 155.0; the after record adds WebKit 26.0
 through the compatible Playwright runner.
 
-| Approval | Change | Before | After |
-| --- | --- | --- | --- |
-| 1 | Fixed origins kept fixed through every stop (`accordion`, `fold-in`, `fold-out`) | 5 distinct computed origins across the animation — `accordion` `100px 0px → 100px 30.8px → 100px 53.1px → 100px 58.5px → 100px 60px`; `fold-in`/`fold-out` `100px 120px → … → 100px 60px`. The declared pivot interpolates toward the element's own origin, so it is only the pivot at `0%` | 1 distinct value at every authored offset and midpoint: `accordion` `100px 0px`, `fold-in`/`fold-out` `100px 120px`, in Chromium, Firefox and WebKit |
-| 1 | `unfold-x`, `unfold-y` state `center` instead of leaning on the element's own origin | already 1 distinct value — the declaration was true but implicit | unchanged (1 distinct) and now declared at `50%`, `80%`, `100%` |
-| 2 | `swing` gains an explicit `0%` rest state | with a `rotate(20deg)` base it reads `20°` at `t=0` against `0°` with no base: the effect's first fifth belongs to the host element, not the effect | both bases produce the identical series `0° → 6.128° → 12.036° → 14.407° → 15° → -10° → 0°` |
-| 3 | `lift` keeps its lifted pose as the perceptual peak and returns to rest | `100%` was `translateY(-5px) scale(1.02)`, so the loop seam and any non-`forwards` run drop 5px and 2% of scale instantly | `[t, translateY, scale]` = `0:0:1`, `500:-5:1.02`, `1000:0:1`; largest step 2.04px, in all three engines |
-| 4 | `expand-right`, `expand-up` lose the inert `transform-origin` | declared an origin their keyframes never used | per-frame `x/y/width/height` identical before and after, and identical to the `expand-left`/`expand-down` controls that never declared one |
-| 5 | `diamond-in`/`diamond-out` and the ten triangle reveals end past the element | terminal coverage ≈ 0.48 on the audit's 200×120 box — the reveal stops at half the element, and the five triangle directions disagree about which corner they keep | terminal coverage 1.0 with zero enclosed holes on 200×200, 320×120 and 120×320 boxes; monotone intermediates (`diamond-in` 0 → 0.41 → 0.97 → 1, `triangle-in` 0 → 0.65 → 1.0 → 1); each `-out` is its `-in` reversed stop for stop |
+| Approval | Change                                                                               | Before                                                                                                                                                                                                                                                                                      | After                                                                                                                                                                                                                              |
+| -------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1        | Fixed origins kept fixed through every stop (`accordion`, `fold-in`, `fold-out`)     | 5 distinct computed origins across the animation — `accordion` `100px 0px → 100px 30.8px → 100px 53.1px → 100px 58.5px → 100px 60px`; `fold-in`/`fold-out` `100px 120px → … → 100px 60px`. The declared pivot interpolates toward the element's own origin, so it is only the pivot at `0%` | 1 distinct value at every authored offset and midpoint: `accordion` `100px 0px`, `fold-in`/`fold-out` `100px 120px`, in Chromium, Firefox and WebKit                                                                               |
+| 1        | `unfold-x`, `unfold-y` state `center` instead of leaning on the element's own origin | already 1 distinct value — the declaration was true but implicit                                                                                                                                                                                                                            | unchanged (1 distinct) and now declared at `50%`, `80%`, `100%`                                                                                                                                                                    |
+| 2        | `swing` gains an explicit `0%` rest state                                            | with a `rotate(20deg)` base it reads `20°` at `t=0` against `0°` with no base: the effect's first fifth belongs to the host element, not the effect                                                                                                                                         | both bases produce the identical series `0° → 6.128° → 12.036° → 14.407° → 15° → -10° → 0°`                                                                                                                                        |
+| 3        | `lift` keeps its lifted pose as the perceptual peak and returns to rest              | `100%` was `translateY(-5px) scale(1.02)`, so the loop seam and any non-`forwards` run drop 5px and 2% of scale instantly                                                                                                                                                                   | `[t, translateY, scale]` = `0:0:1`, `500:-5:1.02`, `1000:0:1`; largest step 2.04px, in all three engines                                                                                                                           |
+| 4        | `expand-right`, `expand-up` lose the inert `transform-origin`                        | declared an origin their keyframes never used                                                                                                                                                                                                                                               | per-frame `x/y/width/height` identical before and after, and identical to the `expand-left`/`expand-down` controls that never declared one                                                                                         |
+| 5        | `diamond-in`/`diamond-out` and the ten triangle reveals end past the element         | terminal coverage ≈ 0.48 on the audit's 200×120 box — the reveal stops at half the element, and the five triangle directions disagree about which corner they keep                                                                                                                          | terminal coverage 1.0 with zero enclosed holes on 200×200, 320×120 and 120×320 boxes; monotone intermediates (`diamond-in` 0 → 0.41 → 0.97 → 1, `triangle-in` 0 → 0.65 → 1.0 → 1); each `-out` is its `-in` reversed stop for stop |
 
 **The five claims, restated as results.** (a) The fixed origins stay fixed numerically throughout
 interpolation: 1 distinct computed value per effect at every sample, three engines. (b) `swing` is
@@ -365,7 +365,47 @@ exit 0 (`pnpm check`).
 
 **Left alone by instruction.** `zoom-out-elastic`, the alias groups, distance-unit normalization,
 `slide-out`'s visibility behaviour and the naming asymmetries were explicitly out of scope for this
-pass. The documentation items 4b, 6 and 7 remain in the queue.
+pass. The documentation items were closed separately — see H.
+
+## H. Documentation closure — items 4b, 6 and 7
+
+The three documentation items were the last of the queue, and they are written rather than recorded:
+the four effect families they concern had no page of their own, only catalog entries.
+
+**A new page, [sized effects](/docs/sizing-effects/),** covers the three effects whose keyframes
+animate a dimension, and it carries all three items at once because they are the same question — what
+the box has to be for the motion to read as intended.
+
+- **Item 4b, the expand family.** All four grow from the leading edge — left for the horizontal pair,
+  top for the vertical pair — and the page says why a percentage width cannot do anything else. It
+  states the consequence the audit found: `expand-left` grows rightward exactly as `expand-right`
+  does, so the names choose a reading, not a physical direction. Growing toward the far edge needs a
+  container anchored there, because no `transform-origin` can move a percentage.
+- **Item 6, `typing`.** The containing-block contract is stated with the measurement behind it (a
+  46.7px line in a 320px column is fully visible at about 11% of the timeline), together with the
+  requirement that makes the effect read as typing at all: `overflow: hidden` and
+  `white-space: nowrap`. The shrink-wrapped-parent recipe is the page's answer — `inline-block` or
+  `width: fit-content`, so `100%` is the length of the line and the animation ends on the last
+  character.
+- **Item 7, `accordion`.** The 500px/1000px ramp is documented as a ceiling rather than as `auto`,
+  with both consequences: content past 1000px is held at that edge under the default `forwards` fill
+  (and clipped where the panel sets `overflow: hidden`, which an accordion normally does), and a 40px
+  panel finishes opening at about 5% of the timeline. The pivot is named as the top edge, in every
+  stop.
+
+**Item 7's second half, [reveals](/docs/reveals/) — "A clip lasts as long as the fill does".** The
+dependence is stated where the clip family is taught: `mask-*`, `unmask` and the `-out` exits hold
+their endpoint only because the default fill is `forwards`, and `animation-fill-mode-none` releases
+the clip the moment the animation ends. The section also records what the corrections changed: after
+`dcc594d` the entrances in this family — `diamond-in`, the five `triangle-in` variants, and the
+`circle-in`/`square-in`/`reveal-*`/wipe members that already did — reach full coverage, so releasing
+the clip no longer pops them in. The fill-mode dependence is now a property of the effects that
+_conceal_, not of the reveals that used to stop half-way.
+
+**Related drift, fixed in the same pass.** `CONTRIBUTING.md` said the gate ran "all eighteen stages"
+and `scripts/check.mjs` described its pool as sixteen; the gate has been nineteen stages since the
+`scroll-driven` and `studio` stages landed, so both now say nineteen and the contributor list names
+the four checks it had never listed (`effects`, `view-transition`, `scroll-driven`, `studio`).
 
 ## Appendix — the numbers behind the findings
 

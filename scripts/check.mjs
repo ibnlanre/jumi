@@ -14,7 +14,7 @@
  * The list is still **ordered**, and the order is a dependency order rather than a preference:
  *
  *   `bundle`     every stage below loads `dist/`, so it cannot start until the bundle exists — and it is the
- *                only thing that builds it. Nine of the sixteen stages below used to run `pnpm run bundle`
+ *                only thing that builds it. Nine of the seventeen stages below used to run `pnpm run bundle`
  *                themselves. That was invisible while the gate ran them one at a time, and became a race the
  *                moment it did not: `tsup` is `clean: true`, so each of them emptied the directory its peers
  *                were resolving `../dist/index.js` out of, and `behaviour` failed with exactly that message.
@@ -23,11 +23,11 @@
  *                is not left to a comment: the pool fingerprints `dist/` and fails if it moved.
  *   `prepare`    the site's own sources are in this TypeScript project, so `types` cannot resolve without the
  *                vendored declarations
- *   everything   after those two, independent: sixteen stages that share nothing but the tree they read
+ *   everything   after those two, independent: seventeen stages that share nothing but the tree they read
  *
  * Those first two run alone and stream their output, because they are the root of every other stage and their
- * logs are worth watching live. The remaining sixteen run through a **pool** (`--jobs`, default 4) with their
- * output buffered per stage and printed as each one finishes: interleaving sixteen streams would make a failure
+ * logs are worth watching live. The remaining seventeen run through a **pool** (`--jobs`, default 4) with their
+ * output buffered per stage and printed as each one finishes: interleaving seventeen streams would make a failure
  * unreadable, and a failure is the one thing this script exists to report clearly.
  *
  * What does not change is the contract on failure: **no stage starts after one has failed.** The relaxation is
@@ -144,7 +144,7 @@ const STAGES = [
   },
   // The only stage that asks from a consumer's position rather than from this repository's: it packs, lists
   // the tarball, installs it into a clean fixture, and compiles and runs consumers against what the manifest
-  // publishes. It exists because all sixteen other stages stayed green while a `require`-side consumer of the
+  // publishes. It exists because all eighteen other stages stayed green while a `require`-side consumer of the
   // packed artifact could not compile at all — the map named one `types` per entry, so the `.d.cts` files that
   // shipped were never referenced — and `nodenext` alone cannot see it, since it models a Node that can
   // `require` ESM. Nothing else in the gate reads the export map, `files`, an installed tree, or a
@@ -190,7 +190,7 @@ const STAGES = [
  * The gate is ~2.5 minutes of stage work and roughly twice that of wall clock, and 4½ of those five
  * minutes are stages that cannot observe a change to one file: the site build (`studio`, 28s), the
  * View Transition replay (20s), and `lint` over the whole repository (11s). So `node scripts/check.mjs
- * css behaviour` runs those two stages instead of eighteen, and `bundle` and `prepare` come along
+ * css behaviour` runs those two stages instead of nineteen, and `bundle` and `prepare` come along
  * because every stage below them loads `dist/` and fails with `Cannot find module` without them —
  * which is the reason they are stages here at all.
  *
@@ -315,7 +315,7 @@ const built = fingerprintOf(path.join(root, 'dist'))
 /**
  * One stage, with its output captured rather than inherited.
  *
- * The buffer is the reason a pooled run stays readable: sixteen streams writing to one terminal interleave, and
+ * The buffer is the reason a pooled run stays readable: seventeen streams writing to one terminal interleave, and
  * the line that explains a failure is exactly the line that would be lost between two others.
  */
 const run = result =>
