@@ -485,8 +485,41 @@ Four things about that flow are load-bearing:
   notes, plus the one generated block kept for the never-published `1.0.0-beta.1` line — is left exactly as
   written; generation prepends above it. With no tag at all the generator would rewrite the entire history, so
   `pnpm run changelog` refuses to run until one exists.
-- **Never run the generator with `-r 0`.** That mode overwrites the file instead of prepending to it — it is how
-  the hand-written 1.0.0 notes were destroyed once. To _inspect_ output, use the CLI directly with `--stdout`.
+- **Inspection is `--preview`, never a mode that rewrites the file.** `pnpm run changelog -- --preview`
+  prints the section to stdout and writes nothing. Writing always inserts above the first heading, and refuses
+  outright when that version's heading is already there, so a second run cannot duplicate a release. (The
+  danger this bullet used to describe — `conventional-changelog -r 0`, which overwrote the file instead of
+  prepending — went with the CLI; see below.)
+
+### The mechanical record
+
+Everything after the first tag is generated from commit subjects by `pnpm run changelog`. The prefixes it
+accepts are this repository's own vocabulary, measured from its history rather than taken from the full
+Conventional Commits specification:
+
+| Prefix     | Section                  |
+| ---------- | ------------------------ |
+| `feat`     | Features                 |
+| `fix`      | Bug Fixes                |
+| `perf`     | Performance Improvements |
+| `refactor` | Refactoring              |
+| `research` | Research                 |
+| `docs`     | Documentation            |
+| `test`     | Tests                    |
+| `build`    | Build                    |
+| `style`    | Style                    |
+| `chore`    | Chores                   |
+
+A scope is optional — `fix(carriers): …` renders as **carriers:** — and either `!` on the subject or a
+`BREAKING CHANGE:` footer puts the commit in a breaking summary at the top, which quotes the footer when
+there is one. **Nothing is dropped.** A subject that matches no accepted prefix, including a sentence with no
+prefix at all, is listed verbatim under `Other changes`: a prefix is a convenience for the reader, not a tax
+on the writer, and no commit disappears from the record because of how it was written.
+
+Sections appear in the order above regardless of how many commits each holds, so two releases are laid out
+the same way. The generator is deliberately not `conventional-changelog`: its preset drops every subject it
+does not recognise — 107 of this repository's 324, when the record was checked against the history it claims
+to describe.
 
 ## Quality Standards
 

@@ -1,12 +1,11 @@
 # Changelog
 
-> **Nothing here has shipped.** `@ibnlanre/jumi` has no published version yet — `0.1.0` will be the first.
-> Its notes are hand-written from the measurement records in `engineering/research/`, and they give the reasons
-> rather than a recap. Everything under the divider is the mechanical commit record of the `1.0.0-beta.1`
-> line, which was prepared and then renamed before anything was published; it is kept for provenance, not as a
-> release note. From the release after `0.1.0`, `pnpm run changelog` adds each new release at the top of this
-> file as a generated section and leaves what is already written alone. Release flow:
-> [CONTRIBUTING.md](CONTRIBUTING.md).
+> **Releases, newest first.** `0.1.0` is the first release: its notes are hand-written from the measurement
+> records in `engineering/research/`, and they give the reasons rather than a recap. Everything under the
+> divider is the mechanical commit record of the `1.0.0-beta.1` line, which was prepared and then renamed
+> before anything was published — kept for provenance, not as a release note. `pnpm run changelog` writes
+> each release after `0.1.0` above the first heading, from the commits tagged since the boundary, and leaves
+> what is already written alone. Release flow: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## 0.1.0 — unreleased
 
