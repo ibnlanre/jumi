@@ -7,7 +7,7 @@
 > each release after `0.1.0` above the first heading, from the commits tagged since the boundary, and leaves
 > what is already written alone. Release flow: [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## 0.1.0 — unreleased
+## 0.1.0 (2026-09-20)
 
 Each note below describes behaviour that was measured rather than recalled. None of it changes a motion; the
 changes are about what Jumi writes, and about leaving the author's own CSS alone.
