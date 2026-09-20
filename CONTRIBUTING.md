@@ -466,13 +466,19 @@ pnpm version 0.1.0 --no-git-tag-version       # or release:minor, when that is t
 pnpm run changelog                            # second release onward: prepends the generated section
 git add -A && git commit -m "chore(release): v0.1.0"
 git tag v0.1.0
-pnpm publish
+npm publish
 ```
 
 Four things about that flow are load-bearing:
 
 - **The bump comes before the changelog.** The generator stamps the release header from `package.json`, so
   running it first labels the release with the _previous_ version.
+- **Publish with `npm`, not `pnpm`.** Measured on the first release: `pnpm publish` uploads pnpm's own
+  tarball (402,611 B) and rewrites the manifest — it drops `scripts.prepublishOnly` and the dev-only
+  `packageManager` field — while `npm publish` uploads the artifact this repository verifies against
+  (398,114 B for `0.1.0`, shasum `401bca972ccfe7a27cd14887b7c5da081f9c0997`, every manifest key as
+  written). Both install and build correctly, so the difference is only which bytes a consumer can audit:
+  the ones the repository states, or a repackaging of them.
 - **The first release writes its own notes.** `pnpm run changelog` prepends above a tag boundary and
   refuses when none exists — "no tag to start from" — so there is nothing for it to generate _from_ until
   a release has been tagged. For the first release the curated section in `CHANGELOG.md` **is** the
