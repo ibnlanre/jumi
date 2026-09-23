@@ -110,17 +110,46 @@
   },
   "css.customData": [".vscode/tailwind.v4.json"],
   // The Tailwind IntelliSense extension builds one project per CSS file that imports "tailwindcss",
-  // and creating them all is what exhausted its heap. Five files here are real entry points —
-  // docs/src/styles/{motion,catalog,demo}.css, stories/globals.css and examples/input.css. The
-  // `scripts/` corpora are harness fixtures, and storybook-static/ and docs/.astro/ are build output;
-  // none of them should be built as a project. Overriding this setting replaces the extension's
-  // defaults (**/.git/**, **/node_modules/**, **/.hg/**, **/.svn/**), so they are repeated here.
+  // and creating them all is what exhausted its heap. Six files here are real entry points: the four under
+  // docs/src/styles/ and docs/src/details/, stories/globals.css, and examples/input.css. The `scripts/`
+  // corpora are harness fixtures, and storybook-static/ and docs/.astro/ are build output; none of them
+  // should be built as a project. Overriding this setting replaces the extension's defaults
+  // (**/.git/**, **/node_modules/**, **/.hg/**, **/.svn/**), so they are repeated here.
   //
-  // Excluding paths only caps the number of *projects*. Their cost is what each entry scans, which is
-  // why every entry now declares its sources (`source(none)` plus `@source`): a bare
-  // `@import 'tailwindcss'` scans the whole workspace, and in stories/globals.css that was 1.2 GB and
-  // 200 MB of CSS — it could not finish in a 768 MB heap, and crashed the server five times on
-  // 2026-09-15. Scoped to its three sources, the same entry finishes in a 384 MB heap.
+  // Excluding paths only caps the number of *projects*. Their cost is what each entry scans, which is why
+  // every entry declares its sources (`source(none)` plus `@source`) instead of a bare
+  // `@import 'tailwindcss'` that scans the workspace. That was worth 1.2 GB and 200 MB of CSS in
+  // stories/globals.css alone, and it crashed the server five times on 2026-09-15.
+  //
+  // Scoping the scan was not the end of it. Measured on 2026-09-23, per entry, peak RSS and emitted bytes:
+  //
+  //   examples/input.css              136 MB    185 KB
+  //   stories/globals.css             379 MB     49 MB      <-- the outlier
+  //   docs/src/styles/motion.css      135 MB    4.6 KB
+  //   docs/src/styles/catalog.css     136 MB    8.8 KB
+  //   docs/src/styles/demo.css        138 MB    5.8 KB
+  //   docs/src/details/zetta-joule.css 135 MB   18.2 KB
+  //
+  // The stories entry is not scanning anything it should not: those 49 MB are 4,182 rules at roughly
+  // 12 KB each, because every staged rule carries the eight-part `--jumi-<property>-animation-<part>`
+  // fallback chain, and that chain lengthens with every property family the library grows. Five such
+  // projects, rebuilt in watch mode every time `pnpm check` rewrites the plugin it watches, is what
+  // crashes a ~3.2 GB Electron heap; the last line of the extension log before each OOM was the watch
+  // pattern for `dist/index.js`.
+  //
+  // So the projects are declared explicitly, and the outlier is left out. Everything else keeps working,
+  // including the docs pages that depend on their entry. What is lost is completion inside
+  // `stories/**`, which is a dev surface rather than a shipping one; Storybook still builds that entry
+  // from `.storybook/main.ts`, which this setting does not touch. Add it back here if completions there
+  // matter more than a server that stays up.
+  "tailwindCSS.experimental.configFile": {
+    "docs/src/pages/index.astro": "docs/src/styles/motion.css",
+    "docs/src/pages/effects.astro": "docs/src/styles/catalog.css",
+    "docs/src/data/effects.json": "docs/src/styles/catalog.css",
+    "docs/src/pages/demo/**": "docs/src/styles/demo.css",
+    "docs/src/pages/details/**": "docs/src/details/zetta-joule.css",
+    "examples/**": "examples/input.css"
+  },
   "tailwindCSS.files.exclude": [
     "**/.git/**",
     "**/node_modules/**",
