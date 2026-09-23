@@ -479,12 +479,12 @@ Four things about that flow are load-bearing:
   (398,114 B for `0.1.0`, shasum `401bca972ccfe7a27cd14887b7c5da081f9c0997`, every manifest key as
   written). Both install and build correctly, so the difference is only which bytes a consumer can audit:
   the ones the repository states, or a repackaging of them.
-- **The first release writes its own notes.** `pnpm run changelog` prepends above a tag boundary and
-  refuses when none exists — "no tag to start from" — so there is nothing for it to generate _from_ until
-  a release has been tagged. For the first release the curated section in `CHANGELOG.md` **is** the
-  release's notes: stamp its heading (drop `— unreleased`, add the date) and skip the generator, which
-  cannot run until the tag this release is about to create exists. Generation starts with the release after
-  it.
+- **The first release wrote its own notes.** `pnpm run changelog` prepends above a tag boundary and refuses
+  when none exists ("no tag to start from"), so there was nothing for it to generate _from_ until a release
+  had been tagged. `0.1.0` was that release: its curated section in `CHANGELOG.md` **is** its notes, so its
+  heading was stamped by hand (drop `— unreleased`, add the date) and the generator was skipped, since it
+  cannot run until the tag that release is about to create exists. Generation starts with the release after
+  the first one.
 - **`release:*` does not commit or tag.** It runs `pnpm version <bump> --no-git-tag-version`, which edits
   `package.json` and stops — so the release is one commit and one tag, not two of each.
 - **The boundary is a tag.** Everything written in `CHANGELOG.md` before the first tag — the curated `0.1.0`

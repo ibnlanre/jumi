@@ -3,8 +3,9 @@
 ### Big motion. Small classes.
 
 Give your interface life with a composable animation library for Tailwind CSS.
-Choose from **235 effects**, animate property targets, give each its own rhythm,
-and stagger motion across children—all from your markup.
+Choose from **235 effects**, write a keyframe in a class name, animate property
+targets, give each its own rhythm, and stagger motion across children, all from
+your markup.
 
 **[Start here](https://jumi-css.vercel.app/docs/installation/)** ·
 **[Learn to compose](https://jumi-css.vercel.app/docs/properties/)** ·
@@ -98,6 +99,40 @@ Use `motion-safe:animate-reveal-swipe` for decorative motion that respects the
 visitor's reduced-motion preference. Keep the element visible in its unanimated
 state.
 
+## Keyframes, written as a class
+
+A phrase is a keyframe in a class name. Each frame is an offset and a value,
+separated by a pipe. An offset you leave out takes the property's resting value,
+so a phrase holds still until its first frame and closes itself at the end:
+
+```html
+<div
+  class="animate-scale-[0:0.5|50:1.1|100:1] animate-opacity-[0:0|50:1|100:1]
+         animation-duration-2600 animation-iteration-count-infinite"
+>
+  Gather, overshoot, settle.
+</div>
+```
+
+Nothing else declares it. No `@keyframes` block, no stylesheet edit, no runtime:
+the class compiles to a keyframe rule named after the phrase, so two elements
+running the same phrase share one rule, and a different phrase gets its own.
+
+Name the phrase when you want to address it as a slot, and the controls follow it
+with the same `/name`:
+
+```html
+<div
+  class="animate-clip-path-[0:inset(0_100%_0_0)|100:inset(0_0%_0_0)]/reveal
+         animation-duration-[900ms]/reveal animation-timing-function-ease-out/reveal"
+>
+  Frames and controls, one slot.
+</div>
+```
+
+A phrase works wherever a value works: lengths, colours, transforms, clip paths,
+filters, shadows, and the properties that take several parts at each frame.
+
 ## Motion, atom by atom
 
 Effects are a starting point. Property utilities let you author your own motion:
@@ -116,6 +151,7 @@ modifiers scope a control to that property's animation slot.
 | Piece       | Example                             | What it does                       |
 | ----------- | ----------------------------------- | ---------------------------------- |
 | Effects     | `animate-bounce-in`                 | Apply a named keyframe effect      |
+| Phrases     | `animate-opacity-[0:0               | 100:1]`                            | Author the frames in the class |
 | Properties  | `animate-rotate-[0.25turn]`         | Animate a property toward a target |
 | Controls    | `animation-duration-[800ms]/rotate` | Give a property its own timing     |
 | Stagger     | `animate-stagger-forward-[100ms]/3` | Sequence direct children           |

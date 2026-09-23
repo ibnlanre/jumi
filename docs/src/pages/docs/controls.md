@@ -102,7 +102,8 @@ A value can declare its own frames — an offset, a colon, a value — so one ut
 </div>
 ```
 
-Frames are separated by commas, each written `<offset>:<value>`. The offset is a bare number — the `%` is implied, and `0` and `100` are the endpoints. Any offset you leave out is the property's resting value, so a phrase holds still until its first frame and closes itself at the end. That is what makes it safe to run `infinite`: the loop has no seam. An offset outside `0`–`100` is reported and dropped: the motion emits nothing, and the build warns with the class and the offset it refused rather than handing the browser a frame it will throw away.
+Frames are separated by pipes, each written `<offset>:<value>`, so a
+comma-separated value list cannot be mistaken for a phrase. The offset is a bare number, the `%` is implied, and `0` and `100` are the endpoints. Any offset you leave out is the property's resting value, so a phrase holds still until its first frame and closes itself at the end. That is what makes it safe to run `infinite`: the loop has no seam. An offset outside `0`–`100` is reported and dropped: the motion emits nothing, and the build warns with the class and the offset it refused rather than handing the browser a frame it will throw away.
 
 A phrase owns its property, and its keyframe is named after the phrase, so nothing else can share it. Two elements running the same phrase run the same keyframe; a different phrase gets a keyframe of its own. No other markup can change what your animation does — which is also why you write one phrase per property per element rather than layering several.
 

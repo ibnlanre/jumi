@@ -777,10 +777,15 @@ check(
  */
 const docRoot = path.join(root, 'docs/src/pages/docs')
 
-const docPages = readdirSync(docRoot)
-  .filter(name => name.endsWith('.md'))
-  .sort()
-  .map(name => [name, readFileSync(path.join(docRoot, name), 'utf8')])
+// The README is read alongside the guide pages: it is the text the npm page renders, it carries the same kind
+// of examples, and it was the one surface whose classes nothing checked until an example in it went stale.
+const docPages = [
+  ...readdirSync(docRoot)
+    .filter(name => name.endsWith('.md'))
+    .sort()
+    .map(name => [name, readFileSync(path.join(docRoot, name), 'utf8')]),
+  ['README.md', readFileSync(path.join(root, 'README.md'), 'utf8')],
+]
 
 /**
  * Compile one candidate alone, on a compiler of its own, and hand back **both** sides of the pipeline.
