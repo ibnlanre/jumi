@@ -3,39 +3,482 @@ import '../../details/zetta-joule.css'
 import frames from '../../details/zetta-frames.json'
 const asset = '/details/zetta-joule/'
 // These are public Jumi utilities, shared verbatim with the inspection panel.
-const entrance = 'animate-opacity-[0:0|100:1] animate-translate-[0:0_36px|100:0_0] animation-duration-[1400ms] animation-timing-function-ease-out animation-fill-mode-both'
-const reveal = 'data-[entered=true]:animate-opacity-[0:0|100:1] data-[entered=true]:animate-clip-path-[0:inset(0_100%_0_0)|100:inset(0_0%_0_0)] animation-duration-[1000ms] animation-timing-function-ease-out animation-fill-mode-both'
-const progress = 'animate-opacity-[0:0|100:1]/frames animation-timeline-[--reactor]/frames animation-range-[contain_0%_contain_100%]/frames animation-timing-function-linear/frames animation-fill-mode-both/frames'
-const benefit = 'animate-opacity-[0:0|100:1]/reveal animation-timeline-[--reactor]/reveal animation-range-[contain_30%_contain_60%]/reveal animation-timing-function-linear/reveal animation-fill-mode-both/reveal'
-const media = 'animate-clip-path-[0:inset(0_15%_0_35%)|100:inset(0_0%_0_0%)] animation-timeline-[--mission] animation-range-[entry_70%_contain_70%] animation-timing-function-linear animation-fill-mode-both'
-const charts = ['Cities & Infrastructure','Materials & Manufacturing','Fuels & Upstream','H₂ Hydrogen']
-const chartFiles=['cities','materials','fuels','hydrogen']
-const notes=[
- ['Hero entrance',entrance,'Document time. Opacity and translation settle together. The tiled curtain is an independent scale-X phrase with small per-tile delays. Exact load timing is an approximation. The whole scale property is used because the current scale-x phrase drops its keyframe values; see the conformance audit.'],
- ['Section entrance',reveal,'The reference text continues revealing after scrolling stops. IntersectionObserver only sets entered=true; Jumi owns the ensuing document-time opacity and clipping. The simplified block wipe does not reproduce the original character-by-character staggering.'],
- ['Mission media',media,'The clip opens around the original footage. The video renders its own recorded motion; Jumi controls only the surrounding reveal.'],
- ['Reactor sequence',progress,'Motion driver: Jumi / CSS scroll timeline. Progress choreography: Jumi. Frame rendering: a small canvas media bridge reading this element’s animated opacity as a normalized scalar. Discrete media decoding is outside Jumi’s CSS property model.'],
- ['Reactor annotations',benefit,'A separate named reveal shares the reactor driver, placed later in its contain range. CSS position: sticky pins the composition.'],
+const entrance =
+  'animate-opacity-[0:0|100:1] animate-translate-[0:0_36px|100:0_0] animation-duration-[1400ms] animation-timing-function-ease-out animation-fill-mode-both'
+const reveal =
+  'data-[entered=true]:animate-opacity-[0:0|100:1] data-[entered=true]:animate-clip-path-[0:inset(0_100%_0_0)|100:inset(0_0%_0_0)] animation-duration-[1000ms] animation-timing-function-ease-out animation-fill-mode-both'
+const progress =
+  'animate-opacity-[0:0|100:1]/frames animation-timeline-[--reactor]/frames animation-range-[contain_0%_contain_100%]/frames animation-timing-function-linear/frames animation-fill-mode-both/frames'
+const benefit =
+  'animate-opacity-[0:0|100:1]/reveal animation-timeline-[--reactor]/reveal animation-range-[contain_30%_contain_60%]/reveal animation-timing-function-linear/reveal animation-fill-mode-both/reveal'
+const media =
+  'animate-clip-path-[0:inset(0_15%_0_35%)|100:inset(0_0%_0_0%)] animation-timeline-[--mission] animation-range-[entry_70%_contain_70%] animation-timing-function-linear animation-fill-mode-both'
+const charts = [
+  'Cities & Infrastructure',
+  'Materials & Manufacturing',
+  'Fuels & Upstream',
+  'H₂ Hydrogen',
+]
+const chartFiles = ['cities', 'materials', 'fuels', 'hydrogen']
+const notes = [
+  [
+    'Hero entrance',
+    entrance,
+    'Document time. Opacity and translation settle together. The tiled curtain is an independent scale-X phrase with small per-tile delays. Exact load timing is an approximation. The whole scale property is used because the current scale-x phrase drops its keyframe values; see the conformance audit.',
+  ],
+  [
+    'Section entrance',
+    reveal,
+    'The reference text continues revealing after scrolling stops. IntersectionObserver only sets entered=true; Jumi owns the ensuing document-time opacity and clipping. The simplified block wipe does not reproduce the original character-by-character staggering.',
+  ],
+  [
+    'Mission media',
+    media,
+    'The clip opens around the original footage. The video renders its own recorded motion; Jumi controls only the surrounding reveal.',
+  ],
+  [
+    'Reactor sequence',
+    progress,
+    'Motion driver: Jumi / CSS scroll timeline. Progress choreography: Jumi. Frame rendering: a small canvas media bridge reading this element’s animated opacity as a normalized scalar. Discrete media decoding is outside Jumi’s CSS property model.',
+  ],
+  [
+    'Reactor annotations',
+    benefit,
+    'A separate named reveal shares the reactor driver, placed later in its contain range. CSS position: sticky pins the composition.',
+  ],
 ]
 ---
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>ZettaJoule | Jumi motion study</title><meta name="description" content="An independent ZettaJoule motion study built with public Jumi utilities and native CSS."/><link rel="icon" href="/favicon.svg"/></head><body>
-<div class="curtain" aria-hidden="true">{Array.from({length:64},(_,i)=><i class="animate-scale-[0:1_1|100:0_1] animation-duration-[850ms] animation-delay-[var(--tile-delay)] animation-timing-function-ease-in-out animation-fill-mode-both" style={`--tile-delay:${100+(i%16)*22+Math.floor(i/16)*70}ms`}/>)}</div>
-<main>
-<section class="hero" id="hero">
-<header class="reference-nav"><a class="brand" href="https://zetta-joule.com/" aria-label="Original ZettaJoule site"><i class="brand-mark" aria-hidden="true"/>ZettaJoule</a><nav class="nav-links" aria-label="Original website">{[['Company','about-us'],['Technology','technology'],['Solutions','solutions'],['Our Edge','our-edge'],['Our Team','team'],['Investors','investors-private'],['News','news']].map(([label,path])=><a href={`https://zetta-joule.com/${path}`}>{label}</a>)}</nav><a class="contact" href="https://zetta-joule.com/contact">Get in Touch</a><details class="mobile-nav"><summary aria-label="Navigation">☰</summary><nav><a href="#mission">Mission</a><a href="#technology">Technology</a><a href="#reactor">Reactor</a><a href="#heat">Heat capabilities</a><a href="https://zetta-joule.com/">Original website ↗</a></nav></details></header>
-<h1 class="hero-title"><span data-motion class={`${entrance} animation-delay-[450ms]`}>Powering</span><span data-motion class={`world ${entrance} animation-delay-[650ms]`}><span>the</span><span>World</span></span></h1>
-<img data-motion class={`hero-reactor ${entrance} animation-delay-[200ms]`} src={`${asset}hero.webp`} alt="Cutaway of the ZettaJoule reactor" fetchpriority="high"/>
-<p data-motion class={`hero-note ${entrance} animation-delay-[850ms]`}>Clean Heat and Electricity<br/>to Power a World of<br/>Industrial Applications</p>
-</section>
-<section id="mission" class="section mission-intro"><div class="split"><h2 class="eyebrow">The Name Reflects our Mission</h2><div class="copy" data-motion data-entered="false" class:list={[reveal]}><p>Projections by the U.S. Department of Energy show that annual global energy demand by the year 2050 will reach one billion times one trillion (zetta) units of energy (joules).</p><a class="link-button" href="https://zetta-joule.com/about-us"><b>↳</b><span>Discover Our Story</span></a></div></div></section>
-<p class="tablet-mission-copy">Our name, ZettaJoule, reflects our commitment to being part of the solution for meeting this tremendous need by providing clean, reliable heat and power.</p>
-<section class="mission-story"><div class="mission-sticky" data-motion data-scroll class:list={[media]}><video class="mission-video" data-mission-video muted loop playsinline preload="none" poster={`${asset}poster.webp`} aria-label="ZettaJoule industrial energy film"><source data-src={`${asset}mission.mp4`} type="video/mp4"/></video><img class="city" src={`${asset}city.webp`} alt="A city at night" loading="lazy"/><p class="mission-copy" data-motion data-entered="false" class:list={[reveal]}>Our name, ZettaJoule, reflects our commitment to being part of the solution for meeting this tremendous need by providing clean, reliable heat and power.</p><div class="definition"><div>ZettaJoule<br/>\ ˈze-tə-ˌjül \</div><p>One zettajoule equals 10²¹ joules, or one billion trillion joules.</p></div></div></section>
-<section id="technology" class="section technology"><div class="split"><h2 data-motion data-entered="false" class={reveal}>Modernizing<br/>Proven Technology</h2><div class="copy" data-motion data-entered="false" class:list={[reveal]}><p>Established reactor technology, modernized for industrial heat up to 950 °C.</p><a class="link-button" href="https://zetta-joule.com/technology"><b>↳</b><span>Explore Our Technology</span></a></div></div><figure class="building"><img data-motion data-scroll class="animate-scale-[0:1.12|100:1] animation-timeline-[--building] animation-range-[entry_0%_exit_100%] animation-timing-function-linear animation-fill-mode-both" src={`${asset}building.webp`} alt="ZettaJoule’s proposed energy campus beside a river" loading="lazy"/><figcaption data-motion data-entered="false" class:list={[reveal]}>● Design Meets Resilience<p>A contemporary energy campus designed to sit thoughtfully within its surroundings.</p></figcaption></figure></section>
-<section id="reactor" class="reactor-section"><div class="split"><h2 class="eyebrow">Intelligent Systems</h2><p class="copy" data-motion data-entered="false" class:list={[reveal]}>Digital systems support a new generation of industrial energy.</p></div><div class="reactor-scroll"><div class="reactor-stage"><span data-frame-progress data-motion data-scroll class={`frame-progress ${progress}`} aria-hidden="true"></span><canvas data-reactor data-frames={JSON.stringify(frames)} width="1360" height="765" aria-label="Scroll-driven exploded reactor assembly"></canvas><img class="reactor-still" src={`${asset}reactor-mobile.webp`} alt="Reactor assembly" loading="lazy"/><span class="reactor-label">ZJ REACTOR</span><dl class="specs"><dt>REACTOR TYPE</dt><dd>HTGR</dd><dt>GENERATING CAPACITY</dt><dd>30 MWTH</dd><dt>HEAT OUTPUT</dt><dd>UP TO 950 °C</dd></dl><div class="reactor-benefits">{[['Heat','High-temperature process heat for industry.'],['Heat & Power','Combined heat and electricity.'],['Hydrogen','Heat for efficient hydrogen production.'],['Electricity','Reliable power, around the clock.']].map(([title,copy])=><article data-motion data-scroll class={benefit}><h3>{title}</h3><p>{copy}</p></article>)}</div></div></div></section>
-<section id="heat" class="section heat"><div class="split"><h2 data-motion data-entered="false" class={reveal}>Unmatched<br/>Heat Capabilities</h2><p class="copy" data-motion data-entered="false" class:list={[reveal]}>High-temperature heat opens up a wider range of industrial applications.</p></div><div class="chart-tabs" aria-label="Heat applications">{charts.map((title,i)=><button data-chart={i} aria-pressed={i===0}>{title}</button>)}</div><div class="chart"><img src={`${asset}chart.webp`} alt="Operating temperature comparison of reactor technologies" loading="lazy"/>{chartFiles.map((file,i)=><img data-chart-panel={i} class="chart-overlay" hidden={i!==0} src={`${asset}${file}.webp`} alt={`${charts[i]} temperature requirements`} loading="lazy"/>)}</div></section>
-</main>
-<footer class="study-footer"><h2>ZettaJoule / Motion study</h2><p>An independent Jumi recreation of <a href="https://zetta-joule.com/">ZettaJoule’s website</a>. No affiliation or endorsement. Original imagery and film belong to their respective owners.</p><p>This first study covers the hero, mission, technology campus, reactor assembly and heat comparison. Typography uses system fonts; some supporting copy is condensed. The sequence renderer is a disclosed media adapter, not a second animation system.</p><p class="no-scroll">Your browser does not support CSS scroll timelines. This study preserves readable static content instead.</p><a href="/">Built with Jumi ↗</a> · <a href={`${asset}provenance.json`}>Asset provenance</a></footer>
-<aside class="study-bar" aria-label="Jumi study controls"><a href="/">Jumi ↗</a><span class="study-name">ZettaJoule · Motion study</span><a href="https://zetta-joule.com/">Original ↗</a><button data-inspect>How it moves</button></aside>
-<dialog class="inspect"><header><h2>How it moves</h2><button data-close>Close</button></header><p>Independent recreation · public Jumi syntax + native CSS.</p>{notes.map(([title,classes,note])=><details><summary>{title}</summary><pre>{classes}</pre><p>{note}</p></details>)}<details><summary>Honest boundaries</summary><p>The original desktop reactor is rendered imagery. Jumi supplies an animated 0-1 scalar; a media bridge selects and paints a frame. No scroll listener, JavaScript easing, or Jumi internals are involved.</p><p>Mobile uses the source site’s static reactor. Reduced motion disables entrances and footage while keeping content visible. Native CSS owns layout, clipping containers, sticky positioning and responsive rules.</p></details></dialog>
-<script>import '../../details/zetta-joule'</script>
-</body></html>
+
+<!doctype html>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8' />
+    <meta
+      name='viewport'
+      content='width=device-width,initial-scale=1'
+    />
+    <title>ZettaJoule | Jumi motion study</title>
+    <meta
+      name='description'
+      content='An independent ZettaJoule motion study built with public Jumi utilities and native CSS.'
+    />
+    <link
+      rel='icon'
+      href='/favicon.svg'
+    />
+  </head>
+  <body>
+    <div
+      class='curtain'
+      aria-hidden='true'
+    >
+      {Array.from({ length: 64 }, (_, i) => (
+        <i
+          class='animate-scale-[0:1_1|100:0_1] animation-duration-[850ms] animation-delay-[var(--tile-delay)] animation-timing-function-ease-in-out animation-fill-mode-both'
+          style={`--tile-delay:${100 + (i % 16) * 22 + Math.floor(i / 16) * 70}ms`}
+        />
+      ))}
+    </div>
+    <main>
+      <section
+        class='hero'
+        id='hero'
+      >
+        <header class='reference-nav'>
+          <a
+            class='brand'
+            href='https://zetta-joule.com/'
+            aria-label='Original ZettaJoule site'
+          >
+            <i
+              class='brand-mark'
+              aria-hidden='true'
+            />
+            ZettaJoule
+          </a>
+          <nav
+            class='nav-links'
+            aria-label='Original website'
+          >
+            {[
+              ['Company', 'about-us'],
+              ['Technology', 'technology'],
+              ['Solutions', 'solutions'],
+              ['Our Edge', 'our-edge'],
+              ['Our Team', 'team'],
+              ['Investors', 'investors-private'],
+              ['News', 'news'],
+            ].map(([label, path]) => (
+              <a href={`https://zetta-joule.com/${path}`}>{label}</a>
+            ))}
+          </nav>
+          <a
+            class='contact'
+            href='https://zetta-joule.com/contact'
+          >
+            Get in Touch
+          </a>
+          <details class='mobile-nav'>
+            <summary aria-label='Navigation'>☰</summary>
+            <nav>
+              <a href='#mission'>Mission</a>
+              <a href='#technology'>Technology</a>
+              <a href='#reactor'>Reactor</a>
+              <a href='#heat'>Heat capabilities</a>
+              <a href='https://zetta-joule.com/'>Original website ↗</a>
+            </nav>
+          </details>
+        </header>
+        <h1 class='hero-title'>
+          <span
+            data-motion
+            class={`${entrance} animation-delay-[450ms]`}
+          >
+            Powering
+          </span>
+          <span
+            data-motion
+            class={`world ${entrance} animation-delay-[650ms]`}
+          >
+            <span>the</span>
+            <span>World</span>
+          </span>
+        </h1>
+        <img
+          data-motion
+          class={`hero-reactor ${entrance} animation-delay-[200ms]`}
+          src={`${asset}hero.webp`}
+          alt='Cutaway of the ZettaJoule reactor'
+          fetchpriority='high'
+        />
+        <p
+          data-motion
+          class={`hero-note ${entrance} animation-delay-[850ms]`}
+        >
+          Clean Heat and Electricity
+          <br />
+          to Power a World of
+          <br />
+          Industrial Applications
+        </p>
+      </section>
+      <section
+        id='mission'
+        class='section mission-intro'
+      >
+        <div class='split'>
+          <h2 class='eyebrow'>The Name Reflects our Mission</h2>
+          <div
+            class='copy'
+            data-motion
+            data-entered='false'
+            class:list={[reveal]}
+          >
+            <p>
+              Projections by the U.S. Department of Energy show that annual
+              global energy demand by the year 2050 will reach one billion times
+              one trillion (zetta) units of energy (joules).
+            </p>
+            <a
+              class='link-button'
+              href='https://zetta-joule.com/about-us'
+            >
+              <b>↳</b>
+              <span>Discover Our Story</span>
+            </a>
+          </div>
+        </div>
+      </section>
+      <p class='tablet-mission-copy'>
+        Our name, ZettaJoule, reflects our commitment to being part of the
+        solution for meeting this tremendous need by providing clean, reliable
+        heat and power.
+      </p>
+      <section class='mission-story'>
+        <div
+          class='mission-sticky'
+          data-motion
+          data-scroll
+          class:list={[media]}
+        >
+          <video
+            class='mission-video'
+            data-mission-video
+            muted
+            loop
+            playsinline
+            preload='none'
+            poster={`${asset}poster.webp`}
+            aria-label='ZettaJoule industrial energy film'
+          >
+            <source
+              data-src={`${asset}mission.mp4`}
+              type='video/mp4'
+            />
+          </video>
+          <img
+            class='city'
+            src={`${asset}city.webp`}
+            alt='A city at night'
+            loading='lazy'
+          />
+          <p
+            class='mission-copy'
+            data-motion
+            data-entered='false'
+            class:list={[reveal]}
+          >
+            Our name, ZettaJoule, reflects our commitment to being part of the
+            solution for meeting this tremendous need by providing clean,
+            reliable heat and power.
+          </p>
+          <div class='definition'>
+            <div>
+              ZettaJoule
+              <br />\ ˈze-tə-ˌjül \
+            </div>
+            <p>
+              One zettajoule equals 10²¹ joules, or one billion trillion joules.
+            </p>
+          </div>
+        </div>
+      </section>
+      <section
+        id='technology'
+        class='section technology'
+      >
+        <div class='split'>
+          <h2
+            data-motion
+            data-entered='false'
+            class={reveal}
+          >
+            Modernizing
+            <br />
+            Proven Technology
+          </h2>
+          <div
+            class='copy'
+            data-motion
+            data-entered='false'
+            class:list={[reveal]}
+          >
+            <p>
+              Established reactor technology, modernized for industrial heat up
+              to 950 °C.
+            </p>
+            <a
+              class='link-button'
+              href='https://zetta-joule.com/technology'
+            >
+              <b>↳</b>
+              <span>Explore Our Technology</span>
+            </a>
+          </div>
+        </div>
+        <figure class='building'>
+          <img
+            data-motion
+            data-scroll
+            class='animate-scale-[0:1.12|100:1] animation-timeline-[--building] animation-range-[entry_0%_exit_100%] animation-timing-function-linear animation-fill-mode-both'
+            src={`${asset}building.webp`}
+            alt='ZettaJoule’s proposed energy campus beside a river'
+            loading='lazy'
+          />
+          <figcaption
+            data-motion
+            data-entered='false'
+            class:list={[reveal]}
+          >
+            ● Design Meets Resilience
+            <p>
+              A contemporary energy campus designed to sit thoughtfully within
+              its surroundings.
+            </p>
+          </figcaption>
+        </figure>
+      </section>
+      <section
+        id='reactor'
+        class='reactor-section'
+      >
+        <div class='split'>
+          <h2 class='eyebrow'>Intelligent Systems</h2>
+          <p
+            class='copy'
+            data-motion
+            data-entered='false'
+            class:list={[reveal]}
+          >
+            Digital systems support a new generation of industrial energy.
+          </p>
+        </div>
+        <div class='reactor-scroll'>
+          <div class='reactor-stage'>
+            <span
+              data-frame-progress
+              data-motion
+              data-scroll
+              class={`frame-progress ${progress}`}
+              aria-hidden='true'
+            ></span>
+            <canvas
+              data-reactor
+              data-frames={JSON.stringify(frames)}
+              width='1360'
+              height='765'
+              aria-label='Scroll-driven exploded reactor assembly'
+            ></canvas>
+            <img
+              class='reactor-still'
+              src={`${asset}reactor-mobile.webp`}
+              alt='Reactor assembly'
+              loading='lazy'
+            />
+            <span class='reactor-label'>ZJ REACTOR</span>
+            <dl class='specs'>
+              <dt>REACTOR TYPE</dt>
+              <dd>HTGR</dd>
+              <dt>GENERATING CAPACITY</dt>
+              <dd>30 MWTH</dd>
+              <dt>HEAT OUTPUT</dt>
+              <dd>UP TO 950 °C</dd>
+            </dl>
+            <div class='reactor-benefits'>
+              {[
+                ['Heat', 'High-temperature process heat for industry.'],
+                ['Heat & Power', 'Combined heat and electricity.'],
+                ['Hydrogen', 'Heat for efficient hydrogen production.'],
+                ['Electricity', 'Reliable power, around the clock.'],
+              ].map(([title, copy]) => (
+                <article
+                  data-motion
+                  data-scroll
+                  class={benefit}
+                >
+                  <h3>{title}</h3>
+                  <p>{copy}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+      <section
+        id='heat'
+        class='section heat'
+      >
+        <div class='split'>
+          <h2
+            data-motion
+            data-entered='false'
+            class={reveal}
+          >
+            Unmatched
+            <br />
+            Heat Capabilities
+          </h2>
+          <p
+            class='copy'
+            data-motion
+            data-entered='false'
+            class:list={[reveal]}
+          >
+            High-temperature heat opens up a wider range of industrial
+            applications.
+          </p>
+        </div>
+        <div
+          class='chart-tabs'
+          aria-label='Heat applications'
+        >
+          {charts.map((title, i) => (
+            <button
+              data-chart={i}
+              aria-pressed={i === 0}
+            >
+              {title}
+            </button>
+          ))}
+        </div>
+        <div class='chart'>
+          <img
+            src={`${asset}chart.webp`}
+            alt='Operating temperature comparison of reactor technologies'
+            loading='lazy'
+          />
+          {chartFiles.map((file, i) => (
+            <img
+              data-chart-panel={i}
+              class='chart-overlay'
+              hidden={i !== 0}
+              src={`${asset}${file}.webp`}
+              alt={`${charts[i]} temperature requirements`}
+              loading='lazy'
+            />
+          ))}
+        </div>
+      </section>
+    </main>
+    <footer class='study-footer'>
+      <h2>ZettaJoule / Motion study</h2>
+      <p>
+        An independent Jumi recreation of{' '}
+        <a href='https://zetta-joule.com/'>ZettaJoule’s website</a>. No
+        affiliation or endorsement. Original imagery and film belong to their
+        respective owners.
+      </p>
+      <p>
+        This first study covers the hero, mission, technology campus, reactor
+        assembly and heat comparison. Typography uses system fonts; some
+        supporting copy is condensed. The sequence renderer is a disclosed media
+        adapter, not a second animation system.
+      </p>
+      <p class='no-scroll'>
+        Your browser does not support CSS scroll timelines. This study preserves
+        readable static content instead.
+      </p>
+      <a href='/'>Built with Jumi ↗</a> ·{' '}
+      <a href={`${asset}provenance.json`}>Asset provenance</a>
+    </footer>
+    <aside
+      class='study-bar'
+      aria-label='Jumi study controls'
+    >
+      <a href='/'>Jumi ↗</a>
+      <span class='study-name'>ZettaJoule · Motion study</span>
+      <a href='https://zetta-joule.com/'>Original ↗</a>
+      <button data-inspect>How it moves</button>
+    </aside>
+    <dialog class='inspect'>
+      <header>
+        <h2>How it moves</h2>
+        <button data-close>Close</button>
+      </header>
+      <p>Independent recreation · public Jumi syntax + native CSS.</p>
+      {notes.map(([title, classes, note]) => (
+        <details>
+          <summary>{title}</summary>
+          <pre>{classes}</pre>
+          <p>{note}</p>
+        </details>
+      ))}
+      <details>
+        <summary>Honest boundaries</summary>
+        <p>
+          The original desktop reactor is rendered imagery. Jumi supplies an
+          animated 0-1 scalar; a media bridge selects and paints a frame. No
+          scroll listener, JavaScript easing, or Jumi internals are involved.
+        </p>
+        <p>
+          Mobile uses the source site’s static reactor. Reduced motion disables
+          entrances and footage while keeping content visible. Native CSS owns
+          layout, clipping containers, sticky positioning and responsive rules.
+        </p>
+      </details>
+    </dialog>
+    <script>
+      import '../../details/zetta-joule'
+    </script>
+  </body>
+</html>

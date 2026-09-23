@@ -50,11 +50,11 @@ Everything below applies to both.
 
 There are only three, and each one gives up something:
 
-| Written…                                     | Locality                                                                                                                                        | Freshness                                                                                                   |
-| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Written…                                     | Locality                                                                                                                                       | Freshness                                                                                                   |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | **In the utility body**                      | ✓ the body travels with the class: `*:animate-*`, `before:animate-*` and `@apply animate-*` all carry it                                       | ✗ Tailwind caches a utility's output per candidate, so a list that depends on other classes is reused stale |
 | **In a separate rule at a literal selector** | ✗ the rule that needs it has moved: a variant re-parents the class body, so a rule written for the utility is not where `*:animate-*` ended up | ✓ it is rewritten whenever the lists change                                                                 |
-| **After Tailwind emits**                     | ✓ written for every selector the finished stylesheet proves animates, wherever that is                                                          | ✓ computed once every class has been compiled                                                               |
+| **After Tailwind emits**                     | ✓ written for every selector the finished stylesheet proves animates, wherever that is                                                         | ✓ computed once every class has been compiled                                                               |
 
 The first two are complements rather than alternatives: locality wants the list inside the class, freshness wants it outside. That is the entire reason the step exists, and it is why no `@plugin` configuration can stand in for it.
 
