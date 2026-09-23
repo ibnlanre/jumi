@@ -3,7 +3,7 @@
 ### Big motion. Small classes.
 
 Give your interface life with a composable animation library for Tailwind CSS.
-Choose from **228 effects**, animate property targets, give each its own rhythm,
+Choose from **235 effects**, animate property targets, give each its own rhythm,
 and stagger motion across children—all from your markup.
 
 **[Start here](https://jumi-css.vercel.app/docs/installation/)** ·
@@ -162,8 +162,8 @@ Scope transition duration, delay, and easing with the same `/property` syntax.
 
 ## The documentation site
 
-The Astro site in `docs/` is a working showcase: a kinetic landing page, seven
-guides, and a searchable catalog with previews of all 228 effects. Its animation
+The Astro site in `docs/` is a working showcase: a kinetic landing page, eleven
+guides, and a searchable catalog with previews of all 235 effects. Its animation
 examples use Jumi itself.
 
 ```sh
