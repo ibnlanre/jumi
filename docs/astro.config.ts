@@ -15,5 +15,9 @@ import jumi from './vendor/jumi-vite.js'
 // Tailwind declared, so there is nothing here for Jumi to strip.
 export default defineConfig({
   output: 'static',
+  // The site's own address, and the one place it is written. `llms.txt` links in absolute URLs because a
+  // crawler has to attribute what it read, and the alternative is a second copy of the domain that goes
+  // stale quietly.
+  site: 'https://jumi-css.vercel.app',
   vite: { plugins: jumi({ plugin: '../../vendor/jumi.js' }) },
 })

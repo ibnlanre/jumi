@@ -224,15 +224,15 @@ this cost are recorded in `engineering/roadmap/migration.md`.
 state what Jumi is and how to use it. Measurements, incidents, rejected options, dates and hashes are
 records, and records live in `engineering/`.
 
-| Location                       | Holds                                                               |
-| ------------------------------ | ------------------------------------------------------------------- |
-| `docs/`                        | the Astro site only: `src/pages`, layouts, styles, data, `public/` |
-| `engineering/architecture`     | how the machine works, and why it is shaped this way                |
-| `engineering/research`         | investigations, measurements, and their conclusions                 |
-| `engineering/roadmap`          | what is planned, in what order, and what was closed                 |
-| `README.md`, `CONTRIBUTING.md` | what Jumi is, and the rules for changing it                         |
-
-None of it is private; the split is _intended audience_. See `engineering/README.md`.
+| Location                                                                              | Holds                                                              |
+| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `docs/`                                                                               | the Astro site only: `src/pages`, layouts, styles, data, `public/` |
+| `engineering/architecture`                                                            | how the machine works, and why it is shaped this way               |
+| `engineering/research`                                                                | investigations, measurements, and their conclusions                |
+| `engineering/roadmap`                                                                 | what is planned, in what order, and what was closed                |
+| `README.md`, `CONTRIBUTING.md`                                                        | what Jumi is, and the rules for changing it                        |     | `SKILL.md` | how to use Jumi, written for an agent authoring with it |
+| `engineering/SKILLS.md`                                                               | operating knowledge for an agent changing Jumi                     |
+| None of it is private; the split is _intended audience_. See `engineering/README.md`. |
 
 ---
 
@@ -683,7 +683,7 @@ One formatter per language, and one configuration for all of them, `prettier.con
 | language                                                    | formatter                                                    |
 | ----------------------------------------------------------- | ------------------------------------------------------------ |
 | `ts`, `tsx`, `js`, `mjs`, `cjs`                             | ESLint, which runs Prettier through `eslint-plugin-prettier` |
-| `json`, `jsonc`, `css`, `html`, `markdown`, `yaml`, `astro` | Prettier; ESLint ignores these or cannot parse them         |
+| `json`, `jsonc`, `css`, `html`, `markdown`, `yaml`, `astro` | Prettier; ESLint ignores these or cannot parse them          |
 
 The point is that a save in the editor and `pnpm lint` are the same operation. `pnpm lint` is `eslint --fix .`,
 and the editor routes the second row to Prettier directly, with the built-in formatters for those languages

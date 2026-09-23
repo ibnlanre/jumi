@@ -186,6 +186,19 @@ claim(
   `${packedBytes.toLocaleString()} bytes packed, ceiling ${packedCeiling.toLocaleString()}`,
 )
 
+/**
+ * The README tells a coding agent that `SKILL.md` ships, so the tarball is where that promise is checked.
+ * `files` is the only thing that puts it there, and nothing else in the repository reads that list, so
+ * losing the entry would otherwise be silent until someone went looking for the file in an install.
+ */
+claim(
+  listing.includes('package/SKILL.md'),
+  'skill',
+  listing.includes('package/SKILL.md')
+    ? 'the agent skill ships, so a consuming project can read it'
+    : 'SKILL.md is absent from the tarball, and the README says it is in it',
+)
+
 /* ------------------------------------------------------------------------------------
  * One isolated install per arm, and what each of them compiles and runs
  * ---------------------------------------------------------------------------------- */

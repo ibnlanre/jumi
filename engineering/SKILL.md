@@ -20,16 +20,16 @@ decision, and `CONTRIBUTING.md` for the human-facing version of the same materia
 
 ## 2. Commands
 
-| Command | What it does |
-| --- | --- |
-| `pnpm check` | the gate: 19 stages, about 2.5 minutes of stage work |
-| `node scripts/check.mjs css behaviour` | a subset by stage label. `bundle` and `prepare` come along, because every stage below them loads `dist/` |
-| `node scripts/check.mjs view-transition` | the documentation arm lives in this stage, which is why it is worth running alone while writing docs |
-| `pnpm bundle` | rebuilds `dist/`. This is the only thing that builds it |
-| `pnpm test:run` | vitest |
-| `pnpm exec tsc --noEmit` | the `types` stage on its own |
-| `pnpm css:snapshot` | rewrites the recorded CSS snapshot after an intended emission change |
-| `pnpm changelog -- --preview` | prints the generated release section and writes nothing |
+| Command                                  | What it does                                                                                             |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `pnpm check`                             | the gate: 19 stages, about 2.5 minutes of stage work                                                     |
+| `node scripts/check.mjs css behaviour`   | a subset by stage label. `bundle` and `prepare` come along, because every stage below them loads `dist/` |
+| `node scripts/check.mjs view-transition` | the documentation arm lives in this stage, which is why it is worth running alone while writing docs     |
+| `pnpm bundle`                            | rebuilds `dist/`. This is the only thing that builds it                                                  |
+| `pnpm test:run`                          | vitest                                                                                                   |
+| `pnpm exec tsc --noEmit`                 | the `types` stage on its own                                                                             |
+| `pnpm css:snapshot`                      | rewrites the recorded CSS snapshot after an intended emission change                                     |
+| `pnpm changelog -- --preview`            | prints the generated release section and writes nothing                                                  |
 
 The 19 stages, in dependency order: `bundle`, `prepare`, `types`, `lint`, `unit`, `theme`, `css`, `phrase`,
 `incremental`, `behaviour`, `effects`, `view-transition`, `scroll-driven`, `vite`, `postcss`, `consumer`,
@@ -48,16 +48,16 @@ Facts about the gate that change how you work:
 
 ## 3. Invariants and what enforces them
 
-| Invariant | Enforced or checked by |
-| --- | --- |
-| CSS property names are exact, with no invented abbreviations | review, and `properties/match.ts` by example |
-| Utility variables are named `--jumi-<property>` | `scripts/dead-links.mjs --strict`, in the `css` stage |
-| A new effect name is added to the `Effect` union in `src/types/index.ts` | the `types` stage fails with TS2353 |
-| Effect counts agree across source, docs and stories | `pnpm effects:check` |
-| No carrier or legacy class in a shipped surface | `pnpm legacy:check` |
-| Every class the documentation names compiles | the documentation arm, currently 13 pages and 170 classes |
-| The CSS snapshot is byte-exact | the `css` stage |
-| Published declarations and maps are correct per condition | the `consumer` stage, node16 and nodenext |
+| Invariant                                                                | Enforced or checked by                                    |
+| ------------------------------------------------------------------------ | --------------------------------------------------------- |
+| CSS property names are exact, with no invented abbreviations             | review, and `properties/match.ts` by example              |
+| Utility variables are named `--jumi-<property>`                          | `scripts/dead-links.mjs --strict`, in the `css` stage     |
+| A new effect name is added to the `Effect` union in `src/types/index.ts` | the `types` stage fails with TS2353                       |
+| Effect counts agree across source, docs and stories                      | `pnpm effects:check`                                      |
+| No carrier or legacy class in a shipped surface                          | `pnpm legacy:check`                                       |
+| Every class the documentation names compiles                             | the documentation arm, currently 13 pages and 170 classes |
+| The CSS snapshot is byte-exact                                           | the `css` stage                                           |
+| Published declarations and maps are correct per condition                | the `consumer` stage, node16 and nodenext                 |
 
 Two of those need a warning attached:
 
@@ -213,25 +213,27 @@ npm publish
 - **A sentence that claims the current state decays.** The changelog once said "nothing has shipped yet",
   which the first publish would have made false. Prefer statements about structure, and leave state to the
   place that is updated when state changes.
-- **The documentation arm reads fenced ```html blocks.** A class written in a ```css or ```diff block is
+- **The documentation arm reads fenced `html blocks.** A class written in a `css or ```diff block is
   invisible to it, and a `class="..."` attribute outside a recognised block is reported as a skipped page.
 
 ## 11. Where things live
 
-| Path | What it holds |
-| --- | --- |
-| `src/keyframes/effects.ts` | the 235 keyframe timelines |
-| `src/properties/**` | property utilities, controls, phrases, transitions |
-| `src/variables/**` | the `--jumi-*` protocol each utility writes |
-| `src/types/index.ts` | the `Effect` and property unions |
-| `src/view-transition.ts` | `createViewTransition`, the only public runtime export |
-| `scripts/check.mjs` | the gate |
-| `scripts/css-snapshot/` | the recorded corpus and its byte snapshot |
-| `docs/src/pages/docs/` | the eleven guide pages |
-| `docs/src/data/` | generated effect and version data |
-| `engineering/reviews/` | the measurement records behind past decisions |
-| `engineering/decisions/CTO.md` | rulings, with their reasoning kept verbatim |
-| `.github/instructions/philosophy.instructions.md` | the naming and organisation rules for new utilities |
+| Path                                              | What it holds                                          |
+| ------------------------------------------------- | ------------------------------------------------------ |
+| `src/keyframes/effects.ts`                        | the 235 keyframe timelines                             |
+| `src/properties/**`                               | property utilities, controls, phrases, transitions     |
+| `src/variables/**`                                | the `--jumi-*` protocol each utility writes            |
+| `src/types/index.ts`                              | the `Effect` and property unions                       |
+| `src/view-transition.ts`                          | `createViewTransition`, the only public runtime export |
+| `scripts/check.mjs`                               | the gate                                               |
+| `scripts/css-snapshot/`                           | the recorded corpus and its byte snapshot              |
+| `scripts/llms.mjs`                                | renders `llms.txt` and `llms-full.txt` from the guides |
+| `docs/src/pages/docs/`                            | the eleven guide pages                                 |
+| `docs/src/data/`                                  | generated effect and version data                      |
+| `docs/public/`                                    | served verbatim at the site root                       |
+| `engineering/reviews/`                            | the measurement records behind past decisions          |
+| `engineering/decisions/CTO.md`                    | rulings, with their reasoning kept verbatim            |
+| `.github/instructions/philosophy.instructions.md` | the naming and organisation rules for new utilities    |
 
 ## 12. Open items
 

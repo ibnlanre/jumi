@@ -1,0 +1,37 @@
+# Jumi
+
+> Jumi writes CSS animations through Tailwind CSS v4. 235 effects, 395 property targets, keyframes written inside a class name, per-property timing, a stagger, scroll-driven timelines and view transitions, all generated at build time with no runtime in the browser.
+
+Jumi is a Tailwind plugin plus an integration, and the two are not interchangeable: the plugin
+teaches Tailwind the utilities, and the integration completes the stylesheet once every `animate-*`
+class has been compiled. Wiring only the plugin compiles the utilities, animates nothing and warns
+about nothing, which is why the guides start there.
+
+## Guides
+
+- [Introduction](https://jumi-css.vercel.app/docs/): Jumi is a motion vocabulary for Tailwind CSS. Start with an effect, then make every part your own.
+- [Installation](https://jumi-css.vercel.app/docs/installation/): Install the plugin, wire it into your build, and make your first entrance.
+- [The build step](https://jumi-css.vercel.app/docs/build-step/): Jumi is a plugin plus an integration, because the animation lists are assembled after Tailwind compiles. Here is what that means, and what it costs you.
+- [Composing motion](https://jumi-css.vercel.app/docs/properties/): Animate property targets directly. Give simple pieces a shared purpose.
+- [Reveals & exits](https://jumi-css.vercel.app/docs/reveals/): Angular wipes, parallel apertures, hinge exits and a feathered-mask recipe.
+- [Sized effects](https://jumi-css.vercel.app/docs/sizing-effects/): What accordion, typing and the expand family need from the box they animate.
+- [Timing & controls](https://jumi-css.vercel.app/docs/controls/): Control how an animation begins, travels, repeats, and settles.
+- [Stagger](https://jumi-css.vercel.app/docs/stagger/): One motion, passed from child to child. No JavaScript loop required.
+- [Transitions](https://jumi-css.vercel.app/docs/transitions/): Smooth the change on hover, focus, or any other change of style.
+- [View transitions](https://jumi-css.vercel.app/docs/view-transitions/): Animate the browser's own view transition, on the outgoing and incoming sides.
+- [Same-document](https://jumi-css.vercel.app/docs/same-document-transitions/): One wrapper around your state change, and the browser does the rest.
+- [Accessible motion](https://jumi-css.vercel.app/docs/accessibility/): Good motion includes the option to experience less of it.
+
+## Reference
+
+- [The effect catalog](https://jumi-css.vercel.app/effects/): every one of the 235 effects, searchable, with a preview for each.
+- [llms-full.txt](https://jumi-css.vercel.app/llms-full.txt): every guide, plus the agent skill, in one file.
+- [The agent skill](https://raw.githubusercontent.com/ibnlanre/jumi/main/SKILL.md): the whole vocabulary as one markdown file, written for a coding agent, including all 235 effect names and all 395 property utilities.
+- [npm package](https://www.npmjs.com/package/@ibnlanre/jumi): version 0.1.0.
+- [Source](https://github.com/ibnlanre/jumi).
+
+## Optional
+
+- [Release notes](https://github.com/ibnlanre/jumi/blob/main/CHANGELOG.md): every change, newest first.
+- [Contributing](https://github.com/ibnlanre/jumi/blob/main/CONTRIBUTING.md): how the library is built, and the rules its code follows.
+- [How it works](https://github.com/ibnlanre/jumi/tree/main/engineering): the architecture, decisions and measurements behind the emission model.

@@ -10,3 +10,10 @@
 # tracked ones need to be named.
 scripts/css-snapshot/snapshot.css
 scripts/css-snapshot/structure.json
+
+# The crawler-facing files the site publishes, rendered by `scripts/llms.mjs` from the guides and the skill.
+# They are tracked, generated, and `.txt`, which Prettier cannot infer a parser for, so a repo-wide
+# `prettier --check` failed on them the moment they existed. `tailwind-llms.txt` at the root is the same
+# shape and predates this entry.
+docs/public/llms.txt
+docs/public/llms-full.txt

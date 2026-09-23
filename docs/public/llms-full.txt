@@ -1,0 +1,2747 @@
+# Jumi, in full
+
+> Jumi writes CSS animations through Tailwind CSS v4. 235 effects, 395 property targets, keyframes written inside a class name, per-property timing, a stagger, scroll-driven timelines and view transitions, all generated at build time with no runtime in the browser.
+
+Every guide on jumi-css.vercel.app in reading order, followed by the agent skill. Generated from
+the repository by `scripts/llms.mjs`, so do not edit it here: change the page it came from.
+
+---
+
+# Introduction
+
+Make your move. Jumi is a motion vocabulary for Tailwind CSS. Start with an effect, then make every part your own.
+
+Source: https://jumi-css.vercel.app/docs/
+
+## A little class goes a long way
+
+Bring an element into view with a single named effect. Choose its motion and timing; the utilities compose automatically.
+
+```html
+<div class="animate-bounce-in animation-duration-[800ms]">Hello, movement.</div>
+```
+
+Jumi generates CSS at build time. Your animations run in the browser's CSS engine, without a Jumi JavaScript runtime.
+
+## Four pieces to play with
+
+| Piece       | Syntax                        | Purpose                                     |
+| ----------- | ----------------------------- | ------------------------------------------- |
+| Effects     | `animate-bounce-in`           | A complete, named keyframe animation        |
+| Properties  | `animate-rotate-45`           | A target value for a CSS property           |
+| Controls    | `animation-duration-[800ms]`  | Timing, repetition, direction, and playback |
+| Transitions | `transition-duration-[300ms]` | Motion between changes of state             |
+
+Animation and transition utilities compose automatically. Add the motion or transition properties you need; no setup class is required.
+
+That assembly is the whole job, and it is Jumi's rather than yours. One element can carry as many utilities as you like: each one declares its own value, and the composition gathers them into the animation lists the browser needs. To switch motion off across a surface, target the elements themselves, which is how [reduced motion](/docs/accessibility/) is handled.
+
+## Compose something personal
+
+Each property can have its own duration. This element rotates over 800 milliseconds while its scale changes over 1.2 seconds.
+
+```html
+<div
+  class="animate-rotate-45 animate-scale-110
+  animation-duration-[800ms]/rotate
+  animation-duration-[1200ms]/scale
+  animation-direction-alternate
+  animation-iteration-count-infinite"
+>
+  Make your move.
+</div>
+```
+
+## Start here
+
+1. [Install Jumi](/docs/installation/) in a Tailwind CSS project, and read [why it takes two pieces](/docs/build-step/).
+2. [Explore the effect catalog](/effects/) to find a starting point.
+3. [Compose properties](/docs/properties/) and [tune their timing](/docs/controls/).
+4. [Respect motion preferences](/docs/accessibility/) before you ship.
+
+This documentation site uses Astro, Tailwind CSS, and the same Jumi plugin. The rotating hero, its unfurling petals, and the staggered bars are all examples of its atomic animation utilities.
+
+---
+
+# Installation
+
+From zero to moving. Install the plugin, wire it into your build, and make your first entrance.
+
+Source: https://jumi-css.vercel.app/docs/installation/
+
+## 01: Install
+
+Add Jumi to a project with Tailwind CSS already configured. The examples on this site target Tailwind CSS v4.
+
+```sh
+pnpm add @ibnlanre/jumi
+```
+
+Using another package manager? `npm install @ibnlanre/jumi`, `yarn add @ibnlanre/jumi`, and `bun add @ibnlanre/jumi` work too.
+
+## 02: Wire it into your build
+
+Jumi needs two things: the plugin, which teaches Tailwind the utilities, and an integration, which finishes the stylesheet once every `animate-*` class on the page has been compiled. Replacing Tailwind's Vite plugin with Jumi gives you both at once:
+
+```diff
+- import tailwindcss from '@tailwindcss/vite'
++ import jumi from '@ibnlanre/jumi/vite'
+
+  export default defineConfig({
+-   plugins: [tailwindcss()],
++   plugins: [jumi()],
+  })
+```
+
+Your stylesheet does not mention Jumi:
+
+```css
+@import 'tailwindcss';
+```
+
+Import that stylesheet into your application. Tailwind needs to scan the files containing your animation classes.
+
+### Prefer to be explicit?
+
+Register the plugin in CSS and finish the stylesheet with Jumi beside Tailwind's plugin:
+
+```css
+@import 'tailwindcss';
+@plugin "@ibnlanre/jumi";
+```
+
+```ts
+// vite.config.ts: Tailwind's entry, plus Jumi after it
+import tailwindcss from '@tailwindcss/vite'
+import { jumiFinalizer } from '@ibnlanre/jumi/vite'
+
+export default defineConfig({ plugins: [tailwindcss(), jumiFinalizer()] })
+```
+
+Both forms compile to the same CSS. Registration alone is not enough: `@plugin "@ibnlanre/jumi"` teaches Tailwind the utilities but never finishes the stylesheet, so the animations would compile to nothing. [Why there is a build step](/docs/build-step/) is what the second half does, and why Tailwind's plugin API cannot do it for you.
+
+### Using PostCSS instead?
+
+One entry replaces `@tailwindcss/postcss`:
+
+```js
+// postcss.config.js
+export default { plugins: { '@ibnlanre/jumi/postcss': {} } }
+```
+
+If `@tailwindcss/postcss` is already configured separately and you would rather not replace that
+entry, put `jumiFinalizer()` after it instead. Nothing registers Jumi in that shape, so the
+stylesheet still names the plugin: the same `@plugin "@ibnlanre/jumi";` as the explicit setup
+above:
+
+```js
+// postcss.config.js
+import tailwindcss from '@tailwindcss/postcss'
+import { jumiFinalizer } from '@ibnlanre/jumi/postcss'
+
+export default { plugins: [tailwindcss(), jumiFinalizer()] }
+```
+
+### Building with the Tailwind CLI?
+
+The CLI has no hook to finish in, so add one step after Tailwind writes its output:
+
+```js
+import { finalizeCss } from '@ibnlanre/jumi'
+
+const { css } = finalizeCss(readFileSync('dist/output.css', 'utf8'))
+writeFileSync('dist/output.css', css)
+```
+
+## 03: Make an entrance
+
+```html
+<div
+  class="motion-safe:animate-fade-in-up
+  animation-duration-[600ms]"
+>
+  Nice to see you.
+</div>
+```
+
+`motion-safe:` puts the animation behind the visitor's preference: it applies only when they have
+not requested reduced motion. The element stays visible otherwise, because only the animation is
+conditional.
+
+## 04: Add the runtime only where you need it
+
+Jumi is CSS and build-time right up to the point where your own state changes inside one document: a card
+taking the corner, a panel opening, a list reordering. That half needs someone to say _when_ the change
+happens, and it lives behind its own subpath so the root package stays free of runtime code:
+
+```ts
+import { createViewTransition } from '@ibnlanre/jumi/view-transition'
+
+const transition = createViewTransition()
+
+transition.run(() => {
+  setActive('bravo')
+})
+```
+
+[Same-document transitions](/docs/same-document-transitions/) is the whole of it: the synchronous-callback
+rule, what happens when it is called twice, and the outcomes it returns.
+
+## Using Astro
+
+Use Jumi's Vite integration in your Astro configuration:
+
+```js
+import { defineConfig } from 'astro/config'
+import jumi from '@ibnlanre/jumi/vite'
+
+export default defineConfig({
+  vite: { plugins: [jumi()] },
+})
+```
+
+Then import your main stylesheet in an Astro layout. See the [official Astro styling guide](https://docs.astro.build/en/guides/styling/#tailwind) for Tailwind setup.
+
+## Class names must be discoverable
+
+Write complete class names in your source. Tailwind cannot discover a class assembled from fragments such as `animate-${effect}`. Map choices to full class strings, or explicitly register them with Tailwind's `@source inline()` directive.
+
+```css
+@source inline("animate-bounce-in animate-fade-in animate-reveal-swipe");
+```
+
+## If nothing moves
+
+- Check that the element carries the motion utility, and that the variant is on that utility (
+  `motion-safe:animate-*`) rather than on an ancestor.
+- Check that your build includes the integration, not only the plugin. `@plugin "@ibnlanre/jumi"` on its own leaves the stylesheet unfinished, and the animations then compile to nothing, without an error.
+- Check that your stylesheet is imported by your app.
+- Use explicit units for arbitrary timing values: `animation-duration-[800ms]`.
+- Check whether reduced motion is enabled on your device.
+- Remember that a one-shot animation runs when applied. Remount the element or remove and reapply the animation to replay it.
+
+---
+
+# The build step
+
+Why there is a build step. Jumi is a plugin plus an integration, because the animation lists are assembled after Tailwind compiles. Here is what that means, and what it costs you.
+
+Source: https://jumi-css.vercel.app/docs/build-step/
+
+## Two pieces, two jobs
+
+Jumi ships a plugin and an integration, and they are not interchangeable:
+
+|                 | What it is                                                       | What it does                                                                                                 |
+| --------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| The plugin      | `@plugin "@ibnlanre/jumi"`                                       | Teaches Tailwind Jumi's utilities, so `animate-fade-in` and `animation-duration-[600ms]` compile to real CSS |
+| The integration | `jumi()` from `@ibnlanre/jumi/vite`, or `@ibnlanre/jumi/postcss` | Assembles the animation lists once every `animate-*` class has been compiled                                 |
+
+Wire up only the plugin and your utilities compile, your page has no animations, and nothing warns you. That is why the installation guide starts with the integration: it is the half that has to be there.
+
+## What the second step does
+
+Nothing in your markup says "assemble these". An element animates because it carries a motion
+utility, and the integration derives the composition from the finished stylesheet: every rule that
+declares a slot's activation variable is one of the selectors the composition is written for.
+
+```html
+<div class="animate-rotate-45 animate-fade-in">…</div>
+```
+
+```css
+.animate-rotate-45,
+.animate-fade-in {
+  animation-name:
+    var(--jumi-rotate-…-animation-name, var(--jumi-animation-name)),
+    var(--jumi-fade-in-…-animation-name, var(--jumi-animation-name));
+  animation-duration: …;
+  /* one entry per animated slot, for each longhand */
+}
+```
+
+Two things make that impossible to write while any single utility is being compiled. The lists depend
+on **which other classes are present**, and their order is the order the browser resolves them in:
+`animation-composition: replace` gives the last entry the win. Both facts are only settled at the end
+of the build.
+
+A second composition does the same for transitions: `transition-property/…` is what activates a
+motion, and the shorthand is composed from whichever motions the element declared. It has the
+identical problem (the list depends on which utilities exist), so it is assembled the same way.
+Everything below applies to both.
+
+## The three places that list could live
+
+There are only three, and each one gives up something:
+
+| Written…                                     | Locality                                                                                                                                       | Freshness                                                                                                   |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| **In the utility body**                      | ✓ the body travels with the class: `*:animate-*`, `before:animate-*` and `@apply animate-*` all carry it                                       | ✗ Tailwind caches a utility's output per candidate, so a list that depends on other classes is reused stale |
+| **In a separate rule at a literal selector** | ✗ the rule that needs it has moved: a variant re-parents the class body, so a rule written for the utility is not where `*:animate-*` ended up | ✓ it is rewritten whenever the lists change                                                                 |
+| **After Tailwind emits**                     | ✓ written for every selector the finished stylesheet proves animates, wherever that is                                                         | ✓ computed once every class has been compiled                                                               |
+
+The first two are complements rather than alternatives: locality wants the list inside the class, freshness wants it outside. That is the entire reason the step exists, and it is why no `@plugin` configuration can stand in for it.
+
+Said another way, four things have to be true at once: the lists must be **fresh**, and they must reach the element in the **direct**, **variant** and **`@apply`** cases. A Tailwind plugin callback runs per candidate, before the stylesheet is finished, so there is no point inside one that has all four.
+
+## What it leaves behind
+
+Nothing of Jumi's. The integration writes the assembled longhands into each rule, then removes the internal names it used to find them. What ships is the CSS above: ordinary `animation-*` declarations, next to the values your `animate-*` classes declared. No markers, no runtime, no JavaScript.
+
+## Where the step goes
+
+Anywhere that runs after Tailwind and before the CSS is served. Jumi ships an integration for each shape a build tends to take, and [Installation](/docs/installation/) has the exact wiring for all three. If you are migrating, the short version is that Jumi's Vite entry replaces Tailwind's:
+
+```diff
+- import tailwindcss from '@tailwindcss/vite'
++ import jumi from '@ibnlanre/jumi/vite'
+
+  export default defineConfig({
+-   plugins: [tailwindcss()],
++   plugins: [jumi()],
+  })
+```
+
+Because it is a plain step over CSS, it also composes with anything else that owns the stylesheet: another PostCSS plugin, a framework's build, or a `finalizeCss` call after the Tailwind CLI.
+
+> **Could Tailwind do this itself?** Not today. Its plugin API can add a base-layer rule, or a utility whose body variants move, but it offers no point at which a plugin sees the finished rules with the compiler's final state. A hook there would remove the need for an integration entirely; until then, this step is the price of the four properties above.
+
+---
+
+# Composing motion
+
+Compose, then compose again. Animate property targets directly. Give simple pieces a shared purpose.
+
+Source: https://jumi-css.vercel.app/docs/properties/
+
+## Pick a target
+
+Property utilities follow `animate-{property}-{value}`. Values come from the relevant Tailwind theme scale, built-in keywords, or arbitrary values in brackets.
+
+```html
+<div class="animate-color-red-600">Color</div>
+<div class="animate-width-[240px]">Width</div>
+<div class="animate-rotate-[0.25turn]">Rotation</div>
+<div class="animate-filter-blur-[8px]">Blur</div>
+<div class="animate-border-radius-[40px]">Corners</div>
+```
+
+Simple property animations generate a `to` keyframe. The starting point comes from the element's underlying styles. Set a useful starting value when the default does not interpolate as you expect.
+
+### Keyword sizes belong to the platform
+
+`auto`, `min-content`, `max-content` and `fit-content` interpolate only with `interpolate-size: allow-keywords`. Jumi does not set it for you, because the declaration is **inherited**: setting it on an element opts in everything beneath it, and that should be your decision rather than a side effect of animating something.
+
+```html
+<div class="interpolate-size-allow-keywords animate-width-auto w-[200px]">
+  Keyword target
+</div>
+```
+
+Without it the keyword still applies, but as a discrete change: the property holds its starting value and flips at the midpoint. `interpolate-size-numeric-only` stops a subtree inheriting the switch.
+
+A value that carries its own intrinsic size needs no switch at all:
+
+```html
+<div class="animate-width-[calc-size(auto,size+2rem)]">
+  Arbitrary intrinsic value
+</div>
+```
+
+## Separate properties, separate rhythms
+
+```html
+<div
+  class="animate-rotate-[180deg]
+  animate-scale-[0.75]
+  animation-duration-[3s]/rotate
+  animation-duration-[1s]/scale
+  animation-direction-alternate
+  animation-iteration-count-infinite"
+>
+  Two rhythms. One element.
+</div>
+```
+
+The `/rotate` and `/scale` modifiers target those property slots. A global control supplies the fallback for slots without an override.
+
+## Compose compound values
+
+Jumi assembles parts of compound CSS values through custom properties. For example, blur and brightness contribute to the same filter:
+
+```html
+<div
+  class="animate-filter-blur-[4px]
+  animate-filter-brightness-[1.2]
+  animation-duration-[900ms]/filter"
+>
+  A softer glow.
+</div>
+```
+
+These parts share a `filter` animation slot. Their timing belongs to `/filter`, not `/filter-blur` or `/filter-brightness`. The same distinction matters for parts of `transform`, shadows, and other compound properties.
+
+## Choose compatible effects
+
+An effect can animate several properties. Combining two effects that both write `transform` or `opacity` can cause one to replace the other. Use nested elements when you want independent effects on the same visual object.
+
+```html
+<div class="animate-fade-in">
+  <div
+    class="animate-spinning
+    animation-duration-[8s]
+    animation-timing-function-linear
+    animation-iteration-count-infinite"
+  >
+    ✳
+  </div>
+</div>
+```
+
+## Follow a path
+
+A motion path is a property you declare and a property you animate, and keeping those two apart is the whole of it. The path is where the motion happens; the distance is how far along it the element has got. Declare the path, animate the distance:
+
+```html
+<div
+  class="[offset-path:path('M0,0_L200,0_L200,200')]
+  animate-offset-distance-100
+  animation-duration-2000"
+></div>
+```
+
+The geometry is arbitrary, so anything the platform accepts is available: `path()`, `ray()`, `circle()`, `ellipse()`, `inset()`, `polygon()`, and the box keywords `border-box`, `padding-box`, `content-box`. `offset-path:border-box` needs no geometry at all; the element travels its own border box.
+
+Three properties describe the geometry, and they are written once rather than animated: `offset-path`, `offset-rotate` (`auto` turns the element to follow the tangent) and `offset-anchor`, which decides which point of the element rides the path. All of them are ordinary utilities with an arbitrary value, so nothing new has to be learned:
+
+```html
+<div
+  class="[offset-path:circle(60px)] [offset-position:50%_50%]
+  [offset-rotate:auto]
+  animate-offset-distance-100
+  animation-duration-[4s]
+  animation-iteration-count-infinite"
+></div>
+```
+
+Because the driver is an ordinary animation, everything else composes with it. Scroll works unchanged:
+
+```html
+<div
+  class="[offset-path:path('M0,0_L200,0_L200,200')]
+  animation-timeline-scroll
+  animation-range-[25%_75%]:animate-offset-distance-100"
+></div>
+```
+
+**A note for the adventurous.** `offset-path` is itself animatable _between two compatible paths_ (the same command list, different coordinates), so a path can morph as it is travelled. Animating it from `none`, though, is a discrete step: the element does not ease onto the path, it appears on it halfway through. Declare the path.
+
+## CSS still sets the boundaries
+
+A utility cannot make a non-animatable CSS property interpolate. Some properties change discretely, and properties such as width can trigger layout work. Use transform and opacity for frequent decorative motion where they suit the effect, and test more complex properties on your target devices.
+
+## Animate SVG dashes
+
+Dash patterns and dash offsets are ordinary property animations:
+
+```html
+<svg viewBox="0 0 240 80">
+  <path
+    d="M 10 40 H 230"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="4"
+    stroke-dasharray="4 8"
+    class="animate-stroke-dasharray-[12_4] animation-duration-[1200ms]"
+  />
+</svg>
+```
+
+`animate-stroke-dasharray-*` accepts `none`, numbers, lengths, percentages, and CSS dash lists.
+Use underscores for spaces inside arbitrary values; comma-separated lists also work. Dash lengths must
+be nonnegative. An odd-length list follows SVG's native repeated-list rules.
+
+`animate-stroke-dashoffset-*` accepts numbers, lengths and percentages, including negative offsets:
+
+```html
+<path
+  d="M 10 40 H 230"
+  fill="none"
+  stroke="currentColor"
+  stroke-dasharray="8 4"
+  class="-animate-stroke-dashoffset-[12px]"
+/>
+```
+
+Both properties support phrases, named motion instances and normal timing controls:
+
+```html
+<path
+  d="M 10 40 H 230"
+  fill="none"
+  stroke="currentColor"
+  stroke-dasharray="8 4"
+  class="animate-stroke-dashoffset-[0:12|40:4|100:0]/trace
+         animation-duration-[2s]/trace
+         animation-timing-function-linear/trace"
+/>
+```
+
+These utilities do not measure paths or turn percentages into path-length progress. SVG percentages use
+its viewport-based reference, not the total length of a path. For a stroke-drawing recipe, establish an
+explicit `pathLength`/dash convention on your asset first. Existing dash styling and multiple subpaths
+matter. Jumi exposes the CSS properties; it does not supply a universal `draw` preset.
+
+---
+
+# Reveals & exits
+
+Reveal the surface. Keep the content still. Angular wipes, parallel apertures, hinge exits and a feathered-mask recipe.
+
+Source: https://jumi-css.vercel.app/docs/reveals/
+
+## Sweep an angle
+
+```html
+<div class="motion-safe:animate-radial-wipe-in animation-duration-[900ms]">
+  Stationary content, opening clockwise from the top center.
+</div>
+```
+
+`radial-wipe-in` changes angular coverage around the center. It does not rotate the content or expand a
+circle. `radial-wipe-out` runs that geometry toward concealment. Both own only `clip-path`.
+
+The implementation uses a fixed polygon fan, with a boundary moving around the box in eight equal
+segments. This is a perimeter-timed angular wipe, not constant angular velocity; a wide or tall box
+changes the apparent sweep speed. The fully visible endpoint includes the whole rectangle.
+
+Use `animation-direction-reverse` when you want the exact reversed playback. No separate start-angle
+or corner variants are implied.
+
+## Open parallel strips
+
+```html
+<div class="motion-safe:animate-blinds-in-y animation-duration-[800ms]">
+  Five horizontal apertures open vertically.
+</div>
+<div class="motion-safe:animate-blinds-in-x animation-duration-[800ms]">
+  Five vertical apertures open horizontally.
+</div>
+```
+
+`blinds-in-x`, `blinds-out-x`, `blinds-in-y`, and `blinds-out-y` reveal or conceal one stationary element
+through five parallel strips. The axis names the direction in which each aperture opens. Content is
+not sliced, duplicated or shifted; the effect changes one `clip-path` polygon. Strip count is fixed.
+
+Unlike `reveal-*` or `unmask`, these effects have several apertures at once. They do not change stripe
+frequency or stagger child elements.
+
+## Let an attachment give way
+
+```html
+<div
+  class="motion-safe:animate-hinge-drop motion-reduce:opacity-0
+            animation-duration-[1400ms]"
+>
+  An outgoing decorative card.
+</div>
+```
+
+`hinge-drop` is an exit: the top-left attachment stays in place while the surface swings, then the
+surface releases and drops while fading. It owns `transform`, `transform-origin`, opacity and local
+segment easing. Translation starts at 70% of the timeline; the final drop is 120% of the element's own
+height. It does not promise to travel beyond the viewport.
+
+This differs from a swing that settles back to rest or a fall that lands. There is no entrance inverse.
+Use it sparingly for expressive dismissal, not as the default for every notification.
+
+## Compose with care
+
+The reveal effects own `clip-path`; another clip animation on the same element competes with them.
+The hinge owns transform and opacity, so another effect writing those properties can replace part of
+its motion. A named motion gives you timing control, not automatic conflict resolution. Use a wrapper
+when you need independently moving and clipped surfaces.
+
+Clipping also clips descendants and decorations such as shadows. None of these visual exits removes
+layout, manages focus or removes an element from the DOM. SVG transforms need a deliberate
+`transform-box` and origin; the hinge's default attachment is designed around a rectangular HTML box.
+
+## Feather a wipe with native CSS
+
+A soft reveal needs a mask, not blurred content. Keep the mask setup visible and animate its position
+with the existing property API; there is no named `feather-wipe` effect.
+
+```css
+@media (prefers-reduced-motion: no-preference) {
+  [data-feather='x'] {
+    mask-image: linear-gradient(90deg, #000 45.454545%, transparent 54.545455%);
+    mask-size: 220% 100%;
+    mask-repeat: no-repeat;
+  }
+  [data-feather='y'] {
+    mask-image: linear-gradient(
+      180deg,
+      #000 45.454545%,
+      transparent 54.545455%
+    );
+    mask-size: 100% 220%;
+    mask-repeat: no-repeat;
+  }
+}
+```
+
+The `data-feather` hook is an example selector; use whatever reaches your element.
+
+```html
+<div
+  data-feather="x"
+  class="motion-safe:animate-mask-position-[0:100%_0%|100:0%_0%]
+         animation-duration-[900ms] animation-timing-function-linear"
+>
+  Horizontal feather. Text remains sharp outside the soft band.
+</div>
+<div
+  data-feather="y"
+  class="motion-safe:animate-mask-position-[0:0%_100%|100:0%_0%]
+         animation-duration-[900ms] animation-timing-function-linear"
+>
+  Vertical feather.
+</div>
+```
+
+The mask is 2.2 times the element's size on the moving axis: one element-length of opaque mask, a
+0.2-length feather, then one length of transparent mask. Moving it from 100% to 0% gives fully hidden
+and fully visible endpoints without a repeated-mask leak. Reverse the animation for a concealment.
+
+This recipe intentionally exposes mask ownership, direction and feather width. Existing masked assets
+need an explicit composition decision. Masking may require painting large surfaces; keep the affected
+area modest and test target devices.
+
+## A clip lasts as long as the fill does
+
+`mask-*` conceals the element down to a band, `unmask` opens out of one, and the `-out` exits end
+concealed. Each of them holds that endpoint only because the default `animation-fill-mode` is
+`forwards`: with `animation-fill-mode-none` the clip is released the moment the animation ends and the
+element returns to its unclipped shape, the whole surface back for `mask-center`, a full box for
+`diamond-out` or `triangle-out`. If a departure should stay gone, keep the fill, or remove the element
+and animate whatever replaces it.
+
+The entrances in this family no longer hold a half-visible window. `diamond-in` and the five
+`triangle-in` variants grow past the element's corners, so their final frame covers the whole box and
+releasing the clip changes nothing, the same way `circle-in`, `square-in`, `reveal-*`,
+`radial-wipe-in` and `blinds-in-*` already reached full coverage. The `-out` variants are their exact
+reversals, so they start at full coverage and conceal from there.
+
+## Reduced motion and final state
+
+The entrance examples use `motion-safe:` with visible base content. The feather setup itself is also
+inside the preference query so a disabled animation cannot leave a static mask hiding the content.
+
+For exits, choose the final state explicitly. For example, `motion-reduce:opacity-0` hides an outgoing
+surface immediately while application code handles removal and focus. Do not apply an unconditional
+hidden base style to an entrance. See [accessible motion](/docs/accessibility/).
+
+---
+
+# Sized effects
+
+Size is part of the effect. What accordion, typing and the expand family need from the box they animate.
+
+Source: https://jumi-css.vercel.app/docs/sizing-effects/
+
+## Percentages belong to the container
+
+`accordion`, `typing` and the four `expand-*` effects animate a dimension: `max-height`, `width` or
+`height`. Nothing about them is unusual except where the number comes from. A percentage resolves
+against the **containing block**, and a `max-height` ramp ends at a number somebody typed, so these
+are the effects whose motion is decided partly by the layout around them.
+
+## Grow a box from its leading edge
+
+```html
+<div class="w-[320px]">
+  <div
+    class="motion-safe:animate-expand-right animation-duration-[600ms]
+           h-2 rounded-full bg-black"
+  ></div>
+</div>
+```
+
+`expand-left` and `expand-right` animate `width` from `0%` to `100%`; `expand-up` and `expand-down`
+animate `height`. All four grow from the **leading edge** of the box: the left edge for the
+horizontal pair, the top edge for the vertical pair. A percentage width extends from the box's start
+edge, and no `transform-origin` can move it, so the effect has no far-edge anchor to declare.
+
+That means the pair share one geometry: `expand-left` grows rightward exactly as `expand-right` does,
+and `expand-down` grows downward exactly as `expand-up` does. Pick the name that matches how your
+layout reads, not a physical direction you expect the box to travel. A box that grows toward its far
+edge needs to be positioned at that edge, which these keyframes do not do: animate `width` in your
+own keyframes, or put the box in a container that is already anchored where you want it.
+
+`100%` is the containing block's width, so the reveal ends at the size of the container rather than
+the size of the content. Give the container the dimensions you want the motion to land on.
+
+## Type on a line that is already the right width
+
+```html
+<div class="inline-block">
+  <span
+    class="motion-safe:animate-typing animation-duration-[1200ms]
+           overflow-hidden whitespace-nowrap font-mono"
+  >
+    Typing needs a box.
+  </span>
+</div>
+```
+
+`typing` animates `width` from `0` to `100%`, and two properties of that number decide how it reads.
+
+- **`100%` is the containing block's width.** In a full-width parent the box keeps growing after the
+  text has finished appearing: measured, a 46.7px line inside a 320px column is fully visible at
+  about 11% of the timeline, and the remaining 89% is empty layout growth. Text wider than its
+  containing block never finishes visually, because `overflow: hidden` clips at the container's edge
+  rather than at the text's own edge.
+- **The reveal needs `overflow: hidden` and `white-space: nowrap`.** Without the first the text is
+  never clipped; without the second the line wraps and the clip reads as a vertical wipe instead of
+  typing.
+
+Both are cured by the same move: give the element a **shrink-wrapped parent**, `inline-block` or
+`width: fit-content`, so the parent's width is the text's own width. Then `100%` is the length of
+the line and the animation ends exactly when the last character appears.
+
+## Open a panel on a fixed ramp
+
+`accordion` animates `max-height` from `0` to `1000px` through a `500px` stop, with `scaleY` from
+`0` to `1.1` to `1`, `opacity` from `0` to `0.8` to `1`, and `transform-origin: top` in every stop so
+the panel unfolds downward from its top edge.
+
+The ceiling is a number, not `auto`, and that is visible in two ways:
+
+- **Content taller than 1000px stays at the ceiling.** The default `forwards` fill holds the final
+  value, so a taller panel keeps a 1000px box; with `overflow: hidden` (which an accordion panel
+  normally needs anyway), everything past that edge is cut off, for as long as the value is held.
+- **Short content finishes early.** Measured, a 40px panel is fully open at about 5% of the timeline,
+  and the remaining 95% is layout growth you cannot see.
+
+Size the ramp to the content. A panel that has to exceed 1000px needs its own keyframes (`accordion`
+is a keyframe first, and the ceiling is part of it), or a different reveal such as `fade-in-up` when
+the height itself does not need to move. The pivot is the top edge in all three stops, so the panel
+grows downward; if you set a `transform-origin` of your own, the keyframes override it for as long as
+the animation runs.
+
+See [timing & controls](/docs/controls/) for `animation-fill-mode` and the rest of the defaults.
+
+---
+
+# Timing & controls
+
+Give motion a rhythm. Control how an animation begins, travels, repeats, and settles.
+
+Source: https://jumi-css.vercel.app/docs/controls/
+
+## The essential controls
+
+| Utility    | Example                              | Purpose                                |
+| ---------- | ------------------------------------ | -------------------------------------- |
+| Duration   | `animation-duration-[800ms]`         | Length of one iteration                |
+| Delay      | `animation-delay-[200ms]`            | Time before starting                   |
+| Easing     | `animation-timing-function-ease-out` | Acceleration through the motion        |
+| Iterations | `animation-iteration-count-3`        | Number of repeats                      |
+| Direction  | `animation-direction-alternate`      | Alternate forwards and backwards       |
+| Fill       | `animation-fill-mode-both`           | Apply endpoint styles before and after |
+| Playback   | `animation-play-state-paused`        | Pause an animation                     |
+
+Defaults are a 1-second duration, one iteration, normal direction, and forwards fill. Forwards fill preserves the final animated value after completion.
+
+## One motion, many personalities
+
+```html
+<div
+  class="animate-rotate-90 animation-duration-1400 animation-timing-function-ease-in-out animation-direction-alternate animation-iteration-count-infinite"
+>
+  Back and forth.
+</div>
+```
+
+Use `animation-timing-function-linear` for steady rotation. Try `animation-timing-function-ease-out-back` for a curve with overshoot, or an arbitrary `cubic-bezier()` value for a custom feel.
+
+```html
+<div class="animate-scale-110 animation-timing-function-ease-out-quint">
+  Settle into place.
+</div>
+```
+
+## Target a property or effect
+
+Append `/{property}` or `/{effect}` to timing controls:
+
+```html
+<div
+  class="animate-rotate-45 animate-scale-110 animation-duration-500 animation-duration-1200/rotate"
+>
+  Scale at 500ms. Rotate at 1200ms.
+</div>
+```
+
+Any motion can be named, and the name goes after a slash: `animate-fade-in/reveal`, `animate-opacity-50/reveal`, `animate-rotate-[0:0deg|12:-8deg|100:-8deg]/reveal`. `[brackets]` are only for a name that needs them: a name is one word, so you can write it directly.
+
+When one property carries more than one animation, name each where you declare it and address it by that name:
+
+```html
+<div
+  class="animate-rotate-[0:0deg|12:-8deg|100:-8deg]/flick
+  animate-rotate-[0:0deg|12:0deg|100:8deg]/return
+  animation-composition-add/rotate
+  animation-timing-function-ease-in-out-circ/flick
+  animation-timing-function-linear/return"
+>
+  A flick that lands, then a plain return.
+</div>
+```
+
+`/flick` gives that animation a name, and the same name on a control times it on its own. Each animation reads its own name first, then the property's control, then the global one, so anything else in the list is left alone, and naming one does not change its phrase.
+
+A name belongs to the motion that declared it, on the element that wrote it. Two elements may use the same word for different motions, and naming a motion elsewhere in your stylesheet never widens what this element answers to. Two motions on one element may also share a name, and then a control written for that name reaches both, which is how a transition of several properties is tuned as one thing.
+
+The name is yours to choose, and a control reads it the same way whether you write `/rotate` or `/flick`. They resolve differently, and that is the one rule to know: a word that is a property Jumi can animate (`rotate`, `scale`, `filter`) is that property's, so every motion animating it answers; any other word is a name, and only the motion that declared it answers. `--jumi-rotate-animation-timing-function` is the variable every rotate animation reads, and a name is reached at `--jumi-label-flick-animation-timing-function`, which no property can occupy. Give each animation you want to time apart its own word, and make it a word that is not a property.
+
+That rule is why a name can never be half-shared. `animate-rotate-45/scale` names a rotate motion `scale`, and `/scale` on a control is the scale property's in every stylesheet, so the name does not steal it; the build tells you instead, and the motion keeps the timing of whatever addresses rotate.
+
+Naming is registered non-inheriting: a name does not travel into descendants, so a wrapper and the element inside it can use the same word without knowing about each other.
+
+The three links do not behave alike across that boundary. A `/{property}` control on a wrapper does reach the animations inside it, because nothing declares `--jumi-{property}-animation-{part}` on the element, so the value it writes is inherited. A global control does not: every animating element declares the global defaults itself, and a declaration beats inheritance. A name never does.
+
+Naming a motion that is not there is not an error: controls configure motion, they do not create it, so `animation-duration-500/reveal` with nothing named `reveal` on the element does nothing at all, exactly like `animation-duration-500`. That is what makes a named control beside a conditional motion (`motion-safe:animate-fade-in/reveal`) ordinary rather than suspect. A name that cannot be written, though, is reported and dropped: a name becomes part of a custom property's name, and whitespace cannot appear there, which is what an underscore becomes inside `[brackets]`, so write a name bare.
+
+Reach for naming when one easing is not enough. A single `animation-timing-function` applies to every segment of an animation, so pairing an eased flick with a linear return takes two animations, each with one moving segment. `animation-composition: add` lets both apply at once instead of the second replacing the first.
+
+The name is written into the rule, so you can retime or re-ease that animation from your own CSS without touching the markup:
+
+```css
+.petal {
+  --jumi-label-flick-animation-duration: 900ms;
+}
+```
+
+## Write the shape of the animation
+
+A value can declare its own frames (an offset, a colon, a value), so one utility describes the whole motion:
+
+```html
+<div
+  class="animate-rotate-[0:0deg|50:0deg|100:45deg]
+  animation-duration-2000
+  animation-iteration-count-infinite"
+>
+  Rest, then turn one way over the second half.
+</div>
+```
+
+Frames are separated by pipes, each written `<offset>:<value>`, so a
+comma-separated value list cannot be mistaken for a phrase. The offset is a bare number, the `%` is implied, and `0` and `100` are the endpoints. Any offset you leave out is the property's resting value, so a phrase holds still until its first frame and closes itself at the end. That is what makes it safe to run `infinite`: the loop has no seam. An offset outside `0`-`100` is reported and dropped: the motion emits nothing, and the build warns with the class and the offset it refused rather than handing the browser a frame it will throw away.
+
+A phrase owns its property, and its keyframe is named after the phrase, so nothing else can share it. Two elements running the same phrase run the same keyframe; a different phrase gets a keyframe of its own. No other markup can change what your animation does, which is also why you write one phrase per property per element rather than layering several.
+
+A phrase works wherever a value works, for any property in the table, including the ones whose values are lengths or colours, such as `animate-offset-distance-[0:0%|100:100%]` or `animate-background-color-[0:red|100:blue]`. The two spellings are validated differently, and deliberately so: an ordinary arbitrary value is checked against the property's CSS type, so `animate-offset-distance-[50%]` is accepted and `animate-offset-distance-[abc]` is not, while a phrase is checked against Jumi's own grammar (`offset:value` pairs) and its values are left to the browser.
+
+Placing an action inside the cycle, rather than spreading it across the whole of it, is what this is for. A step earlier in the phrase is a step later in the cycle:
+
+```html
+<div
+  class="animate-scale-[0:0.5|50:1.1|100:1]
+  animate-opacity-[0:0|50:1|100:1]
+  animation-duration-2600
+  animation-iteration-count-infinite"
+>
+  Gather, overshoot, settle, and arrive while it settles.
+</div>
+```
+
+A property that takes several values takes all of them at each frame, with `_` standing in for the space: `animate-scale-[0:0.42_0.30|50:1.03_1.03]` scales both axes together.
+
+This site's hero is built this way. A wrapper around each petal carries a slow, seamless winding, and the petal inside it carries the flick:
+
+```html
+<div
+  class="petal-position
+  animate-rotate-[0:var(--angle)|100:calc(var(--angle)_-_360deg)]
+  animation-duration-[75s]
+  animation-timing-function-linear
+  animation-iteration-count-infinite"
+  style="--angle:0deg"
+>
+  <div
+    class="petal
+    animate-rotate-[0:0deg|20:-8deg|100:-8deg]/flick
+    animate-rotate-[0:0deg|20:0deg|100:8deg]/return
+    animation-composition-add/rotate
+    animation-duration-3000
+    animation-timing-function-[cubic-bezier(.4,0,.6,1)]/flick
+    animation-timing-function-linear/return
+    animation-iteration-count-infinite"
+    style="--jumi-animation-delay:-250ms"
+  ></div>
+</div>
+```
+
+The wrapper turns a full circle over `75s`, ending exactly one turn from where it starts, so its loop has no seam and the petals can wind continuously in one direction. The petal's own two animations are symmetric (back `8deg`, then forward to rest), so the winding is what keeps the composed rotation moving the same way throughout.
+
+The petals are staggered `250ms` apart, one twelfth of the `3s` cycle, so each flick overlaps the next and the motion travels around the ring rather than arriving everywhere at once.
+
+A phrase is a value, so it can live in your theme and be referenced by name:
+
+```js
+theme: {
+  rotate: {
+    unfurl: '0:16deg,58:0deg'
+  }
+}
+```
+
+```html
+animate-rotate-unfurl
+```
+
+That is the shorter spelling when one phrase is used on several elements, and it keeps the frames in a single place.
+
+## Timelines and composition
+
+Three declarations, three questions, and keeping them apart is the whole of this feature:
+
+```text
+animation  ────────►  what motion happens
+animation-timeline ─►  what drives its progress
+animation-range ────►  where on that driver the motion runs
+```
+
+A motion is not written differently because a scroll drives it. The same `animate-fade-in` is scrubbed by scroll position instead of by time the moment a timeline names the driver:
+
+```html
+<div class="animate-fade-in animation-timeline-view"></div>
+```
+
+`animation-timeline-scroll` follows the nearest scroller, `animation-timeline-view` tracks the element through its scrollport, and `animation-timeline-[--name]` consumes a timeline the page declares in its own CSS. A timeline can be given to one animation on an element and not its neighbour with `/{property}` or `/{label}`, exactly as the timing controls are.
+
+### Choosing the scroller, and where tracking starts
+
+Three controls say more about the driver itself. `animation-timeline-scroller` picks which scroller a `scroll()` timeline takes (`-nearest`, `-root` for the document, or `-self`), and `animation-timeline-axis` picks the axis it follows:
+
+```html
+<div
+  class="animate-fade-in animation-timeline-scroll animation-timeline-scroller-root animation-timeline-axis-inline"
+></div>
+```
+
+For a `view` timeline, the insets place where tracking begins and ends inside the scrollport:
+
+```html
+<article
+  class="animate-fade-in animation-timeline-view animation-timeline-inset-start-[10%] animation-timeline-inset-end-[25%]"
+></article>
+```
+
+Both insets take a `<length-percentage>`, and it is usually a percentage: start tracking once the element is 10% into the scrollport and stop at 25%. Everything here is a control: it configures a timeline, it does not give one, so it does nothing on an element that names no driver.
+
+### Declaring a named timeline
+
+The declaration side is plain CSS on the scroller, and Jumi does not wrap it. Name the timeline where the scrolling happens, then consume it from anywhere inside that element:
+
+```css
+.overflow-y-auto {
+  scroll-timeline-name: --feed;
+  scroll-timeline-axis: block;
+}
+```
+
+```html
+<div class="h-64 overflow-y-auto">
+  <article class="animation-timeline-[--feed] animate-opacity-100">…</article>
+</div>
+```
+
+Two things are worth being precise about, because both are easy to get subtly wrong.
+
+```text
+--feed in scroll-timeline-name   → a <dashed-ident> timeline name
+--feed in animation-timeline     → a reference to that name
+var(--feed)                      → a custom property reference, which is a different thing
+(--feed)                         → Tailwind's shorthand for var(--feed), so also a custom property
+```
+
+The dashed syntax looks like a custom property and is not one: `scroll-timeline-name` computes to `none` on a child of the scroller rather than inheriting, and nothing about `var()` applies. Bracket the name (`animation-timeline-[--feed]`) because it is an arbitrary CSS value, which is exactly what the name is. The parenthesised spelling is not an alternative for it: `(--feed)` means `var(--feed)`, a custom property reference rather than a timeline name, and on the timeline control it carries no declaration at all. Two similar-looking spellings, two unrelated meanings: bracketed for a name.
+
+A named timeline is visible to the **descendants** of the element that declares it, and to nothing else: not to its siblings, not to the rest of the document. `timeline-scope` is the property that would widen that, and in current Chromium it parses and computes without widening resolution, so there is no cross-subtree workflow to build on yet: declare the timeline on an element the animated content lives inside.
+
+A range then places the motion along that driver. The arbitrary form is the value itself, so it is the one to reach for whenever a range has an offset in it:
+
+```html
+animation-range-[entry_0%_cover_50%] animation-range-start-[entry_25%]
+animation-range-end-[exit_75%]
+```
+
+For a range with no offset, the range names are the utilities:
+
+```html
+animation-range-entry animation-range-cover animation-range-contain
+animation-range-exit animation-range-start-entry animation-range-end-exit
+```
+
+and an offset on its own is its own utility: `animation-range-start-offset-25` makes the motion start 25% into the default range, and `animation-range-end-offset-75` ends it 75% in.
+
+Those utilities place the element's animations. To place **one** of them and leave its neighbours where they are, the same vocabulary works as a prefix on the motion itself:
+
+```html
+<div
+  class="animate-fade-in animate-rotate-45 animation-timeline-scroll animation-range-[25%_75%]:animate-fade-in"
+></div>
+```
+
+The fade is scrubbed between 25% and 75% of the scroll while the rotation beside it still fills the whole range. The two spellings compose rather than compete: a ranged motion falls back to the element's range, which falls back to the whole range, so `animation-range-entry:animate-fade-in` says _this animation uses the entry range_, and `animation-range-entry` says _this element's animations do_.
+
+A range Jumi cannot write is reported and dropped: the motion it qualified still runs, on the default range. That matters most for a range that looks legal and is not: `normal` joined to an offset, as in `animation-range-[normal_0%]`, is dropped by the engine without a word, so the warning is the only thing that tells you the range you wrote is not the range you got.
+
+**Fallback:** If the browser does not support scroll-driven timelines, the animation falls back to the document timeline and runs as a normal time-based animation.
+
+That is a real fallback rather than a transparent one: the animation and its final state are kept, but a view-driven entrance plays on load instead of tracking entry. When you want scroll-driven or nothing, put the motion and its timeline behind one capability query:
+
+```html
+<div
+  class="supports-[animation-timeline:scroll()]:animate-fade-in supports-[animation-timeline:scroll()]:animation-timeline-scroll"
+></div>
+```
+
+Inside the query the pair applies together and the motion is scrubbed; outside it neither applies, so the element keeps its base state and the motion never runs. There is no separate strict syntax for this: the guard is the whole mechanism, and it works because both halves are ordinary utilities.
+
+Composition is not how Jumi combines several values of one property: a phrase is. Use `animation-composition` to blend an animation with a value already on the element, or to apply two animations of one property at once, as in the labelled example above.
+
+Composition, timeline and range are assembled per animation, alongside duration, delay, easing, iteration, direction, fill and playback, so `/{property}` and `/{label}` reach them the same way.
+
+On a scroll-driven animation the time controls are reinterpreted rather than ignored: 100% of the timeline is the animation's own end, so `animation-delay` becomes a share of the scroll that also shortens the motion, and `animation-iteration-count` divides the range. Stagger is delay-based, so a staggered group is staggered along the scroll the same way: each child's motion is compressed into its own share. Reach for `animation-range` when you want to place a motion deliberately.
+
+## Pause long-running motion
+
+Give visitors a way to stop decorative loops. This site uses a pause button that applies `animation-play-state: paused` to its Jumi elements, alongside a reduced-motion stylesheet.
+
+---
+
+# Stagger
+
+A chain reaction. One motion, passed from child to child. No JavaScript loop required.
+
+Source: https://jumi-css.vercel.app/docs/stagger/
+
+## Forward stagger
+
+Put the stagger utility on the parent and the children's animation on it too; `*:` applies a utility to every direct child:
+
+```html
+<div class="animate-stagger-forward-[120ms]/3 *:animate-bounce-in">
+  <div>One</div>
+  <div>Two</div>
+  <div>Three</div>
+</div>
+```
+
+The delays are 0ms, 120ms, and 240ms. The `/3` count allows Jumi to generate a fallback for browsers without CSS sibling functions.
+
+## Reverse the order
+
+```html
+<div class="animate-stagger-backward-[150ms]/3 *:animate-fade-in-up">
+  <div>Last</div>
+  <div>Second</div>
+  <div>First</div>
+</div>
+```
+
+## Adaptive lists
+
+Omit the count to use a single rule based on `sibling-index()` and `sibling-count()`:
+
+```html
+<div class="animate-stagger-forward-[100ms]">
+  <!-- Any number of animated direct children -->
+</div>
+```
+
+This form requires support for those CSS functions. Use an explicit count when you need the `:nth-child` fallback. Keep that count aligned with the number of children you intend to stagger.
+
+## Keep the relationship direct
+
+The delay variable is written to direct children. If you add wrappers, move the stagger parent closer to the animated elements. An explicit global animation delay on the child overrides the stagger delay fallback.
+
+---
+
+# Transitions
+
+Between one state and another. Smooth the change on hover, focus, or any other change of style.
+
+Source: https://jumi-css.vercel.app/docs/transitions/
+
+## Activate transitions
+
+Choose the transition property, then set the duration:
+
+```html
+<button
+  class="transition-property/background-color
+  transition-duration-[300ms]
+  bg-lime-300 hover:bg-lime-200 focus-visible:bg-lime-200"
+>
+  Take a closer look.
+</button>
+```
+
+The transition starts when the property's underlying value changes. Unlike a named effect, it does not play just because the element appears.
+
+## Controls do not create a transition
+
+`transition-property/…` is what says which properties transition. Everything else configures it, and on its own it does nothing:
+
+```html
+<!-- configures duration only; no transition by itself -->
+<div class="transition-duration-500">
+  <!-- transitions all changing properties for 500ms -->
+  <div class="transition-property/all transition-duration-500"></div>
+</div>
+```
+
+The same holds for animations: `animation-duration-500` says how long an animation should take if the element has one, and does not give it one.
+
+## Delay, easing, and discrete properties
+
+`transition-delay` and `transition-timing-function` are the other two halves of the same shape as `transition-duration`, and both take the `/{property}` scope:
+
+```html
+<button
+  class="transition-property/background-color
+  transition-property/scale
+  transition-duration-[200ms]/background-color
+  transition-delay-[80ms]/background-color
+  transition-timing-function-ease-out/scale
+  bg-lime-300 hover:bg-lime-200
+  hover:scale-110"
+>
+  A delayed colour and a lifted card.
+</button>
+```
+
+A property the browser cannot interpolate (`display` is the usual one) does not transition at all unless you say it may:
+
+```html
+<div
+  class="transition-property/display transition-duration-300 transition-behavior-allow-discrete"
+></div>
+```
+
+With that, the flip is placed so the content stays on screen: at the start on the way in, at the end on the way out. That is what makes appear-and-disappear work as a transition rather than as an animation. The one thing it cannot supply is the before-style a first render has nothing to travel from: `@starting-style` is plain CSS and belongs in your own stylesheet, next to the markup it describes. `transition-behavior-normal` is the default.
+
+Where the property is unknown, the declaration is ignored, and a discrete property simply does not transition: the change still happens, instantly. Everything else on this page is unaffected, since nothing else here is conditional on it.
+
+## Independent timing
+
+```html
+<button
+  class="transition-property/background-color
+  transition-property/scale
+  transition-duration-[200ms]/background-color
+  transition-duration-[500ms]/scale
+  bg-lime-300 hover:bg-lime-200
+  hover:scale-110 focus-visible:scale-110"
+>
+  A little lift.
+</button>
+```
+
+You can scope `duration`, `delay`, and `timing-function` to the same property name. Tailwind v4's scale utility changes the individual `scale` property, so use `/scale` for that transition.
+
+## Be selective
+
+`transition-property/all` is available when you intentionally want every transitionable property. Explicit property lists make it easier to understand which changes should move.
+
+Remember keyboard interactions. Give focus states the same care as hover states, and [reduce nonessential motion](/docs/accessibility/) for visitors who request it.
+
+---
+
+# View transitions
+
+Between one page and another. Animate the browser's own view transition, on the outgoing and incoming sides.
+
+Source: https://jumi-css.vercel.app/docs/view-transitions/
+
+## Name the visual
+
+A view transition animates the browser's snapshot of an element rather than the element itself.
+`hero` names the visual across the transition, `old` styles the outgoing snapshot and `new` styles the
+incoming one, and Jumi handles the generated view transition pseudo-elements for you.
+
+```html
+<div
+  class="view-transition-old/hero:animate-fade-out view-transition-new/hero:animate-fade-in"
+>
+  hero
+</div>
+```
+
+The name after the `/` is yours (`hero`, `my-card-2`, whatever the thing is), and the motion after the
+`:` is an ordinary Jumi class. An effect, a phrase, an arbitrary value, all work as they do anywhere
+else:
+
+```html
+<!-- the card leaves by shrinking and arrives by growing -->
+<div
+  class="view-transition-old/card:animate-scale-90 view-transition-new/card:animate-scale-110"
+></div>
+```
+
+Either side on its own is fine. With only `view-transition-new/…`, the outgoing side keeps the browser's
+own cross-fade, which is usually what you want when the old state simply disappears.
+
+## The name is a claim on the document
+
+Choosing a name is not labelling the element, because the name is the only thing linking the two halves
+of this. The browser addresses a snapshot _only_ by name ( `::view-transition-old(hero)` is the one
+selector there is for it), so a candidate attaches its motion to whatever carries that name in the
+document, including an element it has never seen:
+
+```css
+/* elsewhere in the same document: this element animates with Jumi's motion as well */
+.card {
+  view-transition-name: hero;
+}
+```
+
+Nothing about that is visible at the call site, in either direction, so the rule is worth stating plainly:
+**a name handed to a candidate is spoken for.** Keep it distinct from the names you write yourself.
+
+Two elements sharing one name is the same mistake in its other form, and it fails differently: the
+browser refuses that transition outright rather than animating the wrong thing, so it arrives as a console
+error about a duplicate name rather than as a difference you can see.
+
+[See it on a layout that actually moves ↗](/demo/view-transitions/): six cards, a real layout shift, and
+a switch between this and the browser's own behaviour.
+
+## Controls do not create a transition
+
+The two sides are independent, so each takes its own controls:
+
+```html
+<div
+  class="view-transition-old/hero:animate-fade-out view-transition-old/hero:animation-duration-300 view-transition-new/hero:animate-fade-in view-transition-new/hero:animation-duration-500"
+></div>
+```
+
+And as everywhere else in Jumi, a control on its own does nothing: it configures a duration for an
+element that would need a motion to have one:
+
+```html
+<!-- configures duration only; this element does not participate -->
+<div class="view-transition-old/hero:animation-duration-300"></div>
+```
+
+## When it applies
+
+Ordinary conditional variants work, and each one applies to the side it is written on:
+
+```html
+<div
+  class="sm:view-transition-old/hero:animate-fade-out view-transition-new/hero:animate-fade-in"
+></div>
+```
+
+Above the breakpoint both sides are yours. Below it the outgoing side keeps the browser's own
+cross-fade rather than going quiet, so the transition still reads as a transition; it just stops being
+yours on that side.
+
+## Reduced motion
+
+A `motion-safe:` motion runs for readers who have not asked for less motion, and the element takes part
+in the transition either way:
+
+```html
+<div
+  class="motion-safe:view-transition-old/hero:animate-fade-out motion-safe:view-transition-new/hero:animate-fade-in"
+></div>
+```
+
+`motion-reduce:` is not available here. Jumi has already decided that its own view transition motion
+does not run under reduced motion, and the browser's cross-fade is what remains, so a candidate asking
+for the opposite is reported rather than accepted.
+
+## Across two pages
+
+Everything above works within one page. For a navigation (one document to another), the page opts in
+the way the platform requires, and nothing else changes:
+
+```css
+@view-transition {
+  navigation: auto;
+}
+```
+
+## When Jumi cannot honour a candidate
+
+Two things have no meaning on the browser's snapshot rather than on your element, and both are reported
+as a build warning naming the candidate, rather than accepted and animated some other way:
+
+- a name the browser will not accept, including the reserved words: `none`, `auto`, and the CSS-wide
+  keywords
+- a variant that depends on the element's own state, such as `hover:` or `group-hover:`; there is no
+  element on the other side for `:hover` to be about
+
+---
+
+# Same-document
+
+Same-document transitions. One wrapper around your state change, and the browser does the rest.
+
+Source: https://jumi-css.vercel.app/docs/same-document-transitions/
+
+## The half CSS cannot do
+
+[View transitions](/docs/view-transitions/) are CSS until the moment the thing that moves is your own
+application state. A navigation is the browser's business (`@view-transition { navigation: auto }` and the
+two documents are captured for you), but swapping a card, opening a panel, or reordering a list happens
+_inside_ one document, and the browser cannot see it happen. It needs a before and an after, which means
+someone has to say when the change is.
+
+Create a transition controller and run the state change through it:
+
+```ts
+import { createViewTransition } from '@ibnlanre/jumi/view-transition'
+
+const transition = createViewTransition()
+
+transition.run(() => {
+  setActive('bravo')
+})
+```
+
+The callback is where your change goes, so the browser captures the before and the after around it. The
+classes from [View transitions](/docs/view-transitions/) style what happens next. Nothing else is required:
+no framework, no state library, and no runtime in the root package: `@ibnlanre/jumi` stays CSS and
+build-time, and only the page that changes state imports this subpath.
+
+## The callback must finish synchronously
+
+**Do not `await` inside it, do not return a Promise, and do not wait for a frame.** This is not a style
+preference. A promise handed to the browser is a _pending_ callback, and `await requestAnimationFrame()`
+inside one wedges the transition permanently: no capture, no animation, no error, and the change never lands.
+The callback is called once, and it has to be finished when it returns. If your change depends on something
+asynchronous, do that first and then transition the result:
+
+```ts
+const next = await load()
+
+transition.run(() => {
+  setActive(next)
+})
+```
+
+## Two calls, and which one wins
+
+Calling it twice while a transition is running is the case worth knowing about, and the default (`auto`)
+decides by _when_ the second call arrives. Which is the one thing an accidental duplicate cannot hide:
+
+- **the same task.** A second call from the same event, or one that event deferred with a promise, is the
+  same interaction twice: your update runs immediately, and no second transition starts. Nothing is dropped,
+  and the transition the reader is already watching is not cut short. (Whether that update shows up inside
+  the running transition's snapshots depends on when they were taken: the point is that you do not have to
+  think about it.)
+- **a later task.** A second click, a keypress, a timer: a new intention, so it supersedes. The move the
+  reader just asked for happens now, and the transition in flight is replaced by it.
+
+So a duplicate handler is harmless and a rapid second gesture is answered, without either case becoming your
+problem. Override it only when you know something the timing does not:
+
+```ts
+// a poll or a resize writing on a schedule: never a second transition per write
+const backgroundUpdates = createViewTransition({ concurrency: 'coalesce' })
+backgroundUpdates.run(update)
+
+// override a controller's policy for this call
+transition.run(update, { concurrency: 'supersede' })
+```
+
+## The result, if you want it
+
+The call resolves to an outcome instead of rejecting whenever the transition could not run. Most callers fire
+it and ignore the result; branch on it when the difference matters, such as reporting why nothing animated,
+the outcome is a discriminated union, so `reason` exists only on the branch where nothing ran:
+
+```ts
+const result = await transition.run(() => {
+  setOpen(true)
+})
+
+if (result.transitioned) {
+  console.log('the change animated')
+} else {
+  // narrowed: `reason` exists here, and nowhere else
+  console.log(result.reason)
+}
+```
+
+| `result`                                         | meaning                                                  |
+| ------------------------------------------------ | -------------------------------------------------------- |
+| `{ transitioned: true }`                         | the transition ran, with your change inside its boundary |
+| `{ transitioned: false, reason: 'in-flight' }`   | a duplicate call in the same interaction                 |
+| `{ transitioned: false, reason: 'aborted' }`     | replaced or skipped before it animated                   |
+| `{ transitioned: false, reason: 'hidden' }`      | the document is in a background tab                      |
+| `{ transitioned: false, reason: 'unsupported' }` | this browser has no view transitions                     |
+
+Your update runs exactly once per call in every one of those cases. An outcome describes the animation, never
+whether your change happened, while update errors and asynchronous callbacks reject rather than becoming platform outcomes.
+
+## Reusable operations
+
+Use `transition.run(update, options)` for a one-off change. For reusable operations, the controller
+holds shared concurrency policy and each wrapped operation owns its lifecycle:
+
+```ts
+import { createViewTransition } from '@ibnlanre/jumi/view-transition'
+
+const transition = createViewTransition({ concurrency: 'auto' })
+const open = transition.wrap(updateOpen, {
+  onTransitionStart() {
+    console.log('open transition started')
+  },
+  onTransitionEnd() {
+    console.log('open transition stopped')
+  },
+  onDecline(reason) {
+    console.log('updated without animation', reason)
+  },
+  onError(error) {
+    console.error(error)
+  },
+})
+
+await open(true)
+```
+
+`wrap()` preserves the update's argument types and call receiver, but intentionally replaces its original
+return value with `Promise<ViewTransitionOutcome>`. Functional updater arguments are forwarded unchanged.
+The controller exposes `run` for one-offs and `wrap` for reusable operations. Lifecycle hooks belong to
+the wrapped operation, not the controller.
+
+| Hook                  | Meaning                                                                                                                                |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `onTransitionStart()` | The visual transition materialized (`ready` resolved).                                                                                 |
+| `onTransitionEnd()`   | A started transition ceased being active, including being superseded or skipped. This does not promise it reached its visual endpoint. |
+| `onDecline(reason)`   | The mutation happened, but no visual transition materialized.                                                                          |
+| `onError(error)`      | The invocation rejected. The hook observes the error; its returned promise still rejects.                                              |
+
+Wrapping establishes **operation attribution**, not invocation attribution. `open(true)` and `open(false)`
+can overlap and invoke the same hooks. Jumi tracks their transitions independently internally; each call's
+returned promise is its own outcome channel. A hook alone cannot identify which overlapping call fired.
+A controller is a configured interface, **not an independent transition domain**. All controllers in the
+same module instance coordinate the document’s active transition. Separate controllers can carry different
+policies, but their transitions still compete. The policy of the incoming call determines how it proceeds.
+
+Update errors reject, including on unsupported, hidden and coalesced paths. With `onError`, Jumi attaches
+an observer to that rejection; awaiting the returned promise still throws. A hook's own exception is
+reported to the global error handler and does not change the invocation's outcome.
+
+## Framework updates must commit the DOM
+
+A synchronous JavaScript setter does not necessarily commit the DOM synchronously. The wrapped update
+must finish its DOM changes inside the browser's update callback. Jumi cannot infer or flush a framework's
+rendering schedule.
+
+For React, make the commit boundary explicit:
+
+```ts
+import { flushSync } from 'react-dom'
+import type { SetStateAction } from 'react'
+import { createViewTransition } from '@ibnlanre/jumi/view-transition'
+
+const transition = createViewTransition()
+const open = transition.wrap((next: SetStateAction<boolean>) => {
+  flushSync(() => setOpen(next))
+})
+
+await open(true)
+await open(previous => !previous)
+```
+
+Use this from an event handler where flushing is supported. `wrap(setOpen)` alone does not guarantee the
+new DOM is captured. React's [flushSync documentation](https://react.dev/reference/react-dom/flushSync)
+explains the constraints and performance tradeoffs. Other frameworks need their equivalent synchronous
+commit boundary. Async navigation functions are not automatically valid updates: finish asynchronous work
+first, then wrap the synchronous DOM mutation.
+
+Both APIs reject Promise-returning updates at the TypeScript boundary and at runtime. Neither introduces
+an asynchronous update mode.
+
+## See it together
+
+[The layout projection demo ↗](/demo/view-transitions/) is the whole story on one page: candidates styling
+the old and new snapshots, a real layout shift, a second click arriving mid-transition, and a switch to the
+browser's own behaviour to compare.
+
+---
+
+# Accessible motion
+
+Make room for stillness. Good motion includes the option to experience less of it.
+
+Source: https://jumi-css.vercel.app/docs/accessibility/
+
+## Honor reduced motion
+
+Activate decorative animation through Tailwind's `motion-safe` variant:
+
+```html
+<div class="motion-safe:animate-fade-in-up">
+  Always readable. Animated when welcome.
+</div>
+```
+
+Keep the base element visible. Avoid an unconditional `opacity-0` or off-screen transform that leaves content hidden when the animation is disabled.
+
+When the movement is continuous rather than an entrance, the inverse variant is the one to reach for. It strips the repetition, and only for the visitors who ask for it:
+
+```html
+<div
+  class="animate-pulsing animation-iteration-count-infinite motion-reduce:animation-iteration-count-1"
+>
+  Pulses until you say otherwise.
+</div>
+```
+
+## Reduce motion across a surface
+
+There is no carrier class to switch off any more, so a rule that reduces motion across a showcase
+has to reach every element:
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+```
+
+This is the approach used for the animated specimens in this documentation site. Their geometry and labels remain readable while still.
+
+## Let people pause
+
+Provide an accessible pause control for persistent decorative movement. Use a real button, label its action, and communicate whether it is pressed with `aria-pressed`.
+
+```css
+.motion-paused *,
+.motion-paused *::before,
+.motion-paused *::after {
+  animation-play-state: paused !important;
+}
+```
+
+## Movement should support meaning
+
+- Keep essential information available without animation.
+- Avoid flashing and rapid, repetitive changes.
+- Let an entrance finish rather than looping it beside reading material.
+- Use visible keyboard focus and touch-sized controls.
+- Test with reduced motion enabled, as well as with motion paused.
+
+The site-wide pause button controls the specimens. Catalog effects play on request so that browsing a library does not become a wall of simultaneous motion.
+
+---
+
+# The agent skill
+
+Source: https://raw.githubusercontent.com/ibnlanre/jumi/main/SKILL.md
+
+# Jumi
+
+Jumi is a motion vocabulary for Tailwind CSS v4. You write classes, Tailwind compiles them, and a build
+step finishes the stylesheet. Nothing of Jumi's ships to the browser: the output is ordinary
+`animation-*` and `transition-*` declarations, so the browser's own CSS engine runs the motion.
+
+There are 235 named effects, 395 property targets, timing controls for every one of them, a way to write
+a keyframe inside a class name, a stagger, scroll-driven timelines, and transitions for both state changes
+and page changes. This skill is the whole vocabulary and the rules that hold it together.
+
+Reading it in order is the fastest route. Sections 1 to 4 are the minimum to write working markup;
+sections 5 to 12 are one feature each; 13 to 15 are the rules and the failure modes; the appendices list
+every class name the library can compile.
+
+---
+
+## 1. Set it up
+
+Install Jumi in a project that already has Tailwind CSS configured:
+
+```sh
+pnpm add @ibnlanre/jumi
+```
+
+`npm install @ibnlanre/jumi`, `yarn add @ibnlanre/jumi` and `bun add @ibnlanre/jumi` work the same way.
+
+Jumi has two halves, and both are needed:
+
+| Half        | What it is                                                       | What it does                                                                 |
+| ----------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| The plugin  | `@plugin "@ibnlanre/jumi"`                                       | Teaches Tailwind the utilities, so `animate-fade-in` compiles to real CSS    |
+| Integration | `jumi()` from `@ibnlanre/jumi/vite`, or `@ibnlanre/jumi/postcss` | Assembles the animation lists once every `animate-*` class has been compiled |
+
+Wire up only the plugin and the utilities compile while the page stays still, with no error. The lists
+cannot be written while any single utility is being compiled, because they depend on which other classes
+are present. So the integration is the half that makes motion happen.
+
+### Vite, the short route (recommended)
+
+Replace Tailwind's plugin with Jumi's. One entry does both jobs:
+
+```diff
+- import tailwindcss from '@tailwindcss/vite'
++ import jumi from '@ibnlanre/jumi/vite'
+
+  export default defineConfig({
+-   plugins: [tailwindcss()],
++   plugins: [jumi()],
+  })
+```
+
+Your stylesheet does not mention Jumi:
+
+```css
+@import 'tailwindcss';
+```
+
+Then import that stylesheet from your application's entry point. Tailwind has to scan the files holding
+your classes, so keep them in files it can see.
+
+### Vite, the explicit route
+
+Register the plugin in CSS, and finish the stylesheet with Jumi beside Tailwind's plugin. Both routes
+compile to the same CSS:
+
+```css
+@import 'tailwindcss';
+@plugin "@ibnlanre/jumi";
+```
+
+```ts
+// vite.config.ts: Tailwind's entry, plus Jumi after it
+import tailwindcss from '@tailwindcss/vite'
+import { jumiFinalizer } from '@ibnlanre/jumi/vite'
+
+export default defineConfig({ plugins: [tailwindcss(), jumiFinalizer()] })
+```
+
+### PostCSS
+
+One entry replaces `@tailwindcss/postcss`:
+
+```js
+// postcss.config.js
+export default { plugins: { '@ibnlanre/jumi/postcss': {} } }
+```
+
+If `@tailwindcss/postcss` is configured separately and you would rather not replace it, put
+`jumiFinalizer()` from `@ibnlanre/jumi/postcss` after it and keep `@plugin "@ibnlanre/jumi";` in the
+stylesheet, since nothing registers Jumi in that shape.
+
+### Tailwind CLI or a plain script
+
+The CLI has no hook to finish in, so run one step after Tailwind writes its output:
+
+```js
+import { finalizeCss } from '@ibnlanre/jumi'
+
+const { css } = finalizeCss(readFileSync('dist/output.css', 'utf8'))
+writeFileSync('dist/output.css', css)
+```
+
+### Astro
+
+```js
+import { defineConfig } from 'astro/config'
+import jumi from '@ibnlanre/jumi/vite'
+
+export default defineConfig({
+  vite: { plugins: [jumi()] },
+})
+```
+
+Then import your stylesheet from an Astro layout.
+
+### Two setup rules that cause most "it does not work" reports
+
+1. **Write complete class names.** Tailwind finds classes by scanning text, so a class built from
+   fragments such as `` `animate-${effect}` `` is never seen. Map choices to full class strings, or
+   register them explicitly:
+
+   ```css
+   @source inline("animate-bounce-in animate-fade-in animate-reveal-swipe");
+   ```
+
+2. **Check the integration, not just the plugin.** If a motion compiles into the stylesheet but nothing
+   moves, the finalizer did not run. Section 15 is the checklist.
+
+---
+
+## 2. The model: five kinds of motion
+
+Every Jumi class is one of five things. Knowing which kind you are writing is most of the expertise,
+because they compose differently.
+
+| Kind                | Example                        | What it means                                                |
+| ------------------- | ------------------------------ | ------------------------------------------------------------ |
+| **Effect**          | `animate-bounce-in`            | A named keyframe timeline, ready to run                      |
+| **Property target** | `animate-rotate-45`            | Animate one CSS property toward a value                      |
+| **Phrase**          | `animate-opacity-[0:0\|100:1]` | Write the frames of one property in the class name           |
+| **Control**         | `animation-duration-800`       | Configure timing, repetition, direction, playback, timelines |
+| **Transition**      | `transition-property/scale`    | Motion between two states of the element                     |
+
+Two laws govern the whole system:
+
+- **A control never creates motion.** It configures a motion that exists, or it does nothing at all.
+  `animation-duration-500` on an element with no animation writes a variable and animates nothing. The
+  same is true of `animation-duration-500/reveal` when nothing is named `reveal`.
+- **Motion comes from a declaration, not from a wrapper.** There is no setup class, no provider, no
+  `motion` attribute. An element animates because it carries an effect, a property target, a phrase, or a
+  transition property.
+
+Composition is automatic. One element can carry as many motion utilities as you like, and each declares
+its own value; the build gathers them into the animation lists the browser needs.
+
+```html
+<div
+  class="animate-rotate-45 animate-scale-110
+         animation-duration-800/rotate animation-duration-1200/scale
+         animation-direction-alternate animation-iteration-count-infinite"
+>
+  Two rhythms. One element.
+</div>
+```
+
+---
+
+## 3. Effects
+
+An effect is a complete, named keyframe animation. Put it on the element and it runs once, in one second,
+easing in and out of rest, holding its final value.
+
+```html
+<div class="animate-bounce-in animation-duration-800">Make your move.</div>
+```
+
+Measured defaults for every element Jumi animates:
+
+| Setting     | Default                                         |
+| ----------- | ----------------------------------------------- |
+| Duration    | `1s`                                            |
+| Easing      | `ease`                                          |
+| Delay       | `0s`, or the stagger's distribution (section 8) |
+| Iterations  | `1`                                             |
+| Direction   | `normal`                                        |
+| Fill mode   | `forwards` (the final frame is held)            |
+| Play state  | `running`                                       |
+| Composition | `replace`                                       |
+
+Use `motion-safe:` for decorative entrances so the visitor's preference is respected:
+
+```html
+<div class="motion-safe:animate-fade-in-up animation-duration-[600ms]">
+  Nice to see you.
+</div>
+```
+
+### Choosing effects
+
+- **Entrances** are named `-in`: `fade-in`, `bounce-in-up`, `slide-in-left`, `zoom-in-elastic`,
+  `blinds-in-y`, `unmask-top-left`, `diamond-in`, `triangle-in-bottom-right`.
+- **Exits** are named `-out`: `fade-out`, `slide-out-up`, `zoom-out-elastic`, `hinge-drop`,
+  `radial-wipe-out`, `mask-center`.
+- **Attention** effects repeat naturally: `pulsing`, `spinning`, `floating`, `wiggle`, `shimmer`,
+  `wobbling`. Pair them with `animation-iteration-count-infinite`.
+- **Emphasis** effects are one-shot highlights: `bounce`, `flash`-like `flicker`, `pop`-like `jello`,
+  `tada`, `heart-beat`, `shake`, `swing`.
+- **Presentation** effects own `clip-path` and reveal one stationary element: `reveal-*`, `wipe-*`-style
+  `radial-wipe-*`, `blinds-*`, `mask-*`, `unmask-*`, `circle-*`, `square-*`, `diamond-*`, `triangle-*`,
+  `iris`-style `radial-*`.
+
+Effect names are hyphenated and directional: `-in`, `-out`, `-in-up`, `-out-left`, `-in-top-right`.
+`-bottom`/`-top`/`-left`/`-right` and `-up`/`-down` are used as the family's geometry requires, so read
+the name or check the catalog rather than assuming a pair exists in every direction.
+
+### Effects compete for properties
+
+An effect writes one or more CSS properties. Two effects writing the same property replace each other,
+because `animation-composition` defaults to `replace`. Nest elements when you want independent layers:
+
+```html
+<div class="animate-fade-in">
+  <div
+    class="animate-spinning animation-duration-[8s] animation-timing-function-linear animation-iteration-count-infinite"
+  >
+    *
+  </div>
+</div>
+```
+
+The same warning applies to a clip reveal beside another clip animation, and to anything writing
+`transform` or `opacity` beside `hinge-drop`. A named motion gives you timing control, not conflict
+resolution.
+
+---
+
+## 4. Property targets
+
+Where an effect is a whole timeline, a property target animates one CSS property toward a value:
+
+```html
+<div
+  class="animate-rotate-[0.25turn] animate-scale-110 animation-duration-[3s]"
+>
+  Toward a value.
+</div>
+```
+
+Names follow the CSS specification: `animate-{property}-{value}`. If you know the CSS property, you know the
+class. `animate-background-color-red-600`, `animate-border-radius-[40px]`, `animate-box-shadow-blur-[8px]`,
+`animate-filter-blur-[8px]`, `animate-stroke-width-4`, `animate-z-index-10`, `animate-grid-column-start-2`,
+`animate-hyphenate-limit-chars-minimum-word-length-4`.
+
+### Where values come from
+
+1. **Tailwind's theme scales**: `animate-background-color-blue-500` compiles to
+   `var(--color-blue-500)`, and spacing, opacity and font scales work the same way.
+2. **Bare numbers**, converted to the unit the property needs:
+   - `animate-rotate-45` is `45deg`
+   - `animate-opacity-50` is `0.5`
+   - `animate-scale-110` is `1.1`
+3. **Arbitrary values in brackets**, which are the escape hatch for anything else:
+   `animate-width-[240px]`, `animate-rotate-[0.25turn]`, `animate-filter-blur-[8px]`,
+   `animate-offset-distance-100`, `animate-width-[calc-size(auto,size+2rem)]`.
+
+When a bare number's meaning is ambiguous for the property, write the arbitrary form with an explicit
+unit. `animation-duration-800` is 800 milliseconds, and so is `animation-duration-[800ms]`; `[0.8s]` is
+equivalent too.
+
+### Each property keeps a resting value
+
+Every animatable property has an underlying value that the animation travels from. Measured, Jumi sets
+`--jumi-opacity: 1`, `--jumi-width: auto`, `--jumi-background-color: transparent`,
+`--jumi-filter-blur: blur(0)`, `--jumi-translate-x: 0px`, `--jumi-scale: 1 1 1`. A property target
+writes a `to` frame, so the motion starts from the element's own styles. Set a deliberate starting value
+in your own CSS when the resting value is not what you want to interpolate from.
+
+### Compound properties share one slot
+
+Compound CSS values are assembled from parts, and the parts share the compound property's timing. Blur and
+brightness both feed the filter, so their rhythm is `filter`:
+
+```html
+<div
+  class="animate-filter-blur-[4px] animate-filter-brightness-[1.2] animation-duration-[900ms]/filter"
+>
+  A softer glow.
+</div>
+```
+
+The same is true of transform parts (`/transform` covers `animate-translate-x-*`, `animate-rotate-*`,
+`animate-scale-*` and the rest), box-shadow parts, text-shadow parts, border-radius corners,
+background-position axes and mask-border parts. Address the compound, not the part.
+
+### Keyword sizes belong to the platform
+
+`auto`, `min-content`, `max-content` and `fit-content` interpolate only with `interpolate-size:
+allow-keywords`. Jumi does not set it, because the declaration is inherited and setting it on an element
+opts in everything beneath it:
+
+```html
+<div class="interpolate-size-allow-keywords animate-width-auto w-[200px]">
+  Keyword target.
+</div>
+```
+
+Without it the target still applies, but as a discrete change: the property holds its starting value and
+flips at the midpoint. `interpolate-size-numeric-only` stops a subtree inheriting the switch. A value
+carrying its own intrinsic size needs no switch at all:
+`animate-width-[calc-size(auto,size+2rem)]`.
+
+### Motion paths
+
+A path is declared once and the distance along it is animated:
+
+```html
+<div
+  class="[offset-path:path('M0,0_L200,0_L200,200')] [offset-rotate:auto]
+         animate-offset-distance-100 animation-duration-2000"
+></div>
+```
+
+`offset-path`, `offset-rotate`, `offset-anchor` and `offset-position` are written once as ordinary
+utilities with arbitrary values. `offset-distance` is the animated property, and because it is an ordinary
+animation, everything else composes with it, including scroll timelines. Animating `offset-path` itself
+from `none` is a discrete step rather than an ease onto the path, so declare the path.
+
+### SVG strokes
+
+Dash patterns and offsets are ordinary property animations:
+
+```html
+<svg viewBox="0 0 240 80">
+  <path
+    d="M 10 40 H 230"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="4"
+    stroke-dasharray="8 4"
+    class="animate-stroke-dashoffset-[0:12|40:4|100:0]/trace
+           animation-duration-[2s]/trace animation-timing-function-linear/trace"
+  />
+</svg>
+```
+
+`animate-stroke-dasharray-*` takes `none`, numbers, lengths, percentages and dash lists (use underscores
+for spaces, or commas). `animate-stroke-dashoffset-*` takes numbers, lengths and percentages, including
+negatives. Percentages resolve against the SVG viewport, not the path length, so a stroke-drawing recipe
+needs an explicit `pathLength` and dash convention on the asset. Jumi exposes the properties; it does not
+ship a `draw` preset.
+
+### CSS still decides what can interpolate
+
+A utility cannot make a non-animatable property interpolate. Some properties change discretely, and some,
+such as `width`, trigger layout work on every frame. Prefer `transform` and `opacity` for frequent
+decorative motion, and test the expensive properties on your target devices.
+
+---
+
+## 5. Phrases: a keyframe written in a class name
+
+A phrase declares the frames of one property inside the utility:
+
+```html
+<div
+  class="animate-scale-[0:0.5|50:1.1|100:1] animate-opacity-[0:0|50:1|100:1]
+         animation-duration-2600 animation-iteration-count-infinite"
+>
+  Gather, overshoot, settle.
+</div>
+```
+
+No `@keyframes` block, no stylesheet edit, no runtime. The class compiles to a keyframe rule of its own.
+
+### The grammar
+
+```text
+phrase      := frame ("|" frame)*
+frame       := offset-list ":" value
+offset-list := <offset> ("," <offset>)*
+offset      := 0 to 100, integer or decimal, the % is implied and never written
+value       := any CSS value
+```
+
+- **Frames are separated by a pipe.** `0:0|100:1` is two frames.
+- **One value may carry several offsets.** `0,100:45deg|50:0deg` is two frames, not three, and it declares
+  the same motion as `0:45deg|50:0deg|100:45deg`.
+- **A frame may omit its offset**, and then it takes the property's resting value. That is why a phrase
+  holds still until its first frame and closes itself at the end, and why it is safe to run `infinite`:
+  the loop has no seam.
+- **A property taking several values takes all of them at each frame**, with `_` standing in for the
+  space. `animate-scale-[0:0.42_0.30|50:1.03_1.03]` scales both axes together.
+- **A bare value is the degenerate phrase.** `animate-rotate-45` means `45deg` at the end.
+
+### Why the separator is a pipe
+
+A comma is a legitimate CSS value character, as in `translate(1px, 2px)`, so it cannot separate frames.
+Measured: `animate-opacity-[0:0|100:1]` builds a two-stop keyframe, while `animate-opacity-[0:0,100:1]`
+builds **one** stop and warns about nothing, because it is a legal single frame whose value happens to
+contain a comma. Semicolons are refused outright by the host, and `%` and `!` are legal CSS values too.
+Write pipes, and read a phrase that animates nothing as a separator mistake first.
+
+### Identity and reuse
+
+A phrase is hashed from its canonical frames: frames are sorted by offset, duplicated offsets are
+last-wins, and the result is trimmed. So `0:a|50:b` and `50:b|0:a` are one keyframe, and two elements
+sharing a phrase share one rule. A different phrase gets a rule of its own. Measured, the same phrase
+twice on a page emits one keyframe and two different phrases emit two.
+
+Nothing else can change what your phrase does, which is also why you write **one phrase per property per
+element** rather than layering several.
+
+### Naming a phrase as a slot
+
+Append `/name` where you declare it, and address it with the same word in the controls:
+
+```html
+<div
+  class="animate-clip-path-[0:inset(0_100%_0_0)|100:inset(0_0%_0_0)]/reveal
+         animation-duration-[900ms]/reveal
+         animation-timing-function-ease-out/reveal"
+>
+  Frames and controls, one slot.
+</div>
+```
+
+A name is one word, so it is usually written bare. Brackets are for a name that needs them, and a name
+cannot contain whitespace: an underscore inside brackets becomes a space in the custom property name, so
+it is reported and dropped rather than written.
+
+A phrase is a value, so it can live in your Tailwind theme and be referenced by name:
+
+```js
+theme: {
+  rotate: {
+    unfurl: '0:16deg,58:0deg'
+  }
+}
+```
+
+and then used as `animate-rotate-unfurl`, which keeps the frames in one place when several elements share
+them.
+
+### What is refused
+
+An offset outside 0 to 100 is reported and dropped: the motion emits nothing and the build warns with the
+class and the offset it refused, rather than handing the browser a frame it will discard. Measured, the
+warning names both, for example `a phrase's offsets are percentages in 0-100, and this one writes 150`.
+An ordinary arbitrary value is validated differently: `animate-offset-distance-[50%]` is accepted while
+`animate-offset-distance-[abc]` produces no rule at all, because the host checks a plain value against the
+property's CSS type while a phrase is checked against Jumi's own grammar.
+
+---
+
+## 6. Controls
+
+Controls configure a motion. They never create one.
+
+| Control         | Syntax                                               | Accepted values                                           |
+| --------------- | ---------------------------------------------------- | --------------------------------------------------------- |
+| Duration        | `animation-duration-800`, `[1.2s]`                   | Bare number is milliseconds; arbitrary values take a unit |
+| Delay           | `animation-delay-150`, `[150ms]`                     | Same                                                      |
+| Easing          | `animation-timing-function-ease-out-quint`           | 37 named curves, or `[cubic-bezier(.4,0,.6,1)]`           |
+| Iterations      | `animation-iteration-count-3`, `-infinite`           | 1 to 10 by name, `infinite`, or an arbitrary number       |
+| Direction       | `animation-direction-alternate`                      | `normal`, `reverse`, `alternate`, `alternate-reverse`     |
+| Fill mode       | `animation-fill-mode-both`                           | `none`, `forwards`, `backwards`, `both`                   |
+| Play state      | `animation-play-state-paused`                        | `running`, `paused`                                       |
+| Composition     | `animation-composition-add`                          | `replace`, `add`, `accumulate`                            |
+| Name            | `animation-name-[none]`                              | `none`, used to switch off what an element was given      |
+| Timeline, range | `animation-timeline-scroll`, `animation-range-entry` | Section 10                                                |
+| Transitions     | `transition-duration-300`                            | Section 9                                                 |
+
+A control written on its own is configuration waiting for a motion:
+
+```html
+<div
+  class="animate-rotate-90 animation-duration-1400 animation-timing-function-ease-in-out
+         animation-direction-alternate animation-iteration-count-infinite"
+>
+  Back and forth.
+</div>
+```
+
+Easing names cover the common curves and their families: `linear`, `ease`, `ease-in`, `ease-out`,
+`ease-in-out`, `step-start`, `step-end`, plus `-quad`, `-cubic`, `-quart`, `-quint`, `-sine`, `-circ`,
+`-expo`, `-back` in the `in`, `out` and `in-out` forms, and `ease-entrance`, `ease-exit`,
+`ease-exit-sharp`, `ease-smooth`, `ease-bounce-out`, `ease-elastic`. Appendix C lists all of them.
+Use `linear` for steady rotation, and a `-back` or `-elastic` curve when you want overshoot.
+
+### Altering rather than replacing
+
+`animation-composition` decides how two animations of one property combine. The default `replace` gives
+the last entry the win; `add` lets both apply at once:
+
+```html
+<div
+  class="animate-rotate-[0:0deg|12:-8deg|100:-8deg]/flick
+         animate-rotate-[0:0deg|12:0deg|100:8deg]/return
+         animation-composition-add/rotate
+         animation-timing-function-ease-in-out-circ/flick
+         animation-timing-function-linear/return
+         animation-iteration-count-infinite"
+>
+  A flick that lands, then a plain return.
+</div>
+```
+
+That is the pattern for one property needing two different rhythms, since a single easing applies to every
+segment of one animation.
+
+---
+
+## 7. Addressing one motion
+
+A control may be scoped to a single animation with a slash. What you write after the slash is either a
+**property** Jumi animates (`/rotate`, `/scale`, `/filter`) or a **name** you chose (`/reveal`,
+`/flick`).
+
+```html
+<div
+  class="animate-rotate-45 animate-scale-110
+         animation-duration-500 animation-duration-1200/rotate"
+>
+  Scale at 500ms. Rotate at 1200ms.
+</div>
+```
+
+An unscoped control is the fallback every animation reads when it has nothing narrower. The resolution
+order is **name, then property or effect, then global**. Measured on `animate-fade-in/reveal`, the emitted
+chain is
+`var(--jumi-label-reveal-animation-duration, var(--jumi-fade-in-animation-duration, var(--jumi-animation-duration)))`.
+
+Rules worth knowing before you name anything:
+
+- **A word that is a property belongs to that property.** `animation-duration-500/scale` reaches every
+  motion animating `scale`, in every stylesheet, whether or not this element animates it. Give a motion
+  its own word, and make it a word that is not a property. A collision is reported, not dropped:
+  measured, naming a rotate motion `scale` warns that the name is also a property and to reword it.
+- **A control for a name that is not present does nothing**, exactly like an unscoped control. That is
+  why a named control beside a conditional motion is unremarkable.
+- **Two motions on one element may share a name**, and then a control written for that name reaches both.
+  That is how several properties are tuned as one thing.
+- **Names do not travel into descendants.** A wrapper and the element inside it can use the same word
+  without knowing about each other.
+- **A property scope does cross a wrapper boundary**, because nothing declares that property's variable
+  on the element. Measured, a `/{property}` control on a wrapper reaches an unlabelled animation inside
+  it.
+- **A global control does not cross it.** Every animating element declares the global defaults itself,
+  and a declaration beats inheritance. Measured, a wrapper's `--jumi-animation-duration: 5s` leaves a
+  child at `1s`.
+
+Because a name is written into the rule, you can retime that animation from your own CSS without touching
+the markup:
+
+```css
+.petal {
+  --jumi-label-flick-animation-duration: 900ms;
+}
+```
+
+---
+
+## 8. Stagger
+
+The stagger distributes a delay across the direct children of the element it is written on. Put the
+stagger on the parent and the children's motion on the parent too, with Tailwind's `*:` variant:
+
+```html
+<div class="animate-stagger-forward-[120ms]/3 *:animate-bounce-in">
+  <div>One</div>
+  <div>Two</div>
+  <div>Three</div>
+</div>
+```
+
+Delays are 0ms, 120ms and 240ms. `animate-stagger-backward-[150ms]/3` runs the same distribution
+backwards. The interval is the value; the number after the slash is the child count.
+
+- **The count-free form adapts to any list.** `animate-stagger-forward-[100ms]` emits one rule using
+  `sibling-index()` and `sibling-count()`, which Chrome, Edge and Safari support.
+- **The `/{count}` form generates an `:nth-child` fallback** for browsers without those functions. Engines
+  that have them still take the adaptive rule, so the count is a compatibility hint rather than a hard
+  limit. Keep it aligned with the number of children you mean to stagger.
+- **The relationship must be direct.** The delay variable is written to direct children, so adding
+  wrappers between the parent and the animated elements stops the distribution. Move the parent closer.
+- **An explicit delay on the child wins.** `animation-delay-*` written on a child overrides the stagger's
+  fallback for that child.
+
+The stagger is delay-based, which matters for scroll-driven motion: a staggered group is staggered along
+the scroll, with each child's motion compressed into its own share of the range.
+
+---
+
+## 9. Transitions between states
+
+A transition animates a change of state rather than animating on arrival. `transition-property/…` is what
+activates one:
+
+```html
+<button
+  class="transition-property/scale transition-duration-300
+         hover:scale-110 focus-visible:scale-110"
+>
+  Take a closer look.
+</button>
+```
+
+`transition-duration`, `transition-delay` and `transition-timing-function` configure it, and all three
+take the same `/{property}` scope:
+
+```html
+<button
+  class="transition-property/background-color transition-property/scale
+         transition-duration-[200ms]/background-color transition-delay-[80ms]/background-color
+         transition-timing-function-ease-out/scale
+         bg-lime-300 hover:bg-lime-200 hover:scale-110"
+>
+  A delayed colour and a lifted card.
+</button>
+```
+
+`transition-property/all` is available when you intentionally want everything transitionable. Explicit
+property names make it easier to see which changes should move. Tailwind v4's `scale-*` utility writes the
+individual `scale` property, so scope that transition with `/scale`.
+
+A property the browser cannot interpolate, `display` being the usual one, does not transition unless you
+say it may:
+
+```html
+<div
+  class="transition-property/display transition-duration-300 transition-behavior-allow-discrete"
+>
+  Appear and disappear.
+</div>
+```
+
+With that, the flip is placed so content stays on screen: at the start on the way in, at the end on the way
+out. What it cannot supply is the before-style a first render has nothing to travel from. `@starting-style`
+is plain CSS and belongs in your own stylesheet, next to the markup it describes.
+
+---
+
+## 10. Motion driven by scroll
+
+Three declarations answer three different questions:
+
+```text
+animation           what motion happens
+animation-timeline  what drives its progress
+animation-range     where on that driver the motion runs
+```
+
+A motion is not written differently when a scroll drives it. The same `animate-fade-in` is scrubbed by
+scroll position the moment a timeline names the driver:
+
+```html
+<article class="animate-fade-in animation-timeline-view"></article>
+```
+
+- `animation-timeline-scroll` follows the nearest scroller.
+- `animation-timeline-view` tracks the element through its scrollport.
+- `animation-timeline-[--feed]` consumes a timeline your own CSS declares.
+- `animation-timeline-scroller-nearest|root|self` picks which scroller a `scroll()` timeline takes.
+- `animation-timeline-axis-block|inline|x|y` picks the axis.
+- `animation-timeline-inset-start-[10%]` and `animation-timeline-inset-end-[25%]` place where tracking
+  begins and ends inside the scrollport for a `view` timeline.
+
+Every one of those is a control: it configures a timeline, it does not give one, so it does nothing on an
+element that names no driver.
+
+### Declaring a named timeline
+
+The declaration side is plain CSS on the scroller, and Jumi does not wrap it:
+
+```css
+#feed {
+  scroll-timeline-name: --feed;
+  scroll-timeline-axis: block;
+}
+```
+
+```html
+<div
+  class="h-64 overflow-y-auto"
+  id="feed"
+>
+  <article class="animation-timeline-[--feed] animate-opacity-100">
+    Tracked entry.
+  </article>
+</div>
+```
+
+Two details are easy to get subtly wrong. `--feed` in `scroll-timeline-name` is a timeline name, not a
+custom property, so `var()` does not apply and the bracketed spelling is how it reaches the control;
+`(--feed)` means `var(--feed)`, which is a different thing entirely. And a named timeline is visible to
+the **descendants** of the element that declares it and to nothing else, not to siblings and not to the
+document, so declare it on an element the animated content lives inside.
+
+### Placing the motion
+
+```html
+<div class="animate-fade-in animation-range-entry"></div>
+```
+
+`animation-range-entry`, `-cover`, `-contain` and `-exit` name a whole range, and `-start-entry`,
+`-end-exit`, `-start-offset-25` and `-end-offset-75` place a half. Anything with both a name and an offset
+in it is the arbitrary form, and it is the one to reach for whenever an offset is involved, since the
+value is written as it stands:
+
+```html
+<div class="animate-fade-in animation-range-[entry_0%_cover_50%]"></div>
+```
+
+The same vocabulary works as a prefix on a single motion, so one animation can be ranged while its
+neighbour fills the whole range:
+
+```html
+<div
+  class="animate-fade-in animate-rotate-45 animation-timeline-scroll
+         animation-range-[25%_75%]:animate-fade-in"
+></div>
+```
+
+A range Jumi cannot write is reported and dropped, and the motion it qualified still runs on the default
+range. That matters most for a range that looks legal and is not: `normal` joined to an offset is dropped
+by the engine without a word, so the warning is the only signal that the range you wrote is not the range
+you got.
+
+### Fallback
+
+If the browser has no scroll-driven timelines, the animation falls back to the document timeline and runs
+as a normal time-based animation. The motion and its final state are kept, so a view-driven entrance plays
+on load instead of tracking entry. When you want scroll-driven or nothing, put both halves behind one
+capability query:
+
+```html
+<div
+  class="supports-[animation-timeline:scroll()]:animate-fade-in
+         supports-[animation-timeline:scroll()]:animation-timeline-scroll"
+></div>
+```
+
+Inside the query the pair applies together and the motion is scrubbed; outside it neither applies, so the
+element keeps its base state and no motion runs.
+
+On a scroll-driven animation the time controls are reinterpreted rather than ignored: 100% of the timeline
+is the animation's own end, so `animation-delay` becomes a share of the scroll, and
+`animation-iteration-count` divides the range. Reach for `animation-range` when you want to place a motion
+deliberately, and reach for `animation-play-state-paused` when you want to stop one.
+
+Note that a `while`-style timeline the page declares in `@keyframes`-adjacent CSS is not Jumi's business:
+`animation-timeline-[--feed]` is how you consume one, and `scroll-timeline-name` is how you declare it.
+
+---
+
+## 11. View transitions
+
+A view transition animates the browser's snapshot of an element rather than the element, so Jumi writes
+the motion onto the generated pseudo-elements for you. Name the visual with the class:
+
+```html
+<div
+  class="view-transition-old/hero:animate-fade-out view-transition-new/hero:animate-fade-in"
+>
+  hero
+</div>
+```
+
+Measured, that emits `view-transition-name: hero` on the element and the motion on
+`::view-transition-old(hero)`. The name after the slash is yours (`hero`, `my-card-2`, whatever the thing
+is), and anything Jumi can animate works after the colon: an effect, a phrase, an arbitrary value.
+
+```html
+<div
+  class="view-transition-old/card:animate-scale-90 view-transition-new/card:animate-scale-110"
+></div>
+```
+
+Either side on its own is fine. With only the incoming side, the outgoing side keeps the browser's own
+cross-fade, which is usually what you want when the old state simply disappears.
+
+The name is a **claim on the document**, not a label. The browser addresses a snapshot only by name, so a
+candidate attaches its motion to whatever carries that name, including an element it has never seen.
+Keep candidate names distinct from any `view-transition-name` you write yourself. Two elements sharing one
+name is the same mistake in another form, and it fails differently: the browser refuses that transition
+outright and reports a duplicate name rather than animating the wrong thing.
+
+- Each side takes its own controls: `view-transition-old/hero:animation-duration-300`,
+  `view-transition-new/hero:animation-duration-500`. As everywhere else, a control without a motion on
+  that side does nothing.
+- Conditional variants work and apply to the side they are written on.
+- `motion-safe:` is honoured. `motion-reduce:` is reported rather than accepted, because Jumi has already
+  decided that its view transition motion does not run under reduced motion and the browser's cross-fade
+  is what remains.
+- A name the browser will not accept, including the reserved words `none` and `auto`, is reported.
+- A variant that depends on the element's own state, such as `hover:`, is reported: there is no element on
+  the other side for `:hover` to be about.
+
+For a navigation between documents, the page opts in the way the platform requires and nothing else
+changes:
+
+```css
+@view-transition {
+  navigation: auto;
+}
+```
+
+---
+
+## 12. Same-document transitions at runtime
+
+Everything above is CSS. When the thing that moves is your own state (a card taking the corner, a panel
+opening, a list reordering) the browser cannot see the change happen, so someone has to say when it is.
+That half lives behind its own subpath, so the root package stays free of runtime code:
+
+```ts
+import { createViewTransition } from '@ibnlanre/jumi/view-transition'
+
+const transition = createViewTransition()
+
+transition.run(() => {
+  setActive('bravo')
+})
+```
+
+The classes from section 11 style what happens next. Three rules govern the call:
+
+1. **The callback must finish synchronously.** Do not `await` inside it, do not return a promise, and do
+   not wait for a frame. A promise handed to the browser is a pending callback, and awaiting a frame
+   inside one wedges the transition permanently: no capture, no animation, no error, and the change never
+   lands. Do asynchronous work first, then transition the result.
+2. **Two calls while a transition is running are decided by when the second arrives.** A second call in
+   the same task is the same interaction twice, so your update runs and no second transition starts. A
+   second call in a later task, such as another click or a timer, is a new intention and supersedes the
+   one in flight. Override the policy only when you know something the timing does not:
+   `createViewTransition({ concurrency: 'coalesce' })` or `run(update, { concurrency: 'supersede' })`.
+3. **The call resolves to an outcome instead of rejecting when the transition could not run.** Branch on
+   it when the difference matters.
+
+| Result                                           | Meaning                                                  |
+| ------------------------------------------------ | -------------------------------------------------------- |
+| `{ transitioned: true }`                         | The transition ran, with your change inside its boundary |
+| `{ transitioned: false, reason: 'in-flight' }`   | A duplicate call in the same interaction                 |
+| `{ transitioned: false, reason: 'aborted' }`     | Replaced or skipped before it animated                   |
+| `{ transitioned: false, reason: 'hidden' }`      | The document is in a background tab                      |
+| `{ transitioned: false, reason: 'unsupported' }` | The browser has no view transitions                      |
+
+Your update runs exactly once per call in every one of those cases: an outcome describes the animation,
+never whether your change happened. Update errors and asynchronous callbacks reject rather than becoming
+platform outcomes. For reusable operations, `transition.wrap(update, hooks)` keeps the update's argument
+types, replaces its return value with the outcome promise, and gives each wrapped operation its own
+lifecycle: `onTransitionStart`, `onTransitionEnd`, `onDecline(reason)` and `onError(error)`. Wrapping is
+operation attribution, not invocation attribution: `open(true)` and `open(false)` may overlap and invoke
+the same hooks, so treat the returned promise as each call's own channel.
+
+A framework's setter does not necessarily commit the DOM synchronously, and Jumi cannot infer a rendering
+schedule. In React, make the commit boundary explicit:
+
+```ts
+import { flushSync } from 'react-dom'
+import { createViewTransition } from '@ibnlanre/jumi/view-transition'
+
+const transition = createViewTransition()
+const open = transition.wrap((next: boolean) => {
+  flushSync(() => setOpen(next))
+})
+
+await open(true)
+```
+
+---
+
+## 13. Accessibility
+
+Decorative motion should be optional, and the element should be readable when the motion is off.
+
+```html
+<div class="motion-safe:animate-fade-in-up">
+  Always readable. Animated when welcome.
+</div>
+```
+
+Keep the base element visible: avoid an unconditional `opacity-0` or an off-screen transform that leaves
+content hidden when the animation is disabled.
+
+For continuous motion, the inverse variant is the one to reach for, because it strips the repetition only
+for the visitors who asked for less:
+
+```html
+<div
+  class="animate-pulsing animation-iteration-count-infinite
+         motion-reduce:animation-iteration-count-1"
+>
+  Pulses until you say otherwise.
+</div>
+```
+
+There is no carrier class to switch off, so reducing motion across a surface means reaching the elements
+themselves:
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+```
+
+Give persistent decorative movement a real pause control, labelled, with `aria-pressed`, and pause it the
+same way:
+
+```css
+.motion-paused *,
+.motion-paused *::before,
+.motion-paused *::after {
+  animation-play-state: paused !important;
+}
+```
+
+For exits, choose the final state explicitly, as in `motion-reduce:opacity-0` on an outgoing surface while
+application code handles removal and focus. Do not apply a hidden base style to an entrance. Keep
+essential information available without animation, avoid flashing and rapid repetition, give focus states
+the same care as hover states, and test with reduced motion enabled as well as with motion paused.
+
+---
+
+## 14. Rules that separate a working answer from a broken one
+
+1. **Controls configure, they never create.** If a control seems to do nothing, look for the motion first.
+2. **Say which kind of motion you are writing.** Effect, property target, phrase, transition. Mixing the
+   mental models is what produces markup that compiles and does not move.
+3. **One phrase per property per element.** A phrase owns its property; layering two on one property is
+   how you get one of them silently.
+4. **Write pipes in phrases, never commas.**
+5. **Name a motion with a word that is not a property**, and give each motion you want to time separately
+   its own word.
+6. **Nest elements to layer motion.** An effect owns the properties it writes, and a second effect writing
+   the same property replaces it.
+7. **Fill mode owns the end state.** The default `forwards` holds the final frame. `animation-fill-mode-none`
+   releases it, so a clip exit such as `diamond-out` or `mask-center` returns to the unclipped surface the
+   moment the animation ends.
+8. **A one-shot animation runs when it is applied.** Replaying it means remounting the element or removing
+   and reapplying the class; it is not a function you call.
+9. **Size effects read the containing block.** `expand-*` animates a percentage of the container, and
+   `typing` animates `width` from `0` to `100%` of it. Measured, a 46.7px line inside a 320px column is
+   fully visible at about 11% of the timeline, and the rest is invisible layout growth. Give the element a
+   shrink-wrapped parent (`inline-block`, or `width: fit-content`) and the animation ends exactly when the
+   last character appears.
+10. **`accordion` has a ceiling.** It ramps `max-height` from 0 to 1000px through a 500px stop, so content
+    taller than 1000px stays at the ceiling and short content finishes early (measured, a 40px panel is
+    fully open at about 5% of the timeline). Size the ramp to the content, or use a reveal such as
+    `fade-in-up` when the height itself does not need to move.
+11. **Clip entrances reach full coverage.** `diamond-in` and the `triangle-in` family grow past the corners,
+    so their final frame covers the whole box; the `-out` variants are exact reversals.
+12. **`100%` in these effects is the container, not the content**, so give the container the dimensions the
+    motion should land on.
+13. **Keyword sizes are opt-in.** `animate-width-auto` interpolates only with
+    `interpolate-size-allow-keywords`, which is inherited.
+14. **Declare a motion path rather than animating from `none`**, or the element appears on the path halfway
+    through instead of easing onto it.
+15. **Write complete class names**, or register the ones you assemble with `@source inline()`.
+
+---
+
+## 15. Troubleshooting
+
+| Symptom                                            | Cause                                                                                    | Fix                                                                            |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| The utilities exist in the CSS, nothing moves      | Only the plugin is wired up; the finalizer never ran                                     | Use `jumi()` from `/vite` or `/postcss`, or call `finalizeCss` after the CLI   |
+| One class seems missing from the stylesheet        | The class is assembled from fragments, so the scanner never saw it                       | Write full class names, or list them in `@source inline("...")`                |
+| A phrase animates nothing, with no warning         | Commas used as frame separators                                                          | Use pipes: `0:0\|100:1`                                                        |
+| A phrase warns and does nothing                    | An offset outside 0 to 100                                                               | Keep offsets in range; the warning names the offset                            |
+| A duration or delay is ignored                     | Arbitrary values need a unit, and the motion must exist                                  | `animation-duration-[800ms]`, and check the motion it should configure         |
+| A scoped control has no effect                     | The name addresses nothing on this element                                               | Match the name to the motion, and remember property words belong to properties |
+| Two effects fight or one disappears                | Both write `transform`, `opacity` or `clip-path`                                         | Nest elements, or combine them deliberately                                    |
+| A clip exit snaps back the moment it ends          | `animation-fill-mode-none` released it                                                   | Keep the default `forwards`, or remove the element                             |
+| An entrance does not play again                    | A one-shot animation runs when applied                                                   | Remount, or remove and reapply the class                                       |
+| `typing` reveals the text early, or never finishes | `100%` is the containing block's width, and the clip needs `overflow: hidden` + `nowrap` | Give it a shrink-wrapped parent                                                |
+| `accordion` cuts off content                       | Content taller than the 1000px ramp                                                      | Own keyframes, a taller-aware reveal, or no height motion                      |
+| The list stagger only moves the first item         | The animated elements are not direct children                                            | Put the stagger parent next to them                                            |
+| A view transition does nothing                     | The name is duplicated in the document, or the browser declined it                       | Keep names unique, and read `reason` from the runtime outcome                  |
+| A scroll-driven entrance plays on load             | No scroll-driven timeline support, so it fell back to time                               | Guard both halves with `supports-[animation-timeline:scroll()]:`               |
+
+---
+
+## 16. Where the rest lives
+
+| Surface               | Where                                                                     |
+| --------------------- | ------------------------------------------------------------------------- |
+| Effects catalog       | the site's `/effects/` page, and Appendix A here                          |
+| Twelve guides         | `docs/src/pages/docs/` in the repository                                  |
+| Setup, in full        | `docs/src/pages/docs/installation.md` and `build-step.md`                 |
+| Effective class names | the editor's autocomplete, since every utility is a real Tailwind utility |
+
+---
+
+## Appendix A: the 235 effect names, by family
+
+Use these with the `animate-` prefix: `animate-fade-in`, `animate-zoom-in-elastic`, and so on.
+
+- **accordion** (1): accordion
+- **arc** (4): arc-bottom-left, arc-bottom-right, arc-top-left, arc-top-right
+- **back** (5): back-in, back-in-down, back-in-left, back-in-right, back-in-up
+- **blinds** (4): blinds-in-x, blinds-in-y, blinds-out-x, blinds-out-y
+- **blink** (1): blink
+- **blur** (2): blur-in, blur-out
+- **bounce** (10): bounce-in, bounce-in-down, bounce-in-left, bounce-in-right, bounce-in-up, bounce-out, bounce-out-down, bounce-out-left, bounce-out-right, bounce-out-up
+- **bubble** (1): bubble
+- **circle** (10): circle-in, circle-in-bottom-left, circle-in-bottom-right, circle-in-top-left, circle-in-top-right, circle-out, circle-out-bottom-left, circle-out-bottom-right, circle-out-top-left, circle-out-top-right
+- **diamond** (2): diamond-in, diamond-out
+- **distort** (1): distort
+- **drip** (1): drip
+- **elastic** (1): elastic
+- **expand** (4): expand-down, expand-left, expand-right, expand-up
+- **explode** (1): explode
+- **fade** (10): fade-in, fade-in-down, fade-in-left, fade-in-right, fade-in-up, fade-out, fade-out-down, fade-out-left, fade-out-right, fade-out-up
+- **fall** (4): fall-down, fall-left, fall-right, fall-up
+- **figure** (1): figure-eight
+- **flicker** (1): flicker
+- **flip** (17): flip-card-x, flip-card-y, flip-diagonal, flip-in-bottom, flip-in-left, flip-in-right, flip-in-top, flip-in-x, flip-in-y, flip-wobble-x, flip-wobble-y, flip-x, flip-x-elastic, flip-y, flip-y-elastic, flip-zoom-x, flip-zoom-y
+- **floating** (1): floating
+- **fold** (2): fold-in, fold-out
+- **glitch** (1): glitch
+- **glow** (1): glow
+- **heart** (1): heart-beat
+- **hinge** (1): hinge-drop
+- **hue** (1): hue-shift
+- **implode** (1): implode
+- **jello** (1): jello
+- **letter** (2): letter-space-in, letter-space-out
+- **lift** (1): lift
+- **magnetic** (1): magnetic
+- **mask** (9): mask-bottom, mask-bottom-left, mask-bottom-right, mask-center, mask-left, mask-right, mask-top, mask-top-left, mask-top-right
+- **melt** (1): melt
+- **morph** (1): morph
+- **neon** (1): neon
+- **power** (2): power-off, power-on
+- **pulsing** (1): pulsing
+- **radial** (2): radial-wipe-in, radial-wipe-out
+- **reveal** (5): reveal-down, reveal-left, reveal-right, reveal-swipe, reveal-up
+- **ripple** (1): ripple
+- **rotate** (2): rotate-left, rotate-right
+- **rush** (8): rush-in-down, rush-in-left, rush-in-right, rush-in-up, rush-out-down, rush-out-left, rush-out-right, rush-out-up
+- **scatter** (1): scatter
+- **shadow** (1): shadow
+- **shake** (1): shake
+- **shimmer** (1): shimmer
+- **skew** (10): skew-down, skew-in, skew-left, skew-left-down, skew-left-up, skew-out, skew-right, skew-right-down, skew-right-up, skew-up
+- **slide** (17): slide-in-down, slide-in-down-elastic, slide-in-left, slide-in-right, slide-in-up, slide-in-up-elastic, slide-in-up-left, slide-in-up-right, slide-out-down, slide-out-left, slide-out-right, slide-out-up, slide-peek-down, slide-peek-left, slide-peek-right, slide-peek-up, slide-stack
+- **spinning** (1): spinning
+- **spiral** (6): spiral, spiral-back-in, spiral-back-out, spiral-in, spiral-out, spiral-path
+- **splash** (1): splash
+- **spring** (4): spring-down, spring-left, spring-right, spring-up
+- **square** (10): square-in, square-in-bottom-left, square-in-bottom-right, square-in-top-left, square-in-top-right, square-out, square-out-bottom-left, square-out-bottom-right, square-out-top-left, square-out-top-right
+- **swing** (1): swing
+- **tada** (1): tada
+- **throw** (4): throw-down, throw-left, throw-right, throw-up
+- **tilt** (1): tilt
+- **triangle** (10): triangle-in, triangle-in-bottom-left, triangle-in-bottom-right, triangle-in-top-left, triangle-in-top-right, triangle-out, triangle-out-bottom-left, triangle-out-bottom-right, triangle-out-top-left, triangle-out-top-right
+- **twist** (3): twist, twist-in, twist-out
+- **typing** (1): typing
+- **unfold** (2): unfold-x, unfold-y
+- **unmask** (9): unmask, unmask-bottom, unmask-bottom-left, unmask-bottom-right, unmask-left, unmask-right, unmask-top, unmask-top-left, unmask-top-right
+- **wave** (1): wave
+- **wiggle** (1): wiggle
+- **wobble** (1): wobble
+- **wobbling** (1): wobbling
+- **word** (1): word-slide
+- **zoom** (17): zoom-in, zoom-in-down, zoom-in-elastic, zoom-in-left, zoom-in-right, zoom-in-up, zoom-out, zoom-out-down, zoom-out-elastic, zoom-out-left, zoom-out-right, zoom-out-up, zoom-pulse, zoom-pulse-grow, zoom-pulse-shrink, zoom-tilt-in, zoom-tilt-out
+
+## Appendix B: the 395 property stems
+
+Every one of these takes the `animate-` prefix and a value: `animate-opacity-50`,
+`animate-background-position-x-offset-[10px]`. Names are the CSS property names, with part tokens added
+for compound values (`filter-blur`, `box-shadow-offset-x`, `border-image-slice-x`, `offset-anchor-x-edge`,
+`background-position-x-offset`, `contain-intrinsic-block-size`, `hyphenate-limit-chars-minimum-word-length`).
+
+```text
+  accent-color align-content align-items align-self alignment-baseline all appearance
+  aspect-ratio aspect-ratio-height aspect-ratio-width backdrop-filter backdrop-filter-blur
+  backdrop-filter-brightness backdrop-filter-contrast backdrop-filter-drop-shadow
+  backdrop-filter-drop-shadow-blur backdrop-filter-drop-shadow-color
+  backdrop-filter-drop-shadow-offset-x backdrop-filter-drop-shadow-offset-y
+  backdrop-filter-grayscale backdrop-filter-hue-rotate backdrop-filter-invert
+  backdrop-filter-opacity backdrop-filter-saturate backdrop-filter-sepia backdrop-filter-url
+  backface-visibility background background-attachment background-blend-mode background-clip
+  background-color background-image background-origin background-position background-position-x
+  background-position-x-edge background-position-x-offset background-position-y
+  background-position-y-edge background-position-y-offset background-repeat background-repeat-x
+  background-repeat-y background-size background-size-height background-size-width block-size
+  border border-block border-block-color border-block-end-radius border-block-end-width
+  border-block-start-radius border-block-start-width border-block-width
+  border-bottom-left-radius border-bottom-radius border-bottom-right-radius border-bottom-width
+  border-collapse border-color border-end-end-radius border-end-start-radius border-image
+  border-image-outset border-image-outset-bottom border-image-outset-left
+  border-image-outset-right border-image-outset-top border-image-outset-x border-image-outset-y
+  border-image-repeat border-image-repeat-x border-image-repeat-y border-inline-end-radius
+  border-inline-end-width border-inline-start-radius border-inline-start-width
+  border-inline-width border-left-radius border-left-width border-radius border-right-radius
+  border-right-width border-start-end-radius border-start-start-radius border-top-left-radius
+  border-top-radius border-top-right-radius border-top-width border-width bottom
+  box-decoration-break box-shadow box-shadow-blur box-shadow-color box-shadow-offset-x
+  box-shadow-offset-y box-shadow-spread box-sizing break-after break-before break-inside
+  caption-side caret-color clear clip-path clip-rule color color-interpolation
+  color-interpolation-filters color-scheme column-count column-fill column-gap column-rule
+  column-rule-color column-rule-style column-rule-width column-span column-width columns
+  contain contain-intrinsic-block-size contain-intrinsic-height contain-intrinsic-inline-size
+  contain-intrinsic-size contain-intrinsic-width content content-visibility counter-increment
+  counter-reset counter-set cursor cx cy d display display-inside display-outside
+  dominant-baseline empty-cells fill fill-opacity fill-rule filter filter-blur
+  filter-brightness filter-contrast filter-drop-shadow filter-drop-shadow-blur
+  filter-drop-shadow-color filter-drop-shadow-offset-x filter-drop-shadow-offset-y
+  filter-grayscale filter-hue-rotate filter-invert filter-opacity filter-saturate filter-sepia
+  filter-url flex flex-basis flex-direction flex-flow flex-grow flex-shrink flex-wrap float
+  flood-color flood-opacity font-family font-feature-settings font-kerning font-size
+  font-size-adjust font-style font-synthesis font-synthesis-small-caps font-synthesis-style
+  font-synthesis-weight font-variant font-variant-alternates font-variant-caps
+  font-variant-east-asian font-variant-ligatures font-variant-numeric font-variant-position
+  font-variation-settings font-weight forced-color-adjust gap grid grid-auto-columns
+  grid-auto-flow grid-auto-rows grid-column grid-column-end grid-column-start grid-row
+  grid-row-end grid-row-start grid-template-areas grid-template-columns grid-template-rows
+  hanging-punctuation height hyphenate-character hyphenate-limit-chars
+  hyphenate-limit-chars-minimum-characters-after
+  hyphenate-limit-chars-minimum-characters-before hyphenate-limit-chars-minimum-word-length
+  hyphens image-orientation image-rendering initial-letter inline-size inset inset-block
+  inset-block-end inset-block-start inset-inline inset-inline-end inset-inline-start
+  justify-content justify-items justify-self left letter-spacing lighting-color line-break
+  line-clamp line-height list-style list-style-image list-style-position list-style-type margin
+  margin-block margin-block-end margin-block-start margin-bottom margin-inline
+  margin-inline-end margin-inline-start margin-left margin-right margin-top marker marker-end
+  marker-mid marker-start mask mask-border mask-border-mode mask-border-outset
+  mask-border-outset-bottom mask-border-outset-left mask-border-outset-right
+  mask-border-outset-top mask-border-outset-x mask-border-outset-y mask-border-repeat
+  mask-border-slice mask-border-slice-bottom mask-border-slice-left mask-border-slice-right
+  mask-border-slice-top mask-border-slice-x mask-border-slice-y mask-border-source
+  mask-border-width mask-clip mask-composite mask-image mask-mode mask-origin mask-position
+  mask-repeat mask-size mask-type math-depth math-depth-add math-style max-block-size
+  max-height max-inline-size max-width min-block-size min-height min-inline-size min-width
+  mix-blend-mode object-fit object-position object-position-x object-position-x-edge
+  object-position-x-offset object-position-y object-position-y-edge object-position-y-offset
+  offset offset-anchor offset-anchor-x-edge offset-anchor-y-edge offset-distance offset-path
+  offset-position offset-position-x offset-position-x-edge offset-position-x-offset
+  offset-position-y offset-position-y-edge offset-position-y-offset offset-rotate opacity order
+  orphans outline outline-color outline-offset outline-style outline-width overflow
+  overflow-anchor overflow-block overflow-clip-margin overflow-inline overflow-wrap overflow-x
+  overflow-y overscroll-behavior overscroll-behavior-block overscroll-behavior-inline
+  overscroll-behavior-x overscroll-behavior-y padding padding-block padding-block-end
+  padding-block-start padding-bottom padding-inline padding-inline-end padding-inline-start
+  padding-left padding-right padding-top page paint-order perspective perspective-origin
+  position right rotate rotate-3d rotate-angle rotate-x rotate-y rotate-z row-gap scale scale-x
+  scale-y scale-z skew skew-x skew-y stroke stroke-dasharray stroke-dashoffset stroke-width
+  text-align text-shadow text-shadow-blur text-shadow-color text-shadow-offset-x
+  text-shadow-offset-y top transform transform-origin transform-origin-x transform-origin-y
+  transform-origin-z transform-style translate translate-3d translate-x translate-y translate-z
+  visibility width x y z-index
+```
+
+## Appendix C: easing names, and the other keyword scales
+
+Timing functions, for `animation-timing-function-*` and `transition-timing-function-*`:
+
+```text
+linear, ease, ease-in, ease-out, ease-in-out, step-start, step-end,
+ease-in-quad, ease-out-quad, ease-in-out-quad, ease-in-cubic, ease-out-cubic, ease-in-out-cubic,
+ease-in-quart, ease-out-quart, ease-in-out-quart, ease-in-quint, ease-out-quint, ease-in-out-quint,
+ease-in-sine, ease-out-sine, ease-in-out-sine, ease-in-circ, ease-out-circ, ease-in-out-circ,
+ease-in-expo, ease-out-expo, ease-in-out-expo, ease-in-back, ease-out-back, ease-in-out-back,
+ease-entrance, ease-exit, ease-exit-sharp, ease-smooth, ease-bounce-out, ease-elastic
+```
+
+Other scales, for the controls that take them:
+
+```text
+direction          normal, reverse, alternate, alternate-reverse
+fill mode          none, forwards, backwards, both
+play state         running, paused
+composition        replace, add, accumulate
+iterations         1 through 10, infinite, or any number
+timeline           auto, none, scroll, view, [--your-timeline]
+timeline scroller  nearest, root, self
+timeline axis      block, inline, x, y
+range names        entry, exit, contain, cover, entry-crossing, exit-crossing
+transition behavior normal, allow-discrete
+interpolate size   allow-keywords, numeric-only
+animation name     none
+```

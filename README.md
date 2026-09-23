@@ -210,6 +210,21 @@ pnpm run docs:dev
 To generate the static site, run `pnpm run docs:build` and preview it with
 `pnpm run docs:preview`.
 
+## Working with an AI agent
+
+`SKILL.md` is a single-file skill for coding agents: installation for all four build
+shapes, the whole class vocabulary, the phrase grammar, the timing controls, stagger,
+scroll-driven timelines, view transitions, accessibility, and the class names that do
+not compile. It is written to be read by a model rather than skimmed by a person, so it
+is denser than these pages and repeats some of what the guides explain at length.
+
+It ships with the package, and it is checked the way `README.md` is: every class it
+names in an example has to compile, or the gate fails.
+
+The site also publishes [`llms.txt`](https://jumi-css.vercel.app/llms.txt) and
+[`llms-full.txt`](https://jumi-css.vercel.app/llms-full.txt): an index of the guides, and
+the guides inlined with that skill, both generated from these sources at build time.
+
 ## Development
 
 ```sh

@@ -49,6 +49,25 @@ function check(name, value) {
   console.log('✓ ' + name)
   checks++
 }
+
+/**
+ * The crawler-facing files, which belong to the site rather than to a page.
+ *
+ * `scripts/llms.mjs` writes them into `docs/public/`, and Astro copies that directory to the build root,
+ * which is exactly the claim worth testing here: they have to be published **at the root**, where the
+ * convention says a crawler looks, and this is the only stage holding a build to ask.
+ */
+const llms = await readFile(path.join(dist, 'llms.txt'), 'utf8')
+const llmsFull = await readFile(path.join(dist, 'llms-full.txt'), 'utf8')
+
+check(
+  'the built site serves llms.txt at its root',
+  llms.startsWith('# Jumi') && llms.includes('/llms-full.txt'),
+)
+check(
+  'and llms-full.txt beside it, with the guides and the skill in it',
+  llmsFull.includes('# Introduction') && llmsFull.includes('# The agent skill'),
+)
 const ready = () =>
   page.waitForFunction(
     () =>
