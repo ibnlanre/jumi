@@ -23,14 +23,14 @@ are the effects whose motion is decided partly by the layout around them.
 ```
 
 `expand-left` and `expand-right` animate `width` from `0%` to `100%`; `expand-up` and `expand-down`
-animate `height`. All four grow from the **leading edge** of the box — the left edge for the
+animate `height`. All four grow from the **leading edge** of the box: the left edge for the
 horizontal pair, the top edge for the vertical pair. A percentage width extends from the box's start
 edge, and no `transform-origin` can move it, so the effect has no far-edge anchor to declare.
 
 That means the pair share one geometry: `expand-left` grows rightward exactly as `expand-right` does,
 and `expand-down` grows downward exactly as `expand-up` does. Pick the name that matches how your
 layout reads, not a physical direction you expect the box to travel. A box that grows toward its far
-edge needs to be positioned at that edge, which these keyframes do not do — animate `width` in your
+edge needs to be positioned at that edge, which these keyframes do not do: animate `width` in your
 own keyframes, or put the box in a container that is already anchored where you want it.
 
 `100%` is the containing block's width, so the reveal ends at the size of the container rather than
@@ -60,8 +60,8 @@ the size of the content. Give the container the dimensions you want the motion t
   never clipped; without the second the line wraps and the clip reads as a vertical wipe instead of
   typing.
 
-Both are cured by the same move: give the element a **shrink-wrapped parent** — `inline-block`, or
-`width: fit-content` — so the parent's width is the text's own width. Then `100%` is the length of
+Both are cured by the same move: give the element a **shrink-wrapped parent**, `inline-block` or
+`width: fit-content`, so the parent's width is the text's own width. Then `100%` is the length of
 the line and the animation ends exactly when the last character appears.
 
 ## Open a panel on a fixed ramp
@@ -73,13 +73,13 @@ the panel unfolds downward from its top edge.
 The ceiling is a number, not `auto`, and that is visible in two ways:
 
 - **Content taller than 1000px stays at the ceiling.** The default `forwards` fill holds the final
-  value, so a taller panel keeps a 1000px box; with `overflow: hidden` — which an accordion panel
-  normally needs anyway — everything past that edge is cut off, for as long as the value is held.
+  value, so a taller panel keeps a 1000px box; with `overflow: hidden` (which an accordion panel
+  normally needs anyway), everything past that edge is cut off, for as long as the value is held.
 - **Short content finishes early.** Measured, a 40px panel is fully open at about 5% of the timeline,
   and the remaining 95% is layout growth you cannot see.
 
-Size the ramp to the content. A panel that has to exceed 1000px needs its own keyframes — `accordion`
-is a keyframe first, and the ceiling is part of it — or a different reveal such as `fade-in-up` when
+Size the ramp to the content. A panel that has to exceed 1000px needs its own keyframes (`accordion`
+is a keyframe first, and the ceiling is part of it), or a different reveal such as `fade-in-up` when
 the height itself does not need to move. The pivot is the top edge in all three stops, so the panel
 grows downward; if you set a `transform-origin` of your own, the keyframes override it for as long as
 the animation runs.

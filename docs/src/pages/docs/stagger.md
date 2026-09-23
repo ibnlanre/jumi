@@ -6,7 +6,7 @@ description: One motion, passed from child to child. No JavaScript loop required
 
 ## Forward stagger
 
-Put the stagger utility on the parent and the children's animation on it too — `*:` applies a utility to every direct child:
+Put the stagger utility on the parent and the children's animation on it too; `*:` applies a utility to every direct child:
 
 ```html
 <div class="animate-stagger-forward-[120ms]/3 *:animate-bounce-in">

@@ -48,7 +48,7 @@ and that is the whole setup. Your stylesheet does not mention Jumi:
 ```
 
 `jumi()` owns Jumi's lifecycle inside the build: it registers Jumi with Tailwind, lets Tailwind
-compile what you wrote, and then completes the stylesheet — because the composition lists cannot be
+compile what you wrote, and then completes the stylesheet, because the composition lists cannot be
 known until every `animate-*` class on the page has been compiled.
 
 Prefer to be explicit? Both work, and they compile to the same CSS:
@@ -59,14 +59,14 @@ Prefer to be explicit? Both work, and they compile to the same CSS:
 ```
 
 ```ts
-// vite.config.ts — Tailwind's entry, plus Jumi after it
+// vite.config.ts: Tailwind's entry, plus Jumi after it
 import tailwindcss from '@tailwindcss/vite'
 import { jumiFinalizer } from '@ibnlanre/jumi/vite'
 
 export default defineConfig({ plugins: [tailwindcss(), jumiFinalizer()] })
 ```
 
-PostCSS instead? Same shape — one entry replaces `@tailwindcss/postcss`:
+PostCSS instead? Same shape: one entry replaces `@tailwindcss/postcss`:
 
 ```js
 // postcss.config.js
@@ -74,7 +74,7 @@ export default { plugins: { '@ibnlanre/jumi/postcss': {} } }
 ```
 
 With `@tailwindcss/postcss` already configured separately, `jumiFinalizer()` from
-`@ibnlanre/jumi/postcss` goes after it instead — and the stylesheet names
+`@ibnlanre/jumi/postcss` goes after it instead, and the stylesheet names
 `@plugin "@ibnlanre/jumi";`, because nothing registers Jumi in that shape.
 
 Building with the Tailwind CLI, or from a script? The CLI has no hook to finish in, so that one
@@ -223,7 +223,7 @@ Created by [Ridwan Olanrewaju](https://github.com/ibnlanre).
 ## License and support
 
 MIT. Commercial use needs no permission and no payment, and only the copyright notice has to travel with the
-code — that is deliberate, because a CSS library is more useful when nobody has to ask.
+code. That is deliberate, because a CSS library is more useful when nobody has to ask.
 
 If it earns a place in something you ship, [sponsoring the work](https://github.com/sponsors/ibnlanre) is what
 keeps it maintained. That is a request rather than a condition: the licence is unchanged for anyone who does not,

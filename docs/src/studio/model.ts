@@ -93,7 +93,7 @@ export function exportedTrackClasses(
    *
    * Controls are scoped by the track's name, and a property's name is not a label: `/opacity` is the scope of
    * every `opacity` motion on the element, so a track named `opacity` publishes controls that reach this track
-   * as well. What that track omits is then decided by its sibling, so this one cannot omit anything — its
+   * as well. What that track omits is then decided by its sibling, so this one cannot omit anything: its
    * "default" is whatever the sibling wrote. Measured before this check: an `opacity-2` track authored at
    * 1000ms ran at its sibling's 2000ms, in the exported page *and* in the editor's own replay, because both
    * read one serialization and parity cannot see a mistake they share.
@@ -110,7 +110,7 @@ export function exportedTrackClasses(
 }
 
 /**
- * The name a new track gets: the property with a count — never the bare property.
+ * The name a new track gets: the property with a count, never the bare property.
  *
  * A bare property name is a **structural address**, not a label: a track named `opacity` publishes controls in
  * the `opacity` property's scope, which reaches its siblings' motions as well as its own, so one track's timing
@@ -297,7 +297,7 @@ export function trackClasses(track: Track, preserveDefaults = false): string[] {
     Math.abs(c.delay) > 120000
   )
     throw new Error(
-      'Use a duration from 1–120000ms and a delay within ±120000ms.',
+      'Use a duration from 1-120000ms and a delay within ±120000ms.',
     )
   if (!/^(infinite|\d+(\.\d+)?)$/.test(c.iterations) || c.iterations === '0')
     throw new Error('Iterations must be positive or infinite.')

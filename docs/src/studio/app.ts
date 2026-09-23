@@ -207,7 +207,7 @@ worker.onmessage = async event => {
     pending = false
     lastError = data.error
     $('compile-status').textContent =
-      'Compilation failed — last valid preview retained'
+      'Compilation failed: last valid preview retained'
     message(data.error)
     renderOutput()
     return

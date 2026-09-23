@@ -4,7 +4,7 @@ title: From zero to moving.
 description: Install the plugin, wire it into your build, and make your first entrance.
 ---
 
-## 01 — Install
+## 01: Install
 
 Add Jumi to a project with Tailwind CSS already configured. The examples on this site target Tailwind CSS v4.
 
@@ -14,7 +14,7 @@ pnpm add @ibnlanre/jumi
 
 Using another package manager? `npm install @ibnlanre/jumi`, `yarn add @ibnlanre/jumi`, and `bun add @ibnlanre/jumi` work too.
 
-## 02 — Wire it into your build
+## 02: Wire it into your build
 
 Jumi needs two things: the plugin, which teaches Tailwind the utilities, and an integration, which finishes the stylesheet once every `animate-*` class on the page has been compiled. Replacing Tailwind's Vite plugin with Jumi gives you both at once:
 
@@ -46,7 +46,7 @@ Register the plugin in CSS and finish the stylesheet with Jumi beside Tailwind's
 ```
 
 ```ts
-// vite.config.ts — Tailwind's entry, plus Jumi after it
+// vite.config.ts: Tailwind's entry, plus Jumi after it
 import tailwindcss from '@tailwindcss/vite'
 import { jumiFinalizer } from '@ibnlanre/jumi/vite'
 
@@ -66,7 +66,7 @@ export default { plugins: { '@ibnlanre/jumi/postcss': {} } }
 
 If `@tailwindcss/postcss` is already configured separately and you would rather not replace that
 entry, put `jumiFinalizer()` after it instead. Nothing registers Jumi in that shape, so the
-stylesheet still names the plugin — the same `@plugin "@ibnlanre/jumi";` as the explicit setup
+stylesheet still names the plugin: the same `@plugin "@ibnlanre/jumi";` as the explicit setup
 above:
 
 ```js
@@ -88,7 +88,7 @@ const { css } = finalizeCss(readFileSync('dist/output.css', 'utf8'))
 writeFileSync('dist/output.css', css)
 ```
 
-## 03 — Make an entrance
+## 03: Make an entrance
 
 ```html
 <div
@@ -103,9 +103,9 @@ writeFileSync('dist/output.css', css)
 not requested reduced motion. The element stays visible otherwise, because only the animation is
 conditional.
 
-## 04 — Add the runtime only where you need it
+## 04: Add the runtime only where you need it
 
-Jumi is CSS and build-time right up to the point where your own state changes inside one document — a card
+Jumi is CSS and build-time right up to the point where your own state changes inside one document: a card
 taking the corner, a panel opening, a list reordering. That half needs someone to say _when_ the change
 happens, and it lives behind its own subpath so the root package stays free of runtime code:
 
@@ -147,8 +147,8 @@ Write complete class names in your source. Tailwind cannot discover a class asse
 
 ## If nothing moves
 
-- Check that the element carries the motion utility, and that the variant is on that utility —
-  `motion-safe:animate-*` — rather than on an ancestor.
+- Check that the element carries the motion utility, and that the variant is on that utility (
+  `motion-safe:animate-*`) rather than on an ancestor.
 - Check that your build includes the integration, not only the plugin. `@plugin "@ibnlanre/jumi"` on its own leaves the stylesheet unfinished, and the animations then compile to nothing, without an error.
 - Check that your stylesheet is imported by your app.
 - Use explicit units for arbitrary timing values: `animation-duration-[800ms]`.

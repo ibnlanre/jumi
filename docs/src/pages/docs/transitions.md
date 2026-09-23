@@ -52,7 +52,7 @@ The same holds for animations: `animation-duration-500` says how long an animati
 </button>
 ```
 
-A property the browser cannot interpolate — `display` is the usual one — does not transition at all unless you say it may:
+A property the browser cannot interpolate (`display` is the usual one) does not transition at all unless you say it may:
 
 ```html
 <div
@@ -60,9 +60,9 @@ A property the browser cannot interpolate — `display` is the usual one — doe
 ></div>
 ```
 
-With that, the flip is placed so the content stays on screen: at the start on the way in, at the end on the way out. That is what makes appear-and-disappear work as a transition rather than as an animation. The one thing it cannot supply is the before-style a first render has nothing to travel from — `@starting-style` is plain CSS and belongs in your own stylesheet, next to the markup it describes. `transition-behavior-normal` is the default.
+With that, the flip is placed so the content stays on screen: at the start on the way in, at the end on the way out. That is what makes appear-and-disappear work as a transition rather than as an animation. The one thing it cannot supply is the before-style a first render has nothing to travel from: `@starting-style` is plain CSS and belongs in your own stylesheet, next to the markup it describes. `transition-behavior-normal` is the default.
 
-Where the property is unknown, the declaration is ignored, and a discrete property simply does not transition — the change still happens, instantly. Everything else on this page is unaffected, since nothing else here is conditional on it.
+Where the property is unknown, the declaration is ignored, and a discrete property simply does not transition: the change still happens, instantly. Everything else on this page is unaffected, since nothing else here is conditional on it.
 
 ## Independent timing
 

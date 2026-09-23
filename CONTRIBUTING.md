@@ -92,8 +92,8 @@ Prioritize clear, readable class names over shorter alternatives.
 
 ### 5. Use Tailwind v4 Relationship Variants
 
-Relationship matching is Tailwind's grammar. Use its variants — including the arbitrary form when a
-named one does not exist — instead of registering a variant of your own.
+Relationship matching is Tailwind's grammar. Use its variants, including the arbitrary form when a
+named one does not exist, instead of registering a variant of your own.
 
 ```html
 ✅ Good - Tailwind's variants
@@ -110,7 +110,7 @@ named one does not exist — instead of registering a variant of your own.
 ```
 
 **Why?** Tailwind owns the selector grammar and keeps evolving it. Jumi registering `is-*`,
-`where-*` or `has-*` would claim part of that vocabulary — see principle 9 for why that is worse
+`where-*` or `has-*` would claim part of that vocabulary; see principle 9 for why that is worse
 than it looks, and what the `has-*` incident cost.
 
 ---
@@ -121,9 +121,9 @@ An element animates because it carries a motion utility. Nothing opts it in a se
 rule of Jumi's is written by hand.
 
 ```html
-✅ Good — the utilities are the whole interface
+✅ Good: the utilities are the whole interface
 <div class="animate-rotate-45 animate-scale-110">
-  ❌ Avoid — a hand-written list is a copy that goes stale
+  ❌ Avoid: a hand-written list is a copy that goes stale
   <div
     class="animate-rotate-45"
     style="animation-name: rot, scale"
@@ -134,11 +134,11 @@ rule of Jumi's is written by hand.
 **Why?** Every animation on an element competes for the same declarations, and those are _lists_
 (`animation-name`, `animation-duration`, and the rest) the browser resolves by position. A utility can
 own its own value; it cannot own the list, because Tailwind compiles each candidate without knowing
-what else the element carries — and caches that utility's output per candidate, so a list written
+what else the element carries, and caches that utility's output per candidate, so a list written
 inside one is reused stale the moment another slot appears. So the integration derives the list from
 the finished stylesheet, for every selector that proves it animates.
 
-This used to be a class the author wrote — `animations`, and `transitions` for the other carrier.
+This used to be a class the author wrote: `animations`, and `transitions` for the other carrier.
 Those are gone, replaced by an inference over emitted CSS, and what survives them is the reason they
 existed. The guardrails below are the ones that outlived the class.
 
@@ -151,12 +151,12 @@ Guardrails, each of which cost a shipped bug to learn:
 - **The defaults resolve on the element.** Their entries reference the slot variables the `animate-*`
   utilities declare _on the element_, and a `var()` chain inside a custom property resolves where it
   is declared. Published on `:root` instead, every animating element silently resolves
-  `animation-name: none`, and the stagger system stops — `--jumi-animation-delay` reads a variable
+  `animation-name: none`, and the stagger system stops: `--jumi-animation-delay` reads a variable
   only the element sets.
 - **The finalizer needs the finished stylesheet.** For Vite that is a transform with no `enforce`; for
   PostCSS it is `OnceExit`. Both were measured against the alternatives.
 - **Slot activation names are registered `inherits: false`; controls are not.** An activation is
-  state — inherited into an animating descendant it makes that descendant run its ancestor's
+  state: inherited into an animating descendant it makes that descendant run its ancestor's
   animation. A control is configuration, and inheriting from a wrapper is the point of it.
 
 Before publishing the composition anywhere else: which element will resolve that declaration? Before
@@ -171,13 +171,13 @@ deletion path.**
 An integration that teaches someone plugin ordering has exported Jumi's complexity to the person with
 no way to fix it. So `jumi()` composes Tailwind's plugin rather than sitting beside it
 (`plugins: [jumi()]`), and registers itself in the Tailwind entry stylesheet, so there is no `@plugin`
-directive to write. The remaining step — finishing the stylesheet after Tailwind — has a deletion
+directive to write. The remaining step (finishing the stylesheet after Tailwind) has a deletion
 path; see `engineering/roadmap/migration.md`. **A new required step is a regression unless it ships
 with the plan to remove it.**
 
 Registration is `jumi()`'s job, and the injection rules are not negotiable: only a stylesheet that
-imports Tailwind is a compilation root, and a file that already registers Jumi — by specifier, or by
-any path whose name mentions Jumi — is left alone. Registering twice emits every `@keyframes` twice.
+imports Tailwind is a compilation root, and a file that already registers Jumi (by specifier, or by
+any path whose name mentions Jumi) is left alone. Registering twice emits every `@keyframes` twice.
 
 ### 8. Theme Mappings Are Measured, Not Inferred
 
@@ -188,7 +188,7 @@ any path whose name mentions Jumi — is left alone. Registering twice emits eve
 - **A key _name_ can be the contract.** For a spacing-derived scale the numeric name _is_ the
   multiple; `--spacing` is only its representation, and the host's JS scale cannot be trusted for it.
 - **A scale can mix modes, so resolution is per value.** `leading-6` is `calc(var(--spacing) * 6)`,
-  `leading-tight` is `var(--leading-tight)`, `leading-none` is a literal — out of one key.
+  `leading-tight` is `var(--leading-tight)`, `leading-none` is a literal, out of one key.
 - **A name with no verified token or formula stays literal.** Inventing a mapping creates a second
   theme source inside Jumi.
 
@@ -226,7 +226,7 @@ records, and records live in `engineering/`.
 
 | Location                       | Holds                                                               |
 | ------------------------------ | ------------------------------------------------------------------- |
-| `docs/`                        | the Astro site only — `src/pages`, layouts, styles, data, `public/` |
+| `docs/`                        | the Astro site only: `src/pages`, layouts, styles, data, `public/` |
 | `engineering/architecture`     | how the machine works, and why it is shaped this way                |
 | `engineering/research`         | investigations, measurements, and their conclusions                 |
 | `engineering/roadmap`          | what is planned, in what order, and what was closed                 |
@@ -419,7 +419,7 @@ pnpm studio:check           # an authored scene survives export, an independent 
 
 `pnpm check` runs all nineteen stages in that order and **names every one in its summary**, with the
 stages it did not reach marked `not run` rather than left out. The sequence still stops at the first
-failure — later checks against a half-built `dist` would be a different gate, not a clearer one — but
+failure: later checks against a half-built `dist` would be a different gate, not a clearer one, but
 a failure can no longer read as "everything after it passed". That misreading cost a real bug: a
 composition fingerprint in `incremental:check` stayed stale across a whole representation change
 because the chain stopped at `test:run` and every stage below it was simply absent from the output.
@@ -432,7 +432,7 @@ Quality Standards.
 **`behaviour:check` is not optional, and it is not a duplicate of the others.** Every
 harness above reads emitted _text_: the snapshot compares bytes, the structural metrics
 count declarations, the incremental harness watches a list grow. A page can pass all of
-them while a browser does nothing — that has happened twice here. It happened most
+them while a browser does nothing, and that has happened twice here. It happened most
 recently with the aggregate published on `:root`, where the CSS looked plausible, the
 snapshot was green, 123 unit tests passed, and every carrier resolved
 `animation-name: none`, because a `var()` chain inside a custom property resolves where
@@ -456,7 +456,7 @@ the check that knows.
 ## Releasing
 
 The version decision is **explicit**. Commit prefixes generate the mechanical record, but they do not decide how
-big a release is — a `fix:` can be the most important change in a release, and an architectural judgement is not
+big a release is: a `fix:` can be the most important change in a release, and an architectural judgement is not
 something a prefix should be trusted to make.
 
 ```bash
@@ -474,8 +474,8 @@ Four things about that flow are load-bearing:
 - **The bump comes before the changelog.** The generator stamps the release header from `package.json`, so
   running it first labels the release with the _previous_ version.
 - **Publish with `npm`, not `pnpm`.** Measured on the first release: `pnpm publish` uploads pnpm's own
-  tarball (402,611 B) and rewrites the manifest — it drops `scripts.prepublishOnly` and the dev-only
-  `packageManager` field — while `npm publish` uploads the artifact this repository verifies against
+  tarball (402,611 B) and rewrites the manifest (it drops `scripts.prepublishOnly` and the dev-only
+  `packageManager` field) while `npm publish` uploads the artifact this repository verifies against
   (398,114 B for `0.1.0`, shasum `401bca972ccfe7a27cd14887b7c5da081f9c0997`, every manifest key as
   written). Both install and build correctly, so the difference is only which bytes a consumer can audit:
   the ones the repository states, or a repackaging of them.
@@ -486,16 +486,16 @@ Four things about that flow are load-bearing:
   cannot run until the tag that release is about to create exists. Generation starts with the release after
   the first one.
 - **`release:*` does not commit or tag.** It runs `pnpm version <bump> --no-git-tag-version`, which edits
-  `package.json` and stops — so the release is one commit and one tag, not two of each.
-- **The boundary is a tag.** Everything written in `CHANGELOG.md` before the first tag — the curated `0.1.0`
-  notes, plus the one generated block kept for the never-published `1.0.0-beta.1` line — is left exactly as
+  `package.json` and stops, so the release is one commit and one tag, not two of each.
+- **The boundary is a tag.** Everything written in `CHANGELOG.md` before the first tag (the curated `0.1.0`
+  notes, plus the one generated block kept for the never-published `1.0.0-beta.1` line) is left exactly as
   written; generation prepends above it. With no tag at all the generator would rewrite the entire history, so
   `pnpm run changelog` refuses to run until one exists.
 - **Inspection is `--preview`, never a mode that rewrites the file.** `pnpm run changelog -- --preview`
   prints the section to stdout and writes nothing. Writing always inserts above the first heading, and refuses
   outright when that version's heading is already there, so a second run cannot duplicate a release. (The
-  danger this bullet used to describe — `conventional-changelog -r 0`, which overwrote the file instead of
-  prepending — went with the CLI; see below.)
+  danger this bullet used to describe (`conventional-changelog -r 0`, which overwrote the file instead of
+  prepending) went with the CLI; see below.)
 
 ### The mechanical record
 
@@ -516,7 +516,7 @@ Conventional Commits specification:
 | `style`    | Style                    |
 | `chore`    | Chores                   |
 
-A scope is optional — `fix(carriers): …` renders as **carriers:** — and either `!` on the subject or a
+A scope is optional (`fix(carriers): …` renders as **carriers:**) and either `!` on the subject or a
 `BREAKING CHANGE:` footer puts the commit in a breaking summary at the top, which quotes the footer when
 there is one. **Nothing is dropped.** A subject that matches no accepted prefix, including a sentence with no
 prefix at all, is listed verbatim under `Other changes`: a prefix is a convenience for the reader, not a tax
@@ -524,7 +524,7 @@ on the writer, and no commit disappears from the record because of how it was wr
 
 Sections appear in the order above regardless of how many commits each holds, so two releases are laid out
 the same way. The generator is deliberately not `conventional-changelog`: its preset drops every subject it
-does not recognise — 107 of this repository's 324, when the record was checked against the history it claims
+does not recognise: 107 of this repository's 324, when the record was checked against the history it claims
 to describe.
 
 ## Quality Standards
@@ -550,14 +550,14 @@ to describe.
 
 A developer-facing CSS library is only as usable as the tools developers read it with. Jumi's
 composition is synthesized into every activating rule, so the amount an inspector has to fetch and
-render scales with the number of slots — and that cost is invisible to every check in the gate.
+render scales with the number of slots, and that cost is invisible to every check in the gate.
 
 - **DevTools inspectability is a release criterion.** Opening the effects catalogue and selecting an
   animated element must not stall Inspector. This was missed once already: the page was smooth, the
   snapshot was green, `behaviour:check` passed, and selecting an element in the Elements panel took
   over 20 seconds.
 - **Measure the protocol, not the file.** At 228 slots the stylesheet and the response differ by a
-  factor of five — 178 KB of composition-rule text becomes 863 KB of
+  factor of five: 178 KB of composition-rule text becomes 863 KB of
   `CSS.getMatchedStylesForNode` payload, because the declaration body crosses the wire three times
   (as each property's `value`, its `text`, and the rule's `cssText`). A 3% change in stylesheet
   bytes corresponded to a 61% change in response bytes, so sheet size is not a usable proxy.
@@ -570,7 +570,7 @@ pnpm spike:recalc       # the renderer: recalc over slot counts × animated elem
 pnpm spike:local-list   # why an element-local vector is not expressible in CSS
 ```
 
-These are measurements, not gates — they are too slow for `pnpm check`. The reasoning and the
+These are measurements, not gates: they are too slow for `pnpm check`. The reasoning and the
 numbers are in `engineering/research/style-cost.md`.
 
 ### Documentation
@@ -664,7 +664,7 @@ node scripts/check.mjs | tail -4 && git commit ...     # the commit runs on a re
 node scripts/check.mjs > /tmp/gate.log 2>&1; echo "exit: $?"; tail -4 /tmp/gate.log
 ```
 
-`scripts/check.mjs` exits 1 when a stage fails, but a pipeline's status is the **last** command's — so
+`scripts/check.mjs` exits 1 when a stage fails, but a pipeline's status is the **last** command's, so
 `| tail` reports success whatever the gate did, and the last four lines still look green because a failing
 stage prints its detail above them. Measured: a formatting sweep was committed on top of a failing `css`
 stage while the summary read `✗ css failed` the whole time.
@@ -678,16 +678,16 @@ wrapping and on `color: rgb(...)` becoming `color:rgb(...)`. Both recorded artif
 
 ## Formatting
 
-One formatter per language, and one configuration for all of them — `prettier.config.mjs`:
+One formatter per language, and one configuration for all of them, `prettier.config.mjs`:
 
 | language                                                    | formatter                                                    |
 | ----------------------------------------------------------- | ------------------------------------------------------------ |
 | `ts`, `tsx`, `js`, `mjs`, `cjs`                             | ESLint, which runs Prettier through `eslint-plugin-prettier` |
-| `json`, `jsonc`, `css`, `html`, `markdown`, `yaml`, `astro` | Prettier — ESLint ignores these or cannot parse them         |
+| `json`, `jsonc`, `css`, `html`, `markdown`, `yaml`, `astro` | Prettier; ESLint ignores these or cannot parse them         |
 
 The point is that a save in the editor and `pnpm lint` are the same operation. `pnpm lint` is `eslint --fix .`,
 and the editor routes the second row to Prettier directly, with the built-in formatters for those languages
-turned off — so a file the default formatter declines cannot silently fall through to a different one.
+turned off, so a file the default formatter declines cannot silently fall through to a different one.
 
 ```sh
 npx eslint src scripts docs/src docs/astro.config.ts   # 0 warnings

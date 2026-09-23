@@ -13,12 +13,12 @@ pnpm run docs:preview
 ```
 
 The build writes `docs/dist/`. That directory is what gets deployed, and the deploy contract lives in
-the root `vercel.json` — see `engineering/research/deployment.md`.
+the root `vercel.json`; see `engineering/research/deployment.md`.
 
 ## How the site is built
 
 `scripts/prepare-docs.mjs` copies the bundled plugin, integration and runtime into the ignored
-`docs/vendor/` directory — each with its declaration, because the files that import them are typed — and
+`docs/vendor/` directory, each with its declaration, because the files that import them are typed, and
 writes `src/data/effects.json` from Jumi's keyframe catalog. Run `docs:prepare` after editing the
 library while the development server is running.
 

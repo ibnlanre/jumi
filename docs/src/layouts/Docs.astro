@@ -20,7 +20,7 @@ const links = [
 ---
 
 <Layout
-  title={`${frontmatter.title} — Jumi`}
+  title={`${frontmatter.title} | Jumi`}
   description={frontmatter.description}
   docs
 >
@@ -63,8 +63,8 @@ const links = [
   </div>
   <script>
     document.querySelectorAll<HTMLPreElement>('.prose pre').forEach(pre => {
-      // The frame owns the button; only the `pre` scrolls. Appended to the `pre` — which is what this
-      // did — the button is a child of the scroller, so it travelled with the code the moment a line was
+      // The frame owns the button; only the `pre` scrolls. Appended to the `which is what this
+      // did, the button is a child of the scroller, so it travelled with the code the moment a line was
       // wider than the column: the screenshot case, and the reason the wrapper exists.
       const frame = document.createElement('div')
       frame.className = 'code-frame'

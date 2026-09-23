@@ -2,7 +2,7 @@
 import '../styles/global.css'
 import effects from '../data/effects.json'
 const {
-  title = 'Jumi — Motion, atom by atom.',
+  title = 'Jumi | Motion, atom by atom.',
   description = 'A composable animation library for Tailwind CSS. Make the web move with Jumi.',
   docs = false,
 } = Astro.props
@@ -120,7 +120,7 @@ const {
             const surface = button.closest('[data-demo]')
             // Whatever the composition resolved onto: a direct utility, a variant, or the children a
             // stagger drives. There is no carrier class to select any more, so the predicate is the one
-            // the browser computed — an element animates when its `animation-name` is not `none`.
+            // the browser computed, an element animates when its `animation-name` is not `none`.
             const animated = (element: HTMLElement) =>
               getComputedStyle(element)
                 .animationName.split(',')

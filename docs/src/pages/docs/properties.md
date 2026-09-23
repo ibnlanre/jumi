@@ -28,7 +28,7 @@ Simple property animations generate a `to` keyframe. The starting point comes fr
 </div>
 ```
 
-Without it the keyword still applies, but as a discrete change — the property holds its starting value and flips at the midpoint. `interpolate-size-numeric-only` stops a subtree inheriting the switch.
+Without it the keyword still applies, but as a discrete change: the property holds its starting value and flips at the midpoint. `interpolate-size-numeric-only` stops a subtree inheriting the switch.
 
 A value that carries its own intrinsic size needs no switch at all:
 
@@ -100,9 +100,9 @@ A motion path is a property you declare and a property you animate, and keeping 
 ></div>
 ```
 
-The geometry is arbitrary, so anything the platform accepts is available: `path()`, `ray()`, `circle()`, `ellipse()`, `inset()`, `polygon()`, and the box keywords `border-box`, `padding-box`, `content-box`. `offset-path:border-box` needs no geometry at all — the element travels its own border box.
+The geometry is arbitrary, so anything the platform accepts is available: `path()`, `ray()`, `circle()`, `ellipse()`, `inset()`, `polygon()`, and the box keywords `border-box`, `padding-box`, `content-box`. `offset-path:border-box` needs no geometry at all; the element travels its own border box.
 
-Three properties describe the geometry, and they are written once rather than animated: `offset-path`, `offset-rotate` — `auto` turns the element to follow the tangent — and `offset-anchor`, which decides which point of the element rides the path. All of them are ordinary utilities with an arbitrary value, so nothing new has to be learned:
+Three properties describe the geometry, and they are written once rather than animated: `offset-path`, `offset-rotate` (`auto` turns the element to follow the tangent) and `offset-anchor`, which decides which point of the element rides the path. All of them are ordinary utilities with an arbitrary value, so nothing new has to be learned:
 
 ```html
 <div
@@ -124,7 +124,7 @@ Because the driver is an ordinary animation, everything else composes with it. S
 ></div>
 ```
 
-**A note for the adventurous.** `offset-path` is itself animatable _between two compatible paths_ — the same command list, different coordinates — so a path can morph as it is travelled. Animating it from `none`, though, is a discrete step: the element does not ease onto the path, it appears on it halfway through. Declare the path.
+**A note for the adventurous.** `offset-path` is itself animatable _between two compatible paths_ (the same command list, different coordinates), so a path can morph as it is travelled. Animating it from `none`, though, is a discrete step: the element does not ease onto the path, it appears on it halfway through. Declare the path.
 
 ## CSS still sets the boundaries
 

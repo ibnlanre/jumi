@@ -48,7 +48,7 @@ Append `/{property}` or `/{effect}` to timing controls:
 </div>
 ```
 
-Any motion can be named, and the name goes after a slash: `animate-fade-in/reveal`, `animate-opacity-50/reveal`, `animate-rotate-[0:0deg|12:-8deg|100:-8deg]/reveal`. `[brackets]` are only for a name that needs them — a name is one word, so you can write it directly.
+Any motion can be named, and the name goes after a slash: `animate-fade-in/reveal`, `animate-opacity-50/reveal`, `animate-rotate-[0:0deg|12:-8deg|100:-8deg]/reveal`. `[brackets]` are only for a name that needs them: a name is one word, so you can write it directly.
 
 When one property carries more than one animation, name each where you declare it and address it by that name:
 
@@ -64,19 +64,19 @@ When one property carries more than one animation, name each where you declare i
 </div>
 ```
 
-`/flick` gives that animation a name, and the same name on a control times it on its own. Each animation reads its own name first, then the property's control, then the global one, so anything else in the list is left alone — and naming one does not change its phrase.
+`/flick` gives that animation a name, and the same name on a control times it on its own. Each animation reads its own name first, then the property's control, then the global one, so anything else in the list is left alone, and naming one does not change its phrase.
 
-A name belongs to the motion that declared it, on the element that wrote it. Two elements may use the same word for different motions, and naming a motion elsewhere in your stylesheet never widens what this element answers to. Two motions on one element may also share a name, and then a control written for that name reaches both — which is how a transition of several properties is tuned as one thing.
+A name belongs to the motion that declared it, on the element that wrote it. Two elements may use the same word for different motions, and naming a motion elsewhere in your stylesheet never widens what this element answers to. Two motions on one element may also share a name, and then a control written for that name reaches both, which is how a transition of several properties is tuned as one thing.
 
-The name is yours to choose, and a control reads it the same way whether you write `/rotate` or `/flick`. They resolve differently, and that is the one rule to know: a word that is a property Jumi can animate — `rotate`, `scale`, `filter` — is that property's, so every motion animating it answers; any other word is a name, and only the motion that declared it answers. `--jumi-rotate-animation-timing-function` is the variable every rotate animation reads, and a name is reached at `--jumi-label-flick-animation-timing-function`, which no property can occupy. Give each animation you want to time apart its own word, and make it a word that is not a property.
+The name is yours to choose, and a control reads it the same way whether you write `/rotate` or `/flick`. They resolve differently, and that is the one rule to know: a word that is a property Jumi can animate (`rotate`, `scale`, `filter`) is that property's, so every motion animating it answers; any other word is a name, and only the motion that declared it answers. `--jumi-rotate-animation-timing-function` is the variable every rotate animation reads, and a name is reached at `--jumi-label-flick-animation-timing-function`, which no property can occupy. Give each animation you want to time apart its own word, and make it a word that is not a property.
 
-That rule is why a name can never be half-shared. `animate-rotate-45/scale` names a rotate motion `scale`, and `/scale` on a control is the scale property's in every stylesheet, so the name does not steal it — the build tells you instead, and the motion keeps the timing of whatever addresses rotate.
+That rule is why a name can never be half-shared. `animate-rotate-45/scale` names a rotate motion `scale`, and `/scale` on a control is the scale property's in every stylesheet, so the name does not steal it; the build tells you instead, and the motion keeps the timing of whatever addresses rotate.
 
 Naming is registered non-inheriting: a name does not travel into descendants, so a wrapper and the element inside it can use the same word without knowing about each other.
 
 The three links do not behave alike across that boundary. A `/{property}` control on a wrapper does reach the animations inside it, because nothing declares `--jumi-{property}-animation-{part}` on the element, so the value it writes is inherited. A global control does not: every animating element declares the global defaults itself, and a declaration beats inheritance. A name never does.
 
-Naming a motion that is not there is not an error: controls configure motion, they do not create it, so `animation-duration-500/reveal` with nothing named `reveal` on the element does nothing at all — exactly like `animation-duration-500`. That is what makes a named control beside a conditional motion (`motion-safe:animate-fade-in/reveal`) ordinary rather than suspect. A name that cannot be written, though, is reported and dropped: a name becomes part of a custom property's name, and whitespace cannot appear there — which is what an underscore becomes inside `[brackets]`, so write a name bare.
+Naming a motion that is not there is not an error: controls configure motion, they do not create it, so `animation-duration-500/reveal` with nothing named `reveal` on the element does nothing at all, exactly like `animation-duration-500`. That is what makes a named control beside a conditional motion (`motion-safe:animate-fade-in/reveal`) ordinary rather than suspect. A name that cannot be written, though, is reported and dropped: a name becomes part of a custom property's name, and whitespace cannot appear there, which is what an underscore becomes inside `[brackets]`, so write a name bare.
 
 Reach for naming when one easing is not enough. A single `animation-timing-function` applies to every segment of an animation, so pairing an eased flick with a linear return takes two animations, each with one moving segment. `animation-composition: add` lets both apply at once instead of the second replacing the first.
 
@@ -90,7 +90,7 @@ The name is written into the rule, so you can retime or re-ease that animation f
 
 ## Write the shape of the animation
 
-A value can declare its own frames — an offset, a colon, a value — so one utility describes the whole motion:
+A value can declare its own frames (an offset, a colon, a value), so one utility describes the whole motion:
 
 ```html
 <div
@@ -103,11 +103,11 @@ A value can declare its own frames — an offset, a colon, a value — so one ut
 ```
 
 Frames are separated by pipes, each written `<offset>:<value>`, so a
-comma-separated value list cannot be mistaken for a phrase. The offset is a bare number, the `%` is implied, and `0` and `100` are the endpoints. Any offset you leave out is the property's resting value, so a phrase holds still until its first frame and closes itself at the end. That is what makes it safe to run `infinite`: the loop has no seam. An offset outside `0`–`100` is reported and dropped: the motion emits nothing, and the build warns with the class and the offset it refused rather than handing the browser a frame it will throw away.
+comma-separated value list cannot be mistaken for a phrase. The offset is a bare number, the `%` is implied, and `0` and `100` are the endpoints. Any offset you leave out is the property's resting value, so a phrase holds still until its first frame and closes itself at the end. That is what makes it safe to run `infinite`: the loop has no seam. An offset outside `0`-`100` is reported and dropped: the motion emits nothing, and the build warns with the class and the offset it refused rather than handing the browser a frame it will throw away.
 
-A phrase owns its property, and its keyframe is named after the phrase, so nothing else can share it. Two elements running the same phrase run the same keyframe; a different phrase gets a keyframe of its own. No other markup can change what your animation does — which is also why you write one phrase per property per element rather than layering several.
+A phrase owns its property, and its keyframe is named after the phrase, so nothing else can share it. Two elements running the same phrase run the same keyframe; a different phrase gets a keyframe of its own. No other markup can change what your animation does, which is also why you write one phrase per property per element rather than layering several.
 
-A phrase works wherever a value works, for any property in the table — including the ones whose values are lengths or colours, such as `animate-offset-distance-[0:0%|100:100%]` or `animate-background-color-[0:red|100:blue]`. The two spellings are validated differently, and deliberately so: an ordinary arbitrary value is checked against the property's CSS type, so `animate-offset-distance-[50%]` is accepted and `animate-offset-distance-[abc]` is not, while a phrase is checked against Jumi's own grammar — `offset:value` pairs — and its values are left to the browser.
+A phrase works wherever a value works, for any property in the table, including the ones whose values are lengths or colours, such as `animate-offset-distance-[0:0%|100:100%]` or `animate-background-color-[0:red|100:blue]`. The two spellings are validated differently, and deliberately so: an ordinary arbitrary value is checked against the property's CSS type, so `animate-offset-distance-[50%]` is accepted and `animate-offset-distance-[abc]` is not, while a phrase is checked against Jumi's own grammar (`offset:value` pairs) and its values are left to the browser.
 
 Placing an action inside the cycle, rather than spreading it across the whole of it, is what this is for. A step earlier in the phrase is a step later in the cycle:
 
@@ -118,7 +118,7 @@ Placing an action inside the cycle, rather than spreading it across the whole of
   animation-duration-2600
   animation-iteration-count-infinite"
 >
-  Gather, overshoot, settle — and arrive while it settles.
+  Gather, overshoot, settle, and arrive while it settles.
 </div>
 ```
 
@@ -149,7 +149,7 @@ This site's hero is built this way. A wrapper around each petal carries a slow, 
 </div>
 ```
 
-The wrapper turns a full circle over `75s`, ending exactly one turn from where it starts, so its loop has no seam and the petals can wind continuously in one direction. The petal's own two animations are symmetric — back `8deg`, then forward to rest — so the winding is what keeps the composed rotation moving the same way throughout.
+The wrapper turns a full circle over `75s`, ending exactly one turn from where it starts, so its loop has no seam and the petals can wind continuously in one direction. The petal's own two animations are symmetric (back `8deg`, then forward to rest), so the winding is what keeps the composed rotation moving the same way throughout.
 
 The petals are staggered `250ms` apart, one twelfth of the `3s` cycle, so each flick overlaps the next and the motion travels around the ring rather than arriving everywhere at once.
 
@@ -189,7 +189,7 @@ A motion is not written differently because a scroll drives it. The same `animat
 
 ### Choosing the scroller, and where tracking starts
 
-Three controls say more about the driver itself. `animation-timeline-scroller` picks which scroller a `scroll()` timeline takes — `-nearest`, `-root` for the document, or `-self` — and `animation-timeline-axis` picks the axis it follows:
+Three controls say more about the driver itself. `animation-timeline-scroller` picks which scroller a `scroll()` timeline takes (`-nearest`, `-root` for the document, or `-self`), and `animation-timeline-axis` picks the axis it follows:
 
 ```html
 <div
@@ -205,7 +205,7 @@ For a `view` timeline, the insets place where tracking begins and ends inside th
 ></article>
 ```
 
-Both insets take a `<length-percentage>`, and it is usually a percentage: start tracking once the element is 10% into the scrollport and stop at 25%. Everything here is a control — it configures a timeline, it does not give one, so it does nothing on an element that names no driver.
+Both insets take a `<length-percentage>`, and it is usually a percentage: start tracking once the element is 10% into the scrollport and stop at 25%. Everything here is a control: it configures a timeline, it does not give one, so it does nothing on an element that names no driver.
 
 ### Declaring a named timeline
 
@@ -233,9 +233,9 @@ var(--feed)                      → a custom property reference, which is a dif
 (--feed)                         → Tailwind's shorthand for var(--feed), so also a custom property
 ```
 
-The dashed syntax looks like a custom property and is not one: `scroll-timeline-name` computes to `none` on a child of the scroller rather than inheriting, and nothing about `var()` applies. Bracket the name — `animation-timeline-[--feed]` — because it is an arbitrary CSS value, which is exactly what the name is. The parenthesised spelling is not an alternative for it: `(--feed)` means `var(--feed)`, a custom property reference rather than a timeline name, and on the timeline control it carries no declaration at all. Two similar-looking spellings, two unrelated meanings — bracketed for a name.
+The dashed syntax looks like a custom property and is not one: `scroll-timeline-name` computes to `none` on a child of the scroller rather than inheriting, and nothing about `var()` applies. Bracket the name (`animation-timeline-[--feed]`) because it is an arbitrary CSS value, which is exactly what the name is. The parenthesised spelling is not an alternative for it: `(--feed)` means `var(--feed)`, a custom property reference rather than a timeline name, and on the timeline control it carries no declaration at all. Two similar-looking spellings, two unrelated meanings: bracketed for a name.
 
-A named timeline is visible to the **descendants** of the element that declares it, and to nothing else: not to its siblings, not to the rest of the document. `timeline-scope` is the property that would widen that, and in current Chromium it parses and computes without widening resolution, so there is no cross-subtree workflow to build on yet — declare the timeline on an element the animated content lives inside.
+A named timeline is visible to the **descendants** of the element that declares it, and to nothing else: not to its siblings, not to the rest of the document. `timeline-scope` is the property that would widen that, and in current Chromium it parses and computes without widening resolution, so there is no cross-subtree workflow to build on yet: declare the timeline on an element the animated content lives inside.
 
 A range then places the motion along that driver. The arbitrary form is the value itself, so it is the one to reach for whenever a range has an offset in it:
 
@@ -261,9 +261,9 @@ Those utilities place the element's animations. To place **one** of them and lea
 ></div>
 ```
 
-The fade is scrubbed between 25% and 75% of the scroll while the rotation beside it still fills the whole range. The two spellings compose rather than compete — a ranged motion falls back to the element's range, which falls back to the whole range — so `animation-range-entry:animate-fade-in` says _this animation uses the entry range_, and `animation-range-entry` says _this element's animations do_.
+The fade is scrubbed between 25% and 75% of the scroll while the rotation beside it still fills the whole range. The two spellings compose rather than compete: a ranged motion falls back to the element's range, which falls back to the whole range, so `animation-range-entry:animate-fade-in` says _this animation uses the entry range_, and `animation-range-entry` says _this element's animations do_.
 
-A range Jumi cannot write is reported and dropped: the motion it qualified still runs, on the default range. That matters most for a range that looks legal and is not — `normal` joined to an offset, as in `animation-range-[normal_0%]`, is dropped by the engine without a word, so the warning is the only thing that tells you the range you wrote is not the range you got.
+A range Jumi cannot write is reported and dropped: the motion it qualified still runs, on the default range. That matters most for a range that looks legal and is not: `normal` joined to an offset, as in `animation-range-[normal_0%]`, is dropped by the engine without a word, so the warning is the only thing that tells you the range you wrote is not the range you got.
 
 **Fallback:** If the browser does not support scroll-driven timelines, the animation falls back to the document timeline and runs as a normal time-based animation.
 
@@ -275,13 +275,13 @@ That is a real fallback rather than a transparent one: the animation and its fin
 ></div>
 ```
 
-Inside the query the pair applies together and the motion is scrubbed; outside it neither applies, so the element keeps its base state and the motion never runs. There is no separate strict syntax for this — the guard is the whole mechanism, and it works because both halves are ordinary utilities.
+Inside the query the pair applies together and the motion is scrubbed; outside it neither applies, so the element keeps its base state and the motion never runs. There is no separate strict syntax for this: the guard is the whole mechanism, and it works because both halves are ordinary utilities.
 
-Composition is not how Jumi combines several values of one property — a phrase is. Use `animation-composition` to blend an animation with a value already on the element, or to apply two animations of one property at once, as in the labelled example above.
+Composition is not how Jumi combines several values of one property: a phrase is. Use `animation-composition` to blend an animation with a value already on the element, or to apply two animations of one property at once, as in the labelled example above.
 
 Composition, timeline and range are assembled per animation, alongside duration, delay, easing, iteration, direction, fill and playback, so `/{property}` and `/{label}` reach them the same way.
 
-On a scroll-driven animation the time controls are reinterpreted rather than ignored: 100% of the timeline is the animation's own end, so `animation-delay` becomes a share of the scroll that also shortens the motion, and `animation-iteration-count` divides the range. Stagger is delay-based, so a staggered group is staggered along the scroll the same way — each child's motion is compressed into its own share. Reach for `animation-range` when you want to place a motion deliberately.
+On a scroll-driven animation the time controls are reinterpreted rather than ignored: 100% of the timeline is the animation's own end, so `animation-delay` becomes a share of the scroll that also shortens the motion, and `animation-iteration-count` divides the range. Stagger is delay-based, so a staggered group is staggered along the scroll the same way: each child's motion is compressed into its own share. Reach for `animation-range` when you want to place a motion deliberately.
 
 ## Pause long-running motion
 

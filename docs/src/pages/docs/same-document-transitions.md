@@ -7,8 +7,8 @@ description: One wrapper around your state change, and the browser does the rest
 ## The half CSS cannot do
 
 [View transitions](/docs/view-transitions/) are CSS until the moment the thing that moves is your own
-application state. A navigation is the browser's business — `@view-transition { navigation: auto }` and the
-two documents are captured for you — but swapping a card, opening a panel, or reordering a list happens
+application state. A navigation is the browser's business (`@view-transition { navigation: auto }` and the
+two documents are captured for you), but swapping a card, opening a panel, or reordering a list happens
 _inside_ one document, and the browser cannot see it happen. It needs a before and an after, which means
 someone has to say when the change is.
 
@@ -26,7 +26,7 @@ transition.run(() => {
 
 The callback is where your change goes, so the browser captures the before and the after around it. The
 classes from [View transitions](/docs/view-transitions/) style what happens next. Nothing else is required:
-no framework, no state library, and no runtime in the root package — `@ibnlanre/jumi` stays CSS and
+no framework, no state library, and no runtime in the root package: `@ibnlanre/jumi` stays CSS and
 build-time, and only the page that changes state imports this subpath.
 
 ## The callback must finish synchronously
@@ -47,13 +47,13 @@ transition.run(() => {
 
 ## Two calls, and which one wins
 
-Calling it twice while a transition is running is the case worth knowing about, and the default — `auto` —
+Calling it twice while a transition is running is the case worth knowing about, and the default (`auto`)
 decides by _when_ the second call arrives. Which is the one thing an accidental duplicate cannot hide:
 
 - **the same task.** A second call from the same event, or one that event deferred with a promise, is the
   same interaction twice: your update runs immediately, and no second transition starts. Nothing is dropped,
   and the transition the reader is already watching is not cut short. (Whether that update shows up inside
-  the running transition's snapshots depends on when they were taken — the point is that you do not have to
+  the running transition's snapshots depends on when they were taken: the point is that you do not have to
   think about it.)
 - **a later task.** A second click, a keypress, a timer: a new intention, so it supersedes. The move the
   reader just asked for happens now, and the transition in flight is replaced by it.
@@ -73,7 +73,7 @@ transition.run(update, { concurrency: 'supersede' })
 ## The result, if you want it
 
 The call resolves to an outcome instead of rejecting whenever the transition could not run. Most callers fire
-it and ignore the result; branch on it when the difference matters, such as reporting why nothing animated —
+it and ignore the result; branch on it when the difference matters, such as reporting why nothing animated,
 the outcome is a discriminated union, so `reason` exists only on the branch where nothing ran:
 
 ```ts
@@ -98,7 +98,7 @@ if (result.transitioned) {
 | `{ transitioned: false, reason: 'unsupported' }` | this browser has no view transitions                     |
 
 Your update runs exactly once per call in every one of those cases. An outcome describes the animation, never
-whether your change happened — while update errors and asynchronous callbacks reject rather than becoming platform outcomes.
+whether your change happened, while update errors and asynchronous callbacks reject rather than becoming platform outcomes.
 
 ## Reusable operations
 

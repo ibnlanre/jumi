@@ -6,7 +6,7 @@ description: Jumi is a motion vocabulary for Tailwind CSS. Start with an effect,
 
 ## A little class goes a long way
 
-Bring an element into view with a single named effect. Choose its motion and timing — the utilities compose automatically.
+Bring an element into view with a single named effect. Choose its motion and timing; the utilities compose automatically.
 
 ```html
 <div class="animate-bounce-in animation-duration-[800ms]">Hello, movement.</div>
@@ -25,7 +25,7 @@ Jumi generates CSS at build time. Your animations run in the browser's CSS engin
 
 Animation and transition utilities compose automatically. Add the motion or transition properties you need; no setup class is required.
 
-That assembly is the whole job, and it is Jumi's rather than yours. One element can carry as many utilities as you like — each one declares its own value, and the composition gathers them into the animation lists the browser needs. To switch motion off across a surface, target the elements themselves, which is how [reduced motion](/docs/accessibility/) is handled.
+That assembly is the whole job, and it is Jumi's rather than yours. One element can carry as many utilities as you like: each one declares its own value, and the composition gathers them into the animation lists the browser needs. To switch motion off across a surface, target the elements themselves, which is how [reduced motion](/docs/accessibility/) is handled.
 
 ## Compose something personal
 

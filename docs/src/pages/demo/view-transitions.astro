@@ -6,16 +6,16 @@ import '../../styles/demo.css'
  * The six cards, and their Jumi candidates written out one by one.
  *
  * The repetition is load-bearing rather than lazy: Tailwind scans this file as **text**, so a name
- * built by interpolation — `view-transition-old/${id}:animate-fade-out` — compiles to nothing at all,
+ * built by interpolation (`view-transition-old/${id}:animate-fade-out`) compiles to nothing at all,
  * silently, and the demo would appear to work while animating none of the cards. The same constraint is
  * why the mode switch reads the candidates back off the element instead of rebuilding them.
  *
- * Each card gets its **own** name. One name shared by six elements aborts the whole transition — the
- * browser refuses a duplicate `view-transition-name` outright — so the name is the card's identity, not
+ * Each card gets its **own** name. One name shared by six elements aborts the whole transition: the
+ * browser refuses a duplicate `view-transition-name` outright, so the name is the card's identity, not
  * the collection's.
  *
  * **No duration control anywhere, and the 1s default is load-bearing.** The browser's own projection is
- * 250ms, so the motion outlives the movement by three quarters of a second — and that overhang is the
+ * 250ms, so the motion outlives the movement by three quarters of a second, and that overhang is the
  * effect this page exists to show. The box arrives at 250ms; the dissolve keeps the change unresolved
  * for the rest of it, which is what makes the shift read as one continuous glide. Matching the motion to
  * the projection instead collapses the whole thing into a snap, and the projection stops looking like
@@ -23,14 +23,14 @@ import '../../styles/demo.css'
  *
  * A motion that long used to cost a dead page: while a transition runs, the browser's pseudo tree covers
  * the viewport and takes every pointer event, so a click never reaches a card and the page ignores you
- * for the full second. That is answered by the script — the event is still dispatched, just not to the
- * element under the pointer — which is what makes the long motion affordable rather than a trade.
+ * for the full second. That is answered by the script: the event is still dispatched, just not to the
+ * element under the pointer, which is what makes the long motion affordable rather than a trade.
  * `scripts/demo-check.mjs` asserts both halves: the cards never see the click, and the page honours it
  * anyway.
  *
  * The behaviour lives in `src/demo/view-transitions.ts`; the page only imports it. Not tidiness: a
- * `<script>` block inside an `.astro` file is checked by nothing in the gate — `tsc` cannot parse
- * `.astro`, and `docs:build` strips types without verifying them — so code that has to get click
+ * `<script>` block inside an `.astro` file is checked by nothing in the gate: `tsc` cannot parse
+ * `.astro`, and `docs:build` strips types without verifying them, so code that has to get click
  * handling right during a transition belongs where `types` can see it.
  */
 const CARDS = [
@@ -74,7 +74,7 @@ const CARDS = [
 ---
 
 <Layout
-  title='Layout projection — Jumi'
+  title='Layout projection | Jumi'
   description="Six cards, a real layout shift, and a switch between the browser's own snapshot motion and Jumi's."
 >
   <main
@@ -90,7 +90,7 @@ const CARDS = [
     <p class='demo-lede'>
       Pick a card. It takes the corner, its neighbours reflow, and the cards
       that move are followed across the change rather than snapped into place.
-      The movement is the browser's — the geometry of the old and new layouts,
+      The movement is the browser's: the geometry of the old and new layouts,
       projected. What each card <em>does</em> while that happens is Jumi's.
       Switch to the browser's own behaviour to see the difference.
     </p>
@@ -248,11 +248,11 @@ const CARDS = [
     /*
       What you would write by hand to get the geometry projection without Jumi: one
       `view-transition-name` per card, in a rule per card. Six lines for six cards, and a seventh every
-      time the collection changes — which is the cost the candidates above remove.
+      time the collection changes, which is the cost the candidates above remove.
 
       The names are deliberately **not** the ones Jumi uses. A pseudo-element is identified by its
       name, so Jumi's emitted motion attaches to `::view-transition-old(alpha)` no matter which class
-      put the name there — hand-writing `alpha` here would leave Jumi's motion running and the two
+      put the name there: hand-writing `alpha` here would leave Jumi's motion running and the two
       modes would look identical. With a name of its own, the browser-default side really is only the
       browser's: it still projects the geometry, and it falls back to the cross-fade it ships with.
     */

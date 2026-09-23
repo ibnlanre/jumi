@@ -94,7 +94,7 @@ with the existing property API; there is no named `feather-wipe` effect.
 }
 ```
 
-The `data-feather` hook is an example selector — use whatever reaches your element.
+The `data-feather` hook is an example selector; use whatever reaches your element.
 
 ```html
 <div
@@ -126,13 +126,13 @@ area modest and test target devices.
 `mask-*` conceals the element down to a band, `unmask` opens out of one, and the `-out` exits end
 concealed. Each of them holds that endpoint only because the default `animation-fill-mode` is
 `forwards`: with `animation-fill-mode-none` the clip is released the moment the animation ends and the
-element returns to its unclipped shape — the whole surface back for `mask-center`, a full box for
+element returns to its unclipped shape, the whole surface back for `mask-center`, a full box for
 `diamond-out` or `triangle-out`. If a departure should stay gone, keep the fill, or remove the element
 and animate whatever replaces it.
 
 The entrances in this family no longer hold a half-visible window. `diamond-in` and the five
 `triangle-in` variants grow past the element's corners, so their final frame covers the whole box and
-releasing the clip changes nothing — the same way `circle-in`, `square-in`, `reveal-*`,
+releasing the clip changes nothing, the same way `circle-in`, `square-in`, `reveal-*`,
 `radial-wipe-in` and `blinds-in-*` already reached full coverage. The `-out` variants are their exact
 reversals, so they start at full coverage and conceal from there.
 

@@ -63,12 +63,12 @@ describe('Studio public output contract', () => {
     p.tracks = [first, second]
 
     // `/opacity` is the property's scope, so the first track's 2000ms reaches the second. The second cannot
-    // omit its own 1000ms, or it reads the sibling's value — which is what it used to do, in the exported page
+    // omit its own 1000ms, or it reads the sibling's value, which is what it used to do, in the exported page
     // and in the editor's replay alike, because both read this one serialization.
     expect(exportedTrackClasses(second, p)).toContain(
       'animation-duration-[1000ms]/opacity-2',
     )
-    // Preserving writes every control, not just the one that differs — the point is that nothing is left to
+    // Preserving writes every control, not just the one that differs: the point is that nothing is left to
     // be decided by the sibling.
     expect(exportedTrackClasses(second, p).length).toBeGreaterThan(1)
     expect(exportedTrackClasses(first, p)).toContain(
