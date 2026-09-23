@@ -7,6 +7,28 @@
 > each release after `0.1.0` above the first heading, from the commits tagged since the boundary, and leaves
 > what is already written alone. Release flow: [CONTRIBUTING.md](CONTRIBUTING.md).
 
+## 0.1.1 (2026-09-23)
+
+### Bug Fixes
+
+- **changelog:** emit the markers the file already uses ([eedfb8f](https://github.com/ibnlanre/jumi/commit/eedfb8f97c2f6b90e37f0b046713c8b4eddcea67))
+
+### Documentation
+
+- **agents:** add the skill for using Jumi, and the files a crawler reads ([e3ebc04](https://github.com/ibnlanre/jumi/commit/e3ebc0473ae89b26cb43289085b06679e69ee13f))
+
+### Style
+
+- **docs:** format the details pages and the build-step table ([ae2c70b](https://github.com/ibnlanre/jumi/commit/ae2c70bc0bce9a74ceda1f1ece2a55723ebc935f))
+
+### Other changes
+
+- Stop the language server building the one entry that costs 49 MB, and write down what agents need to know ([7ca32b1](https://github.com/ibnlanre/jumi/commit/7ca32b1aa471b21fb4a6da9902d66541221deeee))
+- Take the em-dashes out of the prose ([a2ca371](https://github.com/ibnlanre/jumi/commit/a2ca37112f53a1763b1d435df6504e3914c2e750))
+- Give keyframes-as-a-class the billing it deserves, and correct the separator the docs taught ([5e09d22](https://github.com/ibnlanre/jumi/commit/5e09d226fa787dc48719e5bced5834b87e24b397))
+- Correct the README's counts to what the repository holds ([ddda1ad](https://github.com/ibnlanre/jumi/commit/ddda1adf4af1e6f35486ff721fa25e24dcccefe8))
+- Publish with npm, not pnpm, and say why in the flow ([7db24c1](https://github.com/ibnlanre/jumi/commit/7db24c101e903023b6f8b02d01abb4812ee42447))
+
 ## 0.1.0 (2026-09-20)
 
 Each note below describes behaviour that was measured rather than recalled. None of it changes a motion; the

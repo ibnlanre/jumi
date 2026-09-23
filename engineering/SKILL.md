@@ -166,7 +166,7 @@ its own.
 
 ## 9. Release
 
-The next release is `0.1.1`. The flow, and the reasons for its shape:
+The flow that cut `0.1.1`, the second release, and the reasons for its shape:
 
 ```bash
 pnpm check
@@ -191,8 +191,9 @@ npm publish
   Breaking changes come from `!` or a `BREAKING CHANGE:` footer, and the footer's text is quoted. A subject
   that matches no prefix is **not dropped**: it is listed verbatim under `Other changes`. Free-form prose
   subjects are fine, and the section will say so.
-- **The tarball must stay deterministic and small.** 28 files, a 600,000-byte ceiling enforced by the
-  `consumer` stage, and no `sourcesContent` in any published map. Verify with `npm pack` twice.
+- **The tarball must stay deterministic and small.** 29 files since `SKILL.md` joined the package, a
+  600,000-byte ceiling enforced by the `consumer` stage, and no `sourcesContent` in any published map.
+  Verify with `npm pack` twice.
 
 ## 10. Traps that have cost time here
 

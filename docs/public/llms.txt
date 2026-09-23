@@ -27,7 +27,7 @@ about nothing, which is why the guides start there.
 - [The effect catalog](https://jumi-css.vercel.app/effects/): every one of the 235 effects, searchable, with a preview for each.
 - [llms-full.txt](https://jumi-css.vercel.app/llms-full.txt): every guide, plus the agent skill, in one file.
 - [The agent skill](https://raw.githubusercontent.com/ibnlanre/jumi/main/SKILL.md): the whole vocabulary as one markdown file, written for a coding agent, including all 235 effect names and all 395 property utilities.
-- [npm package](https://www.npmjs.com/package/@ibnlanre/jumi): version 0.1.0.
+- [npm package](https://www.npmjs.com/package/@ibnlanre/jumi): version 0.1.1.
 - [Source](https://github.com/ibnlanre/jumi).
 
 ## Optional

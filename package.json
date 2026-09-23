@@ -1,6 +1,6 @@
 {
   "name": "@ibnlanre/jumi",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A comprehensive CSS animation library built as a TailwindCSS plugin",
   "packageManager": "pnpm@9.14.4",
   "main": "dist/index.cjs",
