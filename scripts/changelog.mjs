@@ -146,14 +146,14 @@ const repository = (
   .replace(/\.git$/, '')
 const link = hash => `([${hash.slice(0, 7)}](${repository}/commit/${hash}))`
 const line = commit =>
-  `* ${commit.scope ? `**${commit.scope}:** ` : ''}${commit.text} ${link(commit.hash)}`
+  `- ${commit.scope ? `**${commit.scope}:** ` : ''}${commit.text} ${link(commit.hash)}`
 
 const sections = []
 const breaking = commits.filter(commit => commit.breaking)
 
 if (breaking.length)
   sections.push(
-    `${BREAKING.heading}\n\n${breaking.map(commit => `* ${breakingOf(commit)} ${link(commit.hash)}`).join('\n')}`,
+    `${BREAKING.heading}\n\n${breaking.map(commit => `- ${breakingOf(commit)} ${link(commit.hash)}`).join('\n')}`,
   )
 
 for (const { heading, type } of ACCEPTED) {
@@ -172,7 +172,7 @@ const other = commits.filter(
 
 if (other.length)
   sections.push(
-    `${OTHER.heading}\n\n${other.map(commit => `* ${commit.subject} ${link(commit.hash)}`).join('\n')}`,
+    `${OTHER.heading}\n\n${other.map(commit => `- ${commit.subject} ${link(commit.hash)}`).join('\n')}`,
   )
 
 const date = new Date().toISOString().slice(0, 10)
@@ -230,13 +230,20 @@ if (new RegExp(`^## ${version.replace(/\./g, '\\.')}[ (]`, 'm').test(before)) {
 }
 
 // Above the first release heading and below the preamble, so the document keeps its title and its note while
-// the newest release sits where a reader looks for it.
+// the newest release sits where a reader looks for it. Exactly one blank line on either side of the generated
+// block, whatever the document's own spacing was: the file is markdown, and a generator that leaves two blank
+// lines makes every later formatting pass rewrite it.
 const lines = before.split('\n')
 const first = lines.findIndex(entry => entry.startsWith('## '))
 const at = first === -1 ? lines.length : first
+const preamble = lines.slice(0, at)
+
+while (preamble.length && preamble[preamble.length - 1] === '') preamble.pop()
+
 const after = [
-  ...lines.slice(0, at),
-  ...rendered.split('\n'),
+  ...preamble,
+  '',
+  ...rendered.trimEnd().split('\n'),
   '',
   ...lines.slice(at),
 ].join('\n')
