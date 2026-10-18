@@ -173,3 +173,4 @@ video/voiceover.wav
 video/node_modules/
 video/package-lock.json
 video/music.wav
+video/*.srt

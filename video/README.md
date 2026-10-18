@@ -66,6 +66,7 @@ cd video && npm install && cd ..   # once: Kokoro's Node port, kept apart from t
 node video/speak.mjs               # reads voiceover.json with Kokoro into video/voice/<scene>.wav
 node video/music.mjs               # composes video/music.wav to the scene boundaries
 node video/voice.mjs --keep        # fits each line, ducks the bed under it, writes jumi-voiced.mp4
+node video/captions.mjs            # writes jumi.srt for upload alongside the video
 ```
 
 `voice.mjs` uses `music.wav` when it exists and `--no-music` leaves it out. The bed is synthesized
