@@ -82,7 +82,8 @@ defaults live under `kokoro` in `voiceover.json`.
 Each line in `voiceover.json` carries `at`, the millisecond it starts, and `until`, the cut it has to
 finish before. `voice.mjs` refuses to mix if a read runs past its scene, so a rewrite is caught before
 it is heard. `text` is the line as written; `say` is the spelling handed to the synthesizer when a
-word needs help (Jumi is read as "Joomi").
+word needs help: Jumi is read as "Joomi", and the verb "lives" is spelled "livs", because the
+phonemizer otherwise reads it as the plural of "life".
 
 The narration is written as a talk, not a reading of the slides: the picture carries the headline,
 the voice informs. It speaks about Jumi, never as its maker. Keep that split when editing a line.
