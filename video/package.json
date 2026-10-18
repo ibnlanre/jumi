@@ -1,0 +1,9 @@
+{
+  "name": "jumi-video",
+  "private": true,
+  "type": "module",
+  "description": "The product video's own tools. Separate from the library's dependency graph on purpose.",
+  "dependencies": {
+    "kokoro-js": "1.2.1"
+  }
+}

@@ -1,0 +1,6 @@
+/* The film's own Tailwind entry: it scans one page and registers Jumi from the local bundle,
+   the same shape `examples/input.css` uses. `render.mjs` compiles it and finalizes the output. */
+@import 'tailwindcss' source(none);
+
+@source "./index.html";
+@plugin '../dist/index.js';
