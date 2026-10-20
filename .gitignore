@@ -163,3 +163,14 @@ vite.config.ts.timestamp-*
 
 # Reproducible Studio browser verification screenshots
 artifacts/studio/
+
+# The product video: its stylesheet and renders are built by `node video/render.mjs`.
+video/output.css
+video/stills/
+video/*.mp4
+video/voice/
+video/voiceover.wav
+video/node_modules/
+video/package-lock.json
+video/music.wav
+video/*.srt

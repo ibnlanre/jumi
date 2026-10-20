@@ -1,0 +1,66 @@
+{
+  "kokoro": {
+    "voice": "af_heart",
+    "speed": 1.08
+  },
+  "voice": "Samantha",
+  "rate": 176,
+  "lines": [
+    {
+      "scene": "01",
+      "at": 600,
+      "until": 7970,
+      "text": "There's a reason most interfaces barely move: animation lives in a different file. Jumi puts it back in your markup.",
+      "say": "There's a reason most interfaces barely move: animation livs in a different file. Joomi puts it back in your markup."
+    },
+    {
+      "scene": "02",
+      "at": 8220,
+      "until": 16000,
+      "text": "Tailwind already gives you a class for everything else. With Jumi, motion is one more class, and its timing sits right next to it.",
+      "say": "Tailwind already gives you a class for everything else. With Joomi, motion is one more class, and its timing sits right next to it."
+    },
+    {
+      "scene": "03",
+      "at": 16250,
+      "until": 24170,
+      "text": "There are two hundred and thirty-five of them, from quiet entrances to full theatrics. Whatever the moment needs already has a name.",
+      "say": "There are two hundred and thirty-five of them, from quiet entrances to full theatrics. Whatever the moment needs already has a name."
+    },
+    {
+      "scene": "04",
+      "at": 24420,
+      "until": 32890,
+      "text": "When the effect you want doesn't exist, nobody opens a stylesheet. Describe the frames in the class; the keyframes are generated for you.",
+      "say": "When the effect you want doesn't exist, nobody opens a stylesheet. Describe the frames in the class; the keyframes are generated for you."
+    },
+    {
+      "scene": "05",
+      "at": 33140,
+      "until": 40440,
+      "text": "Properties layer without fighting. Rotation on one rhythm, scale on another, each control scoped to its own slot.",
+      "say": "Properties layer without fighting. Rotation on one rhythm, scale on another, each control scoped to its own slot."
+    },
+    {
+      "scene": "06",
+      "at": 40690,
+      "until": 47380,
+      "text": "Lists stagger with one class on the parent. The children take turns. No JavaScript counting indexes.",
+      "say": "Lists stagger with one class on the parent. The children take turns. No JavaScript counting indexes."
+    },
+    {
+      "scene": "07",
+      "at": 47630,
+      "until": 54830,
+      "text": "And at runtime, it costs nothing. All of it compiles to plain CSS at build time, so the browser does the work.",
+      "say": "And at runtime, it costs nothing. All of it compiles to plain CSS at build time, so the browser does the work."
+    },
+    {
+      "scene": "08",
+      "at": 55080,
+      "until": 61180,
+      "text": "Jumi is MIT-licensed and on npm. Static is just the start.",
+      "say": "Joomi is M I T licensed, and on N P M. Static is just the start."
+    }
+  ]
+}

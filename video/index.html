@@ -1,0 +1,1285 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=1920, initial-scale=1.0"
+    />
+    <title>Jumi · Big motion. Small classes.</title>
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="output.css"
+    />
+    <style>
+      /*
+       * The film is a 1920×1080 stage. Every piece of motion on it is a Jumi class; this block
+       * only holds the palette, the type, and the scene switch. The palette and fonts are the
+       * documentation site's own (docs/src/styles/global.css).
+       */
+      :root {
+        --ink: #171915;
+        --paper: #f4f5ee;
+        --muted: #a8ada0;
+        --lime: #d7fc70;
+        --line: #383c33;
+        --peach: #f3b797;
+        --lilac: #c1b4ef;
+        --mint: #9fd9b5;
+        --panel: #1f221d;
+        font-family: 'DM Sans', sans-serif;
+        color: var(--paper);
+        background: var(--ink);
+        font-synthesis: none;
+        -webkit-font-smoothing: antialiased;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--ink);
+      }
+      .frame {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background:
+          radial-gradient(1200px 700px at 78% 30%, #22261f 0%, transparent 65%),
+          var(--ink);
+      }
+      .grain {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background-image:
+          linear-gradient(var(--line) 1px, transparent 1px),
+          linear-gradient(90deg, var(--line) 1px, transparent 1px);
+        background-size: 120px 120px;
+        opacity: 0.18;
+        mask-image: radial-gradient(
+          900px 600px at 50% 50%,
+          black 30%,
+          transparent 100%
+        );
+      }
+      .chrome {
+        position: absolute;
+        left: 72px;
+        right: 72px;
+        top: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 15px;
+        letter-spacing: 0.14em;
+        color: var(--muted);
+        z-index: 5;
+      }
+      .chrome .logo {
+        font-family: 'Manrope', sans-serif;
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: -2px;
+        color: var(--paper);
+        line-height: 1;
+      }
+      .chrome .logo span {
+        font:
+          11px 'DM Sans',
+          sans-serif;
+        letter-spacing: 0.1em;
+        vertical-align: top;
+        display: inline-block;
+        margin: 2px 0 0 6px;
+        color: var(--muted);
+      }
+      .scene {
+        display: none;
+        position: absolute;
+        inset: 0;
+        padding: 140px 160px 120px;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 96px;
+        align-items: center;
+      }
+      .scene.on {
+        display: grid;
+      }
+      .scene.leaving {
+        opacity: 0;
+      }
+      /* A cue inside a scene: unrendered until its own time, so its Jumi animations start then. */
+      .cue:not(.on) {
+        display: none !important;
+      }
+      .eyebrow {
+        font-size: 16px;
+        letter-spacing: 0.22em;
+        color: var(--lime);
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        text-transform: uppercase;
+      }
+      .eyebrow .cross {
+        color: var(--lime);
+        font-size: 20px;
+      }
+      h1,
+      h2 {
+        font-family: 'Manrope', sans-serif;
+        font-weight: 800;
+        letter-spacing: -0.045em;
+        line-height: 0.96;
+        margin: 0;
+      }
+      h2 {
+        font-size: 104px;
+        margin-top: 28px;
+      }
+      h2 em,
+      h1 em {
+        font-style: italic;
+        font-weight: 500;
+        color: var(--lime);
+        letter-spacing: -0.03em;
+      }
+      .body {
+        font-size: 28px;
+        line-height: 1.4;
+        color: var(--muted);
+        max-width: 620px;
+        margin: 34px 0 0;
+      }
+      .body b {
+        color: var(--paper);
+        font-weight: 500;
+      }
+      .stage {
+        position: relative;
+        border-radius: 28px;
+        overflow: hidden;
+        display: grid;
+        place-items: center;
+        color: var(--ink);
+      }
+      .stage.apricot {
+        background: var(--peach);
+      }
+      .stage.lilac {
+        background: var(--lilac);
+      }
+      .stage.mint {
+        background: var(--mint);
+      }
+      .stage.lime {
+        background: var(--lime);
+      }
+      .stage.panel {
+        background: var(--panel);
+        color: var(--paper);
+        border: 1px solid var(--line);
+      }
+      .word {
+        font-family: 'Manrope', sans-serif;
+        font-weight: 800;
+        font-size: 112px;
+        letter-spacing: -0.05em;
+        line-height: 1;
+      }
+      .tag {
+        position: absolute;
+        left: 22px;
+        bottom: 18px;
+        font-size: 13px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        opacity: 0.7;
+      }
+      code,
+      .code {
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+      }
+      .chip {
+        display: inline-block;
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-size: 16px;
+        padding: 10px 14px;
+        border-radius: 12px;
+        background: rgb(23 25 21 / 0.82);
+        color: var(--lime);
+        white-space: nowrap;
+      }
+      .exhibit {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        padding: 0;
+        overflow: hidden;
+      }
+      .exhibit-top {
+        display: flex;
+        justify-content: space-between;
+        padding: 20px 28px;
+        font-size: 13px;
+        letter-spacing: 0.18em;
+        color: var(--muted);
+        border-bottom: 1px solid var(--line);
+      }
+      .exhibit pre {
+        margin: 0;
+        padding: 30px 32px 34px;
+        font-size: 25px;
+        line-height: 1.55;
+        color: var(--paper);
+        white-space: pre;
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+      }
+      .lime-t {
+        color: var(--lime);
+      }
+      .peach-t {
+        color: var(--peach);
+      }
+      .lilac-t {
+        color: var(--lilac);
+      }
+      .muted-t {
+        color: var(--muted);
+      }
+      .legend {
+        display: flex;
+        gap: 28px;
+        padding: 0 32px 26px;
+        font-size: 13px;
+        letter-spacing: 0.18em;
+        color: var(--muted);
+      }
+      .legend i {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 8px;
+        vertical-align: 1px;
+      }
+      .blob {
+        width: 210px;
+        height: 210px;
+        border-radius: 48px;
+        background: var(--lime);
+      }
+      .tile {
+        display: grid;
+        place-items: center;
+        height: 118px;
+        border-radius: 18px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-size: 15px;
+        color: var(--paper);
+        text-align: center;
+        padding: 0 10px;
+      }
+      .tile:nth-child(5n + 1) {
+        background: var(--lime);
+        color: var(--ink);
+        border-color: transparent;
+      }
+      .tile:nth-child(7n + 3) {
+        background: var(--peach);
+        color: var(--ink);
+        border-color: transparent;
+      }
+      .tile:nth-child(9n + 5) {
+        background: var(--lilac);
+        color: var(--ink);
+        border-color: transparent;
+      }
+      .bars {
+        display: flex;
+        align-items: flex-end;
+        gap: 22px;
+        height: 300px;
+      }
+      .bars i {
+        display: block;
+        width: 48px;
+        height: 300px;
+        border-radius: 14px;
+        background: var(--ink);
+        transform-origin: bottom;
+      }
+      .list {
+        display: grid;
+        gap: 14px;
+        font-family: 'Manrope', sans-serif;
+        font-weight: 700;
+        font-size: 44px;
+        letter-spacing: -0.03em;
+      }
+      .list div {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 22px 28px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .list div span {
+        font:
+          14px 'JetBrains Mono',
+          monospace;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+      }
+      .stat {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        padding: 34px 36px 32px;
+      }
+      .stat .big {
+        font-family: 'Manrope', sans-serif;
+        font-weight: 800;
+        font-size: 96px;
+        letter-spacing: -0.05em;
+        line-height: 1;
+        color: var(--lime);
+      }
+      .stat .label {
+        font-size: 20px;
+        color: var(--paper);
+        margin-top: 18px;
+        line-height: 1.35;
+      }
+      .stat .label small {
+        display: block;
+        color: var(--muted);
+        font-size: 16px;
+        margin-top: 6px;
+      }
+      .install {
+        display: inline-flex;
+        align-items: center;
+        gap: 26px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 18px 20px 18px 34px;
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-size: 30px;
+        background: var(--panel);
+      }
+      .install span {
+        background: var(--lime);
+        color: var(--ink);
+        border-radius: 999px;
+        padding: 12px 24px;
+        font:
+          600 18px 'DM Sans',
+          sans-serif;
+        letter-spacing: 0.08em;
+      }
+      .orbit {
+        position: relative;
+        width: 640px;
+        height: 640px;
+      }
+      .petal-position {
+        position: absolute;
+        inset: 0;
+        rotate: var(--angle);
+      }
+      .petal {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        width: 44px;
+        height: 230px;
+        margin-left: -22px;
+        border-radius: 999px;
+        background: var(--lime);
+        transform-origin: 50% 320px;
+      }
+      .petal-position:nth-child(3n) .petal {
+        background: var(--peach);
+      }
+      .petal-position:nth-child(3n + 1) .petal {
+        background: var(--lilac);
+      }
+      .orbit-core {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 96px;
+        height: 96px;
+        margin: -48px 0 0 -48px;
+        border-radius: 50%;
+        background: var(--paper);
+      }
+      .coordinate {
+        position: absolute;
+        font-size: 13px;
+        letter-spacing: 0.2em;
+        color: var(--muted);
+      }
+      .wordmark {
+        font-family: 'Manrope', sans-serif;
+        font-weight: 800;
+        font-size: 360px;
+        letter-spacing: -0.07em;
+        line-height: 0.9;
+        margin-left: -14px;
+      }
+      .wordmark span {
+        display: inline-block;
+      }
+      .footer-index {
+        position: absolute;
+        left: 72px;
+        bottom: 44px;
+        font-size: 13px;
+        letter-spacing: 0.2em;
+        color: var(--muted);
+      }
+      .footer-url {
+        position: absolute;
+        right: 72px;
+        bottom: 44px;
+        font-size: 13px;
+        letter-spacing: 0.2em;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <div
+        class="grain"
+        aria-hidden="true"
+      ></div>
+
+      <header class="chrome">
+        <div class="logo">Jumi<span>v0.1</span></div>
+        <div>A TAILWIND CSS PLUGIN</div>
+      </header>
+      <div
+        class="footer-index"
+        id="index"
+      >
+        01 / 08
+      </div>
+      <div class="footer-url">JUMI-CSS.VERCEL.APP</div>
+
+      <!-- 01 · Cold open ------------------------------------------------------------- -->
+      <section
+        class="scene"
+        data-at="0"
+        data-until="7970"
+        data-index="01 / 08"
+      >
+        <div>
+          <p class="eyebrow animate-fade-in-down animation-duration-[700ms]">
+            <span class="cross">✳</span> The atomic motion library
+          </p>
+          <h1
+            class="wordmark animate-stagger-forward-[120ms]/4 *:animate-bounce-in *:animation-duration-[1150ms] *:animation-fill-mode-both"
+          >
+            <span>J</span><span>u</span><span>m</span><span>i</span>
+          </h1>
+          <p
+            class="body animate-fade-in-up animation-duration-[800ms] animation-delay-[1300ms] animation-fill-mode-both"
+            style="
+              font-size: 44px;
+              color: var(--paper);
+              font-family: 'Manrope', sans-serif;
+              font-weight: 600;
+              letter-spacing: -0.03em;
+              max-width: none;
+              margin-top: 10px;
+            "
+          >
+            Big motion.
+            <em style="color: var(--lime); font-style: italic; font-weight: 500"
+              >Small classes.</em
+            >
+          </p>
+          <p
+            class="body animate-fade-in-up animation-duration-[800ms] animation-delay-[1800ms] animation-fill-mode-both"
+            style="margin-top: 18px"
+          >
+            A composable animation library for Tailwind CSS.
+          </p>
+        </div>
+        <div
+          class="animate-zoom-in animation-duration-[1400ms] animation-delay-[500ms] animation-fill-mode-both"
+          style="justify-self: center; position: relative"
+        >
+          <div
+            class="orbit animate-rotate-360 animation-duration-[24s] animation-timing-function-linear animation-iteration-count-infinite"
+          >
+            <div
+              class="petal-position"
+              style="--angle: 0deg"
+            >
+              <div
+                class="petal animate-scale-y-[0:0.55|50:1|100:0.55] animation-duration-[2400ms] animation-iteration-count-infinite animation-timing-function-ease-in-out"
+              ></div>
+            </div>
+            <div
+              class="petal-position"
+              style="--angle: 30deg"
+            >
+              <div
+                class="petal animate-scale-y-[0:0.55|50:1|100:0.55] animation-duration-[2400ms] animation-delay-[-200ms] animation-iteration-count-infinite animation-timing-function-ease-in-out"
+              ></div>
+            </div>
+            <div
+              class="petal-position"
+              style="--angle: 60deg"
+            >
+              <div
+                class="petal animate-scale-y-[0:0.55|50:1|100:0.55] animation-duration-[2400ms] animation-delay-[-400ms] animation-iteration-count-infinite animation-timing-function-ease-in-out"
+              ></div>
+            </div>
+            <div
+              class="petal-position"
+              style="--angle: 90deg"
+            >
+              <div
+                class="petal animate-scale-y-[0:0.55|50:1|100:0.55] animation-duration-[2400ms] animation-delay-[-600ms] animation-iteration-count-infinite animation-timing-function-ease-in-out"
+              ></div>
+            </div>
+            <div
+              class="petal-position"
+              style="--angle: 120deg"
+            >
+              <div
+                class="petal animate-scale-y-[0:0.55|50:1|100:0.55] animation-duration-[2400ms] animation-delay-[-800ms] animation-iteration-count-infinite animation-timing-function-ease-in-out"
+              ></div>
+            </div>
+            <div
+              class="petal-position"
+              style="--angle: 150deg"
+            >
+              <div
+                class="petal animate-scale-y-[0:0.55|50:1|100:0.55] animation-duration-[2400ms] animation-delay-[-1000ms] animation-iteration-count-infinite animation-timing-function-ease-in-out"
+              ></div>
+            </div>
+            <div
+              class="petal-position"
+              style="--angle: 180deg"
+            >
+              <div
+                class="petal animate-scale-y-[0:0.55|50:1|100:0.55] animation-duration-[2400ms] animation-delay-[-1200ms] animation-iteration-count-infinite animation-timing-function-ease-in-out"
+              ></div>
+            </div>
+            <div
+              class="petal-position"
+              style="--angle: 210deg"
+            >
+              <div
+                class="petal animate-scale-y-[0:0.55|50:1|100:0.55] animation-duration-[2400ms] animation-delay-[-1400ms] animation-iteration-count-infinite animation-timing-function-ease-in-out"
+              ></div>
+            </div>
+            <div
+              class="petal-position"
+              style="--angle: 240deg"
+            >
+              <div
+                class="petal animate-scale-y-[0:0.55|50:1|100:0.55] animation-duration-[2400ms] animation-delay-[-1600ms] animation-iteration-count-infinite animation-timing-function-ease-in-out"
+              ></div>
+            </div>
+            <div
+              class="petal-position"
+              style="--angle: 270deg"
+            >
+              <div
+                class="petal animate-scale-y-[0:0.55|50:1|100:0.55] animation-duration-[2400ms] animation-delay-[-1800ms] animation-iteration-count-infinite animation-timing-function-ease-in-out"
+              ></div>
+            </div>
+            <div
+              class="petal-position"
+              style="--angle: 300deg"
+            >
+              <div
+                class="petal animate-scale-y-[0:0.55|50:1|100:0.55] animation-duration-[2400ms] animation-delay-[-2000ms] animation-iteration-count-infinite animation-timing-function-ease-in-out"
+              ></div>
+            </div>
+            <div
+              class="petal-position"
+              style="--angle: 330deg"
+            >
+              <div
+                class="petal animate-scale-y-[0:0.55|50:1|100:0.55] animation-duration-[2400ms] animation-delay-[-2200ms] animation-iteration-count-infinite animation-timing-function-ease-in-out"
+              ></div>
+            </div>
+            <span class="orbit-core"></span>
+          </div>
+          <span
+            class="coordinate"
+            style="top: -34px; left: 0"
+            >FIG. 01 / COMPOSITION</span
+          >
+          <span
+            class="coordinate"
+            style="bottom: -34px; right: 0"
+            >12 PARTS. ONE SHARED RHYTHM.</span
+          >
+        </div>
+      </section>
+
+      <!-- 02 · Make an entrance ---------------------------------------------------- -->
+      <section
+        class="scene"
+        data-at="7970"
+        data-until="16000"
+        data-index="02 / 08"
+        style="grid-template-columns: 0.8fr 1.2fr"
+      >
+        <div>
+          <p class="eyebrow animate-fade-in-down animation-duration-[600ms]">
+            <span class="cross">✳</span> 01 / Effects
+          </p>
+          <h2
+            class="animate-fade-in-up animation-duration-[800ms] animation-delay-[150ms] animation-fill-mode-both"
+          >
+            Make an<br /><em>entrance.</em>
+          </h2>
+          <p
+            class="body animate-fade-in-up animation-duration-[800ms] animation-delay-[450ms] animation-fill-mode-both"
+          >
+            Pick an effect. Give it a rhythm. <b>One class</b> is the whole
+            animation, and the duration sits right next to it.
+          </p>
+        </div>
+        <div
+          class="grid grid-cols-3 gap-6"
+          style="height: 560px"
+        >
+          <div
+            class="stage apricot animate-fade-in animation-duration-[500ms] animation-delay-[500ms] animation-fill-mode-both"
+          >
+            <div
+              class="word animate-bounce-in animation-duration-[1200ms] animation-delay-[900ms] animation-fill-mode-both"
+            >
+              hey.
+            </div>
+            <span class="tag">01 / bounce</span>
+            <span
+              class="chip animate-reveal-right animation-duration-[500ms] animation-delay-[1900ms] animation-fill-mode-both"
+              style="position: absolute; left: 22px; top: 22px"
+              >animate-bounce-in</span
+            >
+          </div>
+          <div
+            class="stage lilac animate-fade-in animation-duration-[500ms] animation-delay-[2700ms] animation-fill-mode-both"
+          >
+            <div
+              class="word animate-flip-in-x animation-duration-[1100ms] animation-delay-[3100ms] animation-fill-mode-both"
+            >
+              hi.
+            </div>
+            <span class="tag">02 / flip</span>
+            <span
+              class="chip animate-reveal-right animation-duration-[500ms] animation-delay-[4000ms] animation-fill-mode-both"
+              style="position: absolute; left: 22px; top: 22px"
+              >animate-flip-in-x</span
+            >
+          </div>
+          <div
+            class="stage mint animate-fade-in animation-duration-[500ms] animation-delay-[4800ms] animation-fill-mode-both"
+          >
+            <div
+              class="word animate-zoom-in-elastic animation-duration-[1300ms] animation-delay-[5200ms] animation-fill-mode-both"
+            >
+              yo.
+            </div>
+            <span class="tag">03 / elastic</span>
+            <span
+              class="chip animate-reveal-right animation-duration-[500ms] animation-delay-[6300ms] animation-fill-mode-both"
+              style="position: absolute; left: 22px; top: 22px"
+              >animate-zoom-in-elastic</span
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- 03 · The catalogue ------------------------------------------------------- -->
+      <section
+        class="scene"
+        data-at="16000"
+        data-until="24170"
+        data-index="03 / 08"
+        style="
+          grid-template-columns: 1fr;
+          align-content: start;
+          row-gap: 48px;
+          padding-top: 128px;
+        "
+      >
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+          "
+        >
+          <div>
+            <p class="eyebrow animate-fade-in-down animation-duration-[600ms]">
+              <span class="cross">✳</span> The catalogue
+            </p>
+            <h2
+              class="animate-fade-in-up animation-duration-[800ms] animation-delay-[150ms] animation-fill-mode-both"
+              style="font-size: 92px"
+            >
+              <em>235</em> effects, named.
+            </h2>
+          </div>
+          <p
+            class="body animate-fade-in-up animation-duration-[800ms] animation-delay-[4600ms] animation-fill-mode-both"
+            style="margin: 0 0 14px; text-align: right"
+          >
+            Thirty-two of them here.<br /><b>Two hundred and three more</b> in
+            the catalogue.
+          </p>
+        </div>
+        <div class="grid grid-cols-8 gap-4">
+          <div
+            class="tile animate-bounce-in animation-duration-[900ms] animation-delay-[600ms] animation-fill-mode-both"
+          >
+            bounce-in
+          </div>
+          <div
+            class="tile animate-fade-in-up animation-duration-[900ms] animation-delay-[690ms] animation-fill-mode-both"
+          >
+            fade-in-up
+          </div>
+          <div
+            class="tile animate-zoom-in animation-duration-[900ms] animation-delay-[780ms] animation-fill-mode-both"
+          >
+            zoom-in
+          </div>
+          <div
+            class="tile animate-flip-in-x animation-duration-[900ms] animation-delay-[870ms] animation-fill-mode-both"
+          >
+            flip-in-x
+          </div>
+          <div
+            class="tile animate-slide-in-left animation-duration-[900ms] animation-delay-[960ms] animation-fill-mode-both"
+          >
+            slide-in-left
+          </div>
+          <div
+            class="tile animate-back-in-down animation-duration-[900ms] animation-delay-[1050ms] animation-fill-mode-both"
+          >
+            back-in-down
+          </div>
+          <div
+            class="tile animate-rush-in-right animation-duration-[900ms] animation-delay-[1140ms] animation-fill-mode-both"
+          >
+            rush-in-right
+          </div>
+          <div
+            class="tile animate-spring-up animation-duration-[900ms] animation-delay-[1230ms] animation-fill-mode-both"
+          >
+            spring-up
+          </div>
+
+          <div
+            class="tile animate-blur-in animation-duration-[900ms] animation-delay-[1320ms] animation-fill-mode-both"
+          >
+            blur-in
+          </div>
+          <div
+            class="tile animate-circle-in animation-duration-[900ms] animation-delay-[1410ms] animation-fill-mode-both"
+          >
+            circle-in
+          </div>
+          <div
+            class="tile animate-diamond-in animation-duration-[900ms] animation-delay-[1500ms] animation-fill-mode-both"
+          >
+            diamond-in
+          </div>
+          <div
+            class="tile animate-triangle-in animation-duration-[900ms] animation-delay-[1590ms] animation-fill-mode-both"
+          >
+            triangle-in
+          </div>
+          <div
+            class="tile animate-square-in animation-duration-[900ms] animation-delay-[1680ms] animation-fill-mode-both"
+          >
+            square-in
+          </div>
+          <div
+            class="tile animate-skew-in animation-duration-[900ms] animation-delay-[1770ms] animation-fill-mode-both"
+          >
+            skew-in
+          </div>
+          <div
+            class="tile animate-twist-in animation-duration-[900ms] animation-delay-[1860ms] animation-fill-mode-both"
+          >
+            twist-in
+          </div>
+          <div
+            class="tile animate-zoom-in-elastic animation-duration-[900ms] animation-delay-[1950ms] animation-fill-mode-both"
+          >
+            zoom-in-elastic
+          </div>
+
+          <div
+            class="tile animate-slide-in-up-elastic animation-duration-[900ms] animation-delay-[2040ms] animation-fill-mode-both"
+          >
+            slide-in-up-elastic
+          </div>
+          <div
+            class="tile animate-spiral-in animation-duration-[900ms] animation-delay-[2130ms] animation-fill-mode-both"
+          >
+            spiral-in
+          </div>
+          <div
+            class="tile animate-fold-in animation-duration-[900ms] animation-delay-[2220ms] animation-fill-mode-both"
+          >
+            fold-in
+          </div>
+          <div
+            class="tile animate-unfold-x animation-duration-[900ms] animation-delay-[2310ms] animation-fill-mode-both"
+          >
+            unfold-x
+          </div>
+          <div
+            class="tile animate-reveal-swipe animation-duration-[900ms] animation-delay-[2400ms] animation-fill-mode-both"
+          >
+            reveal-swipe
+          </div>
+          <div
+            class="tile animate-power-on animation-duration-[900ms] animation-delay-[2490ms] animation-fill-mode-both"
+          >
+            power-on
+          </div>
+          <div
+            class="tile animate-radial-wipe-in animation-duration-[900ms] animation-delay-[2580ms] animation-fill-mode-both"
+          >
+            radial-wipe-in
+          </div>
+          <div
+            class="tile animate-blinds-in-x animation-duration-[900ms] animation-delay-[2670ms] animation-fill-mode-both"
+          >
+            blinds-in-x
+          </div>
+
+          <div
+            class="tile animate-arc-top-left animation-duration-[900ms] animation-delay-[2760ms] animation-fill-mode-both"
+          >
+            arc-top-left
+          </div>
+          <div
+            class="tile animate-rush-in-up animation-duration-[900ms] animation-delay-[2850ms] animation-fill-mode-both"
+          >
+            rush-in-up
+          </div>
+          <div
+            class="tile animate-throw-up animation-duration-[900ms] animation-delay-[2940ms] animation-fill-mode-both"
+          >
+            throw-up
+          </div>
+          <div
+            class="tile animate-flip-in-left animation-duration-[900ms] animation-delay-[3030ms] animation-fill-mode-both"
+          >
+            flip-in-left
+          </div>
+          <div
+            class="tile animate-zoom-tilt-in animation-duration-[900ms] animation-delay-[3120ms] animation-fill-mode-both"
+          >
+            zoom-tilt-in
+          </div>
+          <div
+            class="tile animate-slide-peek-up animation-duration-[900ms] animation-delay-[3210ms] animation-fill-mode-both"
+          >
+            slide-peek-up
+          </div>
+          <div
+            class="tile animate-letter-space-in animation-duration-[900ms] animation-delay-[3300ms] animation-fill-mode-both"
+          >
+            letter-space-in
+          </div>
+          <div
+            class="tile animate-unmask-left animation-duration-[900ms] animation-delay-[3390ms] animation-fill-mode-both"
+          >
+            unmask-left
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 · Keyframes, written as a class --------------------------------------- -->
+      <section
+        class="scene"
+        data-at="24170"
+        data-until="32890"
+        data-index="04 / 08"
+      >
+        <div>
+          <p class="eyebrow animate-fade-in-down animation-duration-[600ms]">
+            <span class="cross">✳</span> 02 / Phrases
+          </p>
+          <h2
+            class="animate-fade-in-up animation-duration-[800ms] animation-delay-[150ms] animation-fill-mode-both"
+          >
+            Write the keyframe<br /><em>in the class.</em>
+          </h2>
+          <p
+            class="body animate-fade-in-up animation-duration-[800ms] animation-delay-[450ms] animation-fill-mode-both"
+          >
+            Each frame is an <b>offset and a value</b>, separated by a pipe. No
+            <code>@keyframes</code> block. No stylesheet edit. No runtime.
+          </p>
+        </div>
+        <div style="display: grid; gap: 28px">
+          <div
+            class="exhibit animate-slide-in-up animation-duration-[700ms] animation-delay-[300ms] animation-fill-mode-both"
+          >
+            <div class="exhibit-top">
+              <span>A PHRASE</span><span>HTML</span>
+            </div>
+            <pre>&lt;div class="<span class="lime-t">animate-scale-[0:0.5|50:1.1|100:1]</span>
+  <span class="lime-t">animate-opacity-[0:0|50:1|100:1]</span>
+  <span class="peach-t">animation-duration-[2600ms]</span>
+  <span class="lilac-t">animation-iteration-count-infinite</span>"&gt;
+  Gather, overshoot, settle.
+&lt;/div&gt;</pre>
+          </div>
+          <div
+            class="stage panel animate-fade-in animation-duration-[600ms] animation-delay-[900ms] animation-fill-mode-both"
+            style="height: 330px"
+          >
+            <div
+              class="blob animate-scale-[0:0.5|50:1.1|100:1] animate-opacity-[0:0|50:1|100:1] animation-duration-[2600ms] animation-iteration-count-infinite animation-delay-[1100ms] animation-fill-mode-both"
+            ></div>
+            <span
+              class="tag"
+              style="opacity: 1; color: var(--muted)"
+              >0% · 50% · 100%</span
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- 05 · Two rhythms, one element ------------------------------------------ -->
+      <section
+        class="scene"
+        data-at="32890"
+        data-until="40440"
+        data-index="05 / 08"
+        style="grid-template-columns: 1.15fr 0.85fr"
+      >
+        <div style="display: grid; gap: 28px">
+          <div
+            class="exhibit animate-slide-in-up animation-duration-[700ms] animation-delay-[300ms] animation-fill-mode-both"
+          >
+            <div class="exhibit-top">
+              <span>YOUR FIRST COMPOSITION</span><span>HTML</span>
+            </div>
+            <pre>&lt;div class="<span class="lime-t">animate-rotate-45
+  animate-scale-110</span>
+  <span class="peach-t">animation-duration-[800ms]/rotate
+  animation-duration-[1200ms]/scale</span>
+  <span class="lilac-t">animation-direction-alternate
+  animation-iteration-count-infinite</span>"&gt;
+  Make your move.
+&lt;/div&gt;</pre>
+            <div class="legend">
+              <span><i style="background: var(--lime)"></i>01 COMPOSE</span>
+              <span
+                ><i style="background: var(--peach)"></i>02 CONTROL, PER
+                PROPERTY</span
+              >
+              <span><i style="background: var(--lilac)"></i>03 LOOP</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <p class="eyebrow animate-fade-in-down animation-duration-[600ms]">
+            <span class="cross">✳</span> 03 / Properties
+          </p>
+          <h2
+            class="animate-fade-in-up animation-duration-[800ms] animation-delay-[150ms] animation-fill-mode-both"
+          >
+            Motion,<br /><em>atom by atom.</em>
+          </h2>
+          <p
+            class="body animate-fade-in-up animation-duration-[800ms] animation-delay-[450ms] animation-fill-mode-both"
+          >
+            Rotation takes <b>800ms</b>. Scale takes <b>1200ms</b>. The slash
+            scopes a control to one property's slot, and Jumi assembles the CSS.
+          </p>
+          <div
+            class="stage apricot animate-fade-in animation-duration-[600ms] animation-delay-[900ms] animation-fill-mode-both"
+            style="height: 300px; margin-top: 36px"
+          >
+            <div
+              class="animate-rotate-45 animate-scale-110 animation-duration-[800ms]/rotate animation-duration-[1200ms]/scale animation-direction-alternate animation-iteration-count-infinite animation-timing-function-ease-in-out"
+              style="
+                width: 150px;
+                height: 150px;
+                border-radius: 30px;
+                background: var(--ink);
+                display: grid;
+                place-items: center;
+                color: var(--lime);
+                font:
+                  600 15px 'JetBrains Mono',
+                  monospace;
+              "
+            >
+              /rotate<br />/scale
+            </div>
+            <span class="tag">Two rhythms. One element.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 06 · Start a chain reaction ---------------------------------------------- -->
+      <section
+        class="scene"
+        data-at="40440"
+        data-until="47380"
+        data-index="06 / 08"
+      >
+        <div>
+          <p class="eyebrow animate-fade-in-down animation-duration-[600ms]">
+            <span class="cross">✳</span> 04 / Stagger
+          </p>
+          <h2
+            class="animate-fade-in-up animation-duration-[800ms] animation-delay-[150ms] animation-fill-mode-both"
+          >
+            Start a<br /><em>chain reaction.</em>
+          </h2>
+          <p
+            class="body animate-fade-in-up animation-duration-[800ms] animation-delay-[450ms] animation-fill-mode-both"
+          >
+            The parent sets the rhythm.
+            <b>Each child owns its motion.</b> Tailwind's
+            <code>*:</code> variant does the rest.
+          </p>
+          <div
+            class="exhibit animate-slide-in-up animation-duration-[700ms] animation-delay-[800ms] animation-fill-mode-both"
+            style="margin-top: 40px"
+          >
+            <pre
+              style="font-size: 23px; padding: 26px 30px"
+            >&lt;ul class="<span class="peach-t">animate-stagger-forward-[160ms]/3</span>
+          <span class="lime-t">*:animate-fade-in-up</span>"&gt;</pre>
+          </div>
+        </div>
+        <div style="display: grid; gap: 28px">
+          <div
+            class="stage lime animate-fade-in animation-duration-[500ms] animation-delay-[1200ms] animation-fill-mode-both"
+            style="height: 400px"
+          >
+            <div
+              class="bars animate-stagger-forward-[120ms]/7 *:animate-scale-y-[0.2] *:animation-duration-[1100ms] *:animation-direction-alternate *:animation-iteration-count-infinite *:animation-timing-function-ease-in-out"
+            >
+              <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            </div>
+            <span class="tag">animate-stagger-forward-[120ms]/7</span>
+          </div>
+          <div
+            class="list cue animate-stagger-forward-[160ms]/3 *:animate-fade-in-up *:animation-duration-[800ms] *:animation-fill-mode-both"
+            data-cue="2400"
+          >
+            <div>One <span>0ms</span></div>
+            <div>Two <span>160ms</span></div>
+            <div>Three <span>320ms</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 07 · Nothing to ship ------------------------------------------------------- -->
+      <section
+        class="scene"
+        data-at="47380"
+        data-until="54830"
+        data-index="07 / 08"
+        style="grid-template-columns: 0.9fr 1.1fr"
+      >
+        <div>
+          <p class="eyebrow animate-fade-in-down animation-duration-[600ms]">
+            <span class="cross">✳</span> 05 / The build
+          </p>
+          <h2
+            class="animate-fade-in-up animation-duration-[800ms] animation-delay-[150ms] animation-fill-mode-both"
+          >
+            No runtime.<br /><em>Just CSS.</em>
+          </h2>
+          <p
+            class="body animate-fade-in-up animation-duration-[800ms] animation-delay-[450ms] animation-fill-mode-both"
+          >
+            Jumi generates CSS through Tailwind <b>at build time</b>. The
+            browser's own engine runs the motion. There is nothing of Jumi to
+            download.
+          </p>
+        </div>
+        <div
+          class="grid grid-cols-2 gap-6 cue animate-stagger-forward-[220ms]/4 *:animate-zoom-in *:animation-duration-[800ms] *:animation-fill-mode-both"
+          data-cue="700"
+        >
+          <div class="stat">
+            <div class="big">0 kB</div>
+            <div class="label">
+              of JavaScript shipped<small
+                >Nothing of Jumi reaches the browser.</small
+              >
+            </div>
+          </div>
+          <div class="stat">
+            <div class="big">235</div>
+            <div class="label">
+              named effects<small>plus 395 animatable property targets.</small>
+            </div>
+          </div>
+          <div class="stat">
+            <div class="big">1</div>
+            <div class="label">
+              line to install<small
+                ><code class="lime-t">@plugin "@ibnlanre/jumi"</code>, or the
+                Vite and PostCSS entries.</small
+              >
+            </div>
+          </div>
+          <div class="stat">
+            <div class="big">MIT</div>
+            <div class="label">
+              licensed<small>Use it in anything. Nobody has to ask.</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 08 · Outro --------------------------------------------------------------- -->
+      <section
+        class="scene"
+        data-at="54830"
+        data-until="61180"
+        data-index="08 / 08"
+        style="
+          grid-template-columns: 1fr;
+          justify-items: center;
+          text-align: center;
+          align-content: center;
+          row-gap: 0;
+        "
+      >
+        <p
+          class="eyebrow animate-fade-in-down animation-duration-[600ms]"
+          style="justify-content: center"
+        >
+          <span class="cross">✳</span> Your next idea deserves to move
+        </p>
+        <h2
+          class="animate-bounce-in animation-duration-[1200ms] animation-delay-[200ms] animation-fill-mode-both"
+          style="font-size: 150px; margin-top: 30px"
+        >
+          Static is<br /><em>just the start.</em>
+        </h2>
+        <div
+          class="install animate-fade-in-up animation-duration-[800ms] animation-delay-[1500ms] animation-fill-mode-both"
+          style="margin-top: 64px"
+        >
+          pnpm add @ibnlanre/jumi <span>COPY</span>
+        </div>
+        <p
+          class="body animate-fade-in-up animation-duration-[800ms] animation-delay-[2100ms] animation-fill-mode-both"
+          style="margin-top: 44px; font-size: 24px; max-width: none"
+        >
+          jumi-css.vercel.app &nbsp;·&nbsp; github.com/ibnlanre/jumi
+          &nbsp;·&nbsp; Made by Ridwan Olanrewaju
+        </p>
+      </section>
+    </div>
+
+    <script>
+      // The cut list. A scene is `display: none` until its cue, so every Jumi animation inside it
+      // starts the moment the scene is shown, exactly as it would on a page that just loaded.
+      //
+      // Two ways to run it:
+      //   __start()  real time, for watching the page in a browser;
+      //   __seek(t)  one frame at time `t`, for the recorder. Every animation on the page is paused
+      //              and moved to where it would be at `t`, so a frame is a pure function of `t`.
+      const scenes = [...document.querySelectorAll('.scene')]
+      const index = document.getElementById('index')
+      const LEAVE = 240
+
+      window.__duration = Math.max(...scenes.map(s => Number(s.dataset.until)))
+
+      const cuesOf = scene => [...scene.querySelectorAll('[data-cue]')]
+
+      window.__start = () => {
+        for (const scene of scenes) {
+          const at = Number(scene.dataset.at)
+          const until = Number(scene.dataset.until)
+          setTimeout(() => {
+            scene.classList.add('on')
+            index.textContent = scene.dataset.index
+          }, at)
+          for (const cue of cuesOf(scene)) {
+            setTimeout(
+              () => cue.classList.add('on'),
+              at + Number(cue.dataset.cue),
+            )
+            setTimeout(() => cue.classList.remove('on'), until)
+          }
+          scene.style.transition = `opacity ${LEAVE}ms ease`
+          setTimeout(() => (scene.style.opacity = '0'), until - LEAVE)
+          setTimeout(() => scene.classList.remove('on'), until)
+        }
+      }
+
+      window.__seek = t => {
+        for (const scene of scenes) {
+          const at = Number(scene.dataset.at)
+          const until = Number(scene.dataset.until)
+          const on = t >= at && t < until
+          scene.classList.toggle('on', on)
+          if (!on) continue
+          index.textContent = scene.dataset.index
+          scene.style.opacity =
+            t >= until - LEAVE ? String(1 - (t - (until - LEAVE)) / LEAVE) : '1'
+          for (const cue of cuesOf(scene))
+            cue.classList.toggle('on', t >= at + Number(cue.dataset.cue))
+        }
+        for (const animation of document.getAnimations()) {
+          const target = animation.effect.target
+          const scene = target.closest('.scene')
+          const cue = target.closest('[data-cue]')
+          const origin = scene
+            ? Number(scene.dataset.at) + (cue ? Number(cue.dataset.cue) : 0)
+            : 0
+          animation.pause()
+          animation.currentTime = Math.max(0, t - origin)
+        }
+      }
+
+      if (!location.search.includes('manual')) {
+        document.fonts.ready.then(() => window.__start())
+      }
+    </script>
+  </body>
+</html>
